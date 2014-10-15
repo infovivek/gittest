@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="35" height="34" creationComplete="funOcc()">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Metadata>
+		//[Event("panic")]
+		[Event(name="doClick")]		
+		//[Event(name="docPrint")]
+		//[Event(name="docPrtPrw")]
+		
+	</fx:Metadata>
+	<fx:Script>
+		<![CDATA[
+			public  var Lable_Date:String="";
+			public  var Lable_Day:String="";
+			public  var Color_Day:String="";
+			public  var Bookinglevel:String="";
+			public  var BookingId:String="";
+			public  var BookingCode:String="";
+			public  var Flag:Boolean=false;
+			public  var Symbol:String="";
+			public  var BookingStatus:String="";
+			public  var CheckinFlag:Boolean=false;
+			public  var CheckoutFlag:Boolean=false;
+			public function set _BookingStatus(Val:String):void
+			{
+				BookingStatus=Val;
+			}
+			public function set _CheckinFlag(Val:Boolean):void
+			{
+				CheckinFlag=Val;
+			}
+			public function set _CheckoutFlag(Val:Boolean):void
+			{
+				CheckoutFlag=Val;
+			}
+			public function set _BookingCode(Val:String):void
+			{
+				BookingCode=Val;
+			}
+			public function set _BookingId(Val:String):void
+			{
+				BookingId=Val;
+			}
+			public function set _BookingLevel(Val:String):void
+			{
+				Bookinglevel=Val;
+			}
+			public function set _LabelToolTip(Val:String):void
+			{
+				Lable_Date=Val;
+			}
+			public function set _LabelId(Val:String):void
+			{
+				Lable_Day= Val;
+			}			
+			public function set _CheckInColor(Val:String):void
+			{
+				Brd_Status.setStyle("backgroundColor","Green");
+				//Flag=false;
+				Symbol=Val;
+			}
+			public function set _BookingColor(Val:String):void
+			{
+				Brd_Status.setStyle("backgroundColor","lime");
+				Flag=false;
+				Symbol=Val;
+			}
+			public function set _CheckOutColor(Val:String):void
+			{
+				Brd_Status.setStyle("backgroundColor","#728C00");
+				Flag=false;
+				Symbol=Val;
+			}
+			public function set _OverLapCheckin(Val:String):void
+			{
+				Brd_Status.setStyle("backgroundColor","#A74AC7");
+				Symbol="||";
+			}
+//			public function set _CheckIn(Val:String):void
+//			{
+//				Brd_Status.setStyle("backgroundColor","#B048B5");
+//				Symbol=Val;
+//			}
+//			public function set _CheckOut(Val:String):void
+//			{
+//				Brd_Status.setStyle("backgroundColor","#B048B5");
+//				Symbol=Val;
+//			}
+//			public function set _Booking(Val:String):void
+//			{
+//				Brd_Status.setStyle("backgroundColor","#B048B5");
+//				Symbol=Val;
+//			}
+			
+			public function funOcc():void
+			{
+				Grp_Status.toolTip=Lable_Date
+				Brd_Status.toolTip=Lable_Date
+				lbl_Over.text=Symbol;
+				brd_Checkin.visible= CheckinFlag;
+				brd_Checkout.visible= CheckoutFlag;
+			}
+			protected function doClick(evt:MouseEvent):void
+			{				
+				try{this.parentApplication.BookingClick(evt,BookingId,Bookinglevel,BookingCode,BookingStatus);}catch(e:Error){}
+			}
+		]]>
+	</fx:Script>
+	<s:VGroup x="0" y="0" width="100%" height="100%" verticalAlign="middle" horizontalAlign="center" id="Grp_Status">
+		<s:BorderContainer x="0" y="4" width="100%" height="50%" id="Brd_Status" borderVisible="false" backgroundColor="white"
+						   click="doClick(event)">
+			<s:Label x="2" y="6" width="35" height="20" text="||" textAlign="center" fontSize="20" id="lbl_Over" color="black" visible="true" depth="5"/>
+			<s:BorderContainer x="1" y="0" width="17" height="100%" borderVisible="false" backgroundColor="white" id="brd_Checkin">
+			</s:BorderContainer>
+			<s:BorderContainer x="19" y="0" width="17" height="100%" borderVisible="false" backgroundColor="white" id="brd_Checkout">
+			</s:BorderContainer>
+		</s:BorderContainer>
+	</s:VGroup>	
+	<mx:VRule x="-1" y="0" width="5" height="98%"/>
+	
+	<mx:VRule x="35" y="0" width="5" height="98%"/>
+	<mx:HRule x="0" y="-1" width="99%" height="5" strokeColor="#060000"/>
+	<mx:HRule x="1" y="32" width="99%" height="5" strokeColor="#060000"/>
+	
+</s:Group>

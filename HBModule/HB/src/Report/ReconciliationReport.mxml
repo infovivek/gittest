@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:WrbComp="WrbComp.*"
+			   width="100%" height="100%" creationComplete="PageLoad()"
+			   pageTitle="Reconcile  Report">
+	<fx:Declarations>
+		<s:Animate id="fader"   duration="500"   repeatBehavior="reverse"   repeatCount="0">
+			<s:SimpleMotionPath property="alpha" valueFrom="1.0" valueTo="0.0" />
+		</s:Animate>
+		<s:Animate id="fader1"  duration="0"  repeatBehavior="reverse"  repeatCount="0">
+			<s:SimpleMotionPath property="alpha" valueFrom="1.0" valueTo="0.0" />
+		</s:Animate>
+	</fx:Declarations>
+	
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
+	<fx:Script>
+		<![CDATA[ 
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = ""; 
+			public var ErrorFlag:Boolean=true; 
+			public var Id:Number=0; 
+		    protected function PageLoad():void
+			{
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";
+				useWeb("Reconcile","Report_CUSTOM",[GlobalXml,"Report",FromDate,ToDate,TransactionId,Status,0,0,'','']);
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				Grd_Popup.dataProvider=null;
+				Grd_Reconcile.dataProvider= null;
+				try
+				{
+				if (Ds_Objects.currentTarget.description.toString() == "Report_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_Reconcile.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					} 
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "ReportBorder_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Txt_TransID.text=Ds_Objects.result.Tables.Table.Rows[0].TransactionID;
+						Txt_Date.text=Ds_Objects.result.Tables.Table.Rows[0].DATE;
+						Txt_Amount.text=Ds_Objects.result.Tables.Table.Rows[0].InvoiceAmount;
+					} 
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Grd_Popup.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					} 
+				}
+				}//try end
+				catch(Exception)
+				{
+					
+				}
+			}
+			 	
+			public var 	FromDate:String="",ToDate:String="",TransactionId:String="",Status:String="";
+			public function Clear():void
+			{
+				DT_From.text="";DT_To.text="";txtTransactionID.text="";
+				Ddl_Status.selectedIndex=-1;  
+				Txt_TransID.text="";Txt_Date.text="";Txt_TransID.text="";
+			    FromDate="";ToDate="";TransactionId="";Status="";
+				PageLoad();
+			}  
+			protected function btn_Search_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				ErrorFlag=true; 
+				if(ErrorFlag==true)
+				{			
+					FromDate=DT_From.text;
+					ToDate=DT_To.text;
+					TransactionId=txtTransactionID.text;
+					Status=Ddl_Status.selectedItem;
+					if (Status==null)
+					{
+						Status='';
+					}
+					useWeb("Reconcile","Report_CUSTOM",[GlobalXml,"Report",FromDate,ToDate,TransactionId,Status,0,0,'','']);								
+				} 
+			}
+			public function FnAction(Event):void
+			{  
+				FromDate="";ToDate="";
+				brd_Popup_reset.visible=true; 
+				TransactionId=Grd_Reconcile.selectedItem.TransId;
+			 	useWeb("Reconcile","ReportBorder_CUSTOM",[GlobalXml,"ReportBorder",FromDate,ToDate,TransactionId,'',0,0,'','']);
+			}
+			public function FnClosetariff_clickHandler(event):void
+			{ 
+				brd_Popup_reset.visible=false; 
+				useWeb("Reconcile","Report_CUSTOM",[GlobalXml,"Report",'','','','',0,0,'','']);
+			}
+		]]>
+	</fx:Script>
+	<s:BorderContainer x="0" y="30" width="100%" height="84" borderVisible="false" backgroundColor="#f4efef" depth="10">
+		<s:HGroup x="0" y="0" width="100%" height="90" horizontalAlign="center" verticalAlign="middle">
+			<s:Group x="132" y="5" width="100%" height="80">
+				<mx:Label x="162" y="7" width="64" height="16" text="From Date" id="Lbl_FDT"/>
+				<mx:Label x="175" y="47" text="To Date" id="Lbl_TDT"/>
+				
+				<mx:DateField id="DT_From" x="248" y="6" width="90" formatString="DD/MM/YYYY"  tabIndex="1"
+							  yearNavigationEnabled="true" selectableRange="{{rangeEnd: new Date()}}"/>
+				<mx:DateField id="DT_To" x="248" y="46" width="90" formatString="DD/MM/YYYY"
+							  tabIndex="2" yearNavigationEnabled="true" selectableRange="{{rangeEnd: new Date()}}"/>
+				<WrbComp:Button_HB x="691" y="20" id="btn_Search" click="btn_Search_clickHandler(event)"  Lable_val="Search">
+				</WrbComp:Button_HB>
+				<WrbComp:Button_HB x="791" y="20"  click="Clear()"  Lable_val="Clear">
+				</WrbComp:Button_HB>
+				<s:Label   x="383" y="15" text="Transaction ID"/>
+				<s:Label   x="383" y="52" text="Status"/>
+				<s:TextInput id="txtTransactionID" x="495" y="7" width="139" prompt="TransactionID"/>
+				
+				<s:DropDownList id="Ddl_Status" x="495" y="48" width="139" prompt="Select Status" tabIndex="2">
+					<s:ArrayList> 
+						<fx:String>All</fx:String>
+						<fx:String>New</fx:String>
+						<fx:String>Reconciled</fx:String>
+						<fx:String>Partially Reconciled</fx:String>
+					</s:ArrayList>
+				</s:DropDownList>
+				
+			</s:Group>
+		</s:HGroup>
+	</s:BorderContainer>
+	
+	<s:BorderContainer x="10" y="130" width="100%" height="354" id="bdr_Scroll" visible="true" borderVisible="false">
+		  	<s:HGroup  width="100%" height="100%">
+				<mx:DataGrid id="Grd_Reconcile" x="10" y="150" width="98%" height="100%"  editable="false" tabIndex="3" verticalAlign="middle">
+					<mx:columns>
+						<mx:DataGridColumn dataField="Select" headerText="Select" width="50" 
+										   editable="false" visible="true">
+							<mx:itemRenderer >
+								<fx:Component>
+									<mx:HBox horizontalAlign="center" verticalAlign="middle">										
+										<mx:Image source="@Embed(source='../Assets/application_put.png')" buttonMode="true"
+												  click="outerDocument.FnAction(event)"/>
+									</mx:HBox>	
+								</fx:Component>
+							</mx:itemRenderer>
+						</mx:DataGridColumn>
+						<mx:DataGridColumn dataField="Date" headerText="Date" editable="false" width="100" textAlign="center"/>	
+						<mx:DataGridColumn dataField="TransactionId"  textAlign="center" visible="true" width="100" editable="false"/>
+						<mx:DataGridColumn dataField="Refernce" headerText="Ref. No" textAlign="center" width="100" visible="true"/>
+						<mx:DataGridColumn dataField="Amount"  width="100" editable="false" textAlign="right" visible="true"/>
+						<mx:DataGridColumn dataField="ReconcliledAmount"  width="100" editable="false" textAlign="right" visible="true"/>
+						<mx:DataGridColumn dataField="AmounttobrReconciled"  width="100" textAlign="right" editable="false" visible="true"/>
+						<mx:DataGridColumn dataField="Status"  editable="false" textAlign="center" visible="true" width="100"/>						
+						<mx:DataGridColumn dataField="ReconcilId"  textAlign="right" visible="false" editable="false" width="150" />
+						<mx:DataGridColumn dataField="TransId"  textAlign="right" visible="false"  width="150" />
+					 </mx:columns>
+				</mx:DataGrid>
+			</s:HGroup> 
+	</s:BorderContainer> 
+	<s:BorderContainer x="0" y="19" width="100%" height="474" id="brd_Popup_reset"
+					   borderVisible="true" visible="false" depth="1500">
+		<mx:Label x="23" y="71" text="TransactionId"/>
+		<mx:Label x="354" y="71" text="Date"/>
+		<s:TextInput x="116" y="71" width="163" height="18"  id="Txt_TransID" editable="false"/>
+		<s:TextInput x="406" y="71" width="163" height="18" id="Txt_Date" editable="false"/>
+		<mx:Label x="633" y="71" text="Amount"/>
+		<s:TextInput x="696" y="71" width="163" height="18" id="Txt_Amount" editable="false"/>
+		<mx:DataGrid id="Grd_Popup" x="0" y="110" width="100%" height="100%"  editable="false" tabIndex="3" verticalAlign="middle">
+			<mx:columns> 
+					<mx:DataGridColumn dataField="Invoice"  width="100" textAlign="center" editable="false" visible="true"/>
+					<mx:DataGridColumn dataField="Billtype"  editable="false" textAlign="center" visible="true" width="100"/>						
+					<mx:DataGridColumn dataField="BillAmount"  textAlign="right" visible="true" editable="false" width="150" />
+					<mx:DataGridColumn dataField="ReconciledAmount"  textAlign="right" visible="true"  width="150" />
+				    <mx:DataGridColumn dataField="ServiceCharge"  width="100" textAlign="right" editable="false" visible="true"/>
+				    <mx:DataGridColumn dataField="TDSAmount"  editable="false" textAlign="right" visible="true" width="100"/>						
+				    <mx:DataGridColumn dataField="TransId"  textAlign="right" visible="false"  width="150" />
+		  </mx:columns>
+				</mx:DataGrid>
+		<s:BorderContainer x="0" y="0" width="100%" height="36" borderVisible="true"  backgroundColor="#c2c2c2">
+			<s:Image x="950" y="11" buttonMode="true" click="FnClosetariff_clickHandler(event)"
+					 source="@Embed(source='../Assets/CrossSmall.png')" toolTip="Close"
+					 horizontalAlign="right" verticalAlign="middle"/>
+			<mx:Label x="29" y="8" text="View Reconciled Data" color="red"/> 
+		</s:BorderContainer>
+	</s:BorderContainer>
+</s:Application>

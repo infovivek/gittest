@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" 
+			   xmlns:Controls="fx.com.adobe.Controls.*"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   xmlns:WrbComp="WrbComp.*"
+			   width="100%" height="100%"
+			   creationComplete="PageLoad()"
+			   pageTitle="PettyCash Status Report">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<mx:NumberFormatter id="NF_Two" precision="2" rounding="nearest"/>
+	</fx:Declarations>
+	
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
+	<fx:Script>
+		<![CDATA[
+			
+			
+			import WrbComp.FormPrintView1;
+			import WrbComp.frmsearchwindow;
+			
+			import WrbHelpComp.HlpGridHdr;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.CalendarLayoutChangeEvent;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.events.IndexChangedEvent;
+			import mx.graphics.codec.PNGEncoder;
+			import mx.printing.*;
+			
+			import spark.events.IndexChangeEvent;
+			import spark.events.TextOperationEvent;
+			private var SearchPopUp:frmsearchwindow = new frmsearchwindow();
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "",TypeServiceId:int=0,ErrStr:String="";
+			public var Id:int=0,ErrMsg:String="",UserId:int=0,UserName:String="";
+			public var PropertyId:int=0,PropertyName:String="";
+			public var prodTotal:Number = 0;
+			public var Value_AC:ArrayCollection=new ArrayCollection();
+			public var AddMode:Boolean=true,Flag:Boolean=true;
+			public var Identity:String="";
+			
+			protected function PageLoad():void
+			{
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";
+//				SaveStatus.setButtonRights("Delete",true);
+//				SaveStatus.setButtonRights("Refresh",true);
+//				SaveStatus.setButtonRights("Save",true);
+//				SaveStatus.setButtonRights("Search",true);
+//				SaveStatus.setButtonRights("Clear",true);
+				dt_Date.selectedDate = new Date();
+				Time.setCurrTime= new TimeControl();
+				txt_Total.text="0.00";
+				useWeb("PettyCashRequiedStatus","PAGELOAD_CUSTOM",[GlobalXml,'PAGELOAD',0,Global_AC[0].UsrId]);
+				
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "PAGELOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_Status.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+					var Len:Number=0,TotAmt:Number=0;
+					var Ac_Tmp:ArrayCollection=new ArrayCollection();
+					Ac_Tmp=Grd_Status.dataProvider as ArrayCollection;				
+					txt_Total.text=="";
+					var Total:int=0;
+					for(var i:int=0;i<Ac_Tmp.length;i++)
+					{
+						Total+=Number(Ac_Tmp[i].Amount);
+					}
+					var TA:String=NF_Two.format(Total);
+					txt_Total.text=TA.replace(",","");
+					var Tmp:Number=Number(txt_Total.text)
+					txt_Total.text=NF_Two.format(Tmp);
+					
+				}
+			}
+	
+			public function clear():void
+			{
+				PageLoad();
+			}
+//			public function doPrint():void 
+//			{
+//				if(Grd_Status.dataProvider !=null)
+//				{
+//				var printJob:FlexPrintJob = new FlexPrintJob();
+//				
+//				// Start the print job.
+//				if (printJob.start()) {
+//					// Create a FormPrintView control 
+//					// as a child of the application.
+//					var thePrintView:FormPrintView1 = new FormPrintView1();
+//					addElement(thePrintView);
+//					
+//					// Set the print view properties.
+//					thePrintView.width=printJob.pageWidth;
+//					thePrintView.height=printJob.pageHeight;
+//					thePrintView.prodTotal = prodTotal;
+//					
+//					// Set the data provider of the FormPrintView 
+//					// component's DataGrid to be the data provider of 
+//					// the displayed DataGrid.
+//					thePrintView.myDataGrid.dataProvider = 
+//						Grd_Status.dataProvider;
+//					
+//					// Create a single-page image.
+//					thePrintView.showPage("single");
+//					
+//					// If the print image's DataGrid can hold all the  
+//					// data provider's rows, add the page to the print job. 
+//					if(!thePrintView.myDataGrid.validNextPage)
+//					{
+//						printJob.addObject(thePrintView);
+//					}
+//						// Otherwise, the job requires multiple pages.
+//					else
+//					{
+//						// Create the first page and add it to the print job.
+//						thePrintView.showPage("first");
+//						printJob.addObject(thePrintView);
+//						thePrintView.pageNumber++;
+//						
+//						// Loop through the following code 
+//						// until all pages are queued.
+//						while(true)
+//						{
+//							// Move the next page of data to the top of 
+//							// the PrintDataGrid.
+//							thePrintView.myDataGrid.nextPage();
+//							
+//							// Try creating a last page.
+//							thePrintView.showPage("last");  
+//							
+//							// If the page holds the remaining data, or if 
+//							// the last page was completely filled by the last  
+//							// grid data, queue it for printing.
+//							// Test if there is data for another 
+//							// PrintDataGrid page.
+//							if(!thePrintView.myDataGrid.validNextPage) 
+//							{
+//								// This is the last page; 
+//								// queue it and exit the print loop.
+//								printJob.addObject(thePrintView);
+//								break;
+//							}
+//							else
+//								// This is not the last page. Queue a middle page. 
+//							{
+//								thePrintView.showPage("middle");
+//								printJob.addObject(thePrintView);
+//								thePrintView.pageNumber++;
+//							}
+//						}
+//					}
+//					// All pages are queued; remove the FormPrintView 
+//					// control to free memory.
+//					removeElement(thePrintView);
+//				}
+//				// Send the job to the printer.
+//				printJob.send();
+//				}
+//				else
+//				{
+//					alignAlert(Alert.show("PettyCash Requested Details Required.","Message !",
+//						Alert.OK, null, null, iconErrLarge, Alert.OK),10,"");
+//				}
+//			}
+			
+		]]>
+	</fx:Script>
+	<s:VGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+		<s:BorderContainer x="12" y="19" width="100%" height="500" backgroundColor="#fbf9f9"
+						   borderVisible="false">
+			<mx:DataGrid id="Grd_Status" x="80" y="62" editable="true" width="787" height="387"  tabIndex="4">
+				<mx:columns>
+					<mx:DataGridColumn dataField="UserName" headerText="Name" width="200" editable="false"/>
+					<mx:DataGridColumn dataField="PropertyName" headerText="Property" width="300" editable="false"/>							
+					<mx:DataGridColumn dataField="Amount" headerText="Amount" width="300" editable="false"/>
+					
+				</mx:columns>
+			</mx:DataGrid>
+			<!--WrbHelpComp:HelpText x="129" y="11" width="129" pxTabIndex="1" depth="20" id="Hlp_Reportname" 
+								  onselection="{fnGetLeaveDtls()}" pxSetColumnsWidth="0,150,150"
+								  visible="false">
+			</WrbHelpComp:HelpText-->
+			<mx:Label x="626" y="470" width="35" height="16" text="Total"/>
+			<s:TextInput id="txt_Total" x="676" y="465" editable="false" prompt="Total" textAlign="right"/>
+			<mx:DateField id="dt_Date" x="270" y="29" enabled="false"/>
+			<WrbComp:TimeControl id="Time" x="385" y="24" enabled="false">
+			</WrbComp:TimeControl>
+			<mx:Label x="105" y="30" text="Petty Cash Status as on :"/>
+			<!--mx:Button x="767" y="24" height="30" label="Print" click="doPrint()"/-->
+			</s:BorderContainer>
+		</s:VGroup>
+</s:Application>

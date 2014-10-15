@@ -1,0 +1,714 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   xmlns:WrbComp="WrbComp.*"
+			   width="100%" height="100%" creationComplete="PageLoad()">
+	<fx:Declarations>
+		<s:Animate id="fader"
+				   duration="500"
+				   repeatBehavior="reverse"
+				   repeatCount="0">
+			<s:SimpleMotionPath property="alpha"
+								valueFrom="1.0" valueTo="0.0" />
+		</s:Animate>
+		<s:Animate id="fader1"
+				   duration="0"
+				   repeatBehavior="reverse"
+				   repeatCount="0">
+			<s:SimpleMotionPath property="alpha"
+								valueFrom="1.0" valueTo="0.0" />
+		</s:Animate>
+	</fx:Declarations>
+	<fx:Style source="..\\Common\\ApplicationCSS.css" />
+	<fx:Script source="..\\Common\\CommonScript.as" />
+	<fx:Script source="..\\Common\\Functions.as"/>
+	<fx:Script>
+		<![CDATA[
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "";
+			public var Ac:ArrayCollection=new ArrayCollection();
+			public var ErrorFlag:Boolean=true;
+			public var PropertyId:Number=0;
+			public var Help_AC:ArrayCollection=new ArrayCollection();
+			public var Id:Number=0;
+			//Image Upload
+			private var fileRef:FileReference = new FileReference();
+			private var fileTypes:Array = new Array();
+			
+			/* URL of the file to download. */
+			private var FILE_URL:String = "";			
+			private var urlReq:URLRequest;			
+			public var uploadURL:URLRequest = new URLRequest();
+			
+			//setup the filters (types of files to be browsed)
+			
+			private var imageTypes:FileFilter = new FileFilter("Images (*.jpg; *.jpeg; *.gif; *.png)" ,"*.jpg; *.jpeg; *.gif; *.png");
+			private var documentTypes:FileFilter = new FileFilter("Documents (*.pdf), (*.doc),(*.docx), (*.rtf), (*.txt)",("*.pdf; *.doc;*.docx; *.rtf, *.txt"));
+			
+			private function PageLoad():void
+			{
+				Global_AC = funLoginInfo("<gScrId>1</gScrId><gUsrFk>1</gUsrFk>");				
+				GlobalXml = "";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";		
+				Grp_Submit.visible=false;
+				Help_AC = new ArrayCollection();
+				var Help_AC1:ArrayCollection = new ArrayCollection();
+				Grd_Vendor.dataProvider=Help_AC;
+				Grd_FinalAdjustment.dataProvider=Help_AC1;
+				txt_TotalPOAmount.enabled=false;
+				help();	
+				init();
+			}
+			private function help():void
+			{				
+				useWeb("MapPOAndVendor","Property_CUSTOM", [GlobalXml, "Property",0, "","","",0]);
+				
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "Property_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						hlp_Property.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+					else
+					{
+						Help_AC=new ArrayCollection();
+						hlp_Property.dataProvider=Help_AC;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "POSerch_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_Vendor.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+					else
+					{
+						Help_AC=new ArrayCollection();
+						Grd_Vendor.dataProvider=Help_AC;
+						Clear();
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				{
+					useWeb("MapPOAndVendor","POSerch_CUSTOM", [GlobalXml,"POSerch",PropertyId,DT_From.text,DT_To.text,"",0]);
+					
+					Id=Ds_Objects.result.Tables.Table.Rows[0].MapPOAndVendorPaymentHdrId
+					if(FilePath.text!="")
+					{
+						init();	
+						uploadFiles();
+					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						hlp_Property.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+					else
+					{
+						Help_AC=new ArrayCollection();
+						hlp_Property.dataProvider=Help_AC;
+					}
+					alignAlert(Alert.show("PO Mapped Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+					PaymentClear();
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "ImageUpload_CUSTOM")
+				{
+					Id=0;
+				}
+				
+			}
+			public function Clear():void
+			{
+				DT_From.text="";
+				DT_To.text="";
+				Help_AC = new ArrayCollection();
+				Grd_Vendor.dataProvider=Help_AC;				
+				var Help_AC1:ArrayCollection = new ArrayCollection();
+				Grd_FinalAdjustment.dataProvider=Help_AC1;
+				hlp_Property.text="";
+				PropertyId=0;
+				Chk_Selectall.selected=false;
+				txt_ImageName.text="";
+				txt_InvoiceAmount.text="";
+				txt_InvoiceNo.text="";
+				txt_TotalPOAmount.text="";
+				Grp_Submit.visible=false;
+				DT_InvoiceDate.text="";
+				Lbl_ErrorGrid.visible=false;
+				Change('Lbl_ErrorGrid');
+				
+			}
+			public function PaymentClear():void
+			{
+				var Help_AC1:ArrayCollection = new ArrayCollection();
+				Grd_FinalAdjustment.dataProvider=Help_AC1;
+				Chk_Selectall.selected=false;
+				txt_ImageName.text="";
+				txt_InvoiceAmount.text="";
+				txt_InvoiceNo.text="";
+				txt_TotalPOAmount.text="";
+				Grp_Submit.visible=false;
+				DT_InvoiceDate.text="";
+				Lbl_ErrorGrid.visible=false;
+				FilePath.text="";
+				Change('Lbl_ErrorGrid');
+			}
+			public function FnSelect(Event):void
+			{ 
+				Ac=Grd_Vendor.dataProvider as ArrayCollection;				
+				var Index:int=Grd_Vendor.selectedIndex;
+				var Flag:Boolean=true;
+				
+				if(Ac[Index].checks==1)
+				{
+					Ac[Index].checks=false;
+				}
+				else if(Ac[Index].checks==0)
+				{
+					Ac[Index].checks=true;
+				}
+				var flage:Boolean=true;
+				var TempArr:ArrayCollection=new ArrayCollection();
+				TempArr=Grd_Vendor.dataProvider as ArrayCollection;
+				
+				for(var i:int=0;i<TempArr.length;i++)
+				{
+					if(TempArr[i].checks==false)
+					{
+						flage=false;
+					}
+				}
+				Chk_Selectall.selected=flage;
+				
+				Change('Lbl_ErrorGrid');
+				Lbl_ErrorGrid.visible=false;
+			}	
+			protected function Chk_Selectall_changeHandler(event:Event):void
+			{
+				Change('Lbl_ErrorGrid');
+				Lbl_ErrorGrid.visible=false;
+				
+				var TempArr:ArrayCollection=new ArrayCollection();
+				TempArr=Grd_Vendor.dataProvider as ArrayCollection;
+				if(TempArr!=null)
+				{
+					for(var i:int=0;i<TempArr.length;i++)
+					{
+						TempArr[i].checks=Chk_Selectall.selected;
+					}
+					Grd_Vendor.dataProvider=TempArr;
+				}				
+				
+			}
+			public function Search():void
+			{			
+				ErrorFlag=true;
+				Change('Lbl_ErrorGrid');
+				Lbl_ErrorGrid.visible=false;
+				if(hlp_Property.text=="")
+				{
+					fader.target=Lbl_Vendor;				
+					fader.play();					
+					Lbl_Vendor.setStyle("color","red");					
+					ErrorFlag=false;
+				}
+				if(DT_From.text=="")
+				{
+					fader.target=Lbl_FDT;				
+					fader.play();
+					Lbl_FDT.setStyle("color","red");
+					ErrorFlag=false;
+				}
+				if(DT_To.text=="")
+				{
+					fader.target=Lbl_TDT;				
+					fader.play();
+					Lbl_TDT.setStyle("color","red");
+					ErrorFlag=false;
+				}
+				if(ErrorFlag==true)
+				{					
+					useWeb("MapPOAndVendor","POSerch_CUSTOM", [GlobalXml,"POSerch",PropertyId,DT_From.text,DT_To.text,"",0]);									
+				}
+			}
+			public function Change(LabelName:String):void
+			{
+				
+				fader1.target=this[LabelName];				
+				fader1.play();					
+				this[LabelName].setStyle("color","#565454");
+				if(LabelName=="Lbl_InvoiceAmount")
+				{
+					if(Number(txt_InvoiceAmount.text)>Number(txt_TotalPOAmount.text))
+					{
+						Lbl_ErrorAmount.visible=true;
+						fader.target=Lbl_ErrorAmount;				
+						fader.play();
+						Lbl_ErrorAmount.setStyle("color","red");
+						ErrorFlag=false;
+						
+					}
+					else
+					{
+						Lbl_ErrorAmount.visible=false;
+						Change('Lbl_ErrorAmount');
+					}
+				}
+				
+				
+			}
+			public function fnGetProperty():void
+			{
+				if(hlp_Property.selected())
+				{
+					hlp_Property.text=hlp_Property.Select_Row.PropertyName
+					PropertyId=hlp_Property.Select_Row.ZId
+					DT_From.setFocus();					
+					Change('Lbl_Vendor');	
+					Change('Lbl_ErrorGrid');
+					Lbl_ErrorGrid.visible=false;
+				}
+				else
+				{
+					hlp_Property.text="";
+					PropertyId=0;
+					
+				}
+			}
+			public function DeleteGrid(event:Event):void
+			{
+				var PCId:int=0;
+				PCId=Grd_FinalAdjustment.selectedIndex				
+				var Temp_Ac:ArrayCollection=new ArrayCollection();
+				var Temp_Ac1:ArrayCollection=new ArrayCollection();
+				var Total_Amount:Number=0;
+				
+				//Total_Amount=Number(txt_TotalPOAmount.text);
+				
+				Temp_Ac1=Grd_FinalAdjustment.dataProvider as ArrayCollection;
+				//Temp_Ac=Grd_Vendor.dataProvider as ArrayCollection;		
+				//txt_TotalPOAmount.text=String(Total_Amount-Number(Temp_Ac1[PCId].POAmount));
+				
+				//Temp_Ac.addItemAt(Temp_Ac1[PCId],Temp_Ac.length);
+				Temp_Ac1.removeItemAt(PCId);
+				
+				for(var i:Number=0;i<Temp_Ac1.length;i++)
+				{
+					Total_Amount+=Number(Temp_Ac1[i].POAmount)-Number(Temp_Ac1[i].Adjustment);
+				}
+				txt_TotalPOAmount.text=String(Total_Amount);
+				
+				//Grd_Vendor.dataProvider=Temp_Ac;
+				Grd_FinalAdjustment.dataProvider=Temp_Ac1;
+			}
+			
+			protected function label3_clickHandler(event:MouseEvent):void
+			{
+				Grp_Submit.visible=false;
+				
+			}
+			
+			protected function button_hb1_clickHandler(event:MouseEvent):void
+			{
+				var Temp_Ac:ArrayCollection=new ArrayCollection();
+				var Temp_Ac1:ArrayCollection=new ArrayCollection();				
+				var Total_Amount:Number=0;
+				Grd_FinalAdjustment.dataProvider=Temp_Ac1;
+				Temp_Ac=Grd_Vendor.dataProvider as ArrayCollection;
+				if((Temp_Ac.length==0)||(Temp_Ac==null))
+				{
+					Lbl_ErrorGrid.text="This Is An Invalid Process";
+					Lbl_ErrorGrid.setStyle("color","red");
+					fader.target=Lbl_ErrorGrid;				
+					fader.play();
+					Lbl_ErrorGrid.visible=true;
+				}
+				else
+				{
+					Lbl_ErrorGrid.visible=false;
+					Change('Lbl_ErrorGrid');	
+					
+					for(var i:Number=0;i<Temp_Ac.length;i++)
+					{
+						if(Temp_Ac[i].checks==1)
+						{
+							//Temp_Ac[i].checks=0;
+							Temp_Ac[i].Adjustment=0;
+							Temp_Ac1.addItemAt(Temp_Ac[i],Temp_Ac1.length);						
+							Total_Amount+=Number(Temp_Ac[i].POAmount);
+							//Temp_Ac.removeItemAt(i);
+							
+						}					
+					}
+					if((Temp_Ac1.length==0)||(Temp_Ac1==null))
+					{
+						Lbl_ErrorGrid.text="Please Select Any PO";
+						Lbl_ErrorGrid.setStyle("color","red");
+						fader.target=Lbl_ErrorGrid;				
+						fader.play();
+						Lbl_ErrorGrid.visible=true;
+					}
+					else
+					{
+						Lbl_ErrorGrid.visible=false;
+						Change('Lbl_ErrorGrid');
+						
+						Grd_FinalAdjustment.dataProvider=Temp_Ac1;
+						//Grd_Vendor.dataProvider=Temp_Ac;
+						Grp_Submit.visible=true;
+						txt_TotalPOAmount.text=String(Total_Amount);
+					}
+					
+				}
+				
+			}			
+			protected function Grd_FinalAdjustment_focusOutHandler(event:FocusEvent):void
+			{
+				var Temp_Ac1:ArrayCollection=new ArrayCollection();
+				var Total_Amount:Number=0;
+				Temp_Ac1=Grd_FinalAdjustment.dataProvider as ArrayCollection;				
+				for(var i:Number=0;i<Temp_Ac1.length;i++)
+				{
+					Total_Amount+=Number(Temp_Ac1[i].POAmount)-Number(Temp_Ac1[i].Adjustment);
+				}
+				txt_TotalPOAmount.text=String(Total_Amount);
+			}
+			public function Save():void
+			{
+				ErrorFlag=true;				
+				if(txt_InvoiceAmount.text=="")
+				{
+					fader.target=Lbl_InvoiceAmount;				
+					fader.play();					
+					Lbl_InvoiceAmount.setStyle("color","red");					
+					ErrorFlag=false;
+				}
+				if(DT_InvoiceDate.text=="")
+				{
+					fader.target=Lbl_InvoiceDate;				
+					fader.play();
+					Lbl_InvoiceDate.setStyle("color","red");
+					ErrorFlag=false;
+				}
+				if(txt_InvoiceNo.text=="")
+				{
+					fader.target=Lbl_InvoiceNo;				
+					fader.play();
+					Lbl_InvoiceNo.setStyle("color","red");
+					ErrorFlag=false;
+				}
+				if(FilePath.text=="")
+				{
+					fader.target=LBL_FilePath;				
+					fader.play();
+					LBL_FilePath.setStyle("color","red");
+					ErrorFlag=false;
+				}
+				else
+				{
+					Change('LBL_FilePath')
+				}
+				
+				if(Number(txt_InvoiceAmount.text)>Number(txt_TotalPOAmount.text))
+				{
+					Lbl_ErrorAmount.visible=true;
+					fader.target=Lbl_ErrorAmount;				
+					fader.play();
+					Lbl_ErrorAmount.setStyle("color","red");
+					ErrorFlag=false;
+					
+				}
+				else
+				{
+					Lbl_ErrorAmount.visible=false;
+					Change('Lbl_ErrorAmount');
+				}
+				if(ErrorFlag==true)
+				{	
+					var Temp_AC:ArrayCollection = new ArrayCollection();
+					Temp_AC=Grd_FinalAdjustment.dataProvider as ArrayCollection;
+					var Rem_Val:Number=0;
+					Rem_Val=Number(txt_InvoiceAmount.text)
+					for(var i:int=0;i<Temp_AC.length;i++)
+					{
+						
+						if(Number(Temp_AC[i].POAmount)<=Rem_Val)
+						{
+							Temp_AC[i].Adjustment=Temp_AC[i].POAmount;
+							Rem_Val=Rem_Val-Number(Temp_AC[i].POAmount);
+						}
+						else
+						{
+							Temp_AC[i].Adjustment=Rem_Val;
+							Rem_Val=0;
+							
+						}
+						
+					}
+					
+					var Ac:ArrayCollection=new ArrayCollection
+						([{
+							InvoiceAmount:txt_InvoiceAmount.text,
+							InvoiceDate:DT_InvoiceDate.text,
+							InvoiceNo:txt_InvoiceNo.text,
+							Property:hlp_Property.text,
+							PropertyId:PropertyId,
+							TotalPOAmount:txt_TotalPOAmount.text,							
+							Id:Id
+						}]);
+					var HdrXml:String="";					
+					HdrXml += ObjToXmlStr_Comm(Ac,"HdrXml")					
+					
+					
+					
+					
+					var DtlsXml:String="";
+					DtlsXml += "<ROOT>";
+					DtlsXml += ObjToXmlStr_Comm(Temp_AC ,"DtlsXml")
+					DtlsXml += "</ROOT>";
+					
+					useWeb("MapPOAndVendor","Save_CUSTOM", [GlobalXml,HdrXml,DtlsXml]);									
+				}
+			}
+			//IMAGE UPLOAD
+			public var ImageFormat:String="";			
+			public function init():void
+			{
+				// This URL should be replaced with your server side URL
+				//				var browserUrl:String = ExternalInterface.call("eval", "window.location.href");
+				//				var arr:Array =browserUrl.split("/");
+				ImageFormat=FilePath.text;				
+				uploadURL.url = "http://sstage.in/MapPOAndVendor.php?id="+hlp_Property.text+Id+"&pid="+Id+"&imgcount="+0+"&imgformat="+Id;
+				uploadURL.method = "POST"; // OR "POST" as you need it
+				uploadURL.contentType = "multipart/form-data";				
+				// Event Listeners for UI Buttons (Upload/Browse)
+				
+				Filedata.addEventListener(MouseEvent.CLICK, browseFiles);
+				uploadbutton.addEventListener(MouseEvent.CLICK,uploadFiles);
+				fileRef.addEventListener(Event.SELECT, selectHandler);
+				
+				
+			}			
+			//Browse for files			
+			private function browseFiles(event:Event):void
+			{
+				fileTypes.push(imageTypes);
+				fileTypes.push(documentTypes);
+				fileRef.browse(fileTypes);				
+			}
+			
+			// called after user selects a file form the browse window.			
+			private function selectHandler(event:Event):void
+			{
+				FilePath.text = event.currentTarget.name.toString();
+				ImageFormat=FilePath.text;	
+			}	
+			
+			// called when user clicks on the Upload button to upload the file			
+			private function uploadFiles():void
+			{
+				fileRef.addEventListener(Event.COMPLETE, completeHandler);
+				fileRef.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA,dataHandler);
+				fileRef.addEventListener(SecurityErrorEvent.SECURITY_ERROR,securityErrorHandler);
+				fileRef.addEventListener(HTTPStatusEvent.HTTP_STATUS,httpStatusHandler);
+				fileRef.addEventListener(IOErrorEvent.IO_ERROR,ioErrorHandler);
+				fileRef.upload(uploadURL);
+			}
+			
+			// called after a file is uploaded			
+			private function completeHandler(event:Event):void
+			{
+				//Alert.show("File Uploaded successfully");				
+			}
+			
+			//called after file upload is done and Data has been returned from Server			
+			private function dataHandler(event:DataEvent):void
+			{
+				//Alert.show("File Uploaded successfully");	
+				var ImageFlage:Boolean=true;
+				resultsTxtField.text = event.data.toString();
+				var Err_Image:String=resultsTxtField.text;
+				var Fatal:String=Err_Image.substr(8,18);
+				if(Fatal=="b>Fatal error</b>:")
+				{
+					ImageFlage=false;
+					alignAlert(Alert.show("There was an error uploading the file, please try again!","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+				}
+				if(resultsTxtField.text=="There was an error uploading the file, please try again!")
+				{
+					ImageFlage=false;
+					alignAlert(Alert.show(resultsTxtField.text,"Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+				}				
+				if(ImageFlage==true)
+				{					
+					useWeb("MapPOAndVendor","ImageUpload_CUSTOM",[GlobalXml,'IMAGEUPLOAD',0,"","","http://sstage.in/MapPOAndVendor_Files/"+resultsTxtField.text,Id]);
+					
+				}
+			}
+			
+			// called if there is an error detected by flash player browsing or uploading a file
+			
+			private function ioErrorHandler(event:IOErrorEvent):void
+			{
+				mx.controls.Alert.show(String(event),"ioError",0);
+			}
+			// called if a security error
+			
+			private function securityErrorHandler(event:SecurityErrorEvent):void
+			{
+				mx.controls.Alert.show(String(event),"Security Error",0);
+			}
+			// server will return an http status code, code 200 means all is good
+			
+			private function httpStatusHandler(event:HTTPStatusEvent):void
+			{
+				if (event.status != 200)
+				{
+					mx.controls.Alert.show(String(event),"Error",0);
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	<s:BorderContainer x="0" y="0" width="100%" height="69" borderVisible="false" backgroundColor="#f4efef" depth="10">
+		<s:HGroup x="0" y="0" width="100%" height="90%" horizontalAlign="center" verticalAlign="middle">
+			<s:Group x="75" y="14" width="806" height="34">
+				<mx:Label x="15" y="8" text="Vendor" id="Lbl_Vendor"/>
+				<mx:Label id="Lbl_Vendor0" x="57" y="2" width="13" text="*" color="red" fontSize="16"/>
+				<mx:Label id="Lbl_Vendor1" x="372" y="2" width="13" text="*" color="red" fontSize="16"/>
+				<mx:Label id="Lbl_Vendor2" x="551" y="2" width="13" text="*" color="red" fontSize="16"/>
+				<mx:Label x="312" y="8" width="65" height="16" text="From Date" id="Lbl_FDT"/>
+				<mx:Label x="505" y="8" text="To Date" id="Lbl_TDT"/>
+				<WrbHelpComp:HelpText x="77" y="8.5" width="214" id="hlp_Property" pxSetPrompt="Vendor" pxTabIndex="1"
+									  pxSetColumnsWidth="300,0" onselection="{fnGetProperty()}">
+				</WrbHelpComp:HelpText>
+				<mx:DateField x="393" y="7" id="DT_From" tabIndex="2" change="Change('Lbl_FDT')" formatString="DD/MM/YYYY"/>
+				<mx:DateField x="571" y="7" id="DT_To" tabIndex="3" change="Change('Lbl_TDT')" formatString="DD/MM/YYYY"/>
+				<s:Image x="683" y="-9" source="assets/a1.png" toolTip="Search" click="Search()" tabIndex="5"/>
+				<s:Image x="757" y="-9" source="assets/dust_bin1.png" toolTip="Clear" click="Clear()"/>
+			</s:Group>
+		</s:HGroup>
+	</s:BorderContainer>
+	<s:VGroup x="0" y="70" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle" depth="5">
+		<s:Spacer width="10" height="2"/>
+		<s:Group x="28" y="14" width="860" height="34">
+			<s:CheckBox x="8" y="9" label="Select All" id="Chk_Selectall" change="Chk_Selectall_changeHandler(event)" tabIndex="6"/>
+			<WrbComp:Button_HB x="741" y="2" _Label="Add" click="button_hb1_clickHandler(event)">
+			</WrbComp:Button_HB>
+			<mx:Label x="358" y="7" text="This Is An Invalid Process."  id="Lbl_ErrorGrid" color="red" visible="false"/>
+		</s:Group>
+		
+		<s:VGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+			<mx:DataGrid id="Grd_Vendor" width="900" height="100%" depth="1" editable="true"
+						 tabIndex="93" verticalAlign="middle"  >
+				<mx:columns>
+					<mx:DataGridColumn dataField="checks" headerText="Select" width="50" editable="false"  >
+						<mx:itemRenderer >
+							<fx:Component>
+								<mx:HBox horizontalAlign="center" verticalAlign="middle">
+									<mx:CheckBox selected="{data.checks}"  
+												 change="outerDocument.FnSelect(event);"	/>
+								</mx:HBox>	
+							</fx:Component>
+						</mx:itemRenderer>
+					</mx:DataGridColumn>
+					<mx:DataGridColumn dataField="PONo" headerText="PO No" editable="false" width="100" textAlign="left"/>
+					<mx:DataGridColumn dataField="GuestName" headerText="Guest Name" textAlign="left" editable="false" width="150" />						
+					<mx:DataGridColumn dataField="StayDuration" headerText="Stay Duration" textAlign="left" editable="false"   width="130" />
+					<mx:DataGridColumn dataField="BookingCode" headerText="BookingCode" textAlign="left" visible="true" width="80" editable="false"/>
+					<mx:DataGridColumn dataField="POAmount" headerText="PO Amount"  width="100" textAlign="right" editable="false" visible="true"/>
+					<mx:DataGridColumn dataField="BillAmount" headerText="Bill Amount"  width="100" editable="false" textAlign="right" visible="true"/>
+					<mx:DataGridColumn dataField="Adjustment"   width="0" editable="false" visible="false"/>
+					<mx:DataGridColumn dataField="CheckOutId"  width="0" editable="false" visible="false"/>
+					<mx:DataGridColumn dataField="BookingId"  width="0" editable="false" visible="false"/>
+					<mx:DataGridColumn dataField="MapPOAndVendorPaymentDtlsId"  width="0" editable="false" visible="false"/>					
+					<mx:DataGridColumn dataField="Id"  width="0" editable="false" visible="false"/>
+				</mx:columns>
+			</mx:DataGrid>
+		</s:VGroup>
+	</s:VGroup>	
+	<s:BorderContainer x="0" y="70" width="100%" height="100%" depth="7" id="Grp_Submit" visible="true" borderVisible="false">
+		<s:HGroup x="0" y="30" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle"
+				  depth="5" >
+			<s:VGroup width="70%" height="100%">
+				<mx:DataGrid id="Grd_FinalAdjustment" width="100%" height="100%" depth="1" editable="true"
+							 tabIndex="93" verticalAlign="middle" focusOut="Grd_FinalAdjustment_focusOutHandler(event)"  >
+					<mx:columns>
+						<mx:DataGridColumn dataField="checks" headerText="Delete" width="50" editable="false"  >
+							<mx:itemRenderer >
+								<fx:Component>
+									<mx:HBox horizontalAlign="center" verticalAlign="middle">										
+										<mx:Image source="@Embed(source='../Assets/delete.png')" buttonMode="true"
+												  click="outerDocument.DeleteGrid(event)"/>									
+									</mx:HBox>
+								</fx:Component>
+							</mx:itemRenderer>
+						</mx:DataGridColumn>
+						<mx:DataGridColumn dataField="PONo" headerText="PO No" editable="false" width="120" textAlign="center"/>	
+						<mx:DataGridColumn dataField="BookingCode" headerText="BookingCode" textAlign="left" visible="true" width="80" editable="false"/>
+						<mx:DataGridColumn dataField="BillAmount" headerText="Bill Amount"  width="80" editable="false" textAlign="left" visible="true"/>
+						<mx:DataGridColumn dataField="POAmount" headerText="PO Amount"  width="80" textAlign="right" editable="false" visible="true"/>
+						<mx:DataGridColumn dataField="Adjustment"   editable="true" textAlign="right" visible="false" width="0"/>						
+						<mx:DataGridColumn dataField="GuestName" headerText="Guest Name" textAlign="left" visible="false" editable="false" width="0" />							
+						<mx:DataGridColumn dataField="StayDuration" headerText="Stay Duration" textAlign="left" editable="false"  visible="false"   width="0" />
+						<mx:DataGridColumn dataField="MapPOAndVendorPaymentDtlsId"  width="0" editable="false" visible="false"/>
+						<mx:DataGridColumn dataField="CheckOutId"  width="0" editable="false" visible="false"/>
+						<mx:DataGridColumn dataField="BookingId"  width="0" editable="false" visible="false"/>
+						<mx:DataGridColumn dataField="Id"  width="0" editable="false" visible="false"/>
+					</mx:columns>
+				</mx:DataGrid>
+			</s:VGroup>
+			<s:Group width="50%" height="100%"> 
+				<mx:Label x="35" y="31" text="Invoice No" id="Lbl_InvoiceNo"/>
+				<mx:Label x="35" y="75" text="Invoice Date" id="Lbl_InvoiceDate"/>
+				<mx:Label x="35" y="119" text="Invoice Amount" id="Lbl_InvoiceAmount"/>
+				<mx:Label x="35" y="163" text="Total POAmount " />
+				<mx:Label x="35" y="207" text="Invoice Copy" id="LBL_FilePath"/>
+				<s:TextInput x="150" y="31.5" width="200" tabIndex="10" id="txt_InvoiceNo" focusOut="Change('Lbl_InvoiceNo')" prompt="Invoice No" textAlign="left"/>
+				<s:TextInput x="150" y="119.5" width="200" tabIndex="12" id="txt_InvoiceAmount" restrict="0-9" 
+							 focusOut="Change('Lbl_InvoiceAmount')" prompt="Invoice Amount" textAlign="right"/>
+				<s:TextInput x="150" y="163.5" width="200" tabIndex="13" id="txt_TotalPOAmount" prompt="Total PO Amount" textAlign="right" />
+				<mx:DateField x="151" y="74" id="DT_InvoiceDate" tabIndex="11" change="Change('Lbl_InvoiceDate')" formatString="DD/MM/YYYY"/>
+				<s:BorderContainer x="35" y="230" width="335" height="73" id="Brd_imageUpload" visible="true" borderVisible="false"
+								   backgroundColor="#fbf9f9" cornerRadius="5" >
+					<mx:Panel x="22" y="4" title="Acknowledgement Copy">
+						<mx:ControlBar>
+							<mx:Spacer width="80%"/>
+							<mx:HBox>
+								<mx:TextInput id="FilePath" width="150"  visible="true" focusOut="Change('LBL_FilePath')"/>
+								<mx:Button id="Filedata" label="Browse File" name="Filedata" />
+								<mx:Button label="UpLoad File" name="uploadbutton" id="uploadbutton" visible="false" width="0" />
+							</mx:HBox>
+							<mx:TextArea id="resultsTxtField"  width="0"  name="resultsTxtField" visible="false"/>
+						</mx:ControlBar>
+					</mx:Panel>
+					<mx:Button id="downloadBtn1" x="247" y="172" height="40" label="Download"
+							   visible="false"/>
+					<s:TextInput x="37" y="172" width="189" height="40" id="txt_ImageName" enabled="false" visible="false"/>		
+					
+					<WrbComp:Button_HB x="339" y="172" height="40" _Label="Close" click="{Brd_imageUpload.visible=false;}" visible="false"/>
+					<WrbComp:Button_HB id="downloadBtn" x="247" y="172" height="40" _Label="Download"
+									   visible="false"/>
+				</s:BorderContainer>
+				<WrbComp:Button_HB x="150.5" y="348" width="104" _Label="Map Invoice" click="Save()">
+				</WrbComp:Button_HB>
+				<mx:Label id="Lbl_Vendor3" x="96" y="27" width="13" text="*" color="red" fontSize="16"/>
+				<mx:Label id="Lbl_Vendor4" x="106" y="69" width="13" text="*" color="red" fontSize="16"/>
+				<mx:Label id="Lbl_Vendor5" x="122" y="114" width="13" text="*" color="red" fontSize="16"/>
+				<mx:Label id="Lbl_Vendor6" x="109" y="203" width="13" text="*" color="red" fontSize="16"/>
+			</s:Group>
+		</s:HGroup>
+		<s:HGroup x="0" y="0" width="100%" height="30" horizontalAlign="right" verticalAlign="middle" depth="5" >
+			
+			<mx:Label x="358" y="7" text="Invoice Amount Not Greater Than PO Amount"  id="Lbl_ErrorAmount" color="red" visible="false"/>
+			<s:Spacer width="70" height="10"/>
+			<mx:Label x="910" y="2" width="43" color="red" fontSize="20" text="X" textAlign="center" toolTip="Close" click="label3_clickHandler(event)"/>
+		</s:HGroup>
+	</s:BorderContainer>	
+</s:Application>

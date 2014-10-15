@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:Controls="fx.com.adobe.Controls.*"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   xmlns:ns1="*"
+			   xmlns:WrbComp="WrbComp.*"
+			   width="905" height="498" minWidth="955" minHeight="600" creationComplete="PageLoad()"
+			   fontSize="17" fontWeight="bold">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Style source = "..\\Common\\ApplicationCSS.css"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	<fx:Script>
+		<![CDATA[
+			import WrbComp.frmsearchwindow;
+			
+			import WrbHelpComp.HlpGridHdr;
+			
+			import mx.controls.Alert;
+			import mx.controls.Text;
+			import mx.events.CalendarLayoutChangeEvent;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			
+			import spark.components.calendarClasses.DateSelectorDisplayMode;
+			import spark.events.IndexChangeEvent;
+			import spark.events.TextOperationEvent;
+			public var HdrAC:ArrayCollection=new ArrayCollection();
+			public var DtlsAC:ArrayCollection=new ArrayCollection();
+			public var SearchPopUp:frmsearchwindow = new frmsearchwindow();
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "";
+			public var Markflag:Boolean=false;
+			public var Id:int=0,Type:String="",TypeId:int=0,ModuleId:int=0,ModuleName:String="",OrderId:int=0;
+			public var ErrStr:String="",Flag:Boolean=true,addmode:Boolean=true;
+			protected function PageLoad():void
+			{
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>"; 
+				Help();
+				txtScreenName.setFocus();
+				
+				//dt_Date.text==Ds_Objects.result.Tables.Table.Rows[0].CreatedDate
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "PAGELOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						//dt_Date=
+						//dt_Date.text=Ds_Objects.result.Tables.Table.Rows[0].CreatedDate;
+						//txtorderid.text=Ds_Objects.result.Tables.Table.Rows[0].orderid;
+						
+					}
+					if(Ds_Objects.result.Tables.Table2.Rows.length > 0)
+					{
+						
+						drp_module.dataProvider=Ds_Objects.result.Tables.Table2.Rows  as ArrayCollection;
+						//ModuleId=Ds_Objects.result.Tables.Table.Rows[0].ModuleId;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				{
+					if (Id == 0)
+					{
+						alignAlert(Alert.show("Saved Successfully."));
+					}
+					else
+					{
+						alignAlert(Alert.show("Updated Successfully."));
+					}
+					Clear();
+					Help();
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Search_CUSTOM")
+				{		
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Id=Ds_Objects.result.Tables.Table.Rows[0].Id;
+						txtScreenName.text=Ds_Objects.result.Tables.Table.Rows[0].ScreenName;
+						ModuleId=Ds_Objects.result.Tables.Table.Rows[0].ModuleId;
+						ModuleName=Ds_Objects.result.Tables.Table.Rows[0].ModuleName;
+						txtorderid.text=Ds_Objects.result.Tables.Table.Rows[0].OrderId;
+					//	txtsubmodulename.text=Ds_Objects.result.Tables.Table.Rows[0].SubModuleName;
+						txtswf.text=Ds_Objects.result.Tables.Table.Rows[0].SWF;
+						drp_module.visible=true;
+						lblmodulename.visible=true;
+						star3.visible=true;
+						drp_module.prompt=Ds_Objects.result.Tables.Table.Rows[0].ModuleName;
+						//PageLoad();
+					}
+				}
+				if(Ds_Objects.currentTarget.description.toString() == "Delete_CUSTOM")
+				{
+					alignAlert(Alert.show("Deleted Successfully."));
+					Clear();
+				}
+			}
+			public function Help():void
+			{  
+				useWeb("ScreenMaster","PAGELOAD_CUSTOM",[GlobalXml,"PAGELOAD",0]);
+			}
+			protected function Save():void
+			{ 
+				ErrStr=validation();
+				if(ErrStr !="")
+				{
+					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10,"");
+					return;
+				} 
+				else
+				{
+					if(drp_type.selectedIndex == 0)
+					{
+					var Ac:ArrayCollection=new ArrayCollection
+						([{
+							ScreenName:txtScreenName.text,
+							ModuleName:drp_module.selectedItem.label,
+							ModuleId:ModuleId,
+							SWF:txtswf.text, 
+							OrderId:txtorderid.text,
+							Id:Id
+						//	ModuleName:drp_module.selectedItem,
+						//	SubModuleName:txtsubmodulename.text,
+						}]);
+					var HdrXml:String = ObjToXmlStr_Comm(Ac,"HdrXml")
+					useWeb("ScreenMaster","Save_CUSTOM",[GlobalXml,HdrXml]);
+					}
+				if(drp_type.selectedIndex == 1)
+					{
+						var Ac1:ArrayCollection=new ArrayCollection
+							([{
+								ScreenName:txtScreenName.text,
+								ModuleName:txtScreenName.text,
+								ModuleId:0,
+								OrderId:txtorderid.text,
+								SWF:txtswf.text,
+								Id:Id
+							}]);
+						
+						var HdrXml:String = ObjToXmlStr_Comm(Ac1,"HdrXml")
+					useWeb("ScreenMaster","Save_CUSTOM",[GlobalXml,HdrXml]);
+					}
+				}
+				//useWeb("ScreenMaster","Save_CUSTOM",[GlobalXml,HdrXml]);
+			}
+			
+			private function validation():String 
+			{
+				ErrStr="";
+				var TxtFlag:Boolean=true;
+				
+				if(drp_type.selectedIndex==-1)
+				{
+					if(TxtFlag==true)
+					{
+						drp_type.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+ "*   Please select Type \n";
+				}
+				
+			if(drp_type.selectedIndex == 0)
+			{
+				if(txtScreenName.text=="")
+				{
+					if(TxtFlag==true)
+					{
+						txtScreenName.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr +"*   ScreenName is required \n";
+				}
+				if(drp_module.selectedIndex==-1)
+				{
+					if(TxtFlag==true)
+					{
+						drp_module.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+"*   Module Name is Required\n";
+				}
+				if(txtorderid.text=="")
+				{
+					if(TxtFlag==true)
+					{
+						txtorderid.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+"*   OrderId is Required\n";
+				}
+				if(txtswf.text=="")
+				{
+					if(TxtFlag==true)
+					{
+						txtswf.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+"*   SWF is Required\n";
+				}
+			}		
+			if(drp_type.selectedIndex==1)
+				{
+					drp_module.visible=false;
+					lblscreenname.text="Module Name";
+					if(txtScreenName.text=="")
+					{
+						if(TxtFlag==true)
+						{
+							txtScreenName.setFocus();
+							TxtFlag=false;
+						}
+						ErrStr=ErrStr+"*   Module Name is Required\n";
+					}
+					if(txtorderid.text=="") 
+					{
+						if(TxtFlag==true)
+						{
+							txtorderid.setFocus();
+							TxtFlag=false;
+						}
+						ErrStr=ErrStr+"*   OrderId is Required\n";
+					}
+			}
+			return ErrStr;
+			}
+			
+			
+			protected function Search():void
+			{
+				Clear();
+				PopUpManager.addPopUp( SearchPopUp , this, true);
+				SearchPopUp.Prc_name="ScreenMaster";
+				var SearchParam:Array =new Array();
+				SearchPopUp.HlpIndex="SEARCH";
+				SearchParam[0]=GlobalXml;
+				SearchParam[1]=0;				
+				SearchPopUp.Prc_Param=SearchParam;
+				SearchPopUp.HlpSrchGlobal="";
+				SearchPopUp.dataPanel.focusEnabled=true;
+				SearchPopUp.Pageint();					
+				SearchPopUp.addEventListener("PopupEnter",funpopupEnter);
+				SearchPopUp.addEventListener("PopupClose",funpopupClose);
+				PopUpManager.centerPopUp(SearchPopUp);				
+			}
+			
+			private function funpopupClose(event:Event):void
+			{
+				
+			}
+			
+			private function funpopupEnter(event:Event):void
+			{				
+				Searchmdl(SearchPopUp.SelectRow.Id,0);		
+			}
+			private function Searchmdl(Id:int,_PrdFk:int):void
+			{
+				var Load:Array = new Array(); 
+				Load[0] = GlobalXml; Load[1] = Id;
+				useWeb("ScreenMaster","Search_CUSTOM",Load);
+			}
+			protected function ddl_Type_changeHandler(event:IndexChangeEvent):void
+			{
+				if(drp_type.selectedIndex == 0)   //screen=1 addr(0)
+				{
+					lblscreenname.text="Screen Name";
+					txtScreenName.visible=true;					
+					lblscreenname.visible=true;
+					star2.visible=true;
+					drp_module.visible=true;
+					lblmodulename.visible=true;
+					star3.visible=true;
+					lblswf.visible=true;
+					txtswf.visible=true;
+				}
+				if(drp_type.selectedIndex == 1) 								//Module=2 addr(1)
+				{
+					drp_module.visible=false;
+					lblmodulename.visible=false;
+					star3.visible=false;
+					txtScreenName.visible=true;
+					lblscreenname.text="Module Name";
+					star2.visible=true;
+					lblswf.visible=false;
+					txtswf.visible=false;
+				}
+			}
+			protected function Delete():void
+			{
+				if(Id == 0)
+				{
+					alignAlert(Alert.show("This is Invalid Process.","Alert Message!",Alert.OK, 
+						null, null,iconWarning, Alert.OK),10);
+					return
+				}	
+				alignAlert(Alert.show("Do you want to Delete this item ?", "Warning !",
+					Alert.YES | Alert.NO, null,removeItem, iconWarning, Alert.NO),10,"");
+			}
+			public function Custom_Grid_Delete(index:int,arrGrid:ArrayCollection,GrdId:String):void
+			{
+				if(arrGrid[index].Id!="")
+				{						
+					useWeb("ScreenMaster","Delete_CUSTOM",[GlobalXml,arrGrid[index].Id]);
+				}
+			}
+			
+			private function removeItem(event:CloseEvent):void 
+			{
+				if (event.detail==Alert.YES) 
+				{
+					var Load:Array = new Array();
+					Load[0]=GlobalXml; Load[1]=Id;
+					useWeb("ScreenMaster","Delete_CUSTOM",Load);
+				}
+			} 
+			protected function Clear():void
+			{
+				txtScreenName.setFocus();
+				txtorderid.text="";
+				drp_module.visible=false;
+				drp_type.prompt="Select"
+				txtScreenName.text="";
+				//txtsubmodulename.text="";
+				//dt_Date.text="";
+				//addmode=true;
+				txtswf.text="";
+				Id=0;
+				lblmodulename.visible=false;
+				star3.visible=false;
+				Help();
+			}
+			public function Moduledtls(event:IndexChangeEvent):void
+			{
+				ModuleName=drp_module.selectedItem.label;
+				ModuleId =drp_module.selectedItem.data; 
+				
+				//useWeb("LaundryPayment","RoomDetails_CUSTOM",[GlobalXml,"LaundryDtls","","",RoomId,ChkInHdrId]); 
+			}
+		]]>
+		
+	</fx:Script>	
+	<s:VGroup x="-2" y="1" width="907" height="496" verticalAlign="middle" horizontalAlign="center">
+		<s:BorderContainer width="802" height="330" cornerRadius="10" depth="50" fontSize="12">
+			<s:Label id="lblscreenname" x="51" y="162" fontFamily="Arial" fontSize="12"
+					 fontWeight="normal" text="ScreenName" textDecoration="none"/>
+			<s:Label x="90" y="112" width="7" height="8" color="red" text="*"/>
+			
+			<s:Label id="lblmodulename" x="51" y="208" fontFamily="Arial" fontSize="12"
+					 fontWeight="normal" text="ModuleName" visible="false"/>
+			<!--s:Label id="lblsubmodulename" x="51" y="264" fontFamily="Times New Roman" fontSize="15"
+					 fontWeight="bold" text="SubModuleName"/-->
+			<!--WrbHelpComp:HelpText id="hlptxtmodulename" x="206" y="156" width="158" height="20" visible="true"
+								  pxTabIndex="2" >
+			</WrbHelpComp:HelpText-->
+			
+			<!--WrbHelpComp:HelpText id="hlptxtmodulename" x="205" y="171" width="158" height="20" visible="true">
+			</WrbHelpComp:HelpText-->
+			
+			
+			<s:Label id="lblorderid" x="486" y="123" fontFamily="Arial" fontSize="12"
+					 fontWeight="normal" text="OrderId"/>
+			<s:TextInput id="txtorderid" x="598" y="113" width="158" editable="true" focusEnabled="false"
+						 fontFamily="Times New Roman" fontSize="15" restrict="0-9"/>
+			
+			
+			<s:Label id="lblswf" x="486" y="166" fontFamily="Arial" fontSize="12"
+					 fontWeight="normal" text="Swf"/>
+			
+			<s:Label id="lblheader" x="311" y="28" fontFamily="Times New Roman" fontSize="22"
+					 text="Screen Master"/>
+			
+			<s:TextInput id="txtswf" x="598" y="157" width="158" height="24"/>
+			<s:Label x="55" y="116" fontFamily="Arial" fontSize="12" fontWeight="normal"
+					 text="Type"/>
+			<!--mx:DateField x="598" y="208"/-->
+			<s:DropDownList id="drp_type" x="206" y="110" width="158" fontSize="15"
+							fontWeight="normal" prompt="Select" selectedItem="Select" tabIndex="1" change="ddl_Type_changeHandler(event)">
+				<s:ArrayList>
+					<fx:String>Screen</fx:String>
+					<fx:String>Module</fx:String>
+				</s:ArrayList>
+			</s:DropDownList>
+			<s:Label id="dt_Date" x="488" y="217" fontFamily="Times New Roman" fontSize="15" text="Date" visible="false"/>
+			<s:Label x="129" y="159" width="7" height="8" color="red" text="*" id="star2"/>
+			<s:DropDownList x="206" y="203" width="158" id="drp_module" visible="false" prompt="Select" selectedItem="Select" change="Moduledtls(event)"></s:DropDownList>
+			<s:Label x="132" y="205" text="*" color="red" id="star3" visible="false"/>
+			<s:TextInput x="206" y="159" width="158" id="txtScreenName"/>
+			
+		</s:BorderContainer>	
+		
+		<s:HGroup x="79" y="438" width="797" height="40" horizontalAlign="right" verticalAlign="middle"
+				  depth="0">
+			<s:Label text="Mandatory"/>
+			<s:Label width="7" height="8" color="red" text="*"/>
+			<WrbComp:SaveControl x="239" y="459" docSave="Save()" docClear="Clear()" doSearch="Search()" docDelete="Delete()">
+			</WrbComp:SaveControl>
+		</s:HGroup>
+	</s:VGroup> 
+	
+</s:Application>

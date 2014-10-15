@@ -1,0 +1,850 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   xmlns:WrbComp="WrbComp.*"
+			   width="100%" height="100%" creationComplete="PageLoad()">
+	<fx:Declarations>
+		<s:Animate id="fader"
+				   duration="500"
+				   repeatBehavior="reverse"
+				   repeatCount="0">
+			<s:SimpleMotionPath property="alpha"
+								valueFrom="1.0" valueTo="0.0" />
+		</s:Animate>
+		<s:Animate id="fader1"
+				   duration="0"
+				   repeatBehavior="reverse"
+				   repeatCount="0">
+			<s:SimpleMotionPath property="alpha"
+								valueFrom="1.0" valueTo="0.0" />
+		</s:Animate>
+	</fx:Declarations>
+	<fx:Style source="..\\Common\\ApplicationCSS.css" />
+	<fx:Script source="..\\Common\\CommonScript.as" />
+	<fx:Script source="..\\Common\\Functions.as"/>
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "";
+			public var Ac:ArrayCollection=new ArrayCollection();
+			public var ErrorFlag:Boolean=true;
+			public var PropertyId:Number=0;
+			public var Help_AC:ArrayCollection=new ArrayCollection();
+			public var Advance_AC:ArrayCollection=new ArrayCollection();
+			public var AdvanceTotal:Number=0;
+			private function PageLoad():void
+			{
+				Global_AC = funLoginInfo("<gScrId>1</gScrId><gUsrFk>1</gUsrFk>");				
+				GlobalXml = "";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";		
+				Help_AC=new ArrayCollection();
+				Grd_Invoice.dataProvider=Help_AC;
+				Grd_TAC.dataProvider=Help_AC;
+				help();	
+				Brd_Settlement.visible=false;
+				DDChange();
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "Property_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						hlp_Property.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+					else
+					{
+						Help_AC=new ArrayCollection();
+						hlp_Property.dataProvider=Help_AC;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "PropertySearch_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_Invoice.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+					else
+					{
+						Help_AC=new ArrayCollection();
+						Grd_Invoice.dataProvider=Help_AC;
+					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Grd_TAC.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+					else
+					{
+						Help_AC=new ArrayCollection();
+						Grd_TAC.dataProvider=Help_AC;
+						
+					}
+					if (Ds_Objects.result.Tables.Table2.Rows.length > 0)
+					{
+						Advance_AC=Ds_Objects.result.Tables.Table2.Rows as ArrayCollection;
+					}
+					else
+					{
+						Advance_AC=new ArrayCollection();
+					}
+					if (Ds_Objects.result.Tables.Table3.Rows.length > 0)
+					{
+						AdvanceTotal=Ds_Objects.result.Tables.Table3.Rows[0].AdvanceAmount;
+					}
+					else
+					{
+						AdvanceTotal=0;
+					}
+					
+					
+					Clear()					
+					
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				{
+					useWeb("MapPOAndVendor","PropertySearch_CUSTOM", [GlobalXml, "PropertySearch",PropertyId, "","","",0]);
+					alignAlert(Alert.show("Settlement Successfully Added.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+					
+				}
+				
+			}				
+			
+			private function help():void
+			{
+				//This function call to MAP PO VENDOR SERVICE
+				useWeb("MapPOAndVendor","Property_CUSTOM", [GlobalXml, "Property",0, "","","",0]);
+				
+			}
+			public function fnGetProperty():void
+			{
+				if(hlp_Property.selected())
+				{
+					lbl_Error.visible=false;
+					Change('lbl_Error');
+					hlp_Property.text=hlp_Property.Select_Row.PropertyName
+					PropertyId=hlp_Property.Select_Row.ZId	
+					
+					//This function call to MAP PO VENDOR SERVICE
+					useWeb("MapPOAndVendor","PropertySearch_CUSTOM", [GlobalXml, "PropertySearch",PropertyId, "","","",0]);
+				}
+				else
+				{
+					hlp_Property.text="";
+					PropertyId=0;
+					
+				}
+			}
+			public function Clear():void
+			{				
+				Total_AmountTAC=0;
+				InoviceAmount=0;
+				lbl_InvoiceVendor.text="Total Vendor Invoice Amount : 0.00 ";
+				lbl_Total.text="Total Amount to be paid : 0.00 ";
+				lbl_InvoiceTAC.text="Total TAC Invoice Amount : 0.00  ";
+				lbl_Error.visible=false;
+				Change('lbl_Error');	
+				
+				
+				Brd_Settlement.visible=false;
+				txt_AdjustAdvance.text="";
+				txt_AmountPaid.text="";
+				dt_DateofPayment.text="";							
+				DD_PaymentMode.selectedIndex=0;
+				DD_PaymentMode.enabled=true;
+				
+				Change('lbl_AdvanceAmount')
+				Change('lbl_DateofPayment')
+				Change('lbl_IssuedBy')
+				Change('lbl_DateIssued')
+				Change('lbl_BankName')
+				lbl_AdvanceAmountTotal.text="";
+				lbl_InvoiceAmount.text="";
+				lbl_Error1.visible=false;
+				Change('lbl_Error1')
+				
+				lbl_Payment.visible=true;
+				DD_PaymentMode.enabled=true;
+				
+				DDChange();
+				
+				HdrXml=""; DtlsXml =""; DtlsXml1="";
+				Temp_AC  = new ArrayCollection();
+				
+			}
+			public function MainClear():void
+			{
+				Help_AC=new ArrayCollection();
+				Grd_Invoice.dataProvider=Help_AC;
+				Grd_TAC.dataProvider=Help_AC;
+				Total_AmountTAC=0;
+				InoviceAmount=0;
+				lbl_InvoiceVendor.text="Total Vendor Invoice Amount : 0.00 ";
+				lbl_Total.text="Total Amount to be paid : 0.00 ";
+				lbl_InvoiceTAC.text="Total TAC Invoice Amount : 0.00  ";
+				PropertyId=0;
+				hlp_Property.text="";
+				lbl_Error.visible=false;
+				Change('lbl_Error');
+				
+				Brd_Settlement.visible=false;
+				txt_AdjustAdvance.text="";
+				txt_AmountPaid.text="";
+				dt_DateofPayment.text="";							
+				DD_PaymentMode.selectedIndex=0;
+				DD_PaymentMode.enabled=true;
+				
+				Change('lbl_AdvanceAmount')
+				Change('lbl_DateofPayment')
+				Change('lbl_IssuedBy')
+				Change('lbl_DateIssued')
+				Change('lbl_BankName')
+				lbl_AdvanceAmountTotal.text="";
+				lbl_InvoiceAmount.text="";
+				lbl_Error1.visible=false;
+				Change('lbl_Error1')
+				
+				lbl_Payment.visible=true;
+				DD_PaymentMode.enabled=true;
+				
+				DDChange();
+				
+				HdrXml=""; DtlsXml =""; DtlsXml1="";
+				Temp_AC  = new ArrayCollection();
+				help();
+			}
+			public var Total_AmountTAC:Number=0;
+			public var InoviceAmount:Number=0;
+			public function FnSelectInvoice(Event):void
+			{ 
+				Ac=Grd_Invoice.dataProvider as ArrayCollection;				
+				var Index:int=Grd_Invoice.selectedIndex;
+				InoviceAmount=0
+				var Flag:Boolean=true;
+				
+				if(Ac[Index].checks==1)
+				{
+					Ac[Index].checks=false;
+				}
+				else if(Ac[Index].checks==0)
+				{
+					Ac[Index].checks=true;
+				}
+				
+				for(var i:int=0;i<Ac.length;i++)
+				{
+					if(Ac[i].checks==true)
+					{
+						InoviceAmount+=Ac[i].InvoiceAmount
+					}
+				}
+				lbl_InvoiceVendor.text="Total Vendor Invoice Amount : " +String( InoviceAmount);
+				
+				
+				lbl_Total.text="Total Amount to be paid :  "+String(InoviceAmount-Total_AmountTAC);
+				
+				
+				
+			}	
+			public function FnSelectTAC(Event):void
+			{ 
+				Ac=Grd_TAC.dataProvider as ArrayCollection;				
+				var Index:int=Grd_TAC.selectedIndex;
+				var Flag:Boolean=true;
+				
+				if(Ac[Index].checks==1)
+				{
+					Ac[Index].checks=false;
+				}
+				else if(Ac[Index].checks==0)
+				{
+					Ac[Index].checks=true;
+				}
+				
+			}
+			protected function Grd_FinalAdjustment_focusOutHandler(event:FocusEvent):void
+			{
+				var Temp_Ac1:ArrayCollection=new ArrayCollection();
+				Total_AmountTAC=0;
+				Temp_Ac1=Grd_TAC.dataProvider as ArrayCollection;				
+				for(var i:Number=0;i<Temp_Ac1.length;i++)
+				{
+					if(Temp_Ac1[i].checks==true)
+					{
+						if(Number(Temp_Ac1[i].Adjusment)<=Number(Temp_Ac1[i].AdjusementAmount))
+						{
+							Total_AmountTAC+=Number(Temp_Ac1[i].Adjusment);
+						}
+						else
+						{
+							Temp_Ac1[i].Adjusment=Temp_Ac1[i].AdjusementAmount;
+							Total_AmountTAC+=Number(Temp_Ac1[i].Adjusment);
+						}						
+					}
+					else
+					{
+						Temp_Ac1[i].Adjusment=0;
+					}
+				}
+				lbl_InvoiceTAC.text="Total TAC Invoice Amount : "+String(Total_AmountTAC);
+				
+				lbl_Total.text="Total Amount to be paid :  "+String(InoviceAmount-Total_AmountTAC);
+				
+				
+			}
+			public static var HdrXml:String="";var DtlsXml:String="";var DtlsXml1:String="";
+			public var Temp_AC:ArrayCollection = new ArrayCollection();
+			public function Settlement():void
+			{
+				ErrorFlag=true;
+				var Temp_Ac:ArrayCollection=new ArrayCollection();
+				Temp_Ac=Grd_Invoice.dataProvider as ArrayCollection;
+				if(Temp_Ac.length==0)
+				{
+					lbl_Error.visible=true;
+					lbl_Error.text="This Is An Invalid Process";
+					fader.target=lbl_Error;				
+					fader.play();
+					lbl_Error.setStyle("color","red");
+					ErrorFlag=false;
+					return;
+				}
+				var Temp_Ac1:ArrayCollection=new ArrayCollection();
+				Temp_Ac1=Grd_TAC.dataProvider as ArrayCollection;
+				if(Temp_Ac1.length==0)
+				{
+					lbl_Error.visible=true;
+					lbl_Error.text="This Is An Invalid Process";
+					fader.target=lbl_Error;				
+					fader.play();
+					lbl_Error.setStyle("color","red");
+					ErrorFlag=false;
+					return;
+				}
+				if(InoviceAmount==0)
+				{
+					lbl_Error.visible=true;
+					lbl_Error.text="Please Select Invoice Amount";
+					fader.target=lbl_Error;				
+					fader.play();
+					lbl_Error.setStyle("color","red");
+					ErrorFlag=false;
+					return;
+				}
+				if(Total_AmountTAC==0)
+				{
+					lbl_Error.visible=true;
+					lbl_Error.text="Please Select TAC Invoice Amount";
+					fader.target=lbl_Error;				
+					fader.play();
+					lbl_Error.setStyle("color","red");
+					ErrorFlag=false;
+					return;
+				}
+				if(InoviceAmount<=Total_AmountTAC)
+				{
+					lbl_Error.visible=true;
+					lbl_Error.text="TAC Invoice Amount Not Greater Than Invoice Amount";
+					fader.target=lbl_Error;				
+					fader.play();
+					lbl_Error.setStyle("color","red");
+					ErrorFlag=false;
+					return;
+				}				
+				var Temp_AC1:ArrayCollection = new ArrayCollection();
+				Temp_AC1=Grd_TAC.dataProvider as ArrayCollection;				
+				
+				for(var i:int=0;i<Temp_AC1.length;i++)
+				{
+					if(Temp_AC1[i].checks==true)
+					{
+						if(Temp_AC1[i].Adjusment=='0')
+						{
+							lbl_Error.visible=true;
+							lbl_Error.text="Selected TAC Invoice Adjusment Not In Zero";
+							fader.target=lbl_Error;				
+							fader.play();
+							lbl_Error.setStyle("color","red");
+							ErrorFlag=false;
+							return;
+						}
+					}
+				}
+				
+				if(ErrorFlag==true)
+				{
+					lbl_Error.visible=false;
+					Change('lbl_Error');
+					
+					Temp_AC = new ArrayCollection();
+					Temp_AC=Grd_Invoice.dataProvider as ArrayCollection;
+					var Rem_Val:Number=0;
+					Rem_Val=Number(Total_AmountTAC)
+					for(var a:int=0;a<Temp_AC.length;a++)
+					{
+						if(Temp_AC[a].checks==true)
+						{
+							if(Number(Temp_AC[a].InvoiceAmount)<=Rem_Val)
+							{
+								Temp_AC[a].Adjusment=Temp_AC[a].InvoiceAmount;
+								Rem_Val=Rem_Val-Number(Temp_AC[a].InvoiceAmount);
+							}
+							else
+							{
+								Temp_AC[a].Adjusment=Rem_Val;
+								Rem_Val=0;
+								
+							}
+						}
+						
+					}
+					
+					
+					
+					
+					
+					lbl_AdvanceAmountTotal.text="INR "+String(AdvanceTotal);
+					lbl_InvoiceAmount.text="INR "+String(InoviceAmount-Total_AmountTAC);
+					txt_AmountPaid.text=String(InoviceAmount-Total_AmountTAC);
+					Brd_Settlement.visible=true;
+					
+						
+				}
+			}
+			public function Change(LabelName:String):void
+			{
+				
+				fader1.target=this[LabelName];				
+				fader1.play();					
+				this[LabelName].setStyle("color","#565454");			
+				
+			}
+			public function AdjustAdvanceChange():void
+			{
+				
+				if(Number(txt_AdjustAdvance.text)>AdvanceTotal)
+				{
+					lbl_Error1.visible=true;
+					lbl_AdvanceAmountTotal.text="INR "+String(AdvanceTotal);
+					lbl_Error1.text="Adjust Advance Not Greater Than Advance Amount";
+					txt_AdjustAdvance.text="0";
+					fader.target=lbl_Error1;				
+					fader.play();
+					lbl_Error1.setStyle("color","red");
+					ErrorFlag=false;
+				}
+				else
+				{	
+					if(Number(txt_AdjustAdvance.text)>(InoviceAmount-Total_AmountTAC))
+					{
+						lbl_Error1.visible=true;
+						lbl_AdvanceAmountTotal.text="INR "+String(AdvanceTotal);
+						txt_AmountPaid.text=String(InoviceAmount-Total_AmountTAC)
+						lbl_Error1.text="Adjust Advance Not Greater Than Invoice Amount";
+						txt_AdjustAdvance.text="0";
+						fader.target=lbl_Error1;				
+						fader.play();
+						lbl_Error1.setStyle("color","red");
+						ErrorFlag=false;
+					}
+					else
+					{
+						lbl_AdvanceAmountTotal.text="INR "+String(AdvanceTotal-Number(txt_AdjustAdvance.text));
+						txt_AmountPaid.text=String(InoviceAmount-Total_AmountTAC-Number(txt_AdjustAdvance.text))
+							if(txt_AmountPaid.text=="0")
+							{
+								lbl_Payment.visible=false;
+								DD_PaymentMode.enabled=false;
+							}
+							else
+							{
+								lbl_Payment.visible=true;
+								DD_PaymentMode.enabled=true;
+							}
+						
+						lbl_Error1.visible=false;
+						Change('lbl_Error1')
+					}
+				}
+				
+			}
+			protected function DDChange():void
+			{
+				lbl_DateIssued.visible=false;
+				lbl_IssuedBy.visible=false;
+				lbl_StarIssue.visible=false;
+				lbl_StarIssuedat.visible=false;
+				lbl_StarBankName.visible=false;
+				lbl_BankName.visible=false;
+				dt_Issuedate.visible=false;					
+				txt_ChequeNumber.visible=false;
+				txt_BankName.visible=false;
+				dt_Issuedate.text="";				
+				txt_ChequeNumber.text="";
+				txt_BankName.text="";
+				Change('lbl_PaymentMode')
+				if(DD_PaymentMode.selectedIndex==1)
+				{
+					lbl_IssuedBy.text="Issued By";
+					lbl_IssuedBy.visible=true;	
+					txt_ChequeNumber.visible=true;
+					lbl_StarIssue.visible=true;
+					lbl_StarIssue.x= 484;
+					
+				}
+				if(DD_PaymentMode.selectedIndex==2)
+				{
+					lbl_IssuedBy.text="Cheque Number";
+					
+					lbl_DateIssued.text="Date Issued"; 
+					lbl_DateIssued.visible=true;
+					dt_Issuedate.visible=true;
+					txt_ChequeNumber.visible=true;
+					txt_BankName.visible=true;
+					lbl_BankName.visible=true;
+					lbl_IssuedBy.visible=true;
+					lbl_StarIssue.visible=true;
+					lbl_StarIssue.x= 519;
+					lbl_StarIssuedat.visible=true;
+					lbl_StarIssuedat.x= 496;
+					lbl_StarBankName.visible=true;
+				}
+				if(DD_PaymentMode.selectedIndex==3)
+				{
+					lbl_IssuedBy.text="Reference Number";
+					lbl_DateIssued.text="Date of NEFT"; 
+					lbl_DateIssued.visible=true;
+					dt_Issuedate.visible=true;
+					txt_ChequeNumber.visible=true;
+					txt_BankName.visible=true;
+					lbl_BankName.visible=true;
+					lbl_IssuedBy.visible=true;
+					lbl_StarIssue.visible=true;
+					lbl_StarIssue.x= 533;
+					lbl_StarIssuedat.visible=true;
+					lbl_StarIssuedat.x= 502;
+					lbl_StarBankName.visible=true;
+				}
+			}
+			public function AddPayment():void
+			{
+				ErrorFlag=true;
+				if(Number(txt_AdjustAdvance.text)>AdvanceTotal)
+				{
+					lbl_Error1.visible=true;
+					fader.target=lbl_Error;				
+					fader.play();
+					lbl_Error1.setStyle("color","red");
+					ErrorFlag=false;
+				}
+				else
+				{
+					lbl_Error1.visible=false;
+					Change('lbl_Error1')
+				}
+				if(txt_AmountPaid.text=="")
+				{
+					fader.target=lbl_AdvanceAmount;				
+					fader.play();
+					lbl_AdvanceAmount.setStyle("color","red");
+					ErrorFlag=false;
+				}
+				else
+				{
+					Change('lbl_AdvanceAmount')
+				}
+				if(dt_DateofPayment.text=="")
+				{
+					fader.target=lbl_DateofPayment;				
+					fader.play();
+					lbl_DateofPayment.setStyle("color","red");
+					ErrorFlag=false;
+				}
+				else
+				{
+					Change('lbl_DateofPayment')
+				}
+				if(txt_AmountPaid.text!="0")
+				{
+					if(DD_PaymentMode.selectedIndex==0)
+					{
+						fader.target=lbl_PaymentMode;				
+						fader.play();
+						lbl_PaymentMode.setStyle("color","red");
+						ErrorFlag=false;
+					}	
+				}				
+				else
+				{
+					if(txt_AmountPaid.text!="0")
+					{
+						if(DD_PaymentMode.selectedIndex==1)
+						{
+							if(txt_ChequeNumber.text=="")
+							{
+								fader.target=lbl_IssuedBy;				
+								fader.play();
+								lbl_IssuedBy.setStyle("color","red");
+								ErrorFlag=false;
+							}
+							else
+							{
+								Change('lbl_IssuedBy')
+							}
+							
+						}
+						else
+						{
+							if(txt_ChequeNumber.text=="")
+							{
+								fader.target=lbl_IssuedBy;				
+								fader.play();
+								lbl_IssuedBy.setStyle("color","red");
+								ErrorFlag=false;
+							}
+							else
+							{
+								Change('lbl_IssuedBy')
+							}
+							
+							if(dt_Issuedate.text=="")
+							{
+								fader.target=lbl_DateIssued;				
+								fader.play();
+								lbl_DateIssued.setStyle("color","red");
+								ErrorFlag=false;
+							}
+							else
+							{
+								Change('lbl_DateIssued')
+							}
+							if(txt_BankName.text=="")
+							{
+								fader.target=lbl_BankName;				
+								fader.play();
+								lbl_BankName.setStyle("color","red");
+								ErrorFlag=false;
+							}
+							else
+							{
+								Change('lbl_BankName')
+							}
+							
+						}
+					}
+					
+				}
+				
+				if(ErrorFlag==true)
+				{
+					
+					//REMAINING INVOICE AMOUT  FOR CASH,NEFT OR CHEQUE
+					
+					var Temp_AC1:ArrayCollection = new ArrayCollection();
+					var InvAmt:Number=0;
+					for(var i:int=0;i<Temp_AC.length;i++)
+					{
+						if(Temp_AC[i].checks==true)
+						{
+							if(Number(Temp_AC[i].Adjusment-Temp_AC[i].InvoiceAmount)!=0)
+							{
+								
+								Temp_AC[i].PaidAmount=Temp_AC[i].InvoiceAmount-Temp_AC[i].Adjusment;
+								Temp_AC1.addItemAt(Temp_AC[i],Temp_AC1.length);								
+								
+							}							
+						}						
+					}
+					
+					//ADVANCE AMOUNT REDUCE
+					var ADJAD:Number=Number(txt_AdjustAdvance.text)
+					for(var j:int=0;j<Advance_AC.length;j++)
+					{
+						if(Number(Advance_AC[j].AdvanceAmount)<=ADJAD)
+						{
+							Advance_AC[j].AdjusmentAmount=Advance_AC[j].AdvanceAmount;
+							ADJAD=ADJAD-Number(Advance_AC[j].AdvanceAmount);
+						}
+						else
+						{
+							Advance_AC[j].AdjusmentAmount=ADJAD;
+							ADJAD=0;							
+						}
+					}
+					
+					var Ac:ArrayCollection=new ArrayCollection
+						([{
+							
+							AdjustAdvance:txt_AdjustAdvance.text,
+							DateofPayment:dt_DateofPayment.text,
+							AmountPaid:txt_AmountPaid.text,	
+							PaymentMode:DD_PaymentMode.selectedItem,
+							BankName:txt_BankName.text,							
+							ChequeNumber:txt_ChequeNumber.text,								
+							Issuedate:dt_Issuedate.text						
+							
+						}]);
+					
+					var Ac1:ArrayCollection=new ArrayCollection
+						([{							
+							PropertyId:PropertyId							
+						}]);
+					
+					HdrXml="";
+					HdrXml += ObjToXmlStr_Comm(Ac1,"HdrXml")	
+					
+					DtlsXml="";
+					DtlsXml += "<ROOT>";					
+					DtlsXml += ObjToXmlStr_Comm(Temp_AC,"DtlsXml")
+					DtlsXml += "</ROOT>";
+					
+					DtlsXml1="";
+					DtlsXml1 += "<ROOT>";
+					DtlsXml1 += ObjToXmlStr_Comm(Grd_TAC.dataProvider as ArrayCollection,"DtlsXml1")
+					DtlsXml1 += "</ROOT>";
+					
+					
+					var DtlsXml4:String="";					
+					DtlsXml4 += ObjToXmlStr_Comm(Ac,"DtlsXml4")	
+					
+					var DtlsXml2:String="";
+					DtlsXml2 += "<ROOT>";
+					DtlsXml2 += ObjToXmlStr_Comm(Temp_AC1,"DtlsXml2")
+					DtlsXml2 += "</ROOT>";
+					
+					var DtlsXml3:String="";
+					DtlsXml3 += "<ROOT>";
+					DtlsXml3 += ObjToXmlStr_Comm(Advance_AC,"DtlsXml3")
+					DtlsXml3 += "</ROOT>";
+					useWeb("VendorSettlement","Save_CUSTOM", [GlobalXml,HdrXml,DtlsXml,DtlsXml1,DtlsXml2,DtlsXml3,DtlsXml4]);
+				}
+			}
+			
+			protected function label1_clickHandler(event:MouseEvent):void
+			{
+				Brd_Settlement.visible=false;
+			}
+			
+		]]>
+	</fx:Script>
+	<s:BorderContainer x="0" y="0" width="100%" height="58" borderVisible="false" backgroundColor="#f4efef" depth="10">
+		<s:HGroup x="0" y="0" width="100%" height="59" horizontalAlign="center" verticalAlign="middle">
+			<s:Group x="75" y="14" width="806" height="34">
+				<mx:Label x="15" y="8" text="Vendor" id="Lbl_Vendor"/>
+				<mx:Label id="Lbl_Vendor0" x="57" y="2" width="13" text="*" color="red" fontSize="16"/>
+				<WrbHelpComp:HelpText x="77" y="8.5" width="284" id="hlp_Property" pxSetPrompt="Vendor" pxTabIndex="1"
+									  pxSetColumnsWidth="300,0" onselection="{fnGetProperty()}">
+				</WrbHelpComp:HelpText>				
+				<s:Image x="757" y="-9" source="assets/dust_bin1.png" toolTip="Clear" click="MainClear()"/>
+				<mx:Label x="419" y="7" text="TAC Invoice Amount Not Greater Than Invoice Amount" id="lbl_Error" color="RED" visible="false"/>
+			</s:Group>
+		</s:HGroup>
+	</s:BorderContainer>
+	<s:VGroup x="0" y="64" width="100%" height="372" horizontalAlign="center" verticalAlign="top">
+		<s:VGroup width="80%" height="50%">			
+			<mx:DataGrid id="Grd_Invoice" width="100%" height="100%" depth="1" editable="true"
+						 tabIndex="93" verticalAlign="middle"   >
+				<mx:columns>
+					<mx:DataGridColumn dataField="checks" headerText="Select" width="35" editable="false"  >
+						<mx:itemRenderer >
+							<fx:Component>
+								<mx:HBox horizontalAlign="center" verticalAlign="middle">
+									<mx:CheckBox selected="{data.checks}"  
+												 change="outerDocument.FnSelectInvoice(event);"	/>
+								</mx:HBox>	
+							</fx:Component>
+						</mx:itemRenderer>
+					</mx:DataGridColumn>
+					<mx:DataGridColumn dataField="InvoiceNo" headerText="Invoice No" editable="false" width="100" textAlign="left"/>	
+					<mx:DataGridColumn dataField="InvoiceDate" headerText="Invoice Date" textAlign="left" visible="true" width="80" editable="false"/>
+					<mx:DataGridColumn dataField="InvoiceAmount" headerText="Invoice Amount"  width="80" editable="false" textAlign="left" visible="true"/>
+					<mx:DataGridColumn dataField="Status" headerText="Payment Status"  width="80" textAlign="right" editable="false" visible="true"/>
+					<mx:DataGridColumn dataField="POCount"  headerText="No Of PO's" editable="true" textAlign="right" visible="true" width="80"/>
+					<mx:DataGridColumn dataField="Adjusment" headerText="Adjustment" textAlign="right"  visible="false" editable="true" width="80" />
+					<mx:DataGridColumn dataField="InvoiceId"  width="0" editable="false" visible="false"/>
+					<mx:DataGridColumn dataField="Id"  width="0" editable="false" visible="false"/>
+				</mx:columns>
+			</mx:DataGrid>
+		</s:VGroup>
+		<s:VGroup width="80%" height="50%">
+			<mx:DataGrid id="Grd_TAC" width="100%" height="100%" depth="1" editable="true"
+						 tabIndex="93" verticalAlign="middle" focusOut="Grd_FinalAdjustment_focusOutHandler(event)"  >
+				<mx:columns>
+					<mx:DataGridColumn dataField="checks" headerText="Select" width="50" editable="false"  >
+						<mx:itemRenderer >
+							<fx:Component>
+								<mx:HBox horizontalAlign="center" verticalAlign="middle">
+									<mx:CheckBox selected="{data.checks}"  
+												 change="outerDocument.FnSelectTAC(event);"	/>
+								</mx:HBox>	
+							</fx:Component>
+						</mx:itemRenderer>
+					</mx:DataGridColumn>
+					<mx:DataGridColumn dataField="TACInvoiceNo" headerText="Invoice No" editable="false" width="100" textAlign="left"/>	
+					<mx:DataGridColumn dataField="BillDate" headerText="Invoice Date" textAlign="left" visible="true" width="80" editable="false"/>
+					<mx:DataGridColumn dataField="TACAmount" headerText="Invoice Amount"  width="100" editable="false" textAlign="right" visible="true"/>
+					<mx:DataGridColumn dataField="TotalBusinessSupportST" headerText="Service Tax"  width="80" textAlign="right" editable="false" visible="true"/>
+					<mx:DataGridColumn dataField="Total"  headerText="Total Amount" editable="false" textAlign="right" visible="true" width="100"/>						
+					<mx:DataGridColumn dataField="AdjusementAmount" headerText="Adjust Amount" textAlign="right" visible="true" editable="false" width="100" />
+					<mx:DataGridColumn dataField="Adjusment" headerText="Adjustment" textAlign="right" visible="true" editable="true" width="80" />
+					<mx:DataGridColumn dataField="TACId"  width="0" editable="false" visible="false"/>
+					<mx:DataGridColumn dataField="Id"  width="0" editable="false" visible="false"/>
+				</mx:columns>
+			</mx:DataGrid>
+		</s:VGroup>
+	</s:VGroup>
+	<mx:Label x="514" y="449" text="Total Vendor Invoice Amount : 0.00" id="lbl_InvoiceVendor"/>
+	<mx:Label x="514" y="484" text="Total TAC Invoice Amount : 0.00" id="lbl_InvoiceTAC"/>
+	<mx:Label x="514" y="519" text="Total Amount to be paid : 0.00" id="lbl_Total"/>
+	<WrbComp:Button_HB x="812" y="485" _Label="Settle" click="Settlement()">
+	</WrbComp:Button_HB>
+	<s:BorderContainer x="0" y="64" width="100%" height="100%" borderVisible="false" id="Brd_Settlement" visible="false">
+		<s:VGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle" gap="0">
+			<s:BorderContainer x="122" y="79" width="796" height="42" backgroundColor="#f4efef" borderVisible="false">
+				<mx:Label x="14" y="10" text="Vendor Invoice Payment" color="red"/>
+				<mx:Label x="264" y="10" id="lbl_Error1" visible="false" text="Adjust Advance Not Greater Than Advance Amount" color="red"/>
+				<mx:Label x="757" y="6" width="36" height="30" color="red" fontSize="20" text="X" textAlign="center" toolTip="Close" click="label1_clickHandler(event)"/>
+			</s:BorderContainer>
+			<s:BorderContainer x="80" y="94" width="796" height="312" borderVisible="false">
+				<mx:Label x="519" y="83" width="17" height="21" color="red" fontSize="15" text="*" id="lbl_StarIssue"/>
+				<mx:Label x="509" y="43" width="17" height="21" color="red" fontSize="15" text="*" id="lbl_Payment"/>
+				<mx:Label x="502" y="128" width="17" height="21" color="red" fontSize="15" text="*" id="lbl_StarIssuedat"/>
+				<mx:Label x="492" y="174" width="17" height="21" color="red" fontSize="15" text="*" id="lbl_StarBankName"/>
+				<mx:Label x="118" y="120" width="17" height="21" color="red" fontSize="15" text="*"/>
+				<mx:Label x="107" y="167" width="17" height="21" color="red" fontSize="15" text="*"/>
+				<mx:Label x="14" y="130" text="Amount to be paid " id="lbl_AdvanceAmount"/>
+				<mx:Label x="14" y="175" text="Date of Payment" id="lbl_DateofPayment"/>
+				<mx:Label x="14" y="92" text=" Adjust Advance" id="lbl_AdjustAdvance"/>
+				<mx:Label x="14" y="52" text="Invoice Amount"/>
+				<mx:Label x="14" y="12" text="Advance Amount"/>
+				<mx:Label x="139" y="12" color="red" id="lbl_AdvanceAmountTotal"/>
+				<mx:Label x="139" y="52" color="red" id="lbl_InvoiceAmount"/>
+				<mx:Label x="424" y="179" text="Bank Name" id="lbl_BankName"/>
+				<mx:Label x="424" y="135" text="Date of NEFT" id="lbl_DateIssued"/>
+				<mx:Label x="424" y="90" text="Cheque Number" id="lbl_IssuedBy"/>
+				<mx:Label x="424" y="46" text="Payment Mode" id="lbl_PaymentMode"/>
+				<s:TextInput x="139" y="130.5" width="243" id="txt_AmountPaid" enabled="false" textAlign="right" tabIndex="4" restrict="0-9." focusOut="Change('lbl_AdvanceAmount')"/>
+				<s:TextInput x="139" y="93.5" width="243" id="txt_AdjustAdvance" textAlign="right" tabIndex="3" restrict="0-9." focusOut="AdjustAdvanceChange()"/>
+				<s:TextInput x="548" y="90.5" width="243" id="txt_ChequeNumber" tabIndex="7" focusOut="Change('lbl_IssuedBy')"/>
+				<s:TextInput x="548" y="179.5" width="243" tabIndex="9" id="txt_BankName" focusOut="Change('lbl_BankName')"/>
+				<mx:DateField x="139" y="174" id="dt_DateofPayment" tabIndex="5" formatString="DD/MM/YYYY" change="Change('lbl_DateofPayment')"/>
+				<mx:DateField x="548" y="134" id="dt_Issuedate" tabIndex="8" formatString="DD/MM/YYYY" change="Change('lbl_DateIssued')"/>
+				<s:DropDownList id="DD_PaymentMode" x="548" y="46" width="115"
+								change="DDChange()" selectedIndex="0" tabIndex="6">
+					<mx:ArrayCollection> 
+						<fx:String>Please Select</fx:String> 
+						<fx:String>Cash</fx:String> 
+						<fx:String>Cheque</fx:String>
+						<fx:String>NEFT</fx:String>
+					</mx:ArrayCollection>
+				</s:DropDownList>
+				<WrbComp:Button_HB x="357" y="264" _Label="Add Payment" click="AddPayment()">
+				</WrbComp:Button_HB>
+			</s:BorderContainer>
+		</s:VGroup>
+	</s:BorderContainer>
+</s:Application>

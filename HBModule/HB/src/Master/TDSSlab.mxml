@@ -1,0 +1,517 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" 
+			   xmlns:Controls="fx.com.adobe.Controls.*"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   xmlns:WrbComp="WrbComp.*"
+			   width="100%" height="100%"
+			   creationComplete="PageLoad()"
+			   pageTitle="Tax Slab">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<!--mx:NumberValidator id="NumberValidation"
+			allowNegative="false" 
+			decimalPointCountError="The decimal separator can only occur once." 
+			decimalSeparator="." 
+			domain="int" 
+			exceedsMaxError="The number entered is too large." 
+			integerError="The number must be an integer." 
+			invalidCharError="The input contains invalid characters." 
+			invalidFormatCharsError="One of the formatting parameters is invalid." 
+			lowerThanMinError="The number entered is too small." 
+			maxValue="NaN" 
+			minValue="NaN" 
+			negativeError="The number may not be negative." 
+			precision="-1" 
+			precisionError="The number entered has too many digits beyond the decimal point." 
+			separationError="The thousands separator must be followed by three digits." 
+			thousandsSeparator="," /-->
+		<!--mx:NumberFormatter id="Round2" precision="2" decimalSeparatorFrom="."
+							useThousandsSeparator="true" useNegativeSign="true"/>
+		<mx:CurrencyValidator source="{txt12,txt11}"
+							  property="text"
+							  precision="2" 
+							  trigger="{Button}"
+							  triggerEvent="click"
+							  maxValue="180,000" 
+							  minValue="0"
+							  valid="Alert.show('Validation Succeeded!');" 
+							  thousandsSeparator=","
+							  decimalSeparator="."/-->
+	</fx:Declarations>
+	
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
+	<fx:Script>
+		<![CDATA[
+			import WrbComp.frmsearchwindow;
+			
+			import WrbHelpComp.HlpGridHdr;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.CalendarLayoutChangeEvent;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.events.IndexChangedEvent;
+			import mx.graphics.codec.PNGEncoder;
+			
+			import spark.events.IndexChangeEvent;
+			import spark.events.TextOperationEvent;
+			private var SearchPopUp:frmsearchwindow = new frmsearchwindow();
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "",TypeServiceId:int=0,ErrStr:String="",ErrMsg:String="",Id:int=0;
+			public var AddMode:Boolean=true,Flag:Boolean=true;
+
+			protected function PageLoad():void
+			{
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				{
+					if (AddMode == true)
+					{
+						alignAlert(Alert.show("Tax Saved Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+					}
+					else
+					{
+						alignAlert(Alert.show("Tax Updated Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+					}
+					FnClear();
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Search_CUSTOM")
+				{
+					txt11.text=Ds_Objects.result.Tables.Table.Rows[0].SlabFrom1;
+					txt12.text=Ds_Objects.result.Tables.Table.Rows[0].SlabTo1;
+					txt13.text=Ds_Objects.result.Tables.Table.Rows[0].SlabTax1;
+					txt21.text=Ds_Objects.result.Tables.Table.Rows[0].SlabFrom2;
+					txt22.text=Ds_Objects.result.Tables.Table.Rows[0].SlabTo2;
+					txt23.text=Ds_Objects.result.Tables.Table.Rows[0].SlabTax2;
+					txt31.text=Ds_Objects.result.Tables.Table.Rows[0].SlabFrom3;
+					txt32.text=Ds_Objects.result.Tables.Table.Rows[0].SlabTo3;
+					txt33.text=Ds_Objects.result.Tables.Table.Rows[0].SlabTax3;
+					txt41.text=Ds_Objects.result.Tables.Table.Rows[0].SlabFrom4;
+					txt42.text=Ds_Objects.result.Tables.Table.Rows[0].SlabTo4;
+					txt43.text=Ds_Objects.result.Tables.Table.Rows[0].SlabTax4;
+					
+					Id=Ds_Objects.result.Tables.Table.Rows[0].Id;
+					
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						grd_TDSHistory.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+					AddMode=false;
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Delete_CUSTOM")
+				{	
+					alignAlert(Alert.show("Tax Deleted Successfully.","Message !",Alert.OK, null, FunCall,iconTickLarge, Alert.OK),10,'');
+					FnClear();	
+				}	
+			}
+			protected function FnValidation_BeforeSave():String
+			{
+				var TxtFlag:Boolean=true;ErrStr="";
+				var Flag:Boolean=true;
+				if(txt11.text=="")
+				{
+					if(TxtFlag=true)
+					{
+						txt11.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+"*  Slab1 From is Required \n";
+				}
+				if(txt12.text=="")
+				{
+					if(TxtFlag=true)
+					{
+						txt12.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+"*  Slab1 To is Required \n";
+				}
+				if(txt13.text=="")
+				{
+					if(TxtFlag=true)
+					{
+						txt13.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+"*  Slab1 Tax is Required \n";
+				}
+				if(Number(txt12.text)>180000)
+				{
+					if(TxtFlag=true)
+					{
+						txt12.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+"*  Slab1 Tax Should be Less than 1,80,000 \n";
+				}
+				
+				if(txt21.text=="")
+				{
+					if(TxtFlag=true)
+					{
+						txt21.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+"*  Slab2 From is Required \n";
+				}
+				if(txt22.text=="")
+				{
+					if(TxtFlag=true)
+					{
+						txt22.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+"*  Slab2 To is Required \n";
+				}
+				if(txt23.text=="")
+				{
+					if(TxtFlag=true)
+					{
+						txt23.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+"*  Slab2 Tax is Required \n";
+				}
+				if(txt31.text=="")
+				{
+					if(TxtFlag=true)
+					{
+						txt31.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+"*  Slab3 From is Required \n";
+				}
+				if(txt32.text=="")
+				{
+					if(TxtFlag=true)
+					{
+						txt32.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+"*  Slab3 To is Required \n";
+				}
+				if(txt33.text=="")
+				{
+					if(TxtFlag=true)
+					{
+						txt33.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+"*  Slab3 Tax is Required \n";
+				}
+				if((Number(txt11.text))>(Number(txt12.text)))
+				{
+					if(TxtFlag=true)
+					{
+						txt11.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+"*  To Amount Should be Greater than From Amount \n";
+				}
+				if((Number(txt21.text))>(Number(txt22.text)))
+				{
+					if(TxtFlag=true)
+					{
+						txt21.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+"*  To Amount Should be Greater than From Amount \n";
+				}
+				if((Number(txt31.text))>(Number(txt32.text)))
+				{
+					if(TxtFlag=true)
+					{
+						txt31.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+"*  To Amount Should be Greater than From Amount \n";
+				}
+				txt11.setFocus();
+				return ErrStr;
+				
+			}	
+			protected function FnSave():void
+			{
+				ErrStr="";
+				ErrMsg = ""; Flag = true; 
+				var ErrStr:String=FnValidation_BeforeSave();
+				if(ErrStr !="")
+				{
+					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10,"");
+					
+					return;
+				} 
+				else
+				{
+					var arrcopy:ArrayCollection = new ArrayCollection
+						([{ 
+							SlabFrom1:txt11.text,
+							SlabTo1:txt12.text,
+							SlabTax1:txt13.text,
+							
+							SlabFrom2:txt21.text,
+							SlabTo2:txt22.text,
+							SlabTax2:txt23.text,
+							
+							SlabFrom3:txt31.text,
+							SlabTo3:txt32.text,
+							SlabTax3:txt33.text,
+							
+							SlabFrom4:txt41.text,
+							SlabTo4:txt42.text,
+							SlabTax4:txt43.text,
+							
+							Id:Id
+						}])
+						
+						var HdrXml:String=""
+						HdrXml += "<ROOT>";	
+						HdrXml += ObjToXmlStr_Comm(arrcopy,"HdrXml") 
+						HdrXml += "</ROOT>";
+						useWeb("SlabTax","Save_CUSTOM",[GlobalXml,HdrXml]);
+				}
+			}
+
+			protected function Search():void
+			{
+				PopUpManager.addPopUp( SearchPopUp , this, true);
+				SearchPopUp.Prc_name="SlabTax";
+				var SearchParam:Array =new Array();
+				SearchPopUp.HlpIndex="SEARCH";
+				SearchParam[0]=GlobalXml;
+				SearchParam[1]=0;
+				SearchParam[2]=Id;
+				SearchPopUp.Prc_Param=SearchParam;
+				SearchPopUp.HlpSrchGlobal="";
+				SearchPopUp.dataPanel.focusEnabled=true;
+				SearchPopUp.Pageint();					
+				SearchPopUp.addEventListener("PopupEnter",funpopupEnter);
+				SearchPopUp.addEventListener("PopupClose",funpopupClose);
+				PopUpManager.centerPopUp(SearchPopUp);				
+			}
+			
+			private function funpopupClose(event:Event):void
+			{
+				
+			}
+			
+			private function funpopupEnter(event:Event):void
+			{				
+				Searchhb(SearchPopUp.SelectRow.Id,0);		
+			}
+			private function Searchhb(Id:int,_PrdFk:int):void
+			{
+				var Load:Array = new Array(); 
+				Load[0] = GlobalXml; Load[1] = Id; Load[2]=0;
+				useWeb("SlabTax","Search_CUSTOM",Load);
+			}
+			protected function Delete():void
+			{
+				if(Id == 0)
+				{
+					alignAlert(Alert.show("This is an Invalid Process.","Alert Message !",Alert.OK, 
+						null, null,iconWarning, Alert.OK),10,'');					
+					return;
+				}	
+				alignAlert(Alert.show("Do you want to delete this item?", "Warning",Alert.YES | Alert.NO, null,
+					removedata, iconWarning, Alert.NO),10,"");		
+			}
+			private function removedata(event:CloseEvent):void 
+			{	
+				if (event.detail==Alert.YES) 
+				{	
+					var Load:Array = new Array();
+					Load[0]= GlobalXml; Load[1]= Id;  
+					useWeb("SlabTax","Delete_CUSTOM",Load);
+				}
+			}
+			public function FunCall(event:CloseEvent):void
+			{
+				if (event.detail == Alert.OK) 
+				{	
+					txt11.setFocus();
+				}
+			}
+			protected function FnClear():void
+			{
+				txt11.text="";txt12.text="";txt13.text="";
+				txt21.text="";txt22.text="";txt23.text="";
+				txt31.text="";txt32.text="";txt33.text="";
+				txt41.text="";txt42.text="";txt43.text="";
+				txt11.setFocus();Id=0;
+				grd_TDSHistory.dataProvider=null;
+			}			
+			protected function txt11_focusOutHandler(event:FocusEvent):void
+			{
+//				if(txt12.text != "")
+//				{
+//					//txt_DespFinalAllowance.text=Round2.format((Number(Sum))).toString(); 
+//					txt12.text=Round2.format((Number(txt12))).toString();
+//					//NumberValidation.validate(txt12.text);
+//				}
+//				else
+//				{
+//					txt12.errorString = "";
+//				}
+				if((Number(txt11.text)>=0)&&(Number(txt12.text)<=180000))
+				{
+					txt13.text="0";
+				}
+			}
+			protected function txt22_focusOutHandler(event:FocusEvent):void
+			{
+				if((Number(txt21.text)>=180000)&&(Number(txt22.text)<=500000))
+				{
+					txt23.text="10";	
+				}	
+			}
+			protected function txt32_focusOutHandler(event:FocusEvent):void
+			{
+				if((Number(txt31.text)>=500000)&&(Number(txt32.text)<=10000000))
+				{
+					txt33.text="15"
+				}
+			}
+			protected function txt42_focusOutHandler(event:FocusEvent):void
+			{
+				if((Number(txt41.text)>=500000)&&(Number(txt42.text)<=10000000))
+				{
+					txt43.text="20"
+				}
+			}
+			protected function FnClose_Tariff():void
+			{
+				Grp_ContractTariff.visible=false; 
+			}
+			protected function button_Tariff(event:MouseEvent):void
+			{
+				Grp_ContractTariff.visible=false;
+			}
+			protected function FnClick_Tariff():void
+			{
+				Grp_ContractTariff.visible=true; 
+			}
+		]]>
+	</fx:Script>
+	<s:VGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+		<s:HGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle"
+				   depth="10" visible="true">
+		<s:BorderContainer x="12" y="19" width="100%" height="500" backgroundColor="#fbf9f9"
+						   borderVisible="false">
+			<s:Label x="56" y="32" text="TDS Slab" color="red"/>
+			
+			<s:TextInput id="txt11" x="216" y="96" width="126" maxChars="8" prompt="From"
+						 restrict="0-9." tabIndex="1"/>
+			<s:Label x="344" y="87" text="*" color="red"/>
+			<s:TextInput id="txt12" x="410" y="96" width="126"
+						 focusOut="txt11_focusOutHandler(event)" maxChars="8" prompt="To"
+						 restrict="0-9." tabIndex="2"/>
+			<s:Label x="537" y="87" text="*" color="red"/>
+			<s:TextInput id="txt13" x="592" y="96" width="59" prompt="Tax%" tabIndex="3" maxChars="6"
+						 restrict="0-9."/>
+			<s:Label x="650" y="86" text="*" color="red"/>
+			<s:Label x="364" y="104" text="To"/>
+			<s:Label x="553" y="104" text="="/>
+			<s:TextInput id="txt21" x="216" y="179" width="126" maxChars="6" prompt="From"
+						 restrict="0-9" tabIndex="4"/>
+			<s:Label x="345" y="167" text="*" color="red"/>
+			<s:TextInput id="txt22" x="405" y="179" width="126"
+						 focusOut="txt22_focusOutHandler(event)" maxChars="6" prompt="To"
+						 restrict="0-9" tabIndex="5"/>
+			<s:Label x="534" y="169" text="*" color="red"/>
+			<s:TextInput id="txt23" x="592" y="179" width="59" prompt="Tax%" tabIndex="6" maxChars="6"
+						 restrict="0-9."/>
+			<s:Label x="650" y="173" text="*" color="red"/>
+			<s:Label x="364" y="183" height="16" text="To"/>
+			<s:Label x="553" y="348" text="="/>
+			
+			<s:TextInput id="txt31" x="216" y="259" width="126" maxChars="7" prompt="From"
+						 restrict="0-9" tabIndex="7"/>
+			<s:Label x="345" y="252" text="*" color="red"/>
+			<s:TextInput id="txt32" x="405" y="259" width="126"
+						 focusOut="txt32_focusOutHandler(event)" maxChars="8" prompt="To"
+						 restrict="0-9" tabIndex="8"/>
+			<s:Label x="535" y="254" text="*" color="red"/>
+			<s:TextInput id="txt33" x="592" y="259" width="59" prompt="Tax%" tabIndex="9" maxChars="6"
+						 restrict="0-9."/>
+			<s:Label x="654" y="254" text="*" color="red"/>
+			<s:Label x="364" y="267" text="To"/>
+			<s:Label x="553" y="267" text="="/>
+			
+			<s:TextInput id="txt41" x="216" y="340" width="126" maxChars="7" prompt="From"
+						 restrict="0-9" tabIndex="10"/>
+			<s:TextInput id="txt42" x="405" y="340" width="126"
+						 focusOut="txt42_focusOutHandler(event)" maxChars="8" prompt="To"
+						 restrict="0-9" tabIndex="11"/>
+			<s:TextInput id="txt43" x="592" y="340" width="59" prompt="Tax%" tabIndex="12" maxChars="6"
+						 restrict="0-9."/>
+			<s:Label x="364" y="348" text="To"/>
+			<s:Label x="553" y="187" text="="/>
+			<s:Label x="659" y="96" text="%"/>
+			<s:Label x="659" y="181" text="%"/>
+			<s:Label x="664" y="264" text="%"/>
+			<s:Label x="664" y="345" text="%"/>
+			<s:Label x="130" y="104" text="Slab1"/>
+			<s:Label x="130" y="348" text="Slab4"/>
+			<s:Label x="130" y="267" text="Slab3"/>
+			<s:Label x="130" y="187" text="Slab2"/>
+			<WrbComp:Button_HB id="TDS_History" x="405" y="417" width="122" height="32"
+							   _Label="TDS History" click="FnClick_Tariff()" depth="0"
+							   buttonMode="true" focusEnabled="false"/>
+			</s:BorderContainer>
+			</s:HGroup>
+			<s:HGroup x="5" y="428" width="100%" height="40" horizontalAlign="center" verticalAlign="middle"
+					  depth="0">
+				<WrbComp:SaveControl x="150" y="426" docClear="FnClear()" docRefresh="PageLoad()" docSave="FnSave()"
+									 doSearch="Search()" docDelete="Delete()">
+				</WrbComp:SaveControl>
+			</s:HGroup>
+			<s:Button id="Button" x="802" y="145" label="Button" visible="false"/>
+			
+			<s:HGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle"
+					  id="Grp_ContractTariff" depth="10" visible="false">
+				<s:BorderContainer width="100%" height="100%" backgroundAlpha="0.1" borderVisible="false">
+					<!--s:HGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="middle"-->
+			<s:Panel x="103" y="-379" width="750" height="340" cornerRadius="2"
+					 title="TDS History">
+				<s:Label  x="13" y="26" text="TDS History" color="Red"/>
+				<mx:DataGrid id="grd_TDSHistory" x="28" y="43"  verticalAlign="middle" editable="true" 
+							 width="694" height="191" tabIndex="93">
+					<mx:columns>
+						<mx:DataGridColumn dataField="SlabFrom1" headerText="SlabFrom1" editable="false" width="200" />
+						<mx:DataGridColumn dataField="SlabTo1" headerText="SlabTo1" editable="false" width="200" />
+						<mx:DataGridColumn dataField="SlabTax1" headerText="SlabTax1" editable="false" width="200" />
+						<mx:DataGridColumn dataField="SlabFrom2" headerText="SlabFrom2" editable="false" width="260" />
+						<mx:DataGridColumn dataField="SlabTo2" headerText="SlabTo2" editable="false" width="150" />
+						<mx:DataGridColumn dataField="SlabTax2" headerText="SlabTax2" editable="false" width="130" />
+						<mx:DataGridColumn dataField="SlabFrom3" headerText="SlabFrom3" width="130" editable="false"/>
+						<mx:DataGridColumn dataField="SlabTo3" headerText="SlabTo3" width="130" editable="false"/>
+						<mx:DataGridColumn dataField="SlabTax3" headerText="SlabTax3" width="130" editable="false"/>
+						<!--mx:DataGridColumn dataField="Description" headerText="Description" width="130" editable="false"/-->
+						<mx:DataGridColumn dataField="Id" visible="false"/>
+					</mx:columns>
+				</mx:DataGrid>
+				<s:Image x="671" y="-24" buttonMode="true" click="FnClose_Tariff()"
+						 source="@Embed(source='../Assets/CrossSmall.png')" toolTip="Close"/>
+				<WrbComp:Button_HB x="313" y="265" _Label="Close" buttonMode="true"
+								   click="button_Tariff(event)"/>
+			</s:Panel>
+						
+		
+				<!--/s:HGroup-->					
+			</s:BorderContainer>				
+		</s:HGroup>
+	</s:VGroup>	
+</s:Application>

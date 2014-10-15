@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="35" height="34" creationComplete="funOcc()">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			public  var Lable_Date:String="";
+			public  var Lable_Day:String="";
+			public  var Color_Day:String="";			
+			public function set _LabelData(Val:String):void
+			{
+				Lable_Date=Val;
+			}
+			public function set _LabelId(Val:String):void
+			{
+				Lable_Day= Val;
+			}			
+			public function set _BColor(Val:String):void
+			{
+				Brd_Status.setStyle("backgroundColor","#4F8BBD");
+				Color_Day="White";
+				
+			}
+			public function set _CColor(Val:String):void
+			{
+				Brd_Status.setStyle("backgroundColor","#FFFFFF");
+			}
+			public function set _RedColor(Val:String):void
+			{			
+				Color_Day="Red";
+			}			
+			public function funOcc():void
+			{
+				lbl_Data.text=Lable_Date
+				if(Color_Day=="White")
+				{
+					lbl_Data.setStyle("color","#FFFFFF");
+				}
+				if(Color_Day=="Red")
+				{
+					lbl_Data.setStyle("color","Red");
+				}
+				
+			}			
+		]]>
+	</fx:Script>
+	<s:VGroup x="0" y="0" width="100%" height="100%" verticalAlign="middle" horizontalAlign="center" id="Grp_Status">
+		<s:BorderContainer x="0" y="4" width="100%" height="50%" id="Brd_Status" borderVisible="false">
+			<s:VGroup x="0" y="4" width="100%" height="100%" verticalAlign="middle" horizontalAlign="center">
+				<mx:Label text="" id="lbl_Data"/>
+				
+			</s:VGroup>
+		</s:BorderContainer>
+	</s:VGroup>	
+	<mx:VRule x="-1" y="0" width="5" height="98%" strokeColor="#060000"/>	
+	<mx:VRule x="35" y="0" width="5" height="98%" strokeColor="#060000"/>
+	<mx:HRule x="0" y="-1" width="99%" height="5" strokeColor="#060000"/>
+	<mx:HRule x="1" y="32" width="99%" height="5" strokeColor="#060000"/>
+</s:Group>

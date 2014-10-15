@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml"
+		  xmlns:s="library://ns.adobe.com/flex/spark"
+		  horizontalAlign="left" verticalAlign="middle" width="108" height="33"
+		  paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5" horizontalGap="-3"
+		  borderColor="#000000" borderVisible="true" verticalScrollPolicy="off" initialize="init()"
+		  horizontalScrollPolicy="off" creationPolicy="all" creationComplete="hbox1_creationCompleteHandler(event)">
+	
+	<mx:Script>
+		<![CDATA[
+			import flash.events.Event;
+			
+			import mx.controls.Alert;
+			import mx.controls.RadioButton;
+			import mx.controls.RadioButtonGroup;
+			import mx.core.UIComponent;
+			import mx.events.FlexEvent;
+			import mx.formatters.PhoneFormatter;
+			
+			private var Now:Date;		
+			public var minuteStep:int = 5;
+			private var ShortTime:Boolean=false;
+			private var timeFormatter:PhoneFormatter = new PhoneFormatter();
+			
+			private function init():void
+			{	
+				this.setTime = new Date();
+			}
+			
+			[Bindable]
+			//[Inspectable(category="General", type="Boolean", defaultValue="false", enumeration="true,false")]
+			public function set ShortTimeFormat(val:Boolean):void
+			{
+				this.ShortTime = val;
+				invalidateProperties();
+			}
+			
+			public function get ShortTimeFormat():Boolean
+			{
+				return ShortTime;
+			}
+					
+			[Bindable]
+			public function set setTime(value:Date):void
+			{
+				this.Now = value;
+				invalidateProperties();
+			}
+			public function getTime():String
+			{
+				timeFormatter.formatString = "##";
+				var time:String="";
+				if(this.ShortTime == true)
+				{
+					if(ddlAMPM.selectedIndex == 1)
+					{
+						
+						if(hours.value + 12 >= 24)
+						{
+							//time = formatTwoDigit((hours.value + 12) -1);
+							var Num:Number=hours.value + 12;
+							if(Num == 24)
+							{
+								time = formatTwoDigit(12);
+							}
+							else
+							{
+								time = formatTwoDigit(0);
+							}
+						}
+						else
+						{
+							time = formatTwoDigit(hours.value + 12);
+						}
+					}
+					else
+					{
+						time = formatTwoDigit(hours.value);
+					}
+				}
+				else
+				{
+					time = formatTwoDigit(hours.value);
+				}
+				time += ":" + formatTwoDigit(minutes.value) + ":00";				
+				
+				return time;
+			}
+			
+			private function formatTwoDigit(value:int):String
+			{
+				if(value.toString().length == 1)
+					return "0" + value.toString();
+				
+				return value.toString();
+			}
+			
+			override public function validateProperties():void
+			{
+				super.validateProperties();				
+			}			
+		
+			override public function setFocus():void
+			{
+				this.hours.setFocus();
+			}
+			
+			override protected function commitProperties():void
+			{				
+				super.commitProperties();
+				
+				//Set 12Hours or 24Hours
+				if(this.ShortTime == true)
+				{
+					hours.minimum = 1;
+					hours.maximum = 12;					
+					//rbAM.visible = true;
+					//rbPM.visible = true;
+					ddlAMPM.visible = true;
+					//this.width = 210;
+					this.width = 163;
+					
+					//Set 12Hours Time
+				
+					/*
+					if(this.Now.getHours() >= 12)
+					{
+						//this.groupAMPM.selectedValue = 2;
+						this.ddlAMPM.selectedIndex = 1;
+					}
+					else
+					{
+						//this.groupAMPM.selectedValue = 1;
+						this.ddlAMPM.selectedIndex = 0;
+					}
+					*/
+					
+					if(this.Now.getHours() < 13)
+					{
+						this.hours.value = this.Now.getHours();
+					}
+					else
+					{
+						this.hours.value = this.Now.getHours() - 12;
+						this.ddlAMPM.selectedIndex = 1;
+					}
+					
+					if(this.Now.getHours() == 0)
+					{
+						this.hours.value = 12;
+						this.ddlAMPM.selectedIndex = 0;						
+					}
+					
+					this.minutes.value = this.Now.getMinutes();
+					this.validateNow();
+					
+				}
+				else
+				{
+					hours.minimum = 0;
+					hours.maximum = 23;					
+					//rbAM.visible = false;
+					//rbPM.visible = false;
+					ddlAMPM.visible = false;
+					this.width = 108;
+					
+					//Set 24 Hours times
+					this.hours.value = this.Now.getHours();
+					this.minutes.value = this.Now.getMinutes();
+				}
+					
+			}
+			
+			protected function refreshTime(event:TimerEvent):void
+			{
+				this.setTime = new Date();
+			}
+			
+			protected function hbox1_creationCompleteHandler(event:FlexEvent):void
+			{	
+				if(currTime)
+				{
+					var timer:Timer = new Timer(1000);
+					timer.addEventListener(TimerEvent.TIMER, refreshTime);
+					timer.start();
+				}
+			}
+			
+			public var currTime:Boolean = false;
+			public function set setCurrTime(value:Boolean):void
+			{
+				currTime = value;
+			}
+
+		]]>
+	</mx:Script>
+	
+	<mx:Spacer width="2"/>
+	<mx:NumericStepper id="hours" width="45" 
+					   keyDown="{if(event.keyCode == Keyboard.ENTER)this.minutes.setFocus()}"
+					   stepSize="1" textAlign="center"
+					   height="23" fontSize="11" tabIndex="{this.tabIndex + 1}"/>
+	<mx:Label width="15" fontSize="14" fontWeight="bold" text=":" textAlign="center"/>
+	<mx:NumericStepper id="minutes" width="45" maximum="59" minimum="0"
+					   stepSize="{minuteStep}" textAlign="center" 
+					   keyDown="{if(event.keyCode == Keyboard.ENTER)this.ddlAMPM.setFocus()}" 
+					   height="23" fontSize="11" tabIndex="{this.tabIndex + 2}"/>
+	<mx:Spacer width="10"/>
+	<s:DropDownList id="ddlAMPM" width="53" height="22" visible="false" fontSize="11"
+					keyDown="{if(event.keyCode == Keyboard.ENTER)this.hours.setFocus()}" 
+					textAlign="left" tabIndex="{this.tabIndex + 3}">
+		<s:dataProvider>
+			<s:ArrayCollection>
+				<mx:String>AM</mx:String>
+				<mx:String>PM</mx:String>
+			</s:ArrayCollection>
+		</s:dataProvider>
+	</s:DropDownList>
+	
+</mx:HBox>

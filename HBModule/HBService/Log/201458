@@ -1,0 +1,18 @@
+5/8/2014 12:17:18 PM ==> Cannot insert the value NULL into column 'CltmgntId', table 'HB.dbo.WRBHBClientManagementAddClientGuest'; column does not allow nulls. INSERT fails.
+Cannot insert the value NULL into column 'GuestId', table 'HB.dbo.WRBHBBookingGuestDetails'; column does not allow nulls. INSERT fails.
+The statement has been terminated.
+The statement has been terminated.
+5/8/2014 12:17:32 PM ==> Cannot insert the value NULL into column 'CltmgntId', table 'HB.dbo.WRBHBClientManagementAddClientGuest'; column does not allow nulls. INSERT fails.
+Cannot insert the value NULL into column 'GuestId', table 'HB.dbo.WRBHBBookingGuestDetails'; column does not allow nulls. INSERT fails.
+The statement has been terminated.
+The statement has been terminated.
+5/8/2014 12:17:33 PM ==> Cannot insert the value NULL into column 'CltmgntId', table 'HB.dbo.WRBHBClientManagementAddClientGuest'; column does not allow nulls. INSERT fails.
+Cannot insert the value NULL into column 'GuestId', table 'HB.dbo.WRBHBBookingGuestDetails'; column does not allow nulls. INSERT fails.
+The statement has been terminated.
+The statement has been terminated.
+5/8/2014 2:05:27 PM ==> Object reference not set to an instance of an object.
+5/8/2014 2:06:23 PM ==> Object reference not set to an instance of an object.
+5/8/2014 2:06:39 PM ==> Object reference not set to an instance of an object.
+5/8/2014 4:22:53 PM ==> Invalid object name '#Internal'.
+5/8/2014 11:23:25 PM ==> Error converting data type varchar to numeric.
+5/8/2014 11:24:43 PM ==> Error converting data type varchar to numeric.

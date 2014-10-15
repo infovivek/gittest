@@ -1,0 +1,732 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:Controls="fx.com.adobe.Controls.*"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   xmlns:WrbComp="WrbComp.*"
+			   xmlns:flexlib="http://code.google.com/p/flexlib/"
+			   width="100%" height="100%" creationComplete="PageLoad()" pageTitle="Bill ">
+	<fx:Declarations>
+		<mx:NumberFormatter id="NF_Two" precision="2" rounding="nearest"/>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
+	<fx:Script>
+		<![CDATA[
+			import WrbComp.frmsearchwindow;
+			
+			import WrbHelpComp.HlpGridHdr;
+			
+			import flashx.textLayout.formats.Float;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.CalendarLayoutChangeEvent;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.events.IndexChangedEvent;
+			import mx.graphics.codec.PNGEncoder;
+			
+			import spark.events.IndexChangeEvent;
+			import spark.events.TextOperationEvent;
+			private var SearchPopUp:frmsearchwindow = new frmsearchwindow();
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "",TypeServiceId:int=0,ErrStr:String="";
+			public var Id:int=0,ErrMsg:String="",ClientId:int=0,UserId:int=0;
+			public var AddMode:Boolean=true,Flag:Boolean=true;
+			private var fileRef:FileReference = new FileReference();
+			private var fileTypes:Array = new Array();
+			private var arrColl:ArrayCollection;
+			private var imageTypes:FileFilter = new FileFilter("Images (*.jpg; *.jpeg; *.gif; *.png)" ,"*.jpg; *.jpeg; *.gif; *.png");
+			private var documentTypes:FileFilter = new FileFilter("Documents (*.pdf), (*.doc), (*.rtf), (*.txt)",("*.pdf; *.doc; *.rtf, *.txt"));
+			private var FILE_URL:String = "",PropertyId:int=0,PropertyName:String="",PropertyId1:int=0,PropertyName1:String="",ClientName:String="",ContractName:String="",ContractId:int=0;
+			public var ImageCount:Number=0;
+			private var urlReq:URLRequest;
+			public var Str_ContractBill:String="",PrintChkOutId:int=0,Str_ContractBillDedicated:String="";
+			public var Save_Flag:Boolean=true; 
+			public var Cess:Number=0,Hcess:Number=0,LTTax:Number=0,STTax:Number;
+			public var LTPer:Number=0,STPer:Number=0;
+			public var uploadURL:URLRequest = new URLRequest();
+			public var Amount:String="",CashAccountId:int=0,CashAccount:String="",CashChalan:String="";
+			public var ActualToatl:Number=0,Comments:String="",ChkAccountId:int=0,ChkAccount:String="",Mode:String="Contract";
+			
+			protected function PageLoad():void
+			{
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";
+				btn_ContractBill.Button_B_mouseOverHandler();
+				btn_ManagedContractBill.Button_OutHandler();
+				Brd2_AddContractBill.visible=false;
+//				Str_ContractBill="http://localhost:4171/ContractBill.aspx?";
+//				Str_ContractBillDedicated="http://localhost:4171/ContractBillDedicated.aspx?";
+				Str_ContractBill="http://sstage.in/HBReport/ContractBill.aspx?";
+				Str_ContractBillDedicated="http://sstage.in/HBReport/ContractBillDedicated.aspx?";
+				Mode='Contract';
+				useWeb("ContractBill","PAGELOAD_CUSTOM",[GlobalXml,"PAGELOAD",0,0,Mode]);
+			}
+			public function Help():void
+			{
+				useWeb("ContractBill","PAGELOAD_CUSTOM",[GlobalXml,"PAGELOAD",0,0,Mode]);
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void				
+			{
+				
+				if (Ds_Objects.currentTarget.description.toString() == "CONTRACTLOADClient_CUSTOM")
+				{
+					if(Mode=='Contract')
+					{
+						Grd_Details.dataProvider=null;
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{	
+							Grd_Details.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						}
+						
+					}
+					else
+					{
+						Grd_MDetails.dataProvider=null;
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{
+							Grd_MDetails.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						}
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "PAGELOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{	
+						hlp_AClientName.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						hlp_ClientName.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						hlp_MClientName.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+					Grd_Details.dataProvider=null;
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Grd_Details.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+					Grd_MDetails.dataProvider=null;
+					if (Ds_Objects.result.Tables.Table2.Rows.length > 0)
+					{
+						Grd_MDetails.dataProvider=Ds_Objects.result.Tables.Table2.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "CONTRACTLOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Drp_Contract.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+					else
+					{
+						Drp_Contract.dataProvider=null;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "CONTRACTDETAILLOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						dt_Start.text=Ds_Objects.result.Tables.Table.Rows[0].StartDate;
+						dt_End.text=Ds_Objects.result.Tables.Table.Rows[0].EndDate;
+						lbl_Days.text=Ds_Objects.result.Tables.Table.Rows[0].Days;						
+						lbl_NetTariff.text=Ds_Objects.result.Tables.Table.Rows[0].TariffAmount;
+						txt_Total.text=Ds_Objects.result.Tables.Table.Rows[0].TotalTariff;
+						lbl_DataSTax.text=Ds_Objects.result.Tables.Table.Rows[0].ServiceTax;
+						lbl_DataLTax.text=Ds_Objects.result.Tables.Table.Rows[0].TTax;
+						LTPer=Ds_Objects.result.Tables.Table.Rows[0].LT;
+						STPer=Ds_Objects.result.Tables.Table.Rows[0].ST;
+						Cess=Ds_Objects.result.Tables.Table.Rows[0].Cess;
+						Hcess=Ds_Objects.result.Tables.Table.Rows[0].HCess;
+						//lblBillno.text=Ds_Objects.result.Tables.Table.Rows[0].InvoiceNo;
+						lblLuxury_Tax.text="Luxury Tax("+LTPer+"%)";
+						Id=Ds_Objects.result.Tables.Table.Rows[0].IMAId;
+						ActualToatl=(Number(txt_Total.text));
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Search_CUSTOM")
+				{
+					if(Mode=='Contract')
+					{
+						Grd_Details.dataProvider=null;
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{	
+							Grd_Details.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						}
+					}
+					else
+					{
+						Grd_MDetails.dataProvider=null;
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{
+							Grd_MDetails.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						}
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				{
+					if(Mode=='Contract')
+					{
+						PrintChkOutId=0;
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{
+							PrintChkOutId=Ds_Objects.result.Tables.Table.Rows[0].Id;
+							Mode=Ds_Objects.result.Tables.Table.Rows[0].Type;
+							ExternalInterface.call("changeDocumentTitle",Str_ContractBillDedicated+PrintChkOutId+"?"+Mode);
+						}
+						//					if (AddMode == true)
+						//					{
+						//						alignAlert(Alert.show("Bill Saved Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+						//					}
+						Brd_AddContractBill.visible=false;
+						Brd1_AddContractBill.visible=false;
+						Brd2_AddContractBill.visible=false;
+					}
+					else
+					{
+						PrintChkOutId=0;
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{
+							PrintChkOutId=Ds_Objects.result.Tables.Table.Rows[0].Id;
+							Mode=Ds_Objects.result.Tables.Table.Rows[0].Type;
+							ExternalInterface.call("changeDocumentTitle",Str_ContractBill+PrintChkOutId+"?"+Mode);
+						}
+						//					if (AddMode == true)
+						//					{
+						//						alignAlert(Alert.show("Bill Saved Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+						//					}
+						Brd_AddContractBill.visible=false;
+						Brd1_AddContractBill.visible=false;
+						Brd2_AddContractBill.visible=false;
+					}
+//					PrintChkOutId=0;
+//					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+//					{
+//						PrintChkOutId=Ds_Objects.result.Tables.Table.Rows[0].Id;
+//						Mode=Ds_Objects.result.Tables.Table.Rows[0].Type;
+//						ExternalInterface.call("changeDocumentTitle",PrintChkOutId+"?"+Str_ContractBill);
+//					}
+//					//					if (AddMode == true)
+//					//					{
+//					//						alignAlert(Alert.show("Bill Saved Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+//					//					}
+//					Brd_AddContractBill.visible=false;
+//					Brd1_AddContractBill.visible=false;
+//					Brd2_AddContractBill.visible=false;
+					if(Mode=='D')
+					{
+						Brd_ContractBill.visible=true;
+					}
+					else
+					{
+						Brd_MContract.visible=true;
+					}
+					FnClear();
+					
+				}
+			}
+			public function FnSelect():void
+			{ 
+				if(Mode!='ManagedContract')
+				{
+					var GrdIndex:Number=Grd_Details.selectedIndex;
+					var Temp_AC:ArrayCollection= new ArrayCollection();
+					Temp_AC=Grd_Details.dataProvider as ArrayCollection;
+					
+					ExternalInterface.call("changeDocumentTitle",Str_ContractBillDedicated+Temp_AC[GrdIndex].ContractId+"?"+Temp_AC[GrdIndex].Type);
+				}
+				else
+				{
+					var GrdIndex:Number=Grd_MDetails.selectedIndex;
+					var Temp_AC:ArrayCollection= new ArrayCollection();
+					Temp_AC=Grd_MDetails.dataProvider as ArrayCollection;
+					
+					ExternalInterface.call("changeDocumentTitle",Str_ContractBill+Temp_AC[GrdIndex].ContractId+"?"+Temp_AC[GrdIndex].Type);
+				}
+				
+			}
+			protected function Search():void
+			{
+				ErrStr="";var Flag:Boolean=true;
+				if((ClientId==0)&&(txt_MBillNo.text=="")&&(txt_BillNo.text==""))
+				{
+					if(Flag == true)
+					{
+						hlp_AClientName.setFocus();Flag=false;
+					}
+					ErrStr = ErrStr + "* Client is Required.\n";
+				} 
+				if(ErrStr!="")
+				{
+					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10,"");
+					return;
+				}
+				else
+				{
+					SearchPopUp.Prc_name="ContractBill"
+					var SearchParam:Array =new Array();
+					SearchPopUp.HlpIndex="SEARCH";
+					SearchParam[0]=GlobalXml;
+					SearchParam[1]=0;
+					SearchParam[2]=ClientId; 
+					SearchParam[3]=Drp_PaymentStatus.selectedItem;
+					SearchParam[4]=txt_BillNo.text;
+					SearchParam[5]=Drp_BillStatus.selectedItem;
+					SearchParam[6]=Mode;
+					var Load:Array = new Array(); 
+					Load[0] = GlobalXml; Load[1] = Id; Load[2]=ClientId;
+					Load[3]=Drp_PaymentStatus.selectedItem;Load[4]=txt_BillNo.text;
+					Load[5]=Drp_BillStatus.selectedItem;Load[6]=Mode;
+					useWeb("ContractBill","Search_CUSTOM",Load);
+				}
+			}
+			private function FnSave():void
+			{
+				var arrHdr:ArrayCollection = new ArrayCollection
+					([{
+						LTTax:lbl_DataLTax.text,
+						STTax:lbl_DataSTax.text,
+						StartDate:dt_Start.text,
+						EndDate:dt_End.text,
+						TotalAmount:txt_Total.text,
+						AdjustmentAmount:txt_Adjustment.text,
+						Attention:txt_Attention.text,
+						ReferenceNo:txt_ReferenceNo.text,
+						Remarks:txt_Remarks.text,
+						DueDate:dt_Due.text,
+						ContractId:ContractId,
+						Mode:Mode,
+						Id:Id,
+						LTPer:LTPer,
+						STPer:STPer,
+						Cess:Cess,
+						Hcess:Hcess
+					}]);
+				var HdrXml:String = ObjToXmlStr_Comm(arrHdr, "HdrXml");	
+				useWeb("ContractBill","Save_CUSTOM",[GlobalXml,HdrXml]);
+			}
+			protected function btn_NewContractBill_Click(event:MouseEvent):void
+			{
+				Grp_MContractBill.visible=true;
+				Brd_AddContractBill.visible=true;
+				Brd1_AddContractBill.visible=true;
+				Brd2_AddContractBill.visible=false;
+				Brd_ContractBill.visible=false;
+				Brd_MContract.visible=false;
+				Rbn_Monthly.visible=false;
+				Rbn_Bi.visible=false;
+				lblBill_Mode.visible=false;
+			}
+			protected function btn_NewMContractBill_Click(event:MouseEvent):void
+			{
+				Grp_MContractBill.visible=true;
+				Brd_AddContractBill.visible=true;
+				Brd1_AddContractBill.visible=true;
+				Brd2_AddContractBill.visible=false;
+				Brd_ContractBill.visible=false;
+				Brd_MContract.visible=false;
+				Rbn_Monthly.visible=true;
+				lblBill_Mode.visible=true;
+			}
+			public function	Ddl_Client_changeHandler():void
+			{
+				if(hlp_ClientName.selected())
+				{
+					ClientName=hlp_ClientName.Select_Row.Client;
+					ClientId=hlp_ClientName.Select_Row.ZId;
+					hlp_ClientName.text=ClientName;
+					useWeb("ContractBill","CONTRACTLOADClient_CUSTOM",[GlobalXml,"CONTRACTLOADClient",0,ClientId,Mode]);
+				}
+				else
+				{
+					hlp_ClientName.text="";
+				}
+			}
+			public function Ddl_AClient_changeHandler():void
+			{
+				if(hlp_AClientName.selected())
+				{
+					ClientName=hlp_AClientName.Select_Row.Client;
+					ClientId=hlp_AClientName.Select_Row.ZId;
+					hlp_AClientName.text=ClientName;
+					useWeb("ContractBill","CONTRACTLOAD_CUSTOM",[GlobalXml,"CONTRACTLOAD",0,ClientId,Mode]);
+				}
+				else
+				{
+					hlp_AClientName.text="";
+				}
+			}	
+			public function	Ddl_MClient_changeHandler():void
+			{
+				if(hlp_MClientName.selected())
+				{
+					ClientName=hlp_MClientName.Select_Row.Client;
+					ClientId=hlp_MClientName.Select_Row.ZId;
+					hlp_MClientName.text=ClientName;
+					useWeb("ContractBill","CONTRACTLOADClient_CUSTOM",[GlobalXml,"CONTRACTLOADClient",0,ClientId,Mode]);
+				}
+				else
+				{
+					hlp_MClientName.text="";
+				}
+			}
+			protected function Drp_Contract_clickHandler():void
+			{
+				ContractId=Drp_Contract.selectedItem.data;
+				ContractName=Drp_Contract.selectedItem.label;
+				Drp_Contract.prompt=ContractName;
+				if(Drp_Contract.prompt!="")
+				{
+					Brd2_AddContractBill.visible=true;
+				}
+				useWeb("ContractBill","CONTRACTDETAILLOAD_CUSTOM",[GlobalXml,"CONTRACTDETAIL",0,ContractId,Mode]);
+			}
+			public function Ddl_Property_changeHandler():void
+			{
+				if(hlp_Property.selected())
+				{
+					PropertyName=hlp_Property.Select_Row.Property;
+					PropertyId=hlp_Property.Select_Row.zId;
+					hlp_Property.text=PropertyName;
+				}
+				else
+				{
+					hlp_Property.text="";
+				}
+			}
+			protected function FnClear():void
+			{
+				hlp_ClientName.text="";
+				hlp_AClientName.text="";
+				hlp_MClientName.text="";
+				hlp_ClientName.Select_Row.Client="";
+				hlp_ClientName.Select_Row.ZId=0;
+				ClientName="";
+				ClientId=0;
+				hlp_Property.text="";
+				PropertyName="";
+				PropertyId=0;	
+				Drp_Contract.dataProvider=null;
+				Drp_Contract.prompt="Select Contract";
+				lbl_DataLTax.text="";
+				lbl_DataSTax.text="";
+				lbl_Days.text="";
+				lbl_NetTariff.text="";
+				txt_Adjustment.text="";
+				txt_Attention.text="";
+				txt_BillNo.text="";
+				txt_MBillNo.text="";
+				txt_ContactNo.text="";
+				txt_Remarks.text="";
+				txt_ReferenceNo.text="";
+				txt_Total.text="";
+				LTPer=0;
+				STPer=0;
+				Cess=0;
+				Hcess=0;
+				Help();
+			}
+			protected function CBClose():void
+			{
+				if(Mode=="Contract")
+				{
+					Brd_AddContractBill.visible=false;
+					Brd_ContractBill.visible=true;
+					
+				}
+				if(Mode=="ManagedContract")
+				{
+					Brd_AddContractBill.visible=false;
+					Brd_MContract.visible=true;
+				}
+				FnClear();
+			}
+			protected function btn_ContractBill_clickHandler(event:MouseEvent):void
+			{
+				Mode="Contract";
+				btn_ContractBill.Button_B_mouseOverHandler();
+				btn_ManagedContractBill.Button_OutHandler();
+				Grp_Contract.visible=true;
+				Brd_ContractBill.visible=true;
+				Brd1_AddContractBill.visible=false;
+				Brd2_AddContractBill.visible=false;
+				Brd_AddContractBill.visible=false;
+				Brd_MContract.visible=false;
+				Grp_MContract.visible=false;
+				Brd_MContract.visible=false;
+				lblLuxury_Tax.visible=true;
+				lbl_DataLTax.visible=true;
+				lblHeader.text="Contract Bill";
+				lblservice_Tax.text="ServiceTax(12.36%)";				
+				FnClear();
+			}
+			protected function btn_ManagedContractBill_clickHandler(event:MouseEvent):void
+			{
+				Mode="ManagedContract";
+				btn_ManagedContractBill.Button_B_mouseOverHandler();
+				btn_ContractBill.Button_OutHandler();
+				Grp_Contract.visible=false;
+				Brd_ContractBill.visible=false;
+				Grp_MContract.visible=true;
+				Brd_MContract.visible=true;
+				lblLuxury_Tax.visible=false;
+				lbl_DataLTax.visible=false;
+				Brd1_AddContractBill.visible=false;
+				Brd2_AddContractBill.visible=false;
+				Brd_AddContractBill.visible=false;
+				lblHeader.text="Managed Contract Bill";
+				lblservice_Tax.text="ServiceTax(12.36%)";			
+				FnClear();
+			}
+			protected function txt_Adjustment_changeHandler(event:TextOperationEvent):void
+			{
+				var Total:String="";
+				Total=txt_Total.text;
+				var Adjustment:Number=(Number(txt_Adjustment.text));
+				var Total1:Number=(Number(txt_Total.text));
+				if(Number(txt_Adjustment.text)>0)
+				{
+					txt_Total.text =  String(ActualToatl-Number(Adjustment))
+					txt_Total.text=txt_Total.text.replace("-","");
+					if(txt_Total.text!="")
+					{
+						if(Number(txt_Total.text)<Number(txt_Adjustment.text))
+						{
+							txt_Adjustment.text="";
+							txt_Total.text=ActualToatl.toString();
+							alignAlert(Alert.show("Adjustment Amount Should be Less Than TotalAmount",
+								"Message !",Alert.OK, null, null,iconWarning, Alert.OK),10,"");
+							return; 
+						}
+					}
+				}
+				else
+				{
+					txt_Total.text=ActualToatl.toString();
+				}
+			}
+			
+			
+		]]>
+	</fx:Script>
+	<s:HGroup x="0" y="0" width="945" height="45" horizontalAlign="center" verticalAlign="middle">
+		<WrbComp:TabButton_HB width="120" height="40" _Label="Contract Bill" click="btn_ContractBill_clickHandler(event)" id="btn_ContractBill"/>
+		<WrbComp:TabButton_HB id="btn_ManagedContractBill" x="454" width="164" height="40"
+							  _Label="Managed Contract Bill" click="btn_ManagedContractBill_clickHandler(event)"/>
+	</s:HGroup>
+	
+	
+	
+	
+	<s:HGroup id="Grp_Contract" x="0" y="44" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle"
+			  visible="true">
+		<s:BorderContainer width="100%" height="100%" id="Brd_ContractBill" backgroundColor="#fbf9f9" 
+						   visible="true">
+			<s:Label x="14" y="17" text="Contract Bills" color="red"/>
+			<s:Label x="34" y="56" text="Client"/>
+			<WrbHelpComp:HelpText id="hlp_ClientName" x="96" y="46" width="288" height="22" pxSetColumnsWidth="288,0"
+								  onselection="{Ddl_Client_changeHandler()}"  pxTabIndex="1" depth="100"
+								  pxSetPrompt="Select Client" />
+			<s:Label x="316" y="52" text="Property" visible="false"/>
+			<WrbHelpComp:HelpText id="hlp_Property" x="389" y="44" width="250" height="22" pxSetColumnsWidth="250,0" 
+								  onselection="{Ddl_Property_changeHandler()}"  pxTabIndex="1" depth="10"
+								  pxSetPrompt="Select Property" visible="false"/>
+			<s:Label x="333" y="52" text="Payment Status" visible="false"/>
+			<s:DropDownList id="Drp_PaymentStatus" x="453" y="43" width="150" prompt="Select Status" change="" visible="false">
+				<s:ArrayList>
+					<fx:String>All Status</fx:String>
+					<fx:String>Settled</fx:String>
+					<fx:String>UnSettled</fx:String>
+				</s:ArrayList>
+			</s:DropDownList>
+			<s:Label x="338" y="100" text="Bill Status" visible="false"/>
+			<s:DropDownList id="Drp_BillStatus" x="453" y="91" width="150" prompt="Select Status" change="" visible="false">
+				<s:ArrayList>
+					<fx:String>All Status</fx:String>
+					<fx:String>Active</fx:String>
+					<fx:String>Cancel</fx:String>
+				</s:ArrayList>
+			</s:DropDownList>
+			<s:Label x="363" y="84" text="Bill No" visible="false"/>
+			<s:TextInput id="txt_BillNo" x="425" y="74" width="162" visible="false"/>
+			<s:Button x="673" y="66" height="28" label="Search" click="Search()" visible="false"/>
+			<s:Button x="833" y="46" height="28" label="Clear" click="FnClear()"/>
+			<mx:DataGrid x="15" y="91"  verticalAlign="middle" editable="true" visible="true"
+						 width="100%" height="100%" tabIndex="4" id="Grd_Details">
+				<mx:columns>
+					<mx:DataGridColumn dataField="Print" headerText="Print" width="40" editable="false">
+						<mx:itemRenderer >
+							<fx:Component>
+								<mx:HBox horizontalAlign="center" verticalAlign="middle">
+									
+									<mx:CheckBox selected="{data.checks}"  
+												 change="outerDocument.FnSelect();"/>
+								</mx:HBox>	
+							</fx:Component>
+						</mx:itemRenderer>
+					</mx:DataGridColumn> 
+					<mx:DataGridColumn dataField="InvoiceNo" headerText="Bill No" editable="false"/>
+					<mx:DataGridColumn dataField="Client" headerText="Client" editable="false"/>
+					<mx:DataGridColumn dataField="ContractName" headerText="Contract Name" editable="false"/>
+					<mx:DataGridColumn dataField="StartDate" headerText="Start Date" editable="false"/>
+					<mx:DataGridColumn dataField="EndDate" headerText="End Date" editable="false"/>
+					<mx:DataGridColumn dataField="TariffAmount" headerText="Tariff Amount" editable="false"/>
+					<mx:DataGridColumn dataField="PaymentStatus" headerText="PaymentStatus" editable="false" 
+									   visible="false"/>
+					<mx:DataGridColumn dataField="ContractId" headerText="PaymentStatus" editable="false" 
+									   visible="false"/>
+					<mx:DataGridColumn dataField="Type" headerText="PaymentStatus" editable="false" 
+									   visible="false"/>
+					
+				</mx:columns>
+			</mx:DataGrid>
+			<s:Button x="779" y="10" width="124" height="28" label="New Contract Bill" click="btn_NewContractBill_Click(event)"/>
+		</s:BorderContainer>
+	</s:HGroup>
+	
+	
+	
+	<s:HGroup id="Grp_MContract" x="0" y="44" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle"
+			  visible="false">
+		<s:BorderContainer id="Brd_MContract" x="4" y="11" width="100%" height="100%" backgroundColor="#fbf9f9"
+						   visible="false" borderVisible="false">
+			<s:Label x="14" y="17" text="Managed Contract Bills" color="red"/>
+			<s:Label x="39" y="55" text="Client"/>
+			<WrbHelpComp:HelpText id="hlp_MClientName" x="96" y="50" width="288" height="22" pxSetColumnsWidth="288,0"
+								  onselection="{Ddl_MClient_changeHandler()}"  pxTabIndex="1" depth="100"
+								  pxSetPrompt="Select Client" />
+			<s:Label x="316" y="52" text="Property" visible="false"/>
+			<WrbHelpComp:HelpText id="hlp_MProperty" x="389" y="44" width="250" height="22" pxSetColumnsWidth="250,0" 
+								  onselection="{Ddl_Property_changeHandler()}"  pxTabIndex="1" depth="10"
+								  pxSetPrompt="Select Property" visible="false"/>
+			<s:Label x="333" y="52" text="Payment Status" visible="false"/>
+			<s:DropDownList id="Drp_MPaymentStatus" x="451" y="43" width="150" prompt="Select Status" change=""
+							visible="false">
+				<s:ArrayList>
+					<fx:String>All Status</fx:String>
+					<fx:String>Settled</fx:String>
+					<fx:String>UnSettled</fx:String>
+				</s:ArrayList>
+			</s:DropDownList>
+			<s:Label x="336" y="100" text="Bill Status" visible="false"/>
+			<s:DropDownList id="Drp_MBillStatus" x="451" y="91" width="150" prompt="Select Status" change="" 
+							visible="false">
+				<s:ArrayList>
+					<fx:String>All Status</fx:String>
+					<fx:String>Active</fx:String>
+					<fx:String>Cancel</fx:String>
+				</s:ArrayList>
+			</s:DropDownList>
+			<s:Label x="420" y="85" text="Bill No" visible="false"/>
+			<s:TextInput id="txt_MBillNo" x="484" y="77" width="162" visible="false"/>
+			<s:Button x="715" y="77" height="28" label="Search" click="Search()" visible="false"/>
+			<s:Button x="835" y="50" height="28" label="Clear" click="FnClear()"/>
+			<mx:DataGrid x="15" y="90"  verticalAlign="middle" editable="true" visible="true"
+						 width="100%" height="100%" tabIndex="4" id="Grd_MDetails">
+				<mx:columns>
+					<mx:DataGridColumn dataField="Print" headerText="Print" width="40" editable="false">
+						<mx:itemRenderer >
+							<fx:Component>
+								<mx:HBox horizontalAlign="center" verticalAlign="middle">
+									
+									<mx:CheckBox selected="{data.checks}"  
+												 change="outerDocument.FnSelect();"/>
+								</mx:HBox>	
+							</fx:Component>
+						</mx:itemRenderer>
+					</mx:DataGridColumn> 
+					<mx:DataGridColumn dataField="InvoiceNo" headerText="Bill No" editable="false"/>
+					<mx:DataGridColumn dataField="Client" headerText="Client" editable="false"/>
+					<mx:DataGridColumn dataField="ContractName" headerText="Contract Name" editable="false"/>
+					<mx:DataGridColumn dataField="StartDate" headerText="Start Date" editable="false"/>
+					<mx:DataGridColumn dataField="EndDate" headerText="End Date" editable="false"/>
+					<mx:DataGridColumn dataField="TariffAmount" headerText="Tariff Amount" editable="false"/>
+					<mx:DataGridColumn dataField="PaymentStatus" headerText="PaymentStatus" editable="false"
+									   visible="false"/>
+					<mx:DataGridColumn dataField="ContractId" headerText="PaymentStatus" editable="false" 
+									   visible="false"/>
+					<mx:DataGridColumn dataField="Type" headerText="PaymentStatus" editable="false" 
+									   visible="false"/>
+				</mx:columns>
+			</mx:DataGrid>
+			<s:Button x="724" y="5" width="181" height="28" label="New Managed Contract Bill" click="btn_NewMContractBill_Click(event)"/>
+		</s:BorderContainer>
+	</s:HGroup>
+	
+	
+	
+	
+	<s:HGroup  id="Grp_MContractBill" x="0" y="41" width="100%" height="100%" horizontalAlign="center" 
+			   verticalAlign="middle" visible="false">
+		<s:BorderContainer id="Brd_AddContractBill"  width="100%" height="100%"
+						   visible="false" backgroundColor="#fbf9f9" borderVisible="false">
+			<s:BorderContainer x="1" y="92" width="100%" height="100%" id="Brd2_AddContractBill" backgroundColor="#fbf9f9" 
+							   visible="false" borderVisible="false" depth="100">
+				<s:Label x="67" y="6" text="Contract Bill No"/>
+				<s:Label id="lblBill_Mode" x="240" y="5" text="Bill Mode" visible="false"/>
+				<s:RadioButton id="Rbn_Bi" x="338" y="0" label="Bi-Monthly" visible="false"/>
+				<s:RadioButton id="Rbn_Monthly" x="338" y="0" label="Monthly" selected="true" visible="false"/>
+				<s:Label x="67" y="53" text="Start Date"/>
+				<mx:DateField id="dt_Start" x="162" y="47.5" enabled="false" formatString="DD/MM/YYYY"/>
+				<s:Label x="67" y="94" text="End Date"/>
+				<mx:DateField id="dt_End" x="162" y="88.5" enabled="false" formatString="DD/MM/YYYY"/>
+				<s:Label x="73" y="165" text="Property" visible="false"/>
+				<s:Label id="lbl_Property" x="158" y="165" text="P" visible="false"/>
+				<s:Label x="67" y="134" text="No of Days" visible="true"/>
+				<s:Label id="lbl_Days" x="162" y="129.5" width="47" text="" visible="true"/>
+				<s:Label x="461" y="134" text="Net Tariff"/>
+				<s:Label id="lbl_NetTariff" x="618" y="129.5" width="126" text=""/>
+				<s:Label id="lblLuxury_Tax" x="461" y="53" text="Luxury Tax(8.00%)"/>
+				<s:Label id="lbl_DataLTax" x="618" y="48.5" width="126" text=""/>
+				<s:Label id="lblservice_Tax" x="461" y="94" text="ServiceTax(12.36%)"/>
+				<s:Label id="lbl_DataSTax" x="618" y="89.5" width="122" text=""/>
+				<s:Label x="461" y="175" text="Adjustment"/>
+				<s:Label x="578" y="175" text="INR"/>
+				<s:TextInput id="txt_Adjustment" x="618" y="171" change="txt_Adjustment_changeHandler(event)"  
+							 restrict="-0-9." maxChars="10"/>
+				<s:Label x="461" y="215" text="Due Date"/>
+				<mx:DateField id="dt_Due" x="618" y="209.5" formatString="DD/MM/YYYY"/>
+				<s:Label x="67" y="175" text="Contact No"/>
+				<s:TextInput id="txt_ContactNo" x="162" y="171" restrict="0-9," maxChars="30"/>
+				<s:Label x="461" y="256" text="Attention"/>
+				<s:TextInput id="txt_Attention" x="618" y="252"/>
+				<s:Label x="461" y="297" text="Reference No"/>
+				<s:TextInput id="txt_ReferenceNo" x="618" y="293"/>
+				<s:Label x="67" y="215" text="Remarks"/>
+				<s:TextArea id="txt_Remarks" x="162" y="215" width="170" height="68" maxChars="1000"/>
+				<s:Button x="800" y="332" height="28" label="Generate Bill" click="FnSave()"/>
+				<s:Label x="461" y="337" text="Total"/>
+				<s:TextInput id="txt_Total" x="618" y="333" editable="false"/>
+				
+				<s:Label id="lblBillno" x="167" y="5" width="107" text="New Bill"/>
+			</s:BorderContainer>
+			
+			
+			
+			<s:BorderContainer x="1" y="1" width="100%" height="100%" id="Brd1_AddContractBill" backgroundColor="#fbf9f9" 
+							   visible="false" borderVisible="false" depth="10">
+				<s:Label id="lblHeader" x="42" y="26" text="Contract Billing" color="red"/>
+				<s:Label x="383" y="72" text="Contract"/>
+				<s:Label x="330" y="72" text="Property" visible="false"/>
+				<s:Label x="62" y="72" text="Client"/>
+				<WrbHelpComp:HelpText id="hlp_AClientName" x="112" y="62" width="200" height="22" pxSetColumnsWidth="220,0"
+									  onselection="{Ddl_AClient_changeHandler()}"  pxTabIndex="1"
+									  pxSetPrompt="Select Client" />
+				<WrbHelpComp:HelpText id="hlp_AProperty" x="394" y="62" width="186" height="22" pxSetColumnsWidth="220,0" 
+									  onselection="{Ddl_Property_changeHandler()}"  pxTabIndex="1" depth="100"
+									  pxSetPrompt="Select Property" visible="false"/>
+				<s:DropDownList id="Drp_Contract" x="458" y="63" width="200" prompt="Select Contract"
+								change="Drp_Contract_clickHandler()">	
+					
+				</s:DropDownList>
+				<s:Button id="btn_CBClose" x="756" y="61" label="Close" click="CBClose()"/>
+			</s:BorderContainer>
+		</s:BorderContainer>
+		
+	</s:HGroup>
+</s:Application>

@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   xmlns:WrbComp="WrbComp.*"
+			   width="100%" height="100%" creationComplete="PageLoad()"
+			   pageTitle="NewKOTEntry Report">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<mx:NumberFormatter id="NF_Two" precision="2" rounding="nearest"/>
+	</fx:Declarations>
+	
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
+	<fx:Script>
+		<![CDATA[
+			
+			
+			import WrbComp.FormPrintView1;
+			import WrbComp.frmsearchwindow;
+			
+			import WrbHelpComp.HlpGridHdr;
+			
+			import com.as3xls.xls.Cell;
+			import com.as3xls.xls.ExcelFile;
+			import com.as3xls.xls.Sheet;
+			import com.as3xls.xls.Type;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.CalendarLayoutChangeEvent;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.events.IndexChangedEvent;
+			import mx.graphics.codec.PNGEncoder;
+			import mx.printing.*;
+			
+			import spark.events.IndexChangeEvent;
+			import spark.events.TextOperationEvent;
+			private var SearchPopUp:frmsearchwindow = new frmsearchwindow();
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "",TypeServiceId:int=0,ErrStr:String="";
+			public var Id:int=0,ErrMsg:String="",UserId:int=0,UserName:String="";
+			public var PropertyId:int=0,PropertyName:String="";
+			public var prodTotal:Number = 0;
+			public var Value_AC:ArrayCollection=new ArrayCollection();
+			public var AddMode:Boolean=true,Flag:Boolean=true;
+			public var Identity:String="",From:String="",To:String="";
+			private var xlsFile:ExcelFile;
+			protected function PageLoad():void
+			{
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";
+				useWeb("NewSnackKOTReport","PAGELOAD_CUSTOM",[GlobalXml,'PAGELOAD',0,'','','']);
+				hlp_Property.setFocus();
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "PAGELOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						hlp_Property.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "KOTLoad_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_Status.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "KOTDETAILSLoad_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_Status.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "NewKOTDETAILSLoad_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_Status.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+			}
+			public function OnSelectionPropertyname():void
+			{
+				if(hlp_Property.selected())
+				{
+					hlp_Property.text=hlp_Property.Select_Row.Property;
+					PropertyId=hlp_Property.Select_Row.PropertyId;
+					Id=hlp_Property.Select_Row.Id;
+				//useWeb("NewSnackKOTReport","KOTLoad_CUSTOM",[GlobalXml,'KOT',PropertyId,'','']);
+					dt_DateFrom.setFocus();
+				}
+			}
+			protected function FnValidation_BeforeSave():String
+			{
+				ErrStr="";
+				
+				var TxtFlag:Boolean=true;
+				if(hlp_Property.text =="")
+				{
+					ErrStr=ErrStr+"* PropertyName Required.\n";
+				}
+				return ErrStr;
+			}
+			protected function Grd_DetailsClick():void
+			{
+				ErrStr="";
+				ErrMsg = ""; Flag = true; 
+				//var Str:String=FnValidation_BeforeSave();
+				if(ErrStr !="")
+				{
+					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10,"");
+					return;
+				} 
+				else
+				{
+					var Str1:String="";
+					if(Rd_All.selected==true)
+					{
+						Str1="All";	
+					}
+					else if(Rd_Guest.selected==true)
+					{
+						Str1="Guest";
+					}
+					else if(Rd_staff.selected==true)
+					{
+						Str1="Staff";
+					}
+				Grd_Status.dataProvider=null
+				From=dt_DateFrom.text;
+				To=dt_DateTo.text;
+				Grd_Status.visible=true;
+				if(hlp_Property.text !="")
+				{
+					useWeb("NewSnackKOTReport","KOTDETAILSLoad_CUSTOM",[GlobalXml,'KOTDETAILS',PropertyId,From,To,Str1]);
+				}
+				else
+				{
+					useWeb("NewSnackKOTReport","NewKOTDETAILSLoad_CUSTOM",[GlobalXml,'NewKOTDETAILS',0,From,To,Str1]);
+				}
+				
+			}
+			}
+			protected function ExportExcel(event:MouseEvent):void
+			{
+				
+					if(Grd_Status.dataProvider !=null)
+					{
+						var arrExportResult:ArrayCollection = Grd_Status.dataProvider as ArrayCollection;
+						xlsFile = new ExcelFile();
+						var sheet:Sheet = new Sheet();
+						
+						sheet.resize(arrExportResult.length+1,14);
+						
+						sheet.setCell(0,0,'ServiceItem');
+						sheet.setCell(0,1,'Quantity');
+						sheet.setCell(0,2,'Revenue');
+												
+						for(var i:int=0;i<arrExportResult.length;i++)
+						{
+							sheet.setCell(i+1, 0, arrExportResult[i].ServiceItem);
+							sheet.setCell(i+1, 1, arrExportResult[i].Quantity);
+							sheet.setCell(i+1, 2, arrExportResult[i].Revenue);
+							
+						}
+						Grd_Status.dataProvider = arrExportResult;
+						xlsFile.sheets.addItem(sheet);      
+						var bytes: ByteArray = xlsFile.saveToByteArray();
+						var fr:FileReference = new FileReference();
+						fr.save(bytes,"SampleExport.xls");
+					}
+					else
+					{
+						alignAlert(Alert.show("ServiceItem Details Required.","Message !",
+							Alert.OK, null, null, iconErrLarge, Alert.OK),10,"");
+					}
+					Grd_Status.dataProvider=null;
+					hlp_Property.text="";
+					hlp_Property.dataProvider=null;
+					dt_DateFrom.text="";
+					dt_DateTo.text="";
+					PropertyId=0;
+			}
+			
+		]]>
+	</fx:Script>
+	<s:Label x="157" y="99" text="Property"/>
+	
+	<s:Button x="836" y="93" width="65" label="Search" click="Grd_DetailsClick()"/>
+	<s:Label x="416" y="99" text="From"/>
+	<mx:DateField id="dt_DateFrom" x="450" y="93" width="100" height="23" enabled="true"
+				  formatString="DD/MM/YYYY" selectableRange="{{rangeEnd:new Date()}}"
+				  styleName="DisabledDateField" tabIndex="2"
+				  yearNavigationEnabled="false"/>
+	<s:Label x="557" y="99" text="To"/>
+	<mx:DateField id="dt_DateTo" x="578" y="93" width="100" height="23" enabled="true"
+				  formatString="DD/MM/YYYY" selectableRange="{{rangeEnd:new Date()}}"
+				  styleName="DisabledDateField" tabIndex="3"
+				  yearNavigationEnabled="false"/>
+	<s:HGroup x="687" y="93">
+		<s:RadioButton x="690" y="71" label="All" id="Rd_All" buttonMode="true" 
+					   groupName="radiogroup1"/>
+		<s:RadioButton x="733" y="71" label="Guest" id="Rd_Guest" buttonMode="true" 
+					   groupName="radiogroup1"/>
+		<s:RadioButton id="Rd_staff" x="790" y="71" width="46" label="Staff" buttonMode="true" 
+					   groupName="radiogroup1"/>
+		
+	</s:HGroup>
+	
+	<mx:DataGrid id="Grd_Status" x="154" y="132" editable="true" width="750" height="330" visible="true">
+		<mx:columns>
+			<mx:DataGridColumn dataField="ConsumerType" headerText="ConsumerType" width="100" editable="false"/>
+			<mx:DataGridColumn dataField="Name" headerText="Name" width="150" editable="false" textAlign="left"/>
+			<mx:DataGridColumn dataField="ServiceItem" headerText="ServiceItem" width="200" 
+							   textAlign="left" editable="false"/>
+			<mx:DataGridColumn dataField="Quantity" headerText="Quantity" width="100" editable="false"/>							
+			<mx:DataGridColumn dataField="Revenue" headerText="Revenue" textAlign="right" width="200" editable="false"/>
+			
+		</mx:columns>
+	</mx:DataGrid>
+	<WrbHelpComp:HelpText x="211" y="93" width="196" id="hlp_Property"
+						  pxSetColumnsWidth="201,0"	pxSetHeight="183" depth="46"
+						  onselection="{OnSelectionPropertyname()}" tabIndex="1">
+	</WrbHelpComp:HelpText>
+	<WrbComp:Button_BB x="500" y="485" Lable_val="Export" id="btn_Excel" click="ExportExcel(event)">
+	</WrbComp:Button_BB>
+	
+</s:Application>

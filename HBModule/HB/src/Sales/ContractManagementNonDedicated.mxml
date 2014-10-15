@@ -1,0 +1,803 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:WrbComp="WrbComp.*"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   xmlns:ns1="*"
+			   width="100%" height="100%"
+			   creationComplete="Application_creationCompleteHandler(event)"
+			   pageTitle=" Non DedicatedContract Management">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
+	<fx:Script>
+		<![CDATA[
+			import WrbComp.frmsearchwindow;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.CalendarLayoutChangeEvent;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.graphics.codec.PNGEncoder;
+			
+			import spark.events.IndexChangeEvent;
+			import spark.events.TextOperationEvent;
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "";
+			public var Id:int=0,PropertyId:int=0 ,ClientId:int=0,TransId:int=0;
+			private var SearchPopUp:frmsearchwindow = new frmsearchwindow();
+			public var ErrStr:String="",Flag:Boolean=true,addmode:Boolean=true;
+			protected function Application_creationCompleteHandler(event:FlexEvent):void
+			{
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";
+				Drp_ContractType.prompt="Non-Dedicated Contracts" ; 
+				FnHelp(); Fnhelps(); Drp_PricingModel.selectedIndex=0;
+				//Drp_Trans.visible=false;Lbl_Trans.visible=false;Lbl_Sub.visible=false;
+				Drp_Type.selectedIndex=0;Lbl_Trans1.visible=false;
+				//Drp_Trans.prompt="Please Select Name";
+		//		Txt_Types.visible=true;
+			} 
+			protected function FnHelp():void
+			{ 
+				useWeb("ContractNonDedicated","PageLoad_CUSTOM",[GlobalXml,'PageLoad',0,'']); 
+				useWeb("ContractNonDedicated","Service_CUSTOM",[GlobalXml,'ServiceLoad',0,'']);
+			}  
+			protected function Fnhelps():void
+			{
+				var Tmp:ArrayCollection=new ArrayCollection
+					([{Action:GlobalXml,Param1:"PropertyNONDedicated",Param2:0,Param3:'',prcName:"ContractNonDedicated",
+						ctrlName:"hlpPropertyName",grdWidth:"0,200,0",grdHeight:"50"}]);				
+				Grd_ContractManagementNonDedicated._bindHlpTextData(Tmp);
+				Tmp=new ArrayCollection();
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void				
+			{ 
+				if (Ds_Objects.currentTarget.description.toString() == "PageLoad_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						//dt_StartDate.text=Ds_Objects.result.Tables.Table.Rows[0].Dt;
+						//dt_EndDate.text=Ds_Objects.result.Tables.Table.Rows[0].Dt; 
+					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Hlp_ClientName.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+					
+				}
+				if(Ds_Objects.currentTarget.description.toString() =="Trans_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{ 
+						var typ:Boolean = Ds_Objects.result.Tables.Table.Rows[0].BTC;
+						if(typ=='true')
+						{ 	Drp_Type.selectedIndex=1; 	}
+						else
+						{	Drp_Type.selectedIndex=2; 	} 
+					}
+					if(Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						//Drp_Trans.visible=true;Lbl_Trans.visible=true;Lbl_Sub.visible=false;Lbl_Trans1.visible=true;
+						//Drp_Trans.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+						
+					}
+						
+				}
+				if(Ds_Objects.currentTarget.description.toString() =="SubScript_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{ 
+						var typ:Boolean = Ds_Objects.result.Tables.Table.Rows[0].BTC;
+						if(typ=='true')
+						{ 	Drp_Type.selectedIndex=1; 	}
+						else
+						{	Drp_Type.selectedIndex=2; 	} 
+					}
+					if(Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						//Drp_Trans.visible=true;Lbl_Trans.visible=false;Lbl_Sub.visible=true;Lbl_Trans1.visible=true;
+						//Drp_Trans.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+						
+					}
+					
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Service_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						grd_Services.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection; 
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				{
+					if (Id == 0)
+					{
+						alignAlert(Alert.show("Contract Saved Successfully.","Message !",Alert.OK, 
+							null, null, iconTickLarge, Alert.OK),10,"");
+					}
+					else
+					{
+						alignAlert(Alert.show("Contract Updated Successfully.","Message !",Alert.OK, 
+							null, null, iconTickLarge, Alert.OK),10,"");
+					}
+					SCtrl_ClearHandler();
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Search_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Drp_ContractType.selectedItem=Ds_Objects.result.Tables.Table.Rows[0].ContractType;
+						Txt_ContarctName.text=Ds_Objects.result.Tables.Table.Rows[0].ContractName;
+						Hlp_ClientName.text=Ds_Objects.result.Tables.Table.Rows[0].ClientName;
+						dt_StartDate.text=Ds_Objects.result.Tables.Table.Rows[0].StartDate;
+						dt_EndDate.text=Ds_Objects.result.Tables.Table.Rows[0].EndDate; 
+						ClientId=Ds_Objects.result.Tables.Table.Rows[0].ClientId; 
+						Id=Ds_Objects.result.Tables.Table.Rows[0].Id;
+						Drp_PricingModel.selectedItem==Ds_Objects.result.Tables.Table.Rows[0].ContractType;
+						if(Ds_Objects.result.Tables.Table.Rows[0].PricingModel=='Trial Period')
+						{
+							//Drp_Trans.visible=false;Lbl_Sub.visible=false;Lbl_Trans.visible=false;Lbl_Trans1.visible=false;
+							//Drp_PricingModel.selectedIndex=1;Drp_Type.enabled=false;	
+						}
+						else if(Ds_Objects.result.Tables.Table.Rows[0].PricingModel=='Transactional Model')
+						{
+							//Lbl_Trans.visible=true;Lbl_Sub.visible=false;Drp_Trans.visible=true;Lbl_Trans1.visible=true;
+							//Drp_Trans.selectedItem=Ds_Objects.result.Tables.Table.Rows[0].PricingModel;
+							//Drp_PricingModel.selectedIndex=2;	
+						}
+						else if(Ds_Objects.result.Tables.Table.Rows[0].PricingModel=='Subscription Model')
+						{
+							//Lbl_Sub.visible=true;Lbl_Trans.visible=false;Drp_Trans.visible=true;Lbl_Trans1.visible=true;
+							//Drp_Trans.selectedItem=Ds_Objects.result.Tables.Table.Rows[0].PricingModel;
+							//Drp_PricingModel.selectedIndex=3;	
+						}
+						else if(Ds_Objects.result.Tables.Table.Rows[0].PricingModel=='Non-Dedicated')
+						{
+							//Drp_Trans.visible=false;Lbl_Sub.visible=false;Lbl_Trans.visible=false;Lbl_Trans1.visible=false;
+							//Drp_PricingModel.selectedIndex=4;	Drp_Type.enabled=false;
+						} 
+						//Drp_Trans.dataProvider=null;
+						TransName=Ds_Objects.result.Tables.Table.Rows[0].TransName;
+						Drp_Trans.prompt=TransName;
+						if(Ds_Objects.result.Tables.Table.Rows[0].Types=='Direct')
+						{
+							Drp_Type.selectedIndex=1;
+						}
+						if(Ds_Objects.result.Tables.Table.Rows[0].Types=='BTC')
+						{
+							Drp_Type.selectedIndex=2;
+						}
+					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Grd_ContractManagementNonDedicated._setGridSrc=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+					if (Ds_Objects.result.Tables.Table2.Rows.length > 0)
+					{
+						grd_Services.dataProvider=Ds_Objects.result.Tables.Table2.Rows as ArrayCollection;
+					}
+					if (Ds_Objects.result.Tables.Table3.Rows.length > 0)
+					{
+						grd_TarifHistory.dataProvider=Ds_Objects.result.Tables.Table3.Rows as ArrayCollection;
+					}
+				}
+				if(Ds_Objects.currentTarget.description.toString() == "Delete_CUSTOM")
+				{
+					alignAlert(Alert.show("Contract Deleted Successfully.","Message !",Alert.OK, 
+						null, null, iconTickLarge, Alert.OK),10,"");
+					SCtrl_ClearHandler();
+     			}
+//				if(Ds_Objects.currentTarget.description.toString() =="ApartModel_CUSTOM")
+//				{
+//					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+//					{
+//						
+//					}
+//				}
+			}
+			private function validation():String 
+			{
+				ErrStr="";
+				var TxtFlag:Boolean=true;
+				
+				if(Txt_ContarctName.text=="")
+				{
+					if(TxtFlag==true)
+					{
+						Txt_ContarctName.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+ "*   Contract Name \n";
+				}
+				if(Hlp_ClientName.text=="")
+				{
+					if(TxtFlag==true)
+					{
+						Hlp_ClientName.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+ "*   Client Name \n";
+				}
+//				if(Drp_PricingModel.selectedIndex==0)
+//				{
+//					if(TxtFlag==true)
+//					{
+//						Drp_PricingModel.setFocus();
+//						TxtFlag=false;
+//					}
+//					ErrStr=ErrStr+ "*   Pricing Model Required \n";
+//				}
+				if(dt_StartDate.text=="")
+				{
+					if(TxtFlag==true)
+					{
+						dt_StartDate.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+ "*   Start Date Required \n"; 
+				}			 
+				if(grd_Services.dataProvider==null)
+				{
+					if(TxtFlag==true)
+					{ 
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+ "*   Service Details Reqired \n";
+				}
+				if((Grd_ContractManagementNonDedicated._getGridSrc==null)||(Grd_ContractManagementNonDedicated._getGridSrc.length==0))
+				{
+					if(TxtFlag==true)
+					{ 
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+ "*   Tarif Data Required \n";
+				}
+				return ErrStr;
+			} 
+			protected function SCtrl_SaveHandler():void
+			{
+				
+				ErrStr=validation();
+				if(ErrStr !="")
+				{
+					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10,"");
+					return;
+				} 
+				else
+				{
+					 	var Ac:ArrayCollection=new ArrayCollection
+							([{ContractName: Txt_ContarctName.text,ContractType:"Non-Dedicated Contracts",
+								ClientName:Hlp_ClientName.text,StartDate:dt_StartDate.text,EndDate:dt_EndDate.text,
+								Id:Id,ClientId:ClientId,PricingModel:'',
+								Types:'',TransName:'',
+								TransId:0
+							}]);
+						
+						var HdrXml:String = ObjToXmlStr_Comm(Ac,"HdrXml");
+						var ApartXml:String="";
+						ApartXml += "<ROOT>";
+						ApartXml += ObjToXmlStr_Comm(Grd_ContractManagementNonDedicated._getGridSrc,"ApartXml")
+						ApartXml += "</ROOT>";
+						var ServicesXml:String="";
+						ServicesXml += "<ROOT>";
+						ServicesXml += ObjToXmlStr_Comm(grd_Services.dataProvider as ArrayCollection,"ServicesXml")
+						ServicesXml += "</ROOT>"; 
+				    	useWeb("ContractNonDedicated","Save_CUSTOM",[GlobalXml,HdrXml,ApartXml,ServicesXml]);
+					 
+				}
+			}
+			protected function SCtrl_ClearHandler():void
+			{
+				grd_Services.dataProvider=null;
+				Txt_ContarctName.text="";
+				Hlp_ClientName.text="";
+				Drp_ContractType.prompt="Non-Dedicated Contracts" ;  
+				Grd_ContractManagementNonDedicated._clear();
+				FnHelp(); Fnhelps(); Id=0;ClientId=0;TransId=0;
+				Txt_ContarctName.setFocus();Drp_Trans.visible=false;Lbl_Trans.visible=false;
+				Drp_PricingModel.selectedIndex=0;Drp_Type.selectedIndex=0;
+				Drp_Trans.selectedIndex=0;Lbl_Sub.visible=false;grd_TarifHistory.dataProvider=null;
+				TransName="";dt_StartDate.text="",dt_EndDate.text="";
+				TransId=0;Lbl_Trans1.visible=false;Drp_Trans.prompt="Please Select Name";
+				//Txt_Types.visible=true;
+			}
+			protected function SCtrl_SearchHandler():void
+			{  
+				PopUpManager.addPopUp( SearchPopUp , this, true);
+				SearchPopUp.Prc_name="ContractNonDedicated";
+				var SearchParam:Array =new Array();
+				SearchPopUp.HlpIndex="SEARCH";
+				SearchParam[0]=GlobalXml;
+				SearchParam[1]=0;
+				SearchParam[2]=0;	
+				SearchParam[3]="";
+				SearchPopUp.Prc_Param=SearchParam;
+				SearchPopUp.HlpSrchGlobal="";
+				SearchPopUp.dataPanel.focusEnabled=true;
+				SearchPopUp.Pageint();					
+				SearchPopUp.addEventListener("PopupEnter",funpopupEnter);
+				SearchPopUp.addEventListener("PopupClose",funpopupClose);
+				PopUpManager.centerPopUp(SearchPopUp);				
+			}
+			
+			private function funpopupClose(event:Event):void
+			{ 
+			} 
+			private function funpopupEnter(event:Event):void
+			{				
+				Searchmdl(SearchPopUp.SelectRow.Id,0);		
+			}
+			private function Searchmdl(Id:int,_PrdFk:int):void
+			{
+				var Load:Array = new Array(); 
+				Load[0] = GlobalXml; Load[1] = Id;Load[2]=0;Load[3]="";
+				useWeb("ContractNonDedicated","Search_CUSTOM",Load);
+			}
+			protected function SCtrl_DeleteHandler():void
+			{
+				if(Id == 0)
+				{
+					alignAlert(Alert.show("This is an Invalid Process.","Alert Message !",Alert.OK, 
+						null, null,iconWarning, Alert.OK),10,'');					
+					return;
+				}	
+				alignAlert(Alert.show("Do you want to delete this item?", "Warning",Alert.YES | Alert.NO, null,
+					removeItem, iconWarning, Alert.NO),10,"");		
+			}
+			private function removeItem(event:CloseEvent):void 
+			{	
+				if (event.detail==Alert.YES) 
+				{
+					var Load:Array = new Array();
+					Load[0]=GlobalXml; Load[1]= Id; Load[2]= "";Load[3]= 0;  
+					useWeb("ContractNonDedicated","Delete_CUSTOM",Load);
+				} 
+			}
+			protected function SCtrl_RefreshHandler():void
+			{
+				Fnhelps();//Txt_Types.visible=true;
+				FnHelp();//Fnhelps();
+				Txt_ContarctName.setFocus();
+			}
+			
+			 
+			private function ClientData():void
+			{
+				if(Hlp_ClientName.selected())
+				{
+					ClientId=Hlp_ClientName.Select_Row.Id;
+					Hlp_ClientName.text=Hlp_ClientName.Select_Row.ClientName;
+				}
+				else
+				{
+					Hlp_ClientName.text="";
+					ClientId=0;
+				}
+			}
+			
+			protected function dt_StartDate_changeHandler(event:CalendarLayoutChangeEvent):void
+			{
+				if(dt_StartDate.selectedDate)
+				{
+					var asd:String = dt_StartDate.text;										
+					var Y:String = asd.substr(6,10);
+					var M:String = asd.substr(3,2);
+					var D:String = asd.substr(0,2);
+					var RangeStart:String = Y+'/'+M+'/'+D;
+					dt_EndDate.selectableRange = {rangeStart:new Date(RangeStart)};
+					dt_EndDate.selectedDate = new Date(RangeStart);
+				}
+			}
+			protected function FnClick_Service():void
+			{
+				Grp_ContractService.visible=true;
+			}
+			protected function FnClose_Service():void
+			{
+				Grp_ContractService.visible=false;
+			}
+			protected function button_Service(event:MouseEvent):void
+			{
+				Grp_ContractService.visible=false; 
+			} 
+			public function FnSelect(Event):void
+			{
+				var Ac:ArrayCollection=new ArrayCollection();				
+				Ac=grd_Services.dataProvider as ArrayCollection;				
+				var Index:int=grd_Services.selectedIndex;
+				var Flag:Boolean=true;
+				
+				if(Ac[Index].Enable==true)
+				{
+					Ac[Index].Enable=false;
+				}
+				else
+				{
+					Ac[Index].Enable=true;
+				} 
+			}
+			public function FnSelect1(Event):void
+			{
+				var Ac:ArrayCollection=new ArrayCollection();				
+				Ac=grd_Services.dataProvider as ArrayCollection;				
+				var Index:int=grd_Services.selectedIndex;
+				var Flag:Boolean=true;
+				
+				if(Ac[Index].Complimentary==true)
+				{
+					Ac[Index].Complimentary=false;
+				}
+				else
+				{
+					Ac[Index].Complimentary=true;
+				}
+			}
+			protected function FnClick_Tariff():void
+			{
+				Grp_ContractTariff.visible=true; 
+			}
+			protected function FnClose_Tariff():void
+			{
+				Grp_ContractTariff.visible=false; 
+			}
+			protected function button_Tariff(event:MouseEvent):void
+			{
+				Grp_ContractTariff.visible=false;
+			} 
+			protected function getHlpData(event:Event):void
+			{ 
+				if(event.currentTarget.ID == "hlpPropertyName")
+				{	
+					Grd_ContractManagementNonDedicated._setValuetoCtrl("hlpPropertyName",event.currentTarget.selectedRow.Property);
+					Grd_ContractManagementNonDedicated._setValuetoCtrl("txtPropertyId",event.currentTarget.selectedRow.PropertyId)
+					Grd_ContractManagementNonDedicated._setValuetoCtrl("txtPrtyCategoryId",event.currentTarget.selectedRow.PrtyCategoryId) 
+				    var Proptyidhlp=(event.currentTarget.selectedRow.PropertyId) ;
+					var Propty=(event.currentTarget.selectedRow.PrtyCategoryId) ;
+					if(Propty=='Internal Property')
+					{
+			//			Txt_Types.visible=false;
+			//			Txt_Types.depth=100;
+						Grd_ContractManagementNonDedicated._setFocus(2);
+				  	}
+					else if (Propty=='External Property')
+					{
+			//			Txt_Types.editable=false;
+			//			Txt_Types.visible=true;
+			//			Txt_Types.depth=100;
+						Grd_ContractManagementNonDedicated._setFocus(1);
+					}
+					var Tmp:ArrayCollection=new ArrayCollection
+						([{Action:GlobalXml,Param1:"ApartTypesLoad",Param2:Proptyidhlp,Param3:Propty,prcName:"ContractNonDedicated",
+							ctrlName:"hlpType",grdWidth:"180,160,150,0,0,0",grdHeight:"50"}]);				
+					Grd_ContractManagementNonDedicated._bindHlpTextData(Tmp);
+					Tmp=new ArrayCollection(); 
+				}
+				else if(event.currentTarget.ID == "hlpType")
+				{ 
+				 	Grd_ContractManagementNonDedicated._setValuetoCtrl("hlpType",event.currentTarget.selectedRow.Type);
+					Grd_ContractManagementNonDedicated._setValuetoCtrl("txtApartTarif",event.currentTarget.selectedRow.ApartTarif)  
+					Grd_ContractManagementNonDedicated._setValuetoCtrl("txtDoubleOccupancyTariff",event.currentTarget.selectedRow.DoubleOccupancyTariff) 
+					Grd_ContractManagementNonDedicated._setValuetoCtrl("txtBedTariff",event.currentTarget.selectedRow.BedTariff);
+				    Grd_ContractManagementNonDedicated._setValuetoCtrl("txtRoomTariff",event.currentTarget.selectedRow.RoomTariff);
+					Grd_ContractManagementNonDedicated._setValuetoCtrl("txtApartmentId",event.currentTarget.selectedRow.ApartmentId);
+					Grd_ContractManagementNonDedicated._setValuetoCtrl("txtRoomId",event.currentTarget.selectedRow.RoomId);
+					Grd_ContractManagementNonDedicated._setValuetoCtrl("txtBedId",event.currentTarget.selectedRow.BedId);
+					Grd_ContractManagementNonDedicated._setValuetoCtrl("txtId",event.currentTarget.selectedRow.Id);
+					//Grd_ContractManagementNonDedicated._setValuetoCtrl("txtGridId",event.currentTarget.selectedRow.Place);
+				}  
+				event.currentTarget.selectedRow = null;	
+			}
+			protected function Drp_PricingModel_changeHandler(event:IndexChangeEvent):void
+			{  
+				if(Drp_PricingModel.selectedItem==" Trial Period ")
+				{
+					Drp_Type.enabled=false;Drp_Trans.visible=false;Lbl_Trans.visible=false;
+					Drp_Type.selectedIndex=1; Lbl_Sub.visible=false;
+					Lbl_Trans1.visible=false;
+				}
+				else if(Drp_PricingModel.selectedItem==" Transactional Model ")
+				{  
+					Drp_Type.enabled=true;Drp_Trans.visible=true;Lbl_Trans.visible=true;
+					ClientId=ClientId;Lbl_Sub.visible=false;Lbl_Trans1.visible=true;
+					
+//					if(ClientId!=0)
+//					{
+						useWeb("ContractNonDedicated","Trans_CUSTOM",[GlobalXml,'Transaction',ClientId,'']);
+				//	}
+				}
+				else if(Drp_PricingModel.selectedItem==" Subscription Model ")
+				{
+					Drp_Type.enabled=false;Lbl_Sub.visible=true;
+					Drp_Type.selectedIndex=1; Drp_Trans.visible=true;Lbl_Trans.visible=false;
+					ClientId=ClientId;Lbl_Trans1.visible=true;
+			//		if(ClientId!=0)
+			//		{
+						useWeb("ContractNonDedicated","SubScript_CUSTOM",[GlobalXml,'SubScription',ClientId,'']);
+			//		}
+				}
+				else if(Drp_PricingModel.selectedItem==" Non-Dedicated ")
+				{
+					Drp_Type.selectedIndex=0; 
+					Drp_Type.enabled=false; Drp_Trans.visible=false;
+					Lbl_Trans.visible=false;Lbl_Sub.visible=false;
+					Lbl_Trans1.visible=false;
+				}
+			}
+			public var TransName:String="";
+			public function ChangeTrans(event:IndexChangeEvent):void
+			{ 
+				TransId=Drp_Trans.selectedItem.Id;
+				TransName=Drp_Trans.selectedItem.label;
+			}
+			public var ErrString:String="";
+			public function Custom_Grid_Enter(arrObj:Object, GridEdit:Boolean, index:int):String
+			{
+				ErrString="";
+				if(arrObj.PropertyName =="")
+				{
+					ErrString+="* Property Name is Required.\n";
+					return ErrString;
+				}
+				else
+				{
+					if(arrObj.PropertyId =="")
+					{
+						ErrString+="* Please Clear and select Property.\n ";
+						return ErrString;
+					}
+				}
+				if((arrObj.RoomTariff =="")&&(arrObj.DoubleOccupancyTariff ==""))
+				{
+					ErrString+="* Tariff is Required.\n";
+					return ErrString;
+				}
+				if(arrObj.Type =="")
+				{
+					ErrString+="* Type is Required.\n";
+					return ErrString;
+				}
+				if(arrObj.getDataRow[2]="Internal Property")
+				{
+					Grd_ContractManagementNonDedicated._setValuetoCtrl("hlpType","Internal Property");
+					//Grd_ContractManagementNonDedicated._setFocus(2);
+					//arrObj.PrtyCategoryId="";
+				}
+				else if(arrObj.getDataRow[2]="External Property")
+				{
+					Grd_ContractManagementNonDedicated._setFocus(4);
+					Grd_ContractManagementNonDedicated._setValuetoCtrl("txtApartTarif","0");
+					Grd_ContractManagementNonDedicated._setValuetoCtrl("txtBedTariff","0");
+				} 
+				return ErrString;
+				Grd_ContractManagementNonDedicated._setFocus(0);
+				
+			}
+			public function Custom_Grid_Tab(arrObj:Object,arrObj1:Object,GridMode:Boolean,Index:int):void
+			{
+//				if(arrObj.currentTarget.id == "txtPrtyCategoryId")
+//				{
+//					if((arrObj.Type="")&&(arrObj.Type=""))
+//					{
+//						Grd_ContractManagementNonDedicated._setValuetoCtrl("hlpType","");
+//					}
+//				}
+				if(arrObj.currentTarget.id=="txtBedTariff")
+				{
+					if(arrObj1.PrtyCategoryId=="Internal Property")
+					{
+						Grd_ContractManagementNonDedicated._setValuetoCtrl("hlpType","Internal Property");
+						Grd_ContractManagementNonDedicated._setFocus(0);
+					}
+					else if(arrObj1.PrtyCategoryId=="External Property")
+					{
+						Grd_ContractManagementNonDedicated._setValuetoCtrl("txtApartTarif","0");
+						Grd_ContractManagementNonDedicated._setValuetoCtrl("txtBedTariff","0");
+						Grd_ContractManagementNonDedicated._setFocus(1);
+					}
+				}
+				if(arrObj.currentTarget.id == "hlpPropertyName")
+				{
+					if(arrObj.getDataRow[2]=="Internal Property")
+					{
+						Grd_ContractManagementNonDedicated._setValuetoCtrl("hlpType","Internal Property");
+						Grd_ContractManagementNonDedicated._setFocus(2);
+					}
+					else if(arrObj1.getDataRow[2]=="External Property")
+					{
+						Grd_ContractManagementNonDedicated._setFocus(1);
+						Grd_ContractManagementNonDedicated._setValuetoCtrl("txtApartTarif","0");
+						Grd_ContractManagementNonDedicated._setValuetoCtrl("txtBedTariff","0");
+					}  
+				}
+				if(arrObj.currentTarget.id == "hlpType")
+				{
+					if(arrObj1.PrtyCategoryId=="Internal Property")
+					{
+						Grd_ContractManagementNonDedicated._setFocus(2);
+					}
+					else if(arrObj1.PrtyCategoryId=="External Property")
+					{
+						Grd_ContractManagementNonDedicated._setValuetoCtrl("txtApartTarif","0");
+						Grd_ContractManagementNonDedicated._setFocus(5); 
+						Grd_ContractManagementNonDedicated._setFocusFlag(false);
+					}  
+				} 
+			}
+		]]>
+	</fx:Script> 
+	<s:VGroup x="0" y="0" width="100%" height="100%" gap="5" horizontalAlign="center" verticalAlign="middle">
+		<s:BorderContainer x="6" y="28" width="100%" height="421" backgroundColor="#fbf9f9"
+						   borderVisible="false"> 
+			<mx:Label x="25" y="7" text="Non-Dedicated Contract Information" color="Red"/>
+			<mx:Label x="164" y="48" text="Contract Name"/>
+			<mx:Label x="164" y="95" text="Client Name"/>
+			<mx:Label id="Lbl_Trans" x="46" y="230" width="101" height="42" text="Transactional" visible="false"/>
+			<mx:Label id="Lbl_Sub" x="46" y="230" width="97" height="28" text="Subscription" visible="false"/>
+			<mx:Label id="Lbl_Trans1" x="46" y="245" width="101" height="42" text=" Name" visible="false"/>
+			<mx:Label x="239" y="90" text="*" color="red"/> 
+			<mx:Label x="247" y="42" text="*" color="red"/>
+			<s:DropDownList x="156" y="40" width="200" height="20" id="Drp_ContractType" 
+							selectedItem="Non-Dedicated Contracts" tabIndex="1" visible="false" >
+				<mx:ArrayCollection> 
+					<fx:String> Non-Dedicated Contracts </fx:String>						
+				</mx:ArrayCollection>
+			</s:DropDownList>
+			<s:TextInput id="Txt_ContarctName" x="276" y="46" width="200" height="20"  tabIndex="1"/>
+			<s:TextInput  x="536" y="51" width="154" height="20" depth="20" 
+						 editable="false" prompt="Type" visible="false"/>
+			
+			<WrbComp:Button_HB id="Btn_ContractTarif" x="276" y="372" width="122" height="32"
+							   _Label="Non Dedicated Tariff" click="FnClick_Tariff()" depth="0"
+							   buttonMode="true" focusEnabled="false"/>
+			<WrbComp:Button_HB id="Btn_ContractService" x="486" y="372" width="122" height="32"
+							   _Label="Contract Service" click="FnClick_Service()" depth="0"
+							   buttonMode="true" focusEnabled="false" tabIndex="5"/>  
+			<WrbComp:ProDGrid1 x="55" y="140" width="683" height="220" id="Grd_ContractManagementNonDedicated"
+			       _ColDataField="PropertyName~Type~ApartTarif~RoomTariff~DoubleOccupancyTariff~TripleTarif~BedTariff~Description~PropertyId~ApartmentId~RoomId~BedId~Id~PrtyCategoryId"
+			       _ColHdrText="PropertyName~Type~ApartmentTariff~SingleTariff~DoubleTariff~TripleTarif~BedTariff~Description~PropertyId~ApartmentId~RoomId~BedId~Id~PrtyCategoryId" 
+			       _ColType="hlp~hlp~ntxt~ntxt~ntxt~ntxt~ntxt~txt~txt~txt~txt~txt~txt~txt"
+				   _colVisible="1~1~1~1~1~1~1~1~0~0~0~0~0~0" 
+				   _ColWidth="160~140~100~80~80~90~80~80~0~0~0~0~0~0" 
+				   _editable="1~1~1~1~1~1~1~1~0~0~0~0~0~0"
+				   _required="0~0~0~0~0~0~0~0~0~0~0~0~0~0" 
+				   _spltChar="~" 
+				   _visibleColNos="8"  
+				   _tabIndex="8" 
+				   _getHlpTxtData="getHlpData(event)"
+				   _DuplChk="false" ID="ContractManagementNonDedicated"/>
+			<mx:Label x="512" y="37" text="StartDate"/>
+			<mx:Label x="512" y="84" text="EndDate"/>
+			<mx:DateField x="624" y="34" width="92" tabIndex="3" id="dt_StartDate" yearNavigationEnabled="true" 
+						  formatString="DD/MM/YYYY"   styleName="DisabledDateField" change="dt_StartDate_changeHandler(event)" />
+			<mx:DateField x="624" y="79" width="92" tabIndex="4" id="dt_EndDate" yearNavigationEnabled="true"
+						  formatString="DD/MM/YYYY"   styleName="DisabledDateField" />
+			 
+			<WrbHelpComp:HelpText  id="Hlp_ClientName" x="276" y="93" width="200" 
+								  height="20" pxTabIndex="2"
+								  onselection="{ClientData()}" pxSetColumnsWidth="200,0" depth="10"/>
+			
+			<mx:Label x="13" y="273" text="Type" id="lbl_Type" visible="false"/>
+			<mx:Label x="13" y="229" text="Pricing Model" id="lbl_PricingModel" visible="false"/>
+			<mx:Label x="124" y="221" text="*" color="red" id="lbl_Printing" visible="false"/>
+			<mx:Label x="566" y="31" text="*" color="red" id="lbl_Printing0"/>
+			<s:DropDownList x="156" y="224" width="200" height="20" id="Drp_PricingModel" tabIndex="5"
+							change="Drp_PricingModel_changeHandler(event)"  visible="false">
+				<mx:ArrayCollection> 
+					<fx:String> Select Pricing Model </fx:String>
+					<fx:String> Trial Period </fx:String> 
+					<fx:String> Transactional Model </fx:String>
+					<fx:String> Subscription Model </fx:String> 
+					<fx:String> Non-Dedicated </fx:String>
+				</mx:ArrayCollection>
+			</s:DropDownList>
+			<s:DropDownList x="156" y="269" width="200" height="20" id="Drp_Type" tabIndex="6" visible="false">
+				<mx:ArrayCollection> 
+					<fx:String> Select Type </fx:String>
+					<fx:String> Direct </fx:String> 
+					<fx:String> BTC </fx:String>						
+				</mx:ArrayCollection>
+			</s:DropDownList> 
+			<s:DropDownList id="Drp_Trans" x="155" y="224" width="200" height="23" change="ChangeTrans(event)"
+							prompt="Please Select Name" tabIndex="7" visible="false"/>
+		</s:BorderContainer>
+		
+		<mx:HRule x="0" y="417" width="100%" strokeColor="#eb1c24"/>
+		<s:HGroup y="505" width="100%" height="41" horizontalAlign="center">
+			<WrbComp:SaveControl id="SCtrl" docSave="SCtrl_SaveHandler()" docClear="SCtrl_ClearHandler()"
+								 doSearch="SCtrl_SearchHandler()" docDelete="SCtrl_DeleteHandler()" docRefresh="SCtrl_RefreshHandler()"/>
+		</s:HGroup>
+	</s:VGroup>
+	<s:HGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle"
+			  id="Grp_ContractService" depth="1" visible="false">
+		<s:BorderContainer width="100%" height="100%" backgroundAlpha="0.1" borderVisible="false">
+			<s:HGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+				<s:Panel x="69" y="78" width="778" height="346" title="Contract Services" cornerRadius="2">
+				
+					<mx:DataGrid id="grd_Services" x="51" y="10"  verticalAlign="middle" editable="true" 
+								 width="700" height="252" tabIndex="93">
+						<mx:columns>
+							<mx:DataGridColumn dataField="Enable" editable="false"  headerText="Enable" width="120" >
+								<mx:itemRenderer>
+									<fx:Component>
+										<mx:HBox horizontalAlign="center" verticalAlign="middle">
+											<mx:CheckBox selected="{data.Enable}"
+														 change="outerDocument.FnSelect(event);" />
+										</mx:HBox>	
+									</fx:Component>
+								</mx:itemRenderer>
+							</mx:DataGridColumn>
+							<mx:DataGridColumn dataField="EffectiveFrom" headerText="EffectiveFrom" editable="false" visible="false"/>
+							 <mx:DataGridColumn dataField="Complimentary" headerText="Complimentary" width="120" editable="false"  >
+								<mx:itemRenderer >
+									<fx:Component>
+										<mx:HBox horizontalAlign="center" verticalAlign="middle">
+											<mx:CheckBox selected="{data.Complimentary}" 
+														 change="outerDocument.FnSelect1(event);"/>
+										</mx:HBox>	
+									</fx:Component>
+								</mx:itemRenderer>
+							</mx:DataGridColumn>
+							<mx:DataGridColumn dataField="TypeService" headerText="TypeService" editable="false" width="180"/>
+							<mx:DataGridColumn dataField="ServiceName" headerText="Service Name" width="250" editable="false"/>
+							<mx:DataGridColumn dataField="Price" headerText="Price" width="250" editorDataField="value">
+								<mx:itemEditor>
+									<fx:Component>
+										<mx:NumericStepper stepSize="0.5" maximum="500"/>
+									</fx:Component>
+								</mx:itemEditor>
+							</mx:DataGridColumn> 
+							<mx:DataGridColumn dataField="ProductId" visible="false"/> 
+							<mx:DataGridColumn dataField="AmountChange" visible="false"/>
+							<mx:DataGridColumn dataField="Id" visible="false"/>
+						</mx:columns>
+					</mx:DataGrid>
+				 	<s:Image x="750" y="-24" buttonMode="true" click="FnClose_Service()"
+							 source="@Embed(source='../Assets/CrossSmall.png')" toolTip="Close"/>
+					<WrbComp:Button_HB x="354" y="270" _Label="Close" buttonMode="true"
+									   click="button_Service(event)"/>
+				</s:Panel>						
+			</s:HGroup>
+		</s:BorderContainer>
+	</s:HGroup>
+	
+	<s:HGroup x="3" y="21" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle"
+			  id="Grp_ContractTariff" depth="10" visible="false">
+		<s:BorderContainer width="100%" height="100%" backgroundAlpha="0.1" borderVisible="false">
+			<s:HGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+				<s:Panel width="750" height="400" cornerRadius="2" title="Non Dedicated Contract Tariff">
+					<s:Label  x="13" y="26" text="Tariff History" color="Red"/>
+					<mx:DataGrid id="grd_TarifHistory" x="28" y="43"  verticalAlign="middle" editable="true" 
+								 width="694" height="191" tabIndex="93">
+						<mx:columns>
+							<mx:DataGridColumn dataField="StartDate" headerText="Start Date" editable="false" width="200" />
+							<mx:DataGridColumn dataField="EndDate" headerText="End Date" editable="false" width="200" />
+							<mx:DataGridColumn dataField="Property" headerText="Property" editable="false" width="200" />
+							<mx:DataGridColumn dataField="Place" headerText="Place" editable="false" width="260" />
+							<mx:DataGridColumn dataField="ApartTarif" headerText="ApartmentTariff" editable="false" width="150" />
+							<mx:DataGridColumn dataField="RoomTarif" headerText="RoomTariff" editable="false" width="130" />
+							<mx:DataGridColumn dataField="Tarif" headerText="DoubleTariff" width="130" editable="false"/>
+							<mx:DataGridColumn dataField="Triple Tarif" headerText="TripleTariff" width="130" editable="false"/>
+							<mx:DataGridColumn dataField="BedTarif" headerText="BedTariff" width="130" editable="false"/>
+							<mx:DataGridColumn dataField="Description" headerText="Description" width="130" editable="false"/>
+							<mx:DataGridColumn dataField="Id" visible="false"/>
+						</mx:columns>
+					</mx:DataGrid>
+					<s:Image x="671" y="-24" buttonMode="true" click="FnClose_Tariff()"
+							 source="@Embed(source='../Assets/CrossSmall.png')" toolTip="Close"/>
+					<WrbComp:Button_HB x="313" y="265" _Label="Close" buttonMode="true"
+									   click="button_Tariff(event)"/>
+				</s:Panel>
+			</s:HGroup>					
+		</s:BorderContainer>				
+	</s:HGroup>
+</s:Application> 
+

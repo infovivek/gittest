@@ -1,0 +1,673 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   width="100%" height="100%" creationComplete="PageLoad()">
+	<fx:Declarations>
+		<s:Animate id="fader"
+				   duration="500"
+				   repeatBehavior="reverse"
+				   repeatCount="0">
+			<s:SimpleMotionPath property="alpha"
+								valueFrom="1.0" valueTo="0.0" />
+		</s:Animate>
+		<s:Animate id="fader1"
+				   duration="0"
+				   repeatBehavior="reverse"
+				   repeatCount="0">
+			<s:SimpleMotionPath property="alpha"
+								valueFrom="1.0" valueTo="0.0" />
+		</s:Animate>
+	</fx:Declarations>
+	<fx:Style source="..\\Common\\ApplicationCSS.css" />
+	<fx:Script source="..\\Common\\CommonScript.as" />
+	<fx:Script source="..\\Common\\Functions.as"/>
+	<fx:Script>
+		<![CDATA[
+			import com.as3xls.xls.Cell;
+			import com.as3xls.xls.ExcelFile;
+			import com.as3xls.xls.Sheet;
+			import com.as3xls.xls.Type;
+			public var Temp_AC:ArrayCollection = new ArrayCollection();
+			private var xlsFile:ExcelFile;
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "";
+			public var lbl:String="";
+			public var LocationId:Number=0;
+			public var PropertyId:Number=0;
+			public var Fad:Animate=new Animate();
+			public var ErrorFlag:Boolean=true;
+			private function PageLoad():void
+			{
+				Global_AC = funLoginInfo("<gScrId>1</gScrId><gUsrFk>1</gUsrFk>");				
+				GlobalXml = "";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";	
+				Rd_Bill.selected=true;
+				help();
+			}
+			private function help():void
+			{				
+				useWeb("Report","Property_CUSTOM", [GlobalXml, "PropertyAndCity",0, 0,"","",Drp_Category.selectedItem]);
+				
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "Property_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						hlp_Property.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						
+					}
+					else
+					{
+						hlp_Property.dataProvider=null;
+						
+					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						hlp_Location.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+						
+					}
+					else
+					{
+						hlp_Location.dataProvider=null;
+						
+					}
+					
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Invoicebill_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_Invoice.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+					else
+					{
+						Grd_Invoice.dataProvider=null;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Receipts_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_Receipts.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+					else
+					{
+						Grd_Receipts.dataProvider=null;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Contract_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_Contract.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+					else
+					{
+						Grd_Contract.dataProvider=null;
+					}
+				}
+				
+			}
+			protected function CATChange():void
+			{
+				if(Drp_Category.selectedIndex==1)
+				{
+					//Col_NDD.visible=true;
+					//Col_NDD.width=200;
+					//Col_DD.headerText="Dedicated Revenue";
+				}
+				else if(Drp_Category.selectedIndex==2)
+				{
+					//Col_NDD.visible=false;
+					//Col_NDD.width=0;
+					//Col_DD.headerText="Revenue";
+				}
+				
+			}
+			private function fnGetLocation():void
+			{
+				if(hlp_Location.selected())
+				{
+					hlp_Location.text=hlp_Location.Select_Row.CityName
+					LocationId=hlp_Location.Select_Row.Id
+					//dt_From.setFocus();
+				}
+				else
+				{
+					hlp_Location.text="";
+					LocationId=0;
+				}
+			}
+			private function fnGetProperty():void
+			{
+				if(hlp_Property.selected())
+				{
+					hlp_Property.text=hlp_Property.Select_Row.PropertyName
+					PropertyId=hlp_Property.Select_Row.ZId
+					//dt_From.setFocus();
+				}
+				else
+				{
+					hlp_Property.text="";
+					PropertyId=0;
+				}
+			}
+			protected function Search():void
+			{		
+				ErrorFlag=true;
+				if(DT_From.text=="")
+				{
+					fader.target=Lbl_FdStar;				
+					fader.play();
+					fader.target=lbl_FD;				
+					fader.play();
+					lbl_FD.setStyle("color","red");
+					ErrorFlag=false;
+				}
+				if(DT_TO.text=="")
+				{
+					fader.target=Lbl_TdStar;				
+					fader.play();
+					fader.target=lbl_TD;				
+					fader.play();
+					lbl_TD.setStyle("color","red");
+					ErrorFlag=false;
+				}
+				if(ErrorFlag==true)
+				{	
+					Bill.visible=false;
+					Receipts.visible=false;
+					Contract.visible=false;
+					if(Rd_Bill.selected==true)
+					{
+						Bill.visible=true;
+						useWeb("Report","Invoicebill_CUSTOM", [GlobalXml, "InvoiceBill",LocationId, PropertyId,DT_From.text,DT_TO.text,Drp_Category.selectedItem]);	
+					}
+					if(Rd_Receipt.selected==true)
+					{
+						Receipts.visible=true;						
+						useWeb("Report","Receipts_CUSTOM", [GlobalXml, "Receipts Bill",LocationId, PropertyId,DT_From.text,DT_TO.text,Drp_Category.selectedItem]);	
+					}
+					if(Rd_Contract.selected==true)
+					{
+						Contract.visible=true;
+						useWeb("Report","Contract_CUSTOM", [GlobalXml, "Contract Bill",LocationId, PropertyId,DT_From.text,DT_TO.text,Drp_Category.selectedItem]);	
+					}
+					if(Rd_UnSettled.selected==true)
+					{
+						Bill.visible=true;
+						useWeb("Report","Invoicebill_CUSTOM", [GlobalXml, "UnSettled",LocationId, PropertyId,DT_From.text,DT_TO.text,Drp_Category.selectedItem]);	
+					}
+				}
+				
+			}
+			public function Change(LabelName:String):void
+			{
+				if(LabelName=="DT_From")
+				{
+					fader1.target=Lbl_FdStar;				
+					fader1.play();
+					fader1.target=lbl_FD;				
+					fader1.play();
+					lbl_FD.setStyle("color","#565454");
+				}
+				else
+				{
+					fader1.target=Lbl_TdStar;				
+					fader1.play();
+					fader1.target=lbl_TD;				
+					fader1.play();
+					lbl_TD.setStyle("color","#565454");
+				}
+			}
+			public function clear():void
+			{
+				Grd_Contract.dataProvider=null;
+				Grd_Invoice.dataProvider=null;
+				Grd_Receipts.dataProvider=null;
+				LocationId=0;
+				PropertyId=0;
+				hlp_Location.text="";
+				hlp_Property.text="";
+				Drp_Category.selectedIndex=0;
+				DT_From.text="";
+				DT_TO.text="";
+			}
+			protected function ExportExcel():void
+			{
+				try
+				{
+					var bytes: ByteArray = new ByteArray();
+					var fr:FileReference = new FileReference();
+					var FileName:String = "";
+					var sheet:Sheet = new Sheet();
+					if((Rd_Bill.selected==true)||(Rd_UnSettled.selected==true))
+					{
+						var arrExportResult:ArrayCollection = Grd_Invoice.dataProvider as ArrayCollection;
+						if(arrExportResult.length!=0)
+						{					
+							xlsFile = new ExcelFile();
+							sheet = new Sheet();
+							
+							sheet.resize(arrExportResult.length+2,27);
+							
+							if(Rd_Bill.selected==true)
+							{
+								sheet.setCell(0,13,"Bills Report");	
+							}
+							else
+							{
+								sheet.setCell(0,5,"UnSettled Bills Report");
+							}
+							
+							sheet.setCell(1,0,'Created Date');
+							sheet.setCell(1,1,'Modified Date');
+							sheet.setCell(1,2,'Booking Code');
+							sheet.setCell(1,3,'InvoiceNo');
+							sheet.setCell(1,4,'Property Name');
+							sheet.setCell(1,5,'Company');
+							sheet.setCell(1,6,'Master Client Name');
+							sheet.setCell(1,7,'Guest Name');
+							sheet.setCell(1,8,'Total Amount');							
+							sheet.setCell(1,9,'Total Tariff');
+							sheet.setCell(1,10,'BroadBand');
+							sheet.setCell(1,11,'Food Beverages');
+							sheet.setCell(1,12,'Laundry');
+							sheet.setCell(1,13,'Extra Matress');
+							sheet.setCell(1,14,'Service Charge');
+							sheet.setCell(1,15,'Luxury Tax');
+							sheet.setCell(1,16,'ST@7.20');
+							sheet.setCell(1,17,'ST@12.00');
+							sheet.setCell(1,18,'ST@4.80');							
+							sheet.setCell(1,19,'Cess');
+							sheet.setCell(1,20,'Hcess');
+							sheet.setCell(1,21,'Check-In Date');
+							sheet.setCell(1,22,'Check-Out Date');
+							sheet.setCell(1,23,'Location');
+							sheet.setCell(1,24,'Bill Start Date');
+							sheet.setCell(1,25,'Bill End Date');
+							sheet.setCell(1,26,'VAT');							
+							for(var i:int=0;i<arrExportResult.length;i++)
+							{
+								sheet.setCell(i+2, 0, arrExportResult[i].CreatedDate);
+								sheet.setCell(i+2, 1, arrExportResult[i].ModifiedDate);
+								sheet.setCell(i+2, 2, arrExportResult[i].BookingCode);
+								sheet.setCell(i+2, 3, arrExportResult[i].InVoiceNo);
+								sheet.setCell(i+2, 4, arrExportResult[i].PropertyName);
+								sheet.setCell(i+2, 5, arrExportResult[i].ClientName);
+								sheet.setCell(i+2, 6, arrExportResult[i].MasterClientName);
+								sheet.setCell(i+2, 7, arrExportResult[i].GuestName);
+								sheet.setCell(i+2, 8, arrExportResult[i].TotalAmount);
+								sheet.setCell(i+2, 9, arrExportResult[i].TariffAmount);
+								sheet.setCell(i+2, 10, arrExportResult[i].Broadband);
+								sheet.setCell(i+2, 11, arrExportResult[i].FOODANDBeverages);
+								sheet.setCell(i+2, 12, arrExportResult[i].Laundry);
+								sheet.setCell(i+2, 13, arrExportResult[i].ExtraAmount);
+								sheet.setCell(i+2, 14, arrExportResult[i].ServiceCharge);
+								sheet.setCell(i+2, 15, arrExportResult[i].LuxuryTax);
+								sheet.setCell(i+2, 16, arrExportResult[i].SerivceTax7);
+								sheet.setCell(i+2, 17, arrExportResult[i].Servicetax12);
+								sheet.setCell(i+2, 18, arrExportResult[i].SerivceTax4);
+								sheet.setCell(i+2, 19, arrExportResult[i].Cess);
+								sheet.setCell(i+2, 20, arrExportResult[i].Hcess);
+								sheet.setCell(i+2, 21, arrExportResult[i].CheckInDate);
+								sheet.setCell(i+2, 22, arrExportResult[i].CheckOutDate);
+								sheet.setCell(i+2, 23, arrExportResult[i].Location);
+								sheet.setCell(i+2, 24, arrExportResult[i].BillStartDate);
+								sheet.setCell(i+2, 25, arrExportResult[i].BillEndDate);
+								sheet.setCell(i+2, 26, arrExportResult[i].VAT);								
+								
+							}						
+							
+							
+							
+							xlsFile.sheets.addItem(sheet);      
+							bytes = xlsFile.saveToByteArray();
+							fr = new FileReference();
+							FileName = "";
+							if(Rd_Bill.selected==true)
+							{
+								if(Drp_Category.selectedIndex!=0)
+								{		
+									FileName="Bills"+Drp_Category.selectedItem+".xlsx";
+									fr.save(bytes,FileName);
+								}
+								else
+								{
+									FileName="Bills.xls";
+									fr.save(bytes,FileName);
+								}
+							}
+							else
+							{
+								if(Drp_Category.selectedIndex!=0)
+								{		
+									FileName="UnSettledBills"+Drp_Category.selectedItem+".xlsx";
+									fr.save(bytes,FileName);
+								}
+								else
+								{
+									FileName="UnSettledBills.xls";
+									fr.save(bytes,FileName);
+								}
+							}
+								
+								
+													
+						}
+						else
+						{
+							
+							alignAlert(Alert.show("* No Records Found.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+							return;
+						}
+						//Grd_BCFC.visible=false;
+						Grd_Invoice.dataProvider=null;
+						
+						clear();
+					
+					}
+					if(Rd_Contract.selected==true)
+					{
+						var arrExportResult:ArrayCollection = Grd_Contract.dataProvider as ArrayCollection;
+						if(arrExportResult.length!=0)
+						{					
+							xlsFile = new ExcelFile();
+							sheet = new Sheet();
+							
+							sheet.resize(arrExportResult.length+2,8);
+							
+							sheet.setCell(0,4,"Contract Bills Report");
+							sheet.setCell(1,0,'Created Date');
+							sheet.setCell(1,1,'Modified Date');
+							sheet.setCell(1,2,'ClientName');
+							sheet.setCell(1,3,'InvoiceNo');
+							sheet.setCell(1,4,'Type');
+							sheet.setCell(1,5,'TotalAmount');
+							sheet.setCell(1,6,'AdjustmentAmount');
+							sheet.setCell(1,7,'Tax');	
+							
+							for(var i:int=0;i<arrExportResult.length;i++)
+							{
+								sheet.setCell(i+2, 0, arrExportResult[i].CreatedDate);
+								sheet.setCell(i+2, 1, arrExportResult[i].ModifiedDate);
+								sheet.setCell(i+2, 2, arrExportResult[i].ClientName);
+								sheet.setCell(i+2, 3, arrExportResult[i].InvoiceNo);
+								sheet.setCell(i+2, 4, arrExportResult[i].Type);
+								sheet.setCell(i+2, 5, arrExportResult[i].TotalAmount);
+								sheet.setCell(i+2, 6, arrExportResult[i].AdjustmentAmount);
+								sheet.setCell(i+2, 7, arrExportResult[i].Tax);
+								
+							}
+							
+							xlsFile.sheets.addItem(sheet);      
+							var bytes: ByteArray = xlsFile.saveToByteArray();
+							var fr:FileReference = new FileReference();
+							var FileName:String = ""; 
+							
+//							bytes = xlsFile.saveToByteArray();
+//							fr = new FileReference();
+//							FileName = "";
+							
+							if(Drp_Category.selectedIndex!=0)
+							{		
+								FileName="ContractBills"+Drp_Category.selectedItem+".xlsx";
+								fr.save(bytes,FileName);
+							}
+							else
+							{
+								FileName="ContractBills.xlsx";
+								fr.save(bytes,FileName);
+							}						
+						}
+						else
+						{
+							
+							alignAlert(Alert.show("* No Records Found.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+							return;
+						}
+						//Grd_BCFC.visible=false;
+						Grd_Contract.dataProvider=null;
+						
+						clear();
+					}
+					if(Rd_Receipt.selected==true)
+					{
+						var arrExportResult:ArrayCollection = Grd_Receipts.dataProvider as ArrayCollection;
+						if(arrExportResult.length!=0)
+						{					
+							xlsFile = new ExcelFile();
+							sheet = new Sheet();
+							
+							sheet.resize(arrExportResult.length+2,19);
+							
+							sheet.setCell(0,9,"Receipt Bills Report");
+							sheet.setCell(1,0,'Created Date');
+							sheet.setCell(1,1,'Modified Date');
+							sheet.setCell(1,2,'Booking Code');
+							sheet.setCell(1,3,'InvoiceNo');
+							sheet.setCell(1,4,'Property Name');
+							sheet.setCell(1,5,'Company');
+							sheet.setCell(1,6,'Master Client Name');
+							sheet.setCell(1,7,'Guest Name');
+							sheet.setCell(1,8,'Payment Type');							
+							sheet.setCell(1,9,'Check-In Date');
+							sheet.setCell(1,10,'Check-Out Date');
+							sheet.setCell(1,11,'Location');
+							sheet.setCell(1,12,'NoOfDays');
+							sheet.setCell(1,13,'Total Amount');
+							sheet.setCell(1,14,'Payment Mode');	
+							sheet.setCell(1,15,'Batch Close');	
+							sheet.setCell(1,16,'Payment Date');	
+							sheet.setCell(1,17,'Bill Start Date');	
+							sheet.setCell(1,18,'Bill End Date');							
+							for(var i:int=0;i<arrExportResult.length;i++)
+							{
+								sheet.setCell(i+2, 0, arrExportResult[i].CreatedDate);
+								sheet.setCell(i+2, 1, arrExportResult[i].ModifiedDate);
+								sheet.setCell(i+2, 2, arrExportResult[i].BookingCode);
+								sheet.setCell(i+2, 3, arrExportResult[i].InVoiceNo);
+								sheet.setCell(i+2, 4, arrExportResult[i].PropertyName);
+								sheet.setCell(i+2, 5, arrExportResult[i].ClientName);
+								sheet.setCell(i+2, 6, arrExportResult[i].MasterClientName);
+								sheet.setCell(i+2, 7, arrExportResult[i].GuestName);
+								sheet.setCell(i+2, 8, arrExportResult[i].PaymentType);
+								sheet.setCell(i+2, 9, arrExportResult[i].CheckInDate);
+								sheet.setCell(i+2, 10, arrExportResult[i].CheckOutDate);
+								sheet.setCell(i+2, 11, arrExportResult[i].Location);
+								sheet.setCell(i+2, 12, arrExportResult[i].NoOfDays);
+								sheet.setCell(i+2, 13, arrExportResult[i].TotalAmount);
+								sheet.setCell(i+2, 14, arrExportResult[i].PaymentMode);
+								sheet.setCell(i+2, 15, arrExportResult[i].AcountNo);
+								sheet.setCell(i+2, 16, arrExportResult[i].BillStartDate);
+								sheet.setCell(i+2, 17, arrExportResult[i].BillEndDate);								
+								
+							}
+							
+							xlsFile.sheets.addItem(sheet);      
+							bytes = xlsFile.saveToByteArray();
+							fr = new FileReference();
+							FileName = "";
+							if(Drp_Category.selectedIndex!=0)
+							{		
+								FileName="ReceiptBills"+Drp_Category.selectedItem+".xlsx";
+								fr.save(bytes,FileName);
+							}
+							else
+							{
+								FileName="ReceiptBills.xlsx";
+								fr.save(bytes,FileName);
+							}						
+						}
+						else
+						{
+							
+							alignAlert(Alert.show("* No Records Found.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+							return;
+						}
+						//Grd_BCFC.visible=false;
+						Grd_Receipts.dataProvider=null;
+						
+						clear();
+					}
+					
+				}				
+				catch (myError:Error) 
+				{
+					alignAlert(Alert.show("* Excel File Already Opened.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+					return
+				}catch (error:TypeError)
+				{
+					alignAlert(Alert.show("* Excel File Already Opened.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+					return
+				}catch (error:IOErrorEvent)
+				{
+					alignAlert(Alert.show("* Excel File Already Opened.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+					return
+				}
+				
+				
+			}
+			
+			
+		]]>
+	</fx:Script>
+	
+	<s:VGroup x="0" y="0" width="100%" height="100%" gap="0" depth="100">
+		<s:BorderContainer x="0" y="0" width="100%" height="143" borderVisible="false" depth="20" >
+		 <s:VGroup x="0" y="0" width="100%" height="100%" verticalAlign="middle" horizontalAlign="center">
+			 <mx:HRule width="100%"/>
+			<s:Group x="10" y="12" width="902" height="120">
+				<mx:Label x="7" y="15" text="Property Category" id="lbl_PricingModel" />
+				<s:DropDownList x="130" y="16.5" width="253" height="20" id="Drp_Category" tabIndex="2" selectedIndex="0" change="CATChange()">
+					<mx:ArrayCollection> 
+						<fx:String>All Properties</fx:String> 
+						<fx:String>Internal Property</fx:String> 
+						<fx:String>External Property</fx:String>					
+					</mx:ArrayCollection>
+				</s:DropDownList>
+				<mx:Label x="395" y="55" text="Property"/>
+				<mx:Label x="46" y="55" text="From Date" id="lbl_FD"/>
+				<mx:Label x="110" y="47" width="13" height="21" id="Lbl_FdStar" color="red" fontSize="18" text="*" fontWeight="bold"/>
+				<mx:Label x="277" y="47" width="13" height="21" id="Lbl_TdStar" color="red" fontSize="18" text="*" fontWeight="bold"/>
+				<WrbHelpComp:HelpText x="464" y="55.5" depth="9" pxTabIndex="4"  width="303" id="hlp_Property" onselection="{fnGetProperty()}" pxSetColumnsWidth="300,150,150">
+				</WrbHelpComp:HelpText>
+				<mx:Label x="395" y="15" text="Location" id="lbl_PricingModel0" />
+				<WrbHelpComp:HelpText x="464" y="15.5" width="303" depth="10" pxTabIndex="3" id="hlp_Location" pxSetColumnsWidth="300,0" onselection="{fnGetLocation()}">
+				</WrbHelpComp:HelpText>
+				<mx:DateField x="130" y="54" id="DT_From" change="Change('DT_From')" formatString="DD/MM/YYYY"/>
+				<mx:Label x="229" y="55" text="To Date" id="lbl_TD"/>
+				<mx:DateField x="293" y="54" id="DT_TO" change="Change('DT_To')" formatString="DD/MM/YYYY"/>
+				<s:Image x="850" y="19" width="50" height="50" source="assets/Excel copy copy.png" toolTip="Export" click="ExportExcel()"/>
+				<s:Image x="783" y="19" source="assets/a1.png" toolTip="Search" click="Search()"/>
+				<s:HGroup x="0" y="84" width="100%" height="36" verticalAlign="middle" horizontalAlign="center" gap="30">
+					<s:RadioButton label=" Bills" id="Rd_Bill"/>					
+					<s:RadioButton label="UnSettled Bills" id="Rd_UnSettled"/>
+					<s:RadioButton label="Contract Bills" id="Rd_Contract"/>
+					<s:RadioButton label="Receipt Bills" id="Rd_Receipt"/>
+					<mx:LinkButton label="Click To Clear" click="clear()"/>
+				</s:HGroup >
+			</s:Group>
+			 <mx:HRule width="100%"/>
+		 </s:VGroup>
+		</s:BorderContainer>
+	</s:VGroup>
+		<s:BorderContainer x="0" y="140" width="100%" height="100%" backgroundColor="#f2eeee"
+						   borderVisible="false" depth="10" id="Bill" visible="false">
+			<s:Scroller x="0" y="0" width="100%" height="100%" depth="3"  >
+				<s:VGroup width="100%" height="100%" depth="2" >
+					<mx:DataGrid id="Grd_Invoice" width="3500" height="100%" depth="1" editable="true"
+								 tabIndex="93" verticalAlign="middle"  >
+						<mx:columns>
+							<mx:DataGridColumn dataField="CreatedDate" headerText="Created Date" editable="false" width="80" textAlign="center"/>
+							<mx:DataGridColumn dataField="ModifiedDate" headerText="Modified Date" textAlign="center" editable="false" width="80" />
+							<mx:DataGridColumn dataField="BookingCode" headerText="Booking Code " textAlign="center" editable="false"  id="Col_NDD" width="100" />
+							<mx:DataGridColumn dataField="InVoiceNo" headerText="InvoiceNo" textAlign="left" editable="false"  id="Col_DD" width="130" />
+							<mx:DataGridColumn dataField="PropertyName" headerText="Property Name" textAlign="left" width="200" editable="false"/>
+							<mx:DataGridColumn dataField="ClientName" headerText="Company" editable="false" textAlign="left" width="200" />
+							<mx:DataGridColumn dataField="MasterClientName" headerText="Master Client Name" textAlign="left"  editable="false" width="200"/>
+							<mx:DataGridColumn dataField="GuestName" headerText="Guest Name" textAlign="left" editable="false" width="130"/>					
+							<mx:DataGridColumn dataField="TotalAmount" headerText="Total Amount" textAlign="right"  editable="false" width="100"/>
+							<mx:DataGridColumn dataField="TariffAmount" headerText="Total Tariff" textAlign="right"  editable="false" width="100"/>
+							<mx:DataGridColumn dataField="Broadband" headerText="BroadBand" textAlign="right"  editable="false" width="100"/>
+							<mx:DataGridColumn dataField="FOODANDBeverages" headerText="Food Beverages" textAlign="right"  editable="false" width="100"/>
+							<mx:DataGridColumn dataField="Laundry" headerText="Laundry" textAlign="right"  editable="false" width="100"/>
+							<mx:DataGridColumn dataField="ExtraAmount" headerText="Extra Matress" textAlign="right"  editable="false" width="100"/>
+							<mx:DataGridColumn dataField="ServiceCharge" headerText="Service Charge" textAlign="right"  editable="false" width="100"/>
+							<mx:DataGridColumn dataField="LuxuryTax" headerText="Luxury Tax" textAlign="right"  editable="false" width="100"/>
+							<mx:DataGridColumn dataField="SerivceTax7" headerText="ST@7.20" textAlign="right"  editable="false" width="100"/>
+							<mx:DataGridColumn dataField="Servicetax12" headerText="ST@12.00" textAlign="right"  editable="false" width="100"/>
+							<mx:DataGridColumn dataField="SerivceTax4" headerText="ST@4.80" textAlign="right"  editable="false" width="100"/>
+							
+							<mx:DataGridColumn dataField="Cess" headerText="Cess" textAlign="right"  editable="false" width="100"/>
+							<mx:DataGridColumn dataField="Hcess" headerText="Hcess" textAlign="right"  editable="false" width="100"/>
+							<mx:DataGridColumn dataField="CheckInDate" headerText="Check-In Date" textAlign="right"  editable="false" width="80"/>
+							<mx:DataGridColumn dataField="CheckOutDate" headerText="Check-Out Date" textAlign="right"  editable="false" width="80"/>
+							<mx:DataGridColumn dataField="Location" headerText="Location" textAlign="left"  editable="false" width="100"/>
+							<mx:DataGridColumn dataField="BillStartDate" headerText="Bill Start Date" textAlign="right"  editable="false" width="80"/>
+							<mx:DataGridColumn dataField="BillEndDate" headerText="Bill End Date" textAlign="right"  editable="false" width="80"/>
+							<mx:DataGridColumn dataField="VAT" headerText="VAT Amount" textAlign="right"  editable="false" width="100"/>							
+						</mx:columns>
+					</mx:DataGrid>
+				</s:VGroup>
+			</s:Scroller>
+		</s:BorderContainer>
+	<s:BorderContainer x="0" y="140" width="100%" height="100%" backgroundColor="#f2eeee"
+					   borderVisible="false" depth="10" id="Contract">
+		<s:Scroller x="0" y="0" width="100%" height="100%" depth="3" >
+			<s:VGroup width="100%" height="100%" depth="2" >
+				<mx:DataGrid id="Grd_Contract" width="100%" height="100%" depth="1" editable="true"
+							 tabIndex="93" verticalAlign="middle"  >
+					<mx:columns>
+						<mx:DataGridColumn dataField="CreatedDate" headerText="Created Date" editable="false" width="80" textAlign="center"/>
+						<mx:DataGridColumn dataField="ModifiedDate" headerText="Modified Date" textAlign="center" editable="false" width="80" />
+						<mx:DataGridColumn dataField="ClientName" headerText="Client Name" textAlign="left" editable="false"   width="220" />
+						<mx:DataGridColumn dataField="InvoiceNo" headerText="InvoiceNo" textAlign="left" editable="false"   width="100" />
+						<mx:DataGridColumn dataField="Type" headerText="Type" textAlign="left" width="130" editable="false"/>
+						<mx:DataGridColumn dataField="TotalAmount" headerText="TotalAmount" editable="false" textAlign="right" width="100" />
+						<mx:DataGridColumn dataField="AdjustmentAmount" headerText="Adjustment Amount" textAlign="right"  editable="false" width="100"/>
+						<mx:DataGridColumn dataField="Tax" headerText="ST@12.00" textAlign="right" editable="false" width="100"/>																	
+					</mx:columns>
+				</mx:DataGrid>
+			</s:VGroup>
+		</s:Scroller>	
+	</s:BorderContainer>
+		<s:BorderContainer x="0" y="140" width="100%" height="100%" backgroundColor="#f2eeee"
+						   borderVisible="false" depth="10" id="Receipts" >
+			<s:Scroller x="0" y="0" width="100%" height="100%" depth="3"  >
+				<s:VGroup width="100%" height="100%" depth="2" >
+					
+					<mx:DataGrid id="Grd_Receipts" width="3000" height="100%" depth="1" editable="true"
+								 tabIndex="93" verticalAlign="middle"  >
+						<mx:columns>
+							<mx:DataGridColumn dataField="CreatedDate" headerText="Created Date" editable="false" width="80" textAlign="center"/>
+							<mx:DataGridColumn dataField="ModifiedDate" headerText="Modified Date" textAlign="center" editable="false" width="80" />
+							<mx:DataGridColumn dataField="BookingCode" headerText="Booking Code " textAlign="center" editable="false"   width="100" />
+							<mx:DataGridColumn dataField="InVoiceNo" headerText="InvoiceNo" textAlign="left" editable="false"   width="130" />
+							<mx:DataGridColumn dataField="PropertyName" headerText="Property Name" textAlign="left" width="200" editable="false"/>
+							<mx:DataGridColumn dataField="ClientName" headerText="Company" editable="false" textAlign="left" width="200" />
+							<mx:DataGridColumn dataField="MasterClientName" headerText="Master Client Name" textAlign="left"  editable="false" width="200"/>
+							<mx:DataGridColumn dataField="GuestName" headerText="Guest Name" textAlign="left" editable="false" width="130"/>					
+							<mx:DataGridColumn dataField="PaymentType" headerText="Payment Type" textAlign="left"  editable="false" width="100"/>							
+							<mx:DataGridColumn dataField="CheckInDate" headerText="Check-In Date" textAlign="center"  editable="false" width="80"/>
+							<mx:DataGridColumn dataField="CheckOutDate" headerText="Check-Out Date" textAlign="center"  editable="false" width="80"/>
+							<mx:DataGridColumn dataField="Location" headerText="Location" textAlign="left"  editable="false" width="100"/>
+							<mx:DataGridColumn dataField="NoOfDays" headerText="NoOfDays" textAlign="right"  editable="false" width="100"/>
+							<mx:DataGridColumn dataField="TotalAmount" headerText="Total Amount" textAlign="right"  editable="false" width="100"/>
+							<mx:DataGridColumn dataField="PaymentMode" headerText="Payment Mode" textAlign="left"  editable="false" width="100"/>
+							<mx:DataGridColumn dataField="AcountNo" headerText="Batch Close" textAlign="left"  editable="false" width="100"/>
+							<mx:DataGridColumn dataField="PaymentDate" headerText="PaymentDate" textAlign="center"  editable="false" width="80"/>
+							<mx:DataGridColumn dataField="BillStartDate" headerText="Bill Start Date" textAlign="center"  editable="false" width="80"/>
+							<mx:DataGridColumn dataField="BillEndDate" headerText="Bill End Date" textAlign="center"  editable="false" width="80"/>
+						</mx:columns>
+					</mx:DataGrid>
+				</s:VGroup>
+			</s:Scroller>		
+		</s:BorderContainer>
+</s:Application>

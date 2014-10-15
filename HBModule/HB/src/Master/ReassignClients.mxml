@@ -1,0 +1,664 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:WrbComp="WrbComp.*"
+			   xmlns:WrbComp2="Sales.HB.src.WrbComp.*"
+			   width="100%" height="100%" creationComplete="Pageload(event)"
+			   pageTitle="Reassign Executive">
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.CalendarLayoutChangeEvent;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			
+			import spark.components.supportClasses.ItemRenderer;
+			import spark.events.IndexChangeEvent;
+			import spark.events.TextOperationEvent;
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "";
+			public var SalesExecutiveId:int=0,CRMId:int=0,KeyAccountPersonId:int=0;
+			public var Id:int=0,UserId:int=0,RolesId:int=0;
+			public var ErrStr:String="",Flag:Boolean=true,addmode:Boolean=true;
+			protected function Pageload(event:FlexEvent):void
+			{
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";
+				Drp_Client.visible=true;
+				Drp_Reassignclients.visible=true;
+				lbl_reassign.visible=true;
+				Drp_Category.visible=true;
+				Grd_Details.visible=false;
+				Chk_Selectall.visible=false;
+				SCtrl.setButtonRights("Search",true);
+				SCtrl.setButtonRights("Clear",true);
+				SCtrl.setButtonRights("Delete",true);
+				
+			} 
+			private function Custom_WebSer_Result (Ds_Objects:Object):void				
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "CLIENLOAD_CUSTOM")
+				{
+					Clear();
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Drp_Client.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "PROPLOAD_CUSTOM")
+				{
+					Clear();
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Drp_Client.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "CLIENTSALELOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Drp_User.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "CLIENTCRMLOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Drp_User.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+	               	}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "CLIENTKEYLOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Drp_User.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "PROPERTYOMLOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Drp_User.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "PROPERTYRMLOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Drp_User.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "PROPERTYARMLOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Drp_User.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "PROPERTYPMLOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Drp_User.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "PROPERTYORLOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Drp_User.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "PROPERTYSLOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Drp_User.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "SALESLOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_Details.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Drp_Reassignclients.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "CRM_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_Details.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;						
+					} 
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Drp_Reassignclients.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "KEYLOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_Details.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;						
+					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Drp_Reassignclients.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "OMLOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_Details.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;						
+					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Drp_Reassignclients.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "RMLOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_Details.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;						
+					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Drp_Reassignclients.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "PMLOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_Details.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;						
+					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Drp_Reassignclients.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "ARMLOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_Details.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;						
+					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Drp_Reassignclients.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "ORLOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_Details.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;						
+					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Drp_Reassignclients.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "SALELOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_Details.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;						
+					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Drp_Reassignclients.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				{
+					if (Id !=0)
+					
+					{
+						alignAlert(Alert.show("User Reassigned Successfully.","Message !",Alert.OK, null, FnOkCal, 
+							iconTickLarge, Alert.OK),10,"");
+					}
+					Refresh();
+				}
+			}
+			public function FnOkCal(event:CloseEvent):void
+			{
+				if(event.detail==Alert.OK)
+				{
+					Drp_Category.setFocus();
+				}
+			}
+			protected function Save():void
+			{
+				var ErrStr:String="";
+				var Flag:Boolean=true;
+					
+				if(Drp_Category.selectedIndex == -1)
+				{
+				    if(Flag == true)
+					{ 
+						Drp_Category.setFocus();
+						Flag=false; 
+					}
+					ErrStr=ErrStr+"*  Category is Required.\n";
+				}
+				if(Drp_Client.selectedIndex ==-1)
+				{
+					if(Flag==true)
+					{ 
+						Drp_Client.setFocus();
+						Flag=false; 
+					}
+					ErrStr=ErrStr+"*  UserRole is Required.\n";
+				}
+				if(Drp_User.selectedIndex ==-1)
+				{
+					
+					if(Flag==true)
+					{ 
+						Drp_User.setFocus();
+						Flag=false; 
+					}
+					ErrStr=ErrStr+"*  UserName is Required.\n";
+				} 
+				if((Grd_Details.dataProvider==null)||(Grd_Details.dataProvider.length==0))
+				{
+					if(Flag==true)
+					{ 
+						//Grd_Details.setFocus();
+						Flag=false;
+					}
+					ErrStr=ErrStr+ "*  User Data Required \n";
+				}
+				if(Drp_Reassignclients.selectedIndex ==-1)
+				{
+					if(Flag==true)
+					{ 
+						Drp_Category.setFocus();
+						Flag=false; 
+					}
+					ErrStr=ErrStr+"*  Reassign To is Required.\n";
+				}
+				if(ErrStr!="")
+				{
+					alignAlert(Alert.show(ErrStr,"Required Field(s) !",Alert.OK,this,null,iconErrLarge),10,"");
+					return;
+				}
+				if(Drp_Category.selectedItem =="ClientManagement")
+					
+				{
+				//var UserRole:String="";
+				var Ac_Hdr:ArrayCollection=new ArrayCollection
+					([{
+					   Category:Drp_Category.selectedItem,
+					   UserRole:Drp_Client.selectedItem.label,
+					   UserId:Drp_User.selectedItem.Data,
+					   ReassignId:Drp_Reassignclients.selectedItem.Data,
+					   Id:Id
+					}]);
+				var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
+				
+				var Clnt:ArrayCollection= new  ArrayCollection();
+				Clnt.removeAll();
+				Clnt=Grd_Details.dataProvider as ArrayCollection;
+				var ClientXml:String="";
+				ClientXml += "<ROOT>";
+				ClientXml += ObjToXmlStr_Comm(Clnt,"ClientXml")
+				ClientXml += "</ROOT>";
+				useWeb("ReassignClient","Save_CUSTOM",[GlobalXml,HdrXml,ClientXml]);
+				}
+				if(Drp_Category.selectedItem =="PropertyManagement")
+					{
+						//var UserRole:String="";
+						var Ac_Hdr:ArrayCollection=new ArrayCollection
+							([{
+								Category:Drp_Category.selectedItem,
+								UserRole:Drp_Client.selectedItem.label,
+								UserId:Drp_User.selectedItem.Data,
+								ReassignId:Drp_Reassignclients.selectedItem.Data,
+								Id:Id
+							}]);
+						var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
+						
+						var Prop:ArrayCollection= new  ArrayCollection();
+						Prop.removeAll();
+						Prop=Grd_Details.dataProvider as ArrayCollection;
+						var PropertyXml:String="";
+						PropertyXml += "<ROOT>";
+						PropertyXml += ObjToXmlStr_Comm(Prop,"PropertyXml")
+						PropertyXml += "</ROOT>";
+						useWeb("ReassignProperty","Save_CUSTOM",[GlobalXml,HdrXml,PropertyXml]);
+					}
+			}
+			protected function Clear():void
+			{
+				Drp_Client.visible=true;
+				lbl_reassign.visible=true;
+				Drp_Reassignclients.visible=true;
+				Drp_Category.visible=true;
+				Drp_Reassignclients.selectedIndex=-1;
+				Drp_Client.selectedIndex=-1;
+				Drp_User.selectedIndex=-1;
+				Drp_Client.dataProvider=null;
+				Drp_User.dataProvider=null;
+				Drp_Reassignclients.dataProvider=null;
+				Id=0;
+				SalesExecutiveId=0;
+				CRMId=0;UserId=0;RolesId=0;
+				KeyAccountPersonId=0;
+			    Grd_Details.dataProvider=null;
+				Grd_Details.visible=false;
+				Chk_Selectall.visible=false;
+			}
+			protected function Drp_Category_changeHandler(event:IndexChangeEvent):void
+			{  
+				if(Drp_Category.selectedItem =="ClientManagement")
+				{
+					Drp_Client.visible=true;
+					Drp_User.visible=true;
+					Drp_Reassignclients.visible=true
+					Grd_Details.visible=false;
+					Chk_Selectall.visible=false;
+					useWeb("ReassignClient","CLIENLOAD_CUSTOM",[GlobalXml,'CLIENTLOAD1',0]);
+				}
+				else if(Drp_Category.selectedItem =="PropertyManagement")
+				{ 
+					Drp_Client.visible=true;
+					Drp_Reassignclients.visible=true
+					Grd_Details.visible=false;
+					Chk_Selectall.visible=false;
+					useWeb("ReassignClient","PROPLOAD_CUSTOM",[GlobalXml,'PROPERTYLOAD1',0]);
+				}
+			}
+			public var UserRole:String="";
+			protected function changeclient(event:IndexChangeEvent):void
+			{		
+			    Id=Drp_Client.selectedItem.Data;
+				UserRole=Drp_Client.selectedItem.label;
+				if(Drp_Client.selectedItem.label == "Sales Executive")
+				{
+					Drp_Client.visible=true;
+					Drp_User.visible=true;
+					Drp_Reassignclients.visible=true
+					Grd_Details.visible=false;
+					Chk_Selectall.visible=false;
+					useWeb("ReassignClient","CLIENTSALELOAD_CUSTOM",[GlobalXml,'CLIENTSALELOAD',Id]);
+				}
+				else if(Drp_Client.selectedItem.label== "CRM")
+				{  
+					Drp_Client.visible=true;
+					Drp_User.visible=true;
+					Drp_Reassignclients.visible=true
+					Grd_Details.visible=false;
+					Chk_Selectall.visible=false;
+					useWeb("ReassignClient","CLIENTCRMLOAD_CUSTOM",[GlobalXml,'CLIENTCRMLOAD',Id]);
+				}
+				else if(Drp_Client.selectedItem.label== "Key Account Person")
+				{  
+					Drp_Client.visible=true;
+					Drp_User.visible=true;
+					Drp_Reassignclients.visible=true
+					Grd_Details.visible=false;
+					Chk_Selectall.visible=false;
+					useWeb("ReassignClient","CLIENTKEYLOAD_CUSTOM",[GlobalXml,'CLIENTKEYLOAD',Id]);
+				}
+				else if(Drp_Client.selectedItem.label=="Operations Managers")
+				{
+					Drp_Client.visible=true;
+					Drp_Reassignclients.visible=true
+					Grd_Details.visible=false;
+					Chk_Selectall.visible=false;
+					useWeb("ReassignClient","PROPERTYOMLOAD_CUSTOM",[GlobalXml,'PROPERTYOMLOAD',Id]);
+				}
+				else if(Drp_Client.selectedItem.label=="Resident Managers")
+				{  
+					Drp_Client.visible=true;
+					Drp_Reassignclients.visible=true
+					Grd_Details.visible=false;
+					Chk_Selectall.visible=false;
+					useWeb("ReassignClient","PROPERTYRMLOAD_CUSTOM",[GlobalXml,'PROPERTYRMLOAD',Id]);
+				}
+				else if(Drp_Client.selectedItem.label=="Assistant Resident Managers")
+				{  
+					Drp_Client.visible=true;
+					Drp_Reassignclients.visible=true
+					Grd_Details.visible=false;
+					Chk_Selectall.visible=false;
+					useWeb("ReassignClient","PROPERTYARMLOAD_CUSTOM",[GlobalXml,'PROPERTYPMLOAD',Id]);
+				}
+				else if(Drp_Client.selectedItem.label=="Project Managers")
+				{  
+					Drp_Client.visible=true;
+					Drp_Reassignclients.visible=true
+					Grd_Details.visible=false;
+					Chk_Selectall.visible=false;
+					useWeb("ReassignClient","PROPERTYPMLOAD_CUSTOM",[GlobalXml,'PROPERTYARMLOAD',Id]);
+				}
+				else if(Drp_Client.selectedItem.label=="Other Roles")
+				{  
+					Drp_Client.visible=true;
+					Drp_Reassignclients.visible=true
+					Grd_Details.visible=false;
+					Chk_Selectall.visible=false;
+					useWeb("ReassignClient","PROPERTYORLOAD_CUSTOM",[GlobalXml,'PROPERTYORLOAD',Id]);
+				}	
+				else if(Drp_Client.selectedItem.label=="Sales")
+				{  
+					Drp_Client.visible=true;
+					Drp_Reassignclients.visible=true
+					Grd_Details.visible=false;
+					Chk_Selectall.visible=false;
+					useWeb("ReassignClient","PROPERTYSLOAD_CUSTOM",[GlobalXml,'PROPERTYSLOAD',Id]);
+				}	
+			}
+			public var UserName:String="";
+			protected function ChangeUser(event:IndexChangeEvent):void
+			{
+				Id=Drp_User.selectedItem.Data;
+				UserName=Drp_User.selectedItem.label;
+				Grd_Details.dataProvider=null;
+				if((Drp_Client.selectedItem.label == "Sales Executive")&&(Drp_User.selectedItem.label !=""))
+				{
+					Drp_Client.visible=true;
+					Drp_User.visible=true;
+					Drp_Reassignclients.visible=true
+					Grd_Details.visible=true;
+					Chk_Selectall.visible=true;
+					useWeb("ReassignClient","SALESLOAD_CUSTOM",[GlobalXml,'SALESLOAD',Id]);
+				}
+				else if((Drp_Client.selectedItem.label == "CRM")&&(Drp_User.selectedItem.label !=""))
+				{
+					Drp_Client.visible=true;
+					Drp_User.visible=true;
+					Drp_Reassignclients.visible=true
+					Grd_Details.visible=true;
+					Chk_Selectall.visible=true;
+					useWeb("ReassignClient","CRM_CUSTOM",[GlobalXml,'CRMLOAD',Id]);
+					
+				}
+				else if((Drp_Client.selectedItem.label == "Key Account Person")&&(Drp_User.selectedItem.label !=""))
+				{
+					Drp_Client.visible=true;
+					Drp_User.visible=true;
+					Drp_Reassignclients.visible=true
+					Grd_Details.visible=true;
+					Chk_Selectall.visible=true;
+					useWeb("ReassignClient","KEYLOAD_CUSTOM",[GlobalXml,'KEYACCOUNTPERSON',Id]);
+				}
+				else if((Drp_Client.selectedItem.label=="Operations Managers")&&(Drp_User.selectedItem.label !=""))
+				{
+					Drp_Client.visible=true;
+					Drp_User.visible=true;
+					Drp_Reassignclients.visible=true
+					Grd_Details.visible=true;
+					Chk_Selectall.visible=true;
+					useWeb("ReassignClient","OMLOAD_CUSTOM",[GlobalXml,'OPERATIONMANAGER',Id]);
+				
+				}
+				else if((Drp_Client.selectedItem.label=="Resident Managers")&&(Drp_User.selectedItem.label !=""))
+				{
+					Drp_Client.visible=true;
+					Drp_User.visible=true;
+					Drp_Reassignclients.visible=true
+					Grd_Details.visible=true;
+					Chk_Selectall.visible=true;
+					useWeb("ReassignClient","RMLOAD_CUSTOM",[GlobalXml,'RESIDENTMANAGER',Id]);
+				}
+				else if((Drp_Client.selectedItem.label=="Project Managers")&&(Drp_User.selectedItem.label !=""))
+				{
+					Drp_Client.visible=true;
+					Drp_User.visible=true;
+					Drp_Reassignclients.visible=true
+					Grd_Details.visible=true;
+					Chk_Selectall.visible=true;
+					useWeb("ReassignClient","PMLOAD_CUSTOM",[GlobalXml,'PROJECTMANAGER',Id]);
+				}
+				else if((Drp_Client.selectedItem.label=="Assistant Resident Managers")&&(Drp_User.selectedItem.label !=""))
+				{
+					Drp_Client.visible=true;
+					Drp_User.visible=true;
+					Drp_Reassignclients.visible=true
+					Grd_Details.visible=true;
+					Chk_Selectall.visible=true;
+					useWeb("ReassignClient","ARMLOAD_CUSTOM",[GlobalXml,'ASSISTANTRESIDENTMANAGER',Id]);
+				}
+				else if((Drp_Client.selectedItem.label=="Other Roles")&&(Drp_User.selectedItem.label !=""))
+				{
+					Drp_Client.visible=true;
+					Drp_User.visible=true;
+					Drp_Reassignclients.visible=true
+					Grd_Details.visible=true;
+					Chk_Selectall.visible=true;
+					useWeb("ReassignClient","ORLOAD_CUSTOM",[GlobalXml,'OTHERROLE',Id]);
+				}
+				else if((Drp_Client.selectedItem.label=="Sales")&&(Drp_User.selectedItem.label !=""))
+				{
+					Drp_Client.visible=true;
+					Drp_User.visible=true;
+					Drp_Reassignclients.visible=true
+					Grd_Details.visible=true;
+					Chk_Selectall.visible=true;
+					useWeb("ReassignClient","SALELOAD_CUSTOM",[GlobalXml,'SALE',Id]);
+				}
+			}
+			public var Ac:ArrayCollection=new ArrayCollection();	
+			public function FnSelect(Event):void
+			{ 
+				Ac=Grd_Details.dataProvider as ArrayCollection;				
+				var Index:int=Grd_Details.selectedIndex;
+				var Flag:Boolean=true;
+				
+				if(Ac[Index].checks==1)
+				{
+					Ac[Index].checks=false;
+				}
+				else if(Ac[Index].checks==0)
+				{
+					Ac[Index].checks=true;
+				}
+				var flage:Boolean=true;
+				var TempArr:ArrayCollection=new ArrayCollection();
+				TempArr=Grd_Details.dataProvider as ArrayCollection;
+				
+				for(var i:int=0;i<TempArr.length;i++)
+				{
+					if(TempArr[i].checks==false)
+					{
+						flage=false;
+					}
+				}
+				Chk_Selectall.selected=flage;
+				
+			}
+			protected function Refresh():void
+			{
+				Clear();
+				Drp_Category.selectedIndex=-1;
+			}
+			
+			protected function Chk_Selectall_changeHandler(event:Event):void
+			{
+				var TempArr:ArrayCollection=new ArrayCollection();
+				TempArr=Grd_Details.dataProvider as ArrayCollection;
+				
+				for(var i:int=0;i<TempArr.length;i++)
+				{
+					TempArr[i].checks=Chk_Selectall.selected;
+				}
+				Grd_Details.dataProvider=TempArr;
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<s:DropDownList id="Drp_Category" x="183" y="68" width="175" height="21"
+					change="Drp_Category_changeHandler(event)" prompt="Please Select Category" tabIndex="1">
+		<mx:ArrayCollection> 
+			<fx:String>ClientManagement</fx:String> 
+			<fx:String>PropertyManagement</fx:String>
+		</mx:ArrayCollection>
+	</s:DropDownList>
+	<s:DropDownList x="398" y="68" width="175" id="Drp_Client" change="changeclient(event)" 
+					prompt="Please Select UserRole" tabIndex="2">
+		
+	</s:DropDownList>
+	
+	<s:DropDownList id="Drp_User" x="603" y="68" width="180" height="21" change="ChangeUser(event)"
+					prompt="Please Select UserName" tabIndex="3">
+	</s:DropDownList>
+	<s:DropDownList x="398" y="476" width="183" id="Drp_Reassignclients" tabIndex="5"
+					prompt="Please Select UserName">
+		
+	</s:DropDownList>
+				<mx:DataGrid id="Grd_Details" x="183" y="121"  verticalAlign="middle" editable="true" 
+							 width="600" height="350" tabIndex="4">
+					<mx:columns>
+						<mx:DataGridColumn dataField="checks" headerText="" width="50" editable="false"  >
+							<mx:itemRenderer >
+								<fx:Component>
+									<mx:HBox horizontalAlign="center" verticalAlign="middle">
+										<mx:CheckBox selected="{data.checks}"  
+													 change="outerDocument.FnSelect(event);"	/>
+									</mx:HBox>	
+								</fx:Component>
+							</mx:itemRenderer>
+						</mx:DataGridColumn>
+						<mx:DataGridColumn dataField="RoleName" headerText="" width="250" editable="false" visible="false"/>
+						<mx:DataGridColumn dataField="Id" headerText="Id" width="250" editable="false" visible="false"/>
+						<mx:DataGridColumn dataField="ClientName" headerText="UserName" width="250" editable="false"/>
+						<mx:DataGridColumn dataField="CCity" headerText="CCity" width="125" editable="false" visible="true"/>
+						<mx:DataGridColumn dataField="CreatedDate" headerText="CreatedDate" width="125" editable="false">
+							
+						</mx:DataGridColumn> 
+					</mx:columns>
+				</mx:DataGrid>
+	<s:Label x="316" y="482" text="Reassign To" id="lbl_reassign"/>
+	
+	<mx:HRule x="0" y="511" width="100%" strokeColor="#eb1c24"/>
+		<WrbComp:SaveControl id="SCtrl" y="517" width="500" docClear="Clear()" docSave="Save()" docRefresh="Refresh()"
+							 horizontalCenter="136">
+		</WrbComp:SaveControl>
+	<s:CheckBox x="205" y="97" label="Select All" id="Chk_Selectall" change="Chk_Selectall_changeHandler(event)"/>
+
+	
+</s:Application>

@@ -1,0 +1,1473 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:Controls="fx.com.adobe.Controls.*"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   xmlns:WrbComp="WrbComp.*"
+			   xmlns:flexlib="http://code.google.com/p/flexlib/"
+			   width="100%" height="100%" creationComplete="PageLoad()" pageTitle="Deposit ">
+	<fx:Declarations>
+		<mx:NumberFormatter id="NF_Two" precision="2" rounding="nearest"/>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
+	<fx:Script>
+		<![CDATA[
+			import WrbComp.frmsearchwindow;
+			
+			import WrbHelpComp.HlpGridHdr;
+			
+			import flashx.textLayout.formats.Float;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.CalendarLayoutChangeEvent;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.events.IndexChangedEvent;
+			import mx.graphics.codec.PNGEncoder;
+			
+			import spark.events.IndexChangeEvent;
+			import spark.events.TextOperationEvent;
+			private var SearchPopUp:frmsearchwindow = new frmsearchwindow();
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "",TypeServiceId:int=0,ErrStr:String="";
+			public var Id:int=0,ErrMsg:String="",ClientId:int=0,UserId:int=0;
+			public var AddMode:Boolean=true,Flag:Boolean=true;
+			private var fileRef:FileReference = new FileReference();
+			private var fileTypes:Array = new Array();
+			private var arrColl:ArrayCollection;
+			//public var uploadURL:URLRequest = new URLRequest();
+			private var imageTypes:FileFilter = new FileFilter("Images (*.jpg; *.jpeg; *.gif; *.png)" ,"*.jpg; *.jpeg; *.gif; *.png");
+			private var documentTypes:FileFilter = new FileFilter("Documents (*.pdf), (*.doc), (*.rtf), (*.txt)",("*.pdf; *.doc; *.rtf, *.txt"));
+			private var FILE_URL:String = "",PropertyId:int=0,PropertyName:String="",PropertyId1:int=0,PropertyName1:String="",DId:int=0;
+			public var ImageCount:Number=0;
+			//public var ImageFormat:String="";
+			private var urlReq:URLRequest;
+			public var Save_Flag:Boolean=true; 
+			public var uploadURL:URLRequest = new URLRequest();
+			public var Amount:String="",ImagePath:String="",ClientMgtId:int=0,CashAccountId:int=0,CashAccount:String="",CashChalan:String="";
+			public var Comments:String="",ChkAccountId:int=0,ChkAccount:String="",Mode:String="Cash",ClientName:String="";
+			protected function PageLoad():void
+			{
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";
+				init1();
+				init();
+				Brd_Cash.visible=true;
+				Brd_Cheque.visible=false;
+				btn_Cash.Button_B_mouseOverHandler();
+				btn_Cheque.Button_OutHandler();
+				dt_CashDate.selectedDate = new Date();
+				dt_BTCDate.selectedDate = new Date();
+				Help();
+				txt_BTCTotal.text="0.00";
+				txt_CashTotal.text="0.00";
+			}
+			public function Help():void
+			{
+				useWeb("Deposit","PAGELOAD_CUSTOM",[GlobalXml,'PAGELOAD',"",Global_AC[0].UsrId,0]);
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void				
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "PAGELOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_Cash.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Grd_Cheque.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+					if (Ds_Objects.result.Tables.Table2.Rows.length > 0)
+					{
+						Grd_BTC.dataProvider=Ds_Objects.result.Tables.Table2.Rows as ArrayCollection;
+					}
+					if (Ds_Objects.result.Tables.Table3.Rows.length > 0)
+					{
+						Drp_CashAccount.dataProvider=Ds_Objects.result.Tables.Table3.Rows as ArrayCollection;
+					}
+					if (Ds_Objects.result.Tables.Table4.Rows.length > 0)
+					{
+						hlp_Property.dataProvider=Ds_Objects.result.Tables.Table4.Rows as ArrayCollection;
+						hlp_BTCProperty.dataProvider=Ds_Objects.result.Tables.Table4.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						DId=Ds_Objects.result.Tables.Table.Rows[0].Id;
+					}
+					if(FilePath.text!="")
+					{
+						init();	
+						uploadFiles();
+					}	
+					if (Id == 0)
+					{
+						alignAlert(Alert.show("Deposit Saved Successfully.","Message !",Alert.OK, 
+							null, null, iconTickLarge, Alert.OK),10,"");
+						
+					}
+					CashCancel();
+					BTCCancel();
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "ImageUpload_CUSTOM")
+				{
+					if(Ds_Objects.result.Tables.Table.Rows[0].Logo!="")
+					{
+						//Img_logo.source=Ds_Objects.result.Tables.Table.Rows[0].Logo;
+					}
+					
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Search_CUSTOM")
+				{
+					if(Mode=="Cash")
+					{
+						Grd_Cash.dataProvider=null;
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{
+							Grd_Cash.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						}
+					}
+					if(Mode=="Cheque")
+					{
+						Grd_Cheque.dataProvider=null;
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{
+							Grd_Cheque.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						}
+					}
+					if(Mode=="BTC")
+					{
+						Grd_BTC.dataProvider=null;
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{
+							Grd_BTC.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						}
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "CashDetails_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						dt_CashDate.text=Ds_Objects.result.Tables.Table.Rows[0].Date;
+						txt_CashDepositAmount.text=Ds_Objects.result.Tables.Table.Rows[0].Amount;
+						txt_CashComments.text=Ds_Objects.result.Tables.Table.Rows[0].Comments;
+						Drp_CashAccount.prompt=Ds_Objects.result.Tables.Table.Rows[0].AC;
+						CashAccountId=Ds_Objects.result.Tables.Table.Rows[0].DepositeToId;
+						FilePath.text=Ds_Objects.result.Tables.Table.Rows[0].ImageName;
+						hlp_Property.text=Ds_Objects.result.Tables.Table.Rows[0].Property;
+						txt_CashTotal.text=Ds_Objects.result.Tables.Table.Rows[0].TotalAmount;
+						txt_ChkNo.text=Ds_Objects.result.Tables.Table.Rows[0].ChequeNo;
+						
+					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Grd_Invoice.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "BTCDetails_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						hlp_BTCProperty.text=Ds_Objects.result.Tables.Table.Rows[0].Property;
+						dt_BTCDate.text=Ds_Objects.result.Tables.Table.Rows[0].Date;
+						txt_BTCTotal.text=Ds_Objects.result.Tables.Table.Rows[0].Amount;
+						txt_BTCRemarks.text=Ds_Objects.result.Tables.Table.Rows[0].Remarks;
+						Drp_BTCMode.prompt=Ds_Objects.result.Tables.Table.Rows[0].BTCMode;
+						Drp_BTCTo.prompt=Ds_Objects.result.Tables.Table.Rows[0].BTCTo;
+						txt_DoneBy.text=Ds_Objects.result.Tables.Table.Rows[0].DoneBy;
+						hlp_ClientName.text=Ds_Objects.result.Tables.Table.Rows[0].ClientName;
+					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Grd_BTCInvoice.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+				}
+				
+				if (Ds_Objects.currentTarget.description.toString() == "ImageUpload_CUSTOM")
+				{
+					if(Ds_Objects.result.Tables.Table.Rows[0].Logo!="")
+					{
+						//	Img_logo.source=Ds_Objects.result.Tables.Table.Rows[0].Logo;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "INVOICE_CUSTOM")
+				{
+					if(Mode!="BTC")
+					{
+						Grd_Invoice.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+					if(Mode=="BTC")
+					{
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{
+							Grd_BTCInvoice.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						}
+						if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+						{
+							hlp_ClientName.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+						}
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "FILTER_CUSTOM")
+				{
+					Grd_BTCInvoice.dataProvider=null;
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_BTCInvoice.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "ImageUpload_CUSTOM")
+				{
+					//if(Ds_Objects.result.Tables.Table.Rows.length > 0)
+					//{
+					// ImageCount=Ds_Objects.result.Tables.Table.Rows[0].CNT
+					//	if(ImageCount !=0)
+					//	{
+					//		ImageCount=ImageCount+1;
+					//	}
+					//	if(Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					//	{
+					//		//Grd_Image.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					//	}
+					//	else
+					//	{
+					//		//Grd_Image.dataProvider=null;
+					//	}
+					//						
+					//	init();
+					//	FilePath.text="";
+					//						
+					//	}
+				}
+			}
+			
+			public function FunCall(event:CloseEvent):void
+			{
+				if (event.detail == Alert.OK) 
+				{	
+					txt_CashDepositAmount.setFocus();
+				}
+			}
+			private function CashSave():void
+			{
+				var C1:String=NF_Two.format(txt_CashTotal.text);
+				var C2:String=NF_Two.format(txt_CashDepositAmount.text);
+				var Flag:Boolean=true;var ErrStr:String="";	
+				if(Mode!="BTC")
+				{
+					if(PropertyId==0)
+					{
+						if(Flag==true)
+						{
+							hlp_Property.setFocus();
+							Flag=false;
+						}
+						ErrStr=ErrStr+"* Property is Required \n";
+					}
+					if(txt_CashTotal.text=="0.00")
+					{
+						if(Flag==true)
+						{
+							Grd_Invoice.setFocus();
+							Flag=false;
+						}
+						ErrStr=ErrStr+"* Invoice Numbers are Required \n";
+					}
+					if(txt_CashDepositAmount.text=="")
+					{
+						if(Flag==true)
+						{
+							txt_CashDepositAmount.setFocus();
+							Flag=false;
+						}
+						ErrStr=ErrStr+"* Amount is Required.\n";
+					}
+					if(txt_CashDepositAmount.text!="" && txt_CashTotal.text!="0.00")
+					{
+						if(txt_CashComments.text=="")
+						{
+							if(C1>C2)
+							{
+								if(Flag==true)
+								{
+									txt_CashComments.setFocus();
+									Flag=false;
+								}
+								ErrStr=ErrStr+"* Comments Mandatory \n";
+							}
+							if(C1<C2)
+							{
+								if(Flag==true)
+								{
+									txt_CashComments.setFocus();
+									Flag=false;
+								}
+								ErrStr=ErrStr+"* Comments Mandatory \n";
+							}
+						}
+					}
+					if(CashAccountId==0)
+					{
+						if(Flag==true)
+						{
+							Drp_CashAccount.setFocus();
+							Flag=false;
+						}
+						ErrStr=ErrStr+"* Cash Account is Required.\n";
+					}
+				}
+				if(Mode=="BTC")
+				{
+					var B1:String=NF_Two.format(txt_BTCTotal.text);
+					var B2:String=NF_Two.format(txt_BTCDepositAmount.text);
+					if(PropertyId1==0)
+					{
+						if(Flag==true)
+						{
+							hlp_BTCProperty.setFocus();
+							Flag=false;
+						}
+						ErrStr=ErrStr+"* Property is Required \n";
+					}
+					if(txt_BTCTotal.text=="0.00")
+					{
+						if(Flag==true)
+						{
+							Grd_BTCInvoice.setFocus();
+							Flag=false;
+						}
+						ErrStr=ErrStr+"* Invoice Numbers are Required \n";
+					}
+					if(Drp_BTCTo.selectedIndex==-1)
+					{
+						if(Flag==true)
+						{
+							Drp_BTCTo.setFocus();
+							Flag=false;
+						}
+						ErrStr=ErrStr+"* BTC To is Required.\n";
+					}
+					if(Drp_BTCMode.selectedIndex==-1)
+					{
+						if(Flag==true)
+						{
+							Drp_BTCMode.setFocus();
+							Flag=false;
+						}
+						ErrStr=ErrStr+"* BTC Mode is Required.\n";
+					}
+				}
+				if(ErrStr !="")
+				{
+					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10,"");
+					return;
+				} 
+				if(	AddMode==true)
+				{
+					alignAlert(Alert.show("Do you want to Save this item?", "Warning",Alert.YES | Alert.NO, null,
+						FnCashSave, iconWarning, Alert.NO),10,"");
+				}
+				Help();
+			}
+			protected function FnCashSave(event:CloseEvent):void
+			{ 
+				var ImgFlag:Boolean;
+				if (event.detail==Alert.YES) 
+				{
+					if(ImgFlag == true)
+					{
+						var bit:BitmapData = new BitmapData(100,100); 
+						bit.draw(Img_CashChalan); 
+						var png:PNGEncoder = new PNGEncoder(); 
+						var by:ByteArray = png.encode(bit); 
+						Img_CashChalan.source = by;				
+						var s:int = by.length;				 
+						var sd:String = "";	 
+						CashChalan = "";				
+						for(var i:int = 0; i < s; i++)
+						{
+							sd = by[i]; 
+							CashChalan += sd+",";					
+						}
+					}
+					if(ImgFlag == false)
+					{
+						CashChalan="";
+					}
+					CashChalan="";
+					if(ErrStr !="")
+					{
+						alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10,"");
+						return;
+					} 
+					else
+					{
+						var AC:ArrayCollection=new ArrayCollection();
+						var AC1:ArrayCollection=new ArrayCollection();
+						AC=Grd_Invoice.dataProvider as ArrayCollection;
+						AC1=Grd_BTCInvoice.dataProvider as ArrayCollection; 
+						
+						if(Mode!="BTC")
+						{
+							var Final:ArrayCollection = new ArrayCollection();
+							var Final2:ArrayCollection = new ArrayCollection();
+							
+							Final2.addItem({
+								Id:Id,
+								Date:dt_CashDate.text,
+								Amount:txt_CashDepositAmount.text,
+								AccountId:CashAccountId,
+								Comments:txt_CashComments.text,
+								Mode:Mode,
+								Chalan:FilePath.text,
+								Image:FilePath.text,
+								PropertyId:PropertyId,
+								BTCTo:Drp_BTCTo.selectedItem,
+								BTCMode:Drp_BTCMode.selectedItem,
+								DoneBy:txt_DoneBy.text,
+								Total:txt_CashTotal.text,
+								ChequeNo:txt_ChkNo.text,
+								ClientId:ClientId,
+								BillType:''
+							});
+							
+							for(var J:int =0; J<AC.length; J++)
+							{ 
+								if(AC[J].Tick=="1")
+								{ 
+									Final.addItem({
+										Id:0,
+										BillType:AC[J].BillType,
+										InvoiceNo:AC[J].InvoiceNo,
+										ChkOutHdrId:AC[J].ChkOutHdrId,
+										ClientId:AC[J].ClientId,
+										Amount:AC[J].Total,
+										Tick:AC[J].Tick
+										
+									});
+								}
+							}
+						}
+						if(Mode=="BTC")
+						{
+							var Final:ArrayCollection = new ArrayCollection();
+							var Final2:ArrayCollection = new ArrayCollection();
+							
+							Final2.addItem({
+								Id:Id,
+								Date:dt_BTCDate.text,
+								Amount:txt_BTCDepositAmount.text,
+								AccountId:0,
+								Comments:txt_BTCRemarks.text,
+								Mode:Mode,
+								Chalan:FilePath.text,
+								Image:FilePath.text,
+								PropertyId:PropertyId1,
+								BTCTo:Drp_BTCTo.selectedItem,
+								BTCMode:Drp_BTCMode.selectedItem,
+								DoneBy:txt_DoneBy.text,
+								Total:txt_BTCTotal.text,
+								ChequeNo:txt_ChkNo.text,
+								ClientId:ClientId,
+								BillType:''
+							});
+							for(var J:int =0; J<AC1.length; J++)
+							{ 
+								if(AC1[J].Tick=="1")
+								{ 
+									Final.addItem({
+										Id:0,
+										BillType:AC1[J].BillType,
+										InvoiceNo:AC1[J].InvoiceNo,
+										ChkOutHdrId:AC1[J].ChkOutHdrId,
+										ClientId:AC1[J].ClientId,
+										Amount:AC1[J].Total,
+										Tick:AC1[J].Tick
+									});
+								}
+							}
+						}
+						var GridXml:String="";				
+						GridXml += "<ROOT>";
+						GridXml += ObjToXmlStr_Comm(AC1,"GridXml")
+						GridXml += "</ROOT>";
+						
+						var HdrXml:String="";
+						HdrXml += "<ROOT>";
+						HdrXml += ObjToXmlStr_Comm(Final2,"HdrXml")
+						HdrXml += "</ROOT>";
+						
+						var DepDtls:String="";
+						DepDtls += "<ROOT>";
+						DepDtls += ObjToXmlStr_Comm(Final,"DepDtls")
+						DepDtls += "</ROOT>";
+						useWeb("Deposit","Save_CUSTOM",[GlobalXml,HdrXml,CashChalan,DepDtls]);
+					}
+				}
+			}
+			
+			protected function Search():void
+			{
+				if((dt_To.text!="") || (dt_To1.text!=""))
+				{
+					SearchPopUp.Prc_name="BookingSearch"
+					var SearchParam:Array =new Array();
+					SearchPopUp.HlpIndex="SEARCH"
+					SearchParam[0]=GlobalXml;
+					SearchParam[1]=0;
+					if(Mode=="Cash")
+					{
+						SearchParam[2]=dt_From.text;
+						SearchParam[3]=dt_To.text;
+					}
+					if(Mode=="Cheque")
+					{
+						SearchParam[2]=dt_From1.text;
+						SearchParam[3]=dt_To1.text;
+					}
+					SearchParam[4]=Mode;
+					SearchPopUp.addEventListener("PopupEnter",funpopupEnter);
+					SearchPopUp.addEventListener("PopupClose",funpopupClose);
+					var Load:Array = new Array(); 
+					Load[0] = GlobalXml; Load[1]=Id;
+					if(Mode=="Cash")
+					{
+						Load[2]=dt_From.text;Load[3]=dt_To.text;
+					}
+					if(Mode=="Cheque")
+					{
+						Load[2]=dt_From1.text;Load[3]=dt_To1.text;
+					}
+					Load[4]=Mode;
+					useWeb("Deposit","Search_CUSTOM",Load);
+				}
+				else
+				{
+					alignAlert(Alert.show("Date Range","Required Fields !",Alert.OK,this,null,iconErrLarge),10,"");
+					return;
+				}
+			}
+			private function funpopupClose(event:Event):void
+			{ 
+				
+			} 
+			private function funpopupEnter(event:Event):void
+			{	
+				Searchhb(SearchPopUp.SelectRow.Id,0);	
+			}
+			private function Searchhb(Id:int,_PrdFk:int):void
+			{
+				var Load:Array = new Array(); 
+				Load[0] = GlobalXml; Load[1]=Id;Load[2]=dt_From.text;Load[3]=dt_To.text;Load[4]=Mode;
+				useWeb("Deposit","Search_CUSTOM",Load);
+			}
+			
+			
+			public function CashDetails(Event):void
+			{ 
+				Id=Grd_Cash.selectedItem.Id;
+				useWeb("Deposit","CashDetails_CUSTOM",[GlobalXml,"Search","",Id,0]);
+				Brd_Cash_Panel.visible=true;
+				Brd_Cash.visible=false;
+				btn_SaveCash.visible=false;
+				btn_CancelCash.label="Close";
+				dt_CashDate.enabled=false;
+				txt_CashDepositAmount.enabled=false;
+				Drp_CashAccount.enabled=false;
+				txt_CashComments.editable=false;
+				lblNewCash.text="View Cash Deposit";
+				FilePath.enabled=false;
+				Filedata.enabled=false;
+				hlp_Property.enabled=false;
+				Grd_Invoice.enabled=false;
+				lblChqno.visible=false;
+				txt_ChkNo.visible=false;
+				Grd_Invoice.enabled=false;
+				Grd_Invoice.editable=false;
+			}
+			public function ChkDetails(Event):void
+			{ 
+				Id=Grd_Cheque.selectedItem.Id;
+				useWeb("Deposit","CashDetails_CUSTOM",[GlobalXml,"Search","",Id,0]);
+				Brd_Cash_Panel.visible=true;
+				Brd_Cash.visible=false;
+				btn_SaveCash.visible=false;
+				btn_CancelCash.label="Close";
+				dt_CashDate.enabled=false;
+				txt_CashDepositAmount.enabled=false;
+				Drp_CashAccount.enabled=false;
+				txt_CashComments.editable=false;
+				lblNewCash.text="View Cheque Deposit";
+				FilePath.enabled=false;
+				Filedata.enabled=false;
+				hlp_Property.enabled=false;
+				Grd_Invoice.enabled=false;
+				lblChqno.visible=true;
+				txt_ChkNo.visible=true;
+				txt_ChkNo.enabled=false;
+				Grd_Invoice.enabled=false;
+				Grd_Invoice.editable=false;
+			}
+			public function BTCDetails(Event):void
+			{ 
+				Id=Grd_BTC.selectedItem.Id;
+				useWeb("Deposit","BTCDetails_CUSTOM",[GlobalXml,"BTCSearch","",Id,0]);
+				Brd_Cash_Panel.visible=false;
+				Brd_BTC_Panel.visible=true;
+				Brd_Cash.visible=false;
+				Brd_Cheque.visible=false;
+				btn_SaveCash.visible=false;
+				btn_CancelCash.label="Close";
+				dt_BTCDate.enabled=false;
+				txt_BTCDepositAmount.enabled=false;
+				Drp_BTCMode.enabled=false;
+				Drp_BTCTo.enabled=false;
+				txt_BTCRemarks.editable=false;
+				btn_BTCSave.visible=false;
+				hlp_BTCProperty.enabled=false;
+				txt_DoneBy.enabled=false;
+				lblChqno.visible=false;
+				txt_ChkNo.visible=false;
+				Grd_BTCInvoice.enabled=false;
+				Grd_BTCInvoice.editable=false;
+			}
+			
+			protected function btn_Cash_clickHandler():void
+			{
+				Mode="Cash";
+				Brd_Cash.visible=true;
+				Brd_Cheque.visible=false;
+				btn_Cash.Button_B_mouseOverHandler();
+				btn_Cheque.Button_OutHandler();
+				btn_BTC.Button_OutHandler();
+				Brd_Cash_Panel.visible=false;
+				Brd_BTC_Panel.visible=false;
+				Brd_BTC.visible=false;
+				dt_To.text="";dt_From.text="";
+				dt_To1.text="";dt_From1.text="";
+				Help();
+				FnClear();
+			}
+			protected function btn_Cheque_clickHandler():void
+			{
+				Mode="Cheque";
+				Brd_Cash.visible=false;
+				Brd_Cheque.visible=true;
+				btn_Cash.Button_OutHandler();
+				btn_Cheque.Button_B_mouseOverHandler();
+				btn_BTC.Button_OutHandler();
+				Brd_Cash_Panel.visible=false;
+				Brd_BTC_Panel.visible=false;
+				Brd_BTC.visible=false;
+				//	Brd_Cheque_Panel.visible=false
+				dt_To1.text="";dt_From1.text="";
+				dt_To.text="";dt_From.text="";
+				Help();
+				FnClear();
+			}
+			
+			protected function btn_BTC_clickHandler():void
+			{
+				Mode="BTC";
+				Brd_Cash.visible=false;
+				Brd_Cheque.visible=false;
+				Brd_BTC.visible=true;
+				btn_Cash.Button_OutHandler();
+				btn_Cheque.Button_OutHandler();
+				btn_BTC.Button_B_mouseOverHandler();
+				Brd_Cash_Panel.visible=false;
+				dt_To1.text="";dt_From1.text="";
+				dt_To.text="";dt_From.text="";
+				Help();
+				FnClear();
+			}
+			
+			protected function btn_Cash_Click(event:MouseEvent):void
+			{
+				lblNewCash.text="New Cash Deposit";
+				Brd_Cash_Panel.visible=true;
+				Brd_Cash.visible=false;
+				Brd_Cheque.visible=false;
+				btn_SaveCash.visible=true;
+				dt_CashDate.enabled=true;
+				dt_CashDate.selectedDate=new Date();
+				txt_CashDepositAmount.editable=true;
+				txt_CashComments.editable=true;
+				Drp_CashAccount.enabled=true;
+				Filedata.enabled=true;
+				FilePath.enabled=true;
+				txt_CashDepositAmount.enabled=true;
+				hlp_Property.tabIndex=1;
+				Grd_Invoice.tabIndex=2;
+				dt_CashDate.tabIndex=3;
+				txt_CashDepositAmount.tabIndex=4;
+				Drp_CashAccount.tabIndex=5;
+				FilePath.tabIndex=6;
+				txt_ImageName.tabIndex=7;
+				txt_CashComments.tabIndex=8;
+				btn_SaveCash.tabIndex=9;
+				btn_CancelCash.tabIndex=10;
+				lblChqno.visible=false;
+				txt_ChkNo.visible=false;
+				hlp_Property.enabled=true;
+				Grd_Invoice.enabled=true;
+			}
+			
+			protected function btn_Cheque_Click(event:MouseEvent):void
+			{
+				Brd_Cash_Panel.visible=true;
+				Brd_Cash.visible=false;
+				Brd_Cheque.visible=false;
+				btn_SaveCash.visible=true;
+				txt_CashDepositAmount.tabIndex=1;
+				Drp_CashAccount.tabIndex=2;
+				txt_CashComments.tabIndex=3;
+				lblNewCash.text="New Cheque Deposit";
+				dt_CashDate.enabled=true;
+				dt_CashDate.selectedDate=new Date();
+				txt_CashDepositAmount.enabled=true;
+				txt_CashComments.editable=true;
+				Drp_CashAccount.enabled=true;
+				Filedata.enabled=true;
+				FilePath.enabled=true;
+				txt_CashDepositAmount.enabled=true;
+				hlp_Property.tabIndex=1;
+				Grd_Invoice.tabIndex=2;
+				dt_CashDate.tabIndex=3;
+				txt_CashDepositAmount.tabIndex=4;
+				Drp_CashAccount.tabIndex=5;
+				FilePath.tabIndex=6;
+				txt_ImageName.tabIndex=7;
+				txt_CashComments.tabIndex=8;
+				btn_SaveCash.tabIndex=9;
+				btn_CancelCash.tabIndex=10;
+				lblChqno.visible=true;
+				txt_ChkNo.visible=true;
+				hlp_Property.enabled=true;
+				Grd_Invoice.enabled=true;
+			}
+			
+			protected function btn_BTC_Click(event:MouseEvent):void
+			{
+				Brd_BTC_Panel.visible=true;
+				Brd_BTC.visible=false;
+				Brd_Cash_Panel.visible=false;
+				hlp_BTCProperty.tabIndex=1;
+				Grd_BTCInvoice.tabIndex=2;
+				dt_BTCDate.tabIndex=3;
+				txt_BTCDepositAmount.tabIndex=4;
+				Drp_BTCTo.tabIndex=5;
+				Drp_BTCMode.tabIndex=6;
+				txt_DoneBy.tabIndex=7;
+				txt_BTCRemarks.tabIndex=8;
+				btn_BTCSave.tabIndex=9;
+				btn_BTCClose.tabIndex=10;
+				hlp_BTCProperty.enabled=true;
+				Grd_BTCInvoice.enabled=true;
+				Drp_BTCMode.enabled=true;
+				Drp_BTCTo.enabled=true;
+				txt_BTCRemarks.editable=true;
+				btn_BTCSave.visible=true;
+			}
+			
+			protected function CashCancel():void
+			{
+				hlp_Property.text="";
+				PropertyId=0;
+				Grd_Invoice.dataProvider=null;
+				txt_CashTotal.text="0.00";
+				txt_CashDepositAmount.text="";
+				txt_CashComments.text="";
+				txt_ImageName.text="";
+				Drp_CashAccount.prompt="Select Deposit Account";
+				FilePath.text="";
+				CashAccount="";
+				CashAccountId=0;
+				dt_CashDate.text="";
+				Brd_Cash_Panel.visible=false;
+				Brd_Cash.visible=true;
+				if(Mode=="Cash")
+				{
+					Brd_Cash.visible=true;
+				}
+				if(Mode=="Cheque")
+				{
+					Brd_Cheque.visible=true;
+				}
+			}
+			protected function BTCCancel():void
+			{
+				txt_BTCDepositAmount.text="";
+				txt_BTCRemarks.text="";
+				txt_DoneBy.text="";
+				Brd_BTC.visible=true;
+				Brd_BTC_Panel.visible=false;
+				hlp_BTCProperty.text="";
+				PropertyId1=0;
+				PropertyName1="";
+				Grd_BTCInvoice.dataProvider=null;
+				txt_BTCTotal.text="0.00";
+				hlp_ClientName.dataProvider=null;
+				ClientId=0;
+				ClientName="";
+				hlp_ClientName.text="";
+				Drp_BTCMode.prompt="Select Mode";
+				Drp_BTCTo.prompt="Select To";
+			}
+			protected function Drp_CashAccount_changeHandler():void
+			{
+				CashAccountId=Drp_CashAccount.selectedItem.data;
+				CashAccount=Drp_CashAccount.selectedItem.label;
+			}
+			protected function dt_From_changeHandler(event:CalendarLayoutChangeEvent):void
+			{
+				if(dt_From.selectedDate)
+				{
+					dt_To.selectableRange={rangeEnd: new Date()};
+					var Dt:String = dt_From.text;										
+					var Y:String = Dt.substr(6,10);
+					var M:String = String(Dt.substr(3,2));
+					var D:String =String(Number(Dt.substr(0,2))+1);
+					var RangeStart:String = Y+'/'+M+'/'+D;
+					dt_To.selectableRange = {rangeStart:new Date(RangeStart)};
+					dt_To.selectedDate = new Date(RangeStart);
+				}
+			}	
+			protected function dt_From1_changeHandler(event:CalendarLayoutChangeEvent):void
+			{
+				if(dt_From2.selectedDate)
+				{
+					dt_To2.selectableRange={rangeEnd: new Date()};
+					var Dt:String = dt_From2.text;										
+					var Y:String = Dt.substr(6,10);
+					var M:String = String(Dt.substr(3,2));
+					var D:String =String(Number(Dt.substr(0,2))+1);
+					var RangeStart:String = Y+'/'+M+'/'+D;
+					dt_To2.selectableRange = {rangeStart:new Date(RangeStart)};
+					dt_To2.selectedDate = new Date(RangeStart);
+				}
+			}	
+			protected function FnClear():void
+			{
+				dt_From.text="";
+				dt_To.text="";
+				dt_To1.text="";
+				dt_From1.text="";
+				dt_To2.text="";
+				dt_From2.text="";
+				Help();
+			}	
+			
+			public var ImageFormat:String="";
+			public function init():void
+			{
+				// This URL should be replaced with your server side URL
+				//				var browserUrl:String = ExternalInterface.call("eval", "window.location.href");
+				//				var arr:Array =browserUrl.split("/");
+				ImageFormat=FilePath.text;				
+				uploadURL.url = "http://sstage.in/Challan.php?id="+txt_CashDepositAmount.text+DId+"&pid="+DId+"&imgcount="+0+"&imgformat="+DId;
+				uploadURL.method = "POST"; // OR "POST" as you need it
+				uploadURL.contentType = "multipart/form-data";				
+				// Event Listeners for UI Buttons (Upload/Browse)
+				
+				Filedata.addEventListener(MouseEvent.CLICK, browseFiles);
+				uploadbutton.addEventListener(MouseEvent.CLICK,uploadFiles);
+				fileRef.addEventListener(Event.SELECT, selectHandler);
+				
+				
+			}
+			
+			//Browse for files
+			
+			private function browseFiles(event:Event):void
+			{
+				fileTypes.push(imageTypes);
+				fileTypes.push(documentTypes);
+				fileRef.browse(fileTypes);
+				
+			}
+			
+			// called after user selects a file form the browse window.
+			
+			private function selectHandler(event:Event):void
+			{
+				
+				FilePath.text = event.currentTarget.name.toString();
+				ImageFormat=FilePath.text;	
+				
+			}
+			
+			// called when user clicks on the Upload button to upload the file
+			
+			private function uploadFiles():void
+			{
+				
+				fileRef.addEventListener(Event.COMPLETE, completeHandler);
+				fileRef.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA,dataHandler);
+				fileRef.addEventListener(SecurityErrorEvent.SECURITY_ERROR,securityErrorHandler);
+				fileRef.addEventListener(HTTPStatusEvent.HTTP_STATUS,httpStatusHandler);
+				fileRef.addEventListener(IOErrorEvent.IO_ERROR,ioErrorHandler);
+				fileRef.upload(uploadURL);
+			}
+			
+			// called after a file is uploaded
+			
+			private function completeHandler(event:Event):void
+			{
+				//Alert.show("File Uploaded successfully");	
+			}
+			
+			//called after file upload is done and Data has been returned from Server
+			
+			private function dataHandler(event:DataEvent):void
+			{
+				//Alert.show("File Uploaded successfully");
+				var browserUrl:String = ExternalInterface.call("eval", "window.location.href");
+				var arr:Array =browserUrl.split("/");
+				resultsTxtField.text = event.data.toString();
+				Img_CompanyLogo.visible=false;
+				Img_CompanyLogo.source="http://sstage.in/Challan/"+resultsTxtField.text;
+				useWeb("Deposit","ImageUpload_CUSTOM",[GlobalXml,'IMAGEUPLOAD',"http://sstage.in/Challan/"+resultsTxtField.text,DId,0]);
+			}
+			
+			// called if there is an error detected by flash player browsing or uploading a file
+			
+			private function ioErrorHandler(event:IOErrorEvent):void
+			{
+				mx.controls.Alert.show(String(event),"ioError",0);
+			}
+			// called if a security error
+			
+			private function securityErrorHandler(event:SecurityErrorEvent):void
+			{
+				mx.controls.Alert.show(String(event),"Security Error",0);
+			}
+			// server will return an http status code, code 200 means all is good
+			
+			private function httpStatusHandler(event:HTTPStatusEvent):void
+			{
+				if (event.status != 200)
+				{
+					mx.controls.Alert.show(String(event),"Error",0);
+				}
+			}
+			
+			//Image Download
+			public var PropertyImageId:int=0;			
+			private function init1():void {
+				// Initialize the array collection to an empty collection. 
+				arrColl = new ArrayCollection();
+				
+				// Set up the URL request to download the file specified by the FILE_URL variable. 
+				urlReq = new URLRequest(FILE_URL);
+				
+				// Define file reference object and add a bunch of event listeners. 
+				fileRef = new FileReference();
+				fileRef.addEventListener(Event.CANCEL, doEvent);
+				fileRef.addEventListener(Event.COMPLETE, doEvent);
+				fileRef.addEventListener(Event.OPEN, doEvent);
+				fileRef.addEventListener(Event.SELECT, doEvent);
+				fileRef.addEventListener(HTTPStatusEvent.HTTP_STATUS, doEvent);
+				fileRef.addEventListener(IOErrorEvent.IO_ERROR, doEvent);
+				fileRef.addEventListener(ProgressEvent.PROGRESS, doEvent);
+				fileRef.addEventListener(SecurityErrorEvent.SECURITY_ERROR, doEvent);
+			}
+			
+			private function doEvent(evt:Event):void {
+				
+				FilePath.text="";
+			}
+			
+			private function downloadSourceCodeZip():void {
+				// Clear existing array collection. 
+				//arrColl = new ArrayCollection();
+				//Alert.show(FILE_URL);
+				// Hide the Text control. //
+				//txt.visible = false;
+				// Begin download. 
+				fileRef.download(urlReq);
+			}
+			
+			private function showAlert(item:Object):void {
+				Alert.show(item.eventString, item.type);
+			}
+			
+			
+			public var ImgFlag:Boolean=false;
+			protected function FnClick_Btn_Browse():void
+			{
+				try
+				{
+					var imageTypes:FileFilter = new FileFilter("Images (*.jpg, *.jpeg, *.doc, *.pdf)", "*.jpg; *.jpeg; *.doc; *.pdf");
+					//var textTypes:FileFilter = new FileFilter("Text Files (*.txt, *.rtf)", "*.txt; *.rtf");
+					var allTypes:Array = new Array(imageTypes);
+					var fileRef:FileReference = new FileReference();
+					fileRef.browse(allTypes);				
+					//fileRef = new FileReference();
+					fileRef.addEventListener(Event.SELECT, selectHandler);
+					fileRef.addEventListener(Event.COMPLETE, completeHandler);				
+					function selectHandler(event:Event):void
+					{
+						FilePath.text = event.currentTarget.name.toString();
+						fileRef.load();
+					}
+					function completeHandler(event:Event):void
+					{
+						Img_CompanyLogo.source = fileRef.data;
+						ImgFlag=true;					
+					}
+					Brd_imageUpload.visible=true;
+					init1();
+					init();
+				}
+				catch(Exception)
+				{
+					
+				}
+			}			
+			
+			protected function Drp_Mode_changeHandler(event:IndexChangeEvent):void
+			{
+				txt_DoneBy.enabled=true;
+			}
+			public function Ddl_Property_changeHandler():void
+			{
+				if(hlp_Property.selected())
+				{
+					PropertyName=hlp_Property.Select_Row.Property;
+					PropertyId=hlp_Property.Select_Row.ZId;
+					hlp_Property.text=PropertyName;
+					useWeb("Deposit","INVOICE_CUSTOM",[GlobalXml,"INVOICE",Mode,PropertyId,0]);
+				}
+				else
+				{
+					hlp_Property.text="";
+				}
+			}	
+			public function Ddl_Property1_changeHandler():void
+			{
+				if(hlp_BTCProperty.selected())
+				{
+					PropertyName1=hlp_BTCProperty.Select_Row.Property;
+					PropertyId1=hlp_BTCProperty.Select_Row.ZId;
+					hlp_BTCProperty.text=PropertyName1;
+					useWeb("Deposit","INVOICE_CUSTOM",[GlobalXml,"INVOICE",Mode,PropertyId1,0]);
+				}
+				else
+				{
+					hlp_BTCProperty.text="";
+				}
+			}
+			public function	Ddl_Client_changeHandler():void
+			{
+				if(hlp_ClientName.selected())
+				{
+					ClientName=hlp_ClientName.Select_Row.Client;
+					ClientId=hlp_ClientName.Select_Row.ZId;
+					hlp_ClientName.text=ClientName;
+					useWeb("Deposit","FILTER_CUSTOM",[GlobalXml,"FILTER",Mode,PropertyId1,ClientId]);
+				}
+				else
+				{
+					hlp_ClientName.text="";
+				}
+			}
+			public function FnChkChange(event:Event):void
+			{
+				var Ac:ArrayCollection=new ArrayCollection();				
+				Ac=Grd_Invoice.dataProvider as ArrayCollection;				
+				var Index:int=Grd_Invoice.selectedIndex;				
+				if(Ac[Index].Tick==0)
+				{
+					Ac[Index].Tick=1;
+				}
+				else
+				{
+					Ac[Index].Tick=0;
+				}
+				var AC:ArrayCollection=new ArrayCollection();
+				var AC1:ArrayCollection=new ArrayCollection();
+				AC=Grd_Invoice.dataProvider as ArrayCollection; 
+				for(var i:int=0;i<AC.length;i++)
+				{
+					if(AC[i].Tick=="1")
+					{
+						AC1.addItemAt(AC[i],AC1.length);
+					}
+				}
+				var CCP:ArrayCollection= new  ArrayCollection();
+				CCP.removeAll();
+				CCP=Grd_Invoice.dataProvider as ArrayCollection;
+				var ServiceXml:String="";
+				var TotAmt:int=0;
+				for(var i:int=0;i<AC1.length;i++)
+				{
+					TotAmt+=Number(AC1[i].Total);
+				}
+				var TB:String=NF_Two.format(TotAmt);
+				txt_CashTotal.text=TB.replace(",","");
+			}
+			public function FnChkChange1(event:Event):void
+			{
+				var Ac:ArrayCollection=new ArrayCollection();				
+				Ac=Grd_BTCInvoice.dataProvider as ArrayCollection;				
+				var Index:int=Grd_BTCInvoice.selectedIndex;				
+				if(Ac[Index].Tick==0)
+				{
+					Ac[Index].Tick=1;
+				}
+				else
+				{
+					Ac[Index].Tick=0;
+				}
+				var AC:ArrayCollection=new ArrayCollection();
+				var AC1:ArrayCollection=new ArrayCollection();
+				AC=Grd_BTCInvoice.dataProvider as ArrayCollection; 
+				for(var i:int=0;i<AC.length;i++)
+				{
+					if(AC[i].Tick=="1")
+					{
+						AC1.addItemAt(AC[i],AC1.length);
+					}
+				}
+				var CCP:ArrayCollection= new  ArrayCollection();
+				CCP.removeAll();
+				CCP=Grd_BTCInvoice.dataProvider as ArrayCollection;
+				var ServiceXml:String="";
+				var TotAmt:int=0;
+				for(var i:int=0;i<AC1.length;i++)
+				{
+					TotAmt+=Number(AC1[i].Total);
+				}
+				var TB:String=NF_Two.format(TotAmt);
+				txt_BTCTotal.text=TB.replace(",","");
+			}
+			public function CashDetailsview(Event):void
+			{ 
+				ImagePath=Grd_Cash.selectedItem.ChallanImage;
+				ExternalInterface.call("changeDocumentTitle",ImagePath);
+				ImagePath="";	
+			}
+			public function CashDetailsview1(Event):void
+			{ 
+				ImagePath=Grd_Cheque.selectedItem.ChallanImage;
+				ExternalInterface.call("changeDocumentTitle",ImagePath);
+				ImagePath="";	
+			}
+			public function CashDetailsview2(Event):void
+			{ 
+				ImagePath=Grd_BTC.selectedItem.ChallanImage;
+				ExternalInterface.call("changeDocumentTitle",ImagePath);
+				ImagePath="";	
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:HGroup x="0" y="0" width="100%" height="45" horizontalAlign="center" verticalAlign="middle">
+		<WrbComp:TabButton_HB width="120" height="40" _Label="Cash Deposit" click="btn_Cash_clickHandler()" id="btn_Cash"/>
+		<WrbComp:TabButton_HB width="120" height="40" _Label="Cheque Deposit" click="btn_Cheque_clickHandler()" id="btn_Cheque"/>
+		<WrbComp:TabButton_HB width="120" height="40" _Label="BTC Deposit" click="btn_BTC_clickHandler()" id="btn_BTC"/>
+	</s:HGroup>
+	<s:HGroup x="0" y="44" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle" visible="true">
+		<s:BorderContainer x="0" y="44" width="100%" height="100%" id="Brd_Cash" backgroundColor="#fbf9f9" 
+						   visible="true">
+			<mx:DataGrid x="126" y="117"  verticalAlign="middle" editable="true" visible="true"
+						 width="750" height="380" tabIndex="4" id="Grd_Cash" >
+				<mx:columns>
+					<mx:DataGridColumn dataField="Id" headerText="Id" width="10" editable="false" visible="false"/>
+					<mx:DataGridColumn dataField="Date" headerText="Date" width="75" editable="false"/>
+					<mx:DataGridColumn dataField="Amount" headerText="Amount" width="100" editable="false"/>
+					<mx:DataGridColumn dataField="DepositeTo" headerText="Deposit To" width="200" editable="false"/>
+					<mx:DataGridColumn dataField="DepositedBy" headerText="Deposited By" width="100" editable="false"/>
+					<mx:DataGridColumn dataField="Comments" headerText="Comments" width="100" editable="true"/>
+					<mx:DataGridColumn dataField="ChallanImage" headerText="Comments" width="100" visible="false"/>
+					<mx:DataGridColumn dataField="ViewDetails" headerText="View Details" width="70" editable="false">
+						<mx:itemRenderer >
+							<fx:Component>
+								<mx:HBox horizontalAlign="center" verticalAlign="middle">										
+									<mx:Image source="@Embed(source='../Assets/view.gif')" 
+											  buttonMode="true"
+											  click="outerDocument.CashDetails(event)"/>
+								</mx:HBox>	
+							</fx:Component>
+						</mx:itemRenderer>
+					</mx:DataGridColumn>
+					<mx:DataGridColumn dataField="ViewChallan" headerText="View Challan" width="95" editable="false" 
+									   visible="true">
+						<mx:itemRenderer >
+							<fx:Component>
+								<mx:HBox horizontalAlign="center" verticalAlign="middle">										
+									<mx:Image source="@Embed(source='../Assets/view.gif')" 
+											  buttonMode="true"
+											  click="outerDocument.CashDetailsview(event)"/>
+								</mx:HBox>
+							</fx:Component>
+						</mx:itemRenderer>
+					</mx:DataGridColumn>
+				</mx:columns>
+			</mx:DataGrid>
+			<s:Button x="631" y="83" height="28" label="Clear" click="FnClear()"/>
+			<s:Label x="130" y="60" text="Cash Deposit" color="red"/>
+			<s:Button x="732" y="82" label="New Cash Deposit" click="btn_Cash_Click(event)"/>
+			<s:Label x="176" y="86" text="From"/>
+			<s:Label x="365" y="86" text="To"/>
+			<mx:DateField x="233" y="81" width="93" height="21" id="dt_From" tabIndex="16"
+						  selectableRange="{{rangeEnd: new Date()}}" formatString="DD/MM/YYYY" styleName="DisabledDateField" 
+						  yearNavigationEnabled="true" change="dt_From_changeHandler(event)"/>
+			<mx:DateField id="dt_To" x="400" y="81" selectableRange="{{rangeEnd: new Date()}}" formatString="DD/MM/YYYY"
+						 enabled="false" />
+			<s:Button x="543" y="83" height="28" label="Search" click="Search()"/>
+		</s:BorderContainer>
+	</s:HGroup>
+	
+	
+	<s:HGroup x="0" y="44" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle" visible="true" >
+		<s:BorderContainer x="0" y="44" width="100%" height="100%" id="Brd_Cheque" backgroundColor="#fbf9f9"
+						   visible="true">
+			<mx:DataGrid x="126" y="117"  verticalAlign="middle" editable="true" visible="true"
+						 width="750" height="400" tabIndex="4" id="Grd_Cheque" >
+				<mx:columns>
+					<mx:DataGridColumn dataField="Date" headerText="Date" width="75" editable="false"/>
+					<mx:DataGridColumn dataField="Amount" headerText="Amount" width="100" editable="false"/>
+					<mx:DataGridColumn dataField="DepositeTo" headerText="Deposit To" width="200" editable="false"/>
+					<mx:DataGridColumn dataField="DepositedBy" headerText="Deposited By" width="100" editable="false"/>
+					<mx:DataGridColumn dataField="Comments" headerText="Comments" width="100" editable="true"/>
+					<mx:DataGridColumn dataField="ChallanImage" headerText="Comments" width="100" visible="false"/>
+					<mx:DataGridColumn dataField="ViewDetails" headerText="View Details" width="75" editable="false">
+						<mx:itemRenderer >
+							<fx:Component>
+								<mx:HBox horizontalAlign="center" verticalAlign="middle">										
+									<mx:Image source="@Embed(source='../Assets/view.gif')" buttonMode="true"
+											  click="outerDocument.ChkDetails(event)"/>
+								</mx:HBox>	
+							</fx:Component>
+						</mx:itemRenderer>
+					</mx:DataGridColumn>
+					<mx:DataGridColumn dataField="ViewChallan" headerText="ViewChallan" width="100" editable="false" 
+									   visible="true">
+						<mx:itemRenderer >
+							<fx:Component>
+								<mx:HBox horizontalAlign="center" verticalAlign="middle">										
+									<mx:Image source="@Embed(source='../Assets/view.gif')" buttonMode="true"
+											  click="outerDocument.CashDetailsview1(event)" />
+								</mx:HBox>	
+							</fx:Component>
+						</mx:itemRenderer>
+					</mx:DataGridColumn>
+				</mx:columns>
+			</mx:DataGrid>
+			<s:Label x="110" y="60" text="Cheque Deposit" color="red"/>
+			<s:Button x="712" y="81" label="New Cheque Deposit" click="btn_Cheque_Click(event)"/>
+			<s:Label x="156" y="86" text="From"/>
+			<s:Label x="345" y="86" text="To"/>
+			<mx:DateField x="213" y="81" width="93" height="21" id="dt_From1" tabIndex="16"  enabled="false"
+						  selectableRange="{{rangeEnd: new Date()}}" formatString="DD/MM/YYYY" styleName="DisabledDateField" 
+						  yearNavigationEnabled="true" change="dt_From1_changeHandler(event)"/>
+			<mx:DateField id="dt_To1" x="380" y="81" selectableRange="{{rangeEnd: new Date()}}" formatString="DD/MM/YYYY"
+						  />
+			<s:Button x="523" y="83" height="28" label="Search" click="Search()"/>
+			<s:Button x="611" y="83" height="28" label="Clear" click="FnClear()"/>
+		</s:BorderContainer>
+	</s:HGroup>
+	<s:BorderContainer x="0" y="46" width="100%" height="100%" id="Brd_Cash_Panel" backgroundColor="#fbf9f9"
+					   visible="false">
+		<s:Label id="lblNewCash" x="145" y="23" text="New Cash Deposit" color="red"/>
+		<s:Label x="509" y="50" text="Date Deposited"/>
+		<s:Label x="509" y="89" text="Amount Deposited"/>
+		<s:Label x="509" y="125" text="Deposited Account"/>
+		<s:Label x="509" y="155" text="Deposited Chalan"/>
+		<s:Label x="509" y="281" text="Comments"/>
+		<s:TextInput x="644" y="81" width="171" maxChars="10" id="txt_CashDepositAmount" restrict="0-9."/>
+		<s:Image x="612" y="311" width="100" height="100" id="Img_CashChalan"
+				 source="@Embed(source='../Assets/user.jpg')" visible="false"/>
+		<s:TextArea id="txt_CashComments" x="644" y="281" width="171" height="89" maxChars="2000"/>
+		<s:Button id="btn_SaveCash" x="370" y="417" height="32" label="Save" click="CashSave()"/>
+		<s:Button id="btn_CancelCash" x="506" y="417" height="32" label="Close"
+				  click="CashCancel()"/>
+		<s:DropDownList id="Drp_CashAccount" x="644" y="119" width="225" prompt="Select Deposited Account" 
+						change="Drp_CashAccount_changeHandler()"></s:DropDownList>
+		<mx:DateField id="dt_CashDate" x="644" y="39" selectableRange="{{rangeEnd:new Date()}}"  enabled="false"
+					  formatString="DD/MM/YYYY"/>
+		<s:BorderContainer x="644" y="145" width="297" height="128" id="Brd_imageUpload" visible="true" borderVisible="true"
+						   backgroundColor="#fbf9f9" cornerRadius="5">
+			<mx:Panel x="17" y="19" title="Image Uploader">
+				<mx:ControlBar>
+					<mx:Spacer width="80%"/>
+					<mx:HBox>
+						<mx:TextInput id="FilePath" width="150"  visible="true"/>
+						<mx:Button id="Filedata" label="Browse File" name="Filedata" />
+						<mx:Button label="UpLoad File" name="uploadbutton" id="uploadbutton" visible="false" width="0" />
+					</mx:HBox>
+					<mx:TextArea id="resultsTxtField"  width="0"  name="resultsTxtField" visible="false"/>
+				</mx:ControlBar>
+			</mx:Panel>
+			<s:TextInput x="177" y="152" width="189" height="40" id="txt_ImageName" enabled="false" visible="false"/>		
+			
+			<WrbComp:Button_HB x="329" y="152" height="40" _Label="Close" click="{Brd_imageUpload.visible=false;}" visible="false"/>
+			<WrbComp:Button_HB id="downloadBtn" x="237" y="152" height="40" _Label="Download"
+							   click="downloadSourceCodeZip();"  toolTip="{FILE_URL}" visible="false"/>
+		</s:BorderContainer>
+		<s:Label x="615" y="83" text="*" color="red"/>
+		
+		<s:Label x="615" y="121" text="*" color="red"/>
+		<s:Label x="150" y="56" text="Property"/>
+		
+		<s:Label x="150" y="134" text="Invoice No's"/>
+		<s:Label x="150" y="299" text="Total Amount"/>
+		<WrbHelpComp:HelpText id="hlp_Property" x="240" y="51" width="187" height="22" pxSetColumnsWidth="187,0" 
+							  onselection="{Ddl_Property_changeHandler()}"  pxTabIndex="1" depth="10">
+		</WrbHelpComp:HelpText>
+		
+		<mx:DataGrid id="Grd_Invoice" x="240" y="127"  verticalAlign="middle" editable="true" 
+					 width="250" height="148" tabIndex="4">
+			<mx:columns>
+				<mx:DataGridColumn dataField="Tick" headerText="" width="25"  editable="false">
+					<mx:itemRenderer>
+						<fx:Component id="Chk_Component">
+							<mx:HBox horizontalAlign="center" verticalAlign="middle">
+								<mx:CheckBox selected="{data.Tick}" enabled="true" id="Chk_Box"
+											 change="outerDocument.FnChkChange(event);"/>
+							</mx:HBox>
+						</fx:Component>
+					</mx:itemRenderer>
+				</mx:DataGridColumn>
+				<mx:DataGridColumn dataField="InvoiceNo" headerText="Invoice No" width="150" editable="false" visible="true"/>
+				<mx:DataGridColumn dataField="Total" width="75" visible="true" editable="false"/>
+				<mx:DataGridColumn dataField="ChkOutHdrId"  visible="false"/>
+				<mx:DataGridColumn dataField="BillType"  visible="false"/>
+				<mx:DataGridColumn dataField="ClientId"  visible="false">
+				</mx:DataGridColumn> 
+			</mx:columns>
+		</mx:DataGrid>
+		<s:TextInput id="txt_CashTotal" x="240" y="293" enabled="false" prompt="0.00"/>
+		<s:Label id="lblChqno" x="150" y="351" text="Cheque No"/>
+		<s:TextInput id="txt_ChkNo" x="240" y="343" prompt="Cheque Number"/>
+		<s:Label x="200" y="51" text="*" color="red"/>
+		<s:Label x="219" y="129" text="*" color="red"/>
+	</s:BorderContainer>
+	<s:Image x="632" y="311" width="100" height="100" id="Img_CompanyLogo"
+			 source="@Embed(source='../Assets/user.jpg')" visible="false"/>
+	<s:HGroup x="0" y="44" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle" visible="true" >
+		<s:BorderContainer id="Brd_BTC" visible="false" x="2" y="1" width="100%" height="100%"
+						   backgroundColor="#fbf9f9">
+			<mx:DataGrid x="126" y="117"  verticalAlign="middle" editable="true" visible="true"
+						 width="750" height="359" tabIndex="4" id="Grd_BTC" >
+				<mx:columns>
+					<mx:DataGridColumn dataField="Date" headerText="Date" width="75" editable="false"/>
+					<mx:DataGridColumn dataField="Amount" headerText="Amount" width="100" editable="false"/>
+					<mx:DataGridColumn dataField="BTCTo" headerText="To" width="150" editable="false"/>
+					<mx:DataGridColumn dataField="BTCMode" headerText="Mode" width="125" editable="false"/>
+					<mx:DataGridColumn dataField="Comments" headerText="Comments" width="100" editable="true"/>
+					<mx:DataGridColumn dataField="ChallanImage" headerText="Comments" width="100" visible="false"/>
+					<mx:DataGridColumn dataField="ViewDetails" headerText="View Details" width="100" editable="false">
+						<mx:itemRenderer >
+							<fx:Component>
+								<mx:HBox horizontalAlign="center" verticalAlign="middle">										
+									<mx:Image source="@Embed(source='../Assets/view.gif')" buttonMode="true"
+											  click="outerDocument.BTCDetails(event)"/>
+								</mx:HBox>	
+							</fx:Component>
+						</mx:itemRenderer>
+					</mx:DataGridColumn>
+					
+				</mx:columns>
+			</mx:DataGrid>
+			<s:Label x="110" y="60" text="BTC Deposit" color="red"/>
+			<s:Button x="712" y="81" label="New BTC Deposit" click="btn_BTC_Click(event)"/>
+			<s:Label x="156" y="86" text="From"/>
+			<s:Label x="345" y="90" text="To"/>
+			<mx:DateField x="213" y="81" width="93" height="21" id="dt_From2" tabIndex="16"
+						  selectableRange="{{rangeEnd: new Date()}}" formatString="DD/MM/YYYY" styleName="DisabledDateField" 
+						  yearNavigationEnabled="true" change="dt_From1_changeHandler(event)"/>
+			<mx:DateField id="dt_To2" x="380" y="81" selectableRange="{{rangeEnd: new Date()}}" formatString="DD/MM/YYYY"
+						  />
+			<s:Button x="523" y="81" height="28" label="Search" click="Search()"/>
+			<s:Button x="611" y="81" height="28" label="Clear" click="FnClear()"/>
+		</s:BorderContainer>	
+	</s:HGroup>
+	<s:BorderContainer x="0" y="46" width="100%" height="100%" id="Brd_BTC_Panel" backgroundColor="#fbf9f9"
+					   visible="false">
+		<s:Label id="lblNewBTC" x="177" y="23" text="New BTC Deposit" color="red"/>
+		<s:Label x="559" y="50" text="Date Deposited"/>
+		<s:Label x="449" y="89" text="Amount Deposited" visible="false"/>
+		<s:Label x="559" y="85" text="To"/>
+		<s:Label x="560" y="125" height="11" text="Mode"/>
+		<s:DropDownList id="Drp_BTCMode" x="694" y="115" width="180" prompt="Select Mode" change="Drp_Mode_changeHandler(event)" >
+			<s:ArrayList>
+				<fx:String>Inperson</fx:String>
+				<fx:String>Courier</fx:String>
+			</s:ArrayList>
+		</s:DropDownList>
+		<s:Label x="178" y="103" text="Client"/>
+		<WrbHelpComp:HelpText id="hlp_ClientName" x="260" y="96" width="188" height="22" pxSetColumnsWidth="220,0"
+							  onselection="{Ddl_Client_changeHandler()}"  pxTabIndex="1" depth="10"
+							  pxSetPrompt="Select Client" />
+		<s:Label x="559" y="191" text="Remarks"/>
+		<s:TextInput x="584" y="81" width="171" maxChars="10" id="txt_BTCDepositAmount" restrict="0-9" visible="false"/>
+		<s:Image x="462" y="311" width="100" height="100" id="Img_BTCChalan"
+				 source="@Embed(source='../Assets/user.jpg')" visible="false"/>
+		<s:TextArea id="txt_BTCRemarks" x="694" y="191" width="171" height="89" maxChars="2000"/>
+		<s:Button id="btn_BTCSave" x="390" y="397" height="31" label="Save" click="CashSave()"/>
+		<s:Button id="btn_BTCClose" x="526" y="401" height="31" label="Close" click="BTCCancel()"/>
+		<s:DropDownList id="Drp_BTCTo" x="694" y="79" width="180" prompt="Select To" >
+			<s:ArrayList>
+				<fx:String>Commercial</fx:String>
+				<fx:String>Client</fx:String>
+			</s:ArrayList>
+		</s:DropDownList>
+		<mx:DateField id="dt_BTCDate" x="694" y="39" selectableRange="{{rangeEnd:new Date()}}"  formatString="DD/MM/YYYY"/>
+		<s:Label x="555" y="83" text="*" color="red" visible="false"/>
+		
+		<s:Label x="658" y="79" text="*" color="red"/>
+		<s:Label x="559" y="166" id="lblDoneBy" text="Done By" visible="true"/>
+		<s:TextInput x="694" y="158" id="txt_DoneBy" width="171" visible="true" prompt="Done By" enabled="false"/>
+		
+		<s:Label x="178" y="60" text="Property"/>
+		
+		<s:Label x="178" y="160" text="Invoice No's"/>
+		<s:Label x="178" y="329" text="Total Amount"/>
+		<WrbHelpComp:HelpText id="hlp_BTCProperty" x="260" y="55" width="187" height="22" pxSetColumnsWidth="187,0" 
+							  onselection="{Ddl_Property1_changeHandler()}"  pxTabIndex="1" depth="10">
+		</WrbHelpComp:HelpText>
+		
+		<mx:DataGrid id="Grd_BTCInvoice" x="260" y="135"  verticalAlign="middle" editable="true" 
+					 width="291" height="178" tabIndex="4">
+			<mx:columns>
+				<mx:DataGridColumn dataField="Tick" headerText="" width="25"  editable="false">
+					<mx:itemRenderer>
+						<fx:Component>
+							<mx:HBox horizontalAlign="center" verticalAlign="middle">
+								<mx:CheckBox selected="{data.Tick}" enabled="true" 
+											 change="outerDocument.FnChkChange1(event);"/>
+							</mx:HBox>
+						</fx:Component>
+					</mx:itemRenderer>
+				</mx:DataGridColumn> 
+				<mx:DataGridColumn dataField="InvoiceNo" headerText="Invoice No" width="80" editable="false" visible="true"/>
+				<mx:DataGridColumn dataField="ChkOutHdrId" width="10" visible="false"/>
+				<mx:DataGridColumn dataField="Total" visible="true" editable="false"/>
+				<mx:DataGridColumn dataField="BillType"  visible="false"/>
+				<mx:DataGridColumn dataField="ClientId"  visible="false"/>
+				<mx:DataGridColumn dataField="Client" headerText="Client" width="120" visible="true">
+				</mx:DataGridColumn> 
+			</mx:columns>
+		</mx:DataGrid>
+		<s:TextInput id="txt_BTCTotal" x="260" y="321" enabled="false"/>
+		<s:Label x="659" y="114" text="*" color="red"/>
+		<s:Label x="229" y="53" text="*" color="red"/>
+		<s:Label x="245" y="151" text="*" color="red"/>
+	</s:BorderContainer>
+</s:Application>

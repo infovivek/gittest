@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:WrbComp="WrbComp.*"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   width="100%" height="100%" backgroundColor="#fbf9f9" creationComplete="page_Load()">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Style source="..\\Common\\ApplicationCSS.css" />
+	<fx:Script source="..\\Common\\CommonScript.as" />
+	<fx:Script source="..\\Common\\Functions.as"/>
+	<fx:Script>
+		<![CDATA[
+			import com.as3xls.xls.Cell;
+			import com.as3xls.xls.ExcelFile;
+			import com.as3xls.xls.Sheet;
+			import com.as3xls.xls.Type;
+			
+			import flash.globalization.LocaleID;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.CalendarLayoutChangeEvent;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.events.IndexChangedEvent;
+			import mx.graphics.codec.PNGEncoder;
+			import mx.printing.*;
+			
+			import spark.events.IndexChangeEvent;
+			import spark.events.TextOperationEvent;
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public var Temp_AC:ArrayCollection = new ArrayCollection();
+			private var xlsFile:ExcelFile;
+			public static var GlobalXml:String = "";
+			public var PropertyId:int=0,LocationId:int=0;
+			private function page_Load():void
+			{
+				Global_AC = funLoginInfo("<gScrId>1</gScrId><gUsrFk>1</gUsrFk>");				
+				GlobalXml = "";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";	
+				Temp_AC=new ArrayCollection();
+				Grd_BCFC.dataProvider=Temp_AC;	
+				help();
+				Change();
+			}
+			private function help():void
+			{				
+				useWeb("Report","Property_CUSTOM", [GlobalXml, "PropertyAndCity",0, 0,"","",Drp_Category.selectedItem]);
+				
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "Property_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						hlp_Property.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						
+					}
+					else
+					{
+						hlp_Property.dataProvider=null;
+						
+					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						hlp_Location.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+						
+					}
+					else
+					{
+						hlp_Location.dataProvider=null;
+						
+					}
+					
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "BookingForecast_CUSTOM")
+				{
+					if(Drp_Reporttype.selectedIndex==0)
+					{
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{
+							Grd_BCFC.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+							myArrayCollection=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+							lbl_Direct.text=myArrayCollection[myArrayCollection.length-1].Direct
+							lbl_BTC.text=myArrayCollection[myArrayCollection.length-1].BTC
+							lbl_Online.text=myArrayCollection[myArrayCollection.length-1].Online
+							lbl_Total.text=myArrayCollection[myArrayCollection.length-1].TOTAL
+							lbl_Gtv.text=myArrayCollection[myArrayCollection.length-1].GTV
+							lbl_Dedicated.text=myArrayCollection[myArrayCollection.length-1].DD
+							
+						}
+						else
+						{
+							Temp_AC=new ArrayCollection();
+							Grd_BCFC.dataProvider=Temp_AC;	
+							myArrayCollection=new ArrayCollection();
+							lbl_Direct.text="0";
+							lbl_BTC.text="0";
+							lbl_Online.text="0";
+							lbl_Total.text="0";
+							lbl_Gtv.text="0";
+							lbl_Dedicated.text="0";
+						}
+					}
+					else
+					{
+						if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+						{
+							Grd_BCFC.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+							myArrayCollection=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+							lbl_Direct.text=myArrayCollection[myArrayCollection.length-1].Direct
+							lbl_BTC.text=myArrayCollection[myArrayCollection.length-1].BTC
+							lbl_Online.text=myArrayCollection[myArrayCollection.length-1].Online
+							lbl_Total.text=myArrayCollection[myArrayCollection.length-1].TOTAL
+							lbl_Gtv.text=myArrayCollection[myArrayCollection.length-1].GTV
+							lbl_Dedicated.text=myArrayCollection[myArrayCollection.length-1].DD
+						}
+						else
+						{
+							Temp_AC=new ArrayCollection();
+							Grd_BCFC.dataProvider=Temp_AC;	
+							myArrayCollection=new ArrayCollection();
+							lbl_Direct.text="0";
+							lbl_BTC.text="0";
+							lbl_Online.text="0";
+							lbl_Total.text="0";
+							lbl_Gtv.text="0";
+							lbl_Dedicated.text="0";
+						}
+					}
+					
+					
+				}
+			}
+			private function clear():void
+			{
+				hlp_Property.text="";
+				hlp_Location.text="";
+				PropertyId=0;
+				LocationId=0;
+				dt_Date.selectedDate=new Date();
+				Temp_AC=new ArrayCollection();
+				Grd_BCFC.dataProvider=Temp_AC;	
+				lbl_Direct.text="0";
+				lbl_BTC.text="0";
+				lbl_Online.text="0";
+				lbl_Total.text="0";
+				lbl_Gtv.text="0";
+				lbl_Dedicated.text="0";
+				
+			}
+			private function fnGetProperty():void
+			{
+				if(hlp_Property.selected())
+				{
+					hlp_Property.text=hlp_Property.Select_Row.PropertyName
+					PropertyId=hlp_Property.Select_Row.ZId
+					//dt_From.setFocus();
+				}
+				else
+				{
+					hlp_Property.text="";
+					PropertyId=0;
+				}
+			}
+			private function fnGetLocation():void
+			{
+				if(hlp_Location.selected())
+				{
+					hlp_Location.text=hlp_Location.Select_Row.CityName
+					LocationId=hlp_Location.Select_Row.Id
+					//dt_From.setFocus();
+				}
+				else
+				{
+					hlp_Location.text="";
+					LocationId=0;
+				}
+			}			
+			protected function button_hb1_clickHandler(event:MouseEvent):void
+			{	
+				var a:int = 0;
+				var c:int = 0;
+				if(Drp_Reporttype.selectedIndex==0)
+				{
+					 a = dt_Date.displayedMonth;
+					 c= dt_Date.displayedYear;
+				}
+				else
+				{	
+					 a = dt_Date1.displayedMonth;
+					 c = dt_Date1.displayedYear;
+				}			
+				var b:int = 00;
+				if(a == 0)
+				{
+					b = 01;
+				}
+				if(a != 0)
+				{
+					b = a + 01;
+				}
+				var MFromDate:String = '01'+'/'+String(b)+'/'+String(c);
+				
+			    useWeb("Report","BookingForecast_CUSTOM", [GlobalXml, "BookingForecast",LocationId, PropertyId,
+					MFromDate,"",Drp_Category.selectedItem]);
+					
+				
+			}
+			protected function ExportExcel(event:MouseEvent):void
+			{
+				try
+				{
+					var arrExportResult:ArrayCollection = Grd_BCFC.dataProvider as ArrayCollection;
+					if(arrExportResult.length!=0)
+					{					
+						xlsFile = new ExcelFile();
+						var sheet:Sheet = new Sheet();
+						
+						sheet.resize(arrExportResult.length+2,14);
+						
+							sheet.setCell(0,5,Drp_Reporttype.selectedItem+" Report");
+							sheet.setCell(1,0,'Location');
+							sheet.setCell(1,1,'Property Name');
+							sheet.setCell(1,2,'Dedicated Revenue');
+							sheet.setCell(1,3,'Direct');
+							sheet.setCell(1,4,'BTC');
+							sheet.setCell(1,5,'Online');
+							sheet.setCell(1,6,'TOTAL');
+							sheet.setCell(1,7,'GTV');
+							sheet.setCell(1,8,'Category');
+							
+							for(var i:int=0;i<arrExportResult.length;i++)
+							{
+								sheet.setCell(i+2, 0, arrExportResult[i].CityName);
+								sheet.setCell(i+2, 1, arrExportResult[i].PropertyName);
+								sheet.setCell(i+2, 2, arrExportResult[i].DD);
+								sheet.setCell(i+2, 3, arrExportResult[i].Direct);
+								sheet.setCell(i+2, 4, arrExportResult[i].BTC);
+								sheet.setCell(i+2, 5, arrExportResult[i].Online);
+								sheet.setCell(i+2, 6, arrExportResult[i].TOTAL);
+								sheet.setCell(i+2, 7, arrExportResult[i].GTV);
+								sheet.setCell(i+2, 8, arrExportResult[i].Category);
+								
+							}						
+						
+						
+						Grd_BCFC.dataProvider = arrExportResult;
+						xlsFile.sheets.addItem(sheet);      
+						var bytes: ByteArray = xlsFile.saveToByteArray();
+						var fr:FileReference = new FileReference();
+						var FileName:String = "";
+						if(Drp_Category.selectedIndex!=0)
+						{		
+							FileName=Drp_Reporttype.selectedItem+' '+Drp_Category.selectedItem+".xls";
+							fr.save(bytes,FileName);
+						}
+						else
+						{
+							FileName=Drp_Reporttype.selectedItem+".xls";
+							fr.save(bytes,FileName);
+						}						
+					}
+					else
+					{
+						
+						alignAlert(Alert.show("* No Records Found.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+						return;
+					}
+					//Grd_BCFC.visible=false;
+					Grd_BCFC.dataProvider=null;
+					clear();
+				}				
+				catch (myError:Error) 
+				{
+					alignAlert(Alert.show("* Excel File Already Opened.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+					return
+				}catch (error:TypeError)
+				{
+					alignAlert(Alert.show("* Excel File Already Opened.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+					return
+				}catch (error:IOErrorEvent)
+				{
+					alignAlert(Alert.show("* Excel File Already Opened.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+					return
+				}
+				
+				
+			}			
+			protected function CATChange():void
+			{
+				if(Drp_Category.selectedIndex==1)
+				{
+					//Col_NDD.visible=true;
+					//Col_NDD.width=200;
+					//Col_DD.headerText="Dedicated Revenue";
+				}
+				else if(Drp_Category.selectedIndex==2)
+				{
+					//Col_NDD.visible=false;
+					//Col_NDD.width=0;
+					//Col_DD.headerText="Revenue";
+				}
+				clear();
+				help();
+			}
+			protected function Change():void
+			{
+				if(Drp_Reporttype.selectedIndex==0)
+				{
+					dt_Date.selectedDate=new Date();
+					dt_Date1.visible=false;
+					dt_Date.visible=true;
+				}
+				else
+				{
+					dt_Date.selectedDate=new Date();
+					dt_Date.visible=false;
+					dt_Date1.visible=true;
+					
+				}
+				
+			}
+			public var myArrayCollection:ArrayCollection=new ArrayCollection();
+			public var FltNm:String="";
+			private function filter(Filt:String):void
+			{				
+				FltNm=Filt;				
+				var tempAC:ArrayCollection=new ArrayCollection();	
+				tempAC=myArrayCollection
+				tempAC.filterFunction = filterMyArrayCollection;
+				tempAC.refresh();				
+			}			
+			private function filterMyArrayCollection(item:Object):Boolean 
+			{
+				var Itm:Boolean=true;				
+				if(FiltFirstName.text!="")
+				{
+					var searchString:String = FiltFirstName.text.toLowerCase();
+					var itemName:String = (item.PropertyName as String).toLowerCase();
+					Itm=itemName.indexOf(searchString) > -1;
+				}				
+				return Itm;		
+			}
+			
+		]]>
+	</fx:Script>	
+	<s:Scroller x="1" y="175" width="100%" height="300" depth="40" >
+		<s:VGroup width="100%" height="100%" verticalAlign="top" horizontalAlign="center">
+			<mx:DataGrid id="Grd_BCFC" x="0" y="0" width="100%" height="100%" depth="8"
+						 editable="true" tabIndex="93" verticalAlign="middle">
+				<mx:columns>
+					<mx:DataGridColumn dataField="CityName" headerText="Location" editable="false" width="130" />
+					<mx:DataGridColumn dataField="PropertyName" headerText="Property Name" textAlign="left" editable="false" width="350" />
+					<mx:DataGridColumn dataField="DD" headerText="Dedicated " textAlign="right" editable="false" width="170" id="Col_NDD" />
+					<mx:DataGridColumn dataField="Direct" headerText="Direct" textAlign="right" editable="false" width="170" id="Col_DD" />
+					<mx:DataGridColumn dataField="BTC" headerText="BTC" textAlign="right" width="150" editable="false"/>
+					<mx:DataGridColumn dataField="Online" headerText="Online" editable="false" textAlign="right" width="180" />
+					<mx:DataGridColumn dataField="TOTAL" headerText="TOTAL" textAlign="right" width="150" editable="false"/>
+					<mx:DataGridColumn dataField="GTV" headerText="GTV" textAlign="right" width="150" editable="false"/>					
+					<mx:DataGridColumn dataField="Category" headerText="Category" textAlign="right" width="150" editable="false"/>
+				</mx:columns>
+			</mx:DataGrid>			
+		</s:VGroup>
+	</s:Scroller>
+	<s:VGroup x="0" y="483" width="100%" height="70" verticalAlign="middle" horizontalAlign="center">
+	<s:Group x="92" y="325" width="756" height="51" >				
+		<mx:Label x="72" y="0" text="Dedicated : "/>
+		<mx:Label x="604" y="30" text="GTV : "/>
+		<mx:Label x="272" y="0" text="Direct : "/>
+		<mx:Label x="447" y="0" text="BTC : "/>
+		<mx:Label x="604" y="0" text="Online : "/>
+		<mx:Label x="447" y="30" text="Total : "/>
+		<mx:Label id="lbl_Dedicated" x="139" y="0" width="100" text="0" textAlign="right"/>
+		<mx:Label id="lbl_Direct" x="315" y="0" width="100" text="0" textAlign="right"/>
+		<mx:Label x="487" y="0" width="100" text="0" textAlign="right" id="lbl_BTC"/>
+		<mx:Label x="652" y="0" width="100" text="0" textAlign="right" id="lbl_Online"/>
+		<mx:Label x="487" y="30" width="100" text="0" textAlign="right" id="lbl_Total"/>
+		<mx:Label x="652" y="30" width="100" text="0" textAlign="right" id="lbl_Gtv"/>			
+	</s:Group>
+	</s:VGroup>
+	<s:VGroup x="0" y="0" width="100%" height="147" verticalAlign="middle" horizontalAlign="center" depth="50">
+		<s:Group x="95" y="10" width="744" height="165">
+			<mx:Label x="359" y="65" text="Property"/>
+			<WrbComp:Button_HB x="428" y="102.5" _Label="Genarate" click="button_hb1_clickHandler(event)">
+			</WrbComp:Button_HB>
+			<WrbHelpComp:HelpText x="428" y="65.5" depth="50" pxTabIndex="4"  width="303" id="hlp_Property" onselection="{fnGetProperty()}" pxSetColumnsWidth="300,150,150">
+			</WrbHelpComp:HelpText>
+			<mx:Label x="7" y="65" text="Property Category" id="lbl_PricingModel" />
+			<mx:Label x="359" y="25" text="Location" id="lbl_PricingModel0" />
+			<s:DropDownList x="128" y="65.5" width="213" height="20" id="Drp_Category" tabIndex="2" selectedIndex="0" change="CATChange()">
+				<mx:ArrayCollection> 
+					<fx:String>All Properties</fx:String> 
+					<fx:String>Internal Property</fx:String> 
+					<fx:String>External Property</fx:String>
+					<fx:String>Managed G H</fx:String>					
+				</mx:ArrayCollection>
+			</s:DropDownList>
+			<mx:Label x="7" y="25" text="Report " id="lbl_PricingModel1" />
+			<s:DropDownList x="128" y="25.5" width="213" height="20" id="Drp_Reporttype" tabIndex="1" selectedIndex="0" change="Change()" >
+				<mx:ArrayCollection> 			
+					<fx:String>Booking Forecasted Revenue</fx:String> 
+					<fx:String>Check In Forecasted Revenue</fx:String>					
+				</mx:ArrayCollection>
+			</s:DropDownList>
+			<WrbHelpComp:HelpText x="428" y="25.5" width="303" depth="55" pxTabIndex="3" id="hlp_Location" pxSetColumnsWidth="300,0" onselection="{fnGetLocation()}">
+			</WrbHelpComp:HelpText>
+			<mx:Label x="7" y="108" text="Month"/>
+			
+			<mx:DateChooser id="dt_Date" visible="true" x="129" y="103" height="31"
+							focusEnabled="false" selectedDate="{new Date()}" 
+							yearNavigationEnabled="true" />
+			<mx:DateChooser id="dt_Date1" visible="true" x="129" y="103" height="31"
+							focusEnabled="false" selectedDate="{new Date()}" 
+							yearNavigationEnabled="true" selectableRange="{{rangeEnd: new Date()}}" />
+			<s:BorderContainer x="130" y="134" width="183" height="21" backgroundColor="#fbf9f9"
+							   borderVisible="false" depth="4">
+				
+				
+			</s:BorderContainer>
+			<WrbComp:Button_HB x="540" y="102.5" Lable_val="Export" id="btn_Excel" click="ExportExcel(event)">
+			</WrbComp:Button_HB>
+			<WrbComp:Button_HB x="648" y="102.5" Lable_val="Clear" id="btn_Clear" click="clear()">
+			</WrbComp:Button_HB>
+			
+		</s:Group>
+	</s:VGroup>
+	<mx:Label x="44" y="154" text="Filter"/>
+	<s:TextInput id="FiltFirstName" x="80" y="153" width="253" change="filter('PropertyName')"
+				 depth="8" prompt="Property Name"/>
+</s:Application>

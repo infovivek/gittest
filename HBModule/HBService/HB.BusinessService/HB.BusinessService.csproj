@@ -1,0 +1,182 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{FCE65B90-5B2B-4CB2-A7E6-84310D01539E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>HB.BusinessService</RootNamespace>
+    <AssemblyName>HB.BusinessService</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BusinessServiceFactory.cs" />
+    <Compile Include="BusinessService\AddUserService.cs" />
+    <Compile Include="BusinessService\ApartmentBookingService.cs" />
+    <Compile Include="BusinessService\ApartmentService.cs" />
+    <Compile Include="BusinessService\APIService.cs" />
+    <Compile Include="BusinessService\ApprovedPettyCashService.cs" />
+    <Compile Include="BusinessService\BedBookingService.cs" />
+    <Compile Include="BusinessService\BookingCancelService.cs" />
+    <Compile Include="BusinessService\BookingDtlsService.cs" />
+    <Compile Include="BusinessService\BookingMailService.cs" />
+    <Compile Include="BusinessService\BookingResendMailService.cs" />
+    <Compile Include="BusinessService\BookingService.cs" />
+    <Compile Include="BusinessService\BTCPaymentService.cs" />
+    <Compile Include="BusinessService\BTCSubmissionService.cs" />
+    <Compile Include="BusinessService\ChangePasswordService.cs" />
+    <Compile Include="BusinessService\CheckOutPaymentCardService.cs" />
+    <Compile Include="BusinessService\CheckOutPaymentCashService.cs" />
+    <Compile Include="BusinessService\CheckOutPaymentChequeService.cs" />
+    <Compile Include="BusinessService\CheckOutPaymentCompInvoiceService.cs" />
+    <Compile Include="BusinessService\CheckOutPaymentNEFTService.cs" />
+    <Compile Include="BusinessService\CheckOutPaymentService.cs" />
+    <Compile Include="BusinessService\CheckOutServiceHdrService.cs" />
+    <Compile Include="BusinessService\CheckOutSettleService.cs" />
+    <Compile Include="BusinessService\Citylocalityservice.cs" />
+    <Compile Include="BusinessService\CityService.cs" />
+    <Compile Include="BusinessService\ClientColumnService.cs" />
+    <Compile Include="BusinessService\ClientGradeCityService.cs" />
+    <Compile Include="BusinessService\ClientManagementService.cs" />
+    <Compile Include="BusinessService\ClientWisePriceService.cs" />
+    <Compile Include="BusinessService\CloneClientService.cs" />
+    <Compile Include="BusinessService\CompanyMasterService.cs" />
+    <Compile Include="BusinessService\ContractBillService.cs" />
+    <Compile Include="BusinessService\ContractClientPreferHdrService.cs" />
+    <Compile Include="BusinessService\ContractManagementService.cs" />
+    <Compile Include="BusinessService\ContractNonDedicatedService.cs" />
+    <Compile Include="BusinessService\ContractProductMasterService.cs" />
+    <Compile Include="BusinessService\CreateLogFilesService.cs" />
+    <Compile Include="BusinessService\DepositeService.cs" />
+    <Compile Include="BusinessService\ExpenseMasterService.cs" />
+    <Compile Include="BusinessService\ExportUnsettledService.cs" />
+    <Compile Include="BusinessService\ExternalChechkOutTACSerivce.cs" />
+    <Compile Include="BusinessService\ExternalCheckOutService.cs" />
+    <Compile Include="BusinessService\ExternalExpenseReportService.cs" />
+    <Compile Include="BusinessService\ForgotService.cs" />
+    <Compile Include="BusinessService\FormatReceiptsService.cs" />
+    <Compile Include="BusinessService\GuestCheckInService.cs" />
+    <Compile Include="BusinessService\GuestCheckOutService.cs" />
+    <Compile Include="BusinessService\GuestChkInDtlService.cs" />
+    <Compile Include="BusinessService\IBusinessService.cs" />
+    <Compile Include="BusinessService\ImportExcelService.cs" />
+    <Compile Include="BusinessService\ImportGuestService.cs" />
+    <Compile Include="BusinessService\InternalExpenseReportService.cs" />
+    <Compile Include="BusinessService\KOTEntryService.cs" />
+    <Compile Include="BusinessService\LaundrySService.cs" />
+    <Compile Include="BusinessService\LocalityService.cs" />
+    <Compile Include="BusinessService\MapPOAndVendorService.cs" />
+    <Compile Include="BusinessService\MapVendorService.cs" />
+    <Compile Include="BusinessService\MarkUpService.cs" />
+    <Compile Include="BusinessService\MasterClientManagementServices.cs" />
+    <Compile Include="BusinessService\MenuScreenService.cs" />
+    <Compile Include="BusinessService\NewKOTEntryService.cs" />
+    <Compile Include="BusinessService\NewKOTUserEntryService.cs" />
+    <Compile Include="BusinessService\NewKOTVendorReportService.cs" />
+    <Compile Include="BusinessService\NewSnackKOTHistoryService.cs" />
+    <Compile Include="BusinessService\NewSnackKOTReportService.cs" />
+    <Compile Include="BusinessService\OutsourceKOTService.cs" />
+    <Compile Include="BusinessService\PaxInOutService.cs" />
+    <Compile Include="BusinessService\PCExpenseApprovalService.cs" />
+    <Compile Include="BusinessService\PCHistoryService.cs" />
+    <Compile Include="BusinessService\PendingCkinReportService.cs" />
+    <Compile Include="BusinessService\PettyCashApprovalService.cs" />
+    <Compile Include="BusinessService\PettyCashHdrService.cs" />
+    <Compile Include="BusinessService\PettyCashReportService.cs" />
+    <Compile Include="BusinessService\PettyCashRequiedStatus.cs" />
+    <Compile Include="BusinessService\PettyCashService.cs" />
+    <Compile Include="BusinessService\PettyCashStatusService.cs" />
+    <Compile Include="BusinessService\PropertyAgreementService.cs" />
+    <Compile Include="BusinessService\PropertyImageService.cs" />
+    <Compile Include="BusinessService\PropertyOwnersService.cs" />
+    <Compile Include="BusinessService\PropertyReportService.cs" />
+    <Compile Include="BusinessService\PropertyRoomService.cs" />
+    <Compile Include="BusinessService\PropertyService.cs" />
+    <Compile Include="BusinessService\ReassignClientService.cs" />
+    <Compile Include="BusinessService\ReassignPropertyService.cs" />
+    <Compile Include="BusinessService\ReconcileService.cs" />
+    <Compile Include="BusinessService\ReportService.cs" />
+    <Compile Include="BusinessService\ReportsService.cs" />
+    <Compile Include="BusinessService\RolesService.cs" />
+    <Compile Include="BusinessService\RoomShiftingService.cs" />
+    <Compile Include="BusinessService\ScreenMasterService.cs" />
+    <Compile Include="BusinessService\SearchBookingGuestService.cs" />
+    <Compile Include="BusinessService\SearchBookingService.cs" />
+    <Compile Include="BusinessService\SearchInvoiceReportService.cs" />
+    <Compile Include="BusinessService\SlabTaxService.cs" />
+    <Compile Include="BusinessService\SnackKOTHistoryService.cs" />
+    <Compile Include="BusinessService\SSPCodeGenerationService.cs" />
+    <Compile Include="BusinessService\TACInvoiceService.cs" />
+    <Compile Include="BusinessService\TaxMappingService.cs" />
+    <Compile Include="BusinessService\TaxMasterService.cs" />
+    <Compile Include="BusinessService\TDSDeclarationService.cs" />
+    <Compile Include="BusinessService\TIAandATIAService.cs" />
+    <Compile Include="BusinessService\TransSubsPriceModelService.cs" />
+    <Compile Include="BusinessService\TravelDeskService.cs" />
+    <Compile Include="BusinessService\TRLinkService.cs" />
+    <Compile Include="BusinessService\UserMasterService.cs" />
+    <Compile Include="BusinessService\VendorAdvancePaymentService.cs" />
+    <Compile Include="BusinessService\VendorChequeApprovalService.cs" />
+    <Compile Include="BusinessService\VendorCostService.cs" />
+    <Compile Include="BusinessService\VendorRequestService.cs" />
+    <Compile Include="BusinessService\VendorService.cs" />
+    <Compile Include="BusinessService\VendorSettlementService.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="BusinessService\TariffBasedReportService.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HB.BO\HB.BO.csproj">
+      <Project>{292E7D89-75FD-46EB-A7AD-7F34A6EA6780}</Project>
+      <Name>HB.BO</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\HB.Dao\HB.Dao.csproj">
+      <Project>{C4B66FC8-07BA-4116-8E80-CA912882176B}</Project>
+      <Name>HB.Dao</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\HB.Entity\HB.Entity.csproj">
+      <Project>{CF580ED2-C796-4A0D-AB35-93EDC2C655E7}</Project>
+      <Name>HB.Entity</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

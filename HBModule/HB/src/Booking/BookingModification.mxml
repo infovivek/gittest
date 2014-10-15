@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   xmlns:WrbComp="WrbComp.*"
+			   width="100%" height="100%" backgroundColor="#fbf9f9" creationComplete="Page_Load()">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
+	<fx:Script>
+		<![CDATA[
+			import mx.events.CloseEvent;
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public  var TariffPaymentMode_AC:ArrayCollection = new ArrayCollection();
+			public  var ServicePaymentMode_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "";
+			public  var BookingLevel:String = "";
+			public var DtlsId:int=0;
+			public var BookingId:int=0;
+			public var Status:String="";
+			private function Page_Load():void
+			{
+				Global_AC = funLoginInfo("<gScrId>1</gScrId><gUsrFk>1</gUsrFk>");				
+				GlobalXml = "";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";					
+				SCtrl.setButtonRights("Delete",true);
+				SCtrl.setButtonRights("Clear",true);				
+				SCtrl.setButtonRights("Search",true);
+				Grd_Property._clear();
+				help();
+			}
+			private function help():void
+			{				
+				useWeb("BookingCancel","BookingCode_CUSTOM", [GlobalXml, "BookingCode","", 0, Global_AC[0].UsrId]);
+				
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void				
+			{
+				
+				if (Ds_Objects.currentTarget.description.toString() == "BookingCode_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						hlp_BookingCode.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+					else
+					{
+						hlp_BookingCode.dataProvider=null;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "BookingGuest_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						txt_Property.text=Ds_Objects.result.Tables.Table.Rows[0].PropertyName;
+						Status=Ds_Objects.result.Tables.Table.Rows[0].CheckIn;
+						if(Status=="Booking")
+						{
+							Grp_Checkin.visible=false;
+						}
+						else
+						{
+							Grp_Checkin.visible=true;
+						}
+						if(Status=="CheckOut")
+						{
+							Clear1();
+							alignAlert(Alert.show("This Booking Already CheckOut.Can't Modified.","Message !",Alert.OK,null,null,iconTickLarge, Alert.OK),10,"");
+							return
+						}
+					}
+					else
+					{
+						txt_Property.text="";
+					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						
+						myArrayCollection=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+						Grd_Property._setGridSrc=myArrayCollection;
+					}
+					else
+					{
+						Grd_Property._clear();
+					}
+					if (Ds_Objects.result.Tables.Table2.Rows.length > 0)
+					{
+						TariffPaymentMode_AC=Ds_Objects.result.Tables.Table2.Rows as ArrayCollection;
+						
+					}
+					else
+					{
+						TariffPaymentMode_AC=new ArrayCollection();
+					}
+					if (Ds_Objects.result.Tables.Table3.Rows.length > 0)
+					{
+						ServicePaymentMode_AC=Ds_Objects.result.Tables.Table3.Rows as ArrayCollection;
+						
+					}
+					else
+					{
+						ServicePaymentMode_AC=new ArrayCollection();
+					}
+					if (Ds_Objects.result.Tables.Table4.Rows.length > 0)
+					{
+						var ClientId:String= Ds_Objects.result.Tables.Table4.Rows[0].ClientId;
+						var GradeId:String= Ds_Objects.result.Tables.Table4.Rows[0].GradeId;
+						
+						var Tmp:ArrayCollection=new ArrayCollection
+							([{Action:GlobalXml,Param1:"PaymentMode",Param2:BookingLevel,Param3:BookingId,prcName:"BookingCancel",
+								ctrlName:"hlpTariffPaymentMode",grdWidth:"80,0"},
+								{Action:GlobalXml,Param1:"PaymentModeService",Param2:BookingLevel,Param3:BookingId,prcName:"BookingCancel",
+									ctrlName:"hlpServicePaymentMode",grdWidth:"80,0"},
+								{Action:GlobalXml,Param1:"GuestData",Param2:ClientId,Param3:GradeId,prcName:"BookingCancel",
+									ctrlName:"hlpFirstName",grdWidth:"100,100,0"}]);	
+						Grd_Property._bindHlpTextData(Tmp);
+						Tmp=new ArrayCollection();
+						
+					}
+					
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				{
+					
+					alignAlert(Alert.show("Booking Modified Successfully.","Message !",Alert.OK,null,null,iconTickLarge, Alert.OK),10,"");
+					Clear();
+				}
+			}
+			public function Clear1():void
+			{
+				txt_Remarks.text="";
+				Grd_Property._clear();
+				hlp_BookingCode.text="";				
+				txt_Client.text="";
+				txt_Property.text="";
+				BookingId=0;
+				DtlsId=0;
+				GuestFlag=false;
+				txt_BookingLevel.text="";
+				hlp_BookingCode.setFocus();			
+				BookingLevel="";				
+			}
+			public function Clear():void
+			{
+				txt_Remarks.text="";
+				Grd_Property._clear();
+				hlp_BookingCode.text="";
+				hlp_BookingCode.Select_Row=null;
+				txt_Client.text="";
+				txt_Property.text="";
+				BookingId=0;
+				DtlsId=0;
+				GuestFlag=false;
+				txt_BookingLevel.text="";
+				hlp_BookingCode._setFocus();
+				help();
+			}
+			public var Ac_Guest:ArrayCollection=new ArrayCollection();	
+			public var selectedindex:int=0;			
+			private function Save():void 
+			{
+				
+				if((Grd_Property._getGridSrc!=null)||(Grd_Property._getGridSrc.length!=0))
+				{
+					Ac_Guest=Grd_Property._getGridSrc as ArrayCollection;
+					for(var i:int=0;i<Ac_Guest.length;i++)
+					{
+						if(Ac_Guest[i].Tick=="1")
+						{
+							GuestFlag=true;
+						}
+					}
+				}
+					
+					//var selectedindex:int=Grd_Property.selectedIndex;
+					//DtlsId=Ac_Guest[selectedindex].Id;
+				if(GuestFlag==false)
+				{
+						alignAlert(Alert.show("This is an Invalid Process.None Of Modified.","Error !",Alert.OK, 
+							null, null, iconCrossSmall, Alert.OK),10,"");
+						return;
+				}
+				else if(txt_Remarks.text=="")
+				{
+					alignAlert(Alert.show("* Remarks is Required.","Error !",Alert.OK, 
+						null, null, iconErrLarge, Alert.OK),10,"");
+					return;
+				}
+				else if((Grd_Property._getGridSrc==null)||(Grd_Property._getGridSrc.length==0))
+				{
+					alignAlert(Alert.show("* Details Are Required.","Error !",Alert.OK, 
+						null, null, iconErrLarge, Alert.OK),10,"");
+					return;
+				}
+				else
+				{
+					var HdrXml:String = "";
+					HdrXml += "<ROOT>";
+					HdrXml += ObjToXmlStr_Comm(Grd_Property._getGridSrc as ArrayCollection,"HdrXml")
+					HdrXml += "</ROOT>";
+					useWeb("BookingCancel","Save_CUSTOM", [GlobalXml,HdrXml, BookingId,txt_Remarks.text,Chk_Mail.selected]);
+				}
+			}
+			private function fnGetBooking():void
+			{
+				Grd_Property._clear();
+				if(hlp_BookingCode.selected())
+				{
+					txt_Remarks.text="";
+					hlp_BookingCode.text=hlp_BookingCode.Select_Row.BookingCode;
+					BookingLevel=hlp_BookingCode.Select_Row.ZBookingLevelId;
+					txt_BookingLevel.text=BookingLevel;
+					BookingId=hlp_BookingCode.Select_Row.Id;
+					txt_Client.text=hlp_BookingCode.Select_Row.ZClientNameId;
+//					var Tmp:ArrayCollection=new ArrayCollection
+//						([{Action:GlobalXml,Param1:"PaymentMode",Param2:BookingLevel,Param3:BookingId,prcName:"BookingCancel",
+//							ctrlName:"hlpTariffPaymentMode",grdWidth:"80,0"},
+//							{Action:GlobalXml,Param1:"PaymentModeService",Param2:BookingLevel,Param3:BookingId,prcName:"BookingCancel",
+//								ctrlName:"hlpServicePaymentMode",grdWidth:"80,0"}]);						
+//					Grd_Property._bindHlpTextData(Tmp);
+//					Tmp=new ArrayCollection();
+					useWeb("BookingCancel","BookingGuest_CUSTOM", [GlobalXml, "BookingGuestModified",BookingLevel, BookingId, Global_AC[0].UsrId]);
+					
+				}
+				else
+				{
+					hlp_BookingCode.text="";
+					BookingId=0;
+					txt_Client.text="";
+					txt_Remarks.text="";
+				}
+			}
+			
+			
+			public var GuestFlag:Boolean=false;
+			
+			public var myArrayCollection:ArrayCollection=new ArrayCollection();
+			public var FltNm:String="";
+			private function filter(Filt:String):void
+			{				
+				FltNm=Filt;				
+				var tempAC:ArrayCollection=new ArrayCollection();	
+				tempAC=Grd_Property._getGridSrc as ArrayCollection;
+				tempAC.filterFunction = filterMyArrayCollection;
+				tempAC.refresh();				
+			}			
+			private function filterMyArrayCollection(item:Object):Boolean 
+			{
+				var Itm:Boolean=true;				
+				if(FiltFirstName.text!="")
+				{
+					var searchString:String = FiltFirstName.text.toLowerCase();
+					var itemName:String = (item.FirstName as String).toLowerCase();
+					Itm=itemName.indexOf(searchString) > -1;
+				}				
+				return Itm;		
+			}
+			public function Custom_Grid_Enter(arrObj:Object, GridMode:Boolean, Index:int):String
+			{
+				if(Status!="Booking")
+				{
+					arrObj.ChkInDt=arrObj.OldChkInDt
+				}				
+				arrObj.DateDiffs="";
+				var sDate1:Date=DateField.stringToDate(arrObj.ChkInDt,"DD/MM/YYYY");
+				var sDate2:Date=DateField.stringToDate(arrObj.ChkOutDt,"DD/MM/YYYY");
+				var Err:String=""; 
+				//Date Differance
+				var MS_PER_DAY:uint = 1000 * 60 * 60 * 24;
+				var tempDate:Date = new Date(sDate2.time - sDate1.time);
+				var difference:Number = 
+					Math.abs(Math.round((tempDate.time / MS_PER_DAY)));
+				arrObj.DateDiffs=difference;
+				if(sDate1>sDate2)
+				{
+					Err=Err+"CheckIn Date Not Greater Than CheckOut Date\n";
+					Grd_Property._setFocus(6);
+					Grd_Property._setFocusFlag(false);
+				}
+				
+				if((arrObj.OldChkInDt!=arrObj.ChkInDt)||(arrObj.OldChkOutDt!=arrObj.ChkOutDt))
+				{
+					//Grd_Property._setValuetoCtrl("txtTick","1");
+					arrObj.Tick="1";
+					arrObj.DateChange="1";
+					
+				}
+				if((arrObj.OldServiceMode!=arrObj.ServicePaymentMode)||(arrObj.OldTariffMode!=arrObj.TariffPaymentMode))
+				{
+					arrObj.Tick="1";
+				}				
+				if((arrObj.FirstName!=arrObj.OldFirstname)||(arrObj.LastName!=arrObj.OldLastName))
+				{
+					arrObj.Tick="1";
+				}
+				if(arrObj.DateDiffs=="0")
+				{
+					Err=Err+"CheckIn And CheckOut Date Are Same.\n";
+					Grd_Property._setFocus(6);
+					Grd_Property._setFocusFlag(false);
+				}
+				var TFFlag:Boolean=true;
+				for(var i:int=0;i< ServicePaymentMode_AC.length;i++)
+				{
+					if(TFFlag==true)
+					{
+						if(arrObj.ServicePaymentMode!=ServicePaymentMode_AC[i].Service)
+						{
+							arrObj.ServiceId="1";
+							
+						}
+						else
+						{
+							TFFlag=false;
+							arrObj.ServiceId="0";
+						}
+					}
+					
+				}
+				TFFlag=true;
+				for(var j:int=0;j< TariffPaymentMode_AC.length;j++)
+				{
+					if(TFFlag==true)
+					{
+						if(arrObj.TariffPaymentMode!=TariffPaymentMode_AC[j].Tariff)
+						{
+							arrObj.TariffId="1";
+						}
+						else
+						{
+							TFFlag=false;
+							arrObj.TariffId="0";
+						}
+					}
+					
+				}
+				if(arrObj.ServiceId=="1")
+				{
+					Err=Err+"Service Payment Mode Is Wrong.\n";
+					Grd_Property._setFocus(8);
+					Grd_Property._setFocusFlag(false);
+				}
+				if(arrObj.TariffId=="1")
+				{
+					Err=Err+"Tariff Payment Mode Is Wrong.\n";
+					Grd_Property._setFocus(7);Grd_Property._setFocusFlag(false);
+				}
+				return Err; 
+			}
+			protected function Grd_AddNewGuest(event:Event):void
+			{
+				if((event.currentTarget.ID == "hlpTariffPaymentMode"))
+				{
+					Grd_Property._setValuetoCtrl("hlpTariffPaymentMode",event.currentTarget.selectedRow.Tariff);
+					Grd_Property._setValuetoCtrl("txtTariffId",event.currentTarget.selectedRow.Id);
+					
+				}
+				if((event.currentTarget.ID == "hlpServicePaymentMode"))
+				{
+					Grd_Property._setValuetoCtrl("hlpServicePaymentMode",event.currentTarget.selectedRow.Service);
+					Grd_Property._setValuetoCtrl("txtServiceId",event.currentTarget.selectedRow.Id);
+					
+				}
+				if((event.currentTarget.ID == "hlpFirstName"))
+				{
+					Grd_Property._setValuetoCtrl("hlpFirstName",event.currentTarget.selectedRow.FirstName);
+					Grd_Property._setValuetoCtrl("txtLastName",event.currentTarget.selectedRow.LastName);
+					Grd_Property._setValuetoCtrl("txtGuestId",event.currentTarget.selectedRow.Id);
+				}
+			}
+			
+			
+		]]>
+	</fx:Script>
+	<mx:Label x="37" y="36" text="Booking No"/>
+	<mx:Label x="74" y="76" text="Filter"/>
+	<mx:Label x="295" y="36" text="Client"/>
+	<mx:Label x="250" y="76" text="Booking Level"/>
+	<mx:Label x="85" y="346" text="Remarks"/>
+	<mx:Label x="581" y="36" text="Property"/>
+	<mx:Label x="838" y="86" text="Payment Mode"/>
+	<WrbHelpComp:HelpText x="110" y="36.5" width="135" depth="2" id="hlp_BookingCode" tabIndex="1" onselection="{fnGetBooking()}" pxSetColumnsWidth="100,200,0,300">
+	</WrbHelpComp:HelpText>
+	<s:TextInput x="339" y="36.5" width="221" id="txt_Client"/>
+	<s:TextInput x="339" y="76.5" width="135" id="txt_BookingLevel"/>
+	<s:TextInput x="644" y="36.5" width="262" id="txt_Property"/>	
+	<mx:HRule x="0" y="417" width="100%" strokeColor="#eb1c24"/>
+	<s:HGroup x="0" y="422" width="100%" height="30" horizontalAlign="center" verticalAlign="top">
+		<WrbComp:SaveControl id="SCtrl" docRefresh="help()" docSave="Save()">
+		</WrbComp:SaveControl>
+	</s:HGroup>
+	<s:TextArea x="152" y="344" width="299" height="66" id="txt_Remarks"/>
+	<s:TextInput x="110" y="77" width="135" height="22" prompt="First Name" id="FiltFirstName" change="filter('GuestName')"/>
+	<WrbComp:ProDGrid1 x="40" y="108" width="315" height="198" id="Grd_Property" depth="0"
+					   _ColDataField="FirstName~LastName~Occupancy~RoomType~Tariff~ChkInDt~ChkOutDt~TariffPaymentMode~ServicePaymentMode~RoomId~GuestId~Id~OldChkInDt~OldChkOutDt~Tick~ExpectChkInTime~DateDiffs~TariffId~ServiceId~OldTariffMode~OldServiceMode~OldFirstname~OldLastName~DateChange~OldGuestId"
+					   _ColHdrText="FirstName~LastName~Occupancy~Type~Tariff~CheckIn Date~CheckOut Date~Tariff~Service~RoomId~GuestId~Id~OldChkInDt~OldChkOutDt~Tick~ExpectChkInTime~DateDiffs~TariffId~ServiceId~OldTariffMode~OldServiceMode~OldFirstname~OldLastName~DateChange~OldGuestId"
+					   _ColType="hlp~txt~txt~txt~txt~dtf~dtf~hlp~hlp~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt"
+					   _colVisible="1~1~1~1~1~1~1~1~1~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0"
+					   _ColWidth="150~150~80~130~80~90~90~80~80~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0"
+					   _editable="1~1~0~0~0~1~1~1~1~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0"
+					   _required="0~0~1~1~1~0~1~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0"
+					   _spltChar="~"
+					   _visibleColNos="9"					  
+					   _tabIndex="8"
+					   _DuplChk="false"
+					   _getHlpTxtData="Grd_AddNewGuest(event)"
+					   >
+	</WrbComp:ProDGrid1>
+	<s:CheckBox x="644" y="344" label="Send Mail" id="Chk_Mail"/>
+	<s:Group x="633" y="110" width="88" height="35" id="Grp_Checkin">
+		<s:Label x="0" y="0"  text="" height="100%" width="100%"/>
+	</s:Group>
+</s:Application>

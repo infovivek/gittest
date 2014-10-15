@@ -1,0 +1,557 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="150" minHeight="500" width="603" height="100%" creationComplete="PreInit()" focusEnabled="true" keyDown="application1_keyDownHandler(event)" xmlns:WrbComp="WrbComp.*">
+	<fx:Metadata>
+		[Event(name="PopupClose")]
+		[Event(name="PopupEnter")]
+		
+	</fx:Metadata>
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<s:Animate id="anim" targets="{[Ser]}" duration="1000">
+			<s:SimpleMotionPath property="alpha" valueFrom="0.0" valueTo="1.0" />
+			<s:SimpleMotionPath property="horizontalCenter" valueFrom="-100" valueTo="0" />
+			<s:SimpleMotionPath property="rotationY" valueFrom="-45" valueTo="0" />
+			<s:SimpleMotionPath property="scaleX" valueFrom="1.5" valueTo="1" />
+			<s:SimpleMotionPath property="scaleY" valueFrom="1.5" valueTo="1" />
+		</s:Animate>
+		<s:Move id="moveEffect" target="{this}" xBy="1000"/>
+	</fx:Declarations>
+	<fx:Script source="..\\Common\\CommonScript.as">
+	</fx:Script>
+		<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.controls.DataGrid;
+			import mx.events.FlexEvent;
+			import mx.events.ItemClickEvent;
+			import mx.managers.PopUpManager;
+			
+			/* Viewing pages */
+			[Bindable] public var startAlert:uint;
+			[Bindable] public var endAlert:uint;
+			[Bindable] public var totalAlert:uint;
+			
+			[Bindable] public var myData:ArrayCollection = new ArrayCollection();
+			
+			public var orgData:ArrayCollection = new ArrayCollection();
+			public var ArrData:ArrayCollection = new ArrayCollection;
+			
+			[Bindable] public var nav:ArrayCollection = new ArrayCollection();
+			
+			[Bindable] 
+			public var Filter_Cmb:ArrayCollection = new ArrayCollection
+			
+			
+			/* Records per page */
+			private var pageSize:uint = 0; 
+			private var intPages:uint = 0;
+			private var CurrPage:uint = 0;
+			
+			/* Number of pages per view */
+			public var navSize:uint = 5;
+			
+			private var index:uint = 0;
+			private var navPage:uint = 1;
+			///New End Popup
+			
+			private var _Doubleclick:Boolean=true;
+			private var _Prc_name:String;
+			private var _HlpIndex:String;
+			private var _Parma:Array;
+			private var _HlpSrchGlobal:String;
+			public var SelectRow:Object;
+			
+			public  function get Prc_name():String 
+			{return _Prc_name;}
+			
+			public function set Prc_name(value:String):void 
+			{_Prc_name=value;}
+			
+			
+			
+			public function set Doubleclick_Param(value:Boolean):void 
+			{_Doubleclick=value;}
+			public  function get Prc_Param():Array 
+			{return _Parma;}
+			
+			public function set Prc_Param(value:Array):void 
+			{_Parma=value;}
+			
+			//HelpControl Inedx
+			public  function get HlpIndex():String
+			{return _HlpIndex;}
+			
+			public function set HlpIndex(value:String):void 
+			{_HlpIndex=value;}
+			
+			
+			//HelpSearchGlobal 
+			public  function get HlpSrchGlobal():String
+			{return _HlpSrchGlobal;}
+			
+			public function set HlpSrchGlobal(value:String):void 
+			{_HlpSrchGlobal=value;}
+			
+			
+			var Srch_Datagrid:DataGrid= new DataGrid();
+			private function PreInit():void
+			{
+				anim.play();
+				F_Cmb.setFocus();
+				///Alert.show("PreInit")
+				//funLoginInfo("<FlexServiceUrl>http://pro64/IBASScmDataService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://pro61/scmflex/ </FlexSwfUrl><gVchTypCd>PO2</gVchTypCd><gVchTypDesc>Flex Purchase Order</gVchTypDesc><gVchTypFk>1650</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>3</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>1</gUsrFk><gCur>Indian Rupees</gCur><gCurFk> 453</gCurFk><gCurRt> 1.0000000</gCurRt>")
+			}
+			public function Pageint():void
+			{
+				//Alert.show("Pageint")
+				//Srch_Datagrid.id="S_HP"
+				anim.play();
+				dataPanel.addElement(Srch_Datagrid);
+				useWeb(_Prc_name,"Search_CUSTOM",_Parma);
+				//Srch_Datagrid.addEventListener(KeyboardEvent.KEY_DOWN,SearchGrid_KeyDownHandle)
+				Srch_Datagrid.addEventListener(KeyboardEvent.KEY_DOWN ,  SearchGrid_KeyDownHandle)
+				Srch_Datagrid.addEventListener(MouseEvent.CLICK,SearchGrid_EnterHandle)
+				
+				Srch_Datagrid.doubleClickEnabled = true;
+				Srch_Datagrid.addEventListener(MouseEvent.DOUBLE_CLICK,SearchGrid_DoubleClick)
+				
+				Srch_Datagrid.id="contentAlertDataGrid" 
+				
+				Srch_Datagrid.percentWidth  = 100
+				Srch_Datagrid.percentHeight = 100
+				Srch_Datagrid.rowHeight=22
+				Srch_Datagrid.verticalScrollPolicy="on" 
+				Srch_Datagrid.horizontalScrollPolicy="off"
+				
+			}
+			public function Pageinti():void
+			{
+				//Alert.show("Pageint")
+				//Srch_Datagrid.id="S_HP"
+				anim.play();				
+				dataPanel.addElement(Srch_Datagrid);
+			//	PurchaseWebService("Search","DynamicReport_CUSTOM",_Parma);
+				//Srch_Datagrid.addEventListener(KeyboardEvent.KEY_DOWN,SearchGrid_KeyDownHandle)
+				Srch_Datagrid.addEventListener(KeyboardEvent.KEY_DOWN ,  SearchGrid_KeyDownHandle)
+				Srch_Datagrid.addEventListener(MouseEvent.CLICK,SearchGrid_EnterHandle)
+				
+				Srch_Datagrid.doubleClickEnabled = true;
+				Srch_Datagrid.addEventListener(MouseEvent.DOUBLE_CLICK,SearchGrid_DoubleClick)
+				
+				Srch_Datagrid.id="contentAlertDataGrid" 
+				
+				Srch_Datagrid.percentWidth  = 100
+				Srch_Datagrid.percentHeight = 100
+				Srch_Datagrid.rowHeight=22
+				Srch_Datagrid.verticalScrollPolicy="on" 
+				Srch_Datagrid.horizontalScrollPolicy="off"
+				
+			}
+			private function funAfterDataCmp(Ds_Objects:Object):void
+			{
+				
+			}
+			
+			private function SetSize(Pagewidth:int,PageHeight:int)
+			{
+				this.width = Pagewidth
+				this.height = PageHeight	
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				//Alert.show("Custom_WebSer_Result")
+				if (Ds_Objects.currentTarget.description.toString()=="Search_CUSTOM")
+				{
+					//Srch_Datagrid.dataProvider=Ds_Objects.result.Tables.Table.Rows
+					orgData=Ds_Objects.result.Tables.Table.Rows as ArrayCollection
+					ArrData = orgData;
+					
+					pageSize = (this.Srch_Datagrid.height/this.Srch_Datagrid.rowHeight)-1 ;        
+					//wow dynamic pazeSize !
+					
+					intPages = Math.ceil(orgData.length/pageSize);
+					//let's calc the intPages
+					
+					refreshDataProvider(index);
+					//refresh the data provider
+					
+					
+					
+					if(intPages<=1){ //less then one page ?
+						intPages = 1;
+						createNavBar(1);
+					}else{ //more pages !!!!
+						createNavBar(intPages);    
+					}
+					
+					if (Filter_Cmb.length>0)
+					{
+						F_Cmb.selectedIndex=0
+					}	
+					Srch_Datagrid.setFocus()
+					
+				}
+				if (Ds_Objects.currentTarget.description.toString()=="DynamicReport_CUSTOM")
+				{
+					//Srch_Datagrid.dataProvider=Ds_Objects.result.Tables.Table.Rows
+					orgData=Ds_Objects.result.Tables.Table.Rows as ArrayCollection
+					ArrData = orgData;
+					
+					pageSize = (this.Srch_Datagrid.height/this.Srch_Datagrid.rowHeight)-1 ;        
+					//wow dynamic pazeSize !
+					
+					intPages = Math.ceil(orgData.length/pageSize);
+					//let's calc the intPages
+					
+					refreshDataProvider(index);
+					//refresh the data provider
+					
+					
+					
+					if(intPages<=1){ //less then one page ?
+						intPages = 1;
+						createNavBar(1);
+					}else{ //more pages !!!!
+						createNavBar(intPages);    
+					}
+					
+					if (Filter_Cmb.length>0)
+					{
+						F_Cmb.selectedIndex=0
+					}	
+					Srch_Datagrid.setFocus()
+					
+				}
+				
+				
+			}	
+			
+			private function SearchGrid_EnterHandle(event:MouseEvent):void
+			{	
+				//dataPanel.setFocus();
+				Srch_Datagrid.setFocus();
+				Srch_Datagrid.addEventListener(KeyboardEvent.KEY_DOWN ,SearchGrid_KeyDownHandle);
+			}
+			
+			private var timer:Timer;
+			protected function SearchGrid_DoubleClick(event:MouseEvent):void
+			{
+				if(event.currentTarget.selectedItem != null){
+					if(_Doubleclick==true)
+					{
+						anim.play(null, true);
+						moveEffect.play();						
+					}
+					timer = new Timer(300, 2);
+					timer.addEventListener(TimerEvent.TIMER, timer_timer);
+					timer.addEventListener(TimerEvent.TIMER_COMPLETE, timer_timerComplete1);
+					timer.start();
+					SelectRow=event.currentTarget.selectedItem;
+				}
+			}
+			private function timer_timer(evt:TimerEvent):void {
+				var tmr:Timer = evt.currentTarget as Timer;
+				var obj:Object = new Object();
+				if(_Doubleclick==true)
+				{
+					obj.currentCount = tmr.currentCount;
+					obj.delay = tmr.delay;
+					obj.repeatCount = tmr.repeatCount;
+					obj.running = tmr.running;
+					moveEffect.play();
+				}
+				
+			}			
+			private function timer_timerComplete1(evt:TimerEvent):void
+			{
+				var tmr:Timer = evt.currentTarget as Timer;				
+				dispatchEvent(new Event("PopupEnter"))
+				if(_Doubleclick==true)
+				{
+					PopUpManager.removePopUp(this);
+				}				
+			}	
+			private function timer_timerComplete(evt:TimerEvent):void
+			{
+				var tmr:Timer = evt.currentTarget as Timer;	
+				if(_Doubleclick==true)
+				{
+				PopUpManager.removePopUp(this);}				
+			}	
+			protected function SearchGrid_KeyDownHandle(event:KeyboardEvent):void
+			{
+				if (event.keyCode==Keyboard.ENTER && event.currentTarget.selectedItem != null)
+				{
+					anim.play(null, true);
+					moveEffect.play();
+					SelectRow=event.currentTarget.selectedItem;
+					timer = new Timer(300, 2);
+					timer.addEventListener(TimerEvent.TIMER, timer_timer);
+					timer.addEventListener(TimerEvent.TIMER_COMPLETE, timer_timerComplete1);
+					timer.start();	
+				}
+			}
+			
+			
+			protected function but_hlpClose_clickHandler1(event:KeyboardEvent):void
+			{
+				if(event.keyCode == Keyboard.ENTER)
+				{
+					anim.play(null, true);
+					ClosePopup()
+					anim.play(null, true);
+				}
+			}
+			
+			protected function but_hlpClose_clickHandler(event:MouseEvent):void
+			{
+				anim.play(null, true);
+				ClosePopup()
+				anim.play(null, true);
+			}
+			
+			private function ClosePopup()
+			{
+				_Doubleclick=true;
+				timer = new Timer(300, 2);
+				timer.addEventListener(TimerEvent.TIMER, timer_timer);
+				timer.addEventListener(TimerEvent.TIMER_COMPLETE, timer_timerComplete);
+				timer.start();	
+				SelectRow= new Object();
+			}
+			/* Create pagination */
+			private function createNavBar(pages:uint = 1,intSet:uint = 0):void{
+				nav.removeAll();
+				if( intSet > 1 ){
+					nav.addItem({label:"<< First",data:0});
+					
+					var intLFive:int = intSet-navSize; // calculate start of last 5;
+					
+					nav.addItem({label:"< Previous",data:intLFive});
+				}
+				
+				for( var x:uint = 0; x < navSize; x++){
+					var pg:uint = x + intSet;
+					nav.addItem({label: pg + 1,data: pg});
+					
+					var pgg:uint = pg+1;
+					if(pgg>=intPages){ //if you reach the last page stop adding linkselectors on the navbar
+						x=navSize; 
+					}
+				}
+				
+				var lastpage:Number = 0;
+				for( var y:uint = navSize; y <= pages-1;y = y + navSize ){ //lets calculate the lastpage button
+					if(y+5 > navSize){
+						lastpage = y;
+					}
+					
+				}
+				
+				
+				
+				if( pg < pages - 1 ){
+					nav.addItem({label:"Next >",data:pg + 1});
+					nav.addItem({label:"Last >>",data:lastpage});
+				}                              
+			}
+			
+			/* Refresh data per page groups */
+			private function navigatePage(event:ItemClickEvent):void
+			{
+				refreshDataProvider(event.item.data);
+				var lb:String = event.item.label.toString();
+				if( lb.indexOf("<") > -1 || lb.indexOf(">") > -1 )
+				{
+					//createNavBar(Math.ceil(orgData.length/pageSize),event.item.data);
+					createNavBar(Math.ceil(ArrData.length/pageSize),event.item.data);
+				}
+				
+			}
+			
+			private function refreshDataProvider(start:uint):void{
+				
+				myData = new ArrayCollection( ArrData.source.slice((start * pageSize),(start * pageSize) + pageSize) );
+				Srch_Datagrid.dataProvider=myData
+				DataGridColumnHide()
+				viewingAlertsLabel1.text = 'Page ' + (start+1).toString() + ' of ' + intPages.toString();
+				viewingAlertsLabel2.text = 'Total items ' + orgData.length.toString();
+			}
+			
+			
+			private function viewingAlerts ():void {
+				startAlert == ((navPage - 1) * pageSize + 1);
+				endAlert == ((navPage - 1) * pageSize + pageSize);
+				totalAlert == myData.length;
+			}
+			
+			private var FlNm:String=""
+			private var FlNm_Index:int
+			
+			//search on VA-Naam
+			private function filterVANaam(item:Object):Boolean{
+				FlNm=F_Cmb.selectedItem.label
+				//FlNm_Index=F_Cmb.selectedIndex
+				var pattern:RegExp = new RegExp("[^]*"+txtCheck.text+"[^]*", "i");
+				return pattern.test(item[F_Cmb.selectedItem.label]);
+				
+			}
+			
+			private function filterVANm():void{
+				
+				
+				orgData.filterFunction = filterVANaam;
+				orgData.refresh();
+				Srch_Datagrid.setFocus()
+				//var OBData:Object = orgData;
+				ArrData = new ArrayCollection();
+				
+				for each (var item in orgData) {
+					ArrData.addItem(item);
+				}
+				
+				intPages = Math.ceil(orgData.length/pageSize); //let's recalculate the pages
+				//orgData2 = (
+				var start:uint = 0;
+				createNavBar(Math.ceil(ArrData.length/pageSize));
+				
+				myData = new ArrayCollection(ArrData.source.slice((start * pageSize),(start * pageSize) + pageSize) );
+				
+				Srch_Datagrid.dataProvider=myData
+				DataGridColumnHide()
+				
+				viewingAlertsLabel1.text = 'Page ' + (start+1).toString() + ' of ' + intPages.toString();
+				viewingAlertsLabel2.text = 'Total items ' + ArrData.length.toString();
+				Srch_Datagrid.instanceIndices;
+				
+				//F_Cmb.selectedIndex=FlNm_Index;
+			} 
+			
+			private function DataGridColumnHide():void
+			{	
+				if (F_Cmb.selectedIndex!=-1)
+				{
+					FlNm_Index=F_Cmb.selectedIndex
+				}	
+				
+				Filter_Cmb.removeAll()
+				
+				for (var i:int =0;i<Srch_Datagrid.columnCount;i++)
+				{
+					
+					if ((Srch_Datagrid.columns[i].headerText.toUpperCase().indexOf("PK")!=-1)||(Srch_Datagrid.columns[i].headerText.toUpperCase().indexOf("FK")!=-1)||(Srch_Datagrid.columns[i].headerText.toUpperCase().indexOf("ID")!=-1)||(Srch_Datagrid.columns[i].headerText.toUpperCase().indexOf("HDN")!=-1))
+					{
+						Srch_Datagrid.columns[i].width=0;
+						Srch_Datagrid.columns[i].visible=false
+					}
+					else
+					{
+						Filter_Cmb.addItem({label:Srch_Datagrid.columns[i].headerText})
+					}	
+				}	
+				F_Cmb.selectedIndex=FlNm_Index
+			}
+			private function FunViewAll():void
+			{
+				Srch_Datagrid.dataProvider = orgData
+				DataGridColumnHide()
+			}
+			
+			
+			
+			protected function txtCheck_enterHandler(event:FlexEvent):void
+			{
+				// TODO Auto-generated method stub
+				
+				filterVANm()
+			}
+			
+			
+			protected function txtCheck_keyDownHandler(event:KeyboardEvent):void
+			{
+				if(event.keyCode==Keyboard.DOWN)
+				{
+					Srch_Datagrid.setFocus();
+				}
+			}
+			
+			
+			protected function application1_keyDownHandler(event:KeyboardEvent):void
+			{
+				// TODO Auto-generated method stub
+				//dataPanel.setFocus();
+				if (event.keyCode==Keyboard.ESCAPE)
+				{ClosePopup()}	
+			}
+			
+		]]>
+	</fx:Script>
+	<s:Rect x="0" y="0" width="100%" height="100%">
+		<s:fill>
+			<s:SolidColor color="0xFFFFFF" alpha=".5"/>
+		</s:fill>
+		<s:stroke>
+			<s:SolidColorStroke color="0xFFFFF0" weight="5"/>
+		</s:stroke>
+	</s:Rect>
+	
+	<mx:VBox x="0" y="0" id="Ser" width="100%" height="100%" paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10" verticalScrollPolicy="off" horizontalScrollPolicy="off">
+		
+		<mx:HBox width="100%" height="10%" verticalAlign="middle">
+			<s:ComboBox id="F_Cmb" dataProvider="{Filter_Cmb}" tabIndex="1">
+				
+			</s:ComboBox>
+			<s:TextInput id="txtCheck" enter="txtCheck_enterHandler(event)" prompt="Search" keyDown="txtCheck_keyDownHandler(event)" tabIndex="2"/>
+			<!--s:Button label="Filter" click="filterVANm();" tabIndex="3"/-->
+			<WrbComp:Button_HB _Label="Filter" click="filterVANm();" tabIndex="3">
+				
+			</WrbComp:Button_HB>
+			
+			<!--<mx:Label id="lblBla" text="This filters the first column."/>--> 	
+		</mx:HBox>
+		
+		
+		<!--	<mx:DataGrid id="contentAlertDataGrid" 
+		dataProvider="{myData}" 
+		width="400" 
+		height="244" 
+		rowHeight="20"
+		verticalScrollPolicy="on" 
+		horizontalScrollPolicy="off"/>-->
+		<s:Group x="10" y="10" width="100%" height="100%" id ="dataPanel" tabIndex="4">
+			
+		</s:Group>
+		<mx:HBox width="100%" verticalAlign="middle">
+			<mx:LinkButton id="viewAllLinkBtn" 
+						   label="View All" 
+						   click="FunViewAll()" tabIndex="5" />
+			<mx:VRule height="20"/>
+			<mx:Label id="viewingAlertsLabel1" text=""/>
+			<mx:Label id="viewingAlertsLabel2" text=""/>
+			<!--s:Button label="Close" width="59" id="but_hlpClose" click="but_hlpClose_clickHandler(event)" tabIndex="6"/-->
+			<WrbComp:Button_HB _Label="Close" width="59" id="but_hlpClose" click="but_hlpClose_clickHandler(event)" tabIndex="6">
+				
+			</WrbComp:Button_HB>
+		</mx:HBox>
+		<mx:HRule width="100%"/>
+		<mx:HBox width="100%">
+			<mx:LinkBar id="pageNav" 
+						itemClick="navigatePage(event)" 
+						dataProvider="{nav}"
+						horizontalGap="1" 
+						width="100%"/>
+		</mx:HBox>
+	</mx:VBox>
+	<!--<s:Panel x="10" y="10" width="583" height="333" id ="dataPanel">
+	</s:Panel>-->
+	
+	
+	<!--<mx:ControlBar horizontalAlign="center" width="100%">
+	<mx:VRule height="15" />
+	<mx:Label text="nl4b.com" color="#FFFFFF" fontWeight="bold" useHandCursor="true" buttonMode="true"  mouseChildren="false" click="getURL('http://www.nl4b.com', '_blank');"/>
+	<mx:Label text="Iamboredsoiblog.eu" color="#FFFFFF" fontWeight="bold" useHandCursor="true" buttonMode="true"  mouseChildren="false" click="getURL('http://www.iamboredsoiblog.eu', '_blank');"/>
+	</mx:ControlBar>-->		
+</s:Group> 

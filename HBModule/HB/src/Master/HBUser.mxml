@@ -1,0 +1,871 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:WrbComp="WrbComp.*"
+			   xmlns:Controls="fx.com.adobe.Controls.*"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   width="100%" height="100%" creationComplete="PageLoad()">
+	<fx:Declarations>
+		<mx:EmailValidator id="EmailValidator" valid="EmailValidator_validHandler(event)"
+						   invalid="EmailValidator_invalidHandler(event)"/>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Style source = "..\\Common\\ApplicationCSS.css"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	<fx:Script>
+		<![CDATA[
+			import WrbComp.frmsearchwindow;
+			
+			import WrbHelpComp.HlpGridHdr;
+			
+			import mx.controls.Alert;
+			import mx.controls.Text;
+			import mx.events.CalendarLayoutChangeEvent;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.events.ValidationResultEvent;
+			
+			import spark.components.calendarClasses.DateSelectorDisplayMode;
+			import spark.events.IndexChangeEvent;
+			import spark.events.TextOperationEvent;
+		
+		//	import mx.events.ValidationResultEvent;                       //email
+		//	private var _isValidEmail:Boolean = true;						//email
+			
+			public var validator:ValidationResultEvent;
+			public var Id:int=0;
+			public var Ac_Clear:ArrayCollection=new ArrayCollection();
+			public var Ac_SelectedItems: ArrayCollection = new ArrayCollection();
+		//	public var Ac1_SelectedItems: ArrayCollection = new ArrayCollection(); //New
+			public var SearchPopUp:frmsearchwindow = new frmsearchwindow();
+			public var Ac_Second:ArrayCollection= new ArrayCollection();
+			public var Ac_First:ArrayCollection= new ArrayCollection();
+			public var Len_selectedItems:int=0,Len_SelectedIndices:int=0,Str_Email:String="";;
+			public var Ac_SelectedIndices: ArrayCollection = new ArrayCollection();
+			public var Ac1_SelectedIndices: ArrayCollection = new ArrayCollection();
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "";
+			public var Markflag:Boolean=false;
+			//public var Id:int=0;
+			public var ErrStr:String="",Flag:Boolean=true,addmode:Boolean=true;
+			protected function PageLoad():void
+			{
+					Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+					GlobalXml="";
+					GlobalXml += "<ROOT>";
+					GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+					GlobalXml += "</ROOT>"; 
+					Help();
+					Lst_DSOM.dataProvider=Ac_Clear;
+					txt_username.setFocus();
+					txt_email.enabled=true;
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				{
+					if (Id == 0)
+					{
+						//alignAlert(Alert.show(" User Saved Successfully."));
+						alignAlert(Alert.show("User Saved Successfully.","Message !",
+							Alert.OK, null,	FnOkCal, iconTickLarge, Alert.OK),10,"");
+					}
+					else
+					{
+						alignAlert(Alert.show("User Updated Successfully.","Message !",
+							Alert.OK, null,	FnOkCal, iconTickLarge, Alert.OK),10,"");
+					}
+					Clear();
+				}
+				if(Ds_Objects.currentTarget.description.toString() == "PAGELOAD_CUSTOM")
+				{
+					if(Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						txt_userid.text=Ds_Objects.result.Tables.Table.Rows[0].DocNo;
+					}
+				}
+				if(Ds_Objects.currentTarget.description.toString() == "PAGELOAD1_CUSTOM")
+				{
+					if(Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Lst_SCOM.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+				/*if(Ds_Objects.currentTarget.description.toString() == "Delete_CUSTOM")
+				{
+					alignAlert(Alert.show("Deleted Successfully."));
+					Clear();
+				}*/
+				if (Ds_Objects.currentTarget.description.toString() == "Delete_CUSTOM")
+				{	
+					alignAlert(Alert.show("User Deleted Successfully.","Message !",Alert.OK, null, FunCall,iconTickLarge, Alert.OK),10,'');
+					Clear();	
+				}	
+				if (Ds_Objects.currentTarget.description.toString() == "User_CUSTOM")
+				{
+					Lst_SCOM.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Search_CUSTOM")
+				{
+					txt_email.enabled=false;
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+					//	txt_userid.text=Ds_Objects.result.Tables.Table.Rows[0].Id;
+					//	drp_title.selectedItem=Ds_Objects.result.Tables.Table.Rows[0].Title;
+						txt_username.text=Ds_Objects.result.Tables.Table.Rows[0].UserName;
+				//		txt_userpassword.text=Ds_Objects.result.Tables.Table.Rows[0].UserPassword;
+				//		hlptxt_usergroup.text=Ds_Objects.result.Tables.Table.Rows[0].UserGroup;
+						txt_email.text=Ds_Objects.result.Tables.Table.Rows[0].Email;
+						txt_firstname.text=Ds_Objects.result.Tables.Table.Rows[0].FirstName;
+						txt_lastname.text=Ds_Objects.result.Tables.Table.Rows[0].LastName;
+						txt_address.text=Ds_Objects.result.Tables.Table.Rows[0].Address;
+				//		txt_phonenumber.text=Ds_Objects.result.Tables.Table.Rows[0].PhoneNumber;
+						txt_mobilenumber.text=Ds_Objects.result.Tables.Table.Rows[0].MobileNumber;
+						txt_city.text=Ds_Objects.result.Tables.Table.Rows[0].City;
+						txt_state.text=Ds_Objects.result.Tables.Table.Rows[0].State;
+						txt_zip.text=Ds_Objects.result.Tables.Table.Rows[0].Zip;
+						Id=Ds_Objects.result.Tables.Table.Rows[0].Id;
+					//	Lst_DSOM=Ds_Objects.result.Tables.Table.Rows[0].UserRoles;
+						if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+						{
+							Lst_DSOM.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;							
+							Ac_Clear=Ds_Objects.result.Tables.Table1.Rows;
+							SearchUserList('Lst_SCOM',Ac_Clear,'Ac_Clear');
+						}
+					}
+				}
+			}
+			public function FnOkCal(event:CloseEvent):void
+			{
+				if(event.detail==Alert.OK)
+				{
+					txt_username.setFocus();
+				}
+			}
+			private function SearchUserList(ScLst:String,tempAC:ArrayCollection,ArrName:String):void
+			{
+				var SCtemp_AC:ArrayCollection=new ArrayCollection();
+				SCtemp_AC=this[ScLst].dataProvider
+				for(var i:int=0;i<tempAC.length;i++)
+				{
+					for(var j:int=0;j<SCtemp_AC.length;j++)
+					{
+						if(tempAC[i].UserId==SCtemp_AC[j].UserId)
+						{
+							SCtemp_AC.removeItemAt(j);						}
+					}
+				}
+				this[ArrName]=SCtemp_AC;
+				this[ScLst].dataProvider=this[ArrName];
+			}
+			protected function txt_Email_focusOutHandler(event:FocusEvent):void
+			{
+				if(txt_email.text != "")
+				{
+					EmailValidator.validate(txt_email.text);
+				}
+				else
+				{
+					txt_email.errorString = "";
+				}
+				
+				//txt_email.setFocus();
+			}
+			
+			protected function txt_Email_changeHandler(event:TextOperationEvent):void
+			{
+				if(txt_email.text != "")
+				{
+					txt_email.errorString = "";
+				}
+			}
+			
+			protected function EmailValidator_validHandler(event:ValidationResultEvent):void
+			{
+				Str_Email = "";
+			}
+			
+			protected function EmailValidator_invalidHandler(event:ValidationResultEvent):void
+			{
+				Str_Email = event.message;
+			}
+			protected function Save():void
+			{ 
+				ErrStr=validation();
+				if(Str_Email!="")
+				{
+					if(Flag == true)
+					{
+						txt_email.setFocus();Flag=false;
+					}
+					ErrStr=ErrStr+Str_Email;					
+				}				
+				if(ErrStr !="")
+				{
+					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10,"");
+					return;
+				} 
+				else
+				{
+					var Ac:ArrayCollection=new ArrayCollection
+						([{
+							
+							Id:Id,
+							//Title:drp_title.selectedItem,
+							UserName:txt_firstname.text,
+						//	UserPassword:txt_userpassword.text,
+						 //   UserGroup:hlptxt_usergroup.text,
+							//UserGroupId:UserGroupId,
+							FirstName:txt_firstname.text,
+							LastName:txt_lastname.text,
+							Address:txt_address.text,
+							City:txt_city.text,
+							State:txt_state.text,
+							Zip:txt_zip.text,
+							Email:txt_email.text,
+					//		PhoneNumber:txt_phonenumber.text,
+							MobileNumber:txt_mobilenumber.text,
+					//		UserRoles:Lst_DSOM.selectedItems,
+							CountId:txt_userid.text
+						}]);
+					
+					
+					var HdrXml:String = ObjToXmlStr_Comm(Ac,"HdrXml")
+					var tempList_AC:ArrayCollection= new ArrayCollection();
+					var tempListSave_AC:ArrayCollection= new ArrayCollection();
+					tempList_AC=Lst_DSOM.dataProvider as ArrayCollection
+					for(var i:int=0;i<tempList_AC.length;i++)
+					{
+						tempListSave_AC.addItemAt({
+							   UserName:tempList_AC[i].label,
+							   UserId:tempList_AC[i].UserId,
+							   Id:tempList_AC[i].Id,
+							   UserType:tempList_AC[i].UserType},tempListSave_AC.length);
+					}
+					var HdrXml1:String = ObjToXmlStr_Comm(Ac,"HdrXml") 
+					var GridXml:String ="";
+					GridXml += "<ROOT>";
+					GridXml += ObjToXmlStr_Comm(tempListSave_AC,"GridXml")
+					GridXml += "</ROOT>";
+					useWeb("UserMaster","Save_CUSTOM",[GlobalXml,HdrXml,GridXml]); 
+				}
+			}
+			
+		
+			private function validation():String
+			{
+				ErrStr="";
+				var TxtFlag:Boolean=true;
+			
+				if(txt_email.text!="")
+				{
+					EmailValidator.validate(txt_email.text);
+				}
+//				if(txt_username.text=="")
+//				{
+//					if(TxtFlag=true)
+//					{
+//						txt_username.setFocus();
+//						TxtFlag=false;
+//					}
+//					ErrStr=ErrStr +" *   User Name is Required \n";
+//				}
+				var tempList_AC1:ArrayCollection= new ArrayCollection();
+				tempList_AC1=Lst_DSOM.dataProvider as ArrayCollection;
+				if(tempList_AC1.length== 0)
+				{
+					if(TxtFlag=true)
+					{
+					 // Lst_DSOM.setFocus();
+					  TxtFlag=false;
+					}
+					ErrStr=ErrStr+ " *   User Roles are Required. \n";
+				}	
+				if(txt_firstname.text=="")
+				{
+					if(TxtFlag=true)
+					{
+						txt_firstname.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr +" *   First Name is Required \n";
+				}
+				
+//				if(txt_city.text=="")
+//				{
+//					if(TxtFlag=true)
+//					{
+//						txt_city.setFocus();
+//						TxtFlag=false;
+//					}
+//					ErrStr=ErrStr +" *   City is Required \n";
+//				}
+//				if(txt_state.text=="")
+//				{
+//					if(TxtFlag=true)
+//					{
+//						txt_state.setFocus();
+//						TxtFlag=false;
+//					}
+//					ErrStr=ErrStr +" *   State is Required \n";
+//				}
+//				if(txt_zip.text=="")
+//				{
+//					if(TxtFlag=true)
+//					{
+//						txt_zip.setFocus();
+//						TxtFlag=false;
+//					}
+//					ErrStr=ErrStr +" *   Zip Code is Required \n";
+//				}
+//				if((txt_zip.text.length>6) && (txt_zip.text.length<6))
+//				{
+//					if(TxtFlag=true)
+//					{
+//						txt_zip.setFocus();
+//						TxtFlag=false;
+//					}
+//					ErrStr = ErrStr + " * Please Chech the Zip Code \n";
+//				}
+			
+				if(txt_email.text=="")
+				{
+					if(TxtFlag=true)
+					{
+						txt_email.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr +" *   Email is Required \n";
+				}
+				if(txt_mobilenumber.text=="")
+				{
+					if(TxtFlag=true)
+					{
+						txt_mobilenumber.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr +" *   Mobile Number is Required \n";
+				}
+				else 
+				{
+					if(txt_mobilenumber.text.length != 10)
+					{
+						if(TxtFlag=true)
+						{
+							txt_mobilenumber.setFocus();
+							TxtFlag=false;
+						}
+						ErrStr = ErrStr + " *   Invalid Mobile Number \n";
+					}	
+					txt_Mobile_focusOutHandler();
+				}
+				
+				return ErrStr;
+			}
+			protected function txt_Mobile_changeHandler(event:TextOperationEvent):void
+			{
+				if(txt_mobilenumber.text != "")
+				{
+					txt_mobilenumber.errorString = "";
+				}
+			}
+			protected function txt_Mobile_focusOutHandler():void
+			{
+				if(txt_mobilenumber.text != "")
+				{
+					if(txt_mobilenumber.text.length < 10)
+					{
+						txt_mobilenumber.errorString = "Mobile Number Must be 10 digits.";
+					}
+					if(txt_mobilenumber.text.length == 10)
+					{
+						var Str:String = txt_mobilenumber.text;
+						
+						var Str1:String = Str.substr(0, 1);
+						
+						if((Str1 != "9") && (Str1 != "8") && (Str1 != "7"))
+						{
+							txt_mobilenumber.errorString = "Mobile Number Starts With 9 or 8 or 7";
+						}
+						//ErrStr=ErrStr+" * Invalid Mobile Number";
+					}
+				}
+			}
+			
+			protected function Search():void
+			{
+				Clear();
+				PopUpManager.addPopUp( SearchPopUp , this, true);
+				SearchPopUp.Prc_name="UserMaster";
+				var SearchParam:Array =new Array();
+				SearchPopUp.HlpIndex="SEARCH";
+				SearchParam[0]=GlobalXml;
+				SearchParam[1]=0;				
+				SearchPopUp.Prc_Param=SearchParam;
+				SearchPopUp.HlpSrchGlobal="";
+				SearchPopUp.dataPanel.focusEnabled=true;
+				SearchPopUp.Pageint();					
+				SearchPopUp.addEventListener("PopupEnter",funpopupEnter);
+				SearchPopUp.addEventListener("PopupClose",funpopupClose);
+				PopUpManager.centerPopUp(SearchPopUp);				
+			}
+			
+			private function funpopupClose(event:Event):void
+			{
+				
+			}
+			
+			private function funpopupEnter(event:Event):void
+			{				
+				Searchhb(SearchPopUp.SelectRow.Id,0);		
+			}
+			private function Searchhb(Id:int,_PrdFk:int):void
+			{
+				var Load:Array = new Array(); 
+				Load[0] = GlobalXml; Load[1] = Id;
+				useWeb("UserMaster","Search_CUSTOM",Load);
+				//useWeb("UserMaster","Search1_CUSTOM",Load);
+					
+			}
+			
+			public function Delete():void
+			{
+				if(Id == 0)
+				{
+					alignAlert(Alert.show("This is an Invalid Process.","Alert Message!",Alert.OK, 
+						null, null,iconWarning, Alert.OK),10);
+					return
+				}
+				else
+				{
+					alignAlert(Alert.show("Do you want to Delete this User ?", "Warning !",
+						Alert.YES | Alert.NO, null,removeDgridItem, iconWarning, Alert.NO),10,"");
+				}
+				
+			}
+			public function Help():void
+			{  
+				//useWeb("UserMaster","PAGELOAD_CUSTOM",[GlobalXml,"IncCodeGenerate","","",0]);
+				useWeb("UserMaster","PAGELOAD1_CUSTOM",[GlobalXml,"User","","",0]);
+			}
+			 
+			private function removeDgridItem(event:CloseEvent):void 
+			{
+				if (event.detail==Alert.YES) 
+				{
+					var Load:Array = new Array();
+					Load[0]=GlobalXml; Load[1]=Id; 
+					useWeb("UserMaster","Delete_CUSTOM",Load);
+					
+				}
+			} 
+			
+			public function FunCall(event:CloseEvent):void
+			{
+				if (event.detail == Alert.OK) 
+				{	
+					//txt_title.setFocus();
+					txt_username.setFocus();
+				}
+			}
+			protected function Clear():void
+			{
+				txt_email.enabled=true;
+				txt_username.text="";
+			//	txt_userpassword.text="";
+			//	hlptxt_usergroup.text="";
+				txt_email.text="";
+			//	txt_phonenumber.text="";
+				txt_firstname.text="";
+				txt_lastname.text="";
+				txt_address.text="";
+				txt_city.text="";
+				txt_state.text="";
+				txt_zip.text="";
+				txt_mobilenumber.text="";
+				Ac_Clear=new ArrayCollection();
+				Lst_DSOM.dataProvider=Ac_Clear;	
+				Id=0;
+				Help();
+			}
+		
+			protected function Btn_LstSingle_clickHandler(SClist:String,DSlist:String):void
+			{
+				Ac_SelectedItems = new ArrayCollection();
+			//	Ac1_SelectedItems = new ArrayCollection();  //New
+			//	Ac1_SelectedIndices =  new ArrayCollection();//New
+				Ac_SelectedIndices = new ArrayCollection();
+				Ac_First = new ArrayCollection();
+				Ac_Second = new ArrayCollection();
+				Ac_Clear=new ArrayCollection();
+				Len_selectedItems = 0;
+				Len_SelectedIndices=0;
+				
+				//Ac_SelectedItems.addItem(Lst_SCOM.selectedItems);
+				Ac_SelectedItems.addItem(this[SClist].selectedItems);
+				
+		//		Ac1_SelectedItems.addItem(this[DSlist].selectedItems);      //New
+				
+				//Ac_SelectedIndices.addItem(Lst_SCOM.selectedIndices);
+				Ac_SelectedIndices.addItem(this[SClist].selectedIndices);
+				
+				Ac1_SelectedIndices.addItem(this[DSlist].selectedIndices);    //New
+				
+				//Len_selectedItems = Lst_SCOM.selectedItems.length;
+				Len_selectedItems = this[SClist].selectedItems.length;
+				
+				Len_SelectedIndices = this[SClist].selectedItems.length;
+				
+				Ac_First=this[SClist].dataProvider as ArrayCollection;
+				Ac_Second=this[DSlist].dataProvider as ArrayCollection;
+				var tempA_C:ArrayCollection= new ArrayCollection();
+				for(var i:int=0;i<Len_selectedItems;i++)
+				{
+					
+					
+					if(Ac_Second==null)
+					{
+						Ac_Second.addItem
+							({
+								label:Ac_SelectedItems[0][i].label,
+								UserId:Ac_SelectedItems[0][i].UserId,
+								Id:Ac_SelectedItems[0][i].Id,
+								UserType:Ac_SelectedItems[0][i].UserType});
+						 
+					}
+					else
+					{
+//						if(Ac_SelectedItems[0][i].Id == Ac1_SelectedItems[0][i].Id)     //New
+//						{
+//							alignAlert(Alert.show(" This Role is Already Seleted for this USER"));
+//						}
+						Ac_Second.addItemAt
+							({
+								label:Ac_SelectedItems[0][i].label,
+								Id:Ac_SelectedItems[0][i].Id,
+								UserId:Ac_SelectedItems[0][i].UserId,
+								UserType:Ac_SelectedItems[0][i].UserType
+							},Ac_Second.length);
+					}
+					
+					
+					tempA_C.addItemAt({UserId:Ac_SelectedItems[0][i].UserId},tempA_C.length);
+				}
+				
+				for(var j:int=0;j<tempA_C.length;j++)
+				{
+					for(var s:int=0;s<Ac_First.length;s++)
+					{
+						if(Ac_First[s].UserId==tempA_C[j].UserId)
+						{
+							Ac_First.removeItemAt(s);
+							s=0;
+						}
+						
+					}				
+				}
+				this[SClist].dataProvider=Ac_Clear;this[SClist].dataProvider=Ac_Clear;
+				this[SClist].dataProvider=Ac_First;this[DSlist].dataProvider=Ac_Second;	
+			}
+			
+			protected function Btn_Lst1Single_clickHandler(SClist:String,DSlist:String):void
+			{
+				var tempList_AC1:ArrayCollection= new ArrayCollection();
+				tempList_AC1=Lst_DSOM.dataProvider as ArrayCollection;
+				if(tempList_AC1.length!= 0)
+				{
+					if(Lst_DSOM.selectedItem!=null)
+					{
+						alignAlert(Alert.show("Do you want to Remove this Role ?", "Warning !",
+							Alert.YES | Alert.NO, null,removeDgridItem1, iconWarning, Alert.NO),10,"");
+					}
+				}
+				
+				
+			}
+			private function removeDgridItem1(event:CloseEvent):void
+			{
+				if (event.detail==Alert.YES) 
+				{
+					var SClist:String="Lst_SCOM";
+					var DSlist:String="Lst_DSOM";
+					Ac_SelectedItems = new ArrayCollection();Ac_SelectedIndices = new ArrayCollection();
+					Ac_First = new ArrayCollection();Ac_Second = new ArrayCollection();
+					Ac_Clear=new ArrayCollection();
+					Len_selectedItems = 0;Len_SelectedIndices=0;
+					Ac_SelectedItems.addItem(this[DSlist].selectedItems);
+					Ac_SelectedIndices.addItem(this[DSlist].selectedIndices);
+					Len_selectedItems = this[DSlist].selectedItems.length;
+					Len_SelectedIndices = this[DSlist].selectedItems.length;
+					Ac_First=this[DSlist].dataProvider as ArrayCollection;
+					Ac_Second=this[SClist].dataProvider as ArrayCollection;
+					var tempA_C:ArrayCollection= new ArrayCollection();
+					for(var i:int=0;i<Len_selectedItems;i++)
+					{
+						if((Ac_Second.length==0)||(Ac_Second==null))
+						{
+							Ac_Second.addItem({label:Ac_SelectedItems[0][i].label,Id:Ac_SelectedItems[0][i].Id,UserId:Ac_SelectedItems[0][i].UserId,UserType:Ac_SelectedItems[0][i].UserType});
+						}
+						else
+						{
+							Ac_Second.addItemAt({label:Ac_SelectedItems[0][i].label,Id:Ac_SelectedItems[0][i].Id,UserId:Ac_SelectedItems[0][i].UserId,UserType:Ac_SelectedItems[0][i].UserType},
+								Ac_Second.length);
+						}
+						tempA_C.addItemAt({UserId:Ac_SelectedItems[0][i].UserId},tempA_C.length);
+					}
+					for(var j:int=0;j<tempA_C.length;j++)
+					{
+						for(var s:int=0;s<Ac_First.length;s++)
+						{
+							if(Ac_First[s].UserId==tempA_C[j].UserId)
+							{
+								if(Ac_First[s].Id!=0)
+								{
+									
+									
+									useWeb("UserMaster","UserDelete_CUSTOM",[GlobalXml,'UserDelete','','',Ac_First[s].Id]);
+								}							
+								Ac_First.removeItemAt(s);
+								s=0;
+							}
+							
+						}
+					}
+					this[DSlist].dataProvider=Ac_Clear;this[SClist].dataProvider=Ac_Clear;
+					this[DSlist].dataProvider=Ac_First;this[SClist].dataProvider=Ac_Second;	
+				}
+						
+			}			
+			
+			protected function Btn_LstAll_clickHandler(SClist:String,DSlist:String):void
+			{
+			Ac_First = new ArrayCollection();Ac_Second = new ArrayCollection();
+				Ac_Clear=new ArrayCollection();
+				Ac_First = this[SClist].dataProvider as ArrayCollection;
+				Ac_Second = this[DSlist].dataProvider as ArrayCollection;
+				if(Ac_Second.length==0)
+				{
+					this[DSlist].dataProvider=Ac_First;
+				}
+				else
+				{
+					for(var i:int=0;i<Ac_First.length;i++)
+					{
+						if((Ac_Second.length==0)||(Ac_Second==null))
+						{
+							Ac_Second.addItem
+								({
+									label:Ac_First[i].label,
+									Id:Ac_First[i].Id,
+									UserId:Ac_First[i].UserId,
+									UserType:Ac_First[i].UserType
+								});
+						}
+						else
+						{
+							Ac_Second.addItemAt
+								({
+									label:Ac_First[i].label,
+									Id:Ac_First[i].Id,
+									UserId:Ac_First[i].UserId,
+									UserType:Ac_First[i].UserType},
+								Ac_Second.length);
+						}
+					}
+					this[DSlist].dataProvider=Ac_Second;
+				}
+				this[SClist].dataProvider=null;this[SClist].dataProvider=Ac_Clear;
+			}
+			protected function Refresh():void
+			{
+				Lst_DSOM.dataProvider=Ac_Clear;
+				useWeb("UserMaster","PAGELOAD1_CUSTOM",[GlobalXml,"User","","",0]);
+			} 
+			protected function Btn_Lst1All_clickHandler(SClist:String,DSlist:String):void
+			{
+				var tempList_AC1:ArrayCollection= new ArrayCollection();
+				tempList_AC1=Lst_DSOM.dataProvider as ArrayCollection;
+				if(tempList_AC1.length!= 0)
+				{
+					alignAlert(Alert.show("Do you want to Remove this Roles ?", "Warning !",
+						Alert.YES | Alert.NO, null,removeDgridItem2, iconWarning, Alert.NO),10,"");
+				}
+				
+			}
+			private function removeDgridItem2(event:CloseEvent):void
+			{
+				if (event.detail==Alert.YES) 
+				{
+					var SClist:String="Lst_SCOM";
+					var DSlist:String="Lst_DSOM";
+					Ac_First = new ArrayCollection();Ac_Second = new ArrayCollection();
+					Ac_Clear=new ArrayCollection();
+					Ac_First = this[DSlist].dataProvider as ArrayCollection;
+					Ac_Second = this[SClist].dataProvider as ArrayCollection;
+					if(Ac_Second.length==0)
+					{
+						this[SClist].dataProvider=Ac_First;
+						for(var i:int=0;i<Ac_First.length;i++)
+						{
+							if(Ac_First[i].Id!=0)
+							{
+								useWeb("UserMaster","UserDelete_CUSTOM",[GlobalXml,'UserDelete','','',Ac_First[i].Id]);
+							}
+						}
+					}
+					else
+					{
+						for(var i:int=0;i<Ac_First.length;i++)
+						{
+							if(Ac_First[i].Id!=0)
+							{
+								useWeb("UserMaster","UserDelete_CUSTOM",[GlobalXml,'UserDelete','','',Ac_First[i].Id]);
+							}
+							if((Ac_Second.length==0)||(Ac_Second==null))
+							{
+								Ac_Second.addItem({label:Ac_First[i].label,Id:Ac_First[i].Id,UserId:Ac_First[i].UserId,UserType:Ac_First[i].UserType});
+							}
+							else
+							{
+								Ac_Second.addItemAt({label:Ac_First[i].label,Id:Ac_First[i].Id,UserId:Ac_First[i].UserId,UserType:Ac_First[i].UserType},
+									Ac_Second.length);
+							}
+						}
+						this[SClist].dataProvider=Ac_Second;
+					}
+					this[DSlist].dataProvider=null;this[DSlist].dataProvider=Ac_Clear;
+				}
+				
+			}
+		]]>
+		
+	</fx:Script>	
+	
+		<s:BorderContainer x="0" y="0" width="100%" height="100%" depth="50" backgroundColor="#fbf9f9" borderVisible="false">
+	<!--s:Label id="lbltitle" x="58" y="56" fontFamily="Times New Roman" fontSize="15"
+			 fontWeight="bold" text="Title"/-->
+	<mx:Label id="lblUsername" x="117" y="56" fontFamily="Arial" fontSize="12"
+			 fontWeight="normal" text="User Name" visible="false"/>
+	<mx:Label id="lbluserpwd" x="524" y="60" fontFamily="Arial" fontSize="12"
+			 fontWeight="normal" text="User Password"/>
+	<mx:Label id="lblusergrp" x="117" y="266" fontFamily="Arial" fontSize="12"
+			 fontWeight="normal" text="User Roles"/>
+	<mx:Label id="lblfirstname" x="118" y="116" fontFamily="Arial" fontSize="12"
+			 fontWeight="normal" text="First Name"/>
+	<mx:Label id="lbllastname" x="118" y="191" fontFamily="Arial" fontSize="12"
+			 fontWeight="normal" text="Last Name"/>
+	<mx:Label id="lbladdress" x="584" y="58" fontFamily="Arial" fontSize="12"
+			 fontWeight="normal" text="Address" visible="false"/>
+	<mx:Label id="lblcity" x="566" y="120" fontFamily="Arial" fontSize="12"
+			 fontWeight="normal" text="City" visible="false"/>
+	<mx:Label id="lblstate" x="584" y="197" fontFamily="Arial" fontSize="12"
+			 fontWeight="normal" text="State" visible="false"/>
+	<mx:Label id="lblzipcode" x="584" y="231" fontFamily="Arial" fontSize="12"
+			 fontWeight="normal" text="Zip Code" visible="false"/>
+	<mx:Label id="lblmobile" x="524" y="114" fontFamily="Arial" fontSize="12"
+			 fontWeight="normal" text="Mobile Number"/>
+			<s:TextInput id="txt_username" x="235" y="36.5" width="220" height="20" prompt="UserName" tabIndex="1" maxChars="25" visible="false"/>
+			<!--s:TextInput id="txt_userpassword" x="215" y="104" width="126" displayAsPassword="true"
+						 prompt="UserPassword" tabIndex="2"/-->
+			<s:TextInput id="txt_firstname" x="236" y="116.5" width="220" height="20" prompt="FirstName"
+						 tabIndex="2" maxChars="25" restrict="A-Za-z"/>
+			<s:TextInput id="txt_lastname" x="236" y="191.5" width="220" height="20" prompt="LastName"
+						 tabIndex="3" maxChars="25" restrict="A-Za-z"/>
+			<!--s:TextInput id="txt_address" x="793" y="140" width="126" height="20" prompt="Address"
+						 tabIndex="10"/-->
+			<s:TextInput id="txt_city" x="638" y="120.5" width="220" height="20" prompt="City"
+						 tabIndex="7" maxChars="25" restrict="A-Za-z" visible="false" />
+			<s:TextInput id="txt_state" x="656" y="197.5" width="220" height="20" prompt="State"
+						 tabIndex="8" maxChars="25" restrict="A-Za-z" visible="false"/>
+			<s:TextInput id="txt_zip" x="656" y="231.5" width="220" height="20" maxChars="6"
+						 prompt="ZipCode" restrict="0-9" tabIndex="9" visible="false"/> 
+			<s:TextInput id="txt_mobilenumber" x="638" y="114.5" width="220" height="20"
+						 focusOut="txt_Mobile_focusOutHandler()" change="txt_Mobile_changeHandler(event)"
+						 prompt="MobileNumber" tabIndex="4" maxChars="10" restrict="0-9"/>
+			<!--s:Label x="102" y="54" width="14" color="Red" text="*"/-->
+			<s:Label x="182" y="114" color="Red" text="*"/>
+			<s:Label x="615" y="112" color="Red" text="*"/>
+			<s:Label x="172" y="54" width="11" color="Red" text="*"/>
+			<!--s:Label x="191" y="173" color="Red" text="*"/-->
+			<s:Label x="590" y="118" color="Red" text="*" visible="false"/>
+			<s:Label x="615" y="196" color="Red" text="*" visible="false"/>
+			<s:Label x="637" y="227" color="Red" text="*" visible="false"/>
+			<s:TextArea id="txt_address" x="638" y="51" width="220" height="153" tabIndex="5" maxChars="100"
+						prompt="Address" visible="false"/>
+			<!--s:DropDownList id="drp_title" x="215" y="45" width="126" height="21" selectedItem="Mr">
+				<mx:ArrayList> 
+					<fx:String>Mr</fx:String>
+					<fx:String>Mrs</fx:String>
+				</mx:ArrayList>
+			</s:DropDownList-->
+			<s:List id="Lst_SCOM" x="238" y="264" width="220" height="151"
+					allowMultipleSelection="true" tabIndex="10">
+					<!--mx:ArrayCollection>	
+					<fx:String>Database Administrator</fx:String>
+					<fx:String>Network Administrator</fx:String>
+					<fx:String>DotNet Programmer</fx:String>
+					<fx:String>System Administrator</fx:String>
+					</mx:ArrayCollection-->
+			</s:List>
+			<s:Button id="Btn_addOM" x="524" y="290.5" width="50" height="21" label=">"
+					  click="Btn_LstSingle_clickHandler('Lst_SCOM','Lst_DSOM')"/>
+			<s:Button id="Btn_addAllOM" x="524" y="318.5" width="50" height="21" label=">>"
+					  click="Btn_LstAll_clickHandler('Lst_SCOM','Lst_DSOM')"/>
+			<s:Button id="Btn_delOM" x="524" y="347.5" width="50" height="21" label=" &lt;"
+					  click="Btn_Lst1Single_clickHandler('Lst_SCOM','Lst_DSOM')"/>
+			<s:Button id="Btn_delAllOM" x="524" y="376.5" width="50" height="21" label="&lt;&lt;"
+					  click="Btn_Lst1All_clickHandler('Lst_SCOM','Lst_DSOM')"/>
+
+			
+			<!--s:EmailValidator
+				id="emailValidator"
+				source="{this}"
+				property="text"
+				required="{required}"
+				requiredFieldError="Email Field is Required."
+				invalidCharError="Invalid characters in your email address."
+				invalidDomainError= "The domain in your email address is incorrectly formatted."
+				invalidIPDomainError="The IP domain in your email address is incorrectly formatted."
+				invalidPeriodsInDomainError="The domain in your email address has consecutive periods."
+				missingAtSignError="Missing an at character in your email address."
+				missingPeriodInDomainError="The domain in your email address is missing a period."
+				missingUsernameError="The username in your email address is missing."
+				tooManyAtSignsError="Too many at characters in your email address." /-->
+			
+			
+			
+			<s:List id="Lst_DSOM" x="634" y="262" width="220" height="151"
+					allowMultipleSelection="true"></s:List>
+			<!--s:Label id="lbluserid" x="376" y="13" fontFamily="Times New Roman" fontSize="15"
+					 fontWeight="bold" text="UserId"/-->
+			<s:TextInput id="txt_userid" x="460" y="7" fontFamily="Arial" fontSize="12" editable="false"
+						 fontWeight="normal" prompt="User Id" visible="false"/>
+			<!--s:Label id="lblusergroup" x="60" y="177" height="22" fontFamily="Times New Roman" fontSize="15" fontWeight="bold" text="User Group"/>
+			<s:Label x="146" y="173" text="*" color="Red"/>
+			<WrbHelpComp:HelpText id="hlptxt_usergroup" x="215" y="175" width="126"
+								   depth="200" pxSetColumnsWidth="100,0" onselection="hlp_UserGroup_changeHandler()" tabIndex="3"/-->
+			<s:Label x="184" y="264" width="7" height="15" color="Red" text="*"/>
+		
+			<s:Label x="638" y="66.5" width="220" height="15"
+					 text="Password will be generated by system"/>
+			<mx:Label id="lblemail" x="118" y="56" fontFamily="Arial" fontSize="12"
+					 fontWeight="normal" text="Email Id"/>
+			<s:TextInput id="txt_email" x="238" y="58.5" width="221" height="20" prompt="Email"
+						 change="txt_Email_changeHandler(event)" 
+						 focusOut="txt_Email_focusOutHandler(event)" tabIndex="1" maxChars="50"/>
+			
+			<!--/WrbHelpComp:HelpText-->
+			
+
+		
+		<s:HGroup x="5" y="464" width="100%" height="40" horizontalAlign="center" verticalAlign="middle"
+				  depth="0">			
+			<WrbComp:SaveControl docClear="Clear()" docDelete="Delete()" docSave="Save()"
+								 doSearch="Search()" docRefresh="Refresh()">
+			</WrbComp:SaveControl>
+		</s:HGroup>
+			<mx:HRule x="0" y="450" width="100%" strokeColor="#eb1c24"/>
+		</s:BorderContainer>
+</s:Application>

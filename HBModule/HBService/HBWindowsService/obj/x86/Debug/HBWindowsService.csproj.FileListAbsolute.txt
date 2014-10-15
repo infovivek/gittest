@@ -1,0 +1,9 @@
+D:\Project\HBModule\HBService\HBWindowsService\bin\Debug\HBWindowsService.exe
+D:\Project\HBModule\HBService\HBWindowsService\bin\Debug\HBWindowsService.pdb
+D:\Project\HBModule\HBService\HBWindowsService\obj\x86\Debug\ResolveAssemblyReference.cache
+D:\Project\HBModule\HBService\HBWindowsService\obj\x86\Debug\HBWindowsService.ProjectInstaller.resources
+D:\Project\HBModule\HBService\HBWindowsService\obj\x86\Debug\GenerateResource.read.1.tlog
+D:\Project\HBModule\HBService\HBWindowsService\obj\x86\Debug\GenerateResource.write.1.tlog
+D:\Project\HBModule\HBService\HBWindowsService\obj\x86\Debug\HBWindowsService.exe
+D:\Project\HBModule\HBService\HBWindowsService\obj\x86\Debug\HBWindowsService.pdb
+D:\Project\HBModule\HBService\HBWindowsService\bin\Debug\HBWindowsService.exe.config

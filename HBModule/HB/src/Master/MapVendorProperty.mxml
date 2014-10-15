@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   width="100%" height="100%" creationComplete="PageLoad(event)" 
+			   pageTitle="MapVendorProperty">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Style source = "..\\Common\\ApplicationCSS.css"/>
+	<fx:Script source="..\\Common\\CommonScript.as"/>
+	<fx:Script source="..\\Common\\Functions.as"/>
+	<fx:Script>
+		<![CDATA[
+			import WrbComp.frmsearchwindow;
+			
+			import com.as3xls.xls.Type;
+			
+			import mx.collections.ArrayCollection;
+			import mx.containers.Accordion;
+			import mx.controls.Alert;
+			import mx.controls.Text;
+			import mx.events.CalendarLayoutChangeEvent;
+			import mx.events.CloseEvent;
+			import mx.events.ColorPickerEvent;
+			import mx.events.FlexEvent;
+			import mx.events.IndexChangedEvent;
+			import mx.events.ListEvent;
+			import mx.graphics.codec.PNGEncoder;
+			import mx.managers.PopUpManager;
+			import mx.rpc.http.mxml.HTTPService;
+			
+			import org.hamcrest.mxml.collection.Array;
+			
+			import spark.events.IndexChangeEvent;
+			import spark.events.TextOperationEvent;
+			private var SearchPopUp:frmsearchwindow = new frmsearchwindow();
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "",ErrStr:String="";
+			public var Id:int=0,ErrMsg:String="",VendorId:int=0;
+			public var AddMode:Boolean=true,Flag:Boolean=true;
+			
+	
+	protected function PageLoad(event:FlexEvent):void
+	{
+		Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+		GlobalXml="";
+		GlobalXml += "<ROOT>";
+		GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+		GlobalXml += "</ROOT>";
+		Help();
+	
+	}
+	public function Help():void
+	{  
+			useWeb("MapVendor","PAGELOAD_CUSTOM",[GlobalXml,'PAGELOAD',0]);
+	}
+	private function Custom_WebSer_Result (Ds_Objects:Object):void
+	{
+		if (Ds_Objects.currentTarget.description.toString() == "PAGELOAD_CUSTOM")
+			{
+			if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+			{
+				hlp_vendor.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;		
+			}
+			if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+			{
+				Grd_Details.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;	
+			}
+	 }
+		if (Ds_Objects.currentTarget.description.toString() == "PropertyLOAD_CUSTOM")
+		{
+			if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+			{
+				Grd_Details.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+			}
+		}
+	 if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+		{
+				if (AddMode == true)
+				{
+					alignAlert(Alert.show("Property Added Successfully.","Message !",
+						Alert.OK, null, null,iconTickLarge, Alert.OK),10,"");
+				}
+				else
+				{
+					alignAlert(Alert.show("Property Updated Successfully.","Message !",
+						Alert.OK, null, null,iconTickLarge, Alert.OK),10,"");
+				}
+				FnClear();
+				 
+			}
+		}
+		protected function FnValidation_BeforeSave():String
+		{
+			ErrStr="";
+			
+			var TxtFlag:Boolean=true;
+			if(hlp_vendor.text=="")
+			{
+				if(TxtFlag==true)
+				{
+					hlp_vendor.setFocus();
+					TxtFlag=false;
+				}
+				ErrStr=ErrStr+"* Vendor is Required.\n";					
+			}
+			err();
+			return ErrStr; 
+			
+		 }
+			public function err():void
+			{
+				var Grid_AC1:ArrayCollection=new ArrayCollection();
+				var SaveFlag:Boolean=true;
+				if(Grd_Details.dataProvider !=null)
+				{ 
+					Grid_AC1=Grd_Details.dataProvider as ArrayCollection;
+					var i:int=Grid_AC1.length-1;
+					for( i ;i>=0;i--)
+					{
+						if(Grid_AC1[i].Process ==1)
+						{  
+							SaveFlag=false;
+							Grid_AC1[i].Process =true
+						}
+						else if(Grid_AC1[i].Process ==0)
+						{
+							Grid_AC1[i].Process =false
+						}
+					}	
+					Grd_Details.dataProvider=Grid_AC1.source;
+					if(SaveFlag==true)
+					{
+						ErrStr=ErrStr+"* Select Any One Property.\n";
+					}
+				}
+			}
+		protected function FnClear():void
+		{
+			VendorId=0;
+			hlp_vendor.text="";
+			Help();
+		}
+		protected function OnSelectionGuestname():void
+		{	
+			hlp_vendor.text=hlp_vendor.Select_Row.VendorName;
+			VendorId=hlp_vendor.Select_Row.Id;
+			useWeb("MapVendor","PropertyLOAD_CUSTOM",[GlobalXml,'PropertyLoad',VendorId]);
+			
+		}
+		protected function FnSave():void
+		{
+			ErrStr="";
+			ErrMsg = ""; Flag = true; 
+			var Str:String=FnValidation_BeforeSave();
+			if(ErrStr !="")
+			{
+				alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10,"");
+				return;
+			} 
+			else
+			{
+				var Ac_Hdr:ArrayCollection = new ArrayCollection
+					([{ 
+						VendorId:VendorId,
+						Id:Id
+					}])
+				var VC:ArrayCollection= new  ArrayCollection();
+				VC.removeAll();
+				VC=Grd_Details.dataProvider as ArrayCollection;
+				var ServiceXml:String="";
+				ServiceXml += "<ROOT>";
+				ServiceXml += ObjToXmlStr_Comm(VC,"ServiceXml")
+				ServiceXml += "</ROOT>";
+				var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
+				useWeb("MapVendor","Save_CUSTOM",[GlobalXml,HdrXml,ServiceXml]);
+			}
+		}
+		public function FnChkChange(event:Event):void
+		{
+			var Ac:ArrayCollection=new ArrayCollection();				
+			Ac=Grd_Details.dataProvider as ArrayCollection;				
+			var Index:int=Grd_Details.selectedIndex;
+			var Flag:Boolean=true;
+			
+			if(Ac[Index].Process==0)
+			{
+				Ac[Index].Process=true;
+			}
+			else
+			{
+				Ac[Index].Process=false;
+			} 
+		}		
+		
+		
+		]]>
+	</fx:Script>
+	<s:BorderContainer x="-3" y="0" width="100%" height="100%">
+		<mx:Label x="350" y="41" text="VendorName"/>
+		<WrbHelpComp:HelpText x="442" y="37" width="240" height="26" id="hlp_vendor" depth="50"
+							  onselection="{OnSelectionGuestname()}" pxSetColumnsWidth="0,240">
+		</WrbHelpComp:HelpText>
+		
+		<mx:DataGrid id="Grd_Details" x="300" y="81" width="400" height="408" tabIndex="3"
+					 dragEnabled="true" draggableColumns="false" dragMoveEnabled="true"
+					 dropEnabled="true" editable="true" focusEnabled="false"  
+					 textAlign="center" borderVisible="true">
+			<mx:columns>
+				<mx:DataGridColumn dataField="Process" width="50" headerText="Process"  editable="false">
+					<mx:itemRenderer >
+						<fx:Component>
+							<mx:HBox horizontalAlign="center" verticalAlign="middle">
+								<mx:CheckBox selected="{data.Process}"  
+											 change="outerDocument.FnChkChange(event);"/>
+							</mx:HBox>	
+						</fx:Component>
+					</mx:itemRenderer>
+				</mx:DataGridColumn>
+				<mx:DataGridColumn dataField="PropertyName" width="200" 
+								   headerText="PropertyName" editable="false" textAlign="center"/>							
+				<mx:DataGridColumn dataField="PropertyId" width="100" visible="false"/>
+				<mx:DataGridColumn dataField="Id" width="50" visible="false"/>
+			</mx:columns>
+		</mx:DataGrid>	
+		<mx:HRule x="2" y="497" width="100%" strokeColor="#eb1c24"/>
+		<mx:Button x="408" y="508" width="75" height="23" label="Save" click="FnSave()"/>
+		<mx:Button x="511" y="508" width="75" height="23" label="Reset" click="FnClear()"/>		
+	</s:BorderContainer>
+	
+</s:Application>

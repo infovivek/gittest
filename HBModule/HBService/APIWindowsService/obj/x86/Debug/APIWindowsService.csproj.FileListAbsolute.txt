@@ -1,0 +1,12 @@
+D:\Project\HBModule\HBService\APIWindowsService\bin\Debug\APIWindowsService.exe
+D:\Project\HBModule\HBService\APIWindowsService\bin\Debug\APIWindowsService.pdb
+D:\Project\HBModule\HBService\APIWindowsService\obj\x86\Debug\ResolveAssemblyReference.cache
+D:\Project\HBModule\HBService\APIWindowsService\obj\x86\Debug\APIWindowsService.ProjectInstaller.resources
+D:\Project\HBModule\HBService\APIWindowsService\obj\x86\Debug\GenerateResource.read.1.tlog
+D:\Project\HBModule\HBService\APIWindowsService\obj\x86\Debug\GenerateResource.write.1.tlog
+D:\Project\HBModule\HBService\APIWindowsService\obj\x86\Debug\APIWindowsService.exe
+D:\Project\HBModule\HBService\APIWindowsService\obj\x86\Debug\APIWindowsService.pdb
+D:\Project\HBModule\HBService\APIWindowsService\bin\Debug\APIWindowsService.exe.config
+E:\project\HBModule\HBService\APIWindowsService\bin\Debug\APIWindowsService.exe.config
+E:\project\HBModule\HBService\APIWindowsService\obj\x86\Debug\APIWindowsService.exe
+E:\project\HBModule\HBService\APIWindowsService\obj\x86\Debug\APIWindowsService.pdb

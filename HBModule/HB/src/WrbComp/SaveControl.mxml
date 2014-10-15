@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- http://blog.flexexamples.com/2010/10/24/dispatching-custom-events-from-a-custom-component-in-flex-4/ -->
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		 xmlns:s="library://ns.adobe.com/flex/spark"
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:WrbComp="WrbComp.*"
+		 creationComplete="group1_creationCompleteHandler(event)" name="PanicButtonMXML"> 
+	<!--tabEnabled="false" tabFocusEnabled="false">-->
+	
+	
+	
+	<fx:Metadata>
+		//[Event("panic")]
+		[Event(name="doSearch")]
+		[Event(name="docSave")]
+		[Event(name="docDelete")]
+		[Event(name="docClear")]
+		[Event(name="docRefresh")]
+		//[Event(name="docPrint")]
+		//[Event(name="docPrtPrw")]
+		
+	</fx:Metadata>
+	<fx:Declarations>
+		<mx:WipeLeft id="myWL" duration="1000"/>
+		
+	</fx:Declarations>
+	<fx:Script>
+		 
+		<![CDATA[
+			import flash.events.KeyboardEvent;
+			import flash.system.System;
+			import flash.ui.Keyboard;
+			public var Blurs:String="";
+			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
+			import mx.events.FlexEvent;
+			import spark.effects.*;
+			import spark.filters.BlurFilter;               
+			import spark.effects.animation.*;
+			
+			private var blurFilter:BlurFilter;
+			private var blurAnim:AnimateFilter;
+			private var smpX:SimpleMotionPath;
+			private var smpY:SimpleMotionPath;
+			
+			
+			//			public static const xNEW:String = "docNew";
+			//			public static const SAVE:String = "docSave";
+			//			public static const DELETE:String = "docDelete";
+			//			public static const CLEAR:String = "docClear";
+			
+			protected function doSearch(evt:MouseEvent):void
+			{		
+				dispatchEvent(new Event("doSearch"));
+				blurFilter = new BlurFilter();
+				blurAnim = new AnimateFilter(C_Search, blurFilter);
+				
+				smpX = new SimpleMotionPath("blurX",10,30);
+				smpY = new SimpleMotionPath("blurY",10,30);
+				blurAnim.motionPaths = Vector.<MotionPath>([smpX,smpY]);
+				doBlurSample();
+				
+				
+			}
+			protected function doPrint(evt:MouseEvent):void {
+				dispatchEvent(new Event("docPrint"));
+				
+			}
+			
+			protected function doSave(evt:MouseEvent):void
+			{
+				dispatchEvent(new Event("docSave"));
+				blurFilter = new BlurFilter();
+				blurAnim = new AnimateFilter(C_Save, blurFilter);
+				
+				smpX = new SimpleMotionPath("blurX",10,30);
+				smpY = new SimpleMotionPath("blurY",10,30);
+				blurAnim.motionPaths = Vector.<MotionPath>([smpX,smpY]);
+				doBlurSample();
+			}
+			protected function doDelete(evt:MouseEvent):void {
+				dispatchEvent(new Event("docDelete"));
+				Blurs="C_Del";
+				blurFilter = new BlurFilter();
+				blurAnim = new AnimateFilter(C_Del, blurFilter);
+				
+				smpX = new SimpleMotionPath("blurX",10,30);
+				smpY = new SimpleMotionPath("blurY",10,30);
+				blurAnim.motionPaths = Vector.<MotionPath>([smpX,smpY]);
+				doBlurSample();
+			}
+			protected function doClear(evt:MouseEvent):void {								
+				dispatchEvent(new Event("docClear"));
+				Blurs="C_Clr";
+				blurFilter = new BlurFilter();
+				blurAnim = new AnimateFilter(C_Clr, blurFilter);
+				
+				smpX = new SimpleMotionPath("blurX",10,30);
+				smpY = new SimpleMotionPath("blurY",10,30);
+				blurAnim.motionPaths = Vector.<MotionPath>([smpX,smpY]);
+				doBlurSample();
+			}
+			
+			protected function doPrtPrw(evt:MouseEvent):void {
+				dispatchEvent(new Event("docPrtPrw"));
+			}
+			
+			public function KeyHandler(event:KeyboardEvent):void
+			{
+				
+				switch(event.keyCode)
+				{
+					case Keyboard.F2    : //Search
+						if(C_Search.width > 0){doSearch(event as MouseEvent)};
+						break;
+					case Keyboard.INSERT: //Save
+						if(C_Save.width > 0){doSave(event as MouseEvent)};
+						break;
+					case Keyboard.F9: //Delete
+						if(C_Del.width > 0){doDelete(event as MouseEvent)};
+						break;
+					case Keyboard.F8: //Clear
+						doClear(event as MouseEvent);
+						break;
+					/*case Keyboard.F3: //Print						
+					if(event.ctrlKey == true)
+					{
+					if(C_Print.width > 0){doPrint(event as MouseEvent)};
+					}
+					break;*/
+				}
+			}
+			public function setButtonRights(Rights:String,Search:Boolean):void
+			{
+				switch(Rights)
+				{
+					case "Search"    : //Search
+						if(Search==true) 
+						{
+							C_Search.visible=false;
+							C_Search.width=-6
+							
+						}
+						else
+						{
+							C_Search.width=100
+							C_Search.visible=true;
+						}
+						break;
+					case "Save": //Save
+						if(Search==true) 
+						{
+							C_Save.visible=false;
+							C_Save.width=-6
+							
+						}
+						else
+						{
+							C_Save.width=100
+							C_Save.visible=true;
+						}
+						break;
+					case "Delete": //Delete 
+						if(Search==true) 
+						{
+							C_Del.visible=false;
+							C_Del.width=-6
+								
+						}
+						else
+						{
+							C_Del.width=100
+							C_Del.visible=true;
+						}
+						break;
+					case "Clear": //Delete 
+						if(Search==true) 
+						{
+							C_Clr.visible=false;
+							C_Clr.width =-6;
+							
+						}
+						else
+						{
+							C_Clr.width = 100;
+							C_Clr.visible=true;
+						}
+						break;
+					case "Refresh": //Delete 
+						if(Search==true) 
+						{
+							RefImg1.width = 0;
+							RefImg2.width=0
+						}
+						else
+						{
+							RefImg1.width = 31;
+							RefImg2.width=31;
+							
+						}
+						break;
+					/*case Keyboard.F3: //Print						
+					if(event.ctrlKey == true)
+					{
+					if(C_Print.width > 0){doPrint(event as MouseEvent)};
+					}
+					break;*/
+				}
+				
+			}
+			public function setUserRights(Rights:String,Search:Boolean):void
+			{
+				// String Eg: 1011 (View Add Edit Delete)
+				
+				//View: Search and Print
+				if(Rights.substr(0,1) == "1")
+				{	
+					C_Search.width = 100;
+				}else
+				{	
+					C_Search.width = -7;
+				}
+				
+				//Add: Save (Add or Edit)
+				if(Rights.substr(1,1) == "1" +
+					"" || Rights.substr(2,1) == "1")
+				{	
+					C_Save.width = 100;			
+				}else
+				{	
+					C_Save.width = -7;
+				}
+				
+				if(Search == false)
+				{	
+					//C_Print.width = -7;
+					C_Del.width = -7;
+					
+					return;
+				}
+				
+				if(Rights.substr(0,1) == "1")
+				{	
+					/*if(Search == true)
+					{C_Print.width = 100;}else
+					{C_Print.width = -7;}*/
+				}else
+				{
+					//C_Print.width = -7;
+				}
+				
+				//Delete
+				if(Rights.substr(3,1) == "1")
+				{	
+					if(Search == true)
+					{C_Del.width = 100;}else
+					{C_Del.width = -7;}
+				}else
+				{
+					C_Del.width = -7;
+				}
+				if(Rights.substr(4,1) == "0")
+				{	
+					C_Del.width = -7;
+					C_Save.width =-7;
+				}
+				
+			}
+			
+			protected function group1_creationCompleteHandler(event:FlexEvent):void
+			{	
+				
+			}
+			private function doBlurSample():void {                
+				blurAnim.repeatCount = 1;
+				blurAnim.repeatBehavior = RepeatBehavior.REVERSE;
+				blurAnim.play();
+				
+			}
+			
+			
+			
+			
+			
+			
+			protected function RefImg1_rollOverHandler(event:MouseEvent):void
+			{
+				RefImg2.visible=true;
+				RefImg1.visible=false;
+			}
+			
+			protected function RefImg2_rollOutHandler(event:MouseEvent):void
+			{
+				RefImg2.visible=false;
+				RefImg1.visible=true;
+			}
+			
+			protected function docRefresh(event:MouseEvent):void
+			{
+				dispatchEvent(new Event("docRefresh"));
+				
+			}
+			
+		]]>
+	</fx:Script>
+	<!--<s:Button label="Print[Ctrl+F3]" click="doPrint(event);" id="C_Print"   x="72" y="0" width="100"  focusEnabled="false"/>-->
+	<s:HGroup verticalAlign="middle" horizontalAlign="center">
+	<s:Group height="25">
+		<s:Image x="32" y="-4" id="RefImg1" width="31" height="30" source="Assets/refresh---gray1.png"  depth="2" rollOver="RefImg1_rollOverHandler(event)" click="docRefresh(event)" toolTip="Refresh"/>
+		<s:Image x="32" y="-4" id="RefImg2" width="31" height="30" source="Assets/refresh---red 1.png" rollOut="RefImg2_rollOutHandler(event)" click="docRefresh(event)" depth="1" toolTip="Refresh"/>
+	</s:Group>
+	<s:HGroup verticalAlign="top" horizontalAlign="center" height="35" >	
+		
+		<WrbComp:Button_HB id="C_Search" x="72" y="0" width="100" _Label="Search [F2]" height="25"  
+						   click="doSearch(event);" focusEnabled="false">
+		</WrbComp:Button_HB >
+		<WrbComp:Button_HB id="C_Save" x="181" y="0" width="100" height="25" _Label="Save[Insert]" click="doSave(event);"  
+						   focusEnabled="false">
+		</WrbComp:Button_HB>
+		<WrbComp:Button_HB id="C_Del" x="291" y="0" width="100" height="25" _Label="Delete [F9]" click="doDelete(event);"  
+						   focusEnabled="false">
+		</WrbComp:Button_HB>
+		<WrbComp:Button_HB id="C_Clr" x="401" y="0" width="100" height="25" _Label="Clear [F8]" click="doClear(event);"  
+						   focusEnabled="false">
+		</WrbComp:Button_HB>
+	</s:HGroup>	
+	</s:HGroup>
+</s:Group>

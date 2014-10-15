@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:WrbComp="WrbComp.*"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   width="100%" height="100%" creationComplete="PageLoad()">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Style source="..\\Common\\ApplicationCSS.css" />
+	<fx:Script source="..\\Common\\CommonScript.as" />
+	<fx:Script source="..\\Common\\Functions.as"/>
+	<fx:Script>
+		<![CDATA[
+			import WrbComp.frmsearchwindow;			
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;			
+			import spark.events.IndexChangeEvent;
+			public static var GlobalXml:String="";								
+			public static var Global_AC:ArrayCollection=new ArrayCollection();
+			public var StateId:int=0,Id:int=0,LStateId:int=0,LocalityId:int=0,CityId:int=0,LCityId:int=0;
+			public var Mode:String="";
+			private var SearchPopUp:frmsearchwindow = new frmsearchwindow();
+			private var SearchPopUp1:frmsearchwindow = new frmsearchwindow();
+			protected function PageLoad():void
+			{
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>5</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				GlobalXml = "";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";
+				FnHelp();
+				FnHelp1();	
+			}
+			
+			public function FnHelp():void
+			{
+				useWeb("City","STATELOAD_CUSTOM",[GlobalXml,"STATELOAD","",0]);
+			}
+			
+			public function FnHelp1():void
+			{
+				useWeb("Citylocality","STATELOAD1_CUSTOM",[GlobalXml,"STATELOAD","","",0,0]);	
+			}
+			
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "STATELOAD_CUSTOM")
+				{
+					Ddl_State.dataProvider=null;Ddl_State.prompt="Please Select State";StateId=0;
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Ddl_State.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}				
+    			}
+				if (Ds_Objects.currentTarget.description.toString() == "STATELOAD1_CUSTOM")
+				{
+					Ddl_State0.dataProvider=null;Ddl_State0.prompt="Please Select State";
+					LStateId=0;LCityId=0;
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Ddl_State0.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}					
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "CITYLOAD_CUSTOM")
+				{
+					Ddl_City.dataProvider=null;Ddl_City.prompt="Please Select City";
+					LCityId=0;LocalityId=0;Txt_Locality.text="";
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Ddl_City.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection	
+					}				
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "CITYLOADED_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Ddl_City.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection	
+					}				
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Search_CUSTOM")
+				{
+					if(Mode=="City")
+					{
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)						
+						{
+							StateId=Ds_Objects.result.Tables.Table.Rows[0].StateId;
+							Id=Ds_Objects.result.Tables.Table.Rows[0].Id;
+							Txt_City.text=Ds_Objects.result.Tables.Table.Rows[0].CityName;
+							Txt_CityCode.text=Ds_Objects.result.Tables.Table.Rows[0].CityCode;
+							Ddl_State.prompt=Ds_Objects.result.Tables.Table.Rows[0].StateName;
+						}
+					}
+					if(Mode=="Citylocality")
+					{
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{
+							LStateId=Ds_Objects.result.Tables.Table.Rows[0].StateId;
+							LCityId=Ds_Objects.result.Tables.Table.Rows[0].CityId;
+						    LocalityId=Ds_Objects.result.Tables.Table.Rows[0].Id;
+						    Txt_Locality.text=Ds_Objects.result.Tables.Table.Rows[0].Locality;
+						    Ddl_City.prompt=Ds_Objects.result.Tables.Table.Rows[0].CityName;
+						    Ddl_State0.prompt=Ds_Objects.result.Tables.Table.Rows[0].StateName;
+							useWeb("Citylocality","CITYLOADED_CUSTOM",[GlobalXml,"CITYLOAD","","",LStateId,0]);
+						}
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				{
+					if(Mode=="City")
+					{
+						if(Id==0)
+						{
+							alignAlert(Alert.show("City Added Successfully.","Message !",
+								Alert.OK, null,	FnOkCal, iconTickLarge, Alert.OK),10,"");
+						}
+						else
+						{
+							alignAlert(Alert.show("City Updated Successfully.","Message !",
+								Alert.OK, null,	FnOkCal, iconTickLarge, Alert.OK),10,"");
+						}
+						SCtrl_City_Clear();
+					}
+					if(Mode=="Citylocality")
+					{
+						if(LocalityId == 0)
+						{
+							alignAlert(Alert.show("Locality Added Successfully.","Message !",
+								Alert.OK, null,	FnOkCal1, iconTickLarge, Alert.OK),10,"");
+						}
+						else
+						{
+							alignAlert(Alert.show("Locality Updated Successfully.","Message !",
+								Alert.OK, null,	FnOkCal1,iconTickLarge, Alert.OK),10,"");
+						}
+						SCtrl_Citylocality_Clear();
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Delete_CUSTOM")
+				{
+					if(Mode=="City")
+					{
+						alignAlert(Alert.show("City Deleted Successfully.","Message !",
+							Alert.OK,null,null,iconTickLarge, Alert.OK),10,"");
+						SCtrl_City_Clear();
+					}
+					if(Mode=="Citylocality")
+					{
+						alignAlert(Alert.show("Locality Deleted Successfully.","Message !",
+							Alert.OK,null,null,iconTickLarge, Alert.OK),10,"");
+						SCtrl_Citylocality_Clear();
+					}
+				}
+			}
+			
+			public function FnOkCal(event:CloseEvent):void
+			{
+				if(event.detail==Alert.OK){Ddl_State.setFocus();}
+			}
+			
+			public function FnOkCal1(event:CloseEvent):void
+			{
+				if(event.detail==Alert.OK){Ddl_State0.setFocus();}
+			}
+			
+			private function ChangeState():void
+			{
+				StateId=Ddl_State.selectedItem.StateId;Id=0;				
+			}
+			
+			private function ChangeState1():void
+			{
+				LStateId=Ddl_State0.selectedItem.StateId;
+				useWeb("Citylocality","CITYLOAD_CUSTOM",[GlobalXml,"CITYLOAD","","",LStateId,0]);
+			}
+			
+			private function ChangeCity():void
+			{
+				LCityId=Ddl_City.selectedItem.Id;LocalityId=0;
+			}
+			
+			protected function SCtrl_Citylocality_Save():void
+			{
+				var ErrStr:String="";var Flag:Boolean=true;
+				if(LStateId==0)
+				{
+					if(Flag==true)
+					{
+						Ddl_State0.setFocus();
+						Flag=false;
+					}
+					ErrStr=ErrStr+"*  State is Required. \n";
+				}
+				if(LCityId==0)
+				{
+					if(Flag==true)
+					{
+						Ddl_City.setFocus();
+						Flag=false;
+					}
+					ErrStr=ErrStr+"*  City is Required. \n";
+				}
+				if(Txt_Locality.text=="")
+				{
+					if(Flag==true)
+					{
+						Txt_Locality.setFocus();Flag=false;
+					}
+					ErrStr=ErrStr+"*  Locality is Required. \n";
+				}
+				if(ErrStr != "")
+				{
+					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10,"");
+					return;
+				}
+				var Ac:ArrayCollection=new ArrayCollection
+					([{CityId:LCityId,Locality:Txt_Locality.text,Id:LocalityId}]);
+				var HdrXml:String = ObjToXmlStr_Comm(Ac,"HdrXml");
+				Mode="Citylocality";
+				useWeb("Citylocality","Save_CUSTOM",[GlobalXml,HdrXml]);
+			}
+			
+			protected function SCtrl_Citylocality_Clear():void
+			{
+				Ddl_State0.dataProvider=null;Ddl_State0.prompt="Please Select State";LStateId=0;
+				Ddl_City.dataProvider=null;Ddl_City.prompt="Please Select City";LCityId=0;
+				Txt_Locality.text="";LocalityId=0;FnHelp1();
+			}
+			
+			protected function SCtrl_Citylocality_Search():void
+			{
+				PopUpManager.addPopUp( SearchPopUp , this, true);
+				SearchPopUp.Prc_name="Citylocality";
+				var SearchParam:Array =new Array();
+				SearchPopUp.HlpIndex="SEARCH";
+				SearchParam[0]=GlobalXml;
+				SearchParam[1]=LStateId;
+				SearchParam[2]=LCityId;
+				SearchParam[3]=0;
+				SearchPopUp.Prc_Param=SearchParam
+				SearchPopUp.HlpSrchGlobal=""
+				SearchPopUp.dataPanel.focusEnabled=true
+				SearchPopUp.Pageint()					
+				SearchPopUp.addEventListener("PopupEnter",funpopupEnter);
+				SearchPopUp.addEventListener("PopupClose",funpopupClose);
+				PopUpManager.centerPopUp(SearchPopUp);
+			}
+			
+			private function funpopupClose(event:Event):void
+			{
+				
+			}
+			
+			private function funpopupEnter(event:Event):void
+			{				
+				SearchDtls(SearchPopUp.SelectRow.Id);			
+			}
+			
+			private function SearchDtls(Id:int):void
+			{
+				Mode="Citylocality";
+				var Load:Array =new Array();
+				Load[0]=GlobalXml; Load[1]=LStateId; Load[2]=LCityId; Load[3]=Id;  				
+				useWeb("Citylocality","Search_CUSTOM",Load);
+			}
+			
+			private function SCtrl_Citylocality_Delete():void
+			{
+				if(LocalityId !=0)
+				{
+					alignAlert(Alert.show("Do you want to Delete this item ?", "Warning !",
+						Alert.YES | Alert.NO,null,removeItem, iconWarning, Alert.NO),10,"");
+				}
+				else
+				{
+					alignAlert(Alert.show("This is an Invalid Process.","Alert Message !",
+						Alert.OK, null,	FnOkCal1, iconWarning, Alert.OK),10,"");
+				}
+			}
+			
+			private function removeItem(event:CloseEvent):void 
+			{	
+				if (event.detail==Alert.YES) 
+				{
+					Mode="Citylocality";
+					var Load:Array = new Array();
+					Load[0]=GlobalXml; Load[1]= LocalityId;
+					useWeb("Citylocality","Delete_CUSTOM",Load);
+				} 
+			}
+			
+			protected function SCtrl_City_Save():void
+			{
+				var ErrStr:String="";var Flag:Boolean=true;				
+				if(StateId == 0)
+				{
+					if(Flag==true)
+					{
+						Ddl_State.setFocus();
+						Flag=false;
+					}
+					ErrStr=ErrStr+"*  State is Required. \n";
+				}
+				if(Txt_City.text=="")
+				{
+					if(Flag==true)
+					{
+						Txt_City.setFocus();
+						Flag=false;
+					}
+					ErrStr=ErrStr+"*  City is Required. \n";
+				}
+				if(ErrStr != "")
+				{
+					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10,"");
+					return;
+				}
+				var Ac:ArrayCollection=new ArrayCollection
+					([{StateId:StateId,City:Txt_City.text,CityCode:Txt_CityCode.text,Id:Id}]);
+				var HdrXml:String = ObjToXmlStr_Comm(Ac,"HdrXml");
+				Mode="City";
+				useWeb("City","Save_CUSTOM",[GlobalXml,HdrXml]);
+				
+			}
+			
+			protected function SCtrl_City_Clear():void
+			{
+				Ddl_State.dataProvider=null;Ddl_State.prompt="Please Select State";StateId=0;
+				Txt_City.text="";Txt_CityCode.text="";Id=0;FnHelp();
+			}
+			
+			protected function SCtrl_City_Search():void
+			{
+				PopUpManager.addPopUp( SearchPopUp1 , this, true);
+				SearchPopUp1.Prc_name="City";
+				var SearchParam:Array =new Array();
+				SearchPopUp1.HlpIndex="SEARCH";
+				SearchParam[0]=GlobalXml;
+				SearchParam[1]=StateId;	
+				SearchParam[2]=0;	
+				SearchPopUp1.Prc_Param=SearchParam;
+				SearchPopUp1.HlpSrchGlobal="";
+				SearchPopUp1.dataPanel.focusEnabled=true;
+				SearchPopUp1.Pageint();
+				SearchPopUp1.addEventListener("PopupEnter",funpopup1Enter1);
+				SearchPopUp1.addEventListener("PopupClose",funpopup1Close1);
+				PopUpManager.centerPopUp(SearchPopUp1);
+			}
+			
+			private function funpopup1Close1(event:Event):void
+			{
+				
+			}
+			
+			private function funpopup1Enter1(event:Event):void
+			{				
+				SearchDtls1(SearchPopUp1.SelectRow.Id);			
+			}
+			
+			private function SearchDtls1(Id:int):void
+			{
+				Mode="City";
+				var Load:Array =new Array();
+				Load[0]=GlobalXml;Load[1]=StateId; Load[2]=Id;  				
+				useWeb("City","Search_CUSTOM",Load);
+			}
+			
+			private  function SCtrl_City_Delete():void
+			{
+				if(Id !=0)
+				{
+					alignAlert(Alert.show("Do you want to Delete this item ?", "Warning !",
+						Alert.YES | Alert.NO,null,removeItem1, iconWarning, Alert.NO),10,"");
+				}
+				else
+				{
+					alignAlert(Alert.show("This is an Invalid Process.","Alert Message !",
+						Alert.OK, null,	FnOkCal, iconWarning, Alert.OK),10,"");
+				}
+			}
+			
+			private function removeItem1(event:CloseEvent):void 
+			{
+				if (event.detail==Alert.YES) 
+				{
+					Mode="City";
+					var Load:Array = new Array();
+					Load[0]=GlobalXml; Load[1]= Id;
+					useWeb("City","Delete_CUSTOM",Load);
+				}
+			}
+		
+		]]>
+	</fx:Script>
+	<s:VGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+		<s:BorderContainer x="241" y="70" width="507" height="200">
+			<s:Label x="111" y="32.5" text="State"/>
+			<s:Label x="146" y="32.5" text="*" color="RED"/>
+			<s:Label x="139" y="73.5" text="*" color="RED"/>
+			<s:Label x="111" y="73.5" text="City"/>
+			<s:DropDownList id="Ddl_State" x="182" y="27" width="200" height="23"
+							change="ChangeState()" prompt="Please Select State" tabIndex="1"/>
+			
+			<WrbComp:SaveControl x="-7" y="143" id="SCtrl_City" 
+								 docSave="SCtrl_City_Save()"
+								 docClear="SCtrl_City_Clear()"
+								 docDelete="SCtrl_City_Delete()"
+								 doSearch="SCtrl_City_Search()"
+								 docRefresh="SCtrl_City_Clear()"/>
+			<s:TextInput id="Txt_City" x="182" y="68" width="200" height="23" tabIndex="2" prompt="City"/>
+			<s:Label x="111" y="111.5" text="City Code"/>
+			<s:TextInput id="Txt_CityCode" x="182" y="106" width="200" height="23" tabIndex="2" prompt="City Code" maxChars="10"/>
+		</s:BorderContainer>
+		<s:BorderContainer y="281" width="507" height="214">
+			<s:Label x="111" y="69.5" text="City"/>
+			<s:Label x="111" y="111.5" text="Locality"/>
+			<s:DropDownList id="Ddl_City" x="182" y="64" width="200" height="23" change="ChangeCity()"
+							prompt="Please Select City" tabIndex="4"/>
+			<WrbComp:SaveControl x="-7" y="157" id="SCtrl_Citylocality" 
+								 docSave="SCtrl_Citylocality_Save()"
+								 docDelete="SCtrl_Citylocality_Delete()"
+								 docClear="SCtrl_Citylocality_Clear()"
+								 doSearch="SCtrl_Citylocality_Search()"
+								 docRefresh="SCtrl_Citylocality_Clear()"/>
+			<s:Label x="111" y="27.5" text="State"/>
+			<s:Label x="146" y="27.5" text="*" color="Red"/>
+			<s:Label x="139" y="69.5" text="*" color="Red"/>
+			<s:Label x="160" y="111.5" text="*" color="Red"/>
+			<s:DropDownList id="Ddl_State0" x="182" y="22" width="200" height="23"
+							change="ChangeState1()" prompt="Please Select State" tabIndex="3"/>
+			<s:TextInput id="Txt_Locality" x="182" y="106" width="200" height="23" tabIndex="5" prompt="Locality"/>
+		</s:BorderContainer>
+	</s:VGroup>
+</s:Application>

@@ -1,0 +1,1778 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" 
+			   xmlns:Controls="fx.com.adobe.Controls.*"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"   xmlns:WrbComp="WrbComp.*"
+			   width="100%" height="100%"   creationComplete="PageLoad()"
+			   pageTitle="Reconcile Payments">
+	<fx:Declarations> 
+		<mx:NumberFormatter id="NF_Two" precision="2" rounding="nearest"/>
+	</fx:Declarations>
+	
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
+	<fx:Script>
+		<![CDATA[
+			import WrbComp.frmsearchwindow;
+			
+			import WrbHelpComp.HlpGridHdr;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.CalendarLayoutChangeEvent;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.events.IndexChangedEvent;
+			import mx.graphics.codec.PNGEncoder;
+			
+			import spark.events.IndexChangeEvent;
+			import spark.events.TextOperationEvent;
+			private var SearchPopUp:frmsearchwindow = new frmsearchwindow();
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "",TypeServiceId:int=0,ErrStr:String="";
+			public var Id:int=0,ErrMsg:String="",PricingModelId:int=0,PricingModel:String="";
+			public var AddMode:Boolean=true,Flag:Boolean=true;
+			public var 	PropertyName:String="",PropertyId:int=0,ClientName:String="",ClientId:int=0,Mode1:String="",Type:String="";
+			private var firstTime:Boolean = true;
+			public var 	FromDate:String="",ToDate:String="",TransactionId:String="",ChequeNo:String="";
+			
+			protected function PageLoad():void
+			{
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt>1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";
+			 	btn_BTC.Button_B_mouseOverHandler();
+				btn_Cash.Button_OutHandler();;
+				btn_Cheque.Button_OutHandler();
+				btn_Contract.Button_OutHandler();
+				btn_CreditCard.Button_OutHandler();
+				btn_NEFT.Button_OutHandler();
+				Type="BTC";
+				useWeb("Reconcile","PAGELOAD_CUSTOM",[GlobalXml,"PAGELOAD",'','',0,'',0,0,'','']);
+			 	// Btn_Grid_BTC.visible= true;
+			   //  Grd_Bills_BTC.visible= true; 
+				btn_BTC_clickHandler();
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				if (Ds_Objects.currentTarget.description.toString() =="PAGELOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						hlp_Client.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length >0)
+					{
+						hlp_Property.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+				} 
+				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				{
+					if (AddMode == true)
+					{
+						alignAlert(Alert.show("Reconcile Saved Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+					}
+					else
+					{
+						alignAlert(Alert.show("Reconcile Updated Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+					}
+					FnClear();
+					TotAmt=0;
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "CASHSEARCH_CUSTOM")
+				{
+					if(Mode1=="Bank")
+					{
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{
+						Grd_Bank_General.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						Grd_Bank_BTC.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						}						
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Bill_CUSTOM")
+				{
+					if(Mode1="Bill")
+					{
+						if(Type=="BTC")
+						{
+							if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+							{
+							//	Grd_Bills_BTC.visible=true; 
+								Grd_Bills_General.visible=false; 
+								Grd_Bills_BTC.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+							}
+						}
+						if(Type=="Cash")
+						{
+							if(Ds_Objects.result.Tables.Table.Rows.length > 0)
+							{
+						//		Grd_Bills_BTC.visible=false; 
+								Grd_Bills_General.visible=true; 
+								Grd_Bills_General.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+							}
+						}
+						if(Type=="Cheque")
+						{
+							if(Ds_Objects.result.Tables.Table.Rows.length > 0)
+							{
+						//		Grd_Bills_BTC.visible=false; 
+								Grd_Bills_General.visible=true; 
+								Grd_Bills_General.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+							}
+						}
+						if(Type=="Contract")
+						{
+							if(Ds_Objects.result.Tables.Table.Rows.length > 0)
+							{
+							//	Grd_Bills_BTC.visible=false; 
+								Grd_Bills_General.visible=true; 
+								Grd_Bills_General.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+							}	
+						}
+						if(Type=="CreditCard")
+						{
+							if(Ds_Objects.result.Tables.Table.Rows.length > 0)
+							{
+						//		Grd_Bills_BTC.visible=false; 
+								Grd_Bills_General.visible=true; 
+								Grd_Bills_General.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+							}
+						}
+						if(Type=="NEFT")
+						{
+							if(Ds_Objects.result.Tables.Table.Rows.length > 0)
+							{
+							//	Grd_Bills_BTC.visible=false; 
+								Grd_Bills_General.visible=true; 
+								Grd_Bills_General.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+							}
+						}
+					}
+				}
+			}
+			protected function FnSearchBank():void
+			{
+				if(dt_BankFrom.text !='')
+				{
+					if(dt_BankTo.text =='')
+					{
+						alignAlert(Alert.show("Select Valid From and ToDate","Alert Message !",
+							Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+						return;
+					}
+				}
+				
+				if(dt_BankTo.text !='')
+				{
+					if(dt_BankFrom.text =='')
+					{
+						alignAlert(Alert.show("Select Valid From and ToDate","Alert Message !",
+							Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+						return;
+					}
+				}
+				
+				Mode1="Bank";
+				{
+					FromDate=dt_BankFrom.text;
+					ToDate=dt_BankTo.text;
+					//TransactionId=txtTransactionID.text;
+					ChequeNo=txt_ChkNo.text;
+					useWeb("Reconcile","CASHSEARCH_CUSTOM",[GlobalXml,"CASHSEARCH",FromDate,ToDate,'',ChequeNo,0,0,'',Mode1]);
+				}
+			}
+			protected function FnSearchBill():void
+			{
+				if(dt_Billfrom.text !='')
+				{
+					if(dt_BillTo.text =='')
+					{
+						alignAlert(Alert.show("Select Valid From and ToDate","Alert Message !",
+							Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+						return;
+					}
+				}
+				if(dt_BillTo.text !='')
+				{
+					if(dt_Billfrom.text =='')
+					{
+						alignAlert(Alert.show("Select Valid From and ToDate","Alert Message !",
+							Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+						return;
+					}
+				}
+				Mode1="Bill";
+				if(Type =="BTC")
+				{
+					FromDate=dt_Billfrom.text;
+					ToDate=dt_BillTo.text;
+					ChequeNo=txt_Invoice.text;
+					PropertyId=hlp_Property.Select_Row.PropertyId;
+					ClientId=hlp_Client.Select_Row.ClientId
+					useWeb("Reconcile","Bill_CUSTOM",[GlobalXml,"CASHSEARCH",FromDate,ToDate,'',ChequeNo,PropertyId,ClientId,Type,Mode1]);
+				}
+				if(Type =="Cash")
+				{
+					FromDate=dt_Billfrom.text;
+					ToDate=dt_BillTo.text;
+					//TransactionId=txtTransactionID.text;
+					ChequeNo=txt_Invoice.text;
+					PropertyId=hlp_Property.Select_Row.PropertyId;
+					ClientId=hlp_Client.Select_Row.ClientId
+					useWeb("Reconcile","Bill_CUSTOM",[GlobalXml,"CASHSEARCH",FromDate,ToDate,'',ChequeNo,PropertyId,ClientId,Type,Mode1]);
+				}
+				if(Type =="Cheque") 
+				{
+					FromDate=dt_Billfrom.text;
+					ToDate=dt_BillTo.text; 
+					ChequeNo=txt_Invoice.text;
+					PropertyId=hlp_Property.Select_Row.PropertyId;
+					ClientId=hlp_Client.Select_Row.ClientId
+					useWeb("Reconcile","Bill_CUSTOM",[GlobalXml,"CASHSEARCH",FromDate,ToDate,'',ChequeNo,PropertyId,ClientId,Type,Mode1]);
+				}
+				if(Type=="Contract")
+				{
+					FromDate=dt_Billfrom.text;
+					ToDate=dt_BillTo.text; 
+					ChequeNo=txt_Invoice.text;
+					PropertyId=hlp_Property.Select_Row.PropertyId;
+					ClientId=hlp_Client.Select_Row.ClientId
+					useWeb("Reconcile","Bill_CUSTOM",[GlobalXml,"CASHSEARCH",FromDate,ToDate,'',ChequeNo,PropertyId,ClientId,Type,Mode1]);
+				}
+				if(Type =="CreditCard")
+				{
+					FromDate=dt_Billfrom.text;
+					ToDate=dt_BillTo.text; 
+					ChequeNo=txt_Invoice.text;
+					PropertyId=hlp_Property.Select_Row.PropertyId;
+					ClientId=hlp_Client.Select_Row.ClientId
+					useWeb("Reconcile","Bill_CUSTOM",[GlobalXml,"CASHSEARCH",FromDate,ToDate,'',ChequeNo,PropertyId,ClientId,Type,Mode1]);
+				}
+				if(Type =="NEFT")
+				{
+					FromDate=dt_Billfrom.text;
+					ToDate=dt_BillTo.text; 
+					ChequeNo=txt_Invoice.text;
+					PropertyId=hlp_Property.Select_Row.PropertyId;
+					ClientId=hlp_Client.Select_Row.ClientId
+					useWeb("Reconcile","Bill_CUSTOM",[GlobalXml,"CASHSEARCH",FromDate,ToDate,0,ChequeNo,PropertyId,ClientId,Type,Mode1]);
+				}					 
+			}
+			protected function FnClear():void
+			{
+				hlp_Client.text="";
+				ClientId=0;
+				hlp_Property.text="";
+				PropertyId=0;
+				txt_Invoice.text="";
+				dt_Billfrom.text= "";
+				dt_BillTo.text="";
+				dt_BankFrom.text="";
+				dt_BankTo.text="";
+				FnClose_Tariff();
+				Grd_Grid1.dataProvider= null;
+				Grd_Bank_General.dataProvider= null;
+				Grd_Bills_General.dataProvider= null; 
+				TotAmt=0;
+				Rbtn_Deposited.selected= false;
+				Rbtn_NonDeposited.selected=false;
+				Rbtn_Dedicated.selected=false;
+				Rbtn_Managed.selected=false;
+				txt_ChkNo.text="";
+				txtTransactionID.text="";
+				txtSOC.text="";
+				drp_CardType.selectedIndex=-1;
+				Grd_Bank_BTC.dataProvider= null;
+				Grd_Bills_BTC.dataProvider= null;
+				txt_TotalBANK.text="";txt_Total.text="";
+				TotAmts=0;	TotAmtss=0;
+			}
+			protected function btn_BTC_clickHandler():void
+			{
+				Type = "BTC";
+				btn_BTC.Button_B_mouseOverHandler();
+				btn_Cash.Button_OutHandler();
+				btn_Cheque.Button_OutHandler();
+				btn_Contract.Button_OutHandler();
+				btn_CreditCard.Button_OutHandler();
+				btn_NEFT.Button_OutHandler();
+				lblchkno.visible=true;txt_ChkNo.visible=true;
+				lblchkno.text="Cheque/NEFT No";txt_ChkNo.prompt="Cheque/NEFT No";
+				lblClient.visible=true;hlp_Client.visible=true
+				lblSOC.visible=false;txtSOC.visible=false;
+				lblBilldate.y=81;dt_Billfrom.y=81;dt_BillTo.y=81;
+				lblInvoiceNo.y=119;txt_Invoice.y=119;
+				brd_Rbtn_Deposite.y=154;
+				btn_BillSearch.y=185;btn_BillReset.y=185;
+				chk_AdvPayment.x=257;
+				drp_CardType.visible=false;
+				lblCardtype.visible=false;
+				brd_Rbtn_Deposite.visible=true;
+				brd_Rbtn_Contract.visible=false; 
+				Grd_Bank_BTC.visible= true;
+				Grd_Bills_BTC.visible= true;
+				Grd_Bank_General.visible= false;
+				Grd_Bills_General.visible= false; 
+				Btn_Grid_BTC.visible=true; 
+				Btn_Grid_General.visible=false;
+				Grd_Bank_BTC.dataProvider= null;
+				Grd_Bank_General.dataProvider= null;
+				Grd_Bills_BTC.dataProvider= null;
+			 	Grd_Bills_General.dataProvider= null;
+				txt_TotalBANK.text="";txt_Total.text="";
+				TotAmts=0;	TotAmtss=0;
+			}
+			protected function btn_Cash_clickHandler():void
+			{
+				Type ="Cash"
+				btn_BTC.Button_OutHandler();
+				btn_Cash.Button_B_mouseOverHandler();
+				btn_Cheque.Button_OutHandler();
+				btn_Contract.Button_OutHandler();
+				btn_CreditCard.Button_OutHandler();
+				btn_NEFT.Button_OutHandler();
+				lblchkno.visible=false;
+				txt_ChkNo.visible=false;
+				lblClient.visible=false;
+				hlp_Client.visible=false;
+				lblSOC.visible=false;txtSOC.visible=false;
+				lblBilldate.y=60;dt_Billfrom.y=55;dt_BillTo.y=55;
+				lblInvoiceNo.y=88;txt_Invoice.y=88;
+				brd_Rbtn_Deposite.y=119;
+				btn_BillSearch.y=154;btn_BillReset.y=154;
+				chk_AdvPayment.x=125;
+				drp_CardType.visible=false;
+				lblCardtype.visible=false;
+				brd_Rbtn_Deposite.visible=true;
+				brd_Rbtn_Contract.visible=false;  
+				Grd_Bank_BTC.visible= false;
+				Grd_Bills_BTC.visible= false;
+				Grd_Bank_General.visible= true;
+				Grd_Bills_General.visible= true;
+				Btn_Grid_BTC.visible=false; 
+				Btn_Grid_General.visible=true;
+				Grd_Bank_BTC.dataProvider= null;
+				Grd_Bank_General.dataProvider= null;
+				Grd_Bills_BTC.dataProvider= null;
+				Grd_Bills_General.dataProvider= null;
+				Rbtn_Deposited.selected= false;
+				Rbtn_NonDeposited.selected=false;
+				txt_TotalBANK.text="";txt_Total.text="";
+				TotAmts=0;	TotAmtss=0;
+				}
+			protected function btn_Cheque_clickHandler():void
+			{
+				Type ="Cheque";
+				btn_BTC.Button_OutHandler();
+				btn_Cash.Button_OutHandler();
+				btn_Cheque.Button_B_mouseOverHandler();
+				btn_Contract.Button_OutHandler();
+				btn_CreditCard.Button_OutHandler();
+				btn_NEFT.Button_OutHandler();
+				lblchkno.visible=true;
+				txt_ChkNo.visible=true;
+				lblClient.visible=true;
+				hlp_Client.visible=true;
+				lblSOC.visible=false;txtSOC.visible=false;
+				lblchkno.text="Cheque No";
+				txt_ChkNo.prompt="Cheque No";
+				lblBilldate.y=88;dt_Billfrom.y=88;dt_BillTo.y=88;
+				lblInvoiceNo.y=119;txt_Invoice.y=119;
+				brd_Rbtn_Deposite.y=154;
+				btn_BillSearch.y=185;btn_BillReset.y=185;
+				chk_AdvPayment.x=257;
+				drp_CardType.visible=false;
+				lblCardtype.visible=false;
+				brd_Rbtn_Contract.visible=false;
+				brd_Rbtn_Deposite.visible=true; 
+				Grd_Bank_General.visible= true;
+				Grd_Bills_General.visible= true;
+				Grd_Bank_BTC.visible= false;
+				Grd_Bills_BTC.visible= false; 
+				Btn_Grid_BTC.visible=false; 
+				Btn_Grid_General.visible=true;
+				Grd_Bank_BTC.dataProvider= null;
+				Grd_Bank_General.dataProvider= null;
+				Grd_Bills_BTC.dataProvider= null;
+				Grd_Bills_General.dataProvider= null;
+				Rbtn_Deposited.selected= false;
+				Rbtn_NonDeposited.selected=false;
+				txt_TotalBANK.text="";txt_Total.text="";
+				TotAmts=0;	TotAmtss=0;
+			}
+			protected function btn_Contract_clickHandler():void
+			{
+				Type = "Contract";
+				btn_BTC.Button_OutHandler();
+				btn_Cash.Button_OutHandler();
+				btn_Cheque.Button_OutHandler();
+				btn_Contract.Button_B_mouseOverHandler();
+				btn_CreditCard.Button_OutHandler();
+				btn_NEFT.Button_OutHandler();
+				lblchkno.text="Cheque No";
+				txt_ChkNo.prompt="Cheque No";
+				lblSOC.visible=false;txtSOC.visible=false;
+				brd_Rbtn_Contract.visible=true;
+				brd_Rbtn_Deposite.visible=false;
+				lblClient.visible=true;
+				hlp_Client.visible=true;
+				lblBilldate.y=88;dt_Billfrom.y=88;dt_BillTo.y=88;
+				lblInvoiceNo.y=119;txt_Invoice.y=119;
+				brd_Rbtn_Deposite.y=200;
+				btn_BillSearch.y=185;btn_BillReset.y=185;
+				chk_AdvPayment.x=257;
+				drp_CardType.visible=false;
+				lblCardtype.visible=false; 
+				Grd_Bank_General.visible= true;
+				Grd_Bills_General.visible= true;
+				Grd_Bank_BTC.visible= false;
+				Grd_Bills_BTC.visible= false; 
+				Btn_Grid_BTC.visible=false; 
+				Btn_Grid_General.visible=true;
+				Grd_Bank_BTC.dataProvider= null;
+			    Grd_Bank_General.dataProvider= null;
+				Grd_Bills_BTC.dataProvider= null;
+				Grd_Bills_General.dataProvider= null;
+				Rbtn_Deposited.selected= false;
+				Rbtn_NonDeposited.selected=false;
+				Rbtn_Dedicated.selected=false;
+				Rbtn_Managed.selected=false;
+				txt_TotalBANK.text="";txt_Total.text="";
+				TotAmts=0;	TotAmtss=0;
+					
+			}
+			protected function btn_CreditCard_clickHandler():void
+			{
+				Type="CreditCard";
+				btn_BTC.Button_OutHandler();
+				btn_Cash.Button_OutHandler();
+				btn_Cheque.Button_OutHandler();
+				btn_Contract.Button_OutHandler();
+				btn_CreditCard.Button_B_mouseOverHandler();
+				btn_NEFT.Button_OutHandler();
+				lblchkno.text="Merchant ID";
+				txt_ChkNo.prompt="Merchant ID";
+				lblchkno.visible=true;
+				txt_ChkNo.visible=true;
+				lblClient.visible=false;
+				hlp_Client.visible=false;
+				drp_CardType.visible=true;
+				lblCardtype.visible=true;
+				lblBilldate.y=60;dt_Billfrom.y=55;dt_BillTo.y=55;
+				lblInvoiceNo.y=88;txt_Invoice.y=88;
+				lblSOC.visible=true;txtSOC.visible=true;
+				brd_Rbtn_Deposite.y=119;
+				btn_BillSearch.y=185;btn_BillReset.y=185;
+				chk_AdvPayment.x=125;
+				brd_Rbtn_Deposite.visible=false;
+				brd_Rbtn_Contract.visible=false;
+				chk_AdvPayment.x=257; 
+				Grd_Bank_General.visible= true;
+				Grd_Bills_General.visible= true;
+				Grd_Bank_BTC.visible= false;
+				Grd_Bills_BTC.visible= false; 
+				Btn_Grid_BTC.visible=false; 
+				Btn_Grid_General.visible=true;
+				Grd_Bank_BTC.dataProvider= null;
+			 	Grd_Bank_General.dataProvider= null;
+				Grd_Bills_BTC.dataProvider= null;
+				Grd_Bills_General.dataProvider= null;
+				Rbtn_Deposited.selected= false;
+				Rbtn_NonDeposited.selected=false;
+				txt_TotalBANK.text="";txt_Total.text="";
+				TotAmts=0;	TotAmtss=0;
+			}
+			protected function btn_NEFT_clickHandler():void
+			{
+				Type ="NEFT";
+				btn_BTC.Button_OutHandler();
+				btn_Cash.Button_OutHandler();
+				btn_Cheque.Button_OutHandler();
+				btn_Contract.Button_OutHandler();
+				btn_CreditCard.Button_OutHandler();
+				btn_NEFT.Button_B_mouseOverHandler(); 
+				lblchkno.visible=true;
+				txt_ChkNo.visible=true;
+				lblchkno.text="Cheque/NEFT No";
+				txt_ChkNo.prompt="Cheque/NEFT No";
+				lblClient.visible=true;
+				hlp_Client.visible=true;
+				lblBilldate.y=88;dt_Billfrom.y=88;dt_BillTo.y=88;
+				lblInvoiceNo.y=119;txt_Invoice.y=119;
+				lblSOC.visible=false;txtSOC.visible=false;
+				brd_Rbtn_Deposite.y=154;
+				btn_BillSearch.y=185;btn_BillReset.y=185;
+				chk_AdvPayment.x=257;
+				drp_CardType.visible=false;
+				lblCardtype.visible=false;
+				brd_Rbtn_Deposite.visible=true;
+				brd_Rbtn_Contract.visible=false; 
+				Grd_Bank_General.visible= true;
+				Grd_Bills_General.visible= true;
+				Grd_Bank_BTC.visible= false;
+				Grd_Bills_BTC.visible= false; 
+				Btn_Grid_BTC.visible=false; 
+				Btn_Grid_General.visible=true;
+				Grd_Bank_BTC.dataProvider= null;
+				Grd_Bank_General.dataProvider= null;
+				Grd_Bills_BTC.dataProvider= null;
+				Grd_Bills_General.dataProvider= null;
+				Rbtn_Deposited.selected= false;
+				Rbtn_NonDeposited.selected=false;
+				txt_TotalBANK.text="";txt_Total.text="";
+				TotAmts=0;	TotAmtss=0;
+			}
+			public var Ac3:ArrayCollection=new ArrayCollection();	
+			public function FnSelectBTC(Event):void
+			{ 
+				Ac3= new ArrayCollection();
+				Ac3=Grd_Bank_BTC.dataProvider as ArrayCollection; 
+ 
+				var Index:int=Grd_Bank_BTC.selectedIndex;
+				if(Ac3[Index].Bankchecks==1)
+				{
+					Ac3[Index].Bankchecks=false;
+				}
+				else if(Ac3[Index].Bankchecks==0)
+				{
+					Ac3[Index].Bankchecks=true;
+				} 
+				
+				var ChequeNo:String,AmttobeReconciled:String;
+				ChequeNo=Ac3[Index].ChequeNo;
+				AmttobeReconciled= Ac3[Index].AmttobeReconciled;
+				TotalAmtBankTrans();
+			}
+			public var Ac4:ArrayCollection=new ArrayCollection();
+			var TotAmts:int=0;
+			public function TotalAmtBankTrans():void
+			{
+				var SelBillss:ArrayCollection= new ArrayCollection();
+				SelBankss = Grd_Bank_General.dataProvider as  ArrayCollection;
+				var SelBankss:ArrayCollection= new ArrayCollection();
+				SelBillss= Grd_Bank_BTC.dataProvider as  ArrayCollection;
+				TotAmts=0;
+				var TB:Number=0;
+				for(var M:int=0;M<SelBillss.length;M++)
+				{
+					if(SelBillss[M].Bankchecks==true)
+					{
+						TotAmts+=Number(Ac3[M].AmttobeReconciled);
+					}
+					TB=Number(TotAmts);
+					//txt_Total.text=TB.replace(",","");
+					txt_TotalBANK.text=Number(TB).toString();
+				}
+				txt_TotalBANK.text=txt_TotalBANK.text;
+				
+				for(var i:int =0; i<SelBankss.length;i++)
+				{  
+					if(SelBankss[i].Bankchecks==true)
+					{  	
+						var TransactionNo:String= SelBankss[i].TransId;
+						var AmttobeReconciled:Number = SelBankss[i].AmttobeReconciled;  
+					}
+				}  
+//				var Amttobe:Number =  Number(txt_Total.text);
+//				if(Amttobe!=TB)
+//				{
+//					alignAlert(Alert.show("Total Invoice amount should not exceed statement amount.","Alert Message !",
+//						Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+//					for(var k:int=0;k<SelBills.length;k++)
+//					{
+//						SelBills[k].Billchecks=false;
+//					}
+//				}
+			}
+			var TotAmtss:int=0;
+			public function TotalAmtGEneralTrans():void
+			{
+				var SelBills:ArrayCollection= new ArrayCollection();
+				SelBanks = Grd_Bank_BTC.dataProvider as  ArrayCollection;
+				var SelBanks:ArrayCollection= new ArrayCollection();
+				SelBills= Grd_Bank_General.dataProvider as  ArrayCollection;
+				TotAmtss=0;
+				var TB:Number=0;
+				for(var M:int=0;M<SelBills.length;M++)
+				{
+					if(SelBills[M].Bankchecks==true)
+					{
+						TotAmtss+=Number(Ac3[M].AmttobeReconciled);
+					}
+					TB=Number(TotAmtss);
+					//txt_Total.text=TB.replace(",","");
+					txt_TotalBANK.text=Number(TB).toString();
+				}
+				txt_TotalBANK.text=txt_TotalBANK.text;
+				
+				for(var i:int =0; i<SelBanks.length;i++)
+				{  
+					if(SelBanks[i].Bankchecks==true)
+					{  	
+						var TransactionNo:String= SelBanks[i].TransId;
+						var AmttobeReconciled:Number = SelBanks[i].AmttobeReconciled;  
+					}
+				}  
+	//			var Amttobe:Number =  Number(txt_Total.text);
+//				if(Amttobe!=TB)
+//				{
+//					alignAlert(Alert.show("Total Invoice amount should not exceed statement amount.","Alert Message !",
+//						Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+//					for(var k:int=0;k<SelBills.length;k++)
+//					{
+//						SelBills[k].Billchecks=false;
+//					}
+//				}
+			}
+			public function FnSelectBillBTC(Event):void
+			{ 
+				Ac1 = new ArrayCollection();
+				Ac1=Grd_Bills_BTC.dataProvider as  ArrayCollection;				
+				var Index:int=Grd_Bills_BTC.selectedIndex;
+				var Flag:Boolean=true;
+				
+				if(Ac1[Index].Billchecks==1)
+				{
+					Ac1[Index].Billchecks=false;
+				}
+				else if(Ac1[Index].Billchecks==0)
+				{
+					Ac1[Index].Billchecks=true;
+				} 
+				TotalAmt1(); 
+			}
+			public function TotalAmt1():void
+			{
+				var SelBills:ArrayCollection= new ArrayCollection();
+				SelBills=Grd_Bills_BTC.dataProvider as  ArrayCollection;
+				var SelBanks:ArrayCollection= new ArrayCollection();
+				SelBanks=Grd_Bank_BTC.dataProvider as  ArrayCollection;
+				TotAmt=0;
+				var TB:Number=0;
+				for(var M:int=0;M<SelBills.length;M++)
+				{
+					if(SelBills[M].Billchecks==true)
+					{
+						TotAmt+=Number(Ac1[M].AmttobeReconciled);
+					}
+					TB=Number(TotAmt);
+					//txt_Total.text=TB.replace(",","");
+					txt_Total.text=Number(TB).toString();
+				}
+				txt_Total.text=txt_Total.text;
+				
+				for(var i:int =0; i<SelBanks.length;i++)
+				{  
+					if(SelBanks[i].Bankchecks==true)
+					{  	
+						var TransactionNo:String= SelBanks[i].TransId;
+						var AmttobeReconciled:Number = SelBanks[i].AmttobeReconciled;  
+					}
+				}  
+//				var Amttobe:Number =AmttobeReconciled;
+//				if(Amttobe<TB)
+//				{
+//					alignAlert(Alert.show("Total Invoice amount should not exceed statement amount.","Alert Message !",
+//						Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+//					for(var k:int=0;k<SelBills.length;k++)
+//					{
+//						SelBills[k].Billchecks=false;
+//					}
+//				}
+			}
+			public var Ac:ArrayCollection=new ArrayCollection();	
+			public function FnSelectBank(Event):void
+			{ 
+				//Ac3=Grd_Bank_General.dataProvider as ArrayCollection;	 
+				
+				Ac3= new ArrayCollection();
+				Ac3=Grd_Bank_General.dataProvider as ArrayCollection; 
+				
+				var Index:int=Grd_Bank_General.selectedIndex;
+				if(Ac3[Index].Bankchecks==1)
+				{
+					Ac3[Index].Bankchecks=false;
+				}
+				else if(Ac3[Index].Bankchecks==0)
+				{
+					Ac3[Index].Bankchecks=true;
+				} 
+				 
+				var ChequeNo:String,AmttobeReconciled:String;
+				ChequeNo=Ac3[Index].ChequeNo;
+				AmttobeReconciled= Ac3[Index].AmttobeReconciled;
+				TotalAmtGEneralTrans();
+			}
+			public var Ac1:ArrayCollection=new ArrayCollection();
+			
+			public function FnSelectBill(Event):void
+			{ 
+				Ac1=Grd_Bills_General.dataProvider as  ArrayCollection;				
+				var Index:int=Grd_Bills_General.selectedIndex;
+				var Flag:Boolean=true;
+				
+				if(Ac1[Index].Billchecks==1)
+				{
+					Ac1[Index].Billchecks=false;
+				}
+				else if(Ac1[Index].Billchecks==0)
+				{
+					Ac1[Index].Billchecks=true;
+				} 
+				TotalAmt(); 
+			}
+			var TotAmt:int=0;
+			public function TotalAmt():void
+			{
+				var SelBills:ArrayCollection= new ArrayCollection();
+				SelBills=Grd_Bills_General.dataProvider as  ArrayCollection;
+				var SelBanks:ArrayCollection= new ArrayCollection();
+				SelBanks=Grd_Bank_General.dataProvider as  ArrayCollection;
+				TotAmt=0;
+				var TB:Number=0;
+				for(var M:int=0;M<SelBills.length;M++)
+				{
+					if(SelBills[M].Billchecks==true)
+					{
+						TotAmt+=Number(Ac1[M].AmttobeReconciled);
+					}
+					TB=Number(TotAmt);
+					//txt_Total.text=TB.replace(",","");
+					txt_Total.text=Number(TB).toString();
+				}
+				txt_Total.text=txt_Total.text;
+				
+				for(var i:int =0; i<SelBanks.length;i++)
+				{  
+					if(SelBanks[i].Bankchecks==true)
+					{  	
+						var TransactionNo:String= SelBanks[i].TransId;
+						var AmttobeReconciled:Number = SelBanks[i].AmttobeReconciled;  
+					}
+				}  
+				 var Amttobe:Number =AmttobeReconciled;
+//				if(Amttobe<TB)
+//				{
+//					alignAlert(Alert.show("Total Invoice amount should not exceed statement amount.","Alert Message !",
+//						Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+//					for(var k:int=0;k<SelBills.length;k++)
+//					{
+//						SelBills[k].Billchecks=false;
+//					}
+//				}
+			}
+			public function Ddl_Property_changeHandler():void
+			{
+				if(hlp_Property.selected())
+				{
+					PropertyName=hlp_Property.Select_Row.Property;
+					PropertyId=hlp_Property.Select_Row.Id;
+					hlp_Property.text=PropertyName;
+				}
+				else
+				{
+					hlp_Property.text="";
+				}
+				hlp_Client.setFocus();
+			}
+			public function Ddl_Client_changeHandler():void
+			{
+				if(hlp_Client.selected())
+				{
+					ClientName=hlp_Client.Select_Row.Client;
+					ClientId=hlp_Client.Select_Row.Id;
+					hlp_Client.text=ClientName;
+				}
+				else
+				{
+					hlp_Client.text="";
+				}
+			}	 
+			
+			public function DeleteGrid1():void
+			{ 
+				var Ac_Tmp:ArrayCollection=new ArrayCollection();
+				Ac_Tmp=Grd_Grid1.dataProvider as ArrayCollection;
+				var Serviceindex:int=Grd_Grid1.selectedIndex;
+				//var Amt:int = Grd_Grid1. selectedIndex;//.TotalAmt;
+				Ac_Tmp.removeItemAt(Serviceindex);
+			  // Ac_Tmp
+				var Total:int=0;
+				var Totals:int=0;
+			   for(var i:int=0;i<Ac_Tmp.length;i++)
+				{ 	 
+				   Total+=Number(Ac_Tmp[i].InvoiceAmount);
+				}	
+			   var InvoiceAmt:Number=Number(Total);
+			   
+			 //  Totals=InvoiceAmt.replace(",","");
+			   var InvoiceAmtd:String=txt_Total.text;
+			   txt_Total.text=String(Number(InvoiceAmtd)-Number(InvoiceAmt));
+			} 
+			public function Add_BTC_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				var BamkAmt:Number =  Number(txt_TotalBANK.text);
+				var InvoiceAmt:Number =  Number(txt_Total.text);
+				if(BamkAmt<=InvoiceAmt)
+				{
+					alignAlert(Alert.show("Transaction Amount Should be higher","Alert Message !",
+						Alert.OK,null,null,iconWarning,Alert.OK),10,""); 
+					Grd_Popup.visible=false;
+					return;
+				}
+				if(Grd_Bills_BTC.dataProvider== null)
+				{  
+					alignAlert(Alert.show("Search the Bill Types.","Alert Message !",
+						Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+				}
+				else if(Grd_Bank_BTC.dataProvider== null)
+				{  
+					alignAlert(Alert.show("Search the Transaction Amount.","Alert Message !",
+						Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+				}
+				else
+				{
+					//brd_all.visible=false;
+					Grd_Popup.visible=true;
+					ErrorCheckBillBTC();
+					ErrorCheckBankBTC();
+					var SelBank:ArrayCollection= new ArrayCollection();
+					var SelBill:ArrayCollection= new ArrayCollection();
+					var Final:ArrayCollection= new ArrayCollection();
+					var Temp:ArrayCollection= new ArrayCollection();
+					SelBank=Grd_Bank_BTC.dataProvider as ArrayCollection;
+					SelBill=Grd_Bills_BTC.dataProvider as  ArrayCollection;
+					var Bankcount:int=0;
+					var BillCount:int=0;
+					for(var i:int =0; i<SelBank.length;i++)
+					{  
+						if(SelBank[i].Bankchecks==true)
+						{
+							Bankcount+=1;
+						}
+					}
+					for(var J:int =0; J<SelBill.length;J++)
+					{  
+						if(SelBill[J].Billchecks==true)
+						{ 
+							BillCount+=1;
+						}
+					}
+					if(Bankcount>6)
+					{  
+						alignAlert(Alert.show("Maximum No of Transation in Selected.","Alert Message !",
+							Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+						Grd_Popup.visible=false;
+						return;
+					}
+					var BankTransAmount:Number=0;
+					var Invoices:String='';
+					var Types:String='';
+					//	var NumberDate:String = ''//SelBank[i].NumberDate;
+					//	var TransactionID:int= 0//SelBank[i].TransactionID;
+					if(Bankcount>1)
+					{
+						for(var J:int =0; J<SelBill.length; J++)
+						{ 
+							if(SelBill[J].Billchecks==true)
+							{ 
+								Invoices+=SelBill[J].InVoiceNo+',';
+								Types+=SelBill[J].Chkrefno+','; 
+								var PayType:String="PayType";
+								BankTransAmount+=SelBill[J].AmttobeReconciled; 
+							}
+						}  
+						var FinalBfr:ArrayCollection= new ArrayCollection();
+						//Collecting only Selected Values into this array collection
+						for(var i:int =0; i<SelBank.length;i++)
+						{ 
+							if((SelBank[i].Bankchecks==true))//&&(Flag=0))
+							{
+								FinalBfr.addItem({TransId:SelBank[i].TransId,InvoiceNo:Invoices,
+									BillType:Types,InvoiceAmount:(SelBank[i].AmttobeReconciled),
+									AmttobeReconciled:SelBank[i].AmttobeReconciled,Id:0,Date:SelBank[i].NumberDate,
+									PayType:Type,TransactionID:SelBank[i].TransactionID,TotalAmt:txt_Total.text,Bankchecks:true});
+								Flag=0
+							}
+						}
+						var RemainingAmt:Number=BankTransAmount;
+						var FirstAmt:Number=BankTransAmount;
+						var Flag:int=0;
+						for(var i:int =0; i<FinalBfr.length;i++)
+						{   
+							if((FinalBfr[i].Bankchecks==true)&&(i==0))
+							{  
+								
+								if(FinalBfr[i].AmttobeReconciled<RemainingAmt)
+								{
+									Final.addItem({TransactionNo:FinalBfr[i].TransId,InvoiceNo:Invoices,
+										BillType:Types,InvoiceAmount:FinalBfr[i].AmttobeReconciled,
+										TransactionAmt:FinalBfr[i].AmttobeReconciled,Id:0,Date:SelBank[i].NumberDate,
+										PayType:Type,TransactionID:SelBank[i].TransactionID,TotalAmt:txt_Total.text});
+									RemainingAmt=RemainingAmt-FinalBfr[i].AmttobeReconciled
+								}
+								else
+								{
+									Final.addItem({TransactionNo:FinalBfr[i].TransId,InvoiceNo:Invoices,
+										BillType:Types,InvoiceAmount:(FinalBfr[i].AmttobeReconciled),
+										TransactionAmt:FinalBfr[i].AmttobeReconciled,Id:0,Date:SelBank[i].NumberDate,
+										PayType:Type,TransactionID:SelBank[i].TransactionID,TotalAmt:txt_Total.text});
+									Flag=0
+									RemainingAmt=FinalBfr[i].AmttobeReconciled-RemainingAmt;
+								} 
+							}
+							if((FinalBfr[i].Bankchecks==true)&&(i==1)&&(FinalBfr[i-1].AmttobeReconciled==FinalBfr[i-1].InvoiceAmount))
+							{
+								if(Final[i-1].InvoiceAmount==Final[i-1].TransactionAmt)
+								{
+									if(FinalBfr[i].AmttobeReconciled<RemainingAmt)
+									{
+										Final.addItem({TransactionNo:FinalBfr[i].TransId,InvoiceNo:Invoices,
+											BillType:Types,InvoiceAmount:(FinalBfr[i].AmttobeReconciled),
+											TransactionAmt:FinalBfr[i].AmttobeReconciled,Id:0,Date:SelBank[i].NumberDate,
+											PayType:Type,TransactionID:SelBank[i].TransactionID,TotalAmt:txt_Total.text});
+										Flag=0
+										RemainingAmt=RemainingAmt-FinalBfr[i].AmttobeReconciled
+									}
+									else
+									{
+										Final.addItem({TransactionNo:FinalBfr[i].TransId,InvoiceNo:Invoices,
+											BillType:Types,InvoiceAmount:RemainingAmt,
+											TransactionAmt:FinalBfr[i].AmttobeReconciled,Id:0,Date:SelBank[i].NumberDate,
+											PayType:Type,TransactionID:SelBank[i].TransactionID,TotalAmt:txt_Total.text});
+										Flag=0
+										RemainingAmt=FinalBfr[i].AmttobeReconciled-RemainingAmt;
+									}
+								}
+							}
+							if((FinalBfr[i].Bankchecks==true)&&(i==2)&&(FinalBfr[i-1].AmttobeReconciled==FinalBfr[i-1].InvoiceAmount))
+								
+							{
+								if((Final[i-1].InvoiceAmount==Final[i-1].TransactionAmt))//&&(Final.length==Final.length-1))
+								{
+									if(FinalBfr[i].AmttobeReconciled<RemainingAmt)
+									{
+										Final.addItem({TransactionNo:FinalBfr[i].TransId,InvoiceNo:Invoices,
+											BillType:Types,InvoiceAmount:(FinalBfr[i].AmttobeReconciled),
+											TransactionAmt:FinalBfr[i].AmttobeReconciled,Id:0,Date:SelBank[i].NumberDate,
+											PayType:Type,TransactionID:SelBank[i].TransactionID,TotalAmt:txt_Total.text});
+										Flag=0
+										RemainingAmt=RemainingAmt-FinalBfr[i].AmttobeReconciled
+									}
+									else
+									{
+										Final.addItem({TransactionNo:FinalBfr[i].TransId,InvoiceNo:Invoices,
+											BillType:Types,InvoiceAmount:RemainingAmt,
+											TransactionAmt:FinalBfr[i].AmttobeReconciled,Id:0,Date:SelBank[i].NumberDate,
+											PayType:Type,TransactionID:SelBank[i].TransactionID,TotalAmt:txt_Total.text});
+										Flag=0
+										RemainingAmt=FinalBfr[i].AmttobeReconciled-RemainingAmt;
+									}
+								}
+							}
+							if((FinalBfr[i].Bankchecks==true)&&(i==3)&&(FinalBfr[i-1].AmttobeReconciled==FinalBfr[i-1].InvoiceAmount))
+							{
+								//	if((Final[i-1].InvoiceAmount==Final[i-1].TransactionAmt))//&&(Final[1]==2))
+								///	{
+								if(FinalBfr[i].AmttobeReconciled<RemainingAmt)
+								{
+									Final.addItem({TransactionNo:FinalBfr[i].TransId,InvoiceNo:Invoices,
+										BillType:Types,InvoiceAmount:(FinalBfr[i].AmttobeReconciled),
+										TransactionAmt:FinalBfr[i].AmttobeReconciled,Id:0,Date:SelBank[i].NumberDate,
+										PayType:Type,TransactionID:SelBank[i].TransactionID,TotalAmt:txt_Total.text});
+									Flag=0
+									RemainingAmt=RemainingAmt-FinalBfr[i].AmttobeReconciled
+								}
+								else
+								{
+									Final.addItem({TransactionNo:FinalBfr[i].TransId,InvoiceNo:Invoices,
+										BillType:Types,InvoiceAmount:RemainingAmt,
+										TransactionAmt:FinalBfr[i].AmttobeReconciled,Id:0,Date:SelBank[i].NumberDate,
+										PayType:Type,TransactionID:SelBank[i].TransactionID,TotalAmt:txt_Total.text});
+									Flag=0
+									RemainingAmt=FinalBfr[i].AmttobeReconciled-RemainingAmt;
+								}
+								//	}
+							}
+							if((FinalBfr[i].Bankchecks==true)&&(i==4)&&(FinalBfr[i-1].AmttobeReconciled==FinalBfr[i-1].InvoiceAmount))
+							{
+								//	if(Final[i-1].InvoiceAmount==Final[i-1].TransactionAmt)
+								//	{
+								if(FinalBfr[i].AmttobeReconciled<RemainingAmt)
+								{
+									Final.addItem({TransactionNo:FinalBfr[i].TransId,InvoiceNo:Invoices,
+										BillType:Types,InvoiceAmount:(FinalBfr[i].AmttobeReconciled),
+										TransactionAmt:FinalBfr[i].AmttobeReconciled,Id:0,Date:SelBank[i].NumberDate,
+										PayType:Type,TransactionID:SelBank[i].TransactionID,TotalAmt:txt_Total.text});
+									Flag=0
+									RemainingAmt=RemainingAmt-FinalBfr[i].AmttobeReconciled
+								}
+								else
+								{
+									Final.addItem({TransactionNo:FinalBfr[i].TransId,InvoiceNo:Invoices,
+										BillType:Types,InvoiceAmount:RemainingAmt,
+										TransactionAmt:FinalBfr[i].AmttobeReconciled,Id:0,Date:SelBank[i].NumberDate,
+										PayType:Type,TransactionID:SelBank[i].TransactionID,TotalAmt:txt_Total.text});
+									Flag=0
+									RemainingAmt=FinalBfr[i].AmttobeReconciled-RemainingAmt;
+								}
+								//	}
+							}
+							if((FinalBfr[i].Bankchecks==true)&&(i==5)&&(FinalBfr[i-1].AmttobeReconciled==FinalBfr[i-1].InvoiceAmount))
+							{
+								//	if(Final[i-1].InvoiceAmount==Final[i-1].TransactionAmt)
+								//	{
+								if(FinalBfr[i].AmttobeReconciled<RemainingAmt)								{
+									Final.addItem({TransactionNo:FinalBfr[i].TransId,InvoiceNo:Invoices,
+										BillType:Types,InvoiceAmount:(FinalBfr[i].AmttobeReconciled),
+										TransactionAmt:FinalBfr[i].AmttobeReconciled,Id:0,Date:SelBank[i].NumberDate,
+										PayType:Type,TransactionID:SelBank[i].TransactionID,TotalAmt:txt_Total.text});
+									Flag=0
+									RemainingAmt=RemainingAmt-FinalBfr[i].AmttobeReconciled
+								}
+								else
+								{
+									Final.addItem({TransactionNo:FinalBfr[i].TransId,InvoiceNo:Invoices,
+										BillType:Types,InvoiceAmount:RemainingAmt,
+										TransactionAmt:FinalBfr[i].AmttobeReconciled,Id:0,Date:SelBank[i].NumberDate,
+										PayType:Type,TransactionID:SelBank[i].TransactionID,TotalAmt:txt_Total.text});
+									Flag=0
+									RemainingAmt=FinalBfr[i].AmttobeReconciled-RemainingAmt;
+								}
+								//	}
+							}
+							
+						}   
+						
+						var Index:int=Grd_Bills_General.selectedIndex;
+						Grd_Grid1.dataProvider= Final as ArrayCollection;
+					}
+					else
+					{
+						for(var i:int =0; i<SelBank.length;i++)
+						{  
+							if(SelBank[i].Bankchecks==true)
+							{  	
+								var TransactionNo:String= SelBank[i].TransId;
+								var AmttobeReconciled:Number = SelBank[i].AmttobeReconciled; 
+								var NumberDate:String = SelBank[i].NumberDate;
+								var TransactionID:int= SelBank[i].TransactionID;
+								var PayType:String="PayType"; 
+							}
+						}  
+						for(var J:int =0; J<SelBill.length; J++)
+						{ 
+							if(SelBill[J].Billchecks==true)
+							{ 
+								Invoices+=SelBill[J].InVoiceNo+',';
+								Types+=SelBill[J].Chkrefno+','; 
+								var PayType:String="PayType";
+								BankTransAmount+=SelBill[J].AmttobeReconciled; 
+							}
+						}  
+						for(var J:int =0; J<SelBank.length; J++)
+						{ 
+							if(SelBank[J].Bankchecks==true)
+							{ 
+								Final.addItem({TransactionNo:TransactionNo,InvoiceNo:Invoices,
+									BillType:Types,InvoiceAmount:txt_Total.text,
+									TransactionAmt:AmttobeReconciled,Id:0,Date:NumberDate,PayType:Type,
+									TransactionID:TransactionID,TotalAmt:txt_Total.text });
+							}
+						}  
+						var Index:int=Grd_Bills_General.selectedIndex;
+						Grd_Grid1.dataProvider= Final as ArrayCollection;
+					}
+				}
+//					for(var i:int =0; i<SelBank.length;i++)
+//					{  
+//						if(SelBank[i].Bankchecks==true)
+//						{
+//							Bankcount+=1;
+//						}
+//					}
+//					for(var J:int =0; J<SelBill.length;J++)
+//					{  
+//						if(SelBill[J].Billchecks==true)
+//						{ 
+//							BillCount+=1;
+//						}
+//					}
+//					if(BillCount<Bankcount)
+//					{
+//					for(var i:int =0; i<SelBank.length; i++)
+//					{  
+//						if(SelBank[i].Bankchecks==true)
+//							{  	
+//							var TransactionNo:String= SelBank[i].TransId;
+//							var InvoiceNo:String = SelBank[i].AmttobeReconciled ; 
+//							var TransactionID:int= SelBank[i].TransactionID;
+//							var NumberDate:String = SelBank[i].NumberDate;
+//							}
+//					 }  
+//					for(var J:int =0; J<SelBill.length; J++)
+//					{ 
+//						if(SelBill[J].Billchecks==true)
+//						{ 
+//							  Final.addItem({TransactionNo:TransactionNo,InvoiceNo:SelBill[J].InVoiceNo ,
+//								BillType:'BTC',InvoiceAmount:InvoiceNo,TransactionID:TransactionID,
+//								TotalAmt:txt_Total.text,
+//							  TransactionAmt:SelBill[J].Amount,Id:0,Date:NumberDate,PayType:'BTC'});
+//						}
+//					} 
+//					var Index:int=Grd_Bills_General.selectedIndex;
+//					Grd_Grid1.dataProvider= Final as ArrayCollection;
+//					}
+//					else
+//					{
+//						
+//					}
+//				} 
+			}
+			public function ErrorCheckBillBTC():void
+			{
+				var Grid_AC1:ArrayCollection=new ArrayCollection();
+				var SaveFlag:Boolean=true;				;
+				if(Grd_Bills_BTC.dataProvider !=null)
+				{ 
+					Grid_AC1=Grd_Bills_BTC.dataProvider as ArrayCollection;
+					var i:int=Grid_AC1.length-1;
+					for( i ;i>=0;i--)
+					{
+						if(Grid_AC1[i].Billchecks == 1)
+						{  
+							SaveFlag=false;
+						} 						
+					}	
+					Grd_Bills_BTC.dataProvider=Grid_AC1.source;
+					if(SaveFlag==true)
+					{
+						alignAlert(Alert.show("Select any one Bill.","Alert Message !",
+							Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+						Grd_Popup.visible=false;
+						//	brd_all.visible=true;
+					}
+				}
+			}
+			public function ErrorCheckBankBTC():void
+			{
+				var Grid_AC1:ArrayCollection=new ArrayCollection();
+				var SaveFlag:Boolean=true;				;
+				if(Grd_Bank_BTC.dataProvider !=null)
+				{ 
+					Grid_AC1=Grd_Bank_BTC.dataProvider as ArrayCollection;
+					var i:int=Grid_AC1.length-1;
+					for( i ;i>=0;i--)
+					{
+						if(Grid_AC1[i].Bankchecks == 1)
+						{  
+							SaveFlag=false;
+						} 						
+					}	
+					Grd_Bank_BTC.dataProvider=Grid_AC1.source;
+					if(SaveFlag==true)
+					{
+						alignAlert(Alert.show("Select any one Transaction.","Alert Message !",
+							Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+						Grd_Popup.visible=false;
+						//			brd_all.visible=true;
+					}
+				}
+			}
+			protected function FnClose_Tariff():void
+			{
+				Grd_Popup.visible=false; 
+				Grd_Grid1.dataProvider= null;
+				//brd_all.visible=true;
+			}
+		 
+			public function FnSave():void
+			{ 
+				if((Grd_Grid1.dataProvider==null)||(Grd_Grid1.dataProvider.length==0))
+				{
+					alignAlert(Alert.show("Reconile Details is Required.","Alert Message !",
+						Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+					return;
+				}else
+				{
+					alignAlert(Alert.show("Do you want to Save this item?", "Warning",Alert.YES | Alert.NO, null,
+						Savesuccess, iconWarning, Alert.NO),10,"");
+					return;  
+				}
+				
+			} 
+			private function Savesuccess(event:CloseEvent):void 
+			{
+				if (event.detail==Alert.YES) 
+				{	
+					var BT:ArrayCollection= new  ArrayCollection();
+					BT=Grd_Grid1.dataProvider as ArrayCollection;
+					var DtlsXml:String="";
+					DtlsXml += "<ROOT>";
+					DtlsXml += ObjToXmlStr_Comm(BT,"DtlsXml")
+					DtlsXml += "</ROOT>";
+					useWeb("Reconcile","Save_CUSTOM",[GlobalXml,DtlsXml]);
+				}
+			}
+	     	public function ErrorCheckBill():void
+			{
+				var Grid_AC1:ArrayCollection=new ArrayCollection();
+				var SaveFlag:Boolean=true;				;
+				if(Grd_Bills_General.dataProvider !=null)
+				{ 
+					Grid_AC1=Grd_Bills_General.dataProvider as ArrayCollection;
+					var i:int=Grid_AC1.length-1;
+					for( i ;i>=0;i--)
+					{
+						if(Grid_AC1[i].Billchecks == 1)
+						{  
+							SaveFlag=false;
+						} 						
+					}	
+					Grd_Bills_General.dataProvider=Grid_AC1.source;
+					if(SaveFlag==true)
+					{
+						alignAlert(Alert.show("Select any one Bill.","Alert Message !",
+							Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+						Grd_Popup.visible=false;
+					//	brd_all.visible=true;
+					}
+				}
+			}
+			public function ErrorCheckBank():void
+			{
+				var Grid_AC1:ArrayCollection=new ArrayCollection();
+				var SaveFlag:Boolean=true;				;
+				if(Grd_Bank_General.dataProvider !=null)
+				{ 
+					Grid_AC1=Grd_Bank_General.dataProvider as ArrayCollection;
+					var i:int=Grid_AC1.length-1;
+					for( i ;i>=0;i--)
+					{
+						if(Grid_AC1[i].Bankchecks == 1)
+						{  
+							SaveFlag=false;
+						} 						
+					}	
+					Grd_Bank_General.dataProvider=Grid_AC1.source;
+					if(SaveFlag==true)
+					{
+						alignAlert(Alert.show("Select any one Transaction.","Alert Message !",
+							Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+						Grd_Popup.visible=false;
+			//			brd_all.visible=true;
+					}
+				}
+			}
+			public function Add_General_clickHandler(event:MouseEvent):void
+			{
+				var BamkAmt:Number =  Number(txt_TotalBANK.text);
+				var InvoiceAmt:Number =  Number(txt_Total.text);
+				if(BamkAmt<=InvoiceAmt)
+				{
+					alignAlert(Alert.show("Transaction Amount Should be higher","Alert Message !",
+						Alert.OK,null,null,iconWarning,Alert.OK),10,""); 
+					Grd_Popup.visible=false;
+					return;
+				}
+				if(Grd_Bills_General.dataProvider== null)
+				{  
+					alignAlert(Alert.show("Search the Bill Types.","Alert Message !",
+						Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+				}
+				else if(Grd_Bank_General.dataProvider== null)
+				{  
+					alignAlert(Alert.show("Search the Transaction Amount.","Alert Message !",
+						Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+				}
+				else
+				{  
+			//		brd_all.visible=false;
+					Grd_Popup.visible=true;
+					ErrorCheckBill();
+					ErrorCheckBank();
+					var SelBank:ArrayCollection= new ArrayCollection();
+					var SelBill:ArrayCollection= new ArrayCollection();
+					var FinalBfr:ArrayCollection= new ArrayCollection();
+					var Final:ArrayCollection= new ArrayCollection();
+					var Temp:ArrayCollection= new ArrayCollection();
+					SelBank=Grd_Bank_General.dataProvider as ArrayCollection;
+					SelBill=Grd_Bills_General.dataProvider as  ArrayCollection;
+					var TotAmt:int=0;
+					var Bankcount:int=0;
+					var BillCount:int=0;var Bankcounts:Number=1;						
+					for(var i:int =0; i<SelBank.length;i++)
+					{  
+						if(SelBank[i].Bankchecks==true)
+						{
+							Bankcount+=1;
+						}
+					}
+					for(var J:int =0; J<SelBill.length;J++)
+					{  
+						if(SelBill[J].Billchecks==true)
+						{ 
+							BillCount+=1;
+						}
+					}
+					if(Bankcount>6)
+					{  
+						alignAlert(Alert.show("Maximum No of Transation in Selected.","Alert Message !",
+							Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+						Grd_Popup.visible=false;
+						return;
+					}
+					var BankTransAmount:Number=0;
+					var Invoices:String='';
+					var Types:String='';
+				//	var NumberDate:String = ''//SelBank[i].NumberDate;
+				//	var TransactionID:int= 0//SelBank[i].TransactionID;
+					if((Bankcount>1))//&&(Bankcount<6))
+					{
+						for(var J:int =0; J<SelBill.length; J++)
+						{ 
+							if(SelBill[J].Billchecks==true)
+							{ 
+								Invoices+=SelBill[J].InVoiceNo+',';
+								Types+=SelBill[J].Chkrefno+','; 
+								var PayType:String="PayType";
+								BankTransAmount+=SelBill[J].AmttobeReconciled; 
+							}
+						}  
+						//Collecting only Selected Values into this array collection
+						for(var i:int =0; i<SelBank.length;i++)
+						{ 
+							if((SelBank[i].Bankchecks==true))//&&(Flag=0))
+							{
+								FinalBfr.addItem({TransId:SelBank[i].TransId,InvoiceNo:Invoices,
+									BillType:Types,InvoiceAmount:(SelBank[i].AmttobeReconciled),
+									AmttobeReconciled:SelBank[i].AmttobeReconciled,Id:0,Date:SelBank[i].NumberDate,
+									PayType:Type,TransactionID:SelBank[i].TransactionID,TotalAmt:txt_Total.text,Bankchecks:true});
+								Flag=0
+							}
+						}
+						var RemainingAmt:Number=BankTransAmount;
+						var FirstAmt:Number=BankTransAmount;
+						var Flag:int=0;
+						for(var i:int =0; i<FinalBfr.length;i++)
+						{   
+							if((FinalBfr[i].Bankchecks==true)&&(i==0))
+							{  
+								 
+								if(FinalBfr[i].AmttobeReconciled<RemainingAmt)
+								{
+									Final.addItem({TransactionNo:FinalBfr[i].TransId,InvoiceNo:Invoices,
+									BillType:Types,InvoiceAmount:FinalBfr[i].AmttobeReconciled,
+									TransactionAmt:FinalBfr[i].AmttobeReconciled,Id:0,Date:SelBank[i].NumberDate,
+									PayType:Type,TransactionID:SelBank[i].TransactionID,TotalAmt:txt_Total.text});
+									RemainingAmt=RemainingAmt-FinalBfr[i].AmttobeReconciled
+								 }
+								else
+								{
+									Final.addItem({TransactionNo:FinalBfr[i].TransId,InvoiceNo:Invoices,
+										BillType:Types,InvoiceAmount:(FinalBfr[i].AmttobeReconciled),
+										TransactionAmt:FinalBfr[i].AmttobeReconciled,Id:0,Date:SelBank[i].NumberDate,
+										PayType:Type,TransactionID:SelBank[i].TransactionID,TotalAmt:txt_Total.text});
+									Flag=0
+									RemainingAmt=FinalBfr[i].AmttobeReconciled-RemainingAmt;
+								} 
+							}
+							if((FinalBfr[i].Bankchecks==true)&&(i==1)&&(FinalBfr[i-1].AmttobeReconciled==FinalBfr[i-1].InvoiceAmount))
+							{
+								if(Final[i-1].InvoiceAmount==Final[i-1].TransactionAmt)
+								{
+									if(FinalBfr[i].AmttobeReconciled<RemainingAmt)
+									{
+										Final.addItem({TransactionNo:FinalBfr[i].TransId,InvoiceNo:Invoices,
+											BillType:Types,InvoiceAmount:(FinalBfr[i].AmttobeReconciled),
+											TransactionAmt:FinalBfr[i].AmttobeReconciled,Id:0,Date:SelBank[i].NumberDate,
+											PayType:Type,TransactionID:SelBank[i].TransactionID,TotalAmt:txt_Total.text});
+										Flag=0
+										RemainingAmt=RemainingAmt-FinalBfr[i].AmttobeReconciled
+									}
+									else
+									{
+										Final.addItem({TransactionNo:FinalBfr[i].TransId,InvoiceNo:Invoices,
+											BillType:Types,InvoiceAmount:RemainingAmt,
+											TransactionAmt:FinalBfr[i].AmttobeReconciled,Id:0,Date:SelBank[i].NumberDate,
+											PayType:Type,TransactionID:SelBank[i].TransactionID,TotalAmt:txt_Total.text});
+										Flag=0
+										RemainingAmt=FinalBfr[i].AmttobeReconciled-RemainingAmt;
+									}
+								}
+							}
+							if((FinalBfr[i].Bankchecks==true)&&(i==2)&&(FinalBfr[i-1].AmttobeReconciled==FinalBfr[i-1].InvoiceAmount))
+								
+							{
+								if((Final[i-1].InvoiceAmount==Final[i-1].TransactionAmt))//&&(Final.length==Final.length-1))
+								{
+								if(FinalBfr[i].AmttobeReconciled<RemainingAmt)
+								{
+								Final.addItem({TransactionNo:FinalBfr[i].TransId,InvoiceNo:Invoices,
+									BillType:Types,InvoiceAmount:(FinalBfr[i].AmttobeReconciled),
+									TransactionAmt:FinalBfr[i].AmttobeReconciled,Id:0,Date:SelBank[i].NumberDate,
+									PayType:Type,TransactionID:SelBank[i].TransactionID,TotalAmt:txt_Total.text});
+								Flag=0
+								RemainingAmt=RemainingAmt-FinalBfr[i].AmttobeReconciled
+								}
+								else
+								{
+									Final.addItem({TransactionNo:FinalBfr[i].TransId,InvoiceNo:Invoices,
+										BillType:Types,InvoiceAmount:RemainingAmt,
+										TransactionAmt:FinalBfr[i].AmttobeReconciled,Id:0,Date:SelBank[i].NumberDate,
+										PayType:Type,TransactionID:SelBank[i].TransactionID,TotalAmt:txt_Total.text});
+									Flag=0
+									RemainingAmt=FinalBfr[i].AmttobeReconciled-RemainingAmt;
+								}
+							 }
+							}
+							if((FinalBfr[i].Bankchecks==true)&&(i==3)&&(FinalBfr[i-1].AmttobeReconciled==FinalBfr[i-1].InvoiceAmount))
+							{
+							//	if((Final[i-1].InvoiceAmount==Final[i-1].TransactionAmt))//&&(Final[1]==2))
+							///	{
+								if(FinalBfr[i].AmttobeReconciled<RemainingAmt)
+								{
+								Final.addItem({TransactionNo:FinalBfr[i].TransId,InvoiceNo:Invoices,
+									BillType:Types,InvoiceAmount:(FinalBfr[i].AmttobeReconciled),
+									TransactionAmt:FinalBfr[i].AmttobeReconciled,Id:0,Date:SelBank[i].NumberDate,
+									PayType:Type,TransactionID:SelBank[i].TransactionID,TotalAmt:txt_Total.text});
+								Flag=0
+								RemainingAmt=RemainingAmt-FinalBfr[i].AmttobeReconciled
+								}
+								else
+								{
+									Final.addItem({TransactionNo:FinalBfr[i].TransId,InvoiceNo:Invoices,
+										BillType:Types,InvoiceAmount:RemainingAmt,
+										TransactionAmt:FinalBfr[i].AmttobeReconciled,Id:0,Date:SelBank[i].NumberDate,
+										PayType:Type,TransactionID:SelBank[i].TransactionID,TotalAmt:txt_Total.text});
+									Flag=0
+									RemainingAmt=FinalBfr[i].AmttobeReconciled-RemainingAmt;
+								}
+							//	}
+							}
+							if((FinalBfr[i].Bankchecks==true)&&(i==4)&&(FinalBfr[i-1].AmttobeReconciled==FinalBfr[i-1].InvoiceAmount))
+							{
+							//	if(Final[i-1].InvoiceAmount==Final[i-1].TransactionAmt)
+							//	{
+								if(FinalBfr[i].AmttobeReconciled<RemainingAmt)
+								{
+								Final.addItem({TransactionNo:FinalBfr[i].TransId,InvoiceNo:Invoices,
+									BillType:Types,InvoiceAmount:(FinalBfr[i].AmttobeReconciled),
+									TransactionAmt:FinalBfr[i].AmttobeReconciled,Id:0,Date:SelBank[i].NumberDate,
+									PayType:Type,TransactionID:SelBank[i].TransactionID,TotalAmt:txt_Total.text});
+								Flag=0
+								RemainingAmt=RemainingAmt-FinalBfr[i].AmttobeReconciled
+								}
+								else
+								{
+									Final.addItem({TransactionNo:FinalBfr[i].TransId,InvoiceNo:Invoices,
+										BillType:Types,InvoiceAmount:RemainingAmt,
+										TransactionAmt:FinalBfr[i].AmttobeReconciled,Id:0,Date:SelBank[i].NumberDate,
+										PayType:Type,TransactionID:SelBank[i].TransactionID,TotalAmt:txt_Total.text});
+									Flag=0
+									RemainingAmt=FinalBfr[i].AmttobeReconciled-RemainingAmt;
+								}
+							//	}
+							}
+							if((FinalBfr[i].Bankchecks==true)&&(i==5)&&(FinalBfr[i-1].AmttobeReconciled==FinalBfr[i-1].InvoiceAmount))
+							{
+							//	if(Final[i-1].InvoiceAmount==Final[i-1].TransactionAmt)
+							//	{
+								if(FinalBfr[i].AmttobeReconciled<RemainingAmt)								{
+									Final.addItem({TransactionNo:FinalBfr[i].TransId,InvoiceNo:Invoices,
+										BillType:Types,InvoiceAmount:(FinalBfr[i].AmttobeReconciled),
+										TransactionAmt:FinalBfr[i].AmttobeReconciled,Id:0,Date:SelBank[i].NumberDate,
+										PayType:Type,TransactionID:SelBank[i].TransactionID,TotalAmt:txt_Total.text});
+									Flag=0
+									RemainingAmt=RemainingAmt-FinalBfr[i].AmttobeReconciled
+								}
+								else
+								{
+									Final.addItem({TransactionNo:FinalBfr[i].TransId,InvoiceNo:Invoices,
+										BillType:Types,InvoiceAmount:RemainingAmt,
+										TransactionAmt:FinalBfr[i].AmttobeReconciled,Id:0,Date:SelBank[i].NumberDate,
+										PayType:Type,TransactionID:SelBank[i].TransactionID,TotalAmt:txt_Total.text});
+									Flag=0
+									RemainingAmt=FinalBfr[i].AmttobeReconciled-RemainingAmt;
+								}
+							//	}
+							}
+							
+						}   
+						
+						var Index:int=Grd_Bills_General.selectedIndex;
+						Grd_Grid1.dataProvider= Final as ArrayCollection;
+					}
+					else
+					{
+						for(var i:int =0; i<SelBank.length;i++)
+						{  
+							if(SelBank[i].Bankchecks==true)
+							{  	
+								var TransactionNo:String= SelBank[i].TransId;
+								var AmttobeReconciled:Number = SelBank[i].AmttobeReconciled; 
+								var NumberDate:String = SelBank[i].NumberDate;
+								var TransactionID:int= SelBank[i].TransactionID;
+								var PayType:String="PayType"; 
+							}
+						}  
+						for(var J:int =0; J<SelBill.length; J++)
+						{ 
+							if(SelBill[J].Billchecks==true)
+							{ 
+								Invoices+=SelBill[J].InVoiceNo+',';
+								Types+=SelBill[J].Chkrefno+','; 
+								var PayType:String="PayType";
+								BankTransAmount+=SelBill[J].AmttobeReconciled; 
+							}
+						}  
+						for(var J:int =0; J<SelBank.length; J++)
+						{ 
+							if(SelBank[J].Bankchecks==true)
+							{ 
+								Final.addItem({TransactionNo:TransactionNo,InvoiceNo:Invoices,
+									BillType:Types,InvoiceAmount:txt_Total.text,
+									TransactionAmt:AmttobeReconciled,Id:0,Date:NumberDate,PayType:Type,
+									TransactionID:TransactionID,TotalAmt:txt_Total.text });
+							}
+						}  
+						var Index:int=Grd_Bills_General.selectedIndex;
+						Grd_Grid1.dataProvider= Final as ArrayCollection;
+					}
+				} 
+			}
+		]]>
+	</fx:Script>
+	<s:VGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" 
+			  
+			  verticalAlign="middle">
+		<s:HGroup x="0" y="0" width="100%" height="45" horizontalAlign="center" verticalAlign="middle">
+			<WrbComp:TabButton_HB width="120" height="40" _Label="BTC" click="btn_BTC_clickHandler()" 
+								  id="btn_BTC" />
+			<WrbComp:TabButton_HB width="120" height="40" _Label="Cash" click="btn_Cash_clickHandler()" 
+								  id="btn_Cash"/>
+			<WrbComp:TabButton_HB width="120" height="40" _Label="Cheque" click="btn_Cheque_clickHandler()" 
+								  id="btn_Cheque"/>
+			<WrbComp:TabButton_HB width="120" height="40" _Label="Contract Invoice" click="btn_Contract_clickHandler()" 
+								  id="btn_Contract"/>
+			<WrbComp:TabButton_HB width="120" height="40" _Label="Credit Card" click="btn_CreditCard_clickHandler()"
+								  id="btn_CreditCard"/>
+			<WrbComp:TabButton_HB width="120" height="40" _Label="NEFT" click="btn_NEFT_clickHandler()" 
+								  id="btn_NEFT"/>
+		</s:HGroup>
+		 
+		
+			
+			
+			<!-- GRID 1 FOR  PAYMENT--> 
+		<s:BorderContainer x="0" width="100%" y="0"  height="100%" backgroundColor="#fbf9f9" borderVisible="false" >
+<s:HGroup height="100%" width="100%">
+		
+			<s:BorderContainer x="0" y="0" width="50%" height="100%"  backgroundColor="#fbf9f9" borderVisible="false">
+				<s:Panel title="Search Bank Recepits" x="93" y="0" width="378" height="241" >
+					<s:Label x="13" y="23" text="Value Date Range"/>
+					<mx:DateField id="dt_BankFrom" x="125" y="16" formatString="DD/MM/YYYY"
+								  tabIndex="2" yearNavigationEnabled="true" selectableRange="{{rangeEnd: new Date()}}"/>
+					<mx:DateField id="dt_BankTo" x="244" y="16" formatString="DD/MM/YYYY"
+								  tabIndex="2" yearNavigationEnabled="true" selectableRange="{{rangeEnd: new Date()}}"/>
+					<s:Label id="lblTransactionID" x="13" y="65" text="Transaction ID"/>
+					<s:TextInput id="txtTransactionID" x="125" y="57" prompt="TransactionID"/>
+					<s:Button x="145" y="160" label="Search" click="FnSearchBank()"/>
+					<s:Label id="lblchkno" x="13" y="102" text="Cheque/NEFT No" visible="true"/>
+					
+					<s:TextInput id="txt_ChkNo" x="125" y="94" visible="true" prompt="Cheque/NEFT No"/>
+					<s:CheckBox id="chk_AdvPayment" x="254" y="95" label="Advance Payment" visible="false"/>
+				</s:Panel>
+				<mx:DataGrid  id="Grd_Bank_BTC" visible="false" x="4" y="259"  verticalAlign="middle" editable="true" 
+							 width="98%" height="232" tabIndex="4">
+					<mx:columns>
+						<mx:DataGridColumn dataField="Bankchecks" headerText="" width="20" editable="false" >
+							<mx:itemRenderer> 
+								<fx:Component>
+									<mx:HBox horizontalAlign="center" verticalAlign="middle">
+										<mx:CheckBox selected="{data.Bankchecks}" change="outerDocument.FnSelectBTC(event);"/>
+									</mx:HBox>	
+									<!--mx:HBox horizontalAlign="center" verticalAlign="middle">
+										<mx:RadioButton x="10" y="10" horizontalGap="2" verticalGap="2" horizontalCenter="0"
+														change="outerDocument.FnSelectBTC(event);" selected="{data.Bankchecks}"/>
+									</mx:HBox-->	
+								</fx:Component> 
+							</mx:itemRenderer> 
+						</mx:DataGridColumn>
+						<mx:DataGridColumn dataField="NumberDate" headerText="Date" width="75" editable="false"/>
+						<mx:DataGridColumn dataField="Id" headerText="Id"  editable="false" visible="false"/>
+						<mx:DataGridColumn dataField="ChequeNo" headerText="BTC No" width="100" editable="false"/>
+						<mx:DataGridColumn dataField="TransId" headerText="Trans Id" width="100" editable="false"/>
+						<mx:DataGridColumn dataField="Amount" headerText="Amount" width="75" editable="false"/>
+						<mx:DataGridColumn dataField="ReconcileAmt" headerText="Reconciled" width="100" editable="false"/>
+						<mx:DataGridColumn dataField="AmttobeReconciled" headerText="AmtTobeReconciled" width="125" editable="false">	
+						</mx:DataGridColumn> 
+					</mx:columns>
+				</mx:DataGrid>
+			 
+				<mx:DataGrid id="Grd_Bank_General" x="4" y="259" verticalAlign="middle" editable="true" 
+							 width="98%" height="232" tabIndex="4" visible="true">
+					<mx:columns>
+						<mx:DataGridColumn dataField="Bankchecks" headerText="" width="20" editable="false" >
+							<mx:itemRenderer> 
+								<fx:Component>
+									<mx:HBox horizontalAlign="center" verticalAlign="middle">
+										<mx:CheckBox selected="{data.Bankchecks}" change="outerDocument.FnSelectBank(event);"/>
+									</mx:HBox>	
+									<!--mx:HBox horizontalAlign="center" verticalAlign="middle">
+										<mx:RadioButton x="10" y="10" horizontalGap="2" verticalGap="2" horizontalCenter="0"
+														change="outerDocument.FnSelectBank(event);" selected="{data.Bankchecks}"/>
+									</mx:HBox-->	
+								</fx:Component> 
+							</mx:itemRenderer> 
+						</mx:DataGridColumn>
+						<mx:DataGridColumn dataField="NumberDate" headerText="Date" width="75" editable="false"/>
+						<mx:DataGridColumn dataField="Id" headerText="Id"  editable="false" visible="false"/>
+						<mx:DataGridColumn dataField="TransId" headerText="Trans Id" width="100" editable="false"/>
+						<mx:DataGridColumn dataField="Amount" headerText="Amount" width="85" editable="false"/>
+						<mx:DataGridColumn dataField="ReconcileAmt" headerText="ReconcilAmt" width="85" editable="false"/>
+						<mx:DataGridColumn dataField="AmttobeReconciled" headerText="AmtTobeReconciled" width="75" editable="false"/>
+					    <mx:DataGridColumn dataField="ChequeNo" headerText="Ref No" width="100" editable="false"/>
+						<mx:DataGridColumn dataField="TransactionID" visible="false"/>
+					</mx:columns>
+				</mx:DataGrid>
+				<s:TextInput id="txt_TotalBANK" visible="true" x="380" y="494" width="91" editable="false"/>
+			</s:BorderContainer>	
+				<s:BorderContainer x="490" y="0" width="50%" height="100%"  backgroundColor="#fbf9f9"  visible="true" borderVisible="false">
+					
+					<s:Panel id="Pnl_Bill" title="Search Bills" x="80" y="0" width="378" height="241" visible="true">
+						<s:Label id="lblProperty" x="14" y="15" text="Property"/>
+						<WrbHelpComp:HelpText id="hlp_Property" x="121" y="9" width="200" pxSetColumnsWidth="0,200" 
+											  depth="20" pxSetPrompt="Select Property" onselection="{Ddl_Property_changeHandler()}">
+						</WrbHelpComp:HelpText>
+						<s:Label id="lblClient" x="14" y="48" text="Client"/>
+						<WrbHelpComp:HelpText id="hlp_Client" x="121" y="43" width="200" pxSetColumnsWidth="200,0"
+											  depth="10" pxSetPrompt="Select Client" onselection="{Ddl_Client_changeHandler()}"/>
+						<s:Label id="lblBilldate" x="14" y="88" text="Bill Date Range"/>
+						<mx:DateField id="dt_Billfrom" x="121" y="81" selectableRange="{{rangeEnd: new Date()}}"/>
+						<mx:DateField id="dt_BillTo" x="230" y="81" selectableRange="{{rangeEnd: new Date()}}"/>
+						<s:Label id="lblInvoiceNo" x="14" y="119" text="Invoice NO" visible="true"/>
+						<s:TextInput id="txt_Invoice" x="121" y="119" prompt="Invoice No" visible="true"/>
+						<s:BorderContainer id="brd_Rbtn_Contract" x="86" y="147" width="195" height="30" 
+										   borderVisible="false" visible="false">
+							<s:RadioButton id="Rbtn_Dedicated" x="5" y="3" label="Dedicated" selected="true"/>
+							<s:RadioButton id="Rbtn_Managed" x="89" y="3" label="Managed"/>
+						</s:BorderContainer>
+						<s:BorderContainer id="brd_Rbtn_Deposite" x="117" y="147" width="195" height="30" 
+										   borderVisible="false" visible="true">
+							<s:RadioButton id="Rbtn_Deposited" x="4" y="0" label="Deposited" selected="true"/>
+							<s:RadioButton id="Rbtn_NonDeposited" x="85" y="0" label="Non-Deposited"/>
+						</s:BorderContainer>
+						<s:Button id="btn_BillSearch" x="85" y="175" label="Search" click="FnSearchBill()"/>
+						<s:Button id="btn_BillReset" x="195" y="175" label="Reset" click="FnClear()"/>
+						<s:Label id="lblCardtype" x="15" y="154" text="Card Type" visible="false"/>
+						<s:DropDownList id="drp_CardType" x="121" y="146" width="160" 
+										prompt="Select Card Type" visible="false">
+							<mx:ArrayCollection> 
+								<fx:String>--All--</fx:String> 
+								<fx:String>American Express</fx:String>
+								<fx:String>Discover</fx:String> 
+								<fx:String>Maestro Card</fx:String>
+								<fx:String>Master Card</fx:String> 
+								<fx:String>VISA Card</fx:String>
+							</mx:ArrayCollection>
+						</s:DropDownList>
+						<s:Label id="lblSOC" x="15" y="119" text="SOC/Batch Close" visible="false"/>
+						<s:TextInput id="txtSOC" x="122" y="118" visible="false"/>
+					</s:Panel>
+					<mx:DataGrid x="0" y="259" id="Grd_Bills_BTC"   verticalAlign="middle" editable="true" 
+								 width="98%" height="232" tabIndex="4" depth="5" visible="false">
+						<mx:columns>
+							<mx:DataGridColumn dataField="Billchecks" headerText="" width="20" editable="false"  >
+								<mx:itemRenderer >
+									<fx:Component>
+										<mx:HBox horizontalAlign="center" verticalAlign="middle">
+											<mx:CheckBox selected="{data.Billchecks}" change="outerDocument.FnSelectBillBTC(event);"/>
+										</mx:HBox>	
+									</fx:Component>
+								</mx:itemRenderer>
+							</mx:DataGridColumn>
+							<mx:DataGridColumn dataField="InVoiceNo" headerText="InvoiceNo" width="75" editable="false" />
+							<mx:DataGridColumn dataField="Id" headerText="Id" width="5" editable="false" visible="false"/>
+							<mx:DataGridColumn dataField="InvoiceDate" headerText="InvoiceDate" width="100" editable="false"/>
+							<mx:DataGridColumn dataField="Amount" headerText="Amount" width="75" editable="false" visible="true"/>
+							<mx:DataGridColumn dataField="ReconcileAmt" headerText="Reconciled" width="100" editable="false"/>
+							<mx:DataGridColumn dataField="AmttobeReconciled" headerText="AmtTobeReconcil" width="125" editable="false">
+							</mx:DataGridColumn> 
+						</mx:columns>
+					</mx:DataGrid>
+					<mx:Button x="380" y="494" id="Btn_Grid_BTC" label="BTC Add" click="Add_BTC_clickHandler(event)"/>
+					
+					<!--BILL GRID 2 General BILL --> 
+				  
+				
+			<mx:DataGrid id="Grd_Bills_General" x="0" y="259" verticalAlign="middle" editable="true" 
+						 width="98%" height="232" tabIndex="4" depth="5">
+				<mx:columns>
+					<mx:DataGridColumn dataField="Billchecks" headerText="" width="25" editable="false"  >
+						<mx:itemRenderer >
+							<fx:Component>
+								<mx:HBox horizontalAlign="center" verticalAlign="middle">
+									<mx:CheckBox selected="{data.Billchecks}" change="outerDocument.FnSelectBill(event);"/>
+								</mx:HBox>	
+							</fx:Component>
+						</mx:itemRenderer>
+					</mx:DataGridColumn>
+					<mx:DataGridColumn dataField="InVoiceNo" headerText=" Num/Typ" width="75" editable="false" />
+					<mx:DataGridColumn dataField="Id" headerText="Id" width="10" editable="false" visible="false"/>
+					<mx:DataGridColumn dataField="InvoiceDate" headerText="InvoiceDate" width="100" editable="false"/>
+					<mx:DataGridColumn dataField="Amount" headerText="Amount" width="100" editable="false" visible="true"/>
+					<mx:DataGridColumn dataField="ReconcileAmt" headerText="Reconciled" visible="false"/>
+					<mx:DataGridColumn dataField="AmttobeReconciled" headerText="TobeReconciled" width="100" editable="false"/>
+					<mx:DataGridColumn dataField="Chkrefno" headerText="REF/SOC/NUM" width="100" editable="false"/>
+					
+				</mx:columns>
+			</mx:DataGrid>
+					<mx:Button x="380" y="494" id="Btn_Grid_General" label="Add" click="Add_General_clickHandler(event)"/>
+					<s:TextInput id="txt_Total" visible="true" x="3" y="494" width="91" editable="false"/>
+					
+		 
+			    
+			   <!--BILL GRID 1 BTC BILL -->
+				</s:BorderContainer>
+</s:HGroup>
+		</s:BorderContainer>
+		
+	</s:VGroup>
+	<s:BorderContainer x="0" y="46" width="100%" height="100%" backgroundColor="#fbf9f9" id="Grd_Popup"
+					   borderVisible="false" visible="false" >
+		<s:Image x="908" y="6" buttonMode="true" click="FnClose_Tariff()"
+				 source="@Embed(source='../Assets/CrossSmall.png')" toolTip="Close"/>
+		<s:Button id="btn_Save" x="455" y="445" label="Reconcile" click="FnSave()"/>
+		
+		<mx:DataGrid id="Grd_Grid1" depth="100" x="5" y="43" width="99%" height="391" tabIndex="10"
+					 borderStyle="outset"   > 
+			<mx:columns>	
+				<mx:DataGridColumn dataField="Action" headerText="Delete" width="50" editable="false" >
+					<mx:itemRenderer>
+						<fx:Component>
+							<mx:HBox horizontalAlign="center" verticalAlign="middle">										
+								<mx:Image source="Assets/CrossSmall.png" buttonMode="true"
+										  click="outerDocument.DeleteGrid1()"/>
+							</mx:HBox>
+						</fx:Component>
+					</mx:itemRenderer> 
+				</mx:DataGridColumn>
+				<mx:DataGridColumn dataField="TransactionNo" width="200"  textAlign="left"/> 
+				<mx:DataGridColumn dataField="InvoiceNo"     width="150"  textAlign="left"/>
+				<mx:DataGridColumn dataField="BillType"      width="150"  textAlign="left"/> 
+				<mx:DataGridColumn dataField="InvoiceAmount" width="150"  textAlign="left"/>   
+				<mx:DataGridColumn dataField="TransactionAmt" width="150" textAlign="left"/>
+				<mx:DataGridColumn dataField="Date"  textAlign="left" visible="false"/>
+				<mx:DataGridColumn dataField="PayType" textAlign="left" visible="false"/>
+			</mx:columns>
+		</mx:DataGrid> 
+	</s:BorderContainer>
+	
+</s:Application>

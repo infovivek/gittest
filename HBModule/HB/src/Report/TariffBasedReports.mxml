@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%"
+			   creationComplete="PageLoad()" xmlns:WrbComp="WrbComp.*" xmlns:WrbHelpComp="WrbHelpComp.*"
+			   pageTitle="Tariff Based Report">
+	
+	<fx:Script>
+		<![CDATA[
+			import com.as3xls.xls.ExcelFile;
+			import com.as3xls.xls.Sheet;
+			
+			import mx.events.CalendarLayoutChangeEvent;
+			import mx.events.FlexEvent;
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "";
+			public var YearId:int=0,Year:String="";
+			import spark.events.IndexChangeEvent;                       
+			private var _isValidEmail:Boolean = true;	
+			import spark.events.IndexChangeEvent;
+			protected function PageLoad():void
+			{
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";				
+				FnHelp_PageLoad();
+			}
+			
+			protected function FnHelp_PageLoad():void
+			{
+				//useWeb("TariffBasedReport","PageLoad_CUSTOM",[GlobalXml,"PageLoad",0,0,"",""]);
+				useWeb("TariffBasedReport","year_CUSTOM",[GlobalXml,"Year",0,0,"",""]);
+			}
+			
+			public function Custom_WebSer_Result (Ds_Objects:Object):void				
+			{
+				Grd_Grid1.dataProvider=null;
+				Grd_Grid2.dataProvider=null;
+				var AC:ArrayCollection=new ArrayCollection();
+				if (Ds_Objects.currentTarget.description.toString() == "PageLoad_CUSTOM")
+				{  
+					if (Ds_Objects.result.Tables.Table.Rows.length > 5)
+					{
+					 	Grd_Grid1.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						AC=Grd_Grid1.dataProvider as ArrayCollection; 
+						for(var i:int=0;i<AC.length;i++)
+						{
+ 							if(AC[i].PropertyName=="Ratnalayam")
+							{
+								//(AC[i].PropertyName.setStyle('fontWeight', 'bold'))
+								AC[i].PropertyName= '0x00FF00';
+								//setStyle('PropertyName',0x32CD32);
+								//setStyle('color', 0xFF0000);
+							//	AC[i]('fontWeight', 'bold')
+								//return null;
+							}
+						}
+						//if(Ds_Objects.result.Tables.Table.Columns[0]='PropertyName')
+					}	
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 4)
+					{
+						Grd_Grid2.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+				} 
+				if (Ds_Objects.currentTarget.description.toString() == "year_CUSTOM")
+				{  
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Ddl_Year.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection
+					}					
+				} 
+			}
+			
+			protected function Btn_Show_clickHandler(event:MouseEvent):void
+			{
+				Btn_Show.setFocus();
+				//useWeb("ApartmentBooking","BookingDtls_CUSTOM",[GlobalXml,'BookingDtls',
+				//	dt_Date1.selectedDate,dt_Date2.selectedDate,'','',0,0,ClientId,0,0,0,0]);
+			}			
+			
+			protected function Btn_ExporttoExcel_clickHandler(event:MouseEvent):void
+			{
+				var Grid_AC:ArrayCollection=new ArrayCollection();
+				Grid_AC=Grd_Grid1.dataProvider as ArrayCollection; 
+				if((Grid_AC!=null)&&(Grid_AC.length!=0))
+				//if(Grd_Grid1.dataProvider != null)
+				{
+					var arrExportResult:ArrayCollection = Grd_Grid1.dataProvider as ArrayCollection;
+					var xlsFile:ExcelFile = new ExcelFile();
+					var sheet:Sheet = new Sheet();					
+					sheet.resize(arrExportResult.length+1,15);					
+					//sheet.setCell(0,0,'SNo');
+					sheet.setCell(0,1,'PropertyName');
+					sheet.setCell(0,2,'PropertyType');
+					sheet.setCell(0,3,'JAN');
+					sheet.setCell(0,4,'FEB');
+					sheet.setCell(0,5,'MARCH');
+					sheet.setCell(0,6,'APRL');
+					sheet.setCell(0,7,'MAY');
+					sheet.setCell(0,8,'JUNE');
+					sheet.setCell(0,9,'JULY');
+					sheet.setCell(0,10,'AUG');
+					sheet.setCell(0,11,'SEPT');
+					sheet.setCell(0,12,'OCT');
+					sheet.setCell(0,13,'NOV');
+					sheet.setCell(0,14,'DEC');					
+					for(var i:int = 0; i < arrExportResult.length; i++)
+					{
+					//	sheet.setCell(i+1, 0, arrExportResult[i].SNo);
+						sheet.setCell(i+1, 1, arrExportResult[i].PropertyName);
+						sheet.setCell(i+1, 2, arrExportResult[i].PropertyType);						
+						sheet.setCell(i+1, 3, arrExportResult[i].JAN);
+						sheet.setCell(i+1, 4, arrExportResult[i].FEB);
+						sheet.setCell(i+1, 5, arrExportResult[i].MARCH);
+						sheet.setCell(i+1, 6, arrExportResult[i].APRL);
+						sheet.setCell(i+1, 7, arrExportResult[i].MAY);
+						sheet.setCell(i+1, 8, arrExportResult[i].JUNE);
+						sheet.setCell(i+1, 9, arrExportResult[i].JULY);
+						sheet.setCell(i+1, 10, arrExportResult[i].AUG);
+						sheet.setCell(i+1, 11, arrExportResult[i].SEPT);
+						sheet.setCell(i+1, 12, arrExportResult[i].OCT);
+						sheet.setCell(i+1, 13, arrExportResult[i].NOV);
+						sheet.setCell(i+1, 14, arrExportResult[i].DEC);
+					}
+					//Grd_BookingDtls.dataProvider = arrExportResult;
+					xlsFile.sheets.addItem(sheet);      
+					var bytes:ByteArray = xlsFile.saveToByteArray();
+					var fr:FileReference = new FileReference();
+					var str:String=dt_Date1.selectedDate+"To"+dt_Date2.selectedDate+"GTV-Report.xls";
+					fr.save(bytes,"GTV-Report.xls");
+				}
+				else
+				{
+					alignAlert(Alert.show("GTV - Report Details is Required.","Alert Message !",
+						Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+				}				
+			} 
+			protected function Btn_ExporttoExcel_clickHandler2(event:MouseEvent):void
+			{
+				var Grid_AC1:ArrayCollection=new ArrayCollection();
+				Grid_AC1=Grd_Grid2.dataProvider as ArrayCollection; 
+				if((Grid_AC1!=null)&&(Grid_AC1.length!=0))
+					//if(Grd_Grid1.dataProvider != null)
+				{
+					var arrExportResult:ArrayCollection = Grd_Grid2.dataProvider as ArrayCollection;
+					var xlsFile:ExcelFile = new ExcelFile();
+					var sheet:Sheet = new Sheet();					
+					sheet.resize(arrExportResult.length+1,15);					
+					//sheet.setCell(0,0,'SNo');
+					sheet.setCell(0,1,'PropertyName');
+					sheet.setCell(0,2,'PropertyType');
+					sheet.setCell(0,3,'JAN');
+					sheet.setCell(0,4,'FEB');
+					sheet.setCell(0,5,'MARCH');
+					sheet.setCell(0,6,'APRL');
+					sheet.setCell(0,7,'MAY');
+					sheet.setCell(0,8,'JUNE');
+					sheet.setCell(0,9,'JULY');
+					sheet.setCell(0,10,'AUG');
+					sheet.setCell(0,11,'SEPT');
+					sheet.setCell(0,12,'OCT');
+					sheet.setCell(0,13,'NOV');
+					sheet.setCell(0,14,'DEC');					
+					for(var i:int = 0; i < arrExportResult.length; i++)
+					{
+						//	sheet.setCell(i+1, 0, arrExportResult[i].SNo);
+						sheet.setCell(i+1, 1, arrExportResult[i].PropertyName);
+						sheet.setCell(i+1, 2, arrExportResult[i].PropertyType);						
+						sheet.setCell(i+1, 3, arrExportResult[i].JAN);
+						sheet.setCell(i+1, 4, arrExportResult[i].FEB);
+						sheet.setCell(i+1, 5, arrExportResult[i].MARCH);
+						sheet.setCell(i+1, 6, arrExportResult[i].APRL);
+						sheet.setCell(i+1, 7, arrExportResult[i].MAY);
+						sheet.setCell(i+1, 8, arrExportResult[i].JUNE);
+						sheet.setCell(i+1, 9, arrExportResult[i].JULY);
+						sheet.setCell(i+1, 10, arrExportResult[i].AUG);
+						sheet.setCell(i+1, 11, arrExportResult[i].SEPT);
+						sheet.setCell(i+1, 12, arrExportResult[i].OCT);
+						sheet.setCell(i+1, 13, arrExportResult[i].NOV);
+						sheet.setCell(i+1, 14, arrExportResult[i].DEC);
+					}
+					//Grd_BookingDtls.dataProvider = arrExportResult;
+					xlsFile.sheets.addItem(sheet);      
+					var bytes:ByteArray = xlsFile.saveToByteArray();
+					var fr:FileReference = new FileReference();
+					var str:String=dt_Date1.selectedDate+"To"+dt_Date2.selectedDate+"NET-Report.xls";
+					fr.save(bytes,"NET-Report.xls");
+				}
+				else
+				{
+					alignAlert(Alert.show("NET - Report Details is Required.","Alert Message !",
+						Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+				}				
+			} 
+			protected function Ddl_Year_changeHandler(event:IndexChangeEvent):void
+			{ 
+				YearId=Ddl_Year.selectedItem.Id;
+				Year=Ddl_Year.selectedItem.label;
+				useWeb("TariffBasedReport","PageLoad_CUSTOM",[GlobalXml,"PageLoad",0,Year,"",""]);
+			}
+			  public function Clear():void
+			  {
+				  YearId=0;
+				  Year="";
+				  Grd_Grid1.dataProvider=null
+				 Grd_Grid2.dataProvider=null;
+					  PageLoad();
+			  }
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		
+	</fx:Declarations>
+	
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
+	<s:VGroup x="0" y="0" width="100%" height="100%" >
+		<s:BorderContainer width="100%" height="50" backgroundColor="#fbf9f9" borderVisible="false">
+			<s:HGroup x="177" y="10" width="628" height="36" horizontalAlign="center" 
+					  verticalAlign="middle" gap="20"> 
+				<mx:Label x="47" width="67" text="Select Year"/>
+				<s:DropDownList id="Ddl_Year" x="229" y="40" width="203" height="21"
+								prompt="Select Year" tabIndex="1" change="Ddl_Year_changeHandler(event)"/>
+				
+				  
+				
+			</s:HGroup>
+			<mx:DateChooser id="dt_Date1" visible="false"  
+							focusEnabled="false" selectedDate="{new Date()}" tabIndex="5"
+							yearNavigationEnabled="true"  />
+			<mx:DateChooser id="dt_Date2" visible="false"  
+							focusEnabled="false" selectedDate="{new Date()}" tabIndex="5"
+							yearNavigationEnabled="true"  />
+			<WrbComp:Button_BB id="Btn_Show" _Label="Show" click="Btn_Show_clickHandler(event)" visible="false"/>
+			
+		</s:BorderContainer>
+		<s:BorderContainer x="222" y="50" width="100%" height="517" borderVisible="false"> 
+			<s:Label x="15" y="4" text="GTV - Report" color="red"/>
+			<WrbComp:Button_BB id="Btn_ExporttoExcel" x="125" y="-6" width="142"
+							   _Label="Export –  GTV"
+							   click="Btn_ExporttoExcel_clickHandler(event)"/>
+			<mx:DataGrid id="Grd_Grid1" depth="100" x="5" y="33" width="99%" height="209" tabIndex="10"
+						 borderStyle="outset"   > 
+				<mx:columns>		 	 
+					<mx:DataGridColumn dataField="PropertyName" width="200"  textAlign="left"/> 
+					<mx:DataGridColumn dataField="PropertyType" width="200"  textAlign="left"/>
+					<mx:DataGridColumn dataField="JAN"   textAlign="right"/> 
+					<mx:DataGridColumn dataField="FEB"   textAlign="right"/>  
+					<mx:DataGridColumn dataField="MARCH" width="100"  textAlign="right"/> 
+					<mx:DataGridColumn dataField="APRL" width="100"  textAlign="right"/> 
+					<mx:DataGridColumn dataField="MAY" width="100"  textAlign="right"/> 
+					<mx:DataGridColumn dataField="JUNE" width="100"  textAlign="right"/>  
+					<mx:DataGridColumn dataField="JULY" width="100"  textAlign="right"/> 
+					<mx:DataGridColumn dataField="AUG" width="100"  textAlign="right"/>  
+					<mx:DataGridColumn dataField="SEPT" width="100"  textAlign="right"/> 
+					<mx:DataGridColumn dataField="OCT" width="100"  textAlign="right"/>  
+					<mx:DataGridColumn dataField="NOV" width="100"  textAlign="right"/> 
+					<mx:DataGridColumn dataField="DEC" width="100"  textAlign="right"/> 
+					<mx:DataGridColumn dataField="PropertyId" visible="false"/>
+				</mx:columns>
+			</mx:DataGrid> 
+			
+			<s:Label x="15" y="255" text="NET Revenue" color="red"/>
+			<WrbComp:Button_BB id="Btn_ExporttoExcel2" x="125" y="245" width="142"
+							   _Label="Export – NET Revenue"
+							   click="Btn_ExporttoExcel_clickHandler2(event)"/>
+			<mx:DataGrid id="Grd_Grid2" depth="100" x="5" y="281" width="99%" height="209" tabIndex="10"
+						 borderStyle="outset"   > 
+				<mx:columns>		 	 
+					<mx:DataGridColumn dataField="PropertyName" width="200"  textAlign="left"/> 
+					<mx:DataGridColumn dataField="PropertyType" width="200"  textAlign="left"/>
+					<mx:DataGridColumn dataField="JAN"   textAlign="right"/> 
+					<mx:DataGridColumn dataField="FEB"   textAlign="right"/>  
+					<mx:DataGridColumn dataField="MARCH" width="100"  textAlign="right"/> 
+					<mx:DataGridColumn dataField="APRL" width="100"  textAlign="right"/> 
+					<mx:DataGridColumn dataField="MAY" width="100"  textAlign="right"/> 
+					<mx:DataGridColumn dataField="JUNE" width="100"  textAlign="right"/>  
+					<mx:DataGridColumn dataField="JULY" width="100"  textAlign="right"/> 
+					<mx:DataGridColumn dataField="AUG" width="100"  textAlign="right"/>  
+					<mx:DataGridColumn dataField="SEPT" width="100"  textAlign="right"/> 
+					<mx:DataGridColumn dataField="OCT" width="100"  textAlign="right"/>  
+					<mx:DataGridColumn dataField="NOV" width="100"  textAlign="right"/> 
+					<mx:DataGridColumn dataField="DEC" width="100"  textAlign="right"/> 
+					<mx:DataGridColumn dataField="PropertyId" visible="false"/>
+				</mx:columns>
+			</mx:DataGrid> 
+			<s:Button x="432" y="497" height="24" label="Clear" click="Clear()"/>
+		</s:BorderContainer>
+	</s:VGroup>
+</s:Application>

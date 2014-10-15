@@ -1,0 +1,1378 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   xmlns:WrbComp="WrbComp.*"
+			   width="100%" height="100%" backgroundColor="#fbf9f9"
+			   creationComplete="page_Load()">
+	<fx:Declarations>
+		<mx:NumberFormatter id="Round2" precision="2" 
+							useThousandsSeparator="true" useNegativeSign="true" rounding="nearest"/>
+	</fx:Declarations>
+	<fx:Style source="..\\Common\\ApplicationCSS.css" />
+	<fx:Script source="..\\Common\\CommonScript.as" />
+	<fx:Script source="..\\Common\\Functions.as"/>
+	<fx:Script>
+		<![CDATA[			
+			import WrbComp.OccupancyData;
+			import WrbComp.OccupancyDataHeader;
+			import WrbComp.OccupancyDetails;
+			import WrbComp.OccupancyHeader_HB;
+			import WrbComp.OccupancyStatus;
+			
+			import mx.controls.LinkButton;
+			import mx.events.CalendarLayoutChangeEvent;
+			public static var Global_AC:ArrayCollection = new ArrayCollection();	
+			public  var Occupancy_AC:ArrayCollection = new ArrayCollection();	
+			public  var OccupancyDtls_AC:ArrayCollection = new ArrayCollection();	
+			public  var PropertyRooms_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "";
+			public var PropertyId:int=0;
+			public  var TariffPaymentMode_AC:ArrayCollection = new ArrayCollection();
+			public  var ServicePaymentMode_AC:ArrayCollection = new ArrayCollection();			
+			public var DtlsId:int=0;
+			public var PropertyDDCount:int=0;
+			public var PropertyNDDCount:int=0;
+			public var Data_AC:ArrayCollection=new ArrayCollection();
+			public var ApartmentGuestCount_AC:ArrayCollection=new ArrayCollection();	
+			public var DateWiseOccupancyNDD_AC:ArrayCollection=new ArrayCollection();
+			public var DateWiseOccupancyDD_AC:ArrayCollection=new ArrayCollection();
+			public var DateWiseNOGuest_AC:ArrayCollection=new ArrayCollection();
+			public var BookingId:String="";
+			public var Status:String="";
+			private function page_Load():void
+			{
+				Global_AC = funLoginInfo("<gScrId>1</gScrId><gUsrFk>1</gUsrFk>");				
+				GlobalXml = "";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";	
+				SCtrl.setButtonRights("Delete",true);
+				SCtrl.setButtonRights("Clear",true);				
+				SCtrl.setButtonRights("Search",true);
+				Brd_BookingModification.visible=false;
+				//dt_From.selectedDate=new Date();
+				var asd:String = dt_From.text;										
+				var Y:String = asd.substr(6,10);
+				var M:String = asd.substr(3,2);
+				var D:String = "01";				
+				var RangeStart:String = Y+'/'+M+'/'+D;
+				var anotherToday:Date = new Date(RangeStart);
+				dt_From.selectedDate=anotherToday;
+				anotherToday.setMonth(anotherToday.getMonth() +1)
+				dt_To.selectedDate = anotherToday;
+				TopCntl1.visible=false;
+				//var sDate5:Date=DateField.stringToDate(dt_From.text,"DD/MM/YYYY");	
+				help();
+			}
+			private function help():void
+			{				
+				useWeb("Report","Property_CUSTOM", [GlobalXml, "Property",0, 0,"",""]);
+				
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "Property_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						hlp_Property.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "OccupancyChart_CUSTOM")
+				{
+					
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						PropertyRooms_AC=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection
+					}
+					else
+					{
+						PropertyRooms_AC=new ArrayCollection();
+					}
+					if (Ds_Objects.result.Tables.Table2.Rows.length > 0)
+					{
+						PropertyDDCount=Ds_Objects.result.Tables.Table2.Rows[0].DDCount
+					}
+					else
+					{
+						PropertyDDCount=0
+					}
+					if (Ds_Objects.result.Tables.Table3.Rows.length > 0)
+					{
+						PropertyNDDCount=Ds_Objects.result.Tables.Table3.Rows[0].NDDCount
+					}
+					else
+					{
+						PropertyNDDCount=0
+					}
+					if (Ds_Objects.result.Tables.Table4.Rows.length > 0)
+					{
+						Data_AC=Ds_Objects.result.Tables.Table4.Rows as ArrayCollection
+					}
+					else
+					{
+						Data_AC= new ArrayCollection();
+					}
+					if (Ds_Objects.result.Tables.Table5.Rows.length > 0)
+					{
+						ApartmentGuestCount_AC=Ds_Objects.result.Tables.Table5.Rows as ArrayCollection
+					}
+					else
+					{
+						ApartmentGuestCount_AC=new ArrayCollection();
+					}
+					if (Ds_Objects.result.Tables.Table6.Rows.length > 0)
+					{
+						DateWiseOccupancyNDD_AC=Ds_Objects.result.Tables.Table6.Rows as ArrayCollection
+					}
+					else
+					{
+						DateWiseOccupancyNDD_AC=new ArrayCollection();
+					}
+					if (Ds_Objects.result.Tables.Table7.Rows.length > 0)
+					{
+						DateWiseOccupancyDD_AC=Ds_Objects.result.Tables.Table7.Rows as ArrayCollection
+					}
+					else
+					{
+						DateWiseOccupancyDD_AC=new ArrayCollection();
+					}
+					if (Ds_Objects.result.Tables.Table8.Rows.length > 0)
+					{
+						DateWiseNOGuest_AC=Ds_Objects.result.Tables.Table8.Rows as ArrayCollection
+					}
+					else
+					{
+						DateWiseNOGuest_AC=new ArrayCollection();
+					}
+					
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Occupancy_AC=Ds_Objects.result.Tables.Table.Rows as ArrayCollection
+					}
+					else
+					{
+						Occupancy_AC=new ArrayCollection();
+					}
+					
+					OccupancyChart();
+					
+				}				
+				if (Ds_Objects.currentTarget.description.toString() == "BookingCode_CUSTOM")
+				{
+//					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+//					{
+//						txt_BookingCode.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+//					}
+//					else
+//					{
+//						txt_BookingCode.dataProvider=null;
+//					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "BookingGuest_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						txt_Property.text=Ds_Objects.result.Tables.Table.Rows[0].PropertyName;
+						Status=Ds_Objects.result.Tables.Table.Rows[0].CheckIn;
+						if(Status=="Booking")
+						{
+							Grp_Checkin.visible=false;
+						}
+						else
+						{
+							Grp_Checkin.visible=true;
+						}
+						if(Status=="CheckOut")
+						{
+							Clear1();
+							alignAlert(Alert.show("This Booking Already CheckOut.Can't Modified.","Message !",Alert.OK,null,null,iconTickLarge, Alert.OK),10,"");
+							return
+						}
+						
+					}
+					else
+					{
+						txt_Property.text="";
+					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						
+						myArrayCollection=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+						Grd_Property._setGridSrc=myArrayCollection;
+					}
+					else
+					{
+						Grd_Property._clear();
+					}
+					if (Ds_Objects.result.Tables.Table2.Rows.length > 0)
+					{
+						TariffPaymentMode_AC=Ds_Objects.result.Tables.Table2.Rows as ArrayCollection;
+						
+					}
+					else
+					{
+						TariffPaymentMode_AC=new ArrayCollection();
+					}
+					if (Ds_Objects.result.Tables.Table3.Rows.length > 0)
+					{
+						ServicePaymentMode_AC=Ds_Objects.result.Tables.Table3.Rows as ArrayCollection;
+						
+					}
+					else
+					{
+						ServicePaymentMode_AC=new ArrayCollection();
+					}
+					if (Ds_Objects.result.Tables.Table4.Rows.length > 0)
+					{
+						var ClientId:String= Ds_Objects.result.Tables.Table4.Rows[0].ClientId;
+						var GradeId:String= Ds_Objects.result.Tables.Table4.Rows[0].GradeId;
+						
+						var Tmp:ArrayCollection=new ArrayCollection
+							([{Action:GlobalXml,Param1:"PaymentMode",Param2:BookingLevel,Param3:BookingId,prcName:"BookingCancel",
+								ctrlName:"hlpTariffPaymentMode",grdWidth:"80,0"},
+								{Action:GlobalXml,Param1:"PaymentModeService",Param2:BookingLevel,Param3:BookingId,prcName:"BookingCancel",
+									ctrlName:"hlpServicePaymentMode",grdWidth:"80,0"},
+								{Action:GlobalXml,Param1:"GuestData",Param2:ClientId,Param3:GradeId,prcName:"BookingCancel",
+									ctrlName:"hlpFirstName",grdWidth:"100,100,0"}]);	
+						Grd_Property._bindHlpTextData(Tmp);
+						Tmp=new ArrayCollection();
+						
+					}
+					if (Ds_Objects.result.Tables.Table5.Rows.length > 0)
+					{
+						txt_BookingCode.text=Ds_Objects.result.Tables.Table5.Rows[0].BookingCode;
+						txt_BookingLevel.text=Ds_Objects.result.Tables.Table5.Rows[0].BookingLevel;
+						txt_Client.text=Ds_Objects.result.Tables.Table5.Rows[0].ClientName;
+					}
+					else
+					{
+						txt_BookingCode.text="";
+						txt_BookingLevel.text="";
+						txt_Client.text="";
+					}
+					
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				{
+					
+					alignAlert(Alert.show("Booking Modified Successfully.","Message !",Alert.OK,null,null,iconTickLarge, Alert.OK),10,"");
+					Clear();
+				}				
+			}
+			private function OccupancyChart():void
+			{
+				
+				var sDate1:Date=DateField.stringToDate(dt_From.text,"DD/MM/YYYY");
+				var TwosDate:Date=DateField.stringToDate(dt_From.text,"DD/MM/YYYY");
+				var sDate2:Date=DateField.stringToDate(dt_To.text,"DD/MM/YYYY");
+				var Date_AC:ArrayCollection=new ArrayCollection();
+				var Err:String=""; 
+				//Date Differance
+				var MS_PER_DAY:uint = 1000 * 60 * 60 * 24;
+				var tempDate:Date = new Date(sDate2.time - sDate1.time);
+				var difference:Number = 
+					Math.abs(Math.round((tempDate.time / MS_PER_DAY)));
+				var _x:int=85;
+				var _y:int=0;				
+				TopCntl.removeAllElements();				
+				var DateStr:String=""; 
+				var DayStr:String="";
+				var TwosDateStr:String="";
+				var ConDateStr:String="";
+				var NewControl:Object;
+				if(difference>32)
+				{
+					difference=32;
+				}
+				//Header creation
+				for(var i:int=0;i<=difference;i++)
+				{
+					if(i!=0)
+					{
+						sDate1.setDate(sDate1.getDate() + 1);
+						
+					}	
+					TwosDate.setDate(sDate1.getDate() + 1);
+					DateStr=dateToString(sDate1);
+					TwosDateStr=dateToString(TwosDate);
+					DayStr=dayToString(sDate1);
+					NewControl = new OccupancyHeader_HB(); 
+					NewControl.id = "lbl" + i;					
+					NewControl._LabelDate= DateStr.substring(0,5);	
+					NewControl._LabelDay= DayStr.substring(0,3);										
+					NewControl.x =_x;
+					NewControl.y=_y;	
+					TopCntl.addElement(NewControl as OccupancyHeader_HB)
+					_x+=35;
+					var Ac_DT:ArrayCollection=new ArrayCollection
+						([{
+							Date:DateStr,ContDt:DateStr.substring(0,2)+"-"+TwosDateStr.substring(0,2),
+							DDCount:0,NDDCount:0,NOGuest:0,ApartmentDate:""							
+							//BookingId:'',
+							//RoomId:'',RoomName:'',GuestName:'',CheckInDt:'',Type:'',
+							//CurrentDt:'',Occupancy:'',RoomType:'',BookingLevel:'',NoGuest:'',
+							//BookingCode:'',ClientName:''							
+						}]);					
+					Date_AC.addItemAt(Ac_DT[0],Date_AC.length)					
+				}
+				//Split days wise checkin 
+				OccupancyDtls_AC=new ArrayCollection();
+				for(var a:int=0;a<Occupancy_AC.length;a++)
+				{	
+					var BookingEntryFlag:Boolean=false;
+					if(OccupancyDtls_AC.length!=0)
+					{
+						for(var b:int=0;b<OccupancyDtls_AC.length;b++)
+						{	
+							if((Occupancy_AC[a].DT==OccupancyDtls_AC[b].DT)&&(Occupancy_AC[a].RoomId==OccupancyDtls_AC[b].RoomId))
+							{
+								OccupancyDtls_AC[b].BookingId=OccupancyDtls_AC[b].BookingId+','+Occupancy_AC[a].BookingId
+								OccupancyDtls_AC[b].RoomId=OccupancyDtls_AC[b].RoomId
+								OccupancyDtls_AC[b].RoomName=OccupancyDtls_AC[b].RoomName
+								OccupancyDtls_AC[b].GuestName=OccupancyDtls_AC[b].GuestName+','+Occupancy_AC[a].GuestName
+								OccupancyDtls_AC[b].CheckInDt=OccupancyDtls_AC[b].CheckInDt+','+Occupancy_AC[a].CheckInDt
+								OccupancyDtls_AC[b].CheckOutDt=OccupancyDtls_AC[b].CheckOutDt+','+Occupancy_AC[a].CheckOutDt
+								OccupancyDtls_AC[b].Type=OccupancyDtls_AC[b].Type+','+Occupancy_AC[a].Type
+								OccupancyDtls_AC[b].CurrentDt=OccupancyDtls_AC[b].DT+','+Occupancy_AC[a].DT
+								OccupancyDtls_AC[b].Occupancy=OccupancyDtls_AC[b].Occupancy+','+Occupancy_AC[a].Occupancy
+								OccupancyDtls_AC[b].RoomType=OccupancyDtls_AC[b].RoomType
+								OccupancyDtls_AC[b].BookingLevel=OccupancyDtls_AC[b].BookingLevel+','+Occupancy_AC[a].BookingLevel
+								OccupancyDtls_AC[b].NoGuest=OccupancyDtls_AC[b].NoGuest+','+Occupancy_AC[a].GuestCount
+								OccupancyDtls_AC[b].BookingCode=OccupancyDtls_AC[b].BookingCode+','+Occupancy_AC[a].BookingCode
+								OccupancyDtls_AC[b].ClientName=OccupancyDtls_AC[b].ClientName+','+Occupancy_AC[a].ClientName
+								BookingEntryFlag=true;
+								b=OccupancyDtls_AC.length;
+							}							
+						}						
+					}
+					if(BookingEntryFlag!=true)
+					{
+						var Ac_Hdr:ArrayCollection=new ArrayCollection
+							([{BookingId:Occupancy_AC[a].BookingId,
+								RoomId:Occupancy_AC[a].RoomId,
+								RoomName:Occupancy_AC[a].RoomName,
+								GuestName:Occupancy_AC[a].GuestName,
+								CheckInDt:Occupancy_AC[a].CheckInDt,
+								CheckOutDt:Occupancy_AC[a].CheckOutDt,
+								Type:Occupancy_AC[a].Type,
+								DT:Occupancy_AC[a].DT,
+								Occupancy:Occupancy_AC[a].Occupancy,
+								RoomType:Occupancy_AC[a].RoomType,
+								BookingLevel:Occupancy_AC[a].BookingLevel,
+								NoGuest:Occupancy_AC[a].GuestCount,
+								BookingCode:Occupancy_AC[a].BookingCode,
+								ClientName:Occupancy_AC[a].ClientName
+							}]);
+						OccupancyDtls_AC.addItemAt(Ac_Hdr[0],OccupancyDtls_AC.length);
+					}					
+				}
+				var _a:int=0;
+				var _s:int=40;
+				 _x=0;
+				 _y=40;
+				 //Details creation
+				for(var j:int=0;j<PropertyRooms_AC.length;j++)
+				{													
+					//Create Room No
+					NewControl = new OccupancyDetails(); 
+					NewControl.id = "lbl" + i;
+					NewControl._LabelRooms= PropertyRooms_AC[j].Room;	
+					NewControl._LabelRoomId= PropertyRooms_AC[j].Id;										
+					NewControl.x =_a;
+					NewControl.y=_s;	
+					TopCntl.addElement(NewControl as OccupancyDetails)
+					_s+=32;	
+					if(j!=0)
+					{
+						_y+=32;
+					}
+					var sDate5:Date=DateField.stringToDate(dt_From.text,"DD/MM/YYYY");
+					var sDate6:Date=DateField.stringToDate(dt_To.text,"DD/MM/YYYY");
+					
+					//Date Differance
+					
+					var tempDate3:Date = new Date(sDate6.time - sDate5.time);
+					var difference3:Number = 
+						Math.abs(Math.round((tempDate3.time / MS_PER_DAY)));
+					_x=85;
+					if(difference3>32)
+					{
+						difference3=32;
+					}
+					for(var i:int=0;i<=difference3;i++)//
+					{
+						if(i!=0)
+						{
+							sDate5.setDate(sDate5.getDate() + 1);
+						}
+						DateStr=dateToString(sDate5);
+						var DateFlag:Boolean=true;
+						for(var a:int=0;a<OccupancyDtls_AC.length;a++)
+						{
+							if((OccupancyDtls_AC[a].RoomId==PropertyRooms_AC[j].Id)&&(OccupancyDtls_AC[a].DT==DateStr)&&(DateFlag==true))
+							{
+								DateFlag=false;
+								NewControl = new OccupancyStatus(); 
+								NewControl.id = OccupancyDtls_AC[a].BookingId;
+								NewControl._LabelToolTip="BookingCode : "+ OccupancyDtls_AC[a].BookingCode+"\nGuest Name : "+ OccupancyDtls_AC[a].GuestName+"\nClient Name : "+ OccupancyDtls_AC[a].ClientName+"\nRoom No : "+OccupancyDtls_AC[a].RoomName+"\nOccupancy : "+OccupancyDtls_AC[a].Occupancy+"\nBookingLevel : "+OccupancyDtls_AC[a].BookingLevel+"\nCheckIn Date : "+OccupancyDtls_AC[a].CheckInDt+"\nCheckOut Date : "+OccupancyDtls_AC[a].CheckOutDt+"\nStatus : "+ OccupancyDtls_AC[a].Type +"\nNo Of Guests : "+ OccupancyDtls_AC[a].NoGuest;	
+								NewControl._LabelId= OccupancyDtls_AC[a].BookingId+","+OccupancyDtls_AC[a].RoomId;
+								NewControl._BookingId=OccupancyDtls_AC[a].BookingId;
+								NewControl._BookingCode=OccupancyDtls_AC[a].BookingCode;
+								NewControl._BookingLevel=OccupancyDtls_AC[a].BookingLevel;
+								NewControl._BookingStatus=OccupancyDtls_AC[a].Type;
+								if(OccupancyDtls_AC[a].Type=="CheckIn")
+								{
+									if(OccupancyDtls_AC[a].CheckInDt==OccupancyDtls_AC[a].DT)
+									{
+										NewControl._CheckinFlag=true;
+									}
+									if(OccupancyDtls_AC[a].CheckOutDt==OccupancyDtls_AC[a].DT)
+									{
+										NewControl._CheckoutFlag=true;
+									}
+									if(OccupancyDtls_AC[a].BookingLevel=="Apartment")
+									{
+										NewControl._CheckInColor="A";
+									}
+									else if(OccupancyDtls_AC[a].BookingLevel=="Bed")
+									{
+										NewControl._CheckInColor="B";
+									}
+									else if(OccupancyDtls_AC[a].BookingLevel=="Room")
+									{
+										NewControl._CheckInColor="R";
+									}
+									else
+									{
+										NewControl._OverLapCheckin="#00FF00";
+									}
+								}
+								else if(OccupancyDtls_AC[a].Type=="Booked")
+								{
+									if(OccupancyDtls_AC[a].CheckInDt==OccupancyDtls_AC[a].DT)
+									{
+										NewControl._CheckinFlag=true;
+									}
+									if(OccupancyDtls_AC[a].CheckOutDt==OccupancyDtls_AC[a].DT)
+									{
+										NewControl._CheckoutFlag=true;
+									}									
+									if(OccupancyDtls_AC[a].BookingLevel=="Apartment")
+									{
+										NewControl._BookingColor="A";
+										
+									}
+									else if(OccupancyDtls_AC[a].BookingLevel=="Bed")
+									{
+										NewControl._BookingColor="B";
+									}
+									else if(OccupancyDtls_AC[a].BookingLevel=="Room")
+									{
+										NewControl._BookingColor="R";
+									}
+									else
+									{
+										NewControl._OverLapCheckin="||";
+									}
+								}
+								else if(OccupancyDtls_AC[a].Type=="CheckOut")
+								{
+									if(OccupancyDtls_AC[a].CheckInDt==OccupancyDtls_AC[a].DT)
+									{
+										NewControl._CheckinFlag=true;
+									}
+									if(OccupancyDtls_AC[a].CheckOutDt==OccupancyDtls_AC[a].DT)
+									{
+										NewControl._CheckoutFlag=true;
+									}									
+									if(OccupancyDtls_AC[a].BookingLevel=="Apartment")
+									{
+										NewControl._CheckOutColor="A";
+										
+									}
+									else if(OccupancyDtls_AC[a].BookingLevel=="Bed")
+									{
+										NewControl._CheckOutColor="B";
+									}
+									else if(OccupancyDtls_AC[a].BookingLevel=="Room")
+									{
+										NewControl._CheckOutColor="R";
+									}
+									else
+									{
+										NewControl._OverLapCheckin="||";
+									}
+								}
+								else
+								{
+									NewControl._OverLapCheckin="||";
+								}
+								
+
+								NewControl.x =_x;
+								NewControl.y=_y;	
+								TopCntl.addElement(NewControl as OccupancyStatus)
+								_x+=35;							
+								
+							}							
+						}
+						if(DateFlag==true)
+						{
+							NewControl = new OccupancyStatus(); 
+							NewControl.id = "lbl" + i;
+							NewControl._LabelToolTip="";	
+							NewControl._LabelId= "0";
+							NewControl._BookingId="0";
+							//NewControl._BKColor="#F0FFFF";															
+							NewControl.x =_x;
+							NewControl.y=_y;	
+							TopCntl.addElement(NewControl as OccupancyStatus)
+							_x+=35;	
+							
+						}
+					}
+				}
+				
+				for(var f:int=0;f<Data_AC.length;f++)
+				{
+					//Create Data
+					NewControl = new OccupancyDataHeader(); 
+					NewControl.id = "lbl" + i;
+					NewControl._LabelData= Data_AC[f].DATA;	
+					NewControl._BColor= "";	
+					NewControl.x =_a;
+					NewControl.y=_s;	
+					TopCntl.addElement(NewControl as OccupancyDataHeader)
+					_s+=32;	
+								
+				}
+				_x=85;
+				var NoOfRoomNights:Number=0;
+				var OccupancyND:Number=0;
+				var AvailableND:Number=0;
+				var OccupancyNDPer:Number=0;
+				var NoOfRoomNightsDD:Number=0;
+				var OccupancyDD:Number=0;
+				var AvailableDD:Number=0;
+				var OccupancyDDPer:Number=0;
+				var NoOfGuest:Number=0;
+				var TotalOccupancyPer:Number=0;
+				var RoomNigths:Number=0;
+				var RoomNigths1:Number=0;
+				var RoomNigthsNDD:Number=0;
+				var RoomNigths1DD:Number=0;
+				
+				//date wise night rooms Non-Dedicated
+				if(PropertyNDDCount-PropertyDDCount!=0)
+				{
+					for(var G:int=0;G<Date_AC.length;G++)
+					{
+						for(var H:int=0;H<DateWiseOccupancyNDD_AC.length;H++)
+						{
+							if(Date_AC[G].Date==DateWiseOccupancyNDD_AC[H].DT)
+							{
+								Date_AC[G].NDDCount=DateWiseOccupancyNDD_AC[H].NDDCount
+								if(DateWiseOccupancyNDD_AC.length!=1)
+								{
+									DateWiseOccupancyNDD_AC.removeItemAt(H)
+								}								
+								H=DateWiseOccupancyNDD_AC.length
+							}
+						}
+					}
+				}
+				
+				//date wise night rooms Dedicated
+				if(PropertyDDCount!=0)
+				{
+				 	for(var M:int=0;M<Date_AC.length;M++)
+					{
+						for(var N:int=0;N<DateWiseOccupancyDD_AC.length;N++)
+						{
+							if(Date_AC[M].Date==DateWiseOccupancyNDD_AC[N].DT)
+							{
+								Date_AC[M].DDCount=DateWiseOccupancyNDD_AC[N].DDCount
+								if(DateWiseOccupancyDD_AC.length!=1)
+								{
+									DateWiseOccupancyDD_AC.removeItemAt(N)
+								}								
+								M=DateWiseOccupancyDD_AC.length
+							}
+						}
+					}					
+				}
+				//No of guest count date wise
+				for(var M:int=0;M<Date_AC.length;M++)
+				{
+					for(var N:int=0;N<DateWiseNOGuest_AC.length;N++)
+					{
+						if(Date_AC[M].Date==DateWiseNOGuest_AC[N].DT)
+						{
+							Date_AC[M].NOGuest=DateWiseNOGuest_AC[N].NOGuest
+							if(DateWiseNOGuest_AC.length!=1)
+							{
+								DateWiseNOGuest_AC.removeItemAt(N)
+							}								
+							N=DateWiseNOGuest_AC.length
+						}
+					}
+				}								
+				for(var k:int=0;k<Date_AC.length;k++)
+				{
+					NewControl = new OccupancyData(); 
+					NewControl.id = "lbl" + i;
+					NewControl._LabelData= Date_AC[k].ContDt;	
+					NewControl._BColor= "";	
+					NewControl.x =_x;
+					NewControl.y=_y+32;	
+					TopCntl.addElement(NewControl as OccupancyData)
+					
+					 	
+					
+					NewControl = new OccupancyData(); 
+					NewControl.id = "lbl" + i;
+					NewControl._LabelData= String(PropertyNDDCount-PropertyDDCount);						
+					NewControl.x =_x;
+					NewControl.y=_y+(32*2);	
+					TopCntl.addElement(NewControl as OccupancyData)
+					RoomNigths=	PropertyNDDCount-PropertyDDCount;
+					NoOfRoomNights+=PropertyNDDCount-PropertyDDCount
+					
+					
+					NewControl = new OccupancyData(); 
+					NewControl.id = "lbl" + i;
+					if(RoomNigths>Number(Date_AC[k].NDDCount))
+					{
+						NewControl._LabelData= Date_AC[k].NDDCount;
+						OccupancyND+=Number(Date_AC[k].NDDCount)
+						RoomNigthsNDD=Number(Date_AC[k].NDDCount);
+					}
+					else
+					{
+						NewControl._LabelData= RoomNigths;
+						OccupancyND+=RoomNigths;
+						RoomNigthsNDD=RoomNigths;
+					}					
+					NewControl.x =_x;
+					NewControl.y=_y+(32*3);	
+					TopCntl.addElement(NewControl as OccupancyData)
+						
+					
+					
+					NewControl = new OccupancyData(); 
+					NewControl.id = "lbl" + i;
+					if(RoomNigths>Number(Date_AC[k].NDDCount))
+					{
+						NewControl._LabelData= String((PropertyNDDCount-PropertyDDCount)-Number(Date_AC[k].NDDCount));
+						AvailableND+=(PropertyNDDCount-PropertyDDCount)-Number(Date_AC[k].NDDCount)
+					}
+					else
+					{
+						NewControl._LabelData= String((PropertyNDDCount-PropertyDDCount)-Number(RoomNigths));
+						AvailableND+=(PropertyNDDCount-PropertyDDCount)-Number(RoomNigths)
+					}
+						
+					NewControl._RedColor= "";	
+					NewControl.x =_x;
+					NewControl.y=_y+(32*4);	
+					TopCntl.addElement(NewControl as OccupancyData)
+					
+					
+					
+					NewControl = new OccupancyData(); 
+					NewControl.id = "lbl" + i;
+					if(RoomNigths>Number(Date_AC[k].NDDCount))
+					{
+						NewControl._LabelData= Round2.format((Number(Date_AC[k].NDDCount)/(PropertyNDDCount-PropertyDDCount))*100);
+						OccupancyNDPer+=Number(Round2.format((Number(Date_AC[k].NDDCount)/(PropertyNDDCount-PropertyDDCount))*100))
+					}
+					else
+					{
+						NewControl._LabelData= Round2.format((Number(RoomNigths)/(PropertyNDDCount-PropertyDDCount))*100);
+						OccupancyNDPer+=Number(Round2.format((Number(RoomNigths)/(PropertyNDDCount-PropertyDDCount))*100))
+					}										
+					NewControl.x =_x;
+					NewControl.y=_y+(32*5);	
+					TopCntl.addElement(NewControl as OccupancyData)
+						
+					
+					
+					
+					NewControl = new OccupancyData(); 
+					NewControl.id = "lbl" + i;
+					NewControl._LabelData= String(PropertyDDCount);						
+					NewControl.x =_x;
+					NewControl.y=_y+(32*6);	
+					TopCntl.addElement(NewControl as OccupancyData)
+					
+					NoOfRoomNightsDD+=PropertyDDCount;
+					RoomNigths1=PropertyDDCount;
+					
+					NewControl = new OccupancyData(); 
+					NewControl.id = "lbl" + i;
+					if(RoomNigths1>Number(Date_AC[k].DDCount))
+					{
+						NewControl._LabelData= Date_AC[k].DDCount;	
+						OccupancyDD+=Number(Date_AC[k].DDCount)
+						RoomNigths1DD=Number(Date_AC[k].DDCount);
+					}
+					else
+					{
+						NewControl._LabelData= RoomNigths1;
+						OccupancyDD+=Number(RoomNigths1)
+						RoomNigths1DD=RoomNigths1;
+					}									
+					NewControl.x =_x;
+					NewControl.y=_y+(32*7);	
+					TopCntl.addElement(NewControl as OccupancyData)
+					
+					
+					
+					NewControl = new OccupancyData(); 
+					NewControl.id = "lbl" + i;
+					if(RoomNigths1>Number(Date_AC[k].DDCount))
+					{
+						NewControl._LabelData=  String(PropertyDDCount-Number(Date_AC[k].DDCount));	
+						AvailableDD+=PropertyDDCount-Number(Date_AC[k].DDCount);
+					}
+					else
+					{
+						NewControl._LabelData=  String(PropertyDDCount-Number(RoomNigths1));
+						AvailableDD+=PropertyDDCount-Number(RoomNigths1);
+					}
+					
+					NewControl._RedColor= "";	
+					NewControl.x =_x;
+					NewControl.y=_y+(32*8);	
+					TopCntl.addElement(NewControl as OccupancyData)
+						
+					var DDPer:String="";
+					if(RoomNigths1>Number(Date_AC[k].DDCount))
+					{
+						DDPer=Round2.format((Number(Date_AC[k].DDCount)/PropertyDDCount)*100);
+					}
+					else
+					{
+						DDPer=Round2.format((Number(RoomNigths1)/PropertyDDCount)*100);
+					}					
+					
+					NewControl = new OccupancyData(); 
+					NewControl.id = "lbl" + i;
+					if(DDPer=="")
+					{
+						NewControl._LabelData="0.00";
+					}
+					else
+					{
+						NewControl._LabelData=DDPer;
+					}										
+					NewControl.x =_x;
+					NewControl.y=_y+(32*9);	
+					TopCntl.addElement(NewControl as OccupancyData)
+					
+					OccupancyDDPer+=Number(DDPer)
+					
+					NewControl = new OccupancyData(); 
+					NewControl.id = "lbl" + i;
+					NewControl._LabelData= Date_AC[k].NOGuest;					
+					NewControl.x =_x;
+					NewControl.y=_y+(32*10);	
+					TopCntl.addElement(NewControl as OccupancyData)
+						
+					NoOfGuest+=Number(Date_AC[k].NOGuest);
+						
+					var TPer:String=Round2.format(((Number(RoomNigths1DD)+Number(RoomNigthsNDD))/(PropertyNDDCount+Number(PropertyDDCount)))*100);
+					
+					NewControl = new OccupancyData(); 
+					NewControl.id = "lbl" + i;
+					NewControl._LabelData= TPer;					
+					NewControl.x =_x;
+					NewControl.y=_y+(32*11);	
+					TopCntl.addElement(NewControl as OccupancyData)
+					
+					TotalOccupancyPer+=Number(TPer);
+					_x+=35;
+				}
+				
+				NewControl = new OccupancyData(); 
+				NewControl.id = "lbl" + i;
+				NewControl._LabelData="Total";	
+				NewControl._BColor= "";	
+				NewControl.x =_x;
+				NewControl.y=_y+32;	
+				TopCntl.addElement(NewControl as OccupancyData)
+					
+				NewControl = new OccupancyData(); 
+				NewControl.id = "lbl" + i;
+				NewControl._LabelData= NoOfRoomNights;	
+				NewControl._BColor= "";	
+				NewControl.x =_x;
+				NewControl.y=_y+(32*2);	
+				TopCntl.addElement(NewControl as OccupancyData)
+					
+				NewControl = new OccupancyData(); 
+				NewControl.id = "lbl" + i;
+				NewControl._LabelData= OccupancyND;	
+				NewControl._BColor= "";	
+				NewControl.x =_x;
+				NewControl.y=_y+(32*3);	
+				TopCntl.addElement(NewControl as OccupancyData)
+					
+				NewControl = new OccupancyData(); 
+				NewControl.id = "lbl" + i;
+				NewControl._LabelData= AvailableND;	
+				NewControl._BColor= "";	
+				NewControl.x =_x;
+				NewControl.y=_y+(32*4);	
+				TopCntl.addElement(NewControl as OccupancyData)
+					
+				NewControl = new OccupancyData(); 
+				NewControl.id = "lbl" + i;
+				NewControl._LabelData= Round2.format(OccupancyND/NoOfRoomNights*100);	
+				NewControl._BColor= "";	
+				NewControl.x =_x;
+				NewControl.y=_y+(32*5);	
+				TopCntl.addElement(NewControl as OccupancyData)
+					
+				NewControl = new OccupancyData(); 
+				NewControl.id = "lbl" + i;
+				NewControl._LabelData= NoOfRoomNightsDD;	
+				NewControl._BColor= "";	
+				NewControl.x =_x;
+				NewControl.y=_y+(32*6);	
+				TopCntl.addElement(NewControl as OccupancyData)
+					
+				NewControl = new OccupancyData(); 
+				NewControl.id = "lbl" + i;
+				NewControl._LabelData= OccupancyDD;	
+				NewControl._BColor= "";	
+				NewControl.x =_x;
+				NewControl.y=_y+(32*7);	
+				TopCntl.addElement(NewControl as OccupancyData)
+					
+				NewControl = new OccupancyData(); 
+				NewControl.id = "lbl" + i;
+				NewControl._LabelData= AvailableDD;	
+				NewControl._BColor= "";	
+				NewControl.x =_x;
+				NewControl.y=_y+(32*8);	
+				TopCntl.addElement(NewControl as OccupancyData)
+					
+				var OcPer:String= Round2.format(OccupancyDD/NoOfRoomNightsDD*100);
+					
+				NewControl = new OccupancyData(); 
+				NewControl.id = "lbl" + i;
+				if(OcPer=="")
+				{
+					NewControl._LabelData="0.00";
+				}
+				else
+				{
+					NewControl._LabelData=OcPer;
+				}
+					
+				NewControl._BColor= "";	
+				NewControl.x =_x;
+				NewControl.y=_y+(32*9);	
+				TopCntl.addElement(NewControl as OccupancyData)
+					
+				NewControl = new OccupancyData(); 
+				NewControl.id = "lbl" + i;
+				NewControl._LabelData= NoOfGuest;	
+				NewControl._BColor= "";	
+				NewControl.x =_x;
+				NewControl.y=_y+(32*10);	
+				TopCntl.addElement(NewControl as OccupancyData)
+					
+				var TotalPer:Number=Number(Round2.format(((OccupancyND+OccupancyDD)/(NoOfRoomNightsDD+NoOfRoomNights))*100));
+					
+				NewControl = new OccupancyData(); 
+				NewControl.id = "lbl" + i;
+				NewControl._LabelData=TotalPer;	
+				NewControl._BColor= "";	
+				NewControl.x =_x;
+				NewControl.y=_y+(32*11);	
+				TopCntl.addElement(NewControl as OccupancyData)
+				
+			}		
+			public var BookingLevel:String="";
+			public function BookingClick(event:Object,Booking:String,BookingLevel:String,BookingCode:String,BookingStatus:String):void
+			{
+				if(BookingStatus!="CheckedOut")
+				{
+					if(Booking!="0")
+					{
+						txt_Remarks.text="";
+						Grd_Property._clear();
+						txt_BookingCode.text="";			
+						txt_Client.text="";
+						txt_Property.text="";			
+						txt_BookingLevel.text="";
+						txt_BookingCode.setFocus();
+						BookingId=Booking;
+						var Temp_Arr:Array=new Array();
+						var Temp_Arr1:Array=new Array();
+						var Temp_Arr3:Array=new Array();
+						Temp_Arr3=BookingLevel.split(",");
+						Temp_Arr1=BookingCode.split(",");
+						Temp_Arr=BookingId.split(",");
+						
+						if(Temp_Arr.length==1)
+						{
+							Brd_BookingModification.visible=true;
+							TopCntl1.visible=false;
+							BookingLevel=BookingLevel;
+							
+							//					var Tmp:ArrayCollection=new ArrayCollection
+							//						([{Action:GlobalXml,Param1:"PaymentMode",Param2:BookingLevel,Param3:BookingId,prcName:"BookingCancel",
+							//							ctrlName:"hlpTariffPaymentMode",grdWidth:"80,0"},
+							//							{Action:GlobalXml,Param1:"PaymentModeService",Param2:BookingLevel,Param3:BookingId,prcName:"BookingCancel",
+							//								ctrlName:"hlpServicePaymentMode",grdWidth:"80,0"}]);						
+							//					Grd_Property._bindHlpTextData(Tmp);
+							//					Tmp=new ArrayCollection();
+							useWeb("BookingCancel","BookingGuest_CUSTOM", [GlobalXml, "BookingGuest",BookingLevel, BookingId, Global_AC[0].UsrId]);
+						}
+						else
+						{
+							Brd_BookingModification.visible=true;
+							TopCntl1.removeAllElements();
+							TopCntl1.visible=true;
+							NewControl = new mx.controls.Label;
+							NewControl.id = "lbl1";
+							NewControl.text= "Select Booking No : ";					
+							NewControl.setStyle("color","#F90808");
+							NewControl.x =40;
+							NewControl.y=17;	
+							TopCntl1.addElement(NewControl as mx.controls.Label)
+							for(var k:int=0;k<Temp_Arr.length;k++)
+							{
+								var NewControl:Object;
+								NewControl =  new LinkButton();
+								NewControl.id = Temp_Arr[k].toString()+","+Temp_Arr3[k].toString();
+								NewControl.label= Temp_Arr1[k].toString();
+								NewControl.x =0;
+								NewControl.y=17+k*10;
+								NewControl.addEventListener("click",MenuClick);	
+								TopCntl1.addElement(NewControl as LinkButton)
+							}
+							
+						}
+					}
+				}
+				
+				
+			}
+			private function MenuClick(event:Event):void
+			{
+				txt_Remarks.text="";
+				Grd_Property._clear();
+				txt_BookingCode.text="";			
+				txt_Client.text="";
+				txt_Property.text="";			
+				txt_BookingLevel.text="";
+				txt_BookingCode.setFocus();
+				var Ddl_Id:String=event.target.id;
+				var Arr_Screen:Array=new Array();
+				Arr_Screen=Ddl_Id.split(',');
+				BookingLevel=Arr_Screen[1].toString();
+				BookingId=Arr_Screen[0].toString();
+				useWeb("BookingCancel","BookingGuest_CUSTOM", [GlobalXml, "BookingGuest",Arr_Screen[1].toString(),int(Arr_Screen[0].toString()), Global_AC[0].UsrId]);
+			}
+			private var dateFormatter:DateFormatter;
+			public function dateToString(d:Date):String
+			{
+				dateFormatter = new DateFormatter();
+				dateFormatter.formatString = 'DD/MM/YYYY' 
+				return dateFormatter.format(d);
+			}
+			public function dayToString(d:Date):String
+			{
+				dateFormatter = new DateFormatter();
+				dateFormatter.formatString = 'EEEE' 
+				return dateFormatter.format(d);
+			}			
+			protected function button_hb1_clickHandler(event:MouseEvent):void
+			{
+				if(dt_From.text=="")
+				{
+					alignAlert(Alert.show("* From Date is Required.","Error !",Alert.OK, 
+						null, null, iconErrLarge, Alert.OK),10,"");
+					return;
+				}
+				else if(dt_To.text=="")
+				{
+					alignAlert(Alert.show("* To Date is Required.","Error !",Alert.OK, 
+						null, null, iconErrLarge, Alert.OK),10,"");
+					return;
+				}
+				else if(hlp_Property.text=="")
+				{
+					alignAlert(Alert.show("* Property is Required.","Error !",Alert.OK, 
+						null, null, iconErrLarge, Alert.OK),10,"");
+					return;
+				}
+				else
+				{
+					
+					useWeb("Report","OccupancyChart_CUSTOM", [GlobalXml, "OccupancyChart",0, PropertyId,dt_From.text,dt_To.text]);
+				}
+			}
+			private function fnGetProperty():void
+			{
+				if(hlp_Property.selected())
+				{
+					hlp_Property.text=hlp_Property.Select_Row.PropertyName
+					PropertyId=hlp_Property.Select_Row.ZId
+						dt_From.setFocus();
+				}
+				else
+				{
+					hlp_Property.text="";
+					PropertyId=0;
+				}
+			}
+			private function Close():void
+			{
+				Brd_BookingModification.visible=false;
+			}
+			protected function dt_From_changeHandler(event:CalendarLayoutChangeEvent):void
+			{
+				if(dt_From.selectedDate)
+				{
+					var asd:String = dt_From.text;										
+					var Y:String = asd.substr(6,10);
+					var M:String = asd.substr(3,2);
+					var D:String = asd.substr(0,2);
+					var RangeStart:String = Y+'/'+M+'/'+D;
+					dt_To.selectableRange = {rangeStart:new Date(RangeStart)};
+					dt_To.selectedDate = new Date(RangeStart);
+					
+					dt_To.selectableRange = {rangeStart:new Date(RangeStart)};
+					dt_To.selectedDate = new Date(RangeStart);
+					dt_To.setFocus();
+				}
+			}
+			//Booking Modification
+			public function Clear1():void
+			{
+				txt_Remarks.text="";
+				Grd_Property._clear();
+				txt_BookingCode.text="";				
+				txt_Client.text="";
+				txt_Property.text="";
+				BookingId="";
+				DtlsId=0;
+				GuestFlag=false;
+				txt_BookingLevel.text="";
+				txt_BookingCode.setFocus();			
+				BookingLevel="";				
+			}
+			public function Clear():void
+			{
+				txt_Remarks.text="";
+				Grd_Property._clear();
+				txt_BookingCode.text="";
+				
+				txt_Client.text="";
+				txt_Property.text="";
+				BookingId="";
+				DtlsId=0;
+				GuestFlag=false;
+				txt_BookingLevel.text="";
+				txt_BookingCode.setFocus();
+				help();
+				BookingLevel="";
+				TopCntl1.visible=false;
+				Grd_Property.enabled=true;
+			}
+			public var Ac_Guest:ArrayCollection=new ArrayCollection();	
+			public var selectedindex:int=0;			
+			private function Save():void 
+			{
+				
+				if((Grd_Property._getGridSrc!=null)||(Grd_Property._getGridSrc.length!=0))
+				{
+					Ac_Guest=Grd_Property._getGridSrc as ArrayCollection;
+					for(var i:int=0;i<Ac_Guest.length;i++)
+					{
+						if(Ac_Guest[i].Tick=="1")
+						{
+							GuestFlag=true;
+						}
+					}
+				}
+				
+				//var selectedindex:int=Grd_Property.selectedIndex;
+				//DtlsId=Ac_Guest[selectedindex].Id;
+				if(GuestFlag==false)
+				{
+					alignAlert(Alert.show("This is an Invalid Process.None Of Modified.","Error !",Alert.OK, 
+						null, null, iconCrossSmall, Alert.OK),10,"");
+					return;
+				}
+				else if(txt_Remarks.text=="")
+				{
+					alignAlert(Alert.show("* Remarks is Required.","Error !",Alert.OK, 
+						null, null, iconErrLarge, Alert.OK),10,"");
+					return;
+				}
+				else if((Grd_Property._getGridSrc==null)||(Grd_Property._getGridSrc.length==0))
+				{
+					alignAlert(Alert.show("* Details Are Required.","Error !",Alert.OK, 
+						null, null, iconErrLarge, Alert.OK),10,"");
+					return;
+				}
+				else
+				{
+					var HdrXml:String = "";
+					HdrXml += "<ROOT>";
+					HdrXml += ObjToXmlStr_Comm(Grd_Property._getGridSrc as ArrayCollection,"HdrXml")
+					HdrXml += "</ROOT>";
+					useWeb("BookingCancel","Save_CUSTOM", [GlobalXml,HdrXml, BookingId,txt_Remarks.text,Chk_Mail.selected]);
+				}
+			}
+//			private function fnGetBooking():void
+//			{
+//				Grd_Property._clear();
+//				if(hlp_BookingCode.selected())
+//				{
+//					txt_Remarks.text="";
+//					txt_BookingCode.text=hlp_BookingCode.Select_Row.BookingCode;
+//					BookingLevel=hlp_BookingCode.Select_Row.ZBookingLevelId;
+//					txt_BookingLevel.text=BookingLevel;
+//					BookingId=hlp_BookingCode.Select_Row.Id;
+//					txt_Client.text=hlp_BookingCode.Select_Row.ZClientNameId;
+//					//					var Tmp:ArrayCollection=new ArrayCollection
+//					//						([{Action:GlobalXml,Param1:"PaymentMode",Param2:BookingLevel,Param3:BookingId,prcName:"BookingCancel",
+//					//							ctrlName:"hlpTariffPaymentMode",grdWidth:"80,0"},
+//					//							{Action:GlobalXml,Param1:"PaymentModeService",Param2:BookingLevel,Param3:BookingId,prcName:"BookingCancel",
+//					//								ctrlName:"hlpServicePaymentMode",grdWidth:"80,0"}]);						
+//					//					Grd_Property._bindHlpTextData(Tmp);
+//					//					Tmp=new ArrayCollection();
+//					useWeb("BookingCancel","BookingGuest_CUSTOM", [GlobalXml, "BookingGuest",BookingLevel, BookingId, Global_AC[0].UsrId]);
+//					
+//				}
+//				else
+//				{
+//					txt_BookingCode.text="";
+//					BookingId=0;
+//					txt_Client.text="";
+//					txt_Remarks.text="";
+//				}
+//			}
+			
+			
+			public var GuestFlag:Boolean=false;
+			
+			public var myArrayCollection:ArrayCollection=new ArrayCollection();
+			public var FltNm:String="";
+			private function filter(Filt:String):void
+			{				
+				FltNm=Filt;				
+				var tempAC:ArrayCollection=new ArrayCollection();	
+				tempAC=Grd_Property._getGridSrc as ArrayCollection;
+				tempAC.filterFunction = filterMyArrayCollection;
+				tempAC.refresh();				
+			}			
+			private function filterMyArrayCollection(item:Object):Boolean 
+			{
+				var Itm:Boolean=true;				
+				if(FiltFirstName.text!="")
+				{
+					var searchString:String = FiltFirstName.text.toLowerCase();
+					var itemName:String = (item.FirstName as String).toLowerCase();
+					Itm=itemName.indexOf(searchString) > -1;
+				}				
+				return Itm;		
+			}
+			public function Custom_Grid_Enter(arrObj:Object, GridMode:Boolean, Index:int):String
+			{
+				if(Status!="Booking")
+				{
+					arrObj.ChkInDt=arrObj.OldChkInDt
+				}				
+				arrObj.DateDiffs="";
+				var sDate1:Date=DateField.stringToDate(arrObj.ChkInDt,"DD/MM/YYYY");
+				var sDate2:Date=DateField.stringToDate(arrObj.ChkOutDt,"DD/MM/YYYY");
+				var Err:String=""; 
+				//Date Differance
+				var MS_PER_DAY:uint = 1000 * 60 * 60 * 24;
+				var tempDate:Date = new Date(sDate2.time - sDate1.time);
+				var difference:Number = 
+					Math.abs(Math.round((tempDate.time / MS_PER_DAY)));
+				arrObj.DateDiffs=difference;
+				if(sDate1>sDate2)
+				{
+					Err=Err+"CheckIn Date Not Greater Than CheckOut Date\n";
+					Grd_Property._setFocus(6);
+					Grd_Property._setFocusFlag(false);
+				}
+				
+				if((arrObj.OldChkInDt!=arrObj.ChkInDt)||(arrObj.OldChkOutDt!=arrObj.ChkOutDt))
+				{
+					//Grd_Property._setValuetoCtrl("txtTick","1");
+					arrObj.Tick="1";
+					arrObj.DateChange="1";
+					
+				}
+				if((arrObj.OldServiceMode!=arrObj.ServicePaymentMode)||(arrObj.OldTariffMode!=arrObj.TariffPaymentMode))
+				{
+					arrObj.Tick="1";
+				}				
+				if((arrObj.FirstName!=arrObj.OldFirstname)||(arrObj.LastName!=arrObj.OldLastName))
+				{
+					arrObj.Tick="1";
+				}
+				if(arrObj.DateDiffs=="0")
+				{
+					Err=Err+"CheckIn And CheckOut Date Are Same.\n";
+					Grd_Property._setFocus(6);
+					Grd_Property._setFocusFlag(false);
+				}
+				var TFFlag:Boolean=true;
+				for(var i:int=0;i< ServicePaymentMode_AC.length;i++)
+				{
+					if(TFFlag==true)
+					{
+						if(arrObj.ServicePaymentMode!=ServicePaymentMode_AC[i].Service)
+						{
+							arrObj.ServiceId="1";
+							
+						}
+						else
+						{
+							TFFlag=false;
+							arrObj.ServiceId="0";
+						}
+					}
+					
+				}
+				TFFlag=true;
+				for(var j:int=0;j< TariffPaymentMode_AC.length;j++)
+				{
+					if(TFFlag==true)
+					{
+						if(arrObj.TariffPaymentMode!=TariffPaymentMode_AC[j].Tariff)
+						{
+							arrObj.TariffId="1";
+						}
+						else
+						{
+							TFFlag=false;
+							arrObj.TariffId="0";
+						}
+					}
+					
+				}
+				if(arrObj.ServiceId=="1")
+				{
+					Err=Err+"Service Payment Mode Is Wrong.\n";
+					Grd_Property._setFocus(8);
+					Grd_Property._setFocusFlag(false);
+				}
+				if(arrObj.TariffId=="1")
+				{
+					Err=Err+"Tariff Payment Mode Is Wrong.\n";
+					Grd_Property._setFocus(7);Grd_Property._setFocusFlag(false);
+				}
+				return Err; 
+			}
+			protected function Grd_AddNewGuest(event:Event):void
+			{
+				if((event.currentTarget.ID == "hlpTariffPaymentMode"))
+				{
+					Grd_Property._setValuetoCtrl("hlpTariffPaymentMode",event.currentTarget.selectedRow.Tariff);
+					Grd_Property._setValuetoCtrl("txtTariffId",event.currentTarget.selectedRow.Id);
+					
+				}
+				if((event.currentTarget.ID == "hlpServicePaymentMode"))
+				{
+					Grd_Property._setValuetoCtrl("hlpServicePaymentMode",event.currentTarget.selectedRow.Service);
+					Grd_Property._setValuetoCtrl("txtServiceId",event.currentTarget.selectedRow.Id);
+					
+				}
+				if((event.currentTarget.ID == "hlpFirstName"))
+				{
+					Grd_Property._setValuetoCtrl("hlpFirstName",event.currentTarget.selectedRow.FirstName);
+					Grd_Property._setValuetoCtrl("txtLastName",event.currentTarget.selectedRow.LastName);
+					Grd_Property._setValuetoCtrl("txtGuestId",event.currentTarget.selectedRow.Id);
+				}
+			}
+			
+			
+			
+		]]>
+	</fx:Script>		
+	<mx:Label x="129" y="72" text="Property"/>
+	<mx:Label x="337" y="33" text="Check Out"/>
+	<mx:Label x="447" y="33" text="Check In"/>
+	<mx:Label x="547" y="33" text="Booking"/>
+	<s:BorderContainer x="520" y="36" width="17" height="16" backgroundColor="lime">
+	</s:BorderContainer>
+	<mx:Label x="509" y="72" text="From"/>
+	<mx:Label x="669" y="72" text="To"/>	
+	<mx:DateField x="551" y="71" id="dt_From" formatString="DD/MM/YYYY" selectedDate="{new Date()}" tabIndex="2" change="dt_From_changeHandler(event)" />
+	<mx:DateField x="701" y="71" id="dt_To" formatString="DD/MM/YYYY" tabIndex="3"/>
+	<s:Scroller x="10" y="107" width="100%" height="100%" depth="1">		
+		<s:Group width="100%" height="80%" id="TopCntl">			
+		</s:Group>
+	</s:Scroller>	
+	<WrbComp:Button_HB x="826" y="66.5" _Label="Genarate" click="button_hb1_clickHandler(event)">
+	</WrbComp:Button_HB>
+	<WrbHelpComp:HelpText x="188" y="72.5" depth="5" pxTabIndex="1" width="303" id="hlp_Property" onselection="{fnGetProperty()}" pxSetColumnsWidth="300,150,300">
+	</WrbHelpComp:HelpText>
+	<s:BorderContainer x="0" y="54" width="100%" height="479" id="Brd_BookingModification" visible="false" depth="10" backgroundColor="#E5E4E2">
+		<mx:Label x="74" y="76" text="Filter"/>
+		<mx:Label x="295" y="36" text="Client"/>
+		<mx:Label x="85" y="346" text="Remarks"/>
+		<mx:Label x="581" y="36" text="Property"/>
+		<mx:Label x="838" y="86" text="Payment Mode"/>
+		<s:TextInput x="339" y="36.5" width="221" id="txt_Client" enabled="false"/>
+		<s:TextInput x="109" y="36.5" width="136" id="txt_BookingCode" enabled="false"/>
+		<s:TextInput x="644" y="36.5" width="262" id="txt_Property" enabled="false"/>
+		<mx:HRule x="0" y="437" width="100%" strokeColor="#eb1c24"/>
+		<s:HGroup x="0" y="442" width="100%" height="30" horizontalAlign="center" verticalAlign="top">
+			<WrbComp:SaveControl id="SCtrl" docRefresh="help()" docSave="Save()">
+			</WrbComp:SaveControl>
+		</s:HGroup>
+		<s:TextArea x="152" y="344" width="299" height="66" id="txt_Remarks"/>
+		<s:TextInput x="110" y="77" width="135" height="22" prompt="First Name" id="FiltFirstName" change="filter('GuestName')"/>
+		<WrbComp:ProDGrid1 x="40" y="108" width="315" height="198" id="Grd_Property" depth="0"
+						   _ColDataField="FirstName~LastName~Occupancy~RoomType~Tariff~ChkInDt~ChkOutDt~TariffPaymentMode~ServicePaymentMode~RoomId~GuestId~Id~OldChkInDt~OldChkOutDt~Tick~ExpectChkInTime~DateDiffs~TariffId~ServiceId~OldTariffMode~OldServiceMode~OldFirstname~OldLastName~DateChange~OldGuestId"
+						   _ColHdrText="FirstName~LastName~Occupancy~Type~Tariff~CheckIn Date~CheckOut Date~Tariff~Service~RoomId~GuestId~Id~OldChkInDt~OldChkOutDt~Tick~ExpectChkInTime~DateDiffs~TariffId~ServiceId~OldTariffMode~OldServiceMode~OldFirstname~OldLastName~DateChange~OldGuestId"
+						   _ColType="hlp~txt~txt~txt~txt~dtf~dtf~hlp~hlp~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt"
+						   _colVisible="1~1~1~1~1~1~1~1~1~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0"
+						   _ColWidth="150~150~80~130~80~90~90~80~80~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0"
+						   _editable="1~1~0~0~0~1~1~1~1~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0"
+						   _required="0~0~1~1~1~0~1~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0"
+						   _spltChar="~"
+						   _visibleColNos="9"					  
+						   _tabIndex="8"
+						   _DuplChk="false"
+						   _getHlpTxtData="Grd_AddNewGuest(event)"
+						   >
+		</WrbComp:ProDGrid1>
+		<mx:Label x="37" y="36" text="Booking No"/>
+		<s:Image x="1000" y="9" source="@Embed(source='../Assets/CrossSmall.png')" click="Close()" toolTip="Close"/>
+		<s:CheckBox x="644" y="344" label="Send Mail" id="Chk_Mail"/>
+		<s:Group x="633" y="110" width="88" height="35" id="Grp_Checkin">
+			<s:Label x="0" y="0"  text="" height="100%" width="100%"/>
+		</s:Group>
+		<mx:Label x="250" y="76" text="Booking Level"/>
+		<s:TextInput x="339" y="76.5" width="135" id="txt_BookingLevel" enabled="false"/>		
+			<s:HGroup id="TopCntl1" x="0" y="0" width="100%" height="30" gap="5" depth="2010" horizontalAlign="left" verticalAlign="middle">			
+				<mx:Label text="Select Booking No"/>
+			</s:HGroup>		
+	</s:BorderContainer>
+	<s:BorderContainer x="420" y="36" width="17" height="16" backgroundColor="green">
+	</s:BorderContainer>
+	<s:BorderContainer x="310" y="36" width="17" height="16" backgroundColor="#728C00">
+	</s:BorderContainer>
+	<s:BorderContainer x="620" y="36" width="17" height="16" backgroundColor="#A74AC7">
+	</s:BorderContainer>
+	<mx:Label x="647" y="33" text="Over Lap"/>
+	
+</s:Application>

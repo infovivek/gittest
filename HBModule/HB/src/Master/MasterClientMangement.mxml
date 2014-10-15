@@ -1,0 +1,1033 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:WrbComp="WrbComp.*"
+			   xmlns:Controls="fx.com.adobe.Controls.*"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   width="100%" height="100%"
+			   creationComplete="Application_creationCompleteHandler(event)"
+			   pageTitle="Client Management">
+	<fx:Declarations>
+		
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
+	<fx:Script>
+		<![CDATA[
+			import WrbComp.frmsearchwindow;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.FlexEvent;
+			import mx.events.IndexChangedEvent;
+			import mx.graphics.codec.PNGEncoder;
+			
+			import spark.events.IndexChangeEvent;
+			import spark.events.TextOperationEvent;
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "";
+			public var MasterClientId:int=0,SalesExecutiveId:int=0,CRMId:int=0,KeyAccountPersonId:int=0;
+			public var Id:int=0,StateId:int=0,CityId:int=0,LocalityId:int=0;
+			public var ClientLogo:String="",StateName:String="",CityName:String="",LocalityName:String="";
+			private var SearchPopUp:frmsearchwindow = new frmsearchwindow();
+			protected function Application_creationCompleteHandler(event:FlexEvent):void
+			{
+				Grp_PhoneNo.visible=false;
+				Grp_ClientContacts.visible=false;
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";
+				FnHelp(); 
+				FnHelp_State();	
+				SCtrl_docClearHandler();
+			}		
+			protected function FnHelp_ContactType():void
+			{
+				var Tmp:ArrayCollection=new ArrayCollection
+					([{Action:GlobalXml,Param1:"CONTACTTYPELOAD",Param2:0,Param3:0,prcName:"MasterClientManagement",
+						ctrlName:"hlpContactType",grdWidth:"108"}]);				
+				Grd_AddNewClient._bindHlpTextData(Tmp);
+				Tmp=new ArrayCollection();
+			}
+			
+			protected function FnHelp_State():void
+			{
+				useWeb("MasterClientManagement","CSTATE_CUSTOM",[GlobalXml,'STATELOAD',0,0]);
+			}
+			protected function FnHelp():void
+			{
+				useWeb("MasterClientManagement","PAGELOAD_CUSTOM",[GlobalXml,'PAGELOAD',0,0]);
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void				
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				{
+					if (Id == 0)
+					{
+						alignAlert(Alert.show("Client Added Successfully.","Message !",Alert.OK, 
+							null, null, iconTickLarge, Alert.OK),10,"");
+					}
+					else
+					{
+						alignAlert(Alert.show("Client Updated Successfully.","Message !",Alert.OK, 
+							null, null, iconTickLarge, Alert.OK),10,"");
+					}
+					SCtrl_docClearHandler();
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "CSTATE_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						drp_CState.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+            	if (Ds_Objects.currentTarget.description.toString() == "CCITY_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						drp_CCity.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+
+				if (Ds_Objects.currentTarget.description.toString() == "CLOCALITY_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						drp_CLocality.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						
+					}
+				}
+		  if (Ds_Objects.currentTarget.description.toString() == "Search_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Txt_ClientName.text=Ds_Objects.result.Tables.Table.Rows[0].ClientName;
+						Txt_CAddress1.text=Ds_Objects.result.Tables.Table.Rows[0].CAddress1;
+						Txt_CAddress2.text=Ds_Objects.result.Tables.Table.Rows[0].CAddress2;
+						drp_CCountry.selectedItem=Ds_Objects.result.Tables.Table.Rows[0].CCountry;
+						txt_InCCountry.text=Ds_Objects.result.Tables.Table.Rows[0].InCCountry
+						if(Ds_Objects.result.Tables.Table.Rows[0].CCountry == "India")
+						{
+							drp_CState.visible=true;
+							drp_CCity.visible=true;
+							drp_CLocality.visible=true;
+							txt_InCCountry.visible=false;
+							Txt_CState.visible=false;
+							Txt_CCity.visible=false;
+							Txt_CLocality.visible=false;
+							drp_CState.text=Ds_Objects.result.Tables.Table.Rows[0].CState;
+							drp_CCity.text=Ds_Objects.result.Tables.Table.Rows[0].CCity;
+							drp_CLocality.text=Ds_Objects.result.Tables.Table.Rows[0].CLocality;
+							//drp_CState.prompt=Ds_Objects.result.Tables.Table.Rows[0].CState;
+							//drp_CCity.prompt=Ds_Objects.result.Tables.Table.Rows[0].CCity;
+							//drp_CLocality.prompt=Ds_Objects.result.Tables.Table.Rows[0].CLocality;
+							StateName=Ds_Objects.result.Tables.Table.Rows[0].CState;
+							CityName=Ds_Objects.result.Tables.Table.Rows[0].CCity;
+							LocalityName=Ds_Objects.result.Tables.Table.Rows[0].CLocality;
+							
+						}
+						else 
+						{
+							drp_CState.visible=false;
+							drp_CCity.visible=false;
+							drp_CLocality.visible=false;
+							txt_InCCountry.visible=true;
+							Txt_CState.visible=true;
+							Txt_CCity.visible=true;
+							Txt_CLocality.visible=true;
+							txt_InCCountry.text=Ds_Objects.result.Tables.Table.Rows[0].InCCountry;
+							Txt_CLocality.text=Ds_Objects.result.Tables.Table.Rows[0].CLocality;
+							Txt_CCity.text=Ds_Objects.result.Tables.Table.Rows[0].CCity;
+							Txt_CState.text=Ds_Objects.result.Tables.Table.Rows[0].CState;
+						}
+						Txt_CPincode.text=Ds_Objects.result.Tables.Table.Rows[0].CPincode;
+						Txt_DomainName.text=Ds_Objects.result.Tables.Table.Rows[0].DomainName;
+						// Image
+						var Str:String=Ds_Objects.result.Tables.Table.Rows[0].ClientLogo;
+						if(Str!="")
+						{
+							var Arr:Array = Str.split(",");
+							// ByteArray
+							var Bytes:ByteArray = new ByteArray();
+							// for each item in the array
+							for (var i:int=0;i<Arr.length;i++)
+							{
+								Bytes[i] = Arr[i];
+							}						
+							Img_ClientLogo.source=Bytes;
+						}
+						else
+						{
+							Img_ClientLogo.source="Assets/user.jpg";
+						}
+						Id=Ds_Objects.result.Tables.Table.Rows[0].Id;
+						// Phone No Popup
+						Txt_ContactNo.text=Ds_Objects.result.Tables.Table.Rows[0].ContactNo;
+						Txt_CPhoneNo1.text=Ds_Objects.result.Tables.Table.Rows[0].CPhoneNo1;
+						Txt_CPhoneNo2.text=Ds_Objects.result.Tables.Table.Rows[0].CPhoneNo2;
+						Txt_CPhoneNo3.text=Ds_Objects.result.Tables.Table.Rows[0].CPhoneNo3;
+						Txt_CPhoneNo4.text=Ds_Objects.result.Tables.Table.Rows[0].CPhoneNo4;
+						Txt_CPhoneNo5.text=Ds_Objects.result.Tables.Table.Rows[0].CPhoneNo5;
+					}
+				
+					}
+					
+				if (Ds_Objects.currentTarget.description.toString() == "Delete_CUSTOM")
+				{	
+					alignAlert(Alert.show("Deleted Successfully.","Message !",Alert.OK,null,null,iconTickLarge, Alert.OK),10,"");
+					SCtrl_docClearHandler()	
+				}
+			}
+			public function FnValidation_PhoneNo():void
+			{
+				var Str:String="";
+				var ErrStr:String="";
+				var Ac:Array=new Array();
+				Ac=Str.split(",");
+				var Len:int=Ac.length;
+				for(var i:int=0;i<Len;i++)
+				{
+					var St:String=Ac[i];
+					if((St.length<10)||(St.length>12))
+					{
+						ErrStr=ErrStr+St+" Number is Invalid\n";
+					}
+				}
+				Alert.show(ErrStr);				
+				// &amp; - &
+			}
+			protected function FnClose_Pnl_ClientContacts():void
+			{
+				Grp_ClientContacts.visible=false;
+			}
+			protected function FnClose_Pnl_PhoneNo():void
+			{
+				var Flag:Boolean=true;var ErrStr:String="";				
+				if(Txt_CPhoneNo1.text!="")
+				{
+					if(Txt_CPhoneNo1.text.length<10)
+					{
+						if(Flag==true){Txt_CPhoneNo1.setFocus();Flag=false;}
+						ErrStr=ErrStr+"* Contact No 1 is Invalid.\n";
+					}
+				}
+				if(Txt_CPhoneNo2.text!="")
+				{
+					if(Txt_CPhoneNo2.text.length<10)
+					{
+						if(Flag==true){Txt_CPhoneNo2.setFocus();Flag=false;}
+						ErrStr=ErrStr+"* Contact No 2 is Invalid.\n";
+					}
+				}
+				if(Txt_CPhoneNo3.text!="")
+				{
+					if(Txt_CPhoneNo3.text.length<10)
+					{
+						if(Flag==true){Txt_CPhoneNo3.setFocus();Flag=false;}
+						ErrStr=ErrStr+"* Contact No 3 is Invalid.\n";
+					}
+				}
+				if(Txt_CPhoneNo4.text!="")
+				{
+					if(Txt_CPhoneNo4.text.length<10)
+					{
+						if(Flag==true){Txt_CPhoneNo4.setFocus();Flag=false;}
+						ErrStr=ErrStr+"* Contact No 4 is Invalid.\n";
+					}
+				}
+				if(Txt_CPhoneNo5.text!="")
+				{
+					if(Txt_CPhoneNo5.text.length<10)
+					{
+						if(Flag==true){Txt_CPhoneNo5.setFocus();Flag=false;}
+						ErrStr=ErrStr+"* Contact No 5 is Invalid.\n";
+					}
+				}				
+				if(ErrStr!="")
+				{
+					alignAlert(Alert.show(ErrStr,"Alert Message !",Alert.OK, 
+						null, null,iconWarning, Alert.OK),10,'');					
+					return;
+				}
+				else
+				{
+					Grp_PhoneNo.visible=false;
+				}
+				
+			}
+			protected function FnClick_Btn_ClientContacts():void
+			{
+				FnHelp_ContactType();
+				Grp_ClientContacts.visible=true;
+			}
+			protected function FnClick_Btn_PhoneNo():void
+			{
+				Grp_PhoneNo.visible=true;
+			}
+    		private function ChangeState():void
+			{
+				if(drp_CState.selected())
+				{
+					StateName=drp_CState.Select_Row.label;
+					StateId=drp_CState.Select_Row.StateId;
+				//StateName = drp_CState.selectedItem.label;
+				//StateId=drp_CState.selectedItem.StateId;
+					useWeb("MasterClientManagement","CCITY_CUSTOM",[GlobalXml,'CITYLOAD',0,StateId]);
+				}
+				else
+				{
+					StateName="";
+					StateId=0;
+				}
+			}
+			private function ChangeCity():void
+			{
+				if(drp_CCity.selected())
+				{
+					CityName=drp_CCity.Select_Row.label;
+					CityId=drp_CCity.Select_Row.CityId;
+					drp_CCity.text=drp_CCity.Select_Row.label;
+				//CityId=drp_CCity.selectedItem.CityId;
+				//CityName=drp_CCity.selectedItem.label;
+					var Ac:ArrayCollection=new ArrayCollection();
+					drp_CLocality.dataProvider=Ac;//drp_BLocality.fnClear();
+					useWeb("MasterClientManagement","CLOCALITY_CUSTOM",[GlobalXml,'LOCALITY',0,CityId]);
+				}
+				else
+				{
+					CityId=0;
+					CityName="";
+				}
+			}
+	
+			private function ChangeLocality():void
+			{
+				if(drp_CLocality.selected())
+				{
+					LocalityId=drp_CLocality.Select_Row.LocalityId;
+					LocalityName=drp_CLocality.Select_Row.label;
+					drp_CLocality.text=drp_CLocality.Select_Row.label;
+				//LocalityId=drp_CLocality.selectedItem.LocalityId;
+				//LocalityName=drp_CLocality.selectedItem.label;
+				}
+				else
+				{
+					LocalityId=0;
+					LocalityName="";
+				}
+			}
+			protected function FnClick_Btn_Browse():void
+			{
+				var imageTypes:FileFilter = new FileFilter("Images (*.jpg, *.jpeg, *.gif, *.png)", "*.jpg; *.jpeg; *.gif; *.png");
+				//var textTypes:FileFilter = new FileFilter("Text Files (*.txt, *.rtf)", "*.txt; *.rtf");
+				var allTypes:Array = new Array(imageTypes);
+				var fileRef:FileReference = new FileReference();
+				fileRef.browse(allTypes);				
+				//fileRef = new FileReference();
+				fileRef.addEventListener(Event.SELECT, selectHandler);
+				fileRef.addEventListener(Event.COMPLETE, completeHandler);				
+				function selectHandler(event:Event):void
+				{
+					fileRef.load();
+				}
+				function completeHandler(event:Event):void
+				{
+					Img_ClientLogo.source = fileRef.data;					
+				}
+			}			
+			protected function FnValidation_BeforeSave():String
+			{
+				var Flag:Boolean=true;var ErrStr:String="";
+				if(Txt_ClientName.text=="")
+				{
+					if(Flag==true){Txt_ClientName.setFocus();Flag=false;}
+					ErrStr=ErrStr+"* Client Name is Required.\n";
+				}
+				if(Txt_CAddress1.text=="")
+				{
+					if(Flag==true)
+					{
+						if(Txt_CAddress1.text=="")
+						{
+							Txt_CAddress1.setFocus();Flag=false;
+						}						
+					} 
+					ErrStr=ErrStr+"* Address1 is Required.\n";
+				}
+				
+				if(drp_CCountry.selectedItem=="")
+				{
+					if(Flag==true)
+					{
+						if(drp_CCountry.selectedItem=="")
+						{
+							drp_CCountry.setFocus();Flag=false;
+						}						
+					} 
+					ErrStr=ErrStr+"* Country is Required.\n";
+				}				
+				if(Txt_CPincode.text=="")
+				{
+					if(Flag==true)
+					{
+						if(Txt_CPincode.text=="")
+						{
+							Txt_CPincode.setFocus();Flag=false;
+						}						
+					}
+					ErrStr=ErrStr+"* Postalcode is Required.\n";
+				}
+				if(Txt_ContactNo.text=="")
+				{
+					if(Flag==true)
+					{
+						Txt_ContactNo.setFocus();Flag=false;
+					}
+					ErrStr=ErrStr+"* Contact No is Required.\n";
+				}
+				if(Txt_ContactNo.text!="")
+				{
+					if(Txt_ContactNo.text.length < 10)
+					{
+						if(Flag==true)
+						{
+							Txt_ContactNo.setFocus();Flag=false;
+						}
+						ErrStr=ErrStr+"* Contact No is Required.\n";
+					}					
+				}
+				if(drp_CCountry.selectedItem=="India")
+				{
+					if(StateName=="")
+					{
+						if(Flag==true)
+						{
+							drp_CState.setFocus();Flag=false;
+						}
+						ErrStr=ErrStr+"* State is Required.\n";
+					}
+					if(CityName=="")
+					{
+						if(Flag==true)
+						{
+							drp_CCity.setFocus();Flag=false;
+						}
+						ErrStr=ErrStr+"* City is Required.\n";
+					}
+					if(LocalityName=="")
+					{
+						if(Flag==true)
+						{
+							drp_CLocality.setFocus();Flag=false;
+						}
+						ErrStr=ErrStr+"* Locality is Required.\n";
+					}
+				}
+				else
+				{
+					if(txt_InCCountry.text=="")
+					{
+						if(Flag==true)
+						{
+							Txt_CState.setFocus();Flag=false;
+						}
+						ErrStr=ErrStr+"* Country is Required.\n";
+					}
+					
+					if(Txt_CState.text=="")
+					{
+						if(Flag==true)
+						{
+							Txt_CState.setFocus();Flag=false;
+						}
+						ErrStr=ErrStr+"* State is Required.\n";
+					}
+					if(Txt_CCity.text=="")
+					{
+						if(Flag==true)
+						{
+							Txt_CCity.setFocus();Flag=false;
+						}
+						ErrStr=ErrStr+"* City is Required.\n";
+					}
+					if(Txt_CLocality.text=="")
+					{
+						if(Flag==true)
+						{
+							Txt_CLocality.setFocus();Flag=false;
+						}
+						ErrStr=ErrStr+"* Locality is Required.\n";
+					}
+				}
+				return ErrStr;
+			}
+			protected function SCtrl_docSaveHandler():void
+			{
+				var Str:String=FnValidation_BeforeSave();
+				if(Str!="")
+				{
+					alignAlert(Alert.show(Str,"Requierd Field(s) !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+					return;
+				}
+				var bit:BitmapData = new BitmapData(100,100); 
+				bit.draw(Img_ClientLogo); 
+				var png:PNGEncoder = new PNGEncoder(); 
+				var by:ByteArray = png.encode(bit); 
+				Img_ClientLogo.source = by;				
+				var s:int = by.length;				 
+				var sd:String = "";	 
+				ClientLogo = "";				
+				for(var i:int = 0; i < s; i++)
+				{
+					sd = by[i]; 
+					ClientLogo += sd+",";					
+				}
+				var CdtNo:String="",CdtPrd:String="";
+				var State :String="",City:String="",Locality:String="";
+				if(drp_CCountry.selectedItem == "India")
+				{
+					State=StateName;
+					City=CityName;
+					Locality=LocalityName;
+				}
+				else
+				{
+					State=Txt_CState.text;
+					City=Txt_CCity.text;
+					Locality=Txt_CLocality.text;
+				}
+				var Ac:ArrayCollection=new ArrayCollection
+					([{ClientName:Txt_ClientName.text,
+						CAddress1:Txt_CAddress1.text,
+						CAddress2:Txt_CAddress2.text,
+						CCountry:drp_CCountry.selectedItem,
+						InCCountry:txt_InCCountry.text,
+						CState:State,
+						CCity:City,
+						CLocality:Locality,
+						CPincode:Txt_CPincode.text,
+						ContactNo:Txt_ContactNo.text,
+						DomainName:Txt_DomainName.text,
+						// Communication Phone No 
+						CPhoneNo1:Txt_CPhoneNo1.text,
+						CPhoneNo2:Txt_CPhoneNo2.text,
+						CPhoneNo3:Txt_CPhoneNo3.text,
+						CPhoneNo4:Txt_CPhoneNo4.text,
+						CPhoneNo5:Txt_CPhoneNo5.text,
+						Id:Id
+					}]);
+				var HdrXml:String = ObjToXmlStr_Comm(Ac,"HdrXml");
+				var NewClientXml:String="";
+				NewClientXml += "<ROOT>";
+				NewClientXml += ObjToXmlStr_Comm(Grd_AddNewClient._getGridSrc,"NewClientXml")
+				NewClientXml += "</ROOT>";
+				useWeb("MasterClientManagement","Save_CUSTOM",[GlobalXml,ClientLogo,HdrXml,NewClientXml]);
+			}
+			protected function SCtrl_docClearHandler():void
+			{
+				Txt_ClientName.text="";Txt_CAddress1.text="";Txt_CAddress2.text="";drp_CCountry.selectedItem="India";
+				drp_CCity.visible=true;drp_CLocality.visible=true;drp_CState.visible=true;
+				Txt_CState.text="";Txt_CCity.text="";Txt_CLocality.text="";Txt_CPincode.text="";
+				Txt_CPhoneNo1.text="";Txt_CPhoneNo2.text="";Txt_CPhoneNo3.text="";Txt_CPhoneNo4.text="";
+				Txt_CPhoneNo5.text="";Id=0;Txt_ContactNo.text="";
+				Img_ClientLogo.source="Assets/user.jpg";ClientLogo="";
+				Txt_CState.visible=false;Txt_CCity.visible=false;Txt_CLocality.visible=false;
+				StateName="";CityName="";LocalityName="";
+				drp_CCity.text="";drp_CState.text="";drp_CLocality.text="";
+				StateId=0;CityId=0;LocalityId=0;
+				//drp_CCity.prompt="Select City";drp_CCity.selectedItem="Select City"
+				//drp_CState.prompt="Select State";drp_CState.selectedItem="Select State"
+				//drp_CLocality.prompt="Select Locality";drp_CLocality.selectedItem="Select Locality"
+				FnHelp();txt_InCCountry.visible=false;
+				FnHelp_State();
+				txt_InCCountry.text="";
+				Txt_DomainName.text="";
+				Txt_ClientName.setFocus();
+				
+			}
+			protected function SCtrl_doSearchHandler():void
+			{
+				PopUpManager.addPopUp( SearchPopUp , this, true);
+				SearchPopUp.Prc_name="MasterClientManagement";
+				var SearchParam:Array =new Array();
+				SearchPopUp.HlpIndex="SEARCH";
+				SearchParam[0]=GlobalXml;
+				SearchParam[1]=0;	
+				SearchPopUp.Prc_Param=SearchParam;
+				SearchPopUp.HlpSrchGlobal="";
+				SearchPopUp.dataPanel.focusEnabled=true;
+				SearchPopUp.Pageint();
+				SearchPopUp.addEventListener("PopupEnter",funpopupEnter);
+				SearchPopUp.addEventListener("PopupClose",funpopupClose);
+				PopUpManager.centerPopUp(SearchPopUp);
+			}
+			private function funpopupClose(event:Event):void
+			{
+				
+			}
+			private function funpopupEnter(event:Event):void
+			{				
+				SearchDtls(SearchPopUp.SelectRow.Id);			
+			}
+			private function SearchDtls(Id:int):void
+			{
+				var Load:Array =new Array();
+				Load[0]=GlobalXml; Load[1]=Id;    
+				useWeb("MasterClientManagement","Search_CUSTOM",Load);
+			}
+			protected function button_hb2_clickHandler(event:MouseEvent):void
+			{
+				Grp_ClientContacts.visible=false;
+			}
+			protected function drp_changeHandler(event:IndexChangeEvent):void
+			{
+				if(drp_CCountry.selectedItem == "India")   //India=1 addr(0)
+				{
+					drp_CState.visible=true;
+					drp_CCity.visible=true;
+					drp_CLocality.visible=true;
+					txt_InCCountry.visible=false;
+					Txt_CState.visible=false;
+					Txt_CCity.visible=false;
+					Txt_CLocality.visible=false;
+					FnHelp_State();
+				}
+				if(drp_CCountry.selectedItem == "International")
+				{
+					txt_InCCountry.visible=true;
+					Txt_CState.visible=true;
+					Txt_CCity.visible=true;
+					Txt_CLocality.visible=true;
+					drp_CState.visible=false;
+					drp_CCity.visible=false;
+					drp_CLocality.visible=false;
+				}
+			}
+			protected function SCtrl_docDeleteHandler():void
+			{
+				if(Id ==0)
+				{ 
+					alignAlert(Alert.show("This is an Invalid Process.","Alert Message !",Alert.OK, 
+						null, null,iconWarning, Alert.OK),10,'');					
+					return;
+				}
+				else
+				{
+				if(Id !=0)
+				{
+					alignAlert(Alert.show("Do you want to Delete this item ?", "Warning !",Alert.YES | Alert.NO, 
+						null,removeItem1, iconWarning, Alert.NO),10,"");
+				}
+				}
+			}
+			private function removeItem1(event):void 
+			{	
+				if (event.detail==Alert.YES) 
+				{
+					var Load:Array = new Array();
+					Load[0]=GlobalXml; Load[1]= Id;
+					useWeb("MasterClientManagement","Delete_CUSTOM",Load);
+					
+				} 
+				
+			}
+			protected function SCtrl_docRefresh():void
+			{
+				FnHelp(); 
+				FnHelp_State();		
+			}
+		]]>
+	</fx:Script>
+	<fx:Style>
+		@namespace s "library://ns.adobe.com/flex/spark";
+		@namespace mx "library://ns.adobe.com/flex/mx";
+		@namespace WrbComp "WrbComp.*";
+		s|TextInput
+		{
+			borderVisible:true;
+		}
+	</fx:Style>
+	<s:VGroup x="0" y="0" width="100%" height="100%" gap="5" horizontalAlign="center" verticalAlign="top">
+		<s:BorderContainer x="37" y="319" width="100%" height="500" backgroundColor="#fbf9f9"
+						   borderVisible="false">
+			<s:CheckBox x="764" y="78" label="Same as Address" id="Chk_SameasAddress"
+						 tabIndex="16" visible="false"/>
+			<s:Label x="71" y="50" text="Client Name"/>
+			<s:Label x="9" y="20" text="Client Information" color="Red"/>
+			
+			<s:TextInput x="165" y="46" width="220" height="20" id="Txt_ClientName" 
+						 maxChars="100" tabIndex="1"/>
+			<s:Label x="71" y="89" text=" Address 1"/>
+			<s:Label x="71" y="135" text="Address 2"/>
+			<s:TextInput id="Txt_CAddress1" x="165" y="85" width="220" height="20"
+						  tabIndex="2"/>
+			<s:Label x="617" y="111" text="Billing Address 1" visible="false"/>
+			<s:TextInput id="Txt_CAddress2" x="165" y="131" width="220" height="20"
+						  tabIndex="3" />
+			<s:Label x="71" y="225" height="12" text="State"/>
+			<s:TextInput id="Txt_CState" x="165" y="221" width="220" height="20"
+						 tabIndex="6" />
+			<s:Label x="71" y="179" text="Country" />
+			<s:Label x="617" y="174" text="Country" visible="false"/>
+			<s:Label x="617" y="205" text="State" visible="false"/>
+			<s:TextInput id="Txt_BState" x="764" y="201" width="220" height="20" tabIndex="21" visible="false"/>
+			<s:Label x="617" y="233" text="City" visible="false"/>
+			<s:TextInput id="Txt_BCity" x="764" y="229" width="220" height="20" tabIndex="20" visible="false"/>
+			<s:Label x="617" y="262" text="Locality" visible="false"/>
+			<s:TextInput id="Txt_BLocality" x="764" y="258" width="220" height="20" tabIndex="19" visible="false"/>
+			<s:Label x="591" y="50" text="City"/>
+			<s:TextInput id="Txt_CCity" x="685" y="46" width="220" height="20"
+						  tabIndex="7"/>
+			<s:Label x="591" y="89" text="Locality"/>
+			<s:TextInput id="Txt_CLocality" x="685" y="85" width="220" height="20"
+						  tabIndex="8"/>
+			<s:Label x="591" y="135" text="Postal Code"/>
+			<s:Label x="509" y="60" text="Payment Mode" visible="false"/>
+			<s:TextInput id="Txt_CPincode" x="685" y="131" width="220" height="20"  tabIndex="8"
+						 restrict="0-9" maxChars="6"/>
+			<s:Label x="591" y="179" text="Contact No"/>
+			<s:TextInput id="Txt_ContactNo" x="685" y="174.5" width="137" height="20"
+						 restrict="0-9" maxChars="13"  tabIndex="9"/>
+			<s:Label x="653" y="169" text="*" color="red"/>
+			<s:Label x="591" y="225" text="Domain Name"/>
+			<s:TextInput x="685" y="217" width="220" height="20" id="Txt_DomainName" tabIndex="11"/>
+			<s:Label x="617" y="443" text="Industry Type" visible="false"/>
+			<s:TextInput x="764" y="439" width="220" height="20" id="Txt_IndustryType" tabIndex="28" visible="false"/>
+			<s:Label x="509" y="183" text="Status" visible="false"/>
+			<s:Label x="509" y="122" text="Credit Limit" visible="false"/>
+			<s:Label x="509" y="91" text="Credit Policy" color="red" visible="false"/>
+			<s:Label x="458" y="41" text="Client Logo" color="red"/>
+			<s:Label x="580" y="122" text="*" id="Lbl_CreditLimit" color="red" visible="false"/>
+			<s:Label x="142" y="46" text="*" color="red"/>
+			<s:Label x="131" y="83" text="*" color="red"/>
+			<s:Label x="101" y="220" text="*" color="red"/>
+			<s:Label x="613" y="41" text="*" color="red"/>
+			<s:Label x="635" y="80" text="*" color="red"/>
+			<s:Label x="660" y="128" width="6" height="12" color="red" text="*"/>
+			<s:Label x="710" y="320" text="*" color="red" visible="false"/>
+			<s:Label x="713" y="111" text="*" color="red" visible="false"/>
+			<s:Label x="666" y="262" text="*" color="red" visible="false"/>
+			<s:Label x="645" y="233" text="*" color="red" visible="false"/>
+			<s:Label x="652" y="205" text="*" color="red" visible="false"/>
+			<s:Label x="667" y="174" text="*" color="red" visible="false"/>
+			<s:Label x="692" y="290" text="*" color="red" visible="false"/>
+			<s:Label x="650" y="351" text="*" color="red" visible="false"/>
+			<s:Label x="738" y="382" text="*" color="red" visible="false"/>
+			<s:Label x="588" y="153" text="*" id="Lbl_CreditPeriod" color="red" visible="false"/>
+			<s:TextInput x="655" y="118" width="220" height="20" id="Txt_CreditLimit" restrict="0-9"
+						 maxChars="8" tabIndex="11" visible="false"/>
+			<s:Label x="509" y="153" text="Credit Period" visible="false"/>
+			<s:Label x="617" y="290" text="Postal Code" visible="false"/>
+			<s:TextInput id="Txt_BPincode" x="764" y="286" width="220" height="20" restrict="0-9a-zA-Z"
+						 tabIndex="23" visible="false"/>
+			<s:Label x="617" y="320" text="Sales Executive" visible="false"/>
+			<s:DropDownList x="764" y="316" width="220" height="20" id="Ddl_SalesExecutive" tabIndex="24"
+							prompt="Select Sales Executive"  visible="false"/>
+			<s:Label x="617" y="351" text="CRM" visible="false"/>
+			<s:DropDownList x="764" y="347" width="220" height="20" id="Ddl_CRM" tabIndex="25"
+							prompt="Select CRM"  visible="false"/>
+			<s:Label x="617" y="382" text="Key  Account  Person" visible="false"/>
+			<s:DropDownList x="764" y="378" width="220" height="20" id="Ddl_KeyAccountPerson" tabIndex="26"
+							prompt="Select Key  Account  Person"  visible="false"/>
+			<s:DropDownList x="655" y="179" width="220" height="20" id="Ddl_Status" selectedItem="Active"
+							tabIndex="14" visible="false">
+				<mx:ArrayCollection>
+					<fx:String>Active</fx:String>
+					<fx:String>InActive</fx:String>
+					<fx:String>UnApproved</fx:String>
+				</mx:ArrayCollection>
+			</s:DropDownList>
+			<s:DropDownList x="655" y="149" width="100" height="20" id="Ddl_CreditPeriodNumber"
+							selectedItem="Select"  tabIndex="12" visible="false">
+				<mx:ArrayCollection>
+					<fx:String>Select</fx:String>
+					<fx:String>0</fx:String>
+					<fx:String>1</fx:String>
+					<fx:String>2</fx:String>
+					<fx:String>3</fx:String>
+					<fx:String>4</fx:String>
+					<fx:String>5</fx:String>
+					<fx:String>6</fx:String>
+					<fx:String>7</fx:String>
+					<fx:String>8</fx:String>
+					<fx:String>9</fx:String>
+					<fx:String>10</fx:String>
+					<fx:String>11</fx:String>
+					<fx:String>12</fx:String>
+					<fx:String>13</fx:String>
+					<fx:String>14</fx:String>
+					<fx:String>15</fx:String>
+					<fx:String>16</fx:String>
+					<fx:String>17</fx:String>
+					<fx:String>18</fx:String>
+					<fx:String>19</fx:String>
+					<fx:String>20</fx:String>
+					<fx:String>21</fx:String>
+					<fx:String>22</fx:String>
+					<fx:String>23</fx:String>
+					<fx:String>24</fx:String>
+					<fx:String>25</fx:String>
+					<fx:String>26</fx:String>
+					<fx:String>27</fx:String>
+					<fx:String>28</fx:String>
+					<fx:String>29</fx:String>
+					<fx:String>30</fx:String>
+					<fx:String>31</fx:String>
+					<fx:String>32</fx:String>
+					<fx:String>33</fx:String>
+					<fx:String>34</fx:String>
+					<fx:String>35</fx:String>
+					<fx:String>36</fx:String>
+					<fx:String>37</fx:String>
+					<fx:String>38</fx:String>
+					<fx:String>39</fx:String>
+					<fx:String>40</fx:String>
+					<fx:String>41</fx:String>
+					<fx:String>42</fx:String>
+					<fx:String>43</fx:String>
+					<fx:String>44</fx:String>
+					<fx:String>45</fx:String>
+					<fx:String>46</fx:String>
+					<fx:String>47</fx:String>
+					<fx:String>48</fx:String>
+					<fx:String>49</fx:String>
+					<fx:String>50</fx:String>
+					<fx:String>51</fx:String>
+					<fx:String>52</fx:String>
+					<fx:String>53</fx:String>
+					<fx:String>54</fx:String>
+					<fx:String>55</fx:String>
+					<fx:String>56</fx:String>
+					<fx:String>57</fx:String>
+					<fx:String>58</fx:String>
+					<fx:String>59</fx:String>
+					<fx:String>60</fx:String>
+					<fx:String>61</fx:String>
+					<fx:String>62</fx:String>
+					<fx:String>63</fx:String>
+					<fx:String>64</fx:String>
+					<fx:String>65</fx:String>
+					<fx:String>66</fx:String>
+					<fx:String>67</fx:String>
+					<fx:String>68</fx:String>
+					<fx:String>69</fx:String>
+					<fx:String>70</fx:String>
+					<fx:String>71</fx:String>
+					<fx:String>72</fx:String>
+					<fx:String>73</fx:String>
+					<fx:String>74</fx:String>
+					<fx:String>75</fx:String>
+					<fx:String>76</fx:String>
+					<fx:String>77</fx:String>
+					<fx:String>78</fx:String>
+					<fx:String>79</fx:String>
+					<fx:String>80</fx:String>
+					<fx:String>81</fx:String>
+					<fx:String>82</fx:String>
+					<fx:String>83</fx:String>
+					<fx:String>84</fx:String>
+					<fx:String>85</fx:String>
+					<fx:String>86</fx:String>
+					<fx:String>87</fx:String>
+					<fx:String>88</fx:String>
+					<fx:String>89</fx:String>				
+					<fx:String>90</fx:String>
+					<fx:String>91</fx:String>
+					<fx:String>92</fx:String>
+					<fx:String>93</fx:String>
+					<fx:String>94</fx:String>
+					<fx:String>95</fx:String>
+					<fx:String>96</fx:String>
+					<fx:String>97</fx:String>
+					<fx:String>98</fx:String>
+					<fx:String>99</fx:String>
+					<fx:String>100</fx:String>
+				</mx:ArrayCollection>
+			</s:DropDownList>
+			<s:DropDownList x="775" y="149" width="100" height="20" id="Ddl_CreditPeriod"
+							selectedItem="Select" tabIndex="13" visible="false">
+				<mx:ArrayCollection>
+					<fx:String>Select</fx:String>
+					<fx:String>Month</fx:String>
+					<fx:String>Year</fx:String>
+				</mx:ArrayCollection>
+			</s:DropDownList>
+			<s:HGroup x="185" y="317" gap="25" visible="false">
+				<s:RadioButton label="Direct Pay" groupName="Mode" id="Rdb_DirectPay" focusEnabled="false"/>
+				<s:RadioButton label="BTC" groupName="Mode" id="Rdb_BTC" focusEnabled="false"/>
+			</s:HGroup>
+			<s:HGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle"
+					  id="Grp_ClientContacts" depth="1" visible="false">
+				<s:BorderContainer width="100%" height="100%" backgroundAlpha="0.1" borderVisible="false">
+					<s:HGroup horizontalAlign="center" verticalAlign="middle" width="100%" height="100%">
+						<s:Panel x="3" y="38" width="947" height="423" title="Create New Client Contacts">
+							<s:Image x="921" y="-24" source="@Embed(source='../Assets/CrossSmall.png')" 
+									 buttonMode="true" toolTip="Close" click="FnClose_Pnl_ClientContacts()"/>
+							<WrbComp:ProDGrid1 x="23" y="21" width="900" height="294" id="Grd_AddNewClient"
+											   _ColDataField="ContactType~Title~FirstName~LastName~MobileNo~Email~AlternateEmail~Id"
+											   _ColHdrText="Contact Type~Title~First Name~Last Name~Contact No~Email~Alternate Email~Id" 
+											   _ColType="hlp~hlp~txt~txt~txt~txt~txt~txt"
+											   _colVisible="1~1~1~1~1~1~1~0" 
+											   _ColWidth="110~100~145~145~110~145~145~0" 
+											   _editable="1~1~1~1~1~1~1~0"
+											   _required="1~1~1~0~0~1~0~0" 
+											   _spltChar="~" 
+											   _visibleColNos="7"
+											   ID="ClientContact"
+											   _tabIndex="29"/>
+							<!--_getHlpTxtData="Grd_AddNewClient__getHlpTxtDataHandler(event)"/-->
+							<WrbComp:Button_HB x="431" y="337" _Label="Close" buttonMode="true"
+											   click="button_hb2_clickHandler(event)"/>
+						</s:Panel>
+					</s:HGroup>					
+				</s:BorderContainer>				
+			</s:HGroup>
+			<s:HGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle"
+					  id="Grp_PhoneNo" depth="1" visible="false">
+				<s:BorderContainer width="100%" height="100%" backgroundAlpha="0.1" borderVisible="false">
+					<s:HGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+						<s:Panel x="334" y="56" width="310" height="335" title="Contact Numbers">
+							<s:TextInput x="144" y="30" width="100" height="22" id="Txt_CPhoneNo1"
+										 restrict="0-9" maxChars="13" tabIndex="52"/>
+							<s:TextInput x="144" y="72" width="100" height="22" id="Txt_CPhoneNo2"
+										 restrict="0-9" maxChars="13" tabIndex="53"/>
+							<s:TextInput x="144" y="114" width="100" height="22" id="Txt_CPhoneNo3"
+										 restrict="0-9" maxChars="13"  tabIndex="54"/>
+							<s:TextInput x="144" y="156" width="100" height="22" id="Txt_CPhoneNo4"
+										 restrict="0-9" maxChars="13" tabIndex="55"/>
+							<s:TextInput x="144" y="198" width="100" height="22" id="Txt_CPhoneNo5"
+										 restrict="0-9" maxChars="13" tabIndex="56"/>
+							<s:Label x="50" y="203" text="Contact No 5"/>
+							<s:Label x="50" y="161" text="Contact No 4"/>
+							<s:Label x="50" y="119" text="Contact No 3"/>
+							<s:Label x="50" y="77" text="Contact No 2"/>
+							<s:Label x="50" y="35" text="Contact No 1"/>
+							<s:HGroup x="10" y="253" width="288" height="25" horizontalAlign="center"
+									  verticalAlign="middle">
+								<WrbComp:Button_HB _Label="Close" click="FnClose_Pnl_PhoneNo()"
+												   buttonMode="true"/>
+							</s:HGroup>
+							<s:Image x="282" y="-24" source="@Embed(source='../Assets/CrossSmall.png')" 
+									 buttonMode="true" click="FnClose_Pnl_PhoneNo()" toolTip="Close"/>
+						</s:Panel>
+					</s:HGroup>
+				</s:BorderContainer>				
+			</s:HGroup>
+			<s:HGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle"
+					  id="Grp_ClientGuest" depth="1" visible="false">
+				<s:BorderContainer width="100%" height="100%" backgroundAlpha="0.1"  borderVisible="false">
+					<s:HGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+						<s:Panel x="-1" y="30" width="943" height="420" title="Client Guest">
+							<WrbComp:ProDGrid1 x="20" y="21" width="900" height="294" id="Grd_ClntGuest"
+											   _ColDataField="EmpCode~FirstName~LastName~Grade~GMobileNo~EmailId~Designation~RangeMin~RangeMax~Id"
+											   _ColHdrText="Emp Code~First Name~Last Name~Grade~Mobile No~Email~Designation~Range Min~Range Max~Id" 
+											   _ColType="txt~txt~txt~txt~ntxt~txt~ntxt~ntxt~txt~txt"
+											   _colVisible="1~1~1~1~1~1~1~0~0~0" 
+											   _ColWidth="120~120~110~110~110~130~150~0~0~0" 
+											   _editable="1~1~1~1~1~1~1~0~0~0"
+											   _required="1~0~1~1~1~1~1~0~0~0" 
+											   _spltChar="~" 
+											   _visibleColNos="8"
+											   ID="ClientGuest"
+											   _tabIndex="37"/>
+							<s:Image x="917" y="-24" source="@Embed(source='../Assets/CrossSmall.png')" 
+									 buttonMode="true" toolTip="Close" />
+							<WrbComp:Button_HB x="428" y="336" _Label="Close"
+											   />
+						</s:Panel>
+					</s:HGroup>					
+				</s:BorderContainer>
+			</s:HGroup>
+			<s:HGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle"
+					  id="Grp_CustomField" depth="1" visible="false">
+				<s:BorderContainer width="100%" height="100%" backgroundAlpha="0.1" borderVisible="false">
+					<s:HGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+						<s:Panel x="36" y="41" width="990" height="416" title="Custom Fields">
+							<WrbComp:ProDGrid1 x="21" y="20" width="950" height="294" id="Grd_CustomField"
+											   _ColDataField="FieldName~FieldType~FieldValue~Mandatory~Visible~Id"
+											   _ColHdrText="FieldName~FieldType~FieldValue~Mandatory~Visible~Id" 
+											   _ColType="txt~hlp~txt~Chk~Chk~txt"
+											   _colVisible="1~1~1~1~1~0" 
+											   _ColWidth="100~100~630~70~50~0"
+											   _editable="1~1~1~1~1~1~0"
+											   _required="1~1~0~1~1~0" 
+											   _spltChar="~" 
+											   _visibleColNos="5"
+											   _DuplChk="false"
+											   ID="CustomField"
+											   _tabIndex="46"/>
+							<s:Image x="962" y="-24" buttonMode="true" 
+									 source="@Embed(source='../Assets/CrossSmall.png')" toolTip="Close"/>
+							<WrbComp:Button_HB x="454" y="335" _Label="Close" buttonMode="true"
+											  />
+						</s:Panel>						
+					</s:HGroup>
+				</s:BorderContainer>
+			</s:HGroup>
+			
+			<WrbComp:Button_HB id="Btn_Browse" x="440" y="186" width="100" height="32" buttonMode="true"
+							   _Label="Browse" click="FnClick_Btn_Browse()" depth="0" focusEnabled="false" tabIndex="10"/>
+			
+			<WrbComp:Button_HB id="Btn_ClientContacts" x="510" y="62" width="100" height="32"
+							   _Label="Client Contacts" click="FnClick_Btn_ClientContacts()" depth="0"
+							   buttonMode="true" focusEnabled="false" visible="false"/>
+			<s:Image x="440" y="62" width="100" height="100" id="Img_ClientLogo"
+					 source="@Embed(source='../Assets/user.jpg')"/>
+			<s:DropDownList x="764" y="168" width="115" id="drp_BCountry" prompt="Select Country"  visible="false">
+				<s:ArrayList>
+					<fx:String>India</fx:String>
+					<fx:String>International</fx:String>
+				</s:ArrayList>
+			</s:DropDownList>
+			<s:DropDownList x="764" y="200" width="220" id="drp_BState" prompt="Select State" visible="false" ></s:DropDownList>
+			<s:DropDownList x="764" y="229" width="220" id="drp_BCity" prompt="Select City" visible="false" ></s:DropDownList>
+			<s:DropDownList x="764" y="257" width="220" id="drp_BLocality" prompt="Select Locality" visible="false"></s:DropDownList>
+			<s:DropDownList x="165" y="174.5" width="124" id="drp_CCountry" prompt="India" 
+							change="drp_changeHandler(event)" tabIndex="4">
+				<s:ArrayList>
+					<fx:String>India</fx:String>
+					<fx:String>International</fx:String>
+				</s:ArrayList>
+			</s:DropDownList>
+			
+			<!--s:DropDownList x="165" y="220" width="220" id="drp_CState" prompt="Select State" visible="false"
+							change="ChangeState()" tabIndex="5"></s:DropDownList>
+			<s:DropDownList x="685" y="45" width="220" id="drp_CCity" prompt="Select City" visible="false"
+							change="ChangeCity()" tabIndex="6"></s:DropDownList>
+			<s:DropDownList x="685" y="84" width="220" id="drp_CLocality" prompt="Select Locality"
+							visible="false" change="ChangeLocality()" tabIndex="7"></s:DropDownList-->
+			
+			<WrbHelpComp:HelpText  x="165" y="220" width="220" id="drp_CState" height="21"
+								  pxTabIndex="5" pxSetColumnsWidth="220,0" onselection="{ChangeState()}" >
+			</WrbHelpComp:HelpText>	
+			<WrbHelpComp:HelpText  x="685" y="45" width="220" id="drp_CCity" height="21"
+								   pxTabIndex="6" pxSetColumnsWidth="0,220" onselection="{ChangeCity()}" depth="100" >
+			</WrbHelpComp:HelpText>	
+			<WrbHelpComp:HelpText  x="685" y="84" width="220" id="drp_CLocality" height="21"
+								   pxTabIndex="7" pxSetColumnsWidth="220,0" onselection="{ChangeLocality()}" depth="10" >
+			</WrbHelpComp:HelpText>	
+			
+			<s:TextInput id="txt_InCCountry" visible="false" x="312" y="172" width="110"
+						 tabIndex="5"/>
+			    <s:BorderContainer x="832" y="174" width="72" height="20" borderVisible="false" 
+							   backgroundColor="#c2c2c2" cornerRadius="5">
+				<mx:LinkButton x="0" y="0" label="Add More" width="72" height="20" 
+							   click="FnClick_Btn_PhoneNo()" cornerRadius="5" tabIndex="10"/>
+			</s:BorderContainer>
+			
+			
+		</s:BorderContainer>
+		
+		<mx:HRule x="0" y="417" width="100%" strokeColor="#eb1c24"/>
+		<s:HGroup width="100%" height="25" horizontalAlign="center">
+			<WrbComp:SaveControl id="SCtrl" docSave="SCtrl_docSaveHandler()"
+								 docClear="SCtrl_docClearHandler()" docDelete="SCtrl_docDeleteHandler()"
+								 doSearch="SCtrl_doSearchHandler()" docRefresh="SCtrl_docRefresh()"/>
+		</s:HGroup>
+	</s:VGroup>
+</s:Application>

@@ -1,0 +1,678 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" 
+			   xmlns:Controls="fx.com.adobe.Controls.*"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   xmlns:WrbComp="WrbComp.*"
+			   width="100%" height="100%"
+			   creationComplete="PageLoad()"
+			   pageTitle="Vendor Request">
+	<fx:Declarations>
+		<mx:NumberFormatter id="NF_Two" precision="2" rounding="nearest"/>
+	</fx:Declarations>
+	
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
+	<fx:Script>
+		<![CDATA[
+			import WrbComp.frmsearchwindow;
+			
+			import WrbHelpComp.HlpGridHdr;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.CalendarLayoutChangeEvent;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.events.IndexChangedEvent;
+			import mx.graphics.codec.PNGEncoder;
+			
+			import spark.events.IndexChangeEvent;
+			import spark.events.TextOperationEvent;
+			private var SearchPopUp:frmsearchwindow = new frmsearchwindow();
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public var Ac_Tmp:ArrayCollection=new ArrayCollection();
+			public static var GlobalXml:String = "",TypeServiceId:int=0,ErrStr:String="";
+			public var Id:int=0,ErrMsg:String="",PropertyId:int=0,PropertyName:String="",UserId:int=0,
+				VendorId:int=0,ApartmentId:int=0,RoomId:int=0;
+			public var AddMode:Boolean=true,Flag:Boolean=true,CategoryId:int=0,Category:String="";
+			
+			private var fileRef:FileReference = new FileReference();
+			private var fileTypes:Array = new Array();
+			//setup the filters (types of files to be browsed)
+			private var imageTypes:FileFilter = new FileFilter("Images (*.jpg; *.jpeg; *.gif; *.png)" ,"*.jpg; *.jpeg; *.gif; *.png");
+			private var documentTypes:FileFilter = new FileFilter("Documents (*.pdf), (*.doc), (*.rtf), (*.txt)",("*.pdf; *.doc; *.rtf, *.txt"));
+			public var ImageCount:Number=0;
+			// Set Up URLRequest
+			[Bindable]
+			private var arrColl:ArrayCollection;
+			/* URL of the file to download. */
+			private var FILE_URL:String = "";
+			private var urlReq:URLRequest;
+			public var uploadURL:URLRequest = new URLRequest();
+						
+			protected function PageLoad():void
+			{
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";
+				Help();
+				dt_Date.selectedDate = new Date();
+				hlp_Property.text="";
+			}
+			public function Help():void
+			{
+				useWeb("VendorRequest","PAGELOAD_CUSTOM",[GlobalXml,'PAGELOAD',0,Global_AC[0].UsrId,'']);//32]);
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "PAGELOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						hlp_Property.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;		
+					}
+//					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+//					{
+//						dt_Date.text=Ds_Objects.result.Tables.Table.Rows[0].Date;		
+//					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Property_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Ddl_Category.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;		
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Category_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						hlp_Vendor.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;		
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Vendor_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						hlp_service.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;		
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Service_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						hlp_Type.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;		
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Type_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						hlp_apartment.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;		
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Apartment_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						hlp_Room.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;		
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				{
+					if (AddMode == true)
+					{
+						alignAlert(Alert.show("Vendor Requested Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+					}
+					else
+					{
+						alignAlert(Alert.show("Vendor Requested Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+					}
+					FnClear();
+				}
+			}
+			protected function FnValidation_BeforeSave():String
+			{
+				var TxtFlag:Boolean=true;ErrStr="";
+				var Flag:Boolean=true;
+				//if(hlp_Property.text=="")
+				if(PropertyId==0)
+				{
+					if(TxtFlag=true)
+					{
+						hlp_Property.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+"*  Property Name is Required \n";
+				}
+				if(CategoryId==0)
+				{
+					if(Flag==true)
+					{
+						Flag=false;
+					}
+					ErrStr=ErrStr+"*  Category is Required.\n";
+				}
+				if(VendorId==0)
+				{
+					if(TxtFlag=true)
+					{
+						hlp_Vendor.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+"*  Vendor Name is Required \n";
+				}
+				if(hlp_service.text =="")
+				{
+					if(Flag==true)
+					{
+						hlp_service.setFocus();
+						Flag=false;
+					}
+					ErrStr=ErrStr+"*  Nature Of Service is Required.\n";
+				}
+				if(hlp_Type.text =="")
+				{
+					if(Flag==true)
+					{
+						hlp_Type.setFocus();
+						Flag=false;
+					}
+					ErrStr=ErrStr+"*  Allocation Type is Required.\n";
+				}
+				if(Type == "Room")
+				{
+				if(hlp_apartment.text=="")
+				 {
+				 if(Flag==true)
+				 {
+						hlp_apartment.setFocus();
+						Flag=false;
+				 }
+					ErrStr=ErrStr+"*  ApartmentNo is Required.\n";
+				 }
+				 if(hlp_Room.text=="")
+				 {
+					  if(Flag==true)
+					  {
+						  hlp_Room.setFocus();
+						  Flag=false;
+					  }
+					  ErrStr=ErrStr+"*  RoomNo is Required.\n";
+				   }
+				  }
+				else if(Type == "Apartment")
+				{
+					if(hlp_apartment.text=="")
+					{
+						if(Flag==true)
+						{
+							hlp_apartment.setFocus();
+							Flag=false;
+						}
+						ErrStr=ErrStr+"*  ApartmentNo is Required.\n";
+					}
+				}
+				
+			    if(dt_Date.text =="")
+				 {
+					if(Flag==true)
+					{
+						dt_Date.setFocus();
+						Flag=false;
+					}
+					ErrStr=ErrStr+"*  Requested On is Required.\n";
+				 }
+				 if(Txt_Amount.text =="")
+				 {
+					if(Flag==true)
+					{
+						Txt_Amount.setFocus();
+						Flag=false;
+					}
+					ErrStr=ErrStr+"*  Bill Amount is Required.\n";
+				 }
+				 if(txt_ImageName.text =="")
+				 {
+					 if(Flag==true)
+					 {
+						 Brd_imageUpload.visible=true;
+						 Flag=false;
+					 }
+					 ErrStr=ErrStr+"*  Bill is Required.\n";
+				 }
+				return ErrStr;
+			}	
+			protected function FnSave():void
+			{
+				ErrStr="";
+				ErrMsg = ""; Flag = true; 
+				var Str:String=FnValidation_BeforeSave();
+				if(ErrStr !="")
+				{
+					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10,"");
+					return;
+				} 
+				else
+				{
+					var arrcopy:ArrayCollection = new ArrayCollection
+						([{ 
+							PropertyId:PropertyId,Property:hlp_Property.text,CategoryId:CategoryId,
+							Category:Ddl_Category.selectedItem.label,VendorId:VendorId,VendorName:hlp_Vendor.text,
+							Service:hlp_service.text,Type:hlp_Type.text,ApartmentId:ApartmentId,
+							RoomId:RoomId,Date:dt_Date.text,Amount:Txt_Amount.text,BillNo:Txt_Billno.text,
+							Duedate:dt_Duedate.text,VendorBill:txt_ImageName.text,Des:Txt_Des.text,
+							Id:Id							
+						}])
+					
+					var HdrXml:String=""
+					HdrXml += "<ROOT>";	
+					HdrXml += ObjToXmlStr_Comm(arrcopy,"HdrXml") 
+					HdrXml += "</ROOT>";
+					useWeb("VendorRequest","Save_CUSTOM",[GlobalXml,HdrXml]);
+				}
+			}
+			
+			protected function FnClear():void
+			{
+				CategoryId=0;PropertyId=0;VendorId=0;ApartmentId=0;RoomId=0;
+				hlp_Property.dataProvider=null;
+				Ddl_Category.selectedItem="Select Category"
+				hlp_Vendor.dataProvider=null;hlp_Vendor.text="";
+				hlp_service.dataProvider=null;hlp_service.text="";
+				hlp_Type.dataProvider=null;hlp_Type.text="";
+				hlp_apartment.dataProvider=null;hlp_apartment.text="";
+				hlp_Room.dataProvider=null;hlp_Room.text="";
+				dt_Date.selectedDate = new Date();
+				Txt_Amount.text="";Txt_Billno.text="";
+				dt_Duedate.text="";Txt_Des.text="";txt_ImageName.text="";
+				hlp_Property.text="";
+				Help();
+				
+			}
+			protected function ExpenseGroupLoad():void
+			{
+				 
+				CategoryId=Ddl_Category.selectedItem.data;
+				Category=Ddl_Category.selectedItem.label;
+				useWeb("VendorRequest","Category_CUSTOM",[GlobalXml,'Category',CategoryId,0,'']);
+				hlp_Vendor.setFocus();
+				
+			}
+			public function Ddl_Property_changeHandler():void
+			{
+				
+				
+				if(hlp_Property.selected())
+				{
+					PropertyName=hlp_Property.Select_Row.Property;
+					PropertyId=hlp_Property.Select_Row.Id;
+					hlp_Property.text=PropertyName;
+					useWeb("VendorRequest","Property_CUSTOM",[GlobalXml,'Property',PropertyId,0,'']);
+					Ddl_Category.setFocus();
+				}
+				else
+				{
+					hlp_Property.text="";
+				}
+			}	
+			public function Ddl_Vendor_changeHandler():void
+			{
+				
+				
+				if(hlp_Vendor.selected())
+				{
+					var VendorName=hlp_Vendor.Select_Row.VendorName;
+					hlp_Vendor.text=VendorName;
+					VendorId=hlp_Vendor.Select_Row.Id;
+					useWeb("VendorRequest","Vendor_CUSTOM",[GlobalXml,'Vendor',VendorId,0,'']);
+					hlp_service.setFocus();
+				}
+				else
+				{
+					hlp_Vendor.text="";
+				}
+			}
+			public function Ddl_Service_changeHandler():void
+			{
+				
+				if(hlp_service.selected())
+				{
+					var Service=hlp_service.Select_Row.NatureofService;
+					hlp_service.text=Service;
+					useWeb("VendorRequest","Service_CUSTOM",[GlobalXml,'Service',0,0,'']);
+					hlp_Type.setFocus();
+				}
+				else
+				{
+					hlp_service.text="";
+				}
+			}
+			public var Type:String="";
+			public function Ddl_Type_changeHandler():void
+			{
+				
+				
+				if(hlp_Type.selected())
+				{
+				    Type=hlp_Type.Select_Row.Type;
+					if(Type!="Property")
+					{
+						if(Type =="Apartment")
+						{
+						 useWeb("VendorRequest","Type_CUSTOM",[GlobalXml,'Apartment',PropertyId,0,'Type']);
+						 lbl_Apart.visible=true;
+						 Txt_Apart.visible=true;
+						 hlp_apartment.visible=true;
+						 hlp_apartment.setFocus();
+						}
+						else if(Type =="Room")
+						{
+							useWeb("VendorRequest","Type_CUSTOM",[GlobalXml,'Apartment',PropertyId,0,'Type']);
+							lbl_Apart.visible=true;
+							Txt_Apart.visible=true;
+							hlp_apartment.visible=true;
+						}
+					}
+				}
+				else
+				{
+					hlp_Type.text="";
+				}
+			}
+			public function Ddl_Apartment_changeHandler():void
+			{
+				if(hlp_apartment.selected())
+				{
+					var Apartment=hlp_apartment.Select_Row.ApartmentNo;
+					ApartmentId=hlp_apartment.Select_Row.ApartmentId;
+					hlp_apartment.text=Apartment;
+					if(Type=="Room")
+					{
+						useWeb("VendorRequest","Apartment_CUSTOM",[GlobalXml,'Room',PropertyId,ApartmentId,'']);
+						lbl_Room.visible=true;
+						Txt_Room.visible=true;
+						hlp_Room.visible=true;
+						hlp_Room.setFocus();
+					}
+					else
+					{
+						useWeb("VendorRequest","Apartment_CUSTOM",[GlobalXml,'Apartment',PropertyId,0,'']);
+					}
+				}
+				else
+				{
+					hlp_apartment.text="";
+				}
+			}
+			public function Ddl_Room_changeHandler():void
+			{
+				
+				if(hlp_Room.selected())
+				{
+					var Room=hlp_Room.Select_Row.RoomNo;
+					RoomId=hlp_Room.Select_Row.RoomId
+					hlp_Room.text=Room;
+				}
+				else
+				{
+					hlp_Room.text="";
+				}
+			}
+			protected function FnClick_Btn_Browse():void
+			{
+				Brd_imageUpload.visible=true;
+				init1();
+				init();
+			}
+			//Image Upload
+			public var ImageFormat:String="";
+			public function init():void
+			{
+				// This URL should be replaced with your server side URL
+				//				var browserUrl:String = ExternalInterface.call("eval", "window.location.href");
+				//				var arr:Array =browserUrl.split("/");
+				ImageFormat=FilePath.text;				
+				uploadURL.url = "http://sstage.in/VendorBill.php?id="+hlp_Vendor.text+"&pid="+VendorId+"&imgcount="+ImageCount+"&imgformat="+ImageFormat;
+				uploadURL.method = "POST"; // OR "POST" as you need it
+				uploadURL.contentType = "multipart/form-data";				
+				// Event Listeners for UI Buttons (Upload/Browse)
+				
+				Filedata.addEventListener(MouseEvent.CLICK, browseFiles);
+				uploadbutton.addEventListener(MouseEvent.CLICK,uploadFiles);
+				fileRef.addEventListener(Event.SELECT, selectHandler);
+			}
+			//Browse for files
+			
+			private function browseFiles(event:Event):void
+			{
+				fileTypes.push(imageTypes);
+				fileTypes.push(documentTypes);
+				fileRef.browse(fileTypes);
+				
+			}
+			
+			// called after user selects a file form the browse window.
+			
+			private function selectHandler(event:Event):void
+			{
+				
+				FilePath.text = event.currentTarget.name.toString();
+				ImageFormat=FilePath.text;	
+				
+				//if()
+				
+			}
+			
+			// called when user clicks on the Upload button to upload the file
+			
+			private function uploadFiles():void
+			{
+				
+				fileRef.addEventListener(Event.COMPLETE, completeHandler);
+				fileRef.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA,dataHandler);
+				fileRef.addEventListener(SecurityErrorEvent.SECURITY_ERROR,securityErrorHandler);
+				fileRef.addEventListener(HTTPStatusEvent.HTTP_STATUS,httpStatusHandler);
+				fileRef.addEventListener(IOErrorEvent.IO_ERROR,ioErrorHandler);
+				fileRef.upload(uploadURL);
+			}
+			
+			// called after a file is uploaded
+			
+			private function completeHandler(event:Event):void
+			{
+				Alert.show("File Uploaded successfully");
+				
+			}
+			
+			//called after file upload is done and Data has been returned from Server
+			
+			private function dataHandler(event:DataEvent):void
+			{
+				//Alert.show("File Uploaded successfully");
+				var browserUrl:String = ExternalInterface.call("eval", "window.location.href");
+				var arr:Array =browserUrl.split("/");
+				resultsTxtField.text = event.data.toString();
+				if(resultsTxtField.text=="There was an error uploading the file, please try again!")
+				{
+					alignAlert(Alert.show("There was an error uploading the Image, please try again!","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+				}
+				else
+				{
+					txt_ImageName.text="http://sstage.in/Vendor_Bill/"+resultsTxtField.text;				
+					Brd_imageUpload.visible=false;
+				}
+			}
+			
+			// called if there is an error detected by flash player browsing or uploading a file
+			
+			private function ioErrorHandler(event:IOErrorEvent):void
+			{
+				mx.controls.Alert.show(String(event),"ioError",0);
+			}
+			// called if a security error
+			
+			private function securityErrorHandler(event:SecurityErrorEvent):void
+			{
+				mx.controls.Alert.show(String(event),"Security Error",0);
+			}
+			// server will return an http status code, code 200 means all is good
+			
+			private function httpStatusHandler(event:HTTPStatusEvent):void
+			{
+				if (event.status != 200)
+				{
+					mx.controls.Alert.show(String(event),"Error",0);
+				}
+			}
+			
+			//Image Download
+			public var PropertyImageId:int=0;			
+			private function init1():void 
+			{
+				// Initialize the array collection to an empty collection. 
+				arrColl = new ArrayCollection();
+				
+				// Set up the URL request to download the file specified by the FILE_URL variable. 
+				urlReq = new URLRequest(FILE_URL);
+				
+				// Define file reference object and add a bunch of event listeners. 
+				fileRef = new FileReference();
+				fileRef.addEventListener(Event.CANCEL, doEvent);
+				fileRef.addEventListener(Event.COMPLETE, doEvent);
+				fileRef.addEventListener(Event.OPEN, doEvent);
+				fileRef.addEventListener(Event.SELECT, doEvent);
+				fileRef.addEventListener(HTTPStatusEvent.HTTP_STATUS, doEvent);
+				fileRef.addEventListener(IOErrorEvent.IO_ERROR, doEvent);
+				fileRef.addEventListener(ProgressEvent.PROGRESS, doEvent);
+				fileRef.addEventListener(SecurityErrorEvent.SECURITY_ERROR, doEvent);
+			}
+			
+			private function doEvent(evt:Event):void 
+			{
+				
+				FilePath.text="";
+			}
+			
+			//private function downloadSourceCodeZip():void 
+			//{
+			// Clear existing array collection. 
+			//arrColl = new ArrayCollection();
+			//Alert.show(FILE_URL);
+			// Hide the Text control. //
+			//txt.visible = false;
+			// Begin download. 
+			//fileRef.download(urlReq);
+			//}
+			
+			private function showAlert(item:Object):void 
+			{
+				Alert.show(item.eventString, item.type);
+			}
+			public function FnClose_clickHandler3(event):void
+			{
+				init();	
+				uploadFiles();
+				init1();
+			}
+
+			
+		]]>
+	</fx:Script>
+	<s:VGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+		<s:BorderContainer x="12" y="-2" width="100%" height="584" backgroundColor="#fbf9f9"
+						   borderVisible="false">
+			<mx:Label x="83" y="62" text="Property"/>
+			<WrbHelpComp:HelpText id="hlp_Property" x="207" y="62" width="200" height="22" pxSetColumnsWidth="0,200" 
+								  onselection="{Ddl_Property_changeHandler()}"  pxTabIndex="1" depth="5000">
+			</WrbHelpComp:HelpText>
+			<mx:HRule x="0" y="444" width="100%" strokeColor="#eb1c24"/>
+			<s:HGroup x="0" y="458" width="100%" height="50" horizontalAlign="center" verticalAlign="middle">
+				<WrbComp:Button_BB id="Sctrl_Approve" width="120" height="30" click="FnSave()"
+								   Lable_val="Send For Approval">
+				</WrbComp:Button_BB>
+				<WrbComp:Button_BB id="Sctrl_Sendback" x="445" y="422" height="30"
+								   Lable_val="Clear" click="FnClear()">
+				</WrbComp:Button_BB>
+			</s:HGroup>
+			<s:Label x="87" y="40" text="Vendor Request" color="red"/>
+			<s:Label x="182" y="99" text="*" color="red"/>
+			<s:Label x="182" y="63" text="*" color="red"/>
+			<s:Label x="182" y="142" text="*" color="red"/>
+			<s:Label x="183" y="181" text="*" color="red"/>
+			<s:Label x="182" y="216" text="*" color="red"/>
+			<s:Label x="183" y="273" text="*" color="red" visible="false" id="lbl_Apart"/>
+			<s:Label x="182" y="306" text="*" color="red" visible="false" id="lbl_Room"/>
+			<s:Label x="553" y="66" text="*" color="red"/>
+			<s:Label x="552" y="98" text="*" color="red"/>
+			<mx:DateField x="578" y="62" width="126" id="dt_Date" yearNavigationEnabled="true" tabIndex="8" 
+						  formatString="DD/MM/YYYY" selectableRange="{{rangeEnd:new Date()}}" enabled="false"/>
+			<s:DropDownList id="Ddl_Category" x="207" y="101" width="200" prompt="Select Category"
+						change="ExpenseGroupLoad()"	 tabIndex="2">
+			</s:DropDownList>
+			<mx:Label x="83" y="100" width="86" text="Category"/>
+			<mx:Label x="83" y="138" width="96" text="Vendor Name"/>
+			<mx:Label x="83" y="271" width="96" text="Apartment No" visible="false" id="Txt_Apart"/>
+			<mx:Label x="83" y="215" width="96" text="Allocation Type"/>
+			<mx:Label x="82" y="304" width="96" text="Room" visible="false" id="Txt_Room"/>
+			<mx:Label x="83" y="175" width="96" text="service"/>
+			<mx:Label x="473" y="271" width="96" text="Description"/>
+			<mx:Label x="473" y="100" width="96" text="Amount"/>
+			<mx:Label x="473" y="138" width="96" text="Bill No"/>
+			<mx:Label x="473" y="215" width="96" height="26" text="Bill upload"/>
+			<mx:Label x="473" y="175" width="96" height="26" text="Due Date"/>
+			<mx:Label x="473" y="62" width="96" text="Request On"/>
+			<WrbHelpComp:HelpText x="207" y="139" id="hlp_Vendor" width="200" height="22" pxSetColumnsWidth="0,200" 
+								  onselection="{Ddl_Vendor_changeHandler()}"  pxTabIndex="3" depth="3000">
+			</WrbHelpComp:HelpText>
+			<WrbHelpComp:HelpText x="207" y="267" width="200" id="hlp_apartment" height="22" pxSetColumnsWidth="0,200" 
+								  onselection="{Ddl_Apartment_changeHandler()}"  pxTabIndex="6" depth="2000" visible="false">
+			</WrbHelpComp:HelpText>
+			<WrbHelpComp:HelpText x="207" y="177" width="200" id="hlp_service" height="22" pxSetColumnsWidth="200" 
+								  onselection="{Ddl_Service_changeHandler()}"  pxTabIndex="4" depth="2000">
+			</WrbHelpComp:HelpText>
+			<s:TextArea x="577" y="270" width="200" height="83" id="Txt_Des" tabIndex="12"/>
+			<s:TextInput x="577" y="101" width="126" id="Txt_Amount" tabIndex="9" restrict="0-9"/>
+			<s:TextInput x="577" y="139" id="Txt_Billno" tabIndex="10"/>
+			<mx:DateField x="578" y="177" width="126" id="dt_Duedate" yearNavigationEnabled="true" tabIndex="11" 
+						  formatString="DD/MM/YYYY"  enabled="true"/>
+			
+			<WrbHelpComp:HelpText x="207" y="216" width="200" id="hlp_Type" height="22" pxSetColumnsWidth="200" 
+								  onselection="{Ddl_Type_changeHandler()}"  pxTabIndex="5" depth="1000">
+			</WrbHelpComp:HelpText>
+			<WrbHelpComp:HelpText x="207" y="304" width="200" id="hlp_Room" height="22" pxSetColumnsWidth="0,200" 
+								  onselection="{Ddl_Room_changeHandler()}"  pxTabIndex="7" depth="1000" visible="false" >
+			</WrbHelpComp:HelpText>
+			<WrbComp:Button_HB id="Btn_Browse" x="580" y="216" width="118" height="20" buttonMode="true"
+							   _Label="Bill Upload" click="FnClick_Btn_Browse()" depth="0" focusEnabled="false" visible="true"/>
+			<s:BorderContainer x="243" y="260" width="437" height="237" id="Brd_imageUpload" visible="false" 
+							   borderVisible="true" backgroundColor="#fbf9f9" cornerRadius="5" depth="2500">
+				<mx:Panel x="37" y="39" title="Bill Uploader">
+					<mx:ControlBar>
+						<mx:Spacer width="80%"/>
+						<mx:HBox>
+							<mx:TextInput id="FilePath" width="150"  visible="true"/>
+							<mx:Button id="Filedata" label="Browse File" name="Filedata" />
+							<mx:Button label="UpLoad File" name="uploadbutton" id="uploadbutton" visible="false" width="0" />
+						</mx:HBox>
+						<mx:TextArea id="resultsTxtField"  width="0"  name="resultsTxtField" visible="false"/>
+					</mx:ControlBar>
+				</mx:Panel>
+				<WrbComp:Button_HB id="Btn_Close" x="215" y="177" width="118" height="32" buttonMode="true"
+								   _Label="Upload" click="FnClose_clickHandler3(event)" depth="0" focusEnabled="false" visible="true"/>
+				
+				<!--mx:Button id="downloadBtn1" x="247" y="172" height="40" label="Download"
+				click="downloadSourceCodeZip();"  toolTip="{FILE_URL}"/!-->
+				<s:TextInput x="37" y="172" width="189" height="40" id="txt_ImageName" enabled="false"/>		
+				
+				<WrbComp:Button_HB x="339" y="177" height="32" _Label="Close" click="{Brd_imageUpload.visible=false;}"/>
+			</s:BorderContainer>
+			
+		</s:BorderContainer>
+	</s:VGroup>	
+</s:Application>

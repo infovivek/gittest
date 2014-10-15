@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" 
+			   xmlns:WrbComp="WrbComp.*"
+			   creationComplete="application1_creationCompleteHandler(event)">	
+	<fx:Script>
+		<![CDATA[
+			import com.as3xls.xls.ExcelFile;
+			import com.as3xls.xls.Sheet;
+			
+			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
+			public var Ac:ArrayCollection=new ArrayCollection();
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "";
+			public var Cnt:int=0;
+			
+			protected function application1_creationCompleteHandler(event:FlexEvent):void
+			{
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";
+			}
+			
+			private function Custom_WebSer_Result (Ds_Objects:Object):void				
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "DatewiseBookingCnt_CUSTOM")
+				{
+					Grd_BookingCnt.dataProvider=null;Cnt = 0;
+					if(Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Cnt = Ds_Objects.result.Tables.Table.Rows[0].Cnt;
+					}
+					if(Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Grd_BookingCnt.dataProvider = Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+										
+				}
+			}
+			
+			protected function Btn_Show_clickHandler(event:MouseEvent):void
+			{
+				var M:int = Dt.displayedMonth;
+				var Y:int = Dt.displayedYear;
+				var M1:int = 0;
+				if(M == 0)
+				{
+					M1 = 01;
+				}
+				if(M != 0)
+				{
+					M1 = M + 1;
+				}
+				var Dt1:String=String(Y)+'-'+String(M1)+'-'+'01';
+				useWeb("Reports","DatewiseBookingCnt_CUSTOM",
+					[GlobalXml,'DatewiseBookingCnt',Dt1,'','','','','',M1,Y,0,0]);
+			}
+			
+			protected function Btn_ExportExcel_clickHandler(event:MouseEvent):void
+			{
+				Ac = new ArrayCollection();
+				Ac = Grd_BookingCnt.dataProvider as ArrayCollection;
+				if(Ac.length > 0)
+				{
+					var xlsFile:ExcelFile = new ExcelFile();
+				    var sheet:Sheet = new Sheet();
+				    var sheet1:Sheet = new Sheet();
+				    sheet.resize(Ac.length+3,36);
+				    sheet.setCell(0,0,"");
+				    sheet.setCell(1,0,"");
+				    sheet.setCell(2,0,"User Name");
+				    sheet.setCell(2,1,"1");
+				    sheet.setCell(2,2,"2");
+				    sheet.setCell(2,3,"3");
+				    sheet.setCell(2,4,"4");
+				    sheet.setCell(2,5,"5");
+				    sheet.setCell(2,6,"6");
+				    sheet.setCell(2,7,"7");
+				    sheet.setCell(2,8,"8");
+				    sheet.setCell(2,9,"9");
+				    sheet.setCell(2,10,"10");
+				    sheet.setCell(2,11,"11");
+				    sheet.setCell(2,12,"12");
+				    sheet.setCell(2,13,"13");
+				    sheet.setCell(2,14,"14");
+				    sheet.setCell(2,15,"15");
+				    sheet.setCell(2,16,"16");
+				    sheet.setCell(2,17,"17");
+				    sheet.setCell(2,18,"18");
+				    sheet.setCell(2,19,"19");
+				    sheet.setCell(2,20,"20");
+				    sheet.setCell(2,21,"21");
+				    sheet.setCell(2,22,"22");
+				    sheet.setCell(2,23,"23");
+				    sheet.setCell(2,24,"24");
+				    sheet.setCell(2,25,"25");
+				    sheet.setCell(2,26,"26");
+				    sheet.setCell(2,27,"27");
+					if(Cnt == 28)
+					{
+						sheet.setCell(2,28,"28");
+						sheet.setCell(2,29,"Total");
+					}
+					if(Cnt == 29)
+					{
+						sheet.setCell(2,28,"28");
+						sheet.setCell(2,29,"29");
+						sheet.setCell(2,30,"Total");
+					}				    
+					if(Cnt == 30)
+					{
+						sheet.setCell(2,28,"28");
+						sheet.setCell(2,29,"29");
+						sheet.setCell(2,30,"30");
+						sheet.setCell(2,31,"Total");
+					}				    
+					if(Cnt == 31)
+					{
+						sheet.setCell(2,28,"28");
+						sheet.setCell(2,29,"29");
+						sheet.setCell(2,30,"30");
+						sheet.setCell(2,31,"31");
+						sheet.setCell(2,32,"Total");
+					}				    				
+				    for(var i:int = 0; i < Ac.length; i++)
+				    {
+						sheet.setCell(i+3, 0, Ac[i].Name);
+					    sheet.setCell(i+3, 1, Ac[i].D01);
+					    sheet.setCell(i+3, 2, Ac[i].D02);
+					    sheet.setCell(i+3, 3, Ac[i].D03);
+					    sheet.setCell(i+3, 4, Ac[i].D04);
+					    sheet.setCell(i+3, 5, Ac[i].D05);
+					    sheet.setCell(i+3, 6, Ac[i].D06);
+					    sheet.setCell(i+3, 7, Ac[i].D07);
+					    sheet.setCell(i+3, 8, Ac[i].D08);
+					    sheet.setCell(i+3, 9, Ac[i].D09);
+					    sheet.setCell(i+3, 10, Ac[i].D10);
+					    sheet.setCell(i+3, 11, Ac[i].D11);
+					    sheet.setCell(i+3, 12, Ac[i].D12);
+					    sheet.setCell(i+3, 13, Ac[i].D13);
+					    sheet.setCell(i+3, 14, Ac[i].D14);
+					    sheet.setCell(i+3, 15, Ac[i].D15);
+					    sheet.setCell(i+3, 16, Ac[i].D16);
+					    sheet.setCell(i+3, 17, Ac[i].D17);
+					    sheet.setCell(i+3, 18, Ac[i].D18);
+					    sheet.setCell(i+3, 19, Ac[i].D19);
+					    sheet.setCell(i+3, 20, Ac[i].D20);
+					    sheet.setCell(i+3, 21, Ac[i].D21);
+					    sheet.setCell(i+3, 22, Ac[i].D22);
+					    sheet.setCell(i+3, 23, Ac[i].D23);
+					    sheet.setCell(i+3, 24, Ac[i].D24);
+					    sheet.setCell(i+3, 25, Ac[i].D25);
+					    sheet.setCell(i+3, 26, Ac[i].D26);
+					    sheet.setCell(i+3, 27, Ac[i].D27);
+						if(Cnt == 28)
+						{
+							sheet.setCell(i+3, 28, Ac[i].D28);
+							sheet.setCell(i+3, 29, Ac[i].Tot);
+						}
+						if(Cnt == 29)
+						{
+							sheet.setCell(i+3, 28, Ac[i].D28);
+							sheet.setCell(i+3, 29, Ac[i].D29);
+							sheet.setCell(i+3, 30, Ac[i].Tot);
+						}
+						if(Cnt == 30)
+						{
+							sheet.setCell(i+3, 28, Ac[i].D28);
+							sheet.setCell(i+3, 29, Ac[i].D29);
+							sheet.setCell(i+3, 30, Ac[i].D30);
+							sheet.setCell(i+3, 31, Ac[i].Tot);
+						}
+						if(Cnt == 31)
+						{
+							sheet.setCell(i+3, 28, Ac[i].D28);
+							sheet.setCell(i+3, 29, Ac[i].D29);
+							sheet.setCell(i+3, 30, Ac[i].D30);
+							sheet.setCell(i+3, 31, Ac[i].D31);
+							sheet.setCell(i+3, 32, Ac[i].Tot);
+						}					    
+					}
+					xlsFile.sheets.addItem(sheet);
+					var bytes:ByteArray = xlsFile.saveToByteArray();
+					var fr:FileReference = new FileReference();
+					var str:String="UserWiseBookingCountReport.xls";
+					fr.save(bytes,str);
+				}
+				else
+				{
+					alignAlert(Alert.show("User Details is Required.","Alert Message !",
+						Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+				}
+			}
+			
+		]]>
+	</fx:Script>	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
+	<s:VGroup x="0" y="0" width="100%" height="100%">
+		<s:BorderContainer width="100%" height="100%" borderColor="#fbf9f9" borderVisible="false">
+			<mx:DataGrid id="Grd_BookingCnt" x="0" y="72" width="100%" height="100%" depth="1">
+				<mx:columns>
+					<mx:DataGridColumn dataField="Name" headerText="User Name" width="200"/>
+					<mx:DataGridColumn dataField="D01" headerText="1"/>					
+					<mx:DataGridColumn dataField="D02" headerText="2"/>
+					<mx:DataGridColumn dataField="D03" headerText="3"/>
+					<mx:DataGridColumn dataField="D04" headerText="4"/>
+					<mx:DataGridColumn dataField="D05" headerText="5"/>
+					<mx:DataGridColumn dataField="D06" headerText="6"/>
+					<mx:DataGridColumn dataField="D07" headerText="7"/>
+					<mx:DataGridColumn dataField="D08" headerText="8"/>
+					<mx:DataGridColumn dataField="D09" headerText="9"/>					
+					<mx:DataGridColumn dataField="D10" headerText="10"/>					
+					<mx:DataGridColumn dataField="D11" headerText="11"/>
+					<mx:DataGridColumn dataField="D12" headerText="12"/>
+					<mx:DataGridColumn dataField="D13" headerText="13"/>
+					<mx:DataGridColumn dataField="D14" headerText="14"/>
+					<mx:DataGridColumn dataField="D15" headerText="15"/>
+					<mx:DataGridColumn dataField="D16" headerText="16"/>
+					<mx:DataGridColumn dataField="D17" headerText="17"/>
+					<mx:DataGridColumn dataField="D18" headerText="18"/>
+					<mx:DataGridColumn dataField="D19" headerText="19"/>
+					<mx:DataGridColumn dataField="D20" headerText="20"/>
+					<mx:DataGridColumn dataField="D21" headerText="21"/>
+					<mx:DataGridColumn dataField="D22" headerText="22"/>
+					<mx:DataGridColumn dataField="D23" headerText="23"/>
+					<mx:DataGridColumn dataField="D24" headerText="24"/>
+					<mx:DataGridColumn dataField="D25" headerText="25"/>
+					<mx:DataGridColumn dataField="D26" headerText="26"/>
+					<mx:DataGridColumn dataField="D27" headerText="27"/>
+					<mx:DataGridColumn dataField="D28" headerText="28"/>
+					<mx:DataGridColumn dataField="D29" headerText="29"/>
+					<mx:DataGridColumn dataField="D30" headerText="30"/>
+					<mx:DataGridColumn dataField="D31" headerText="31"/>
+					<mx:DataGridColumn dataField="Tot" headerText="Total"/>
+				</mx:columns>
+			</mx:DataGrid>
+			<WrbComp:Button_HB id="Btn_Show" x="416" y="21" _Label="Show"
+							   click="Btn_Show_clickHandler(event)"/>
+			<WrbComp:Button_HB id="Btn_ExportExcel" x="716" y="21" _Label="Export to Excel"
+							   click="Btn_ExportExcel_clickHandler(event)" width="100"/>
+			<mx:DateChooser x="100" y="21" id="Dt" yearNavigationEnabled="true"
+							selectedDate="{new Date()}"/>
+			<s:BorderContainer x="94" y="51" width="200" height="200" borderVisible="false">
+			</s:BorderContainer>
+		</s:BorderContainer>
+	</s:VGroup>
+</s:Application>

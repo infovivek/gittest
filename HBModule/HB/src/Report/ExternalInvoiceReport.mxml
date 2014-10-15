@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" xmlns:WrbHelpComp="WrbHelpComp.*"
+			   creationComplete="PageLoad()">
+	<fx:Declarations>
+		<s:Animate id="fader"
+				   duration="500"
+				   repeatBehavior="reverse"
+				   repeatCount="0">
+			<s:SimpleMotionPath property="alpha"
+								valueFrom="1.0" valueTo="0.0" />
+		</s:Animate>
+		<s:Animate id="fader1"
+				   duration="0"
+				   repeatBehavior="reverse"
+				   repeatCount="0">
+			<s:SimpleMotionPath property="alpha"
+								valueFrom="1.0" valueTo="0.0" />
+		</s:Animate>
+	</fx:Declarations>
+	<fx:Style source="..\\Common\\ApplicationCSS.css" />
+	<fx:Script source="..\\Common\\CommonScript.as" />
+	<fx:Script source="..\\Common\\Functions.as"/>
+	<fx:Script>
+		<![CDATA[
+			import com.as3xls.xls.Cell;
+			import com.as3xls.xls.ExcelFile;
+			import com.as3xls.xls.Sheet;
+			import com.as3xls.xls.Type;
+			private var xlsFile:ExcelFile;
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "";
+			public var Ac:ArrayCollection=new ArrayCollection();
+			public var Help_AC:ArrayCollection=new ArrayCollection();
+			public var Dtls_AC:ArrayCollection=new ArrayCollection();
+			public var ErrorFlag:Boolean=true;
+			public var PropertyId:Number=0;
+			public var ClientId:Number=0;
+			private function PageLoad():void
+			{
+				Global_AC = funLoginInfo("<gScrId>1</gScrId><gUsrFk>1</gUsrFk>");				
+				GlobalXml = "";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";	
+				Help_AC=new ArrayCollection();
+				Grd_FinalAdjustment.dataProvider=Help_AC;
+				help();				
+			}
+			private function help():void
+			{	
+				//This function call to MAP PO VENDOR SERVICE
+				useWeb("MapPOAndVendor","Property_CUSTOM", [GlobalXml, "Property",0, "","","",0]);				
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "Property_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						hlp_Property.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+					else
+					{
+						Help_AC=new ArrayCollection();
+						hlp_Property.dataProvider=Help_AC;
+					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Hlp_Client.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+					else
+					{
+						Help_AC=new ArrayCollection();
+						Hlp_Client.dataProvider=Help_AC;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "ExternalInvoice_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_FinalAdjustment.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						
+						Dtls_AC=Ds_Objects.result.Tables.Table1.Rows; 
+					}
+					else
+					{
+						Help_AC=new ArrayCollection();
+						Grd_FinalAdjustment.dataProvider=Help_AC;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Export_CUSTOM")
+				{
+//					var Str_TE:String=Ds_Objects.result.Tables.TabelsNew.Rows[0].Exception; 
+//					alignAlert(Alert.show(Str_TE,"Message !",
+//						Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+					
+					Clear();
+				}
+			}
+			public function Change(LabelName:String):void
+			{
+				
+				fader1.target=this[LabelName];				
+				fader1.play();					
+				this[LabelName].setStyle("color","#565454");
+			}
+			public function Clear():void
+			{
+				hlp_Property.text="";
+				PropertyId=0;
+				Hlp_Client.text="";
+				ClientId=0;
+				DT_From.text="";
+				DT_To.text="";
+				Help_AC=new ArrayCollection();
+				Grd_FinalAdjustment.dataProvider=Help_AC;
+				Lbl_Error.visible=false;
+				Change('Lbl_Error'); 
+			}
+			public function Search():void
+			{
+				Lbl_Error.visible=false;
+				Change('Lbl_Error'); 
+				ErrorFlag=true;	
+				var Str_Temp:String="";
+				Str_Temp="All";
+				if(PropertyId!=0)
+				{
+					Str_Temp="Property";
+				}
+				if(ClientId!=0)
+				{
+					Str_Temp="Client";
+				}
+				if(DT_From.text=="")
+				{
+					fader.target=Lbl_FDT;				
+					fader.play();
+					Lbl_FDT.setStyle("color","red");
+					ErrorFlag=false;
+				}
+				if(DT_To.text=="")
+				{
+					fader.target=Lbl_TDT;				
+					fader.play();
+					Lbl_TDT.setStyle("color","red");
+					ErrorFlag=false;
+				}
+				if(ErrorFlag==true)
+				{		
+					//This function call to MAP PO VENDOR SERVICE
+					useWeb("MapPOAndVendor","ExternalInvoice_CUSTOM", [GlobalXml,"ExternalInvoice",PropertyId,DT_From.text,DT_To.text,Str_Temp,ClientId]);									
+				}
+			}
+			public function fnGetProperty():void
+			{
+				if(hlp_Property.selected())
+				{
+					hlp_Property.text=hlp_Property.Select_Row.PropertyName
+					PropertyId=hlp_Property.Select_Row.ZId
+					Hlp_Client.text="";
+					ClientId=0;
+					DT_From.setFocus();	
+				}
+				else
+				{
+					hlp_Property.text="";
+					PropertyId=0;
+					
+				}
+			}
+			public function fnGetClient():void
+			{
+				if(Hlp_Client.selected())
+				{
+					Hlp_Client.text=Hlp_Client.Select_Row.ClientName
+					ClientId=Hlp_Client.Select_Row.ZId
+					hlp_Property.text="";
+					PropertyId=0;
+					DT_From.setFocus();	
+				}
+				else
+				{
+					Hlp_Client.text="";
+					ClientId=0;
+					
+				}
+			}
+			
+			protected function image1_clickHandler(event:MouseEvent):void
+			{
+				ErrorFlag=true;		
+				Help_AC=new ArrayCollection();
+				Help_AC=Grd_FinalAdjustment.dataProvider as ArrayCollection;
+				Lbl_Error.visible=false;
+				Change('Lbl_Error'); 
+				if(Help_AC.length==0)
+				{
+					Lbl_Error.visible=true;
+					fader.target=Lbl_Error;				
+					fader.play();
+					Lbl_Error.setStyle("color","red");
+					ErrorFlag=false;
+				}
+				if(ErrorFlag==true)
+				{	
+					try
+					{
+						var bytes: ByteArray = new ByteArray();
+						var fr:FileReference = new FileReference();
+						var FileName:String = "";
+						var sheet:Sheet = new Sheet();
+						var arrExportResult:ArrayCollection = Grd_FinalAdjustment.dataProvider as ArrayCollection;
+						if(arrExportResult.length!=0)
+						{					
+							xlsFile = new ExcelFile();
+							sheet = new Sheet();
+							
+							sheet.resize(arrExportResult.length+7,15);
+							
+							sheet.setCell(0,7,"External Invoice Report");
+							sheet.setCell(1,0,'Booking Date');
+							sheet.setCell(1,1,'Bill No');
+							sheet.setCell(1,2,'Property Name');
+							sheet.setCell(1,3,'Company Name');
+							sheet.setCell(1,4,'Guest Name');
+							sheet.setCell(1,5,'Bill Start Date');
+							sheet.setCell(1,6,'Bill End Date');
+							sheet.setCell(1,7,'No Of Days');	
+							sheet.setCell(1,8,'Tariff Per day');	
+							sheet.setCell(1,9,'Total Tariff');	
+							sheet.setCell(1,10,'Service Tax');	
+							sheet.setCell(1,11,'Vendor No Of Days');	
+							sheet.setCell(1,12,'Tariff Per day');	
+							sheet.setCell(1,13,'Vendor Invoice Amount');	
+							sheet.setCell(1,14,'Difference Amount');
+							
+							for(var i:int=0;i<arrExportResult.length;i++)
+							{
+								sheet.setCell(i+2, 0, arrExportResult[i].BookingDate);
+								sheet.setCell(i+2, 1, arrExportResult[i].BillNumber);
+								sheet.setCell(i+2, 2, arrExportResult[i].PropertyName);
+								sheet.setCell(i+2, 3, arrExportResult[i].CompanyName);
+								sheet.setCell(i+2, 4, arrExportResult[i].GuestName);
+								sheet.setCell(i+2, 5, arrExportResult[i].BillStartDate);
+								sheet.setCell(i+2, 6, arrExportResult[i].BillEndDate);
+								sheet.setCell(i+2, 7, arrExportResult[i].NoOFDays);
+								sheet.setCell(i+2, 8, arrExportResult[i].Tariff);
+								sheet.setCell(i+2, 9, arrExportResult[i].MarkUpTotalTariff);
+								sheet.setCell(i+2, 10, arrExportResult[i].ServiceTax);
+								sheet.setCell(i+2, 11, arrExportResult[i].NoOFDays);
+								sheet.setCell(i+2, 12, arrExportResult[i].VendorTariff);								
+								sheet.setCell(i+2, 13, arrExportResult[i].VendorTotal);
+								sheet.setCell(i+2, 14, arrExportResult[i].DifferanceAmount);
+								
+								if(i==arrExportResult.length-1)
+								{
+									sheet.setCell(i+4,7,'Total Tariff Amount');
+									sheet.setCell(i+4,8,'Difference Amount');
+									sheet.setCell(i+4,9,'Difference Amount in  %');
+									
+									sheet.setCell(i+5,7,Dtls_AC[0].MarkUpTotalTariff);
+									sheet.setCell(i+5,8,Dtls_AC[0].DifferanceAmount);
+									sheet.setCell(i+5,9,Dtls_AC[0].PER);
+								}
+							}
+							
+							xlsFile.sheets.addItem(sheet); 					
+							
+							bytes = xlsFile.saveToByteArray();
+							fr = new FileReference();
+							FileName = "";						
+							
+							FileName="ExternalInvoiceReport.xls";
+							fr.save(bytes,FileName);
+													
+						}
+						else
+						{
+							
+							alignAlert(Alert.show("* No Records Found.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+							return;
+						}
+						//Grd_BCFC.visible=false;
+						Grd_FinalAdjustment.dataProvider=null;
+						
+						Clear();
+						
+					}				
+					catch (myError:Error) 
+					{
+						alignAlert(Alert.show("* Excel File Already Opened.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+						return
+					}catch (error:TypeError)
+					{
+						alignAlert(Alert.show("* Excel File Already Opened.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+						return
+					}catch (error:IOErrorEvent)
+					{
+						alignAlert(Alert.show("* Excel File Already Opened.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+						return
+					}
+					
+//					var Ac:ArrayCollection=new ArrayCollection
+//						([{
+//							BookingDate:'Booking Date',
+//							BillNumber:'Bill No',
+//							PropertyName:'Property Name',
+//							CompanyName:'Company Name',
+//							GuestName:'Guest Name',
+//							BillStartDate:'Bill Start Date',							
+//							BillEndDate:'Bill End Date',
+//							NoOFDays:'No Of Days',
+//							Tariff:'Tariff Per day',
+//							MarkUpTotalTariff:'Total Tariff',
+//							ServiceTax:'Service Tax',
+//							VendorNoOFDays:'Vendor No Of Days',
+//							TariffPerday:'Tariff Per day',
+//							VendorInvoiceAmount:'Vendor Invoice Amount',
+//							DifferenceAmount:'Difference Amount'
+//							
+//						}]);
+//					
+//					var HdrXml:String="";					
+//					HdrXml += ObjToXmlStr_Comm(Ac,"HdrXml")		
+//					
+//					var DtlsXml:String="";
+//					DtlsXml += "<ROOT>";
+//					DtlsXml += ObjToXmlStr_Comm(Grd_FinalAdjustment.dataProvider as ArrayCollection ,"DtlsXml")
+//					DtlsXml += "</ROOT>";
+//					
+//					var DtlsXml1:String="";					
+//					DtlsXml1 += ObjToXmlStr_Comm(Dtls_AC ,"DtlsXml1")
+//					
+//					
+//					//This function call to MAP PO VENDOR SERVICE
+//					useWeb("MapPOAndVendor","Export_CUSTOM", [GlobalXml,"Export",0,DtlsXml1,HdrXml,DtlsXml,0]);
+				}
+				
+			}
+			
+		]]>
+	</fx:Script>
+	<s:BorderContainer x="0" y="0" width="100%" height="92" borderVisible="false" backgroundColor="#f4efef" depth="10">
+		<s:HGroup x="0" y="0" width="100%" height="90%" horizontalAlign="center" verticalAlign="middle">
+			<s:Group x="108" y="7" width="740" height="70">
+				<mx:Label x="15" y="8" text="Propery" id="Lbl_Vendor"/>
+				<mx:Label id="Lbl_Vendor1" x="372" y="2" width="13" text="*" color="red" fontSize="16"/>
+				<mx:Label id="Lbl_Vendor2" x="361" y="42" width="13" text="*" color="red" fontSize="16"/>
+				<mx:Label x="312" y="8" width="65" height="16" text="From Date" id="Lbl_FDT"/>
+				<mx:Label x="312" y="48" text="To Date" id="Lbl_TDT"/>
+				<WrbHelpComp:HelpText x="77" y="8.5" width="214" id="hlp_Property" pxSetPrompt="Property" pxTabIndex="1"
+									  pxSetColumnsWidth="300,0" onselection="{fnGetProperty()}" depth="1500">
+				</WrbHelpComp:HelpText>
+				<mx:Label x="15" y="48" text="Client" id="Lbl_Vendor0"/>				
+				<mx:Label x="585" y="58" text="It Is An Invalid Process" id="Lbl_Error" color="red" visible="false"/>
+				<mx:DateField x="393" y="7" id="DT_From" tabIndex="2" change="Change('Lbl_FDT')" formatString="DD/MM/YYYY"/>
+				<mx:DateField x="393" y="47" id="DT_To" tabIndex="3" change="Change('Lbl_TDT')" formatString="DD/MM/YYYY"/>
+				<s:Image x="543" y="8" source="assets/a1.png" toolTip="Search" click="Search()" tabIndex="5"/>
+				<s:Image x="687" y="8" source="assets/dust_bin1.png" toolTip="Clear" click="Clear()"/>
+				<WrbHelpComp:HelpText x="77" y="50" width="214" id="Hlp_Client" pxTabIndex="2"  pxSetPrompt="Client" 
+									  pxSetColumnsWidth="300,0" onselection="{fnGetClient()}">
+				</WrbHelpComp:HelpText>
+				<s:Image x="620" y="8" width="50" height="50" source="assets/Excel copy copy.png" toolTip="Export" click="image1_clickHandler(event)"/>
+			</s:Group>
+		</s:HGroup>
+	</s:BorderContainer>
+	<s:VGroup x="0" y="100" width="100%" height="100%">
+		<s:Scroller width="100%" height="100%">
+			<s:VGroup width="100%" height="100%">
+				<mx:DataGrid id="Grd_FinalAdjustment" width="1500" height="100%" depth="1" editable="true"
+							 tabIndex="93" verticalAlign="middle" >	
+					<mx:columns>
+						<mx:DataGridColumn dataField="BookingDate" headerText="Booking Date" editable="false" width="100" textAlign="left"/>	
+						<mx:DataGridColumn dataField="BillNumber" headerText="Bill No" textAlign="left" visible="true" width="120" editable="false"/>
+						<mx:DataGridColumn dataField="PropertyName" headerText="Property Name"  width="120" editable="false" textAlign="left" visible="true"/>
+						<mx:DataGridColumn dataField="CompanyName" headerText="Company Name"  width="120" textAlign="right" editable="false" visible="true"/>	
+						
+						<mx:DataGridColumn dataField="GuestName" headerText="Guest Name" textAlign="left" visible="true" editable="false" width="120" />						
+						<mx:DataGridColumn dataField="BillStartDate" headerText="Bill Start Date" textAlign="left" visible="true" editable="false" width="100" />
+						<mx:DataGridColumn dataField="BillEndDate" headerText="Bill End Date" textAlign="left" visible="true" editable="false" width="100" />
+						<mx:DataGridColumn dataField="NoOFDays" headerText="No Of Days" textAlign="center" visible="true" editable="false" width="100" />
+						<mx:DataGridColumn dataField="Tariff" headerText="Tariff Per day" textAlign="right" visible="true" editable="false" width="100" />
+						<mx:DataGridColumn dataField="MarkUpTotalTariff" headerText="Total Tariff" textAlign="right" visible="true" editable="false" width="100" />
+						<mx:DataGridColumn dataField="ServiceTax" headerText="Service Tax" textAlign="right" visible="true" editable="false" width="100" />
+						<mx:DataGridColumn dataField="NoOFDays" headerText="Vendor No Of Days" textAlign="center" visible="true" editable="false" width="100" />
+						<mx:DataGridColumn dataField="VendorTariff" headerText="Tariff Per day" textAlign="right" visible="true" editable="false" width="100" />	
+						
+						<mx:DataGridColumn dataField="VendorTotal" headerText="Vendor Invoice Amount" textAlign="right" visible="true" editable="false" width="100" />
+						<mx:DataGridColumn dataField="DifferanceAmount" headerText="Difference Amount" textAlign="right" visible="true" editable="false" width="100" />					
+					</mx:columns>
+				</mx:DataGrid>
+			</s:VGroup>
+		</s:Scroller>
+	</s:VGroup>
+</s:Application>

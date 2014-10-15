@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<publishData>
+  <publishProfile publishUrl="D:\HB Upload Files\July\24 Jul\Service" deleteExistingFiles="True" ftpAnonymousLogin="False" ftpPassiveMode="True" msdeploySite="" msdeploySiteID="" msdeployRemoteSitePhysicalPath="" msdeployAllowUntrustedCertificate="False" msdeploySkipExtraFilesOnServer="True" msdeployMarkAsApp="False" profileName="Profile1" publishMethod="FileSystem" replaceMatchingFiles="False" userName="" savePWD="False" userPWD="" SelectedForPublish="True">
+    <file relUrl="Web.config" publishTime="07/24/2014 18:44:09" />
+    <file relUrl="bin/HB.Dao.pdb" publishTime="07/24/2014 18:43:55" />
+    <file relUrl="Scripts/jquery-1.4.1.min.js" publishTime="01/03/2014 12:36:09" />
+    <file relUrl="bin/HB.BusinessService.dll" publishTime="07/24/2014 18:43:56" />
+    <file relUrl="bin/HB.Entity.dll" publishTime="07/24/2014 18:43:54" />
+    <file relUrl="bin/HBService.dll" publishTime="07/24/2014 18:43:57" />
+    <file relUrl="Scripts/jquery-1.4.1.js" publishTime="01/03/2014 12:36:09" />
+    <file relUrl="bin/HBService.pdb" publishTime="07/24/2014 18:43:56" />
+    <file relUrl="bin/HB.BusinessService.pdb" publishTime="07/24/2014 18:43:56" />
+    <file relUrl="bin/HB.Dao.dll" publishTime="07/24/2014 18:43:55" />
+    <file relUrl="HBService.asmx" publishTime="01/03/2014 12:39:08" />
+    <file relUrl="bin/HB.BO.pdb" publishTime="07/24/2014 18:43:55" />
+    <file relUrl="bin/EASendMail20.dll" publishTime="07/03/2014 16:43:58" />
+    <file relUrl="bin/HB.Entity.pdb" publishTime="07/24/2014 18:43:54" />
+    <file relUrl="Styles/Site.css" publishTime="01/03/2014 12:36:09" />
+    <file relUrl="bin/HB.BO.dll" publishTime="07/24/2014 18:43:55" />
+    <file relUrl="Scripts/jquery-1.4.1-vsdoc.js" publishTime="01/03/2014 12:36:09" />
+  </publishProfile>
+</publishData>

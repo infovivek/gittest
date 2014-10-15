@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:Controls="fx.com.adobe.Controls.*"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   xmlns:WrbComp="WrbComp.*"
+			   xmlns:flexlib="http://code.google.com/p/flexlib/"
+			   width="100%" height="100%" creationComplete="PageLoad()" pageTitle="Client Column">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
+	<fx:Script>
+		<![CDATA[
+			import WrbComp.frmsearchwindow;
+			
+			import WrbHelpComp.HlpGridHdr;
+			
+			import flashx.textLayout.formats.Float;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.CalendarLayoutChangeEvent;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.events.IndexChangedEvent;
+			import mx.graphics.codec.PNGEncoder;
+			
+			import spark.events.IndexChangeEvent;
+			import spark.events.TextOperationEvent;
+			private var SearchPopUp:frmsearchwindow = new frmsearchwindow();
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "",TypeServiceId:int=0,ErrStr:String="";
+			public var ClientId:Number=0,ClientName:String="";
+			public var Id:int=0,ErrMsg:String="",Flag:Boolean=true,AddMode:Boolean=true;
+			
+			protected function PageLoad():void
+			{
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";
+				Help();
+				Save_Columns.setButtonRights("Delete",true);
+				Save_Columns.setButtonRights("Refresh",true);
+				Save_Columns.setButtonRights("Search",true);
+				hlp_Client.setFocus();
+			}
+			public function Help():void
+			{
+				useWeb("ClientColumn","PAGELOAD_CUSTOM",[GlobalXml,'PAGELOAD',0,0]);
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void				
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "PAGELOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						hlp_Client.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				{
+					if(AddMode==true)
+					{
+						alignAlert(Alert.show("Saved Successfully.","Message !",Alert.OK, null, null, 
+						iconTickLarge, Alert.OK),10,"");
+					}
+					else
+					{
+						alignAlert(Alert.show("Updated Successfully.","Message !",Alert.OK, null, null, 
+							iconTickLarge, Alert.OK),10,"");
+					}
+					FnClear();
+					//hlp_Client.setFocus();
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "LASTDATA_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						txt_Col1.text=Ds_Objects.result.Tables.Table.Rows[0].Column1;
+						txt_COl2.text=Ds_Objects.result.Tables.Table.Rows[0].Column2;
+						txt_COl3.text=Ds_Objects.result.Tables.Table.Rows[0].Column3;
+						txt_COl4.text=Ds_Objects.result.Tables.Table.Rows[0].Column4;
+						txt_COl5.text=Ds_Objects.result.Tables.Table.Rows[0].Column5;
+						txt_COl6.text=Ds_Objects.result.Tables.Table.Rows[0].Column6;
+						txt_COl7.text=Ds_Objects.result.Tables.Table.Rows[0].Column7;
+						txt_COl8.text=Ds_Objects.result.Tables.Table.Rows[0].Column8;
+						txt_COl9.text=Ds_Objects.result.Tables.Table.Rows[0].Column9;
+						txt_COl10.text=Ds_Objects.result.Tables.Table.Rows[0].Column10;
+						ClientId=Ds_Objects.result.Tables.Table.Rows[0].ClientId;
+						Id=Ds_Objects.result.Tables.Table.Rows[0].Id;
+						AddMode=false;
+					}
+				}
+			}
+			protected function FnValidation_BeforeSave():String
+			{
+				var TxtFlag:Boolean=true;ErrStr="";
+				var Flag:Boolean=true;
+				if(ClientId==0)
+				{
+					if(TxtFlag=true)
+					{
+						hlp_Client.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+" *   Client is Required \n";
+				}
+				if(txt_Col1.text=="")
+				{
+					if(TxtFlag=true)
+					{
+						txt_Col1.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+" *   Column1 is Required \n";
+				}
+				return ErrStr;
+			}
+			protected function FnSave():void
+			{
+				ErrStr="";
+				ErrMsg = ""; Flag = true; 
+				var Str:String=FnValidation_BeforeSave();
+				if(ErrStr !="")
+				{
+					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10,"");
+					return;
+				} 
+				else
+				{
+					var arrcopy:ArrayCollection = new ArrayCollection
+						([{ 
+							ClientId:ClientId,
+							Column1:txt_Col1.text,
+							Column2:txt_COl2.text,
+							Column3:txt_COl3.text,
+							Column4:txt_COl4.text,
+							Column5:txt_COl5.text,
+							Column6:txt_COl6.text,
+							Column7:txt_COl7.text,
+							Column8:txt_COl8.text,
+							Column9:txt_COl9.text,
+							Column10:txt_COl10.text,
+							Id:Id
+						}])
+					
+					var HdrXml:String=""
+					HdrXml += "<ROOT>";	
+					HdrXml += ObjToXmlStr_Comm(arrcopy,"HdrXml") 
+					HdrXml += "</ROOT>";
+					
+					useWeb("ClientColumn","Save_CUSTOM",[GlobalXml,HdrXml]);
+				}
+			}
+			protected function FnClear():void
+			{
+			//	hlp_Client.setFocus();
+				ClientId=0;
+				hlp_Client.text="";
+				ClientName="";
+				txt_Col1.text="";
+				txt_COl2.text="";
+				txt_COl3.text="";
+				txt_COl4.text="";
+				txt_COl5.text="";
+				txt_COl6.text="";
+				txt_COl7.text="";
+				txt_COl8.text="";
+				txt_COl9.text="";
+				txt_COl10.text="";
+				Help();
+			}
+			public function fnGetClient():void
+			{
+				if(hlp_Client.selected())
+				{
+					ClientName=hlp_Client.Select_Row.ClientName
+					hlp_Client.text=ClientName;	
+					ClientId=hlp_Client.Select_Row.ZId
+					txt_Col1.setFocus();
+					useWeb("ClientColumn","LASTDATA_CUSTOM",[GlobalXml,'LASTDATA',ClientId,Global_AC[0].UsrId]);
+				}
+				else
+				{
+					hlp_Client.text="";
+					ClientId=0;
+				}
+			}
+		]]>
+	</fx:Script>
+	<s:HGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+		<s:BorderContainer x="0" y="-2" width="100%" height="100%" id="Brd_Cash" backgroundColor="#fbf9f9" 
+						   visible="true" borderVisible="false">
+			<s:Label x="272" y="69" text="Client"/>
+			<WrbHelpComp:HelpText x="372" y="61.5" width="200" pxTabIndex="1" depth="10" pxSetPrompt="Select Client"
+								  id="hlp_Client" pxSetColumnsWidth="200,0" onselection="{fnGetClient()}">
+			</WrbHelpComp:HelpText>
+			<s:Label x="115" y="159" text="Column1"/>
+			<s:Label x="115" y="201" text="Column2"/>
+			<s:Label x="115" y="242" text="Column3"/>
+			<s:Label x="115" y="282" text="Column4"/>
+			<s:Label x="115" y="320" text="Column5"/>
+			<s:Label x="555" y="159" text="Column6"/>
+			<s:Label x="555" y="201" text="Column7"/>
+			<s:Label x="555" y="242" text="Column8"/>
+			<s:Label x="555" y="282" text="Column9"/>
+			<s:Label x="555" y="320" text="Column10"/>
+			<s:TextInput id="txt_Col1" x="215" y="151" maxChars="100" tabIndex="2"/>
+			<s:TextInput id="txt_COl2" x="215" y="193" maxChars="100" tabIndex="3"/>
+			<s:TextInput id="txt_COl3" x="215" y="234" maxChars="100" tabIndex="4"/>
+			<s:TextInput id="txt_COl4" x="215" y="274" maxChars="100" tabIndex="5"/>
+			<s:TextInput id="txt_COl5" x="215" y="312" maxChars="100" tabIndex="6"/>
+			<s:TextInput id="txt_COl6" x="655" y="151" maxChars="100" tabIndex="7"/>
+			<s:TextInput id="txt_COl7" x="655" y="193" maxChars="100" tabIndex="8"/>
+			<s:TextInput id="txt_COl8" x="655" y="234" maxChars="100" tabIndex="9"/>
+			<s:TextInput id="txt_COl9" x="655" y="274" maxChars="100" tabIndex="10"/>
+			<s:TextInput id="txt_COl10" x="655" y="312" maxChars="100" tabIndex="11"/>
+			<s:Label x="34" y="23" text="Client Columns" color="red"/>
+			<s:HGroup x="0" y="439" width="100%" height="50" horizontalAlign="center" verticalAlign="middle">
+				<WrbComp:SaveControl id="Save_Columns" x="196" y="451" docSave="FnSave()" docClear="FnClear()">
+				</WrbComp:SaveControl>
+			</s:HGroup>
+		</s:BorderContainer>
+	</s:HGroup>
+</s:Application>

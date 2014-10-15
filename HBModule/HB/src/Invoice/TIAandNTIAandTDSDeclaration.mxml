@@ -1,0 +1,821 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:Controls="fx.com.adobe.Controls.*"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   xmlns:WrbComp="WrbComp.*"
+			   xmlns:flexlib="http://code.google.com/p/flexlib/"
+			   xmlns:ns1="*"
+			   width="100%" height="100%" creationComplete="PageLoad()"
+			   pageTitle="TIAandNTIAandTDSDeclaration">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
+	<fx:Script>
+		<![CDATA[
+			import WrbComp.frmsearchwindow;
+			
+			import WrbHelpComp.HlpGridHdr;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.CalendarLayoutChangeEvent;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.events.IndexChangedEvent;
+			import mx.graphics.codec.PNGEncoder;
+			
+			import spark.events.IndexChangeEvent;
+			import spark.events.TextOperationEvent;
+			public var Screen:String = "";
+			public var ScreenName:String = "TIAandNTIA";
+			public var ADate:String = "";
+			private var SearchPopUp:frmsearchwindow = new frmsearchwindow();
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "",TypeServiceId:int=0,ErrStr:String="",AdjustmentCategory:String="";
+			public var Id:int=0,ErrMsg:String="",PropertyId:int=0,PropertyName:String="",UserId:int=0,PropertyId2:int=0,PropertyName2:String="";
+			public var AddMode:Boolean=true,Flag:Boolean=true,AdjustmentCategoryId:int=0,TDSImage:String="";
+			public var OwnerId:int=0,OwnerName:String="",FinancialYear:String="",FinancialYearId:int=0,OwnerId2=0,OwnerName2:String="";
+			
+			protected function PageLoad():void
+			{
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";
+				dt_Date.selectedDate = new Date();
+				dt_Date2.selectedDate = new Date();
+				FnHelp();
+				hlp_property.setFocus();
+				Brd_TIANTIA.visible=true;
+				Brd_TIAANDNTIA0.visible=false;
+				btn_TIAANDNTIA.Button_B_mouseOverHandler();
+				btn_TIAANDNTIA0.Button_OutHandler();
+			}
+			protected function FnHelp():void
+			{ 
+				useWeb("TIAandNTIA","PageLoad_CUSTOM",[GlobalXml,'PAGELOAD',0,0]); 
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void				
+			{ 
+				try
+				{
+				if (Ds_Objects.currentTarget.description.toString() == "PageLoad_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						hlp_property.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						hlp_property2.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						drp_AdjustmentCategory.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;	
+					}
+					if (Ds_Objects.result.Tables.Table2.Rows.length > 0)
+					{
+						drp_FinancialYear.dataProvider=Ds_Objects.result.Tables.Table2.Rows as ArrayCollection;
+					}
+					if (Ds_Objects.result.Tables.Table3.Rows.length > 0)
+					{
+						var FlagId:int=Ds_Objects.result.Tables.Table3.Rows[0].FlagId
+						chk_Flag.selected=Ds_Objects.result.Tables.Table3.Rows[0].Flag;
+					}
+				}
+				}
+				catch(Exception)
+				{
+					//chk_Flag.selected=false;
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				{
+					if(ScreenName=="TIAandNTIA")
+					{
+						if (Id == 0)
+						{
+							alignAlert(Alert.show("TIAandNTIA Saved Successfully.","Message !",Alert.OK, 
+								null, null, iconTickLarge, Alert.OK),10,"");
+						}
+						else
+						{
+							alignAlert(Alert.show("TIAandNTIA Updated Successfully.","Message !",Alert.OK, 
+								null, null, iconTickLarge, Alert.OK),10,"");
+						}
+						FnClear("TIAandNTIA");
+					}
+					if(ScreenName=="TDSDeclaration")
+					{
+						if(Id==0)
+						{
+							alignAlert(Alert.show("TDS Declaration Saved Successfully.","Message !",Alert.OK, 
+								null, null, iconTickLarge, Alert.OK),10,"");
+						}
+						else
+						{
+							alignAlert(Alert.show("TDS Declaration Updated Successfully.","Message !",Alert.OK, 
+								null, null, iconTickLarge, Alert.OK),10,"");
+						}
+						FnClear("TDSDeclaration");
+					}
+					FnClear("TIAandNTIA");
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Search_CUSTOM")
+				{
+					if(ScreenName=="TIAandNTIA")
+					{
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{
+							//dt_Date.selectedRanges=Ds_Objects.result.Tables.Table.Rows[0].Date;
+							ADate = Ds_Objects.result.Tables.Table.Rows[0].Date;
+							var FDM:Number = Number(ADate.substr(0,2)); 
+							var FDY:Number = Number(ADate.substr(6,4)); 
+							if(FDM != 0)
+							{
+								FDM = FDM - 1;
+							}
+							dt_Date.selectedDate = new Date(FDY, FDM, 01);
+							hlp_property.text=Ds_Objects.result.Tables.Table.Rows[0].PropertyName;
+							PropertyId=Ds_Objects.result.Tables.Table.Rows[0].PId;
+							hlp_Owner.text=Ds_Objects.result.Tables.Table.Rows[0].OwnerName;
+							txt_AdjustedAmount.text=Ds_Objects.result.Tables.Table.Rows[0].AdjustmentAmount;
+							txt_Description.text=Ds_Objects.result.Tables.Table.Rows[0].Descr;
+							drp_AdjustmentCategory.prompt=Ds_Objects.result.Tables.Table.Rows[0].AdjustmentCategory;
+							AdjustmentCategoryId=Ds_Objects.result.Tables.Table.Rows[0].AdjustmentCategoryId;
+							drp_AdjustmentType.selectedItem=Ds_Objects.result.Tables.Table.Rows[0].AdjustmentType;
+							PropertyId=Ds_Objects.result.Tables.Table.Rows[0].PId;
+							OwnerId=Ds_Objects.result.Tables.Table.Rows[0].OId;
+							Id=Ds_Objects.result.Tables.Table.Rows[0].Id;
+						}
+					}
+					if(ScreenName=="TDSDeclaration")
+					{
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{
+							dt_Date2.text=Ds_Objects.result.Tables.Table.Rows[0].Date;
+							hlp_property2.text=Ds_Objects.result.Tables.Table.Rows[0].PropertyName;
+							PropertyId2=Ds_Objects.result.Tables.Table.Rows[0].PId;
+							hlp_Owner2.text=Ds_Objects.result.Tables.Table.Rows[0].OwnerName;
+							OwnerId2=Ds_Objects.result.Tables.Table.Rows[0].OId;
+							txt_PAN.text=Ds_Objects.result.Tables.Table.Rows[0].PanNo;
+							txt_TDSpercentage.text=Ds_Objects.result.Tables.Table.Rows[0].TDSPercentage;
+							drp_FinancialYear.prompt=Ds_Objects.result.Tables.Table.Rows[0].FinancialYear;
+							FinancialYearId=Ds_Objects.result.Tables.Table.Rows[0].FId;
+							var Str:String=Ds_Objects.result.Tables.Table.Rows[0].Image;
+							if(Str!="")
+							{
+								var Arr:Array = Str.split(",");
+								// ByteArray
+								var Bytes:ByteArray = new ByteArray();
+								// for each item in the array
+								for (var i:int=0;i<Arr.length;i++)
+								{
+									Bytes[i] = Arr[i];
+								}						
+								Image.source=Bytes;
+							}
+							else
+							{
+								Image.source="Assets/user.jpg";
+							}
+							Id=Ds_Objects.result.Tables.Table.Rows[0].Id;
+						}
+					}
+					FnHelp();
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Delete_CUSTOM")
+				{	
+					if(ScreenName=="TIAandNTIA")
+					{
+						alignAlert(Alert.show("TIA and NTIA Deleted Successfully.","Message !",Alert.OK,null,null,iconTickLarge,
+							Alert.OK),10,"");
+					}
+					if(ScreenName=="TDSDeclaration")
+					{
+						alignAlert(Alert.show("TDSDeclaration Deleted Successfully.","Message !",Alert.OK,null,null,iconTickLarge,
+						Alert.OK),10,"");
+					}
+					FnClear("TIAandNTIA");
+					FnClear("TDSDeclaration");
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "OWNERLOAD_CUSTOM")
+				{
+					if(ScreenName=="TIAandNTIA")
+					{
+						hlp_Owner.dataProvider=null;
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{
+							hlp_Owner.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+							//hlp_Owner2.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						}
+					}
+					if(ScreenName=="TDSDeclaration")
+					{
+						hlp_Owner2.dataProvider=null;
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{
+							//hlp_Owner.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+							hlp_Owner2.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						}
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "PANLOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						txt_PAN.text=Ds_Objects.result.Tables.Table.Rows[0].PN;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "FLAGLOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						chk_Flag.selected=Ds_Objects.result.Tables.Table.Rows[0].Flag;
+					}
+				}
+				
+			}
+			protected function FnValidation_BeforeSave(ScreenName:String):String
+			{
+				if(ScreenName=="TIAandNTIA")
+				{
+					var Flag:Boolean=true;var ErrStr:String="";
+					if(PropertyId==0)
+					{
+						if(Flag==true)
+						{
+							hlp_property.setFocus();
+							Flag=false;
+						}
+						ErrStr=ErrStr+"* Property is Required.\n";
+					}
+					if(OwnerId==0)
+					{
+						if(Flag==true)
+						{
+							hlp_Owner.setFocus();
+							Flag=false;
+						}
+						ErrStr=ErrStr+"* Owner is Required.\n";
+					}
+					if(AdjustmentCategoryId==0)
+					{
+						if(Flag==true)
+						{
+							drp_AdjustmentCategory.setFocus();
+							Flag=false;
+						}
+						ErrStr=ErrStr+"* Adjustment Category is Required. \n";
+					}
+					if(txt_AdjustedAmount.text=="")
+					{
+						if(Flag==true)
+						{
+							txt_AdjustedAmount.setFocus();
+							Flag=false;
+						}
+						ErrStr=ErrStr+"* Adjustment Amount is Required. \n";
+					}
+//					if(dt_Date.text=="")
+//					{
+//						if(Flag==true)
+//						{
+//							dt_Date.setFocus();
+//							Flag=false;
+//						}
+//						ErrStr=ErrStr+"* Date is Required. \n";
+//					}
+					if(drp_AdjustmentType.selectedItem=="Select Adjustment Type")
+					{
+						if(Flag==true)
+						{
+							drp_AdjustmentType.setFocus();
+							Flag=false;
+						}
+						ErrStr=ErrStr+"* Adjustment Type is Required. \n";
+					}
+				}
+				if(ScreenName=="TDSDeclaration")
+				{
+					ErrStr="";
+					var flag:Boolean=true; var ErrString:String="";
+					if(PropertyId2==0)
+					{
+						if(Flag==true)
+						{
+							hlp_property2.setFocus();
+							Flag=false;
+						}
+						ErrStr=ErrStr+"* Property is Required.\n";
+					}
+					if(OwnerId2==0)
+					{
+						if(Flag==true)
+						{
+							hlp_Owner2.setFocus();
+							Flag=false;
+						}
+						ErrStr=ErrStr+"* Owner is Required.\n";
+					}
+					if(txt_PAN.text=="")
+					{
+						if(Flag==true)
+						{
+							txt_PAN.setFocus();
+							Flag=false;
+						}
+						ErrStr=ErrStr+"* Pan Number is Required. \n";
+					}
+					if(txt_TDSpercentage.text=="")
+					{
+						if(Flag==true)
+						{
+							txt_TDSpercentage.setFocus();
+							Flag=false;
+						}
+						ErrStr=ErrStr+"* TDS % is Required. \n";
+					}
+//					if(drp_FinancialYear.selectedIndex==-1)
+//					{
+					if((drp_FinancialYear.prompt=="Select Financial Year") && (drp_FinancialYear.selectedIndex==-1))
+					{
+						if(Flag==true)
+						{
+							drp_FinancialYear.setFocus();
+							Flag=false;
+						}
+						ErrStr=ErrStr+"*  Financial Year is Required \n";
+					}//}
+				}
+				return ErrStr;
+			}
+			protected function FnSave(Screen:String):void
+			{
+				ScreenName=""
+				ScreenName=Screen;
+				if(ScreenName=="TIAandNTIA")
+				{
+					ErrMsg = ""; Flag = true; hlp_property.setFocus();
+					var Str:String=FnValidation_BeforeSave(ScreenName);
+					if(Str!="")
+					{
+						alignAlert(Alert.show(Str,"Requierd Field(s) !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+						return;
+					}
+					var a:int = dt_Date.displayedMonth;
+					var c:int = dt_Date.displayedYear;
+					var b:int = 00;
+					if(a == 0)
+					{
+						b = 01;
+					}
+					if(a != 0)
+					{
+						b = a + 01;
+					}
+					var MFromDate:String = '01/'+String(b)+'/'+String(c);
+					var arrHdr:ArrayCollection = new ArrayCollection
+					([{
+						Id:Id,
+						PropertyId:PropertyId,
+						OwnerId:OwnerId,
+						AdjustmentCategory:AdjustmentCategoryId,
+						AdjustmentAmount:txt_AdjustedAmount.text,
+						AdjustmentMonth:MFromDate,//dt_Date.selectedRanges.label,
+						AdjustmentType:drp_AdjustmentType.selectedItem,
+						Description:txt_Description.text,
+						Flag:Flag
+					}]);
+					var HdrXml:String = ObjToXmlStr_Comm(arrHdr, "HdrXml");	
+					useWeb(ScreenName,"Save_CUSTOM",[GlobalXml,HdrXml]);
+				}
+				if(ScreenName=="TDSDeclaration")
+				{
+					ErrMsg = ""; Flag = true; hlp_property2.setFocus();
+					var Str:String=FnValidation_BeforeSave(ScreenName);
+					if(Str!="")
+					{
+						alignAlert(Alert.show(Str,"Requierd Field(s) !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+						return;
+					}
+					var Flag:Boolean = true;
+					
+					var bit:BitmapData = new BitmapData(100,100); 
+					bit.draw(Image); 
+					var png:PNGEncoder = new PNGEncoder(); 
+					var by:ByteArray = png.encode(bit); 
+					Image.source = by;				
+					var s:int = by.length;				 
+					var sd:String = "";	 
+					TDSImage = "";				
+					for(var i:int = 0; i < s; i++)
+					{
+						sd = by[i]; 
+						TDSImage += sd+",";					
+					}
+					var arrHdr:ArrayCollection = new ArrayCollection
+						([{
+							Id:Id,
+							PropertyId:PropertyId2,
+							OwnerId:OwnerId2,
+							PanNo:txt_PAN.text,
+							TDSPercentage:txt_TDSpercentage.text,
+							AdjustmentMonth:dt_Date2.text,
+							FinancialYear:FinancialYearId,
+							Image:TDSImage,
+							Date:dt_Date2.text
+							
+						}]);
+					var HdrXml:String = ObjToXmlStr_Comm(arrHdr, "HdrXml");	
+					useWeb("TDSDeclaration","Save_CUSTOM",[GlobalXml,HdrXml]);
+				}
+				
+			}
+			protected function FnSearch(Screen:String):void
+			{
+				Id=0;
+				ScreenName=Screen;
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>"; 
+				
+				PopUpManager.addPopUp( SearchPopUp , this, true);
+				SearchPopUp.Prc_name=ScreenName//"TIAandNTIA"
+				var SearchParam:Array =new Array();
+				SearchPopUp.HlpIndex="SEARCH"
+				SearchParam[0]=GlobalXml;
+				SearchParam[1]=Id;
+				SearchParam[2]="";
+				
+				SearchPopUp.Prc_Param=SearchParam
+				SearchPopUp.HlpSrchGlobal=""
+				SearchPopUp.dataPanel.focusEnabled=true
+				SearchPopUp.Pageint()					
+				SearchPopUp.addEventListener("PopupEnter",funpopupEnter);
+				SearchPopUp.addEventListener("PopupClose",funpopupClose);
+				PopUpManager.centerPopUp(SearchPopUp);
+			}
+			private function funpopupClose(event:Event):void
+			{
+				
+			}
+			private function funpopupEnter(event:Event):void
+			{				
+				SearchDtls(SearchPopUp.SelectRow.Id,0);			
+			}
+			private function SearchDtls(Id:int,_PrdFk:int):void
+			{ 
+				var Load:Array =new Array();
+				Load[0]=GlobalXml; Load[1]=Id;Load[2]=0;    
+				useWeb(ScreenName,"Search_CUSTOM",Load);
+			}
+
+			protected function FnDelete(Screen:String):void
+			{
+				ScreenName=Screen;
+				if(ScreenName=='TIAandNTIA')
+				{
+					if(Id == 0)
+					{
+						alignAlert(Alert.show("This is an Invalid Process.","Alert Message !",Alert.OK, 
+							null, null,iconWarning, Alert.OK),10,'');					
+						return;
+					}	
+					alignAlert(Alert.show("Do you want to Delete this item ?", "Warning !",
+						Alert.YES | Alert.NO, null,
+						DeleteItem, iconWarning, Alert.NO),10,'');	
+					hlp_property.setFocus();
+				}
+				if(ScreenName=='TDSDeclaration')
+				{
+					if(Id == 0)
+					{
+						alignAlert(Alert.show("This is an Invalid Process.","Alert Message !",Alert.OK, 
+							null, null,iconWarning, Alert.OK),10,'');					
+						return;
+					}	
+					alignAlert(Alert.show("Do you want to Delete this item ?", "Warning !",
+						Alert.YES | Alert.NO, null,
+						DeleteItem, iconWarning, Alert.NO),10,'');	
+					hlp_property2.setFocus();
+				}
+				
+			}
+			private function DeleteItem(event:CloseEvent):void 
+			{
+				
+				if(event.detail == Alert.YES)
+				{
+					var Load:Array = new Array();
+					
+					Load[0] = GlobalXml; Load[1] = Id;
+					
+					useWeb(ScreenName, "Delete_CUSTOM", Load);
+				}
+			}
+			protected function FnClear(Screen:String):void
+			{
+				
+				if(Screen=='TIAandNTIA')
+				{
+					hlp_property.setFocus();
+					hlp_Owner.Select_Row.Owner="";
+					hlp_Owner.dataProvider=null;
+					hlp_property.Select_Row.Property="";
+					PropertyId=0;
+					hlp_property.text="";
+					OwnerId=0;
+					hlp_Owner.text="";
+					txt_AdjustedAmount.text="";
+					txt_Description.text="";
+					drp_AdjustmentCategory.dataProvider=null;
+					drp_AdjustmentCategory.prompt="Select Adjustment Category";
+					drp_AdjustmentType.selectedIndex=-1;
+					drp_AdjustmentType.selectedItem="Select Adjustment Type";
+					dt_Date.selectedDate = new Date();
+					Id=0
+					AdjustmentCategoryId=0;
+					//PageLoad();
+				}
+				if(Screen=='TDSDeclaration')
+				{
+					hlp_property2.setFocus();
+					//hlp_Owner2.Select_Row.label="";
+					hlp_Owner2.Select_Row.Owner="";
+					hlp_property2.Select_Row.Property="";
+					PropertyId2=0;
+					OwnerId2=0;
+					Id=0;
+					hlp_property2.text="";
+					hlp_Owner2.text="";
+					txt_PAN.text="";
+					txt_TDSpercentage.text="";
+					dt_Date2.selectedDate = new Date();
+					drp_FinancialYear.selectedIndex=-1;
+					drp_FinancialYear.prompt="Select Financial Year"
+					Image.source="Assets/user.jpg";
+					TDSImage="";
+					hlp_Owner2.dataProvider=null;
+//					Brd_TIAANDNTIA0.visible=true;
+//					btn_TIAANDNTIA0.Button_B_mouseOverHandler();
+//					btn_TIAANDNTIA..Button_OutHandler();
+				}
+				
+			}
+			private function PropertyLoad():void
+			{
+				if(hlp_property.selected())
+				{
+					hlp_Owner.text="";
+					OwnerId=0;
+					PropertyName=hlp_property.Select_Row.Property;
+					PropertyId=hlp_property.Select_Row.Id;
+					hlp_property.text=PropertyName;
+					useWeb("TIAandNTIA","OWNERLOAD_CUSTOM",[GlobalXml,"OWNERLOAD",PropertyId,0]);
+				}
+				else
+				{
+					hlp_property.text="";
+					PropertyName="";
+					PropertyId=0;
+				}
+				hlp_Owner_focusOutHandler();
+			}
+			protected function hlp_Owner_focusOutHandler():void
+			{
+				hlp_Owner._setFocus();
+			}
+			private function PropertyLoad2():void
+			{
+				if(hlp_property2.selected())
+				{
+					hlp_Owner2.text="";
+					OwnerId2=0; 
+					PropertyId2=hlp_property2.Select_Row.Id;
+					PropertyName2=hlp_property2.Select_Row.Property;
+					hlp_property2.text=PropertyName2;
+					useWeb("TIAandNTIA","OWNERLOAD_CUSTOM",[GlobalXml,"OWNERLOAD",PropertyId2,0]);
+				}
+				else
+				{
+					hlp_property2.text="";
+					PropertyName="";
+					PropertyId=0;
+				}
+				hlp_Owner2_focusOutHandler();
+			}
+			protected function hlp_Owner2_focusOutHandler():void
+			{
+				hlp_Owner2._setFocus();
+			}
+			private function OwnerLoad():void
+			{
+				if(hlp_Owner.selected())
+				{
+					OwnerId=hlp_Owner.Select_Row.Id;
+					OwnerName=hlp_Owner.Select_Row.Owner;
+					hlp_Owner.text=OwnerName;
+				}
+				else
+				{
+					hlp_Owner.text="";
+					OwnerName="";
+					OwnerId=0;
+				}
+				txt_PAN.setFocus();
+			}
+			private function OwnerLoad2():void
+			{
+				if(hlp_Owner2.selected())
+				{
+					OwnerId2=hlp_Owner2.Select_Row.Id;
+					OwnerName2=hlp_Owner2.Select_Row.Owner;
+					hlp_Owner2.text=OwnerName2;
+					useWeb("TIAandNTIA","PANLOAD_CUSTOM",[GlobalXml,"PANLOAD",OwnerId2,0]);
+				}
+				else
+				{
+					hlp_Owner2.text="";
+					OwnerName2="";
+					OwnerId2=0;
+				}
+				txt_PAN.setFocus();
+			}
+			protected function drp_AdjustmentCategory_changeHandler():void
+			{
+				//var Flag:int =drp_AdjustmentCategory.selectedItem.Flag;
+				AdjustmentCategoryId=drp_AdjustmentCategory.selectedItem.Id;
+				AdjustmentCategory=drp_AdjustmentCategory.selectedItem.label;
+				useWeb("TIAandNTIA","FLAGLOAD_CUSTOM",[GlobalXml,"Flag",AdjustmentCategoryId,0]);
+			}
+//			protected function dt_Date1(event:CalendarLayoutChangeEvent):void
+//			{
+//				if(dt_Date.text != "")
+//				{
+//					dt_Date.errorString = "";
+//				}
+//				txt_Description.setFocus();
+//			}
+			protected function FnClick_Btn_Browse():void
+			{
+				var imageTypes:FileFilter = new FileFilter("Images (*.jpg, *.jpeg, *.gif, *.png)", "*.jpg; *.jpeg; *.gif; *.png");
+				//var textTypes:FileFilter = new FileFilter("Text Files (*.txt, *.rtf)", "*.txt; *.rtf");
+				var allTypes:Array = new Array(imageTypes);
+				var fileRef:FileReference = new FileReference();
+				fileRef.browse(allTypes);				
+				//fileRef = new FileReference();
+				fileRef.addEventListener(Event.SELECT, selectHandler);
+				fileRef.addEventListener(Event.COMPLETE, completeHandler);				
+				function selectHandler(event:Event):void
+				{
+					fileRef.load();
+				}
+				function completeHandler(event:Event):void
+				{
+					Image.source = fileRef.data;					
+				}
+			}		
+			protected function btn_TIAANDNTIA_clickHandler():void
+			{
+				ScreenName="TIAandNTIA";
+				Brd_TIANTIA.visible=true;
+				Brd_TIAANDNTIA0.visible=false;
+				btn_TIAANDNTIA.Button_B_mouseOverHandler();
+				btn_TIAANDNTIA0.Button_OutHandler();
+				hlp_property.setFocus();
+				hlp_property.tabIndex=1;
+				hlp_Owner.tabIndex=2;
+				drp_AdjustmentCategory.tabIndex=3;
+				txt_AdjustedAmount.tabIndex=4;
+				dt_Date.tabIndex=5;
+				txt_Description.tabIndex=6;
+				drp_AdjustmentType.tabIndex=7;
+			}
+			
+			protected function btn_TIAANDNTIA0_clickHandler():void
+			{
+				ScreenName="TDSDeclaration";
+				Brd_TIANTIA.visible=false;
+				Brd_TIAANDNTIA0.visible=true;
+				btn_TIAANDNTIA0.Button_B_mouseOverHandler();
+				btn_TIAANDNTIA..Button_OutHandler();
+				hlp_property2.setFocus();
+				hlp_property2.tabIndex=1;
+				hlp_Owner2.tabIndex=2;
+				txt_PAN.tabIndex=3;
+				txt_TDSpercentage.tabIndex=4;
+				dt_Date2.tabIndex=5;
+				drp_FinancialYear.tabIndex=6;
+				Btn_Browse.tabIndex=7;
+			}
+			protected function drp_FinancialYear_changeHandler():void
+			{
+				//PropertyId=Ddl_Property.selectedItem.data;
+				//PropertyName=Ddl_Property.selectedItem.label;
+				FinancialYear=drp_FinancialYear.selectedItem.label;
+				FinancialYearId=drp_FinancialYear.selectedItem.data;
+			}
+			
+		]]>
+	</fx:Script>
+		
+	<s:HGroup x="0" y="0" width="100%" height="45" horizontalAlign="center" verticalAlign="middle">
+		<WrbComp:TabButton_HB width="120" height="40" _Label="TIA &amp; NTIA" click="btn_TIAANDNTIA_clickHandler()" id="btn_TIAANDNTIA"/>
+		<WrbComp:TabButton_HB width="120" height="40" _Label="TDS Declaration" click="btn_TIAANDNTIA0_clickHandler()" id="btn_TIAANDNTIA0"/>
+	</s:HGroup>
+	<s:BorderContainer x="0" y="44" width="100%" height="100%" id="Brd_TIANTIA" backgroundColor="#fbf9f9"
+					   visible="false">
+		<mx:Label x="99" y="68" text="Property"/>
+		<mx:Label x="99" y="133" text="Owner"/>
+		<mx:Label x="99" y="194" text="Adjustment"/>
+		<mx:Label x="99" y="211" text="Category"/>
+		<mx:Label x="99" y="264" text="Adjusted Amount "/>
+		<mx:Label x="522" y="68" text="Adjustment Month"/>
+		<mx:Label x="522" y="129" text="Description"/>
+		<mx:Label x="522" y="264" text="Adjustment Type "/>
+		<WrbHelpComp:HelpText x="237" y="68.5" width="215" pxTabIndex="1" id="hlp_property" pxSetPrompt="Property"
+							  onselection="{PropertyLoad()}" pxSetColumnsWidth="0,220" depth="100">
+		</WrbHelpComp:HelpText>
+		<WrbHelpComp:HelpText x="237" y="130" width="215" pxTabIndex="2" id="hlp_Owner" pxSetPrompt="Owner"
+							  onselection="{OwnerLoad()}" pxSetColumnsWidth="0,220" depth="10">
+		</WrbHelpComp:HelpText>
+		<s:DropDownList id="drp_AdjustmentCategory" x="237" y="194" width="279" prompt="Select Adjustment Category"
+						change="drp_AdjustmentCategory_changeHandler()" tabIndex="3"></s:DropDownList>
+		<s:DropDownList id="drp_AdjustmentType" x="640" y="264" width="215" prompt="Select Adjustment Type"
+						tabIndex="7" selectedItem="Select Adjustment Type">
+			<mx:ArrayCollection>
+				<fx:String>Select Adjustment Type</fx:String>
+				<fx:String>Debit</fx:String>
+				<fx:String>Credit</fx:String>
+			</mx:ArrayCollection>
+		</s:DropDownList>
+		<s:TextInput id="txt_AdjustedAmount" x="237" y="265" width="215" prompt="Adjusted Amount"
+					 tabIndex="4" restrict="0-9" maxChars="10"/>
+		<mx:DateChooser id="dt_Date" visible="true" x="644" y="56" height="31"
+						focusEnabled="false" selectedDate="{new Date()}" tabIndex="5"
+						yearNavigationEnabled="true"  />
+		<s:BorderContainer x="644" y="90" width="183" backgroundColor="#fbf9f9" borderVisible="false">
+			
+		</s:BorderContainer>
+		<s:TextArea id="txt_Description" x="640" y="129" width="215" height="99" prompt="Description"
+					tabIndex="6"/>
+		<mx:HRule x="0" y="417" width="100%" strokeColor="#eb1c24"/>
+		<s:VGroup x="0" y="421" width="100%" height="30" horizontalAlign="center">
+			<WrbComp:SaveControl docSave="FnSave('TIAandNTIA')" docClear="FnClear('TIAandNTIA')"
+								 doSearch="FnSearch('TIAandNTIA')" docDelete="FnDelete('TIAandNTIA')"
+								 docRefresh="PageLoad()">
+			</WrbComp:SaveControl>
+		</s:VGroup>
+		<s:Label x="154" y="69" text="*" color="red"/>
+		<s:Label x="619" y="266" text="*" color="red"/>
+		<s:Label x="199" y="265" text="*" color="red"/>
+		<s:Label x="172" y="194" text="*" color="red"/>
+		<s:Label x="144" y="134" text="*" color="red"/>
+		<s:CheckBox id="chk_Flag" x="524" y="197" label="Flag" selected="false" visible="false"/>
+		
+		
+	</s:BorderContainer>
+	<s:BorderContainer x="0" y="44" width="100%" height="100%" id="Brd_TIAANDNTIA0" backgroundColor="#fbf9f9"
+					   visible="true">
+		<s:Label x="176" y="74" text="Property"/>
+		<s:Label x="176" y="144" text="Owner"/>
+		<s:Label x="176" y="218" text="PAN NO"/>
+		<s:Label x="579" y="218" text="TDS Declaration"/>
+		<s:Label x="176" y="289" text="TDS %"/>
+		<s:Label x="579" y="73" text="Date"/>
+		<s:Label x="579" y="136" text="Financial Year"/>
+		<WrbHelpComp:HelpText x="247" y="68.5" width="215" pxTabIndex="1" id="hlp_property2" pxSetPrompt="Property"
+							  onselection="{PropertyLoad2()}" pxSetColumnsWidth="0,220" depth="100">
+		</WrbHelpComp:HelpText>
+		<WrbHelpComp:HelpText x="246" y="136" width="215" pxTabIndex="2" id="hlp_Owner2" pxSetPrompt="Owner"
+							  onselection="{OwnerLoad2()}" pxSetColumnsWidth="0,220" depth="10">
+		</WrbHelpComp:HelpText>
+		<s:TextInput id="txt_PAN" x="246" y="210" width="215" prompt="PAN NO" maxChars="20"/>
+		<s:Image x="687" y="201" width="100" height="100" id="Image"
+				 source="@Embed(source='../Assets/user.jpg')"/>
+		<WrbComp:Button_HB id="Btn_Browse" x="687" y="310" width="100" height="32" buttonMode="true"
+						   _Label="Browse" click="FnClick_Btn_Browse()" depth="0" focusEnabled="false" tabIndex="10"/>
+		<s:TextInput id="txt_TDSpercentage" x="246" y="281" width="215" prompt="TDS %" maxChars="3" restrict="0-9"/>
+		<mx:DateField id="dt_Date2" x="689" y="66" enabled="false" formatString="DD/MM/YYYY"/>
+		<s:DropDownList id="drp_FinancialYear" x="689" y="127" width="166" change="drp_FinancialYear_changeHandler()"
+						prompt="Select Financial Year"></s:DropDownList>
+		<mx:HRule x="0" y="417" width="100%" strokeColor="#eb1c24"/>
+		<s:VGroup x="0" y="421" width="100%" height="30" horizontalAlign="center">
+		<WrbComp:SaveControl x="231" y="423" docSave="FnSave('TDSDeclaration')" docClear="FnClear('TDSDeclaration')"
+							 doSearch="FnSearch('TDSDeclaration')" docDelete="FnDelete('TDSDeclaration')"
+							 docRefresh="PageLoad()">
+		</WrbComp:SaveControl>
+		</s:VGroup>
+		<s:Label x="655" y="130" text="*" color="red"/>
+		<s:Label x="215" y="281" text="*" color="red"/>
+		<s:Label x="221" y="211" text="*" color="red"/>
+		<s:Label x="215" y="139" text="*" color="red"/>
+		<s:Label x="224" y="71" text="*" color="red"/>
+		
+	</s:BorderContainer>
+</s:Application>

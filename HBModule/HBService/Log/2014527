@@ -1,0 +1,8 @@
+5/27/2014 10:50:57 AM ==> Error converting data type nvarchar to bigint.
+5/27/2014 10:51:03 AM ==> Error converting data type nvarchar to bigint.
+5/27/2014 11:14:31 AM ==> Error converting data type nvarchar to bigint.
+5/27/2014 11:20:04 AM ==> Error converting data type nvarchar to bigint.
+5/27/2014 11:28:45 AM ==> Error converting data type nvarchar to bigint.
+5/27/2014 5:46:21 PM ==> Failure sending mail.
+5/27/2014 5:47:18 PM ==> Transaction failed. The server response was: Message rejected: Email address is not verified.
+5/27/2014 5:48:04 PM ==> Transaction failed. The server response was: Message rejected: Email address is not verified.

@@ -1,0 +1,573 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%"
+			  creationComplete="Page_Load(event)" xmlns:WrbComp="WrbComp.*"
+			   keyDown="application1_keyDownHandler(event)" pageTitle="TaxMaster">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Style source = "..\\Common\\ApplicationCSS.css"/>
+	<fx:Script source="..\\Common\\CommonScript.as"/>
+	<fx:Script source="..\\Common\\Functions.as"/>
+	<fx:Script>
+		<![CDATA[
+			import mx.events.CalendarLayoutChangeEvent;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			public var Id:int=0;
+			public var StateId:int=0
+			public static var GlobalXml:String="";var date:String="";
+			public static var Global_AC:ArrayCollection=new ArrayCollection();
+			
+			protected function Page_Load(event:FlexEvent):void
+			{
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";
+				//Sctrl.setButtonRights("Refresh",true);
+				Sctrl.setButtonRights("Search",true);
+				Sctrl.setButtonRights("Clear",true);
+				Sctrl.setButtonRights("Delete",true);
+				Help();
+				Drp_State.setFocus();
+			}
+			public function Help():void
+			{
+				useWeb("TaxMaster","STATE_CUSTOM",[GlobalXml,"STATELOAD","",0,0]);
+	      	}			
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "STATE_CUSTOM")
+				{
+				   Drp_State.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+				} 
+				if (Ds_Objects.currentTarget.description.toString() == "STATETAX_CUSTOM")
+				{	
+					if(Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Txt_Cess.text=Ds_Objects.result.Tables.Table.Rows[0].Cess;
+						Txt_HECess.text=Ds_Objects.result.Tables.Table.Rows[0].HECess;
+						Txt_VAT.text=Ds_Objects.result.Tables.Table.Rows[0].VAT;
+						Txt_ServiceAmount.text=	Ds_Objects.result.Tables.Table.Rows[0].ServiceTaxOnTariff;
+						Txt_TarifAmtFrom.text=Ds_Objects.result.Tables.Table.Rows[0].TariffAmtFrom;
+						Txt_TarifAmtTo.text=Ds_Objects.result.Tables.Table.Rows[0].TariffAmtTo;
+						Txt_Taxper.text=Ds_Objects.result.Tables.Table.Rows[0].LTaxper;
+						Txt_TarifAmtFrom1.text=Ds_Objects.result.Tables.Table.Rows[0].TariffAmtFrom1;
+						Txt_TarifAmtTo1.text=Ds_Objects.result.Tables.Table.Rows[0].TariffAmtTo1;
+						Txt_Taxper1.text=Ds_Objects.result.Tables.Table.Rows[0].LTaxper1;
+						Txt_TarifAmtFrom2.text=Ds_Objects.result.Tables.Table.Rows[0].TariffAmtFrom2;
+						Txt_TarifAmtTo2.text=Ds_Objects.result.Tables.Table.Rows[0].TariffAmtTo2;
+						Txt_Taxper2.text=Ds_Objects.result.Tables.Table.Rows[0].LTaxper2;
+						Txt_TarifAmtFrom3.text=Ds_Objects.result.Tables.Table.Rows[0].TariffAmtFrom3;
+						Txt_TarifAmtTo3.text=Ds_Objects.result.Tables.Table.Rows[0].TariffAmtTo3;
+						Txt_Taxper3.text=Ds_Objects.result.Tables.Table.Rows[0].LTaxper3;
+						dt_Effectivedate.text=Ds_Objects.result.Tables.Table.Rows[0].Date;
+						Drp_State.prompt=Ds_Objects.result.Tables.Table.Rows[0].State;
+						Txt_Vatno.text=Ds_Objects.result.Tables.Table.Rows[0].VATNo;
+						Txt_luxuryno.text=Ds_Objects.result.Tables.Table.Rows[0].LuxuryNo;
+						Txt_serviceno.text=Ds_Objects.result.Tables.Table.Rows[0].ServiceNo;
+						Txt_Servicerestaurant.text=Ds_Objects.result.Tables.Table.Rows[0].RestaurantST;
+						Txt_BusinessSupport.text=Ds_Objects.result.Tables.Table.Rows[0].BusinessSupportST;
+						Chk_Racktariff.selected=Ds_Objects.result.Tables.Table.Rows[0].RackTariff;
+						Id=Ds_Objects.result.Tables.Table.Rows[0].Id;
+						date=dt_Effectivedate.text; 
+						Txt_TinNumber.text=Ds_Objects.result.Tables.Table.Rows[0].TINNumber;
+						Txt_CinNumber.text=Ds_Objects.result.Tables.Table.Rows[0].CINNumber;
+					}
+					else
+					{
+						Id=0;
+						Txt_Cess.text="";
+						Txt_HECess.text="";
+						Txt_VAT.text="";
+						Txt_TarifAmtFrom.text="";
+						Txt_TarifAmtTo.text="";
+						Txt_Taxper.text="";
+						Txt_TarifAmtFrom1.text="";
+						Txt_TarifAmtTo1.text="";
+						Txt_Taxper1.text="";
+						Txt_TarifAmtFrom2.text="";
+						Txt_TarifAmtTo2.text="";
+						Txt_Taxper2.text="";
+						Txt_TarifAmtFrom3.text="";
+						Txt_TarifAmtTo3.text="";
+						Txt_Taxper3.text="";
+						Txt_ServiceAmount.text="";
+						dt_Effectivedate.text="";
+						Txt_Vatno.text="";
+						Txt_luxuryno.text="";
+						Drp_State.prompt="Select State";
+						Grd_Details.dataProvider=null;
+						Grd_Details.visible=false;
+						grp_luxury.visible=false;
+						Txt_serviceno.text="";
+						Txt_BusinessSupport.text="";
+						Txt_Servicerestaurant.text="";
+						Chk_Racktariff.selected=false;
+						StateId=0;Txt_TinNumber.text=""; Txt_CinNumber.text="";
+					}
+					Grd_Details.visible=false;
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Grd_Details.visible=true;
+						Grd_Details.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;	
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				{
+					if (Id==0)
+					{
+						alignAlert(Alert.show("Tax Added Successfully.","Message !",Alert.OK, null, FnOkCal, 
+							iconTickLarge, Alert.OK),10,"");
+					}
+					else
+					{
+						alignAlert(Alert.show("Tax Updated Successfully.","Message !",Alert.OK, null, FnOkCal, 
+							iconTickLarge, Alert.OK),10,"");
+					}
+					FnClr();
+				}
+			}
+			public function FnOkCal(event:CloseEvent):void
+			{
+				if(event.detail==Alert.OK)
+				{
+					Drp_State.setFocus();
+				}
+			}
+			protected function FnSave():void
+			{
+				var ErrStr:String="";
+				var Flag:Boolean=true;
+				if(Txt_Cess.text=="")
+				{
+					ErrStr=ErrStr+"*  Cess % is Required.\n";
+					if(Flag==true)
+					{ 
+						Txt_Cess.setFocus();
+						Flag=false; 
+					}
+				}
+				if(Txt_HECess.text=="")
+				{
+					ErrStr=ErrStr+"*  H E Cess % is Required.\n";
+					if(Flag==true)
+					{ 
+						Txt_HECess.setFocus();
+						Flag=false; 
+					}
+				}				
+				if(Txt_VAT.text=="")
+				{
+					ErrStr=ErrStr+"*  V A T % is Required.\n";
+					if(Flag==true)
+					{ 
+						Txt_VAT.setFocus();
+						Flag=false;
+					}
+				}
+				
+				if(Txt_TarifAmtFrom.text=="")
+				{
+					ErrStr=ErrStr+"*  Tariff  Amount From is Required.\n";
+					if(Flag==true)
+					{ 
+						Txt_TarifAmtFrom.setFocus();
+						Flag=false;  
+					}
+				}
+				if(Txt_TarifAmtTo.text=="")
+				{
+					ErrStr=ErrStr+"*  Tariff  Amount To is Required.\n";
+					if(Flag==true)
+					{ 
+						Txt_TarifAmtTo.setFocus();
+						Flag=false;  
+					}
+				}
+				if(Txt_Taxper.text=="")
+				{
+					ErrStr=ErrStr+"*  Luxury Tax is Required.\n";
+					if(Flag==true)
+					{ 
+						Txt_Taxper.setFocus();
+						Flag=false;  
+					}
+				}
+				if(Txt_ServiceAmount.text=="")
+				{
+					ErrStr=ErrStr+"* Tariff Amount Service Tax is Required.\n";
+					if(Flag==true)
+					{ 
+						Txt_ServiceAmount.setFocus();
+						Flag=false;  
+					}
+				} 
+				if(Txt_Servicerestaurant.text=="")
+				{
+					ErrStr=ErrStr+"* Restaurant Amount Service Tax is Required.\n";
+					if(Flag==true)
+					{ 
+						Txt_ServiceAmount.setFocus();
+						Flag=false;  
+					}
+				} 
+				if(Txt_BusinessSupport.text=="")
+				{
+					ErrStr=ErrStr+"* BusinessSupport Amount Service Tax is Required.\n";
+					if(Flag==true)
+					{ 
+						Txt_ServiceAmount.setFocus();
+						Flag=false;  
+					}
+				} 
+				if(dt_Effectivedate.text=="")
+				{
+					ErrStr=ErrStr+"*  Effective From is Required.\n";
+					if(Flag==true)
+					{ 
+						dt_Effectivedate.setFocus();
+						Flag=false; 
+					}
+				}
+				if(Drp_State.selectedItem == "")
+				{
+					ErrStr=ErrStr+"*  State is Required.\n";
+					if(Flag==true)
+					{ 
+						Drp_State.setFocus();
+						Flag=false; 
+					}
+				}
+				
+				if(ErrStr!="")
+				{
+					Drp_State.setFocus();
+					alignAlert(Alert.show(ErrStr,"Required Field(s) !",Alert.OK,this,null,iconErrLarge),10,"");
+					return;
+				}//Here Txt_ServiceTax is Service tax Above Percentage.
+				var Ac_Hdr:ArrayCollection=new ArrayCollection
+					([{Cess:Txt_Cess.text,HECess:Txt_HECess.text,VAT:Txt_VAT.text,
+						
+						TariffAmtFrom:Txt_TarifAmtFrom.text,
+						TariffAmtTo:Txt_TarifAmtTo.text,
+						TariffAmtFrom1:Txt_TarifAmtFrom1.text,
+						TariffAmtTo1:Txt_TarifAmtTo1.text,
+						TariffAmtFrom2:Txt_TarifAmtFrom2.text,
+						TariffAmtTo2:Txt_TarifAmtTo2.text,
+						TariffAmtFrom3:Txt_TarifAmtFrom3.text,
+						TariffAmtTo3:Txt_TarifAmtTo3.text,
+						ServiceAmount:Txt_ServiceAmount.text,
+						Taxper:Txt_Taxper.text,
+						Taxper1:Txt_Taxper1.text,
+						Taxper2:Txt_Taxper2.text,
+						Taxper3:Txt_Taxper3.text,
+						Date:dt_Effectivedate.text,
+						State:Drp_State.selectedItem.label,
+						StateId:Drp_State.selectedItem.Data,
+						VATNo:Txt_Vatno.text,
+						LuxuryNo:Txt_luxuryno.text,
+						ServiceNo:Txt_serviceno.text,
+						RestaurantST:Txt_Servicerestaurant.text,
+						BusinessSupportST:Txt_BusinessSupport.text,
+						RackTariff:Chk_Racktariff.selected,
+						TINNumber:Txt_TinNumber.text,CINNumber:Txt_CinNumber.text,
+						Id:Id}]);
+				var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");				
+				useWeb("TaxMaster","Save_CUSTOM",[GlobalXml,HdrXml]);	
+			}
+			protected function FnClr():void
+			{
+				Id=0;
+				Txt_Cess.text="";
+				Txt_HECess.text="";
+				Txt_VAT.text="";
+				
+				Txt_TarifAmtFrom.text="";
+				Txt_TarifAmtTo.text="";
+				Txt_Taxper.text="";
+				Txt_TarifAmtFrom1.text="";
+				Txt_TarifAmtTo1.text="";
+				Txt_Taxper1.text="";
+				Txt_TarifAmtFrom2.text="";
+				Txt_TarifAmtTo2.text="";
+				Txt_Taxper2.text="";
+				Txt_TarifAmtFrom3.text="";
+				Txt_TarifAmtTo3.text="";
+				Txt_Taxper3.text="";
+				Txt_ServiceAmount.text="";
+				dt_Effectivedate.text="";
+				Drp_State.prompt="Select State";
+				Txt_Vatno.text="";
+				Txt_luxuryno.text="";
+				StateId=0;
+				Grd_Details.dataProvider=null;
+				Grd_Details.visible=false;
+				Help();
+				Drp_State.setFocus();
+				grp_luxury.visible=false;
+				Txt_serviceno.text="";
+				Txt_BusinessSupport.text="";
+				Txt_Servicerestaurant.text="";
+				Chk_Racktariff.selected=false;Txt_TinNumber.text=""; Txt_CinNumber.text="";
+			}
+			protected function application1_keyDownHandler(event:KeyboardEvent):void
+			{
+				Sctrl.KeyHandler(event);
+			}
+			private function ChangeState():void
+			{
+				StateId=Drp_State.selectedItem.Data;
+				useWeb("TaxMaster","STATETAX_CUSTOM",[GlobalXml,"StateTax","",0,StateId]);
+				//useWeb("TaxMaster","STATETAX1_CUSTOM",[GlobalXml,"StateTax1","",0,StateId]);
+				Grd_Details.dataProvider=null;
+			}
+			public function TarifAmtTo(eventTextOperationEvent):void
+			{
+				if(Number(Txt_TarifAmtTo.text)<=(Number(Txt_TarifAmtFrom.text)))
+				{
+					Txt_TarifAmtTo.text="";
+					alignAlert(Alert.show("TariffAmountTo Should be Greater Than TariffAmountFrom.",
+						"Message !",Alert.OK, null, null,iconWarning, Alert.OK),10,"");
+					return; 
+				}
+			}
+			public function TarifAmtFrom1(eventTextOperationEvent):void
+			{
+				if(Number(Txt_TarifAmtFrom1.text)<=(Number(Txt_TarifAmtTo.text)))
+				{
+					Txt_TarifAmtFrom1.text="";
+				 		alignAlert(Alert.show("TariffAmountFrom 1 Should be Greater Than TariffAmountTo.",
+						"Message !",Alert.OK, null, null,iconWarning, Alert.OK),10,"");
+					return;
+				}
+            } 
+			public function TarifAmtTo1(eventTextOperationEvent):void
+			{
+				if(Txt_TarifAmtTo1.text != "")
+					{
+						if(Number(Txt_TarifAmtTo1.text)<=(Number(Txt_TarifAmtFrom1.text)))
+						{
+							Txt_TarifAmtTo1.text="";
+							alignAlert(Alert.show("TariffAmountTo 1 Should be Greater Than TariffAmountFrom 1.",
+								"Message !",Alert.OK, null, null,iconWarning, Alert.OK),10,"");
+							return; 
+					}
+					} 
+			} 
+			public function TarifAmtFrom2():void
+			{
+				if(Txt_TarifAmtFrom2.text != "")
+				{
+					if(Number(Txt_TarifAmtFrom2.text)<=Number(Txt_TarifAmtTo1.text))
+					{
+						Txt_TarifAmtFrom2.text="";
+						alignAlert(Alert.show("TariffAmountFrom 2 Should be Greater Than TariffAmountTo 1.",
+							"Message !",Alert.OK, null, null,iconWarning, Alert.OK),10,"");
+						return; 
+					}
+			}
+			} 
+			public function TarifAmtTo2():void
+			{
+				if(Txt_TarifAmtTo2.text != "")
+				{
+					if(Number(Txt_TarifAmtTo2.text)<=Number(Txt_TarifAmtFrom2.text))
+					{
+						Txt_TarifAmtTo2.text="";
+						alignAlert(Alert.show("TariffAmountTo 2 Should be Greater Than TariffAmountFrom 2.",
+							"Message !",Alert.OK, null, null,iconWarning, Alert.OK),10,"");
+						return; 
+					}
+				}
+			} 
+			public function TarifAmtFrom3():void
+			{
+//				if(Txt_TarifAmtFrom3.text != "")
+//				{
+//					if(Number(Txt_TarifAmtFrom3.text)<=(Number(Txt_TarifAmtTo2.text)))
+//					{
+//						Txt_TarifAmtFrom3.text="";
+//						alignAlert(Alert.show("TariffAmountFrom 3 Should be Greater Than TariffAmountTo 2.",
+//							"Message !",Alert.OK, null, null,iconWarning, Alert.OK),10,"");
+//						return; 
+//						Refresh();
+//					}
+//				}
+			}
+			public function TarifAmtTo3():void
+			{
+//				if(Txt_TarifAmtTo3.text != "")
+//				{
+//					if(Number(Txt_TarifAmtTo3.text)<=(Number(Txt_TarifAmtFrom3.text)))
+//					{
+//						Txt_TarifAmtTo3.text="";
+//						alignAlert(Alert.show("TariffAmountTo 3 Should be Greater Than TariffAmountFrom 3.",
+//						"Message !",Alert.OK, null, null,iconWarning, Alert.OK),10,"");
+//						return; 
+//					}
+//				}
+			}
+			protected function Refresh():void
+			{
+				Help();
+				FnClr();
+			}
+			
+			protected function luxury_clickHandler(event:MouseEvent):void
+			{
+				grp_luxury.visible=true;
+				Grd_Details.visible=false;
+			}
+			protected function History_clickHandler(event:MouseEvent):void
+			{
+				grp_luxury.visible=false;
+				Grd_Details.visible=true;
+			}
+			protected function dt_DateofAgreement_changeHandler(event:CalendarLayoutChangeEvent):void
+			{
+				//dt_ExpiryDate.text="";
+				if(dt_Effectivedate.selectedDate)
+				{
+					var asd:String = dt_Effectivedate.text;										
+					var Y:String = asd.substr(6,10);
+					var M:String = asd.substr(3,2);
+					var D:String = asd.substr(0,2);
+					var RangeStart:String = Y+'/'+M+'/'+D;
+					dt_Effectivedate.selectableRange = {rangeStart:new Date(RangeStart)};
+					dt_Effectivedate.selectedDate = new Date(RangeStart);
+					
+					dt_Effectivedate.selectableRange = {rangeStart:new Date(RangeStart)};
+					dt_Effectivedate.selectedDate = new Date(RangeStart);
+				}
+			}
+			
+		]]>
+	</fx:Script>	
+	<s:VGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+		<s:BorderContainer x="1" y="0" width="914" height="476" borderVisible="false">
+			<s:TextInput x="166" y="79.5" width="154" height="23" id="Txt_VAT" restrict="0-9."
+						 textAlign="right" tabIndex="4" maxChars="5"/>
+			<s:Label x="387" y="85.5" text="Cess %" id="lbl_cess"/>
+			<s:Label x="715" y="77" text="*"  styleName="ReqLable" color="red" id="s1"/>
+			<s:Label x="431" y="81" text="*"  styleName="ReqLable" color="red" id="s2"/>
+			<s:Label x="84" y="80" text="*"  styleName="ReqLable" color="red" id="s3"/>
+			<s:Label x="647" y="85.5" text="H E Cess %" id="lbl_hecess"/>
+			<s:Label x="44" y="85.5" text="V A T %" id="lbl_vat"/>
+			<s:TextInput x="511" y="79.5" width="116" height="23" id="Txt_Cess" restrict="0-9."
+						 textAlign="right" tabIndex="5" maxChars="8"/>
+			<s:TextInput x="777" y="79.5" width="109" height="23" id="Txt_HECess" restrict="0-9."
+						 textAlign="right" tabIndex="6" maxChars="8"/>
+			<s:DropDownList id="Drp_State" x="166" y="36" width="154" change="ChangeState()"
+							prompt="Select State" tabIndex="1"></s:DropDownList>
+			<s:Label x="387" y="39" text="With Effective From "/>
+			<s:Label x="44" y="39" text="Select State"/>
+			<mx:DateField x="511" y="36" width="116" id="dt_Effectivedate" yearNavigationEnabled="true" tabIndex="2" 
+						  formatString="DD/MM/YYYY" change="dt_DateofAgreement_changeHandler(event)"/>
+			<s:Label x="760" y="31" text="*"  styleName="ReqLable" color="red" id="abvper2"/>
+			
+			<mx:DataGrid id="Grd_Details" x="44" y="298"  editable="false" visible="False"
+									 width="825" height="176" >
+							<mx:columns>
+								<mx:DataGridColumn dataField="State" headerText="State" width="125" editable="false" visible="true"/>
+								<mx:DataGridColumn dataField="Cess" headerText="Cess" width="75" editable="false"/>
+								<mx:DataGridColumn dataField="HECess" headerText="HECess" width="75" editable="false"/>
+								<mx:DataGridColumn dataField="VAT" headerText="VAT" width="75" editable="false"/>
+								<mx:DataGridColumn dataField="ServiceTaxOnTariff" headerText="TariffST" width="75" editable="false"/>
+								<mx:DataGridColumn dataField="RestaurantST" headerText="ServicesST" width="100" editable="false"/>
+								<mx:DataGridColumn dataField="BusinessSupportST" headerText="BusinessST" width="100" editable="false"/>
+								<mx:DataGridColumn dataField="EffectiveFrom" headerText="EffectiveFrom" width="100" visible="true"/>
+								<mx:DataGridColumn dataField="EffectiveTo" headerText="EffectiveTo" width="100" visible="true"/>
+								<mx:DataGridColumn dataField="Id" visible="false"/>
+							</mx:columns>
+						</mx:DataGrid>
+			<s:TextInput x="777" y="36" width="109" height="23" id="Txt_ServiceAmount" restrict="0-9."
+						 textAlign="right" tabIndex="3" maxChars="8"/>
+			<s:Label x="469" y="115" text="*"  styleName="ReqLable" color="red" id="abvper7"/>
+			<s:TextInput x="511" y="120" width="116" height="23" id="Txt_BusinessSupport" restrict="0-9."
+						 textAlign="right" tabIndex="8" maxChars="8"/>
+			<s:Label x="130" y="115" text="*"  styleName="ReqLable" color="red" id="abvper8"/>
+			<s:TextInput x="166" y="120" width="154" height="23" id="Txt_Servicerestaurant" restrict="0-9."
+						 textAlign="right" tabIndex="7" maxChars="8"/>
+			<s:Label x="44" y="123" text="Service Tax  On " id="lbl_Lux_Food20"/>
+			<s:Label x="44" y="135" text="RestaurantServices" id="lbl_Lux_Food21"/>
+			<s:Label x="647" y="39" text="Service Tax  On Tariff" id="lbl_Lux_Food19"/>
+			<s:Label x="84" y="181" text="*"  styleName="ReqLable" color="red" id="abvper4"/>
+			<s:TextInput x="166" y="180" width="154" height="23" id="Txt_Vatno" 
+						 textAlign="right" tabIndex="9" maxChars="25"/>
+			<s:TextInput x="511" y="180" width="116" height="23" id="Txt_CinNumber" 
+						 textAlign="right" tabIndex="9" maxChars="25"/>
+			<s:TextInput x="777" y="180" width="109" height="23" id="Txt_TinNumber" 
+						 textAlign="right" tabIndex="9" maxChars="25"/>
+			<s:Label x="647" y="183" text="TIN Number" id="lbl_Lux_Food24"/>
+			<s:Label x="387" y="183" text="CIN Number" id="lbl_Lux_Food23"/>
+			<s:Label x="44" y="183" text="VAT No" id="lbl_Lux_Food5"/>
+			<s:Label x="387" y="123" text="Service Tax  On" id="lbl_Lux_Food2"/>
+			<s:Label x="387" y="135" text="Business Support" id="lbl_Lux_Food22"/>
+			<s:Label x="119" y="222" text="*"  styleName="ReqLable" color="red" id="abvper5"/>
+			<s:TextInput x="166" y="226" width="154" height="23" id="Txt_luxuryno" 
+						 textAlign="right" tabIndex="10" maxChars="25"/>
+			<s:Label x="129" y="264" text="*"  styleName="ReqLable" color="red" id="abvper6"/>
+			<s:TextInput x="166" y="268" width="154" height="23" id="Txt_serviceno" 
+						 textAlign="right" tabIndex="11" maxChars="25"/>
+			<s:Label id="lbl_Lux_Food18" x="44" y="271" width="92" text="Service Tax No"/>
+			<s:Label x="44" y="229" text="Luxury Tax No" id="lbl_Lux_Food6"/>
+			<s:Group x="4" y="294" width="902" height="176" id="grp_luxury" visible="false">
+				<s:Label x="476" y="22" text="*"  styleName="ReqLable" color="red" id="abvper0"/>
+				<s:Label x="725" y="22" text="*"  styleName="ReqLable" color="red" id="abvper3"/>
+				<s:Label x="693" y="25" text="Tax" id="lbl_Lux_Food4"/>
+				<s:Label x="383" y="25" text="Tariff  Amount To" id="lbl_Lux_Food0"/>
+				<s:TextInput x="507" y="19.5" width="116" height="23" id="Txt_TarifAmtTo" restrict="0-9."
+							 textAlign="right"  maxChars="8"  tabIndex="13" focusOut="TarifAmtTo(event)"/>
+				<s:TextInput x="773" y="19.5" width="100" height="23" id="Txt_Taxper" restrict="0-9."
+							 textAlign="right"  maxChars="8"  tabIndex="14"/>
+				<s:Label x="693" y="60" text="Tax 1" id="lbl_Lux_Food7"/>
+				<s:Label x="383" y="60" text="Tariff  Amount To 1" id="lbl_Lux_Food8"/>
+				<s:TextInput id="Txt_TarifAmtTo1" x="507" y="53" width="116" height="23" maxChars="8"
+							 restrict="0-9." tabIndex="15" textAlign="right" focusOut="TarifAmtTo1(event)"/>
+				<s:TextInput x="773" y="53" width="100" height="23" id="Txt_Taxper1" restrict="0-9."
+							 textAlign="right"  maxChars="8"  tabIndex="16" />
+				<s:Label x="693" y="98" text="Tax 2" id="lbl_Lux_Food10"/>
+				<s:Label x="383" y="96" text="Tariff  Amount To 2" id="lbl_Lux_Food11"/>
+				<s:TextInput x="507" y="88.5" width="116" height="23" id="Txt_TarifAmtTo2" restrict="0-9."
+							 textAlign="right"  maxChars="8"  tabIndex="18" focusOut="TarifAmtTo2()"/>
+				<s:TextInput x="773" y="90.5" width="100" height="23" id="Txt_Taxper2" restrict="0-9."
+							 textAlign="right"  maxChars="8"  tabIndex="19" />
+				<s:Label x="693" y="138" text="Tax 3" id="lbl_Lux_Food13"/>
+				<s:Label x="167" y="138" text="Tariff  Amount To 3" id="lbl_Lux_Food14" visible="false"/>
+				<s:TextInput x="291" y="132.5" width="100" height="23" id="Txt_TarifAmtTo3" restrict="0-9."
+							 textAlign="right"  maxChars="8"  tabIndex="20" focusOut="TarifAmtTo3()" visible="false"/>
+				<s:TextInput x="773" y="130.5" width="100" height="23" id="Txt_Taxper3" restrict="0-9."
+							 textAlign="right"  maxChars="8"  tabIndex="21" />
+				<s:Label x="40" y="138" text="Tariff Amount Above" id="lbl_Lux_Food15"/>
+				<s:TextInput x="162" y="132.5" width="154" height="23" id="Txt_TarifAmtFrom3" restrict="0-9."
+							 textAlign="right" tabIndex="20" maxChars="8" focusOut="TarifAmtFrom3()"/>
+				<s:Label x="40" y="98" text="Tariff Amount From 2" id="lbl_Lux_Food12"/>
+				<s:TextInput x="162" y="92.5" width="154" height="23" id="Txt_TarifAmtFrom2" restrict="0-9."
+							 textAlign="right" tabIndex="17" maxChars="8" focusOut="TarifAmtFrom2()"/>
+				<s:Label x="40" y="60" text="Tariff Amount From 1" id="lbl_Lux_Food9"/>
+				<s:TextInput x="162" y="53" width="154" height="23" id="Txt_TarifAmtFrom1" restrict="0-9."
+							 textAlign="right" tabIndex="14" maxChars="8" focusOut="TarifAmtFrom1(event)"/>
+				<s:Label x="144" y="16" text="*"  styleName="ReqLable" color="red" id="abvper1"/>
+				<s:Label x="40" y="25" text="Tariff Amount From" id="lbl_Lux_Food3"/>
+				<s:TextInput x="162" y="19.5" width="154" height="23" id="Txt_TarifAmtFrom" restrict="0-9."
+							 textAlign="right" tabIndex="12" maxChars="8" />
+			</s:Group>
+			<s:Label x="405" y="217" text="Luxury Tax" color="#eb1c24" id="lbl_Lux_Food1"/>
+			<s:Label x="45" y="162" text="Tax Number" color="#eb1c24" id="lbl_Lux_Food17"/>
+			<s:Label x="45" y="18" text="ServiceTax" color="#eb1c24" id="lbl_Lux_Food16"/>
+			<s:Button id="btn_luxury" x="505" y="239" width="87" height="25" label="Luxury Tax"
+					  click="luxury_clickHandler(event)"/>
+			<s:Button id="btn_History" x="675" y="239" width="87" height="25" label="Tax History"
+					  click="History_clickHandler(event)"/>
+			<s:CheckBox x="396" y="246" label="RackTariff" id="Chk_Racktariff"/>
+		</s:BorderContainer>
+		<mx:HRule x="0" y="450" width="100%" strokeColor="#eb1c24"/>
+		<s:HGroup x="176" width="410" height="40" horizontalAlign="center" verticalAlign="middle"> 
+			<WrbComp:SaveControl id="Sctrl" docSave="FnSave()" docRefresh="Refresh()"/>
+		</s:HGroup>
+	</s:VGroup>
+</s:Application>

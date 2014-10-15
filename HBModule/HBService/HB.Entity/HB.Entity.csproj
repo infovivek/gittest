@@ -1,0 +1,186 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{CF580ED2-C796-4A0D-AB35-93EDC2C655E7}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>HB.Entity</RootNamespace>
+    <AssemblyName>HB.Entity</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AddUser.cs" />
+    <Compile Include="Apartment.cs" />
+    <Compile Include="ApartmentBookingProperty.cs" />
+    <Compile Include="ApartmentBookingPropertyAssignedGuest.cs" />
+    <Compile Include="APIDynamic.cs" />
+    <Compile Include="ApprovedPettyCash.cs" />
+    <Compile Include="BedBookingProperty.cs" />
+    <Compile Include="BedBookingPropertyAssignedGuest.cs" />
+    <Compile Include="Booking.cs" />
+    <Compile Include="BookingCustomFieldsDetails.cs" />
+    <Compile Include="BookingGuestDetails.cs" />
+    <Compile Include="BookingProperty.cs" />
+    <Compile Include="BookingPropertyAssignedGuest.cs" />
+    <Compile Include="BTCSubmission.cs" />
+    <Compile Include="ChangePassword.cs" />
+    <Compile Include="CheckInDtls.cs" />
+    <Compile Include="CheckOutPayment.cs" />
+    <Compile Include="CheckOutPaymentCard.cs" />
+    <Compile Include="CheckOutPaymentCash.cs" />
+    <Compile Include="CheckOutPaymentCheque.cs" />
+    <Compile Include="CheckOutPaymentCompInvoice.cs" />
+    <Compile Include="CheckOutPaymentNEFT.cs" />
+    <Compile Include="CheckOutServiceDtls.cs" />
+    <Compile Include="CheckOutServiceHdr.cs" />
+    <Compile Include="CheckOutSettleDtl.cs" />
+    <Compile Include="CheckOutSettleHdr.cs" />
+    <Compile Include="City.cs" />
+    <Compile Include="Citylocality.cs" />
+    <Compile Include="ClientColumnEntity.cs" />
+    <Compile Include="LaundryServiceDtl.cs" />
+    <Compile Include="LaundryServiceHdr.cs" />
+    <Compile Include="MapPOAndVendorEntity.cs" />
+    <Compile Include="PCExpenseApproval.cs" />
+    <Compile Include="CloneClientEntity.cs" />
+    <Compile Include="ContractBillEntity.cs" />
+    <Compile Include="ExternalChechkOutTAC.cs" />
+    <Compile Include="ExternalCheckOut.cs" />
+    <Compile Include="MapVendor.cs" />
+    <Compile Include="NewKOTUserEntryDtl.cs" />
+    <Compile Include="NewKOTUserEntryHdr.cs" />
+    <Compile Include="OutsourceKOTDtl.cs" />
+    <Compile Include="OutsourceKOTHdr.cs" />
+    <Compile Include="PaxInOut.cs" />
+    <Compile Include="ClientGradeCity.cs" />
+    <Compile Include="ClientGradeCityDetails.cs" />
+    <Compile Include="ClientManagement.cs" />
+    <Compile Include="ClientMgntAddNewClient.cs" />
+    <Compile Include="ClientMgntClientguest.cs" />
+    <Compile Include="ClientMgntCustomFields.cs" />
+    <Compile Include="ClientWisePriceEntity.cs" />
+    <Compile Include="CompanyMasterEntity.cs" />
+    <Compile Include="DepositEnitty.cs" />
+    <Compile Include="ExpenseMasterEntity.cs" />
+    <Compile Include="Forgot.cs" />
+    <Compile Include="GuestCheckIn.cs" />
+    <Compile Include="GuestCheckOut.cs" />
+    <Compile Include="ImportGuestEntity.cs" />
+    <Compile Include="KOTEntryDtls.cs" />
+    <Compile Include="KOTEntryHdr.cs" />
+    <Compile Include="KOTEntryUser.cs" />
+    <Compile Include="MarkUpEntity.cs" />
+    <Compile Include="NewKOTEntryDtl.cs" />
+    <Compile Include="NewKOTEntryHdr.cs" />
+    <Compile Include="PCHistoryEntity.cs" />
+    <Compile Include="PettyCashApprovalDtl.cs" />
+    <Compile Include="PettyCashEntity.cs" />
+    <Compile Include="PettyCashApprovalHdr.cs" />
+    <Compile Include="PettyCashHdr.cs" />
+    <Compile Include="PettyCashReportEntity.cs" />
+    <Compile Include="PettyCashStatusEntity.cs" />
+    <Compile Include="PropertyOwnerOtherContacts.cs" />
+    <Compile Include="PropertyReport.cs" />
+    <Compile Include="ReassignClient.cs" />
+    <Compile Include="ReassignClientDtl.cs" />
+    <Compile Include="ReassignProperty.cs" />
+    <Compile Include="ReassignPropertyDtl.cs" />
+    <Compile Include="ReconcileEntity.cs" />
+    <Compile Include="RoomShifting.cs" />
+    <Compile Include="SearchBookingEntity.cs" />
+    <Compile Include="SearchBookingGuestEntity.cs" />
+    <Compile Include="SlabTaxEntity.cs" />
+    <Compile Include="SSPCodeGenerationApartment.cs" />
+    <Compile Include="SSPCodeGenerationRooms.cs" />
+    <Compile Include="SSPCodeGenerationServiceEntity.cs" />
+    <Compile Include="ContractClientPreferDtl.cs" />
+    <Compile Include="ContractClientPreferHdr.cs" />
+    <Compile Include="ContractManagement.cs" />
+    <Compile Include="ContractManagementServices.cs" />
+    <Compile Include="ContractManagementTariff.cs" />
+    <Compile Include="ContractManagementTariffAppartment.cs" />
+    <Compile Include="ContractNonDedicated.cs" />
+    <Compile Include="ContractNonDedicatedApartment.cs" />
+    <Compile Include="ContractNondedicatedService.cs" />
+    <Compile Include="ContractProductMaster.cs" />
+    <Compile Include="HBUser.cs" />
+    <Compile Include="ImportExcelEntity.cs" />
+    <Compile Include="Locality.cs" />
+    <Compile Include="MasterClientManagement.cs" />
+    <Compile Include="PropertyAgreement.cs" />
+    <Compile Include="PropertyAgreementDetails.cs" />
+    <Compile Include="PropertyAgreementOwner.cs" />
+    <Compile Include="PropertyAgreementsRoomCharges.cs" />
+    <Compile Include="PropertyBlock.cs" />
+    <Compile Include="PropertyEntity.cs" />
+    <Compile Include="PropertyImageEntity.cs" />
+    <Compile Include="PropertyOwnerApartment.cs" />
+    <Compile Include="PropertyOwners.cs" />
+    <Compile Include="PropertyRoom.cs" />
+    <Compile Include="PropertyRoomBeds.cs" />
+    <Compile Include="PropertyUserEntity.cs" />
+    <Compile Include="Roles.cs" />
+    <Compile Include="RolesDetails.cs" />
+    <Compile Include="ScreenMaster.cs" />
+    <Compile Include="SSPCodeGeneration.cs" />
+    <Compile Include="TACInvoiceEntity.cs" />
+    <Compile Include="TaxMapping.cs" />
+    <Compile Include="TAxMaster.cs" />
+    <Compile Include="TDSDeclarationEntity.cs" />
+    <Compile Include="TIAandATIAEntity.cs" />
+    <Compile Include="TransSubsEntity.cs" />
+    <Compile Include="TravelDesk.cs" />
+    <Compile Include="TRLinkEntity.cs" />
+    <Compile Include="User.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UserMaster.cs" />
+    <Compile Include="UserMasterRolesEntity.cs" />
+    <Compile Include="CheckOutTariff.cs" />
+    <Compile Include="Vendor.cs" />
+    <Compile Include="VendorAdvancePaymentEntity.cs" />
+    <Compile Include="VendorChequeApprovalHdr.cs" />
+    <Compile Include="VendorChequeApprovalDtl.cs" />
+    <Compile Include="VendorCost.cs" />
+    <Compile Include="VendorRequest.cs" />
+    <Compile Include="VendorSettlementEntity.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

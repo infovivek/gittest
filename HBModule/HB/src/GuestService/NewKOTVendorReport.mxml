@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   xmlns:WrbComp="WrbComp.*"
+			   width="100%" height="100%" creationComplete="PageLoad()"
+			   pageTitle="NewKOTVendorReport">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<mx:NumberFormatter id="NF_Two" precision="2" rounding="nearest"/>
+	</fx:Declarations>
+	
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
+	<fx:Script>
+		<![CDATA[
+			
+			
+			import WrbComp.FormPrintView1;
+			import WrbComp.frmsearchwindow;
+			
+			import WrbHelpComp.HlpGridHdr;
+			
+			import com.as3xls.xls.Cell;
+			import com.as3xls.xls.ExcelFile;
+			import com.as3xls.xls.Sheet;
+			import com.as3xls.xls.Type;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.CalendarLayoutChangeEvent;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.events.IndexChangedEvent;
+			import mx.graphics.codec.PNGEncoder;
+			import mx.printing.*;
+			
+			import spark.events.IndexChangeEvent;
+			import spark.events.TextOperationEvent;
+			private var SearchPopUp:frmsearchwindow = new frmsearchwindow();
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "",TypeServiceId:int=0,ErrStr:String="";
+			public var Id:int=0,ErrMsg:String="",UserId:int=0,UserName:String="";
+			public var PropertyId:int=0,PropertyName:String="",VendorId:int=0;
+			public var prodTotal:Number = 0;
+			public var Value_AC:ArrayCollection=new ArrayCollection();
+			public var AddMode:Boolean=true,Flag:Boolean=true;
+			public var Identity:String="";private var xlsFile:ExcelFile;
+			protected function PageLoad():void
+			{
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";
+				useWeb("NewKOTVendorReport","PAGELOAD_CUSTOM",[GlobalXml,'PageLoad',0,0,'','']);
+				hlp_vendor.setFocus();
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "PAGELOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						hlp_vendor.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "PropertyLoad_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						hlp_Property.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "GridLoad_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_Status.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+					var Len:Number=0,Quantity:Number=0;
+					var Rate:Number=0,Total:Number=0,Revenue:Number=0;
+					var Ac_Tmp:ArrayCollection=new ArrayCollection();
+					Ac_Tmp=Grd_Status.dataProvider as ArrayCollection;				
+					lbl_Quantity.text=="";
+					lbl_VendorRate.text=="";
+					lbl_Total.text=="";
+					lbl_Revenue.text=="";
+					for(var i:int=0;i<Ac_Tmp.length;i++)
+					{
+						Quantity+=Number(Ac_Tmp[i].Quantity);
+						Rate+=Number(Ac_Tmp[i].Cost);
+						Total+=Number(Ac_Tmp[i].Total);
+						Revenue+=Number(Ac_Tmp[i].Revenue);
+					}
+					var TA:Number=Number(Quantity);
+					lbl_Quantity.text=TA.toString();
+//					var Tmp:Number=Number(lbl_Quantity.text)
+//					lbl_Quantity.text=NF_Two.format(Tmp);
+					var TB:String=NF_Two.format(Rate);
+					lbl_VendorRate.text=TB.replace(",","");
+					var TMN:Number=Number(lbl_VendorRate.text)
+					lbl_VendorRate.text=NF_Two.format(TMN);
+					var TC:String=NF_Two.format(Total);
+					lbl_Total.text=TC.replace(",","");
+					var TNM:Number=Number(lbl_Total.text)
+					lbl_Total.text=NF_Two.format(TNM);
+					var TD:String=NF_Two.format(Revenue);
+					lbl_Revenue.text=TD.replace(",","");
+					var TBN:Number=Number(lbl_Revenue.text)
+					lbl_Revenue.text=NF_Two.format(TBN);
+					
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Grd_Status1.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "NewGridLoad_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_Status.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+					var Len:Number=0,Quantity:Number=0;
+					var Rate:Number=0,Total:Number=0,Revenue:Number=0;
+					var Ac_Tmp:ArrayCollection=new ArrayCollection();
+					Ac_Tmp=Grd_Status.dataProvider as ArrayCollection;				
+					lbl_Quantity.text=="";
+					lbl_VendorRate.text=="";
+					lbl_Total.text=="";
+					lbl_Revenue.text=="";
+					for(var i:int=0;i<Ac_Tmp.length;i++)
+					{
+						Quantity+=Number(Ac_Tmp[i].Quantity);
+						Rate+=Number(Ac_Tmp[i].Cost);
+						Total+=Number(Ac_Tmp[i].Total);
+						Revenue+=Number(Ac_Tmp[i].Revenue);
+					}
+					var TA:Number=Number(Quantity);
+					lbl_Quantity.text=TA.toString();
+					//					var Tmp:Number=Number(lbl_Quantity.text)
+					//					lbl_Quantity.text=NF_Two.format(Tmp);
+					var TB:String=NF_Two.format(Rate);
+					lbl_VendorRate.text=TB.replace(",","");
+					var TMN:Number=Number(lbl_VendorRate.text)
+					lbl_VendorRate.text=NF_Two.format(TMN);
+					var TC:String=NF_Two.format(Total);
+					lbl_Total.text=TC.replace(",","");
+					var TNM:Number=Number(lbl_Total.text)
+					lbl_Total.text=NF_Two.format(TNM);
+					var TD:String=NF_Two.format(Revenue);
+					lbl_Revenue.text=TD.replace(",","");
+					var TBN:Number=Number(lbl_Revenue.text)
+					lbl_Revenue.text=NF_Two.format(TBN);
+					
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Grd_Status1.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+				}
+			}
+			public function OnSelectionVendorname():void
+			{
+				if(hlp_vendor.selected())
+				{
+					hlp_vendor.text=hlp_vendor.Select_Row.VendorName;
+					VendorId=hlp_vendor.Select_Row.Id;
+					useWeb("NewKOTVendorReport","PropertyLoad_CUSTOM",[GlobalXml,'PropertyLoad',VendorId,0,'','']);
+					hlp_Property.setFocus();
+				}
+			}
+			public function OnSelectionPropertyname():void
+			{
+				if(hlp_Property.selected())
+				{
+					hlp_Property.text=hlp_Property.Select_Row.Property;
+					PropertyId=hlp_Property.Select_Row.PropertyId;
+					//useWeb("NewKOTVendorReport","GridLoad_CUSTOM",[GlobalXml,'KOT',PropertyId,'','']);
+					dt_From.setFocus();
+				}
+			}
+			protected function FnValidation_BeforeSave():String
+			{
+				ErrStr="";
+				var TxtFlag:Boolean=true;
+				if(hlp_vendor.text=="")
+				{
+					if(TxtFlag==true)
+					{
+						hlp_vendor.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+"* Vendor is Required.\n";
+				}
+//				if(hlp_Property.text=="")
+//				{
+//					if(TxtFlag==true)
+//					{
+//						hlp_Property.setFocus();
+//						TxtFlag=false;
+//					}
+//					ErrStr=ErrStr+"* Property is Required.\n";					
+//				}
+				if(dt_From.text=="")
+				{
+					if(TxtFlag==true)
+					{
+						dt_From.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+"* FromDate is Required.\n";	
+				}
+				if(dt_To.text=="")
+				{
+					if(TxtFlag==true)
+					{
+						dt_To.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+"* ToDate is Required.\n";	
+				}
+				return ErrStr; 
+			}
+			public function Grd_DetailsClick():void
+			{
+				Grd_Status.dataProvider=null;
+				ErrStr="";
+				ErrMsg = ""; Flag = true; 
+				var Str:String=FnValidation_BeforeSave();
+				if(ErrStr !="")
+				{
+					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10,"");
+					return;
+				} 
+				else
+				{			
+				var From:String="",To:String="";
+				From=dt_From.text;
+				To=dt_To.text;
+				if(hlp_Property.text !="")
+				{
+					useWeb("NewKOTVendorReport","GridLoad_CUSTOM",[GlobalXml,'Serviceload',VendorId,PropertyId,From,To]);
+				}
+				else
+				{
+					useWeb("NewKOTVendorReport","NewGridLoad_CUSTOM",[GlobalXml,'NewServiceload',VendorId,0,From,To]);
+				}
+				
+				}
+			}
+			protected function ExportExcel(event:MouseEvent):void
+			{
+				
+				if(Grd_Status.dataProvider !=null)
+				{
+					var arrExportResult:ArrayCollection = Grd_Status1.dataProvider as ArrayCollection;
+					xlsFile = new ExcelFile();
+					var sheet:Sheet = new Sheet();
+					
+					sheet.resize(arrExportResult.length+1,14);
+					
+					sheet.setCell(0,0,'ServiceItem');
+					sheet.setCell(0,1,'Quantity');
+					sheet.setCell(0,2,'Cost');
+					sheet.setCell(0,3,'Total');
+					
+					
+					for(var i:int=0;i<arrExportResult.length;i++)
+					{
+						sheet.setCell(i+1, 0, arrExportResult[i].ServiceItem);
+						sheet.setCell(i+1, 1, arrExportResult[i].Quantity);
+						sheet.setCell(i+1, 2, arrExportResult[i].Cost);
+						sheet.setCell(i+1, 3, arrExportResult[i].Total);
+						
+						
+					}
+					Grd_Status1.dataProvider = arrExportResult;
+					xlsFile.sheets.addItem(sheet);      
+					var bytes: ByteArray = xlsFile.saveToByteArray();
+					var fr:FileReference = new FileReference();
+					fr.save(bytes,"SampleExport.xls");
+				}
+				else
+				{
+					alignAlert(Alert.show("ServiceItem Details Required.","Message !",
+						Alert.OK, null, null, iconErrLarge, Alert.OK),10,"");
+				}
+				Grd_Status.dataProvider=null;
+				Grd_Status1.dataProvider=null;
+				hlp_vendor.text="";lbl_Quantity.text="";lbl_Total.text="";
+				hlp_Property.text="";lbl_VendorRate.text="";lbl_Revenue.text="";
+				hlp_Property.dataProvider=null;
+				PropertyId=0;dt_From.text="";dt_To.text="";
+				
+			}
+			
+		]]>
+	</fx:Script>
+	<mx:Label x="297" y="55" text="Property"/>
+	<mx:Label x="96" y="51" width="10" height="12" text="*" color="Red"/>
+	<mx:Label x="545" y="56" text="From"/>
+	
+	<mx:DateField x="726" y="54" width="110" id="dt_To" yearNavigationEnabled="true" tabIndex="4" 
+				  formatString="DD/MM/YYYY"/>
+	<mx:Button x="846" y="54" width="65" label="Search" click="Grd_DetailsClick()"/>
+	
+	<mx:DataGrid id="Grd_Status" x="65" y="102" editable="true" width="843" height="309" visible="true">
+		<mx:columns>
+			<mx:DataGridColumn dataField="ServiceItem" headerText="ServiceItem" width="200" textAlign="left" editable="false"/>
+			<mx:DataGridColumn dataField="Quantity" headerText="Quantity" width="150" editable="false" />
+			<mx:DataGridColumn dataField="Cost" headerText="VendorRate" width="150" editable="false" textAlign="center"/>							
+			<mx:DataGridColumn dataField="Total" headerText="TotalCost" width="150" editable="false" textAlign="center"/>
+			<mx:DataGridColumn dataField="Revenue" headerText="Revenue" width="150" editable="false" textAlign="center"/>
+			
+		</mx:columns>
+	</mx:DataGrid>
+	<mx:DataGrid id="Grd_Status1" x="65" y="102" editable="true" width="843" height="309" visible="false">
+		<mx:columns>
+			<mx:DataGridColumn dataField="ServiceItem" headerText="ServiceItem" width="200" textAlign="left" editable="false"/>
+			<mx:DataGridColumn dataField="Quantity" headerText="Quantity" width="150" editable="false" />
+			<mx:DataGridColumn dataField="Cost" headerText="VendorRate" width="150" editable="false" textAlign="right"/>							
+			<mx:DataGridColumn dataField="Total" headerText="TotalCost" width="150" editable="false" textAlign="right"/>
+			</mx:columns>
+	</mx:DataGrid>
+
+	<WrbHelpComp:HelpText id="hlp_Property" x="354" y="54" width="183" height="23" depth="46"
+						  onselection="{OnSelectionPropertyname()}" pxSetColumnsWidth="193,0"
+						  pxSetHeight="183" pxTabIndex="2">
+	</WrbHelpComp:HelpText>
+	<mx:Label x="57" y="56" text="Vendor"/>
+	<mx:Label x="575" y="51" width="10" height="12" text="*" color="Red"/>
+	<WrbHelpComp:HelpText id="hlp_vendor" x="107" y="54" width="183" height="23" depth="46"
+						  onselection="{OnSelectionVendorname()}" pxSetColumnsWidth="0,193"
+						  pxSetHeight="183" pxTabIndex="1">
+	</WrbHelpComp:HelpText>
+	<WrbComp:Button_BB x="440" y="465" Lable_val="Export" id="btn_Excel" click="ExportExcel(event)">
+	</WrbComp:Button_BB>
+	<mx:Label x="697" y="56" text="To"/>
+	<mx:Label x="714" y="51" width="10" height="12" text="*" color="Red"/>
+	<mx:DateField id="dt_From" x="586" y="54" width="105" height="23" formatString="DD/MM/YYYY"
+				  tabIndex="3" yearNavigationEnabled="true"/>
+	<mx:Label x="138" y="426" text="Total"/>
+	<mx:Label id="lbl_Revenue" x="804" y="426" width="62" text=""/>
+	<mx:Label id="lbl_Total" x="636" y="426" width="70" text=""/>
+	<mx:Label id="lbl_VendorRate" x="479" y="426" width="66" text=""/>
+	<mx:Label id="lbl_Quantity" x="334" y="426" width="54" text=""/>
+	
+</s:Application>

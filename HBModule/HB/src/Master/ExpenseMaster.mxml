@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" 
+			   xmlns:Controls="fx.com.adobe.Controls.*"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   xmlns:WrbComp="WrbComp.*"
+			   width="100%" height="100%"
+			   creationComplete="PageLoad()"
+			   pageTitle="Expense Heads">
+	<fx:Declarations>
+		<mx:NumberFormatter id="NF_Two" precision="2" rounding="nearest"/>
+	</fx:Declarations>
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
+	<fx:Script>
+		<![CDATA[
+			import WrbComp.frmsearchwindow;
+			
+			import WrbHelpComp.HlpGridHdr;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.CalendarLayoutChangeEvent;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.events.IndexChangedEvent;
+			import mx.graphics.codec.PNGEncoder;
+			
+			import spark.events.IndexChangeEvent;
+			import spark.events.TextOperationEvent;
+			private var SearchPopUp:frmsearchwindow = new frmsearchwindow();
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "",TypeServiceId:int=0,ErrStr:String="";
+			public var Id:int=0,ErrMsg:String="",PropertyId:int=0,PropertyName:String="",UserId:int=0;
+			public var AddMode:Boolean=true,Flag:Boolean=true,ExpenseGroupId:int=0,ExpenseGroup:String="";
+			protected function PageLoad():void
+			{
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";
+				SCtrl.setButtonRights("Refresh",true);
+				SCtrl.setButtonRights("Search",true);
+				SCtrl.setButtonRights("Delete",true);
+				Drp_ExpenseGroup.text="";
+				ExpenseGroupId=0;
+				Drp_ExpenseGroup.setFocus();
+				useWeb("ExpenseMaster","PAGELOAD_CUSTOM",[GlobalXml,'PAGELOAD',0,Global_AC[0].UsrId]);
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "PAGELOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Drp_ExpenseGroup.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;		
+					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Grd_Expense.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;		
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Search_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						ExpenseGroup=Ds_Objects.result.Tables.Table.Rows[0].ExpenseGroup;
+						Drp_ExpenseGroup.text=ExpenseGroup;
+						txt_ExpenseHead.text=Ds_Objects.result.Tables.Table.Rows[0].ExpenseHead;
+						Drp_Status.selectedItem=Ds_Objects.result.Tables.Table.Rows[0].Status;
+						ExpenseGroupId=Ds_Objects.result.Tables.Table.Rows[0].ExpenseGroupId;
+						Id=Ds_Objects.result.Tables.Table.Rows[0].Id;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				{
+					if (Id == 0)
+					{
+						alignAlert(Alert.show("ExpenseMaster Saved Successfully.","Message !",Alert.OK, 
+						null, null, iconTickLarge, Alert.OK),10,"");
+					}
+					else
+					{
+						alignAlert(Alert.show("ExpenseMaster Updated Successfully.","Message !",Alert.OK, 
+						null, null, iconTickLarge, Alert.OK),10,"");
+					}
+					ExpenseGroupId=0;
+					FnClear();
+				}
+			}
+			protected function FnValidation_BeforeSave()
+			{
+				var TxtFlag:Boolean=true;ErrStr="";
+				var Flag:Boolean=true;
+				//if((ExpenseGroupId=0)||(Drp_ExpenseGroup.text=""))
+				
+				if(ExpenseGroupId==0)
+				{
+					if(Flag==true)
+					{
+						Drp_ExpenseGroup.setFocus();
+						Flag=false;
+					}
+					ErrStr=ErrStr+"*   Expense Group is Required.\n";
+				}
+				if(txt_ExpenseHead.text=="")
+				{
+					if(TxtFlag=true)
+					{
+						txt_ExpenseHead.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+" *   Expense Head is Required \n";
+				}
+				
+//				if(Drp_Status.selectedItem=="Select Status")
+//				{
+//					if(Flag==true)
+//					{
+//						Drp_Status.setFocus();
+//						Flag=false;
+//					}
+//					ErrStr=ErrStr+"*   Status is Required.\n";
+//				}
+				return ErrStr;
+			}
+				
+			protected function FnSave():void
+			{
+				ErrStr="";
+				ErrMsg = ""; Flag = true; 
+				var Str:String=FnValidation_BeforeSave();
+				if(ErrStr !="")
+				{
+					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10,"");
+					return;
+				} 
+				else
+				{
+					var arrcopy:ArrayCollection = new ArrayCollection
+						([{ 
+							//UsrId:Global_AC[0].UsrId,
+							Id:Id,
+							ExpenseGroupId:ExpenseGroupId,
+							ExpenseHead:txt_ExpenseHead.text,
+							Status:Drp_Status.selectedItem
+						}])
+					
+					var HdrXml:String=""
+					HdrXml += "<ROOT>";	
+					HdrXml += ObjToXmlStr_Comm(arrcopy,"HdrXml") 
+					HdrXml += "</ROOT>";
+					useWeb("ExpenseMaster","Save_CUSTOM",[GlobalXml,HdrXml]);
+				}
+			}
+			protected function Grd_Expense_doubleClickHandler(event:MouseEvent):void
+			{
+				var Load:Array =new Array();
+				Load[0]=GlobalXml;
+				Load[1]=event.currentTarget.selectedItem.Id;
+				Load[2]=Drp_Status.selectedItem;
+				Load[3]=Drp_ExpenseGroup.Select_Row.data;
+				useWeb("ExpenseMaster","Search_CUSTOM",Load);
+			}
+			
+			protected function Drp_ExpenseGroup_changeHandler():void
+			{
+				ExpenseGroup="";
+				ExpenseGroupId=0;
+				if(Drp_ExpenseGroup.selected())
+				{
+					ExpenseGroupId=Drp_ExpenseGroup.Select_Row.Id;
+					ExpenseGroup=Drp_ExpenseGroup.Select_Row.label;
+					txt_ExpenseHead.setFocus();
+				}
+				else
+				{
+					Drp_ExpenseGroup.text="";
+				}
+			}
+			public function FnClear():void
+			{
+				//Drp_ExpenseGroup.prompt="Please Select Expense Group";
+				ExpenseGroupId=0;
+				ExpenseGroup="";
+				txt_ExpenseHead.text="";
+				Drp_ExpenseGroup.text="";
+				Drp_Status.selectedIndex=0;
+				Id=0;
+				PageLoad();
+			}
+		
+		]]>
+	</fx:Script>
+	<s:VGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+		<s:BorderContainer x="12" y="19" width="100%" height="500" backgroundColor="#fbf9f9"
+						   borderVisible="false">
+			<s:Label x="32" y="21" text="Expense Master" color="red"/>
+			<s:Label x="199" y="53" text="Expense Group"/>
+			<WrbHelpComp:HelpText  id="Drp_ExpenseGroup" x="335" y="44" width="250" pxSetColumnsWidth="250,0"
+								   onselection="{Drp_ExpenseGroup_changeHandler()}" depth="10" pxTabIndex="1"
+								   pxSetPrompt="Select Expense Group">
+			</WrbHelpComp:HelpText>
+			<!--s:DropDownList id="Drp_ExpenseGroup" x="335" y="44" width="225" prompt="Please Select Expense Group"
+							change="Drp_ExpenseGroup_changeHandler(event)"></s:DropDownList-->
+			<s:Label x="199" y="112" text="Expense Head"/>
+			<mx:DataGrid x="191" y="149" width="729" height="242" id="Grd_Expense" doubleClickEnabled="true" 
+						 doubleClick="Grd_Expense_doubleClickHandler(event)" textAlign="left" visible="true">
+				<mx:columns>
+					<mx:DataGridColumn dataField="ExpenseGroup" headerText="Expense Group" width="140"/>
+					<mx:DataGridColumn dataField="HeaderName" headerText="Expense Head" width="200"/>
+					<mx:DataGridColumn dataField="Status" headerText="Status" width="70" textAlign="center"/>
+					<mx:DataGridColumn dataField="Id" headerText="Id" visible="false"/>
+				</mx:columns>
+			</mx:DataGrid> 
+			<s:TextInput id="txt_ExpenseHead" x="335" y="104" width="250" prompt="Expense Head" tabIndex="2"
+						 maxChars="100"/>
+			<s:HGroup x="0" y="419" width="100%" height="50" horizontalAlign="center" verticalAlign="middle">
+			<WrbComp:SaveControl id="SCtrl" x="195" y="416" docSave="FnSave()" docClear="FnClear()">
+			</WrbComp:SaveControl>
+				</s:HGroup>
+			<s:Label x="609" y="46" text="Status"/>
+			<s:DropDownList id="Drp_Status" x="694" y="37" selectedItem="Active" tabIndex="3">
+			<s:ArrayList>
+				<fx:String>Active</fx:String>
+				<fx:String>In Active</fx:String>
+			</s:ArrayList>
+			</s:DropDownList>
+			<s:Label x="285" y="44" text="*" color="red"/>
+			<s:Label x="283" y="104" text="*" color="red"/>
+			
+			
+			</s:BorderContainer>
+		</s:VGroup>
+</s:Application>

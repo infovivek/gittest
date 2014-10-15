@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<publishData>
+  <publishProfile publishUrl="E:\Project\HBVirtual" deleteExistingFiles="False" ftpAnonymousLogin="False" ftpPassiveMode="True" msdeploySite="" msdeploySiteID="" msdeployRemoteSitePhysicalPath="" msdeployAllowUntrustedCertificate="False" msdeploySkipExtraFilesOnServer="True" msdeployMarkAsApp="False" profileName="Profile1" publishMethod="FileSystem" replaceMatchingFiles="True" userName="" savePWD="False" userPWD="" SelectedForPublish="True">
+    <file relUrl="Web.config" publishTime="05/19/2014 22:42:04" />
+    <file relUrl="bin/HBReport.pdb" publishTime="05/20/2014 16:38:47" />
+    <file relUrl="Site.Master" publishTime="05/18/2014 10:46:13" />
+    <file relUrl="Account/Web.config" publishTime="05/18/2014 10:46:13" />
+    <file relUrl="bin/HB.Dao.pdb" publishTime="05/19/2014 22:16:49" />
+    <file relUrl="bin/HB.Entity.pdb" publishTime="05/19/2014 22:16:49" />
+    <file relUrl="Account/ChangePasswordSuccess.aspx" publishTime="05/18/2014 10:46:13" />
+    <file relUrl="Account/Login.aspx" publishTime="05/18/2014 10:46:13" />
+    <file relUrl="Styles/Site.css" publishTime="05/18/2014 10:46:13" />
+    <file relUrl="Scripts/jquery-1.4.1.js" publishTime="05/18/2014 10:46:13" />
+    <file relUrl="Account/ChangePassword.aspx" publishTime="05/18/2014 10:46:13" />
+    <file relUrl="bin/HB.Entity.dll" publishTime="05/19/2014 22:16:49" />
+    <file relUrl="bin/HB.Dao.dll" publishTime="05/19/2014 22:16:50" />
+    <file relUrl="GuestCheckOutTariff.aspx" publishTime="05/19/2014 11:19:47" />
+    <file relUrl="Global.asax" publishTime="05/18/2014 10:46:13" />
+    <file relUrl="bin/HBReport.dll" publishTime="05/20/2014 16:38:47" />
+    <file relUrl="Scripts/jquery-1.4.1.min.js" publishTime="05/18/2014 10:46:13" />
+    <file relUrl="Account/Register.aspx" publishTime="05/18/2014 10:46:13" />
+    <file relUrl="Scripts/jquery-1.4.1-vsdoc.js" publishTime="05/18/2014 10:46:13" />
+  </publishProfile>
+</publishData>

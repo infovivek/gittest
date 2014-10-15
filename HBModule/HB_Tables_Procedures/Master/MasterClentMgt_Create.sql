@@ -1,0 +1,3 @@
+Create Table WRBHBMasterClientManagement (MasterClientId int,MasterClientName nvarchar(100),CAddress1 nvarchar(100),CAddress2 nvarchar(100),CCountry nvarchar(100),CState nvarchar(100),CCity nvarchar(100),CLocality nvarchar(100),CPincode nvarchar(100),ContactNo nvarchar(100),DomainName nvarchar(100),
+CPhoneNo1 nvarchar(100),CPhoneNo2 nvarchar(100),CPhoneNo3 nvarchar(100),CPhoneNo4 nvarchar(100),CPhoneNo5 nvarchar(100),ClientLogo nvarchar(max),InCCountry nvarchar(100),Id bigint,CreatedBy bigint,
+CreatedDate datetime,ModifiedBy int,ModifiedDtae datetime,IsActive bit,IsDeleted bit,RowId uniqueidentifier)

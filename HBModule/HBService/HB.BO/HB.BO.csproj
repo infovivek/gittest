@@ -1,0 +1,211 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{292E7D89-75FD-46EB-A7AD-7F34A6EA6780}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>HB.BO</RootNamespace>
+    <AssemblyName>HB.BO</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EASendMail20">
+      <HintPath>..\HBService\bin\EASendMail20.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AddUserBo.cs" />
+    <Compile Include="ApartmentBO.cs" />
+    <Compile Include="ApartmentBookingPropertyAssignedGuestBO.cs" />
+    <Compile Include="ApartmentBookingPropertyBO.cs" />
+    <Compile Include="ApprovedPettyCashBO.cs" />
+    <Compile Include="BedBookingPropertyAssignedGuestBO.cs" />
+    <Compile Include="BedBookingPropertyBO.cs" />
+    <Compile Include="BookingBO.cs" />
+    <Compile Include="BookingCancelBO.cs" />
+    <Compile Include="BookingCustomFieldsDetailsBO.cs" />
+    <Compile Include="BookingGuestDetailsBO.cs" />
+    <Compile Include="BookingMailResendBO.cs" />
+    <Compile Include="BookingPropertyAssignedGuestBO.cs" />
+    <Compile Include="BookingPropertyBO.cs" />
+    <Compile Include="BTCSubmissionBO.cs" />
+    <Compile Include="CheckInDtlsBo.cs" />
+    <Compile Include="CheckOutPaymentBO.cs" />
+    <Compile Include="CheckOutPaymentCardBO.cs" />
+    <Compile Include="CheckOutPaymentCashBO.cs" />
+    <Compile Include="CheckOutPaymentChequeBO.cs" />
+    <Compile Include="CheckOutPaymentCompInvoiceBO.cs" />
+    <Compile Include="CheckOutPaymentNEFTBO.cs" />
+    <Compile Include="CheckOutServiceDtlsBO.cs" />
+    <Compile Include="CheckOutServiceHdrBO.cs" />
+    <Compile Include="CheckOutSettleHdrBO.cs" />
+    <Compile Include="CheckOutSettleDtlBO.cs" />
+    <Compile Include="CheckStatusBo.cs" />
+    <Compile Include="CityBO.cs" />
+    <Compile Include="CitylocalityBO.cs" />
+    <Compile Include="ClientColumnBO.cs" />
+    <Compile Include="ClientGradeCityBO.cs" />
+    <Compile Include="ClientGradeCityDetailsBO.cs" />
+    <Compile Include="ClientManagementBO.cs" />
+    <Compile Include="ClientMgntAddNewClientBO.cs" />
+    <Compile Include="ClientMgntClientguestBO.cs" />
+    <Compile Include="ClientMgntCustomFieldsBO.cs" />
+    <Compile Include="ClientWisePriceBO.cs" />
+    <Compile Include="CloneClientBO.cs" />
+    <Compile Include="CompanyMasterBO.cs" />
+    <Compile Include="ContractBillBO.cs" />
+    <Compile Include="DepositBO.cs" />
+    <Compile Include="ExpenseMasterBO.cs" />
+    <Compile Include="ExportUnsettledBO.cs" />
+    <Compile Include="ExternalChechkOutTACBO.cs" />
+    <Compile Include="ExternalCheckOutBO.cs" />
+    <Compile Include="ExternalExpenseReportBO.cs" />
+    <Compile Include="ForgotBo.cs" />
+    <Compile Include="FormatReceiptsBO.cs" />
+    <Compile Include="GuestCheckInBO.cs" />
+    <Compile Include="GuestCheckOutBO.cs" />
+    <Compile Include="ImportGuestBO.cs" />
+    <Compile Include="InternalExpenseReportBO.cs" />
+    <Compile Include="KOTEntryDtlsBO.cs" />
+    <Compile Include="KOTEntryHdrBO.cs" />
+    <Compile Include="KOTEntryUserBO.cs" />
+    <Compile Include="LaundryServiceDtlBO.cs" />
+    <Compile Include="LaundryServiceHdrBO.cs" />
+    <Compile Include="MapPOAndVendorBO.cs" />
+    <Compile Include="MapVendorBO.cs" />
+    <Compile Include="MarkUpBO.cs" />
+    <Compile Include="MenuScreenBO.cs" />
+    <Compile Include="NewKOTEntryDtlBO.cs" />
+    <Compile Include="NewKOTEntryHdrBO.cs" />
+    <Compile Include="NewKOTUserEntryDtlBo.cs" />
+    <Compile Include="NewKOTUserEntryHdrBo.cs" />
+    <Compile Include="NewKOTVendorReportBO.cs" />
+    <Compile Include="NewSnackKOTHistoryBO.cs" />
+    <Compile Include="NewSnackKOTReportBO.cs" />
+    <Compile Include="OutsourceKOTDtlBO.cs" />
+    <Compile Include="OutsourceKOTHdrBO.cs" />
+    <Compile Include="PaxInOutBO.cs" />
+    <Compile Include="PCExpenseApprovalBO.cs" />
+    <Compile Include="PCHistroryBO.cs" />
+    <Compile Include="PettCashRequiredStatusBO.cs" />
+    <Compile Include="PettyCashApprovalDtlBO.cs" />
+    <Compile Include="PettyCashBO.cs" />
+    <Compile Include="PettyCashApprovalHdrBO.cs" />
+    <Compile Include="PettyCashHdrBO.cs" />
+    <Compile Include="PettyCashReportBO.cs" />
+    <Compile Include="PettyCashStatusBO.cs" />
+    <Compile Include="PropertyOwnerOtherContactsBO.cs" />
+    <Compile Include="PropertyReportBO.cs" />
+    <Compile Include="ReassignClientBO.cs" />
+    <Compile Include="ReassignClientDtlBo.cs" />
+    <Compile Include="ReassignPropertyBO.cs" />
+    <Compile Include="ReassignPropertyDtlBO.cs" />
+    <Compile Include="ReconcileBO.cs" />
+    <Compile Include="ReportBO.cs" />
+    <Compile Include="RoomShiftingBO.cs" />
+    <Compile Include="SearchBookingBO.cs" />
+    <Compile Include="SearchBookingGuestBO.cs" />
+    <Compile Include="SlabTaxBO.cs" />
+    <Compile Include="SnackKOTHistoryBO.cs" />
+    <Compile Include="SSPCodeGenerationApartmentBO.cs" />
+    <Compile Include="SSPCodeGenerationRoomsBO.cs" />
+    <Compile Include="SSPCodeGenerationServiceBO.cs" />
+    <Compile Include="ContractClientPreferDtlBo.cs" />
+    <Compile Include="ContractClientPreferHdrBo.cs" />
+    <Compile Include="ContractManagementBO.cs" />
+    <Compile Include="ContractManagementServicesBo.cs" />
+    <Compile Include="ContractManagementTariffAppartmentBO.cs" />
+    <Compile Include="ContractManagementTariffBO.cs" />
+    <Compile Include="ContractNonDedicatedApartmentBO.cs" />
+    <Compile Include="ContractNonDedicatedBO.cs" />
+    <Compile Include="ContractNonDedicatedServiceBO.cs" />
+    <Compile Include="ContractProductMasterBO.cs" />
+    <Compile Include="ImportExcelBO.cs" />
+    <Compile Include="LocalityBO.cs" />
+    <Compile Include="MasterClientManagementBo.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PropertyAgreementBO.cs" />
+    <Compile Include="PropertyAgreementDetailsBO.cs" />
+    <Compile Include="PropertyAgreementOwnerBO.cs" />
+    <Compile Include="PropertyAgreementsRoomChargesBO.cs" />
+    <Compile Include="PropertyBlockBO.cs" />
+    <Compile Include="PropertyBO.cs" />
+    <Compile Include="PropertyImageBO.cs" />
+    <Compile Include="PropertyOwnerApartmentBO.cs" />
+    <Compile Include="PropertyOwnersBO.cs" />
+    <Compile Include="PropertyRoomBedsBO.cs" />
+    <Compile Include="PropertyRoomBO.cs" />
+    <Compile Include="PropertyUserBO.cs" />
+    <Compile Include="RolesBo.cs" />
+    <Compile Include="RolesDetailsBo.cs" />
+    <Compile Include="ScreenMasterBO.cs" />
+    <Compile Include="SSPCodeGenerationBO.cs" />
+    <Compile Include="TACInvoiceBO.cs" />
+    <Compile Include="TaxMappingBO.cs" />
+    <Compile Include="TaxMasterBo.cs" />
+    <Compile Include="TDSDeclarationBO.cs" />
+    <Compile Include="TIAandATIABO.cs" />
+    <Compile Include="TransSubsPriceModelBO.cs" />
+    <Compile Include="TravelDeskBo.cs" />
+    <Compile Include="TRLinkBO.cs" />
+    <Compile Include="UserMasterBo.cs" />
+    <Compile Include="UserRolesBo.cs" />
+    <Compile Include="CheckOutTariffBO.cs" />
+    <Compile Include="VendorAdvancePaymentBO.cs" />
+    <Compile Include="VendorBo.cs" />
+    <Compile Include="VendorChequeApprovalDtlBO.cs" />
+    <Compile Include="VendorChequeApprovalHdrBO.cs" />
+    <Compile Include="VendorCostBO.cs" />
+    <Compile Include="VendorRequestBO.cs" />
+    <Compile Include="VendorSettlementBO.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HB.Dao\HB.Dao.csproj">
+      <Project>{C4B66FC8-07BA-4116-8E80-CA912882176B}</Project>
+      <Name>HB.Dao</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\HB.Entity\HB.Entity.csproj">
+      <Project>{CF580ED2-C796-4A0D-AB35-93EDC2C655E7}</Project>
+      <Name>HB.Entity</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

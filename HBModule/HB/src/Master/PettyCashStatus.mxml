@@ -1,0 +1,838 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" 
+			   xmlns:Controls="fx.com.adobe.Controls.*"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   xmlns:WrbComp="WrbComp.*"
+			   width="100%" height="100%"
+			   creationComplete="PageLoad()"
+			   pageTitle="Petty Cash Status">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<mx:NumberFormatter id="NF_Two" precision="2" rounding="nearest"/>
+	</fx:Declarations>
+	
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
+	<fx:Script>
+		<![CDATA[
+			import WrbComp.frmsearchwindow;
+			
+			import WrbHelpComp.HlpGridHdr;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.CalendarLayoutChangeEvent;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.events.IndexChangedEvent;
+			import mx.events.ListEvent;
+			import mx.graphics.codec.PNGEncoder;
+			
+			import spark.events.IndexChangeEvent;
+			import spark.events.TextOperationEvent;
+			import spark.primitives.Path;
+			private var SearchPopUp:frmsearchwindow = new frmsearchwindow();
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "",BillLogo:String="",TypeServiceId:int=0,ErrStr:String="",ErrStr1:String="";
+			public var Id:int=0,ErrMsg:String="",UserId:int=0,UserName:String="";
+			public var PropertyId:int=0,ExpenseId:int=0,PropertyName:String="";
+			public var AddMode:Boolean=true,Flag:Boolean=true;
+			//Image Upload
+			private var fileRef:FileReference = new FileReference();
+			private var fileTypes:Array = new Array();
+			
+			//setup the filters (types of files to be browsed)
+			
+			private var imageTypes:FileFilter = new FileFilter("Images (*.jpg; *.jpeg; *.gif; *.png)" ,"*.jpg; *.jpeg; *.gif; *.png");
+			private var documentTypes:FileFilter = new FileFilter("Documents (*.pdf), (*.doc), (*.rtf), (*.txt)",("*.pdf; *.doc; *.rtf, *.txt"));
+			public var ImageCount:Number=0;
+			// Set Up URLRequest
+			[Bindable]
+			private var arrColl:ArrayCollection;
+			
+			/* URL of the file to download. */
+			private var FILE_URL:String = "";
+			
+			
+			private var urlReq:URLRequest;
+			public var date:String="";
+			public var uploadURL:URLRequest = new URLRequest();
+			protected function PageLoad():void
+			{
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";
+				FnHelp_PageLoad();
+			}
+			protected function FnHelp_PageLoad():void
+			{
+				useWeb("PettyCashStatus","PAGELOAD_CUSTOM",[GlobalXml,'PAGELOAD','',0,Global_AC[0].UsrId,0]);
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "PAGELOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						hlp_property.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;		
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				{
+					
+					if (AddMode == true)
+					{
+						alignAlert(Alert.show("Status Saved Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+					}
+					else
+					{
+						alignAlert(Alert.show("Status Updated Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+					}
+					FnClear();
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Property_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_Status.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Actionload_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_User.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						hlp_Expense.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+					if (Ds_Objects.result.Tables.Table2.Rows.length > 0)
+					{
+						Txt_OpenBalance.text=Ds_Objects.result.Tables.Table2.Rows[0].ClosingBalance;
+					}
+					var OB:Number=Number(Txt_OpenBalance.text);
+					var Ac_Tmp1:ArrayCollection=new ArrayCollection();
+					Ac_Tmp1=Grd_User.dataProvider as ArrayCollection;
+					var Total:int=0;
+					for(var i:int=0;i<Ac_Tmp1.length;i++)
+					{
+						Total+=Number(Ac_Tmp1[i].Amount);
+					}
+					var TA:String=NF_Two.format(Total+OB);
+					lbl_Total.text=TA.replace(",","");
+							
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "ActionUpload_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Txt_ExpenseHead.text=Ds_Objects.result.Tables.Table.Rows[0].ExpenseHead;
+						Txt_desupload.text=Ds_Objects.result.Tables.Table.Rows[0].Description;
+					}
+				}
+			
+			if (Ds_Objects.currentTarget.description.toString() == "Statusload_CUSTOM")
+			{
+				if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+				{
+					Grd_User1.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+				}
+			}
+			if (Ds_Objects.currentTarget.description.toString() == "ImageUpload_CUSTOM")
+			{
+				//					if (Id == 0)
+				//					{
+				//						alignAlert(Alert.show("Client Added Successfully.","Message !",Alert.OK, 
+				//							null, null, iconTickLarge, Alert.OK),10,"");
+				//					}
+				//					else
+				//					{
+				//						alignAlert(Alert.show("Client Updated Successfully.","Message !",Alert.OK, 
+				//							null, null, iconTickLarge, Alert.OK),10,"");
+				//					}
+				//					SCtrl_docClearHandler();
+				
+			}
+		   }
+			protected function FnValidation_BeforeSave():String
+			{
+				ErrStr="";
+				var Flag:Boolean=true;
+				
+				if((Grd_User.dataProvider==null)||(Grd_User.dataProvider.length==0))
+				{
+					if(Flag==true)
+					{
+						Grd_User.setFocus();
+						Flag=false;
+					}
+					ErrStr=ErrStr+"* Tariff Data's is Required.\n";
+				}
+				if(Number(lbl_PaidTotal.text)> (Number(lbl_Total.text)))
+				{
+					if(Flag==true)
+					{
+						Grd_User.setFocus();
+						lbl_PaidTotal.text="";
+						Flag=false;
+					}
+					ErrStr=ErrStr+"*Paid Amount Should Not be Greater than RequestedAmount.\n";
+				}
+			   return ErrStr;
+			}
+			protected function FnSave():void
+			{
+				ErrStr="";
+				ErrMsg = ""; Flag = true; 
+				var Str:String=FnValidation_BeforeSave();
+				if(ErrStr !="")
+				{
+					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10,"");
+					return;
+				} 
+				else
+				{
+					alignAlert(Alert.show("Do you want To Submit ?", "Warning",Alert.YES | Alert.NO, null,
+						FnSave1, iconWarning, Alert.NO),10,"");
+				}
+			}
+			protected function FnSave1(event:CloseEvent):void
+			{
+				if ((event.detail==Alert.YES)) 
+				{
+					var arrcopy:ArrayCollection = new ArrayCollection
+						([{ 
+							PropertyId:PropertyId,
+							UserId:Global_AC[0].UsrId
+						}])
+						
+					var StatusGrid:ArrayCollection=new ArrayCollection();
+					StatusGrid=Grd_User.dataProvider as ArrayCollection
+					var HdrXml:String="";
+					HdrXml += "<ROOT>";
+					HdrXml += ObjToXmlStr_Comm(StatusGrid,"HdrXml")
+					HdrXml += "</ROOT>";
+					
+					var HdrXml1:String=""
+					HdrXml1 += "<ROOT>";	
+					HdrXml1 += ObjToXmlStr_Comm(arrcopy,"Property") 
+					HdrXml1 += "</ROOT>";
+					useWeb("PettyCashStatus","Save_CUSTOM",[GlobalXml,HdrXml,HdrXml1]);
+				}
+			}
+			
+			protected function OnSelectionGuestname():void
+			{
+				PropertyName=hlp_property.Select_Row.Property;
+				hlp_property.text=PropertyName;					
+				PropertyId=hlp_property.Select_Row.PropertyId;
+				useWeb("PettyCashStatus","Property_CUSTOM",[GlobalXml,"PROPERTYLOAD",'',PropertyId,Global_AC[0].UsrId,0]);
+			}
+			protected function FnClear():void
+			{
+				Grd_Status.dataProvider=null;
+				hlp_property.dataProvider=null;
+				hlp_property.text="";
+				PageLoad();
+				PropertyId=0,UserId=0;
+				bdr_Action.visible=false;
+				hlp_Expense.text="";
+				Txt_des.text="";
+				Txt_amt.text="";
+				lbl_PaidTotal.text="";
+				lbl_Total.text="";
+			}
+			public function FnAction(Event):void
+			{ 
+				date=Grd_Status.selectedItem.Date;
+				Grd_User.dataProvider=null;
+				useWeb("PettyCashStatus","Actionload_CUSTOM",[GlobalXml,"EXPENSELOAD",date,PropertyId,Global_AC[0].UsrId,0]);
+				bdr_Action.visible=true;
+				Grd_User.visible=true;
+				
+			}
+			
+			public function FnAction1(Event):void
+			{ 
+				//var Grid_AC:ArrayCollection=new ArrayCollection();
+				//PropertyId=Grd_Status.selectedItem.PropertyId;
+				date=Grd_Status.selectedItem.Date;
+				Grd_User1.dataProvider=null;
+				useWeb("PettyCashStatus","Statusload_CUSTOM",[GlobalXml,"Action",date,PropertyId,Global_AC[0].UsrId,0]);
+				Grd_User.visible=false;
+				Grd_Status.visible=false;
+				bdr_Action1.visible=true;
+				Grd_User1.visible=true;
+			}
+			public function FnClose_clickHandler(event):void
+			{
+				bdr_Action.visible=false;
+				Grd_Status.visible=true;
+				Grd_User.dataProvider=null;
+			}
+			public var ExpenseId1:Number=0;
+			protected function OnSelectionExpense():void
+			{
+				hlp_Expense.text=hlp_Expense.Select_Row.ExpenseHead;
+				ExpenseId1=hlp_Expense.Select_Row.ExpenseId;
+				Txt_des.setFocus();
+			}
+			public var Totalamt:int=0;
+			protected function AddExpense(event:MouseEvent):void
+			{
+				if((hlp_Expense.text == "")||(Txt_amt.text==""))
+				{
+					alignAlert(Alert.show("ExpenseHead and Amount Should Not be Empty.","Message !",Alert.OK, null, null, 
+						iconErrLarge, Alert.OK),10,"");
+					return;
+				}
+				else
+				{
+				ErrStr1="";
+				var TempProduct_AC:ArrayCollection=new ArrayCollection();
+				var TempCreate_AC:ArrayCollection=new ArrayCollection();
+				var Total:int=0;
+				TempProduct_AC=Grd_User.dataProvider as ArrayCollection
+				if(TempProduct_AC.length==0)
+				{
+					var TempCreate_AC:ArrayCollection=new ArrayCollection
+						([{
+							ExpenseHead:hlp_Expense.text,
+							Description:Txt_des.text,
+							Paid:Txt_amt.text								
+						}]);
+					TempProduct_AC.addItem(TempCreate_AC[0])
+				}
+				else
+				{
+					var TempCreate_AC:ArrayCollection=new ArrayCollection
+						([{
+							ExpenseHead:hlp_Expense.text,
+							Description:Txt_des.text,
+							Amount:0,
+							Status:"",
+							Paid:Txt_amt.text,
+							ExpenseId:ExpenseId1,
+							FilePath:"",
+							Id:0
+						}]);
+					TempProduct_AC.addItemAt(TempCreate_AC[0],TempProduct_AC.length)
+				}
+				Totalamt=0;
+				for(var i:int=0;i<TempProduct_AC.length;i++)
+				{
+					Totalamt+=Number(TempProduct_AC[i].Paid);
+				}
+				var TAmt:String=NF_Two.format(Totalamt);
+				lbl_PaidTotal.text=TAmt.replace(",","");;
+				var TotalPaidAmount:String=NF_Two.format(lbl_PaidTotal.text);
+				var total:Number=Math.round(Number(lbl_Total.text));
+				if(Totalamt<=total)
+				{
+					
+				}
+				else
+				{
+					
+					TempProduct_AC.removeItemAt(TempProduct_AC.length-1);
+					lbl_PaidTotal.text=NF_Two.format(Number(TotalPaidAmount)-Number(Txt_amt.text));					
+					alignAlert(Alert.show("Paid Amount Should Not be Greater than RequestedAmount","!",Alert.OK,this,null,iconErrLarge),10,"");
+					return;
+				}
+				Grd_User.dataProvider=TempProduct_AC;	
+				hlp_Expense.text="";
+				Txt_des.text="";
+				Txt_amt.text="";
+				hlp_Expense._setFocus();
+			}
+			}
+			public function DeleteGrid(event:Event):void
+			{
+				var TotAmt:int=0;
+				var total:Number=Math.round(Number(lbl_PaidTotal.text));
+				var Ac_PettyCash:ArrayCollection=new ArrayCollection();
+				Ac_PettyCash=Grd_User.dataProvider as ArrayCollection;
+				var Foodindex:int=Grd_User.selectedIndex;
+				var Tmp:ArrayCollection=new ArrayCollection([{ExpenseHead:Ac_PettyCash[Foodindex].ExpenseHead,
+					Description:Ac_PettyCash[Foodindex].Description,Amount:Ac_PettyCash[Foodindex].Amount,
+					Paid:Ac_PettyCash[Foodindex].Paid}]);				
+				Ac_PettyCash.removeItemAt(Foodindex);
+				for(var i:int=0;i<Tmp.length;i++)
+				{
+					TotAmt+=Number(Tmp[i].Paid);
+				}
+				var TB:String=NF_Two.format(total-TotAmt);
+				lbl_PaidTotal.text=TB.replace(",","");
+				Grd_User.dataProvider=Ac_PettyCash.source;
+			}
+			public function FnClose_clickHandler1(event):void
+			{
+				bdr_Action1.visible=false;
+				Grd_User.visible=false;
+				Grd_Status.visible=true;
+				bdr_Action.visible=false;
+				Grd_User1.dataProvider=null;
+			}
+			public function PaidAmount():void
+			{
+				var Tmp_AC:ArrayCollection=new ArrayCollection();
+				Tmp_AC=Grd_User.dataProvider as ArrayCollection
+				var Tot:int=0;
+				for(var i:int=0;i<Tmp_AC.length;i++)
+				{
+					Tot+=Number(Tmp_AC[i].Paid);
+				}
+				var TotalAmt:String=NF_Two.format(Tot);
+				lbl_PaidTotal.text=TotalAmt.replace(",","");
+				
+				var TotalAmount:Number= Number(lbl_Total.text);
+				var TotalPaidAmount:Number= Number(lbl_PaidTotal.text);
+			}
+			protected function FnClick_Btn_Browse():void
+			{
+				Brd_imageUpload.visible=true;
+				init1();
+				init();
+			}
+			//Image Upload
+			public var ImageFormat:String="";
+			public function init():void
+			{
+				// This URL should be replaced with your server side URL
+				//				var browserUrl:String = ExternalInterface.call("eval", "window.location.href");
+				//				var arr:Array =browserUrl.split("/");
+				ImageFormat=FilePath.text;				
+				uploadURL.url = "http://sstage.in/Billupload.php?id="+Txt_ExpenseHead.text+"&pid="+ExpenseId+"&imgcount="+ImageCount+"&imgformat="+ImageFormat;
+				uploadURL.method = "POST"; // OR "POST" as you need it
+				uploadURL.contentType = "multipart/form-data";				
+				// Event Listeners for UI Buttons (Upload/Browse)
+				
+				Filedata.addEventListener(MouseEvent.CLICK, browseFiles);
+				uploadbutton.addEventListener(MouseEvent.CLICK,uploadFiles);
+				fileRef.addEventListener(Event.SELECT, selectHandler);
+			}
+			//Browse for files
+			
+			private function browseFiles(event:Event):void
+			{
+				fileTypes.push(imageTypes);
+				fileTypes.push(documentTypes);
+				fileRef.browse(fileTypes);
+				
+			}
+			
+			// called after user selects a file form the browse window.
+			
+			private function selectHandler(event:Event):void
+			{
+				
+				FilePath.text = event.currentTarget.name.toString();
+				ImageFormat=FilePath.text;	
+				
+				//if()
+				
+			}
+			
+			// called when user clicks on the Upload button to upload the file
+			
+			private function uploadFiles():void
+			{
+				
+				fileRef.addEventListener(Event.COMPLETE, completeHandler);
+				fileRef.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA,dataHandler);
+				fileRef.addEventListener(SecurityErrorEvent.SECURITY_ERROR,securityErrorHandler);
+				fileRef.addEventListener(HTTPStatusEvent.HTTP_STATUS,httpStatusHandler);
+				fileRef.addEventListener(IOErrorEvent.IO_ERROR,ioErrorHandler);
+				fileRef.upload(uploadURL);
+			}
+			
+			// called after a file is uploaded
+			
+			private function completeHandler(event:Event):void
+			{
+				Alert.show("File Uploaded successfully");
+				
+			}
+			
+			//called after file upload is done and Data has been returned from Server
+			
+			private function dataHandler(event:DataEvent):void
+			{
+				//Alert.show("File Uploaded successfully");
+				var browserUrl:String = ExternalInterface.call("eval", "window.location.href");
+				var arr:Array =browserUrl.split("/");
+				resultsTxtField.text = event.data.toString();
+				if(resultsTxtField.text=="There was an error uploading the file, please try again!")
+				{
+					alignAlert(Alert.show("There was an error uploading the Image, please try again!","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+				}
+				else
+				{
+					var Ac_PettyCash:ArrayCollection=new ArrayCollection();
+					Ac_PettyCash=Grd_User.dataProvider as ArrayCollection;
+					var Uploadindex:int=Grd_User.selectedIndex;
+					Ac_PettyCash[Uploadindex].FilePath="http://sstage.in/Bill_images/"+resultsTxtField.text;				
+					
+					Grd_User.dataProvider=Ac_PettyCash;
+					
+					bdr_Action1.visible=false;
+					Grd_User.visible=true;
+					bdr_Action.visible=true;
+					//Grd_User1.visible=true;
+					Brd_imageUpload.visible=false;
+					bdr_Upload.visible=false;
+				}
+			}
+			
+			// called if there is an error detected by flash player browsing or uploading a file
+			
+			private function ioErrorHandler(event:IOErrorEvent):void
+			{
+				mx.controls.Alert.show(String(event),"ioError",0);
+			}
+			// called if a security error
+			
+			private function securityErrorHandler(event:SecurityErrorEvent):void
+			{
+				mx.controls.Alert.show(String(event),"Security Error",0);
+			}
+			// server will return an http status code, code 200 means all is good
+			
+			private function httpStatusHandler(event:HTTPStatusEvent):void
+			{
+				if (event.status != 200)
+				{
+					mx.controls.Alert.show(String(event),"Error",0);
+				}
+			}
+			
+			//Image Download
+			public var PropertyImageId:int=0;			
+			private function init1():void 
+			{
+				// Initialize the array collection to an empty collection. 
+				arrColl = new ArrayCollection();
+				
+				// Set up the URL request to download the file specified by the FILE_URL variable. 
+				urlReq = new URLRequest(FILE_URL);
+				
+				// Define file reference object and add a bunch of event listeners. 
+				fileRef = new FileReference();
+				fileRef.addEventListener(Event.CANCEL, doEvent);
+				fileRef.addEventListener(Event.COMPLETE, doEvent);
+				fileRef.addEventListener(Event.OPEN, doEvent);
+				fileRef.addEventListener(Event.SELECT, doEvent);
+				fileRef.addEventListener(HTTPStatusEvent.HTTP_STATUS, doEvent);
+				fileRef.addEventListener(IOErrorEvent.IO_ERROR, doEvent);
+				fileRef.addEventListener(ProgressEvent.PROGRESS, doEvent);
+				fileRef.addEventListener(SecurityErrorEvent.SECURITY_ERROR, doEvent);
+			}
+			
+			private function doEvent(evt:Event):void 
+			{
+				
+				FilePath.text="";
+			}
+			
+			//private function downloadSourceCodeZip():void 
+			//{
+				// Clear existing array collection. 
+				//arrColl = new ArrayCollection();
+				//Alert.show(FILE_URL);
+				// Hide the Text control. //
+				//txt.visible = false;
+				// Begin download. 
+				//fileRef.download(urlReq);
+			//}
+			
+			private function showAlert(item:Object):void 
+			{
+				Alert.show(item.eventString, item.type);
+			}
+			public function FnUpload(Event):void
+			{ 
+				bdr_Upload.visible=true;
+				Grd_User.visible=false;
+				bdr_Action.visible=false;
+				ExpenseId=Grd_User.selectedItem.ExpenseId;
+				useWeb("PettyCashStatus","ActionUpload_CUSTOM",[GlobalXml,"EXPENSEUPLOAD",'',PropertyId,Global_AC[0].UsrId,ExpenseId]);
+				
+			}
+			public function FnClose_clickHandler2(event):void
+			{
+				bdr_Action1.visible=false;
+				Grd_User.visible=true;
+				bdr_Action.visible=true;
+				//Grd_User1.visible=true;
+				bdr_Upload.visible=false;
+			}
+			public function FnClose_clickHandler3(event):void
+			{
+				init();	
+				uploadFiles();
+			}
+			
+			protected function AmountValidation(event:FocusEvent):void
+			{
+				
+				if(event.currentTarget.selectedItem !=null)
+				{
+					var Paid:Number=event.currentTarget.selectedItem.Paid	
+					var Amount:Number=event.currentTarget.selectedItem.Amount
+					var TempCreate_AC:ArrayCollection=new ArrayCollection();
+					
+					if(Paid>Amount)
+					{
+						if(Amount !=0)
+						{
+							event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Paid=Amount;
+						}
+					}
+					var Tmp_AC:ArrayCollection=new ArrayCollection();
+					Tmp_AC=Grd_User.dataProvider as ArrayCollection
+					var Tot:int=0;
+					for(var i:int=0;i<Tmp_AC.length;i++)
+					{
+						Tot+=Number(Tmp_AC[i].Paid);
+					}
+					var TotalAmt:String=NF_Two.format(Tot);
+					lbl_PaidTotal.text=TotalAmt.replace(",","");
+					
+					var TotalAmount:Number= Number(lbl_Total.text);
+					var TotalPaidAmount:Number= Number(lbl_PaidTotal.text);
+				}
+				var Tmp_AC:ArrayCollection=new ArrayCollection();
+				try
+				{
+					if(lbl_Total.text<lbl_PaidTotal.text)
+					{
+							var m:int=0;
+							Tmp_AC=Grd_User.dataProvider as ArrayCollection
+							var k:int=Tmp_AC.length;
+							for(m;m<=k;m++)
+							{
+								if(m==0)
+								{
+									if(Tmp_AC[m].Amount==0)
+									{
+										Tmp_AC.removeItemAt(m);
+									}
+								}
+								else
+								{
+									if(Tmp_AC[m].Amount==0)
+									{
+										Tmp_AC.removeItemAt(m);
+									}
+									m=m+1;
+								}
+							}
+						}
+				 	}
+				catch(Exception)
+				{
+				
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	<s:VGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+		<s:BorderContainer x="12" y="19" width="100%" height="500" backgroundColor="#fbf9f9" visible="true"
+						   borderVisible="false">
+			<mx:DataGrid id="Grd_Status" x="259" y="94" editable="true" width="610" height="307"  tabIndex="4">
+				<mx:columns>
+					<mx:DataGridColumn dataField="Action" headerText="Action" width="75" editable="false"
+									   visible="true">
+						<mx:itemRenderer >
+							<fx:Component>
+								<mx:HBox horizontalAlign="center" verticalAlign="middle">										
+									<mx:Image source="@Embed(source='../Assets/view.gif')" buttonMode="true"
+											  click="outerDocument.FnAction(event)"/>
+								</mx:HBox>	
+							</fx:Component>
+						</mx:itemRenderer>
+					</mx:DataGridColumn>
+					<mx:DataGridColumn dataField="Date" headerText="Date" width="125" editable="false"/>
+					<mx:DataGridColumn dataField="Amount" headerText="Amount" width="100" editable="false"/>
+					<mx:DataGridColumn dataField="Status" headerText="Status" width="150" editable="false">
+						<mx:itemRenderer >
+							<fx:Component>
+								<mx:HBox horizontalAlign="center" verticalAlign="middle">										
+									<mx:Image source="@Embed(source='../Assets/view.gif')" buttonMode="true"
+											  click="outerDocument.FnAction1(event)"/>
+								</mx:HBox>	
+							</fx:Component>
+						</mx:itemRenderer>
+					</mx:DataGridColumn>
+					<mx:DataGridColumn dataField="Id" width="10" visible="false" editable="false"/>
+					<mx:DataGridColumn dataField="FinanceStatus" headerText="FinanceStatus" width="150" editable="false"/>
+					<!--mx:DataGridColumn dataField="Remark" headerText="Remark" editable="true"/-->
+				</mx:columns>
+			</mx:DataGrid>
+					
+			
+			<!--s:DropDownList id="Ddl_Client" x="272" y="48" width="356" height="23" tabIndex="1"
+			prompt="Please Select Client" change="Ddl_Client_changeHandler(event)"/-->
+			<WrbHelpComp:HelpText id="hlp_property" x="418" y="55" width="280" height="28" depth="1000"
+								  onselection="{OnSelectionGuestname()}" pxSetColumnsWidth="280,0"
+								  pxSetHeight="183">
+			</WrbHelpComp:HelpText>
+			<mx:Label x="347" y="56" text="Property"/>
+			<mx:Label x="261" y="30" text="PettyCash Recieved Status" color="red"/>
+			<mx:HRule x="0" y="425" width="100%" strokeColor="#eb1c24"/>
+			<s:BorderContainer x="150" y="8" width="776" height="449" id="bdr_Action" visible="false" 
+							   depth="1000">
+				<s:BorderContainer x="0" y="0" width="775" height="42" borderVisible="true"  
+								   backgroundColor="#c2c2c2">
+					<s:Label x="15" y="12" text="Recieved Amount History" color="red"/>
+				</s:BorderContainer>
+				<WrbComp:Button_BB id="Sctrl_Approve" x="238" y="415" width="94" height="30" click="FnSave()"
+								   Lable_val="Spend">
+				</WrbComp:Button_BB>
+				<WrbComp:Button_BB id="Sctrl_Clear" x="356" y="414" width="94" height="30"
+								   click="FnClear()" Lable_val="Clear">
+				</WrbComp:Button_BB>
+				<mx:Label x="15" y="46" text="Spend Status" color="red"/>
+				
+				<s:Image x="753" y="14" source="@Embed(source='../Assets/CrossSmall.png')" 
+						 buttonMode="true" toolTip="Close" click="FnClose_clickHandler(event)"/>
+				<mx:DataGrid x="12" y="96"  verticalAlign="middle" editable="true" visible="true"
+							 width="750" height="248"  id="Grd_User" focusOut="AmountValidation(event)"
+							 change="PaidAmount()">
+					<mx:columns>
+						<mx:DataGridColumn dataField="Remove" width="75"  editable="false">
+							<mx:itemRenderer>
+								<fx:Component>
+									<mx:HBox horizontalAlign="center" verticalAlign="top">										
+										<mx:Image source="@Embed(source='../Assets/delete.png')" buttonMode="true"
+												  click="outerDocument.DeleteGrid(event)"/>
+										
+									</mx:HBox>
+								</fx:Component>
+							</mx:itemRenderer>
+						</mx:DataGridColumn>
+						<mx:DataGridColumn dataField="ExpenseHead" headerText="ExpenseHead" width="150" editable="false"
+										   visible="true">
+						</mx:DataGridColumn>
+						<mx:DataGridColumn dataField="Description" headerText="Description" width="160" 
+										   editable="false" visible="true">
+						</mx:DataGridColumn>
+						<mx:DataGridColumn dataField="BillNo" headerText="BillNo" width="100" 
+										   editable="true" visible="true">
+						</mx:DataGridColumn>
+						<mx:DataGridColumn dataField="Amount" headerText="Amount" width="100" editable="false">
+						</mx:DataGridColumn>
+						<mx:DataGridColumn dataField="Paid" headerText="Paid" width="100" editable="true" />
+						<mx:DataGridColumn dataField="Action" headerText="Action" width="75" editable="false"
+										   visible="true">
+							<mx:itemRenderer >
+								<fx:Component>
+									<mx:HBox horizontalAlign="center" verticalAlign="middle">										
+										<mx:Image source="@Embed(source='../Assets/Comment.png')" buttonMode="true"
+												  click="outerDocument.FnUpload(event)"/>
+									</mx:HBox>	
+								</fx:Component>
+							</mx:itemRenderer>
+						</mx:DataGridColumn>
+						<mx:DataGridColumn dataField="FilePath" headerText="FilePath" width="50" editable="true" visible="false"/>
+						<mx:DataGridColumn dataField="Id" headerText="Id" width="10" editable="true" visible="false"/>
+						<mx:DataGridColumn dataField="ExpenseId" headerText="ExpenseId" width="10" editable="true" visible="false"/>
+						<mx:DataGridColumn dataField="Total" headerText="Total" width="10" editable="false" visible="false"/>
+					</mx:columns>
+				</mx:DataGrid>
+				
+				<mx:Label x="16" y="384" text="ExpenseHead" id="lbl_Expense"/>
+				<mx:Label x="304" y="384" text="Description" id="lbl_Des"/>
+				<mx:Label x="559" y="384" text="Amount"/>
+				<mx:Label x="396" y="352" text="TotalAmount"/>
+				<mx:Label x="483" y="352" width="98" id="lbl_Total" textAlign="center"/>
+				<mx:Label x="586" y="351" width="98" id="lbl_PaidTotal" textAlign="center"/>
+				<WrbHelpComp:HelpText x="106" y="384" width="190" id="hlp_Expense" depth="100" tabIndex="1"
+									  onselection="{OnSelectionExpense()}" pxSetColumnsWidth="190,0">
+				</WrbHelpComp:HelpText>
+				<mx:TextInput x="376" y="384" width="165" id="Txt_des" tabIndex="2"/>
+				<mx:Label x="494" y="56" text="OpeningBalance" id="lbl_Des0"/>
+				<mx:TextInput x="596" y="56" width="165" id="Txt_OpenBalance" />
+				<mx:TextInput id="Txt_amt" x="612" y="384" width="153" tabIndex="3" restrict="0-9"/>
+				<mx:Button x="680" y="422" label="Add" click="AddExpense(event)"/>
+				
+				
+			</s:BorderContainer>
+			
+		
+		<s:BorderContainer x="259" y="33" width="610" height="409" id="bdr_Action1" visible="false" depth="1000">
+			<s:BorderContainer x="0" y="-1" width="608" height="42" borderVisible="true"  backgroundColor="#c2c2c2">
+				<mx:Label x="15" y="12" text="Comment History" color="red"/>
+			</s:BorderContainer>
+			
+			<mx:Label x="18" y="43" text="Approval Status" color="red"/>
+			
+			<s:Image x="583" y="14" source="@Embed(source='../Assets/CrossSmall.png')" 
+					 buttonMode="true" toolTip="Close" click="FnClose_clickHandler1(event)"/>
+			<mx:DataGrid x="58" y="66"  verticalAlign="middle" editable="true" visible="true"
+						 width="510" height="331" id="Grd_User1" >
+				<mx:columns>
+					<mx:DataGridColumn dataField="UserName" headerText="UserName" width="150" editable="false"
+									   visible="true">
+					</mx:DataGridColumn>
+					<mx:DataGridColumn dataField="Status" headerText="Status" width="100" 
+									   editable="false" visible="true">
+					</mx:DataGridColumn>
+					<mx:DataGridColumn dataField="Comments" headerText="Comments" width="150" editable="false">
+					</mx:DataGridColumn>
+					<mx:DataGridColumn dataField="Processedon" headerText="Processedon" width="100" editable="false">
+					</mx:DataGridColumn>
+				</mx:columns>
+			</mx:DataGrid>
+			
+		</s:BorderContainer>
+			<s:BorderContainer x="161" y="8" width="759" height="435" id="bdr_Upload" visible="false" 
+							   depth="2500">
+				<s:BorderContainer x="-1" y="0" width="759" height="42" borderVisible="true"  
+								   backgroundColor="#c2c2c2">
+					<s:Label x="15" y="12" text="BillUpload" color="red"/>
+					<s:Image x="732" y="14" source="@Embed(source='../Assets/CrossSmall.png')" 
+							 buttonMode="true" toolTip="Close" click="FnClose_clickHandler2(event)"/>
+					</s:BorderContainer>
+				<mx:Label x="236" y="122" text="ExpenseHead" id="lbl_ExpenseUpload"/>
+				<mx:Label x="236" y="172" text="Description" id="lbl_DesUpload"/>
+				<mx:Label x="242" y="232" text="Attachment"/>
+				
+				<mx:TextInput id="Txt_desupload" x="326" y="172" width="190" height="23" tabIndex="2"/>
+				<mx:TextInput id="Txt_ExpenseHead" x="326" y="121" width="190" height="23" tabIndex="2"/>
+				<WrbComp:Button_HB id="Btn_Browse" x="372" y="225" width="118" height="32" buttonMode="true"
+								   _Label="Bill Upload" click="FnClick_Btn_Browse()" depth="0" focusEnabled="false" visible="true"/>
+				
+				</s:BorderContainer>
+			<s:BorderContainer x="293" y="95" width="437" height="237" id="Brd_imageUpload" visible="false" 
+							   borderVisible="true" backgroundColor="#fbf9f9" cornerRadius="5" depth="2500">
+				<mx:Panel x="37" y="39" title="Bill Uploader">
+					<mx:ControlBar>
+						<mx:Spacer width="80%"/>
+						<mx:HBox>
+							<mx:TextInput id="FilePath" width="150"  visible="true"/>
+							<mx:Button id="Filedata" label="Browse File" name="Filedata" />
+							<mx:Button label="UpLoad File" name="uploadbutton" id="uploadbutton" visible="false" width="0" />
+						</mx:HBox>
+						<mx:TextArea id="resultsTxtField"  width="0"  name="resultsTxtField" visible="false"/>
+					</mx:ControlBar>
+				</mx:Panel>
+				<WrbComp:Button_HB id="Btn_Close" x="215" y="177" width="118" height="32" buttonMode="true"
+								   _Label="Upload" click="FnClose_clickHandler3(event)" depth="0" focusEnabled="false" visible="true"/>
+				
+				<!--mx:Button id="downloadBtn1" x="247" y="172" height="40" label="Download"
+						   click="downloadSourceCodeZip();"  toolTip="{FILE_URL}"/!-->
+				<s:TextInput x="37" y="172" width="189" height="40" id="txt_ImageName" enabled="false"/>		
+				
+				<WrbComp:Button_HB x="339" y="177" height="32" _Label="Close" click="{Brd_imageUpload.visible=false;}"/>
+						</s:BorderContainer>
+		</s:BorderContainer>
+	</s:VGroup>	
+</s:Application>

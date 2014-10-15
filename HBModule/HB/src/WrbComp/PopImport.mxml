@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="264" creationComplete="PageInit()">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Style source="..\\Common\\ApplicationCSS.css">
+	</fx:Style>
+	<fx:Script>
+		<![CDATA[			
+			import Purchase.FrmPurchasOrder;			
+			import mx.collections.ArrayCollection;
+			import mx.managers.PopUpManager;
+			public var PopRmk:ArrayCollection = new ArrayCollection();
+			
+			protected function button1_clickHandler(event:MouseEvent):void
+			{
+				var PopRmk:ArrayCollection = new ArrayCollection
+					([{
+						PopCurrency: txt_Cury.text, PopDelivery:txt_Dely.text,
+						PopDestinationPort:txt_DesPt.text,PopLoadingPort:txt_LadPt.text,
+						PopPriceDetails:txt_Prc.text
+					}]);
+				var obj:FrmPurchasOrder = new FrmPurchasOrder();  
+				obj.PopImpVal(PopRmk);
+				clear();
+				ClosePopup();
+				
+			}
+			
+			private function PageInit():void
+			{
+				setVal(); txt_Cury.setFocus();
+			}
+			public function setVal():void
+			{
+				if(PopRmk.length!=0)
+				{
+					txt_Cury.text=PopRmk[0].PopCurrency
+					txt_Dely.text=PopRmk[0].PopDelivery
+					txt_DesPt.text=PopRmk[0].PopDestinationPort
+					txt_LadPt.text=PopRmk[0].PopLoadingPort
+					txt_Prc.text=PopRmk[0].PopPriceDetails
+				}
+			}
+			
+			private function ClosePopup():void
+			{
+				PopUpManager.removePopUp(this);
+				dispatchEvent(new Event("PopupClose"));
+				
+			}
+			
+			public function clear():void
+			{
+				txt_Cury.text = ""; txt_Dely.text = ""; txt_DesPt.text = ""; txt_LadPt.text = ""; 
+				txt_Prc.text = "";
+			}
+			
+			public function PopRemVal(arr:ArrayCollection):void
+			{
+				PopRmk = arr; setVal();
+			}
+			
+			protected function application1_keyDownHandler(event:KeyboardEvent):void
+			{
+				if (event.keyCode == Keyboard.ESCAPE)
+				{
+					ClosePopup();
+				}	
+			}
+			
+			protected function button2_clickHandler(event:MouseEvent):void
+			{
+				ClosePopup();
+			}
+			
+			protected function txt_Cury_focusOutHandler(event:FocusEvent):void
+			{
+				txt_Prc.setFocus();
+			}
+			
+			protected function txt_Prc_focusOutHandler(event:FocusEvent):void
+			{
+				txt_LadPt.setFocus();	
+			}
+			
+			protected function txt_LadPt_focusOutHandler(event:FocusEvent):void
+			{
+				txt_DesPt.setFocus();
+			}
+			
+			protected function txt_DesPt_focusOutHandler(event:FocusEvent):void
+			{
+				txt_Dely.setFocus();
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:Panel x="0" y="0" width="400" height="100%" title="Import Details">
+		<s:BitmapImage x="-1" y="0" width="400" height="100%" source="Assets/metal6.jpg"/>
+		<s:Label x="55" y="19.5" text="Currency"/>
+		<s:Label x="35" y="54.5" text="Price Details"/>
+		<s:Label x="35" y="89.5" text="Loading Port"/>
+		<s:Label x="16" y="124.5" text="Destination Port"/>
+		<s:Label x="63" y="159.5" text="Delivery"/>
+		<s:TextInput x="123" y="13" width="263" height="25" id="txt_Cury" focusOut="txt_Cury_focusOutHandler(event)"/>
+		<s:TextInput id="txt_Prc" x="123" y="48" width="263" height="25" focusOut="txt_Prc_focusOutHandler(event)"/>
+		<s:TextInput id="txt_LadPt" x="123" y="83" width="263" height="25" focusOut="txt_LadPt_focusOutHandler(event)"/>
+		<s:TextInput id="txt_DesPt" x="123" y="118" width="263" height="25" focusOut="txt_DesPt_focusOutHandler(event)"/>
+		<s:TextInput id="txt_Dely" x="123" y="153" width="263" height="25"/>
+		<s:Button x="157" y="193" id="btn_details" label="Submit" click="button1_clickHandler(event)" height="25" 
+				  width="100"/>
+		<s:Button x="367" y="-31" width="31" height="30" label="X" color="#F90909"
+				  fontWeight="bold" click="button2_clickHandler(event)" visible="false"/>
+		<s:Image x="366" y="-31" click="button2_clickHandler(event)" source="Assets/CrossLarge.png"
+				 toolTip="Close"/>
+	</s:Panel>
+</s:Group>

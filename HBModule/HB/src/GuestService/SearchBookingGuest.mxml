@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:Controls="fx.com.adobe.Controls.*"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   xmlns:WrbComp="WrbComp.*"
+			   xmlns:flexlib="http://code.google.com/p/flexlib/"
+			   xmlns:ns1="*"
+			   width="100%" height="100%" creationComplete="PageLoad()"
+			   pageTitle="SearchBookingGuest">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
+	<fx:Script>
+		<![CDATA[
+			import WrbComp.frmsearchwindow;
+			
+			import WrbHelpComp.HlpGridHdr;
+			
+			import com.as3xls.xls.Cell;
+			import com.as3xls.xls.ExcelFile;
+			import com.as3xls.xls.Sheet;
+			import com.as3xls.xls.Type;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.CalendarLayoutChangeEvent;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.events.IndexChangedEvent;
+			import mx.graphics.codec.PNGEncoder;
+			
+			import spark.events.IndexChangeEvent;
+			import spark.events.TextOperationEvent;
+			public var Screen:String = "";
+			public var ScreenName:String = "";
+			public var ADate:String = "";
+			public var Identity:String="";private var xlsFile:ExcelFile;
+			private var SearchPopUp:frmsearchwindow = new frmsearchwindow();
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "";
+			public var Id:int=0,ErrMsg:String="",PropertyId:int=0,PropertyName:String="",UserId:int=0;
+			public var AddMode:Boolean=true,Flag:Boolean=true,PropretyType:String="";
+			public var ClientName:String="",ClientId:int=0,Guest:String="",GuestId:int=0;
+			
+			protected function PageLoad():void
+			{
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";
+				SCtrl.setButtonRights("Search",true);
+				SCtrl.setButtonRights("Save",true);
+				SCtrl.setButtonRights("Delete",true);
+				SCtrl.setButtonRights("Refresh",true);
+				//dt_From.selectedDate = new Date();
+				Grd_Details.dataProvider=null;
+				lbl.visible=true;
+				
+				hlp_Property.enabled=true;
+				useWeb("BookingSearchGuest","PAGELOAD_CUSTOM",[GlobalXml,'PAGELOAD',0,0,"","",""]);
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void				
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "PAGELOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_Details.dataProvider=null;
+						hlp_Property.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;		
+					}
+					if (Ds_Objects.result.Tables.Table2.Rows.length > 0)
+					{
+						Grd_Details.dataProvider=null;
+						hlp_ClientName.dataProvider=Ds_Objects.result.Tables.Table2.Rows as ArrayCollection;		
+					}
+					if (Ds_Objects.result.Tables.Table3.Rows.length > 0)
+					{
+						Grd_Details.dataProvider=null;
+						hlp_Guest.dataProvider=Ds_Objects.result.Tables.Table3.Rows as ArrayCollection;		
+					}
+					if (Ds_Objects.result.Tables.Table4.Rows.length > 0)
+					{
+						Grd_Details.dataProvider=null;
+						Grd_Details.dataProvider=Ds_Objects.result.Tables.Table4.Rows as ArrayCollection;		
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Search_CUSTOM")
+				{
+					Grd_Details.dataProvider=null;
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_Details.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+			}
+			
+			protected function Search():void
+			{
+			
+				lbl.visible=false;
+				SearchPopUp.Prc_name="BookingSearchGuest"
+				var SearchParam:Array =new Array();
+				SearchPopUp.HlpIndex="SEARCH"
+				SearchParam[0]=GlobalXml;
+				SearchParam[1]=0;
+				SearchParam[2]=PropertyId; 
+				SearchParam[3]=drp_Status.selectedItem;
+				SearchParam[4]=txt_BookingCodes.text;
+				SearchParam[5]=dt_From.text;
+				SearchParam[6]=dt_To.text;
+				var Action:String="Booking";
+				
+				SearchParam[7]=Action;
+				SearchPopUp.addEventListener("PopupEnter",funpopupEnter);
+				SearchPopUp.addEventListener("PopupClose",funpopupClose);
+				var Load:Array = new Array(); 
+				Load[0] = GlobalXml; Load[1] = Id; Load[2]=PropertyId;Load[3]=drp_Status.selectedItem;
+				Load[4]=txt_BookingCodes.text;Load[5]=dt_From.text;Load[6]=dt_To.text;Load[7]=Action;
+				Load[8]=ClientId;Load[9]=GuestId;
+				useWeb("BookingSearchGuest","Search_CUSTOM",Load);
+			}
+			private function funpopupClose(event:Event):void
+			{ 
+				
+			} 
+			private function funpopupEnter(event:Event):void
+			{	
+				Searchhb(SearchPopUp.SelectRow.Id,0);	
+			}
+			private function Searchhb(Id:int,_PrdFk:int):void
+			{
+				var Load:Array = new Array(); 
+				Load[0] = GlobalXml; Load[1] = Id; Load[2]=PropertyId;Load[3]=drp_Status.selectedItem;
+				Load[5]=dt_From.text;Load[6]=dt_To.text;
+				useWeb("BookingSearchGuest","Search_CUSTOM",Load);
+			}
+			
+			public function Ddl_Property_changeHandler():void
+			{
+				if(hlp_Property.selected())
+				{
+					PropertyName=hlp_Property.Select_Row.Property;
+					PropertyId=hlp_Property.Select_Row.zId;
+					hlp_Property.text=PropertyName;
+				}
+				else
+				{
+					hlp_Property.text="";
+				}
+			}
+			public function Ddl_Guest_changeHandler():void
+			{
+				if(hlp_Guest.selected())
+				{
+					Guest=hlp_Guest.Select_Row.Guest;
+					GuestId=hlp_Guest.Select_Row.ZId;
+					hlp_Guest.text=Guest;
+				}
+				else
+				{
+					hlp_Guest.text="";
+				}
+			}	
+			public function Ddl_Client_changeHandler():void
+			{
+				if(hlp_ClientName.selected())
+				{
+					ClientName=hlp_ClientName.Select_Row.Client;
+					ClientId=hlp_ClientName.Select_Row.ZId;
+					hlp_ClientName.text=ClientName;
+				}
+				else
+				{
+					hlp_ClientName.text="";
+				}
+			}	
+			protected function FnClear():void
+			{
+				txt_BookingCodes.text="";
+				PropertyName="";
+				hlp_Property.Select_Row.Property="";
+				hlp_Property.Select_Row.zId=0;
+				hlp_Property.text="";
+				PropertyId=0;
+				drp_Status.selectedItem="Select Status";
+				Grd_Details.dataProvider=null;
+				dt_From.text="";
+				dt_To.text="";
+				PageLoad();
+				lbl.visible=true;
+				hlp_ClientName.text="";
+				ClientId=0;
+				hlp_Guest.text="";
+				hlp_Guest.Select_Row.Guest="";
+				hlp_Guest.Select_Row.ZId=0;
+				GuestId=0;
+			}
+			protected function dt_From_changeHandler(event:CalendarLayoutChangeEvent):void
+			{
+				if(dt_From.selectedDate)
+				{
+					dt_To.selectableRange={rangeEnd: new Date()};
+					var Dt:String = dt_From.text;										
+					var Y:String = Dt.substr(6,10);
+					var M:String = String(Dt.substr(3,2));
+					var D:String =String(Number(Dt.substr(0,2))+1);
+					var RangeStart:String = Y+'/'+M+'/'+D;
+					dt_To.selectableRange = {rangeStart:new Date(RangeStart)};
+					//dt_To.selectableRange={rangeEnd: new Date()};//
+					dt_To.selectedDate = new Date(RangeStart);
+					//Txt_StayDays.text="1";
+					dt_To.enabled=true;
+				}
+			}	
+			protected function ExportExcel(event:MouseEvent):void
+			{
+				
+				if(Grd_Details.dataProvider !=null)
+				{
+					var arrExportResult:ArrayCollection = Grd_Details.dataProvider as ArrayCollection;
+					xlsFile = new ExcelFile();
+					var sheet:Sheet = new Sheet();
+					
+					sheet.resize(arrExportResult.length+1,14);
+					
+					sheet.setCell(0,0,'BookingCode');
+					sheet.setCell(0,1,'OccupancyLevel');
+					sheet.setCell(0,2,'Guests');
+					sheet.setCell(0,3,'Client');
+					sheet.setCell(0,3,'Property');
+					sheet.setCell(0,4,'Booking Date');
+					sheet.setCell(0,5,'CheckInDate');
+					sheet.setCell(0,6,'CheckOutDate');
+					sheet.setCell(0,7,'Status');
+					sheet.setCell(0,8,'PaymentMode');
+					sheet.setCell(0,9,'BookingMode');
+					sheet.setCell(0,10,'TotalTariff');
+					
+					for(var i:int=0;i<arrExportResult.length;i++)
+					{
+						sheet.setCell(i+1, 0, arrExportResult[i].BookingCode);
+						sheet.setCell(i+1, 1, arrExportResult[i].Guests);
+						sheet.setCell(i+1, 2, arrExportResult[i].Client);
+						sheet.setCell(i+1, 3, arrExportResult[i].Property);
+						sheet.setCell(i+1, 4, arrExportResult[i].BookingDate);
+						sheet.setCell(i+1, 5, arrExportResult[i].CheckInDate);
+						sheet.setCell(i+1, 6, arrExportResult[i].CheckOutDate);
+						sheet.setCell(i+1, 7, arrExportResult[i].Status);
+						sheet.setCell(i+1, 8, arrExportResult[i].PaymentMode);
+						sheet.setCell(i+1, 9, arrExportResult[i].BookingMode);
+						sheet.setCell(i+1, 10, arrExportResult[i].TotalTariff);
+					}
+					Grd_Details.dataProvider = arrExportResult;
+					xlsFile.sheets.addItem(sheet);      
+					var bytes: ByteArray = xlsFile.saveToByteArray();
+					var fr:FileReference = new FileReference();
+					fr.save(bytes,"Search_Booking_guest.xlsx");
+				}
+				else
+				{
+					alignAlert(Alert.show("ServiceItem Details Required.","Message !",
+						Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+				}
+			}
+			
+			protected function Grd_Details_doubleClickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				bdr_Intermidiate.visible=true;
+				
+				
+				
+				
+				
+			}
+			
+			protected function button_hb1_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				
+			}
+			
+		]]>
+	</fx:Script>
+	<s:VGroup x="0" y="0" width="100%" height="100%" gap="5" horizontalAlign="center" verticalAlign="middle">
+		<s:HGroup x="6" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+			<s:BorderContainer x="102" y="0" width="100%" height="100%" backgroundColor="#fbf9f9"
+							   borderVisible="false">
+				<s:Label x="19" y="41" text="Property"/>
+				<WrbHelpComp:HelpText id="hlp_Property" x="77" y="36" width="220" height="22" pxSetColumnsWidth="220,0" 
+									  onselection="{Ddl_Property_changeHandler()}"  pxTabIndex="1" depth="10"
+									  pxSetPrompt="Select Property">
+				</WrbHelpComp:HelpText>
+				<mx:DataGrid x="0" y="220"  verticalAlign="middle" editable="true" visible="true"
+							 width="100%" height="98%" tabIndex="4" id="Grd_Details" 
+							 doubleClickEnabled="true" doubleClick="Grd_Details_doubleClickHandler(event)">
+					<mx:columns>
+						<mx:DataGridColumn dataField="BookingCode" headerText="B.Code" editable="false"/>
+						<mx:DataGridColumn dataField="OccupancyLevel" headerText="Occupancy Level" editable="false"/>
+						<mx:DataGridColumn dataField="Guests" headerText="Guests" width="100" editable="false"/>
+						<mx:DataGridColumn dataField="Client" headerText="Client" editable="false"/>
+						<mx:DataGridColumn dataField="Property" headerText="Property" editable="false"/>
+						<mx:DataGridColumn dataField="BookingDate" headerText="Booking Date" editable="false"/>
+						<mx:DataGridColumn dataField="CheckInDate" headerText="CheckIn Date" editable="false"/>
+						<mx:DataGridColumn dataField="CheckOutDate" headerText="CheckOut Date" editable="false"/>
+						<mx:DataGridColumn dataField="Status" headerText="Status" editable="false"/>
+						<mx:DataGridColumn dataField="PaymentMode" headerText="PaymentMode" editable="false"/>
+						<mx:DataGridColumn dataField="BookingMode" headerText="Booking Mode" editable="false"/>
+						<mx:DataGridColumn dataField="TotalTariff" headerText="Tariff *" editable="false"/>
+					</mx:columns>
+				</mx:DataGrid>
+				<s:Label x="21" y="85" text="Status"/>
+				<s:DropDownList id="drp_Status" x="80" y="80.5" width="145" prompt="Select Status">
+					<mx:ArrayCollection>
+						<fx:String>All Status</fx:String>
+						<fx:String>Booked</fx:String>
+						<!--fx:String>Direct Booked</fx:String-->
+						<fx:String>Cancelled</fx:String>
+						<fx:String>CheckIn</fx:String>
+						<fx:String>CheckOut</fx:String>
+						<!--fx:String>No Show</fx:String-->
+					</mx:ArrayCollection>
+				</s:DropDownList>
+				<mx:DateField x="82" y="124.5" width="93" height="21" id="dt_From" tabIndex="16"
+							  selectableRange="{{rangeEnd: new Date()}}" formatString="DD/MM/YYYY" styleName="DisabledDateField" 
+							  yearNavigationEnabled="true" change="dt_From_changeHandler(event)"/>
+				<mx:DateField id="dt_To" x="237" y="123.5" selectableRange="{{rangeEnd: new Date()}}" formatString="DD/MM/YYYY"
+							  enabled="false"/>
+				<s:Label x="20" y="129" text="Date From"/>
+				<s:Label x="191" y="129" text="Date To"/>
+				<mx:HRule x="0" y="472" width="100%" strokeColor="#eb1c24" visible="false"/>
+				<s:VGroup x="0" y="165" width="100%" height="30" horizontalAlign="center">
+					<WrbComp:SaveControl id="SCtrl" x="231" y="490" docClear="FnClear()">
+					</WrbComp:SaveControl>
+				</s:VGroup>
+				<s:Label x="15" y="15" text="Search Booking" color="red"/>
+				<s:Button x="592" y="118" width="70" height="34" label="Search" click="Search()"/>
+				<WrbComp:Button_HB id="btn_Excel" x="697" y="119" width="88" click="ExportExcel(event)"
+								   Lable_val="Export To Excel">
+				</WrbComp:Button_HB>
+				<s:Image x="331" y="123.5" width="22" height="23"
+						 source="@Embed(source='../Assets/Warning2.png')"
+						 toolTip="Recommended to have 30 days search for quicker results"/>
+				<s:Label id="lbl" x="10" y="202" text="Last 30 Days Booking"/>
+				<s:Label x="318" y="85" text="Booking Code"/>
+				<s:TextInput id="txt_BookingCodes" x="417" y="81" width="220" prompt="123,456" maxChars="100"
+							 restrict="0-9,"/>
+				<s:Label x="320" y="41" text="Client Name"/>
+				<WrbHelpComp:HelpText id="hlp_ClientName" x="396" y="36" width="220" height="22" pxSetColumnsWidth="220,0"
+									  onselection="{Ddl_Client_changeHandler()}"  pxTabIndex="1" depth="100"
+									  pxSetPrompt="Select Client" >
+				</WrbHelpComp:HelpText>
+				<s:Label x="636" y="41" text="Guest Name"/>
+				<WrbHelpComp:HelpText id="hlp_Guest" x="719" y="36" width="184" height="22" pxSetColumnsWidth="220,0"
+									  onselection="{Ddl_Guest_changeHandler()}"  pxTabIndex="1" depth="10"
+									  pxSetPrompt="Select Guest" >
+				</WrbHelpComp:HelpText>
+				<s:Label x="762" y="203" text="* Approximate" color="red"/>
+				<s:BorderContainer x="87" y="15" width="751" height="515" id="bdr_Intermidiate" visible="false">
+					<s:Scroller x="0" y="0" width="749" height="513">
+						<s:VGroup width="100%" height="100%">
+							<s:Group width="727" height="187">
+								<s:BorderContainer x="2" y="1" width="725" height="186">
+									<mx:Label x="27" y="20" text="Booking Information" color="red"/>
+									<mx:Label x="29" y="54" text="Booking Code :"/>
+									<mx:Label x="29" y="95" text="Guest Name    :"/>
+									<mx:Label x="265" y="54"  text="CheckIn Date  :"/>
+									<mx:Label x="265" y="95" text="CheckOut Date :"/>
+									<mx:Label x="497" y="54"  text="Property         :"/>
+									<mx:Label x="497" y="95" text="Client Name :"/>
+									<s:TextInput x="122" y="55" id="Txt_BookingCode"/>
+									<s:TextInput x="122" y="95" id="Txt_GuestName"/>
+									<s:TextInput x="361" y="55" width="109" id="Txt_CheckIn"/>
+									<s:TextInput x="361" y="95" width="109" id="Txt_CheckOut"/>
+									<s:TextInput x="580" y="55" id="Txt_Property"/>
+									<s:TextInput x="580" y="95" id="Txt_Clientname"/>
+									<mx:Label x="88" y="133" text="Start Date :"/>
+									<mx:Label x="344" y="133" text="End Date :"/>
+									<mx:DateField x="414" y="132" id="Dt_CheckOutDate"/>
+									<mx:DateField x="174" y="132" width="117" id="Dt_Checkindate"/>
+									<WrbComp:Button_HB x="549" y="129" Lable_val="Process" click="button_hb1_clickHandler(event)">
+									</WrbComp:Button_HB>
+								</s:BorderContainer>
+							</s:Group>
+							
+						</s:VGroup>
+					</s:Scroller>
+				</s:BorderContainer>
+				
+				
+			</s:BorderContainer>
+		</s:HGroup>
+	</s:VGroup>
+	
+</s:Application>

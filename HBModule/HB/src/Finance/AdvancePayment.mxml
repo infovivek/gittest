@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   xmlns:WrbComp="WrbComp.*"
+			   width="100%" height="100%" creationComplete="PageLoad()"> 
+	<fx:Declarations>
+		<s:Animate id="fader"
+				   duration="500"
+				   repeatBehavior="reverse"
+				   repeatCount="0">
+			<s:SimpleMotionPath property="alpha"
+								valueFrom="1.0" valueTo="0.0" />
+		</s:Animate>
+		<s:Animate id="fader1"
+				   duration="0"
+				   repeatBehavior="reverse"
+				   repeatCount="0">
+			<s:SimpleMotionPath property="alpha"
+								valueFrom="1.0" valueTo="0.0" />
+		</s:Animate>
+	</fx:Declarations> 
+	<fx:Style source="..\\Common\\ApplicationCSS.css" />
+	<fx:Script source="..\\Common\\CommonScript.as" />
+	<fx:Script source="..\\Common\\Functions.as"/>
+	<fx:Script>
+		<![CDATA[
+			import WrbComp.frmsearchwindow;
+			
+			import spark.events.IndexChangeEvent;
+			public var VendorId:Number=0;
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "";
+			public var Ac:ArrayCollection=new ArrayCollection();
+			public var Help_AC:ArrayCollection=new ArrayCollection();
+			public var ErrorFlag:Boolean=true;			
+			public var Id:Number=0;
+			private var SearchPopUp:frmsearchwindow = new frmsearchwindow();
+			public function PageLoad():void
+			{
+				Global_AC = funLoginInfo("<gScrId>1</gScrId><gUsrFk>1</gUsrFk>");				
+				GlobalXml = "";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";	
+				SCtl.setButtonRights("Delete",true);
+				Help();	
+				DDChange();
+			}
+			public function Help():void
+			{
+				useWeb("MapPOAndVendor","Property_CUSTOM", [GlobalXml, "Property",0, "","","",0]);
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				{
+					
+					
+					if (Id==0)
+					{
+						alignAlert(Alert.show("Advance Saved Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+					}
+					else
+					{
+						alignAlert(Alert.show("Advance Updated Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+					}
+					
+					Clear();
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Property_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Hlp_Vendor.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+					else
+					{
+						Help_AC=new ArrayCollection();
+						Hlp_Vendor.dataProvider=Help_AC;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Search_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Hlp_Vendor.text=Ds_Objects.result.Tables.Table.Rows[0].PropertyName;						
+						VendorId=Ds_Objects.result.Tables.Table.Rows[0].PropertyId;
+						txt_AdvanceAmount.text=Ds_Objects.result.Tables.Table.Rows[0].AdvanceAmount;
+						dt_DateofPayment.text=Ds_Objects.result.Tables.Table.Rows[0].DateofPayment;
+						txt_Comments.text=Ds_Objects.result.Tables.Table.Rows[0].Comments;	
+						
+						txt_BankName.text=Ds_Objects.result.Tables.Table.Rows[0].BankName;							
+						txt_ChequeNumber.text=Ds_Objects.result.Tables.Table.Rows[0].ChequeNumber;								
+						dt_Issuedate.text=Ds_Objects.result.Tables.Table.Rows[0].IssueDate;					
+						Id=Ds_Objects.result.Tables.Table.Rows[0].Id;
+						DD_PaymentMode.enabled=false;
+						if(Ds_Objects.result.Tables.Table.Rows[0].PaymentMode=="Cash")
+						{
+							DD_PaymentMode.selectedIndex=1;
+						}
+						if(Ds_Objects.result.Tables.Table.Rows[0].PaymentMode=="Cheque")
+						{
+							DD_PaymentMode.selectedIndex=2;
+						}
+						if(Ds_Objects.result.Tables.Table.Rows[0].PaymentMode=="NEFT")
+						{
+							DD_PaymentMode.selectedIndex=3;
+						}						
+						if(DD_PaymentMode.selectedIndex==1)
+						{
+							lbl_IssuedBy.text="Issued By";
+							lbl_IssuedBy.visible=true;	
+							txt_ChequeNumber.visible=true;
+							lbl_StarIssue.visible=true;
+							lbl_StarIssue.x= 484;
+							
+						}
+						if(DD_PaymentMode.selectedIndex==2)
+						{
+							lbl_IssuedBy.text="Cheque Number";
+							
+							lbl_DateIssued.text="Date Issued"; 
+							lbl_DateIssued.visible=true;
+							dt_Issuedate.visible=true;
+							txt_ChequeNumber.visible=true;
+							txt_BankName.visible=true;
+							lbl_BankName.visible=true;
+							lbl_IssuedBy.visible=true;
+							lbl_StarIssue.visible=true;
+							lbl_StarIssue.x= 519;
+							lbl_StarIssuedat.visible=true;
+							lbl_StarIssuedat.x= 496;
+							lbl_StarBankName.visible=true;
+						}
+						if(DD_PaymentMode.selectedIndex==3)
+						{
+							lbl_IssuedBy.text="Reference Number";
+							lbl_DateIssued.text="Date of NEFT"; 
+							lbl_DateIssued.visible=true;
+							dt_Issuedate.visible=true;
+							txt_ChequeNumber.visible=true;
+							txt_BankName.visible=true;
+							lbl_BankName.visible=true;
+							lbl_IssuedBy.visible=true;
+							lbl_StarIssue.visible=true;
+							lbl_StarIssue.x= 533;
+							lbl_StarIssuedat.visible=true;
+							lbl_StarIssuedat.x= 502;
+							lbl_StarBankName.visible=true;
+						}
+					}
+				}
+				
+			}			
+			protected function DDChange():void
+			{
+				lbl_DateIssued.visible=false;
+				lbl_IssuedBy.visible=false;
+				lbl_StarIssue.visible=false;
+				lbl_StarIssuedat.visible=false;
+				lbl_StarBankName.visible=false;
+				lbl_BankName.visible=false;
+				dt_Issuedate.visible=false;					
+				txt_ChequeNumber.visible=false;
+				txt_BankName.visible=false;
+				dt_Issuedate.text="";				
+				txt_ChequeNumber.text="";
+				txt_BankName.text="";
+				Change('lbl_PaymentMode')
+				if(DD_PaymentMode.selectedIndex==1)
+				{
+					lbl_IssuedBy.text="Issued By";
+					lbl_IssuedBy.visible=true;	
+					txt_ChequeNumber.visible=true;
+					lbl_StarIssue.visible=true;
+					lbl_StarIssue.x= 484;
+					
+				}
+				if(DD_PaymentMode.selectedIndex==2)
+				{
+					lbl_IssuedBy.text="Cheque Number";
+					
+					lbl_DateIssued.text="Date Issued"; 
+					lbl_DateIssued.visible=true;
+					dt_Issuedate.visible=true;
+					txt_ChequeNumber.visible=true;
+					txt_BankName.visible=true;
+					lbl_BankName.visible=true;
+					lbl_IssuedBy.visible=true;
+					lbl_StarIssue.visible=true;
+					lbl_StarIssue.x= 519;
+					lbl_StarIssuedat.visible=true;
+					lbl_StarIssuedat.x= 496;
+					lbl_StarBankName.visible=true;
+				}
+				if(DD_PaymentMode.selectedIndex==3)
+				{
+					lbl_IssuedBy.text="Reference Number";
+					lbl_DateIssued.text="Date of NEFT"; 
+					lbl_DateIssued.visible=true;
+					dt_Issuedate.visible=true;
+					txt_ChequeNumber.visible=true;
+					txt_BankName.visible=true;
+					lbl_BankName.visible=true;
+					lbl_IssuedBy.visible=true;
+					lbl_StarIssue.visible=true;
+					lbl_StarIssue.x= 533;
+					lbl_StarIssuedat.visible=true;
+					lbl_StarIssuedat.x= 502;
+					lbl_StarBankName.visible=true;
+				}
+			}
+			public function Clear():void
+			{
+				Hlp_Vendor.text="";
+				txt_AdvanceAmount.text="";
+				dt_DateofPayment.text="";
+				txt_Comments.text="";				
+				DD_PaymentMode.selectedIndex=0;
+				DD_PaymentMode.enabled=true;
+				Change('lbl_Vendor')
+				Change('lbl_AdvanceAmount')
+				Change('lbl_DateofPayment')
+				Change('lbl_IssuedBy')
+				Change('lbl_DateIssued')
+				Change('lbl_BankName')
+				DDChange();
+			}
+			public function Save():void
+			{
+				ErrorFlag=true;				
+				if(Hlp_Vendor.text=="")
+				{
+					fader.target=lbl_Vendor;				
+					fader.play();					
+					lbl_Vendor.setStyle("color","red");					
+					ErrorFlag=false;
+				}
+				else
+				{
+					Change('lbl_Vendor')
+				}
+				if(txt_AdvanceAmount.text=="")
+				{
+					fader.target=lbl_AdvanceAmount;				
+					fader.play();
+					lbl_AdvanceAmount.setStyle("color","red");
+					ErrorFlag=false;
+				}
+				else
+				{
+					Change('lbl_AdvanceAmount')
+				}
+				if(dt_DateofPayment.text=="")
+				{
+					fader.target=lbl_DateofPayment;				
+					fader.play();
+					lbl_DateofPayment.setStyle("color","red");
+					ErrorFlag=false;
+				}
+				else
+				{
+					Change('lbl_DateofPayment')
+				}
+				if(DD_PaymentMode.selectedIndex==0)
+				{
+					fader.target=lbl_PaymentMode;				
+					fader.play();
+					lbl_PaymentMode.setStyle("color","red");
+					ErrorFlag=false;
+				}
+				else
+				{
+					if(DD_PaymentMode.selectedIndex==1)
+					{
+						if(txt_ChequeNumber.text=="")
+						{
+							fader.target=lbl_IssuedBy;				
+							fader.play();
+							lbl_IssuedBy.setStyle("color","red");
+							ErrorFlag=false;
+						}
+						else
+						{
+							Change('lbl_IssuedBy')
+						}
+						
+					}
+					else
+					{
+						if(txt_ChequeNumber.text=="")
+						{
+							fader.target=lbl_IssuedBy;				
+							fader.play();
+							lbl_IssuedBy.setStyle("color","red");
+							ErrorFlag=false;
+						}
+						else
+						{
+							Change('lbl_IssuedBy')
+						}
+						
+						if(dt_Issuedate.text=="")
+						{
+							fader.target=lbl_DateIssued;				
+							fader.play();
+							lbl_DateIssued.setStyle("color","red");
+							ErrorFlag=false;
+						}
+						else
+						{
+							Change('lbl_DateIssued')
+						}
+						if(txt_BankName.text=="")
+						{
+							fader.target=lbl_BankName;				
+							fader.play();
+							lbl_BankName.setStyle("color","red");
+							ErrorFlag=false;
+						}
+						else
+						{
+							Change('lbl_BankName')
+						}
+						
+					}
+				}
+				
+				if(ErrorFlag==true)
+				{	
+					
+					
+					var Ac:ArrayCollection=new ArrayCollection
+						([{
+							Property:Hlp_Vendor.text,
+							PropertyId:VendorId,
+							AdvanceAmount:txt_AdvanceAmount.text,
+							DateofPayment:dt_DateofPayment.text,
+							Comments:txt_Comments.text,	
+							PaymentMode:DD_PaymentMode.selectedItem,
+							BankName:txt_BankName.text,							
+							ChequeNumber:txt_ChequeNumber.text,								
+							Issuedate:dt_Issuedate.text,						
+							Id:Id
+						}]);
+					
+					var HdrXml:String="";					
+					HdrXml += ObjToXmlStr_Comm(Ac,"HdrXml")					
+					
+					
+					
+					
+					useWeb("VendorAdvancePayment","Save_CUSTOM", [GlobalXml,HdrXml]);									
+				}
+			}
+			public function Search():void
+			{
+				
+				PopUpManager.addPopUp( SearchPopUp , this, true);
+				SearchPopUp.Prc_name="VendorAdvancePayment";
+				var SearchParam:Array =new Array();
+				SearchPopUp.HlpIndex="SEARCH";
+				SearchParam[0]=GlobalXml;
+				SearchParam[1]=0;
+				SearchParam[2]=0;	
+				SearchParam[3]=0;	
+				SearchPopUp.Prc_Param=SearchParam;
+				SearchPopUp.HlpSrchGlobal="";
+				SearchPopUp.dataPanel.focusEnabled=true;
+				SearchPopUp.Pageint();					
+				SearchPopUp.addEventListener("PopupEnter",funpopupEnter);
+				SearchPopUp.addEventListener("PopupClose",funpopupClose);
+				PopUpManager.centerPopUp(SearchPopUp);
+			}
+			private function funpopupClose(event:Event):void
+			{
+				
+			}
+			private function funpopupEnter(event:Event):void
+			{				
+				SearchDtls(SearchPopUp.SelectRow.Id,0);			
+			}
+			private function SearchDtls(Id:int,_PrdFk:int):void
+			{ 
+				var Load:Array =new Array();
+				Load[0]=GlobalXml; Load[1]=Id;Load[2]="",Load[3]=0;    
+				useWeb("VendorAdvancePayment","Search_CUSTOM",Load);
+			}
+			public function Change(LabelName:String):void
+			{
+				
+				fader1.target=this[LabelName];				
+				fader1.play();					
+				this[LabelName].setStyle("color","#565454");
+			}
+			public function fnGetProperty():void
+			{
+				if(Hlp_Vendor.selected())
+				{
+					Hlp_Vendor.text=Hlp_Vendor.Select_Row.PropertyName
+					VendorId=Hlp_Vendor.Select_Row.ZId
+					txt_AdvanceAmount.setFocus();					
+					Change('lbl_Vendor');	
+				}
+				else
+				{
+					Hlp_Vendor.text="";
+					VendorId=0;
+					
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	<s:VGroup x="0" y="0" width="100%" height="100%" verticalAlign="middle" horizontalAlign="center" >
+		<s:BorderContainer x="75" y="132" width="806" height="260" borderVisible="false">
+			<mx:Label x="14" y="46" text="Vendor" id="lbl_Vendor"/>
+			<mx:Label x="57" y="40" width="17" height="21" color="red" fontSize="15" text="*"/>
+			<mx:Label x="519" y="83" width="17" height="21" color="red" fontSize="15" text="*" id="lbl_StarIssue"/>
+			<mx:Label x="509" y="43" width="17" height="21" color="red" fontSize="15" text="*" id="lbl_StarIssue0"/>
+			<mx:Label x="502" y="128" width="17" height="21" color="red" fontSize="15" text="*" id="lbl_StarIssuedat"/>
+			<mx:Label x="492" y="174" width="17" height="21" color="red" fontSize="15" text="*" id="lbl_StarBankName"/>
+			<mx:Label x="108" y="80" width="17" height="21" color="red" fontSize="15" text="*"/>
+			<mx:Label x="107" y="127" width="17" height="21" color="red" fontSize="15" text="*"/>
+			<mx:Label x="14" y="90" text="Advance Amount " id="lbl_AdvanceAmount"/>
+			<mx:Label x="14" y="135" text="Date of Payment" id="lbl_DateofPayment"/>
+			<mx:Label x="14" y="179" text="Comments"/>
+			<mx:Label x="424" y="179" text="Bank Name" id="lbl_BankName"/>
+			<mx:Label x="424" y="135" text="Date of NEFT" id="lbl_DateIssued"/>
+			<mx:Label x="424" y="90" text="Cheque Number" id="lbl_IssuedBy"/>
+			<mx:Label x="424" y="46" text="Payment Mode" id="lbl_PaymentMode"/>
+			<WrbHelpComp:HelpText x="139" y="46.5" width="243" id="Hlp_Vendor" pxTabIndex="1" depth="10" pxSetColumnsWidth="300,0" onselection="{fnGetProperty()}">
+			</WrbHelpComp:HelpText>
+			<s:TextArea x="139" y="185" width="243" height="62" tabIndex="4" id="txt_Comments"/>
+			<s:TextInput x="139" y="90.5" width="243" id="txt_AdvanceAmount" textAlign="right" tabIndex="2" restrict="0-9." focusOut="Change('lbl_AdvanceAmount')"/>
+			<s:TextInput x="548" y="90.5" width="243" id="txt_ChequeNumber" tabIndex="7" focusOut="Change('lbl_IssuedBy')"/>
+			<s:TextInput x="548" y="179.5" width="243" tabIndex="9" id="txt_BankName" focusOut="Change('lbl_BankName')"/>
+			<mx:DateField x="139" y="134" id="dt_DateofPayment" tabIndex="3" formatString="DD/MM/YYYY" change="Change('lbl_DateofPayment')"/>
+			<mx:DateField x="548" y="134" id="dt_Issuedate" tabIndex="8" formatString="DD/MM/YYYY" change="Change('lbl_DateIssued')"/>			
+			<s:DropDownList id="DD_PaymentMode" x="548" y="46" width="115"
+							change="DDChange()" selectedIndex="0" tabIndex="5">
+				<mx:ArrayCollection> 
+					<fx:String>Please Select</fx:String> 
+					<fx:String>Cash</fx:String> 
+					<fx:String>Cheque</fx:String>
+					<fx:String>NEFT</fx:String>
+				</mx:ArrayCollection>
+			</s:DropDownList>
+		</s:BorderContainer>
+		<WrbComp:SaveControl id="SCtl" doSearch="Search()" docClear="Clear()" docSave="Save()" docRefresh="Help()">
+		</WrbComp:SaveControl>
+	</s:VGroup>
+</s:Application>

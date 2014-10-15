@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<!-- printing\myComponents\FormPrintView.mxml -->
+<mx:VBox xmlns:fx="http://ns.adobe.com/mxml/2009"
+		 xmlns:s="library://ns.adobe.com/flex/spark"
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:MyComp="myComponents.*"
+		 xmlns:WrbComp="WrbComp.*"
+		 width="691" height="266" backgroundColor="#FFFFFF" paddingBottom="50" paddingLeft="50"
+		 paddingTop="50">
+	<fx:Script>
+		<![CDATA[
+			import mx.core.*
+				
+				// Declare and initialize the variables used in the component.
+				// The application sets the actual prodTotal value.
+				//[Bindable]
+			public var pageNumber:Number = 1;
+			//[Bindable]
+			public var prodTotal:Number = 0;
+			//[Bindable]
+			public var BranchName:String = "";
+			
+			// Control the page contents by selectively hiding the header and
+			// footer based on the page type.
+			public function showPage(pageType:String):void 
+			{
+				if(pageType == "first" || pageType == "middle") 
+				{
+					// Hide the footer.
+					footer.includeInLayout=false;
+					footer.visible = false;
+				}
+				if(pageType == "middle" || pageType == "last") 
+				{
+					// The header won't be used again; hide it.
+					header.includeInLayout=false;
+					header.visible = false;
+				}
+				if(pageType == "last") {
+					// Show the footer.
+					footer.includeInLayout=true;
+					footer.visible = true;
+				}
+				//Update the DataGrid layout to reflect the results.
+				validateNow();
+			}
+		]]>
+	</fx:Script>
+	
+	<!-- The template for the printed page, 
+	with the contents for all pages. -->
+	<s:HGroup width="527" height="111">
+		<s:BorderContainer width="121" height="109" borderVisible="true">		
+			<s:Image width="100" height="100" source="@Embed(source='../Assets/HB_Logo_New.png')"/>
+		</s:BorderContainer>
+		<s:BorderContainer width="395" height="109" borderVisible="true">
+			<s:Label x="110" y="40" text="HummingBird India Pvt Ltd"/>
+			<s:Label x="134" y="60" text="PettyCashReport"/>
+		</s:BorderContainer>
+			
+		
+	</s:HGroup>
+	
+	<WrbComp:FormPrintHeader id="header" visible="false"/>
+	<s:HGroup width="524">
+		<mx:Label width="174" text="UserName" textAlign="center" fontSize="11" color="#091b34"/>
+		<mx:Label width="183" text="RequestedAmount" textAlign="center" fontSize="11" color="#091b34"/>
+		<mx:Label width="149" text="TransferredAmount" textAlign="center" fontSize="11" color="#091b34"/>
+	</s:HGroup>
+	<mx:PrintDataGrid id="myDataGrid" width="516" height="1" showHeaders="false">
+		<!-- Specify the columns to ensure that their order is correct. -->
+		<mx:columns>
+			<mx:DataGridColumn dataField="UserName" />
+			<mx:DataGridColumn dataField="RequestedAmount" />
+			<mx:DataGridColumn dataField="TransferredAmount" />
+			<mx:DataGridColumn dataField="EmployeeId" visible="false" />
+			<mx:DataGridColumn dataField="Id"  visible="false"/>
+		</mx:columns>
+	</mx:PrintDataGrid>
+	<WrbComp:FormPrintFooter id="footer" width="524" pTotal="{prodTotal}" visible="false"/>
+	
+	<!-- The sizeToPage property is true by default, so the last
+	page has only as many grid rows as are needed for the data. -->
+	
+	
+	<!-- Create a FormPrintFooter control 
+	and set its prodTotal variable. -->
+</mx:VBox>

@@ -1,0 +1,2523 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:WrbComp="WrbComp.*"
+			   xmlns:Controls="fx.com.adobe.Controls.*"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   width="100%" height="100%"
+			   creationComplete="Application_creationCompleteHandler(event)"
+			   pageTitle="Client Management">
+	<fx:Declarations>
+		<s:RadioButtonGroup id="Mode" change="Mode_changeHandler()"/>
+		<mx:EmailValidator id="EmailValidator" invalid="EmailValidator_invalidHandler(event)"
+						   valid="EmailValidator_validHandler(event)"/>
+		<mx:EmailValidator id="EmailValidator1" invalid="EmailValidator1_invalidHandler(event)"
+						   valid="EmailValidator1_validHandler(event)"/>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
+	<fx:Script>
+		<![CDATA[
+			import WrbComp.frmsearchwindow;
+			
+			import WrbHelpComp.HlpGridHdr;
+			
+			import flash.net.FileReference;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.events.IndexChangedEvent;
+			import mx.graphics.codec.PNGEncoder;
+			
+			import spark.events.IndexChangeEvent;
+			import spark.events.TextOperationEvent;
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "";
+			public var MasterClientId:int=0,SalesExecutiveId:int=0,CRMId:int=0,KeyAccountPersonId:int=0;
+			public var Id:int=0;
+			public var ClientId:int=0;
+			public var ClientLogo:String="";
+			private var SearchPopUp:frmsearchwindow = new frmsearchwindow();
+			public var Ac_State:ArrayCollection=new ArrayCollection();
+			public var ImageCount:Number=0;
+			//Image Upload
+			private var fileRef:FileReference = new FileReference();
+			private var fileTypes:Array = new Array();
+			
+			//setup the filters (types of files to be browsed)
+			
+			private var imageTypes:FileFilter = new FileFilter("Images (*.jpg; *.jpeg; *.gif; *.png)" ,"*.jpg; *.jpeg; *.gif; *.png");
+			private var documentTypes:FileFilter = new FileFilter("Documents (*.pdf), (*.doc), (*.rtf), (*.txt)",("*.pdf; *.doc; *.rtf, *.txt"));
+			
+			// Set Up URLRequest
+			[Bindable]
+			private var arrColl:ArrayCollection;
+			
+			/* URL of the file to download. */
+			private var FILE_URL:String = "";
+			
+			
+			private var urlReq:URLRequest;
+			
+			public var uploadURL:URLRequest = new URLRequest();
+			protected function Application_creationCompleteHandler(event:FlexEvent):void
+			{
+				Brd_imageUpload.visible=false;
+				Grd_AddNewClient._clear();Grd_ClntGuest._clear();Grd_CustomField._clear();
+				Grp_PhoneNo.visible=false;Grp_ClientContacts.visible=false;Grp_ClientGuest.visible=false;
+				Grp_CustomField.visible=false;Rdb_DirectPay.selected=true;Mode_changeHandler();
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";
+				FnHelp();FnHelp_FieldValue();FnHelp_Title();FnHelp_State();	
+				SCtrl.setButtonRights("Refresh",true);
+				drp_MasterClient.text="";
+				drp_CCountry.selectedItem="India";drp_changeHandler1();
+				drp_BCountry.selectedItem="India";drp_changeHandler2();
+			}		
+			
+			protected function FnHelp_ContactType():void
+			{
+				var Tmp:ArrayCollection=new ArrayCollection
+					([{Action:GlobalXml,Param1:"CONTACTTYPELOAD",Param2:0,Param3:0,prcName:"ClientManagement",
+					   ctrlName:"hlpEscalationLevel",grdWidth:"0,108"}]);				
+				Grd_AddNewClient._bindHlpTextData(Tmp);
+				Tmp=new ArrayCollection();
+			}
+			
+			protected function FnHelp_Title():void
+			{
+				var Tmp:ArrayCollection=new ArrayCollection
+					([{Action:GlobalXml,Param1:"TITLELOAD",Param2:0,Param3:0,prcName:"ClientManagement",
+						ctrlName:"hlpTitle",grdWidth:"48"}]);				
+				Grd_AddNewClient._bindHlpTextData(Tmp);
+				Tmp=new ArrayCollection();
+			}
+						
+			protected function FnHelp_FieldValue():void
+			{
+				var Tmp:ArrayCollection=new ArrayCollection
+					([{Action:GlobalXml,Param1:"FIELDTYPELOAD",Param2:0,Param3:0,prcName:"ClientManagement",
+						ctrlName:"hlpFieldType",grdWidth:"98"}]);				
+				Grd_CustomField._bindHlpTextData(Tmp);
+				Tmp=new ArrayCollection();
+			}
+			protected function FnHelp_State():void
+			{
+				useWeb("ClientManagement","STATE_CUSTOM",[GlobalXml,'STATELOAD',0,0]);
+			}
+			
+			protected function FnHelp_State_Billing():void
+			{
+				useWeb("ClientManagement","BSTATE_CUSTOM",[GlobalXml,'STATELOAD',0,0]);
+			}
+			
+			protected function FnHelp():void
+			{
+				useWeb("ClientManagement","PAGELOAD_CUSTOM",[GlobalXml,'PAGELOAD',0,0]);
+			}
+			protected function FnHelp_Delete():void
+			{
+				useWeb("ClientManagement","Delete_NEWCUSTOM",[GlobalXml,'MODELDELETE',0,0]);
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void				
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "PAGELOAD_CUSTOM")
+				{
+					drp_MasterClient.dataProvider=null;
+					Ddl_SalesExecutive.dataProvider=null;Ddl_SalesExecutive.prompt="Select Sales Executive";
+					Ddl_CRM.dataProvider=null;Ddl_CRM.prompt="Select C R M";
+					Ddl_KeyAccountPerson.dataProvider=null;Ddl_KeyAccountPerson.prompt="Select Key  Account  Person";
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						drp_MasterClient.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Ddl_SalesExecutive.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+					if (Ds_Objects.result.Tables.Table2.Rows.length > 0)
+					{
+						Ddl_CRM.dataProvider=Ds_Objects.result.Tables.Table2.Rows as ArrayCollection;
+					}
+					if (Ds_Objects.result.Tables.Table3.Rows.length > 0)
+					{
+						Ddl_KeyAccountPerson.dataProvider=Ds_Objects.result.Tables.Table3.Rows as ArrayCollection;
+					}					
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				{
+					
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				{
+					
+					if(Save_String=="ClientManagement")
+					{
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{						
+							ClientId=Ds_Objects.result.Tables.Table.Rows[0].Id
+							Id=Ds_Objects.result.Tables.Table.Rows[0].Id
+								
+						}
+						if(Save_Flag==true)
+						{
+							if(FilePath.text!="")
+							{
+								init();	
+								uploadFiles();
+							}					
+							if (Id == 0)
+							{
+								alignAlert(Alert.show("Client Added Successfully.","Message !",Alert.OK, 
+									null, null, iconTickLarge, Alert.OK),10,"");
+							}
+							else
+							{
+								alignAlert(Alert.show("Client Updated Successfully.","Message !",Alert.OK, 
+									null, null, iconTickLarge, Alert.OK),10,"");
+							}
+							SCtrl_docClearHandler();
+						}
+					}
+					else
+					{
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{						
+							Grd_ClntGuest._setGridSrc=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						}
+					}
+					
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "STATE_CUSTOM")
+				{
+					drp_CState.dataProvider=null;//drp_CState.prompt="Select State";
+					drp_BState.dataProvider=null;//drp_BState.prompt="Select State";
+					Ac_State=new ArrayCollection();
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						drp_CState.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						drp_BState.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						Ac_State=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "BSTATE_CUSTOM")
+				{
+					drp_BState.dataProvider=null;//drp_BState.prompt="Select State";
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						drp_BState.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "CCITY_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						drp_CCity.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+					FnChange();
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "BCITY_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						drp_BCity.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}	
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "CLOCALITY_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						drp_CLocality.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+					FnChange();
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "BLOCALITY_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						drp_BLocality.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "MasterClientAddress_CUSTOM")
+				{
+						
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						if(drp_CCountry.selectedItem == "India")
+						{
+							drp_CState.visible=true;
+							drp_CCity.visible=true;
+							drp_CLocality.visible=true;
+							txt_InCCountry.visible=false;
+							Txt_CState.visible=false;
+							Txt_CCity.visible=false;
+							Txt_CLocality.visible=false;
+							
+							//drp_BState.dataProvider=drp_CState.dataProvider as ArrayCollection;
+							//drp_BCity.dataProvider=drp_CCity.dataProvider as ArrayCollection;
+							//drp_BLocality.dataProvider=drp_CLocality.dataProvider as ArrayCollection;
+							
+							drp_CCountry.selectedItem=Ds_Objects.result.Tables.Table.Rows[0].CCId;						
+							drp_CState.text=Ds_Objects.result.Tables.Table.Rows[0].SId;
+							drp_CCity.text=Ds_Objects.result.Tables.Table.Rows[0].CId;
+							drp_CLocality.text=Ds_Objects.result.Tables.Table.Rows[0].LId;
+							Txt_CAddress1.text=Ds_Objects.result.Tables.Table.Rows[0].CAId;
+							Txt_CAddress2.text=Ds_Objects.result.Tables.Table.Rows[0].CA2Id;
+							Txt_CPincode.text=Ds_Objects.result.Tables.Table.Rows[0].PId;
+						}
+						if(drp_CCountry.selectedItem == "International")
+						{
+							drp_CState.visible=false;
+							drp_CCity.visible=false;
+							drp_CLocality.visible=false;
+							txt_InCCountry.visible=true;
+							Txt_CState.visible=true;
+							Txt_CCity.visible=true;
+							Txt_CLocality.visible=true;
+							drp_CState.dataProvider=null;
+							drp_CCity.dataProvider=null;
+							drp_CLocality.dataProvider=null;
+							drp_CCountry.selectedItem=Ds_Objects.result.Tables.Table.Rows[0].CCId;	
+							txt_InCCountry.text=Ds_Objects.result.Tables.Table.Rows[0].CName;	
+							Txt_CState.text=Ds_Objects.result.Tables.Table.Rows[0].SId;
+							Txt_CCity.text=Ds_Objects.result.Tables.Table.Rows[0].CId;
+							Txt_CLocality.text=Ds_Objects.result.Tables.Table.Rows[0].LId;
+							Txt_CAddress1.text=Ds_Objects.result.Tables.Table.Rows[0].CAId;
+							Txt_CAddress2.text=Ds_Objects.result.Tables.Table.Rows[0].CA2Id;
+							Txt_CPincode.text=Ds_Objects.result.Tables.Table.Rows[0].PId;
+							
+						}
+					}
+					else
+					{
+						Txt_CAddress1.text="";Txt_CAddress2.text="";drp_CCountry.selectedItem="India";
+						Txt_CState.text="";Txt_CCity.text="";Txt_CLocality.text="";Txt_CPincode.text="";
+						drp_CState.text="";
+						drp_CCity.text="";
+						drp_CLocality.text="";
+						Txt_CState.text="";
+						Txt_CCity.text="";
+						Txt_CLocality.text="";
+						//drp_BState.prompt="Select State";drp_BCity.prompt="Select City";
+						//drp_BLocality.prompt="Select Locality";
+						//drp_changeHandler2();
+					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						drp_CState.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+					
+				}
+				
+				if (Ds_Objects.currentTarget.description.toString() == "Search_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Txt_ClientName.text=Ds_Objects.result.Tables.Table.Rows[0].ClientName;
+						Txt_CAddress1.text=Ds_Objects.result.Tables.Table.Rows[0].CAddress1;
+						Txt_CAddress2.text=Ds_Objects.result.Tables.Table.Rows[0].CAddress2;
+						drp_CCountry.selectedItem=Ds_Objects.result.Tables.Table.Rows[0].CCountry;
+						drp_BCountry.selectedItem=Ds_Objects.result.Tables.Table.Rows[0].BCountry;
+						if(drp_CCountry.selectedItem == "India")
+						{							
+							drp_CState.visible=true;drp_CCity.visible=true;drp_CLocality.visible=true;
+							txt_InCCountry.visible=false;Txt_CState.visible=false;Txt_CCity.visible=false;
+							Txt_CLocality.visible=false;drp_CState.tabIndex=5;drp_CCity.tabIndex=6;
+							drp_CLocality.tabIndex=7;txt_InCCountry.tabIndex=0;Txt_CState.tabIndex=0;
+							Txt_CCity.tabIndex=0;Txt_CLocality.tabIndex=0;							
+							//drp_CState.prompt=Ds_Objects.result.Tables.Table.Rows[0].CState;
+							//drp_CCity.prompt=Ds_Objects.result.Tables.Table.Rows[0].CCity;
+							//drp_CLocality.prompt=Ds_Objects.result.Tables.Table.Rows[0].CLocality;
+							drp_CState.text=Ds_Objects.result.Tables.Table.Rows[0].CState;
+							drp_CCity.text=Ds_Objects.result.Tables.Table.Rows[0].CCity;
+							drp_CLocality.text=Ds_Objects.result.Tables.Table.Rows[0].CLocality;
+						}
+						else 
+						{
+							txt_InCCountry.visible=true;Txt_CState.visible=true;Txt_CCity.visible=true;
+							Txt_CLocality.visible=true;drp_CState.visible=false;drp_CCity.visible=false;
+							drp_CLocality.visible=false;drp_CState.tabIndex=0;drp_CCity.tabIndex=0;
+							drp_CLocality.tabIndex=0;txt_InCCountry.tabIndex=5;Txt_CState.tabIndex=6;
+							Txt_CCity.tabIndex=7;Txt_CLocality.tabIndex=8;
+							txt_InCCountry.text=Ds_Objects.result.Tables.Table.Rows[0].InCCountry;
+							Txt_CLocality.text=Ds_Objects.result.Tables.Table.Rows[0].CLocality;
+							Txt_CCity.text=Ds_Objects.result.Tables.Table.Rows[0].CCity;
+							Txt_CState.text=Ds_Objects.result.Tables.Table.Rows[0].CState;
+						}
+						if(drp_BCountry.selectedItem == "India")
+						{
+							drp_BState.text=Ds_Objects.result.Tables.Table.Rows[0].BState;
+							drp_BCity.text=Ds_Objects.result.Tables.Table.Rows[0].BCity;
+							drp_BLocality.text=Ds_Objects.result.Tables.Table.Rows[0].BLocality;
+							//drp_BState.prompt=Ds_Objects.result.Tables.Table.Rows[0].BState;
+							//drp_BCity.prompt=Ds_Objects.result.Tables.Table.Rows[0].BCity;
+							//drp_BLocality.prompt=Ds_Objects.result.Tables.Table.Rows[0].BLocality;
+							txt_InBCountry.visible=false;Txt_BState.visible=false;Txt_BCity.visible=false;
+							Txt_BLocality.visible=false;drp_BState.visible=true;drp_BCity.visible=true;
+							drp_BLocality.visible=true;txt_InBCountry.visible=false;Txt_BState.visible=false;
+							Txt_BCity.visible=false;Txt_BLocality.visible=false;drp_BState.tabIndex=20;
+							drp_BCity.tabIndex=21;drp_BLocality.tabIndex=22;txt_InBCountry.tabIndex=0;
+							Txt_BState.tabIndex=0;Txt_BCity.tabIndex=0;Txt_BLocality.tabIndex=0;
+						}
+						else
+						{
+							txt_InBCountry.text=Ds_Objects.result.Tables.Table.Rows[0].InBCountry;
+							Txt_BCity.text=Ds_Objects.result.Tables.Table.Rows[0].BCity;
+							Txt_BState.text=Ds_Objects.result.Tables.Table.Rows[0].BState;
+							Txt_BLocality.text=Ds_Objects.result.Tables.Table.Rows[0].BLocality;
+							txt_InBCountry.visible=true;Txt_BState.visible=true;Txt_BCity.visible=true;
+							Txt_BLocality.visible=true;drp_BState.visible=false;drp_BCity.visible=false;
+							drp_BLocality.visible=false;drp_BState.tabIndex=0;drp_BCity.tabIndex=0;
+							drp_BLocality.tabIndex=0;txt_InBCountry.tabIndex=20;Txt_BState.tabIndex=21;
+							Txt_BCity.tabIndex=22;Txt_BLocality.tabIndex=23;
+						}
+						Txt_CPincode.text=Ds_Objects.result.Tables.Table.Rows[0].CPincode;
+						//
+						Rdb_DirectPay.selected=Ds_Objects.result.Tables.Table.Rows[0].DirectPay;
+						Rdb_BTC.selected=Ds_Objects.result.Tables.Table.Rows[0].BTC;
+						Mode_changeHandler();
+						//
+						Txt_CreditLimit.text=Ds_Objects.result.Tables.Table.Rows[0].CreditLimit;
+						var CdtNo:String="",CdtPrd:String="";
+						if(Ds_Objects.result.Tables.Table.Rows[0].CreditPeriod=="")
+						{
+							Ddl_CreditPeriod.selectedItem=="Select";
+						}
+						else
+						{
+							Ddl_CreditPeriod.selectedItem=Ds_Objects.result.Tables.Table.Rows[0].CreditPeriod;
+						}
+						if(Ds_Objects.result.Tables.Table.Rows[0].CreditPeriodNumber=="")
+						{
+							Ddl_CreditPeriodNumber.selectedItem=="Select";
+						}
+						else
+						{
+							Ddl_CreditPeriodNumber.selectedItem=Ds_Objects.result.Tables.Table.Rows[0].CreditPeriodNumber;
+						}						
+						Ddl_Status.selectedItem=Ds_Objects.result.Tables.Table.Rows[0].Status;
+						//
+						MasterClientId=Ds_Objects.result.Tables.Table.Rows[0].MasterClientId;
+						drp_MasterClient.text=Ds_Objects.result.Tables.Table.Rows[0].MasterClient;
+						//
+						Txt_BAddress1.text=Ds_Objects.result.Tables.Table.Rows[0].BAddress1;
+						Txt_BAddress2.text=Ds_Objects.result.Tables.Table.Rows[0].BAddress2;						
+						Txt_BPincode.text=Ds_Objects.result.Tables.Table.Rows[0].BPincode;
+						//
+						SalesExecutiveId=Ds_Objects.result.Tables.Table.Rows[0].SalesExecutiveId;
+						Ddl_SalesExecutive.prompt=Ds_Objects.result.Tables.Table.Rows[0].SalesExecutive;
+						//
+						CRMId=Ds_Objects.result.Tables.Table.Rows[0].CRMId;
+						Ddl_CRM.prompt=Ds_Objects.result.Tables.Table.Rows[0].CRM;
+						//
+						KeyAccountPersonId=Ds_Objects.result.Tables.Table.Rows[0].KeyAccountPersonId;
+						Ddl_KeyAccountPerson.prompt=Ds_Objects.result.Tables.Table.Rows[0].KeyAccountPerson;
+						//
+						Txt_DomainName.text=Ds_Objects.result.Tables.Table.Rows[0].DomainName;
+						Txt_IndustryType.text=Ds_Objects.result.Tables.Table.Rows[0].IndustryType;
+						// Image
+						var Str:String=Ds_Objects.result.Tables.Table.Rows[0].ClientLogo;
+						FILE_URL=Ds_Objects.result.Tables.Table.Rows[0].ClientLogo;
+						if(Ds_Objects.result.Tables.Table.Rows[0].ClientLogo !="")
+						{
+							Img_Client.visible=true;
+							Img_Client.source=Ds_Objects.result.Tables.Table.Rows[0].ClientLogo;
+							txt_ImageName.text=Ds_Objects.result.Tables.Table.Rows[0].ImageName;
+						}
+						else
+						{
+							Img_Client.visible=false;
+							txt_ImageName.text="";
+						}
+						ServiceCharge.selected=Ds_Objects.result.Tables.Table.Rows[0].ServiceCharge;
+						if(Str!="")
+						{
+							var Arr:Array = Str.split(",");
+							// ByteArray
+							var Bytes:ByteArray = new ByteArray();
+							// for each item in the array
+							for (var i:int=0;i<Arr.length;i++)
+							{
+								Bytes[i] = Arr[i];
+							}						
+							Img_ClientLogo.source=Bytes;
+						}
+						else
+						{
+							Img_ClientLogo.source="Assets/user.jpg";
+						}
+						Id=Ds_Objects.result.Tables.Table.Rows[0].Id;
+						ClientId=Ds_Objects.result.Tables.Table.Rows[0].Id;
+						// Phone No Popup
+						Txt_ContactNo.text=Ds_Objects.result.Tables.Table.Rows[0].ContactNo;
+						Txt_CPhoneNo1.text=Ds_Objects.result.Tables.Table.Rows[0].CPhoneNo1;
+						Txt_CPhoneNo2.text=Ds_Objects.result.Tables.Table.Rows[0].CPhoneNo2;
+						Txt_CPhoneNo3.text=Ds_Objects.result.Tables.Table.Rows[0].CPhoneNo3;
+						Txt_CPhoneNo4.text=Ds_Objects.result.Tables.Table.Rows[0].CPhoneNo4;
+						Txt_CPhoneNo5.text=Ds_Objects.result.Tables.Table.Rows[0].CPhoneNo5;
+					}
+					else
+					{
+						alignAlert(Alert.show("Values not Loaded.","Alert Message !",
+							Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Grd_AddNewClient._setGridSrc=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+					else
+					{
+						Grd_AddNewClient._clear();
+					}
+					if (Ds_Objects.result.Tables.Table2.Rows.length > 0)
+					{
+						Grd_ClntGuest._setGridSrc=Ds_Objects.result.Tables.Table2.Rows as ArrayCollection;
+					}
+					else
+					{
+						Grd_ClntGuest._clear();
+					}
+					if (Ds_Objects.result.Tables.Table3.Rows.length > 0)
+					{
+						Grd_CustomField._setGridSrc=Ds_Objects.result.Tables.Table3.Rows as ArrayCollection;
+					}
+					else
+					{
+						Grd_CustomField._clear();
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Delete_CUSTOM")
+				{	
+					alignAlert(Alert.show("Deleted Successfully.","Message !",Alert.OK,null,null,iconTickLarge, Alert.OK),10,"");
+					SCtrl_docClearHandler()	
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Delete_NEWCUSTOM")
+				{	
+					alignAlert(Alert.show("Deleted Successfully.","Message !",Alert.OK,null,null,iconTickLarge, Alert.OK),10,"");
+					SCtrl_docClearHandler()	
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "ImageUpload_CUSTOM")
+				{
+//					if (Id == 0)
+//					{
+//						alignAlert(Alert.show("Client Added Successfully.","Message !",Alert.OK, 
+//							null, null, iconTickLarge, Alert.OK),10,"");
+//					}
+//					else
+//					{
+//						alignAlert(Alert.show("Client Updated Successfully.","Message !",Alert.OK, 
+//							null, null, iconTickLarge, Alert.OK),10,"");
+//					}
+//					SCtrl_docClearHandler();
+					
+				}
+
+			}
+			
+			public function FnValidation_PhoneNo():void
+			{
+				var Str:String="";
+				var ErrStr:String="";
+				var Ac:Array=new Array();
+				Ac=Str.split(",");
+				var Len:int=Ac.length;
+				for(var i:int=0;i<Len;i++)
+				{
+				var St:String=Ac[i];
+				if((St.length<10)||(St.length>12))
+				{
+				ErrStr=ErrStr+St+" Number is Invalid\n";
+				}
+				}
+				Alert.show(ErrStr);				
+				// &amp; - &
+			}
+			
+			
+			public function fnGetMasterClient():void
+			{
+				if(drp_MasterClient.selected())
+				{
+					drp_MasterClient.text=drp_MasterClient.Select_Row.ClientName;
+					MasterClientId=drp_MasterClient.Select_Row.Id;
+					if(Chk_MasterAddress.selected == true)
+					{
+						if(MasterClientId!=0)
+						{
+							useWeb("ClientManagement","MasterClientAddress_CUSTOM",
+								[GlobalXml,'MasterClientAddress',0,MasterClientId]);	
+						}
+					}
+					else
+					{
+						Txt_BAddress1.text="";Txt_BAddress2.text="";drp_BCountry.selectedItem="India";
+						Txt_BState.text="";Txt_BCity.text="";Txt_BLocality.text="";Txt_BPincode.text="";
+						drp_BState.text="";
+						drp_BCity.text="";
+						drp_BLocality.text="";
+						Txt_BState.text="";
+						Txt_BCity.text="";
+						Txt_BLocality.text="";
+					}
+				}
+				else
+				{
+					MasterClientId=0;
+					drp_MasterClient.text="";
+				}
+							
+			}
+			
+			protected function FnClose_Pnl_ClientContacts():void
+			{
+				Grp_ClientContacts.visible=false;
+			}
+			//DFSFS
+			protected function FnClose_Pnl_PhoneNo():void
+			{
+				var Flag:Boolean=true;var ErrStr:String="";				
+				if(Txt_CPhoneNo1.text!="")
+				{
+					if(Txt_CPhoneNo1.text.length<10)
+					{
+						if(Flag==true){Txt_CPhoneNo1.setFocus();Flag=false;}
+						ErrStr=ErrStr+"* Contact No 1 is Invalid.\n";
+					}
+				}
+				if(Txt_CPhoneNo2.text!="")
+				{
+					if(Txt_CPhoneNo2.text.length<10)
+					{
+						if(Flag==true){Txt_CPhoneNo2.setFocus();Flag=false;}
+						ErrStr=ErrStr+"* Contact No 2 is Invalid.\n";
+					}
+				}
+				if(Txt_CPhoneNo3.text!="")
+				{
+					if(Txt_CPhoneNo3.text.length<10)
+					{
+						if(Flag==true){Txt_CPhoneNo3.setFocus();Flag=false;}
+						ErrStr=ErrStr+"* Contact No 3 is Invalid.\n";
+					}
+				}
+				if(Txt_CPhoneNo4.text!="")
+				{
+					if(Txt_CPhoneNo4.text.length<10)
+					{
+						if(Flag==true){Txt_CPhoneNo4.setFocus();Flag=false;}
+						ErrStr=ErrStr+"* Contact No 4 is Invalid.\n";
+					}
+				}
+				if(Txt_CPhoneNo5.text!="")
+				{
+					if(Txt_CPhoneNo5.text.length<10)
+					{
+						if(Flag==true){Txt_CPhoneNo5.setFocus();Flag=false;}
+						ErrStr=ErrStr+"* Contact No 5 is Invalid.\n";
+					}
+				}				
+				if(ErrStr!="")
+				{
+					alignAlert(Alert.show(ErrStr,"Alert Message !",Alert.OK, 
+						null, null,iconWarning, Alert.OK),10,'');					
+					return;
+				}
+				else
+				{
+					Grp_PhoneNo.visible=false;
+				}
+				
+			}
+			
+			protected function FnClose_Pnl_ClientGuest():void
+			{
+				Grp_ClientGuest.visible=false;
+			}
+			
+			protected function FnClose_Pnl_CustomField():void
+			{
+				Grp_CustomField.visible=false;
+			}
+			
+			protected function FnClick_Btn_PhoneNo():void
+			{
+				Grp_PhoneNo.visible=true;
+			}
+			
+			protected function FnClick_Btn_ClientContacts():void
+			{
+				FnHelp_ContactType();
+				Grp_ClientContacts.visible=true;
+			}
+			
+			public var Save_Flag:Boolean=true; 
+			protected function FnClick_Btn_ClientGuest():void
+			{
+				Save_Flag=false;
+				Grp_ClientGuest.visible=true;
+				if(Id==0)
+				{
+					SCtrl_docSaveHandler();
+				}
+				
+			}
+			
+			protected function FnClick_Btn_CustomField():void
+			{
+				Grp_CustomField.visible=true;
+			}
+			
+			protected function Mode_changeHandler():void
+			{
+				if(Rdb_DirectPay.selected==true)
+				{
+					Lbl_CreditLimit.visible=false;Lbl_CreditPeriod.visible=false;
+					Ddl_CreditPeriodNumber.selectedItem="Select";Ddl_CreditPeriod.selectedItem="Select";
+					Txt_CreditLimit.text="";Txt_CreditLimit.editable=false;
+					Ddl_CreditPeriodNumber.enabled=false;Ddl_CreditPeriod.enabled=false;
+					Ddl_Status.setFocus();
+				}
+				else
+				{
+					Lbl_CreditLimit.visible=true;Lbl_CreditPeriod.visible=true;
+					Ddl_CreditPeriodNumber.selectedItem="Select";Ddl_CreditPeriod.selectedItem="Select";
+					Txt_CreditLimit.text="";Txt_CreditLimit.editable=true;
+					Ddl_CreditPeriodNumber.enabled=true;Ddl_CreditPeriod.enabled=true;
+					Txt_CreditLimit.setFocus();
+				}
+			}
+			private function ChangeState2():void
+			{
+				if(drp_BState.selected())
+				{
+					drp_BState.text=drp_BState.Select_Row.label;					
+					drp_BCity.dataProvider=null;
+					drp_BLocality.dataProvider=null;
+					drp_BCity.text="";drp_BLocality.text="";					
+					useWeb("ClientManagement","BCITY_CUSTOM",
+						[GlobalXml,'CITYLOAD',0,drp_BState.Select_Row.StateId]);
+					drp_BCity._setFocus();
+				}
+				else
+				{
+					drp_BState.text="";
+					
+				}
+			}
+			private function ChangeState1():void
+			{
+				if(drp_CState.selected())
+				{
+					drp_CState.text=drp_CState.Select_Row.label;					
+					drp_CCity.dataProvider=null;drp_CLocality.dataProvider=null;
+					drp_CCity.text="";drp_CLocality.text="";					
+					useWeb("ClientManagement","CCITY_CUSTOM",
+						[GlobalXml,'CITYLOAD',0,drp_CState.Select_Row.StateId]);
+					drp_CCity._setFocus();
+				}
+				else
+				{
+					drp_CState.text="";
+					
+				}
+			}
+			private function ChangeCity1():void
+			{
+				if(drp_CCity.selected())
+				{
+					drp_CCity.text=drp_CCity.Select_Row.label;					
+					drp_CLocality.dataProvider=null;					
+					drp_CLocality.text="";
+					useWeb("ClientManagement","CLOCALITY_CUSTOM",
+						[GlobalXml,'LOCALITY',0,drp_CCity.Select_Row.CityId]);
+					drp_CLocality._setFocus();
+				}
+				else
+				{
+					drp_CCity.text="";
+				}
+			}
+			private function ChangeCity2():void
+			{
+				if(drp_BCity.selected())
+				{
+					drp_BCity.text=drp_BCity.Select_Row.label;					
+					drp_BLocality.dataProvider=null;					
+					drp_BLocality.text="";
+					useWeb("ClientManagement","BLOCALITY_CUSTOM",
+						[GlobalXml,'LOCALITY',0,drp_BCity.Select_Row.CityId]);	
+					drp_BLocality._setFocus();
+				}
+				else
+				{
+					drp_BCity.text="";
+				}
+				
+			}
+			
+			private function ChangeLocality1():void
+			{
+				if(drp_CLocality.selected())
+				{
+					drp_CLocality.text=drp_CLocality.Select_Row.label;
+					FnChange();
+				}
+				else
+				{
+					drp_CLocality.text="";
+				}
+			}
+			
+			private function ChangeLocality2():void
+			{
+				if(drp_BLocality.selected())
+				{
+					drp_BLocality.text=drp_BLocality.Select_Row.label;					
+				}
+				else
+				{
+					drp_BLocality.text="";
+				}
+			}
+			
+			public var ImgFlag:Boolean=false;
+			protected function FnClick_Btn_Browse():void
+			{
+//				var imageTypes:FileFilter = new FileFilter("Images (*.jpg, *.jpeg, *.gif, *.png)", "*.jpg; *.jpeg; *.gif; *.png");
+//				//var textTypes:FileFilter = new FileFilter("Text Files (*.txt, *.rtf)", "*.txt; *.rtf");
+//				var allTypes:Array = new Array(imageTypes);
+//				var fileRef:FileReference = new FileReference();
+//				fileRef.browse(allTypes);				
+//				//fileRef = new FileReference();
+//				fileRef.addEventListener(Event.SELECT, selectHandler);
+//				fileRef.addEventListener(Event.COMPLETE, completeHandler);				
+//				function selectHandler(event:Event):void
+//				{
+//					fileRef.load();
+//				}
+//				function completeHandler(event:Event):void
+//				{
+//					Img_ClientLogo.source = fileRef.data;
+//					ImgFlag=true;					
+//				}
+				Brd_imageUpload.visible=true;
+				init1();
+				init();
+			}			
+			protected function Chk_MasterClientAddress_changeHandler():void
+			{
+				if(Chk_MasterAddress.selected == true)
+				{
+					Chk_SameasAddress.selected=false;
+					if(MasterClientId!=0)
+					{
+						useWeb("ClientManagement","MasterClientAddress_CUSTOM",
+							[GlobalXml,'MasterClientAddress',0,MasterClientId]);	
+					}
+					else
+					{
+						Chk_MasterAddress.selected =false;
+						alignAlert(Alert.show("Master Client is Requierd","Alert Message !",Alert.OK, 
+							null, null,iconWarning, Alert.OK),10,'');
+						return;
+					}
+					
+				}
+				else
+				{
+					Txt_BAddress1.text="";Txt_BAddress2.text="";drp_BCountry.selectedItem="India";
+					Txt_BState.text="";Txt_BCity.text="";Txt_BLocality.text="";Txt_BPincode.text="";
+					drp_BState.text="";
+					drp_BCity.text="";
+					drp_BLocality.text="";
+					Txt_BState.text="";
+					Txt_BCity.text="";
+					Txt_BLocality.text="";
+				}
+			}
+			protected function Chk_SameasAddress_changeHandler(event:Event):void
+			{
+				if(Chk_SameasAddress.selected == true)
+				{
+					Chk_MasterAddress.selected=false;
+					if(drp_CCountry.selectedItem == "India")
+					{
+						drp_BState.visible=true;
+						drp_BCity.visible=true;
+						drp_BLocality.visible=true;
+						txt_InBCountry.visible=false;
+						Txt_BState.visible=false;
+						Txt_BCity.visible=false;
+						Txt_BLocality.visible=false;
+						drp_BState.dataProvider=drp_CState.dataProvider as ArrayCollection;
+						drp_BCity.dataProvider=drp_CCity.dataProvider as ArrayCollection;
+						drp_BLocality.dataProvider=drp_CLocality.dataProvider as ArrayCollection;
+						drp_BCountry.prompt=drp_CCountry.prompt;
+						//drp_BState.prompt=drp_CState.prompt;
+						//drp_BCity.prompt=drp_CCity.prompt;
+						//drp_BLocality.prompt=drp_CLocality.prompt;
+						drp_BState.text=drp_CState.text;
+						drp_BCity.text=drp_CCity.text;
+						drp_BLocality.text=drp_CLocality.text;
+					}
+					if(drp_CCountry.selectedItem == "International")
+					{
+						drp_BState.visible=false;
+						drp_BCity.visible=false;
+						drp_BLocality.visible=false;
+						txt_InBCountry.visible=true;
+						Txt_BState.visible=true;
+						Txt_BCity.visible=true;
+						Txt_BLocality.visible=true;
+						drp_BState.dataProvider=null;
+						drp_BCity.dataProvider=null;
+						drp_BLocality.dataProvider=null;
+						drp_BCountry.prompt=drp_CCountry.prompt;
+						//drp_BState.prompt=drp_CState.prompt;
+						//drp_BCity.prompt=drp_CCity.prompt;
+						//drp_BLocality.prompt=drp_CLocality.prompt;
+						drp_BState.text=drp_CState.text;
+						drp_BCity.text=drp_CCity.text;
+						drp_BLocality.text=drp_CLocality.text;
+					}
+					drp_BState.dataProvider=drp_CState.dataProvider as ArrayCollection;
+					drp_BCity.dataProvider=drp_CCity.dataProvider as ArrayCollection;
+					drp_BLocality.dataProvider=drp_CLocality.dataProvider as ArrayCollection;
+					drp_BCountry.prompt=drp_CCountry.prompt;
+					//drp_BState.prompt=drp_CState.prompt;
+					//drp_BCity.prompt=drp_CCity.prompt;drp_BLocality.prompt=drp_CLocality.prompt;
+					drp_BCountry.selectedItem=drp_CCountry.selectedItem;
+					Txt_BAddress1.text=Txt_CAddress1.text;Txt_BAddress2.text=Txt_CAddress2.text;
+					txt_InBCountry.text=txt_InCCountry.text;Txt_BState.text=Txt_CState.text;
+					Txt_BCity.text=Txt_CCity.text;Txt_BLocality.text=Txt_CLocality.text;
+					Txt_BPincode.text=Txt_CPincode.text;
+				}
+				else
+				{
+					Txt_BAddress1.text="";Txt_BAddress2.text="";drp_BCountry.selectedItem="India";
+					Txt_BState.text="";Txt_BCity.text="";Txt_BLocality.text="";Txt_BPincode.text="";
+					//drp_BState.prompt="Select State";drp_BCity.prompt="Select City";
+					//drp_BLocality.prompt="Select Locality";
+					drp_changeHandler2();
+				}
+			}
+			
+			protected function Change():void
+			{
+				if(Chk_SameasAddress.selected == true)
+				{
+					Txt_BAddress1.text=Txt_CAddress1.text;
+					Txt_BAddress2.text=Txt_CAddress2.text;
+					drp_BCountry.selectedItem=drp_CCountry.selectedItem;
+					txt_InBCountry.text=txt_InCCountry.text;
+					Txt_BState.text=Txt_CState.text;
+					Txt_BCity.text=Txt_CCity.text;
+					Txt_BLocality.text=Txt_CLocality.text;
+					Txt_BPincode.text=Txt_CPincode.text;					
+					//drp_BState.prompt=drp_CState.prompt;
+					//drp_BCity.prompt=drp_CCity.prompt;
+					//drp_BLocality.prompt=drp_CLocality.prompt;
+					drp_BState.text=drp_CState.text;
+					drp_BCity.text=drp_CCity.text;
+					drp_BLocality.text=drp_CLocality.text;
+					drp_BState.dataProvider=drp_CState.dataProvider as ArrayCollection;
+					drp_BCity.dataProvider=drp_CCity.dataProvider as ArrayCollection;
+					drp_BLocality.dataProvider=drp_CLocality.dataProvider as ArrayCollection;					
+					if(drp_BCountry.selectedItem == "India")
+					{
+						txt_InBCountry.visible=false;Txt_BState.visible=false;Txt_BCity.visible=false;
+						Txt_BLocality.visible=false;						
+						drp_BState.visible=true;drp_BCity.visible=true;drp_BLocality.visible=true;
+					}
+					if(drp_BCountry.selectedItem == "International")
+					{
+						txt_InBCountry.visible=true;Txt_BState.visible=true;Txt_BCity.visible=true;
+						Txt_BLocality.visible=true;drp_BState.visible=false;drp_BCity.visible=false;
+						drp_BLocality.visible=false;
+					}
+				}
+			}
+			
+			public function FnChange():void
+			{
+				if(Chk_SameasAddress.selected == true)
+				{
+					drp_BState.dataProvider=drp_CState.dataProvider as ArrayCollection;
+					drp_BCity.dataProvider=drp_CCity.dataProvider as ArrayCollection;
+					drp_BLocality.dataProvider=drp_CLocality.dataProvider as ArrayCollection;
+					//drp_BState.prompt=drp_CState.prompt;
+					
+					//drp_BCity.prompt=drp_CCity.prompt;
+					//drp_BLocality.prompt=drp_CLocality.prompt;
+				}
+			}
+			
+			protected function FnValidation_BeforeSave():String
+			{
+				var Flag:Boolean=true;var ErrStr:String="";
+				if(Txt_ClientName.text=="")
+				{
+					if(Flag==true)
+					{
+						Txt_ClientName.setFocus();Flag=false;
+					}
+					ErrStr=ErrStr+"* Client Name is Required.\n";
+				}
+				if(Txt_CAddress1.text=="")
+				{
+					if(Flag==true)
+					{
+						Txt_CAddress1.setFocus();Flag=false;
+					}
+					ErrStr=ErrStr+"* Communication Address 1 is Required.\n";
+				}				
+				if(drp_CCountry.selectedItem == "India")
+				{
+					if(drp_CState.text=="")
+					//if(drp_CState.prompt=="Select State")
+					{
+						if(Flag == true)
+						{
+							drp_CState.setFocus();Flag=false;
+						}												
+						ErrStr=ErrStr+"* Communication State is Required.\n";
+					}
+					if(drp_CCity.text=="")
+					//if(drp_CCity.prompt=="Select City")
+					{
+						if(Flag == true)
+						{
+							drp_CCity.setFocus();Flag=false;
+						}												
+						ErrStr=ErrStr+"* Communication City is Required.\n";
+					}
+					if(drp_CLocality.text=="")
+					//if(drp_CLocality.prompt=="Select Locality")
+					{
+						if(Flag == true)
+						{
+							drp_CLocality.setFocus();Flag=false;
+						}												
+						ErrStr=ErrStr+"* Communication Locality is Required.\n";
+					}
+				}
+				if(drp_CCountry.selectedItem == "International")
+				{
+					if(txt_InCCountry.text == "")
+					{
+						if(Flag == true)
+						{
+							txt_InCCountry.setFocus();Flag=false;
+						}
+						ErrStr=ErrStr+"* Communication Country is Required.\n";
+					}
+					if(Txt_CState.text == "")
+					{
+						if(Flag == true)
+						{
+							Txt_CState.setFocus();Flag=false;
+						}
+						ErrStr=ErrStr+"* Communication State is Required.\n";
+					}
+					if(Txt_CCity.text == "")
+					{
+						if(Flag == true)
+						{
+							Txt_CCity.setFocus();Flag=false;
+						}
+						ErrStr=ErrStr+"* Communication City is Required.\n";
+					}
+					if(Txt_CLocality.text == "")
+					{
+						if(Flag == true)
+						{
+							Txt_CLocality.setFocus();Flag=false;
+						}
+						ErrStr=ErrStr+"* Communication Locality is Required.\n";
+					}
+				}
+				if(Txt_CPincode.text=="")
+				{
+					if(Flag==true)
+					{
+						Txt_CPincode.setFocus();Flag=false;
+					}
+					ErrStr=ErrStr+"* Communication Postal code is Required.\n";
+				}
+				if(Txt_ContactNo.text=="")
+				{
+					if(Flag==true){Txt_ContactNo.setFocus();Flag=false;}
+					ErrStr=ErrStr+"* Contact No is Required.\n";
+				}
+				if(Txt_ContactNo.text!="")
+				{
+					if(Txt_ContactNo.text.length < 10)
+					{
+						if(Flag==true){Txt_ContactNo.setFocus();Flag=false;}
+						ErrStr=ErrStr+"* Contact No is Invalid.\n";
+					}					
+				}
+				if(Rdb_BTC.selected==true)
+				{
+					if(Txt_CreditLimit.text=="")
+					{
+						if(Flag==true)
+						{
+							Txt_CreditLimit.setFocus();Flag=false;
+						}
+						ErrStr=ErrStr+"* Credit Limit is Required.\n";
+					}
+				}
+				if(Rdb_BTC.selected==true)
+				{
+					if(Ddl_CreditPeriodNumber.selectedItem=="Select")
+					{
+						if(Flag==true)
+						{
+							Ddl_CreditPeriodNumber.setFocus();Flag=false;
+						}
+						ErrStr=ErrStr+"* Credit Period is Required.\n";
+					}
+				}
+				
+				if(Txt_BAddress1.text=="")
+				{
+					if(Flag==true)
+					{
+						Txt_BAddress1.setFocus();Flag=false;
+					}
+					ErrStr=ErrStr+"* Billing Address 1 is Required.\n";
+				}
+				if(drp_BCountry.selectedItem == "India")
+				{
+					if(drp_BState.text=="")
+					//if(drp_BState.prompt=="Select State")
+					{
+						if(Flag == true)
+						{
+							drp_BState.setFocus();Flag=false;
+						}												
+						ErrStr=ErrStr+"* Billing State is Required.\n";
+					}
+					if(drp_BCity.text=="")
+					//if(drp_BCity.prompt=="Select City")
+					{
+						if(Flag == true)
+						{
+							drp_BCity.setFocus();Flag=false;
+						}												
+						ErrStr=ErrStr+"* Billing City is Required.\n";
+					}
+					if(drp_BLocality.text=="")
+					//if(drp_BLocality.prompt=="Select Locality")
+					{
+						if(Flag == true)
+						{
+							drp_BLocality.setFocus();Flag=false;
+						}												
+						ErrStr=ErrStr+"* Billing Locality is Required.\n";
+					}
+				}
+				if(drp_BCountry.selectedItem == "International")
+				{
+					if(txt_InBCountry.text == "")
+					{
+						if(Flag == true)
+						{
+							txt_InBCountry.setFocus();Flag=false;
+						}
+						ErrStr=ErrStr+"* Billing Country is Required.\n";
+					}
+					if(Txt_BState.text == "")
+					{
+						if(Flag == true)
+						{
+							Txt_BState.setFocus();Flag=false;
+						}
+						ErrStr=ErrStr+"* Billing State is Required.\n";
+					}
+					if(Txt_BCity.text == "")
+					{
+						if(Flag == true)
+						{
+							Txt_BCity.setFocus();Flag=false;
+						}
+						ErrStr=ErrStr+"* Billing City is Required.\n";
+					}
+					if(Txt_BLocality.text == "")
+					{
+						if(Flag == true)
+						{
+							Txt_BLocality.setFocus();Flag=false;
+						}
+						ErrStr=ErrStr+"* Billing Locality is Required.\n";
+					}										
+				}				
+				if(Txt_BPincode.text=="")
+				{
+					if(Flag==true)
+					{
+						Txt_BPincode.setFocus();Flag=false;
+					}
+					ErrStr=ErrStr+"* Billing Postal code is Required.\n";
+				}
+				if(SalesExecutiveId==0)
+				{
+					if(Flag==true){Ddl_SalesExecutive.setFocus();Flag=false;}
+					ErrStr=ErrStr+"* Sales Executive is Required.\n";
+				}
+				if(CRMId==0)
+				{
+					if(Flag==true){Ddl_CRM.setFocus();Flag=false;}
+					ErrStr=ErrStr+"* C R M is Required.\n";
+				}
+				if(KeyAccountPersonId==0)
+				{
+					if(Flag==true){Ddl_KeyAccountPerson.setFocus();Flag=false;}
+					ErrStr=ErrStr+"* Key Account Person is Required.\n";
+				}
+				if(Txt_DomainName.text=="")
+				{
+					if(Flag==true)
+					{
+						Txt_DomainName.setFocus();Flag=false;
+					}
+					ErrStr=ErrStr+"* Domain Name is Required.\n";
+				}
+				
+				return ErrStr;
+				/*if(drp_BCountry.selectedItem == "India")
+				{
+					if((drp_BState.prompt=="Select State")||(drp_CState.prompt=="Select State"))
+					{
+						if(drp_BState.prompt=="Select State")
+						{
+							drp_BState.setFocus();
+						}
+						if(drp_CState.prompt=="Select State")
+						{
+							drp_CState.setFocus();
+						}
+						ErrStr=ErrStr+"* State is Required.\n";
+					}
+				}
+				else if((Txt_CState.text=="")||(Txt_BState.text==""))
+				{
+					if(Flag==true)
+					{
+						if((Txt_CState.text=="")&&(Txt_BState.text==""))
+						{
+							Txt_CState.setFocus();Flag=false;
+						}						
+					}
+					if(Flag==true)
+					{
+						if(Txt_CState.text=="")
+						{
+							Txt_CState.setFocus();Flag=false;
+						}						
+					}
+					if(Flag==true)
+					{
+						if(Txt_BState.text=="")
+						{
+							Txt_BState.setFocus();Flag=false;
+						}						
+					}
+					ErrStr=ErrStr+"* State is Required.\n";
+				}
+				if(drp_BCountry.selectedItem == "India")
+				{
+					if((drp_BCity.prompt=="Select City")||(drp_CCity.prompt=="Select City"))
+					{
+						if(drp_BCity.prompt=="Select City")
+						{
+							drp_BCity.setFocus();
+						}
+						if(drp_CCity.prompt=="Select City")
+						{
+							drp_CCity.setFocus();
+						}
+						ErrStr=ErrStr+"* City is Required.\n";
+					}
+				}
+				else
+					if((Txt_CCity.text=="")||(Txt_BCity.text==""))
+					{
+						if(Flag==true)
+						{
+							if((Txt_CCity.text=="")&&(Txt_BCity.text==""))
+							{
+								Txt_CCity.setFocus();Flag=false;
+							}						
+						}
+						if(Flag==true)
+						{
+							if(Txt_CCity.text=="")
+							{
+								Txt_CCity.setFocus();Flag=false;
+							}						
+						}
+						if(Flag==true)
+						{
+							if(Txt_BCity.text=="")
+							{
+								Txt_BCity.setFocus();Flag=false;
+							}						
+						}
+						ErrStr=ErrStr+"* City is Required.\n";
+					}
+				if(drp_BCountry.selectedItem == "India")
+				{
+					if((drp_BLocality.prompt=="Select Locality")||(drp_CLocality.prompt=="Select Locality"))
+					{
+						(drp_BLocality.prompt=="Select Locality")
+						{
+							drp_BLocality.setFocus();
+						}
+						if(drp_CLocality.prompt=="Select Locality")
+						{
+							drp_CLocality.setFocus();
+						}
+						ErrStr=ErrStr+"* Locality is Required.\n";
+					}
+				}
+				else
+					if((Txt_CLocality.text=="")||(Txt_BLocality.text==""))
+					{
+						if(Flag==true)
+						{
+							if((Txt_CLocality.text=="")&&(Txt_BLocality.text==""))
+							{
+								Txt_CLocality.setFocus();Flag=false;
+							}						
+						}
+						if(Flag==true)
+						{
+							if(Txt_CLocality.text=="")
+							{
+								Txt_CLocality.setFocus();Flag=false;
+							}						
+						}
+						if(Flag==true)
+						{
+							if(Txt_BLocality.text=="")
+							{
+								Txt_BLocality.setFocus();Flag=false;
+							}						
+						}
+						ErrStr=ErrStr+"* Locality is Required.\n";
+					}
+				if((drp_CCountry.selectedItem=="")||(drp_BCountry.selectedItem==""))
+				{
+					if(Flag==true)
+					{
+						if((drp_CCountry.selectedItem=="")&&(drp_BCountry.selectedItem=""))
+						{
+							drp_CCountry.setFocus();Flag=false;
+						}						
+					}
+					if(Flag==true)
+					{
+						if(drp_CCountry.selectedItem=="")
+						{
+							drp_CCountry.setFocus();Flag=false;
+						}						
+					}
+					if(Flag==true)
+					{
+						if(drp_BCountry.selectedItem=="")
+						{
+							drp_BCountry.setFocus();Flag=false;
+						}						
+					}
+					ErrStr=ErrStr+"* Country is Required.\n";
+				}				
+				if((Txt_CPincode.text=="")||(Txt_BPincode.text==""))
+				{
+					if(Flag==true)
+					{
+						if((Txt_CPincode.text=="")&&(Txt_BPincode.text==""))
+						{
+							Txt_CPincode.setFocus();Flag=false;
+						}						
+					}
+					if(Flag==true)
+					{
+						if(Txt_CPincode.text=="")
+						{
+							Txt_CPincode.setFocus();Flag=false;
+						}						
+					}
+					if(Flag==true)
+					{
+						if(Txt_BPincode.text=="")
+						{
+							Txt_BPincode.setFocus();Flag=false;
+						}						
+					}
+					ErrStr=ErrStr+"* Pincode is Required.\n";
+				}*/				
+			}
+			
+			protected function SCtrl_docSaveHandler():void
+			{
+				
+				var Str:String=FnValidation_BeforeSave();
+				if(Str!="")
+				{
+					Grp_ClientGuest.visible=false;
+					alignAlert(Alert.show(Str,"Requierd Field(s) !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+					return;
+				}
+				if(ImgFlag == true)
+				{
+					var bit:BitmapData = new BitmapData(100,100); 
+					bit.draw(Img_ClientLogo); 
+					var png:PNGEncoder = new PNGEncoder(); 
+					var by:ByteArray = png.encode(bit); 
+					Img_ClientLogo.source = by;				
+					var s:int = by.length;				 
+					var sd:String = "";	 
+					ClientLogo = "";				
+					for(var i:int = 0; i < s; i++)
+					{
+						sd = by[i]; 
+						ClientLogo += sd+",";					
+					}
+				}
+				if(ImgFlag == false)
+				{
+					ClientLogo="";
+				}				
+				var CdtNo:String="",CdtPrd:String="";
+				if(Ddl_CreditPeriodNumber.selectedItem=="Select"){CdtNo="";}
+				else{CdtNo=Ddl_CreditPeriodNumber.selectedItem;}
+				if(Ddl_CreditPeriod.selectedItem=="Select"){CdtPrd="";}
+				else{CdtPrd=Ddl_CreditPeriod.selectedItem;}
+				var State :String="",City:String="",Locality:String="";
+				if(drp_CCountry.selectedItem == "India")
+				{
+					State=drp_CState.text;City=drp_CCity.text;
+					Locality=drp_CLocality.text;
+					//State=drp_CState.prompt;
+					//City=drp_CCity.prompt;Locality=drp_CLocality.prompt;
+				}
+				else
+				{
+					State=Txt_CState.text;City=Txt_CCity.text;Locality=Txt_CLocality.text;
+				}
+				var State1:String="",City1:String="",Locality1:String="";
+				if(drp_BCountry.selectedItem == "India")
+				{
+					State1=drp_BState.text;City1=drp_BCity.text;
+					Locality1=drp_BLocality.text;
+					//State1=drp_BState.prompt;City1=drp_BCity.prompt;Locality1=drp_BLocality.prompt;
+				}
+				else
+				{
+					State1=Txt_BState.text;City1=Txt_BCity.text;Locality1=Txt_BLocality.text;	
+				}
+				var Ac:ArrayCollection=new ArrayCollection
+					([{ClientName:Txt_ClientName.text,
+						CAddress1:Txt_CAddress1.text,
+						CAddress2:Txt_CAddress2.text,
+						CCountry:drp_CCountry.selectedItem,
+						InCCountry:txt_InCCountry.text,
+						CState:State,
+						CCity:City,
+						CLocality:Locality,
+						CPincode:Txt_CPincode.text,
+						ContactNo:Txt_ContactNo.text,
+						DirectPay:
+						Rdb_DirectPay.selected,
+						BTC:Rdb_BTC.selected,
+						CreditLimit:Number(Txt_CreditLimit.text),
+						CreditPeriodNumber:CdtNo,
+						CreditPeriod:CdtPrd,
+						Status:Ddl_Status.selectedItem,
+						MasterClient:"",
+						MasterClientId:MasterClientId,
+						BAddress1:Txt_BAddress1.text,
+						BAddress2:Txt_BAddress2.text,
+						BCountry:drp_BCountry.selectedItem,
+						InBCountry:txt_InBCountry.text,
+						BState:State1,
+						BCity:City1,
+						BLocality:Locality1,
+						BPincode:Txt_BPincode.text,
+						SalesExecutiveId:SalesExecutiveId,
+						CRMId:CRMId,
+						KeyAccountPersonId:KeyAccountPersonId,
+						DomainName:Txt_DomainName.text,
+						IndustryType:Txt_IndustryType.text,
+						// Communication Phone No 
+						CPhoneNo1:Txt_CPhoneNo1.text,
+						CPhoneNo2:Txt_CPhoneNo2.text,
+						CPhoneNo3:Txt_CPhoneNo3.text,
+						CPhoneNo4:Txt_CPhoneNo4.text,
+						CPhoneNo5:Txt_CPhoneNo5.text,
+						Id:Id,
+						ServiceCharge:ServiceCharge.selected
+					}]);
+				var HdrXml:String = ObjToXmlStr_Comm(Ac,"HdrXml");
+				var NewClientXml:String="";
+				NewClientXml += "<ROOT>";
+				NewClientXml += ObjToXmlStr_Comm(Grd_AddNewClient._getGridSrc,"NewClientXml")
+				NewClientXml += "</ROOT>";
+				var Temp_Arr:ArrayCollection=new ArrayCollection();
+				var ClientGuest:String="";
+				ClientGuest += "<ROOT>";
+				ClientGuest += ObjToXmlStr_Comm(Temp_Arr,"ClientGuest")
+				ClientGuest += "</ROOT>";
+				var CustomFields:String="";
+				CustomFields += "<ROOT>";
+				CustomFields += ObjToXmlStr_Comm(Grd_CustomField._getGridSrc,"CustomFields")
+				CustomFields += "</ROOT>";
+				Save_String="ClientManagement";
+				useWeb("ClientManagement","Save_CUSTOM",[GlobalXml,ClientLogo,HdrXml,NewClientXml,ClientGuest,CustomFields]);
+			}
+			
+			protected function Ddl_MasterClient_changeHandler(event:IndexChangeEvent):void
+			{
+				//MasterClientId=drp_MasterClient.selectedItem.Id;
+			}
+			
+			protected function Ddl_SalesExecutive_changeHandler(event:IndexChangeEvent):void
+			{
+				SalesExecutiveId=Ddl_SalesExecutive.selectedItem.Id;
+			}
+			
+			protected function Ddl_CRM_changeHandler(event:IndexChangeEvent):void
+			{
+				CRMId=Ddl_CRM.selectedItem.Id;
+			}
+			
+			protected function Ddl_KeyAccountPerson_changeHandler(event:IndexChangeEvent):void
+			{
+				KeyAccountPersonId=Ddl_KeyAccountPerson.selectedItem.Id;
+			}			
+			
+			protected function SCtrl_docClearHandler():void
+			{
+				
+				Txt_ClientName.text="";Txt_CAddress1.text="";Txt_CAddress2.text="";
+				//Txt_CState.text="";Txt_CCity.text="";Txt_CLocality.text="";
+				Txt_CPincode.text="";
+				Chk_MasterAddress.selected=false;
+				Rdb_DirectPay.selected=true;Rdb_BTC.selected=false;Txt_CreditLimit.text="";
+				Ddl_Status.selectedItem="Active";MasterClientId=0;drp_MasterClient.text="";
+				Ddl_CreditPeriodNumber.selectedItem="0";Ddl_CreditPeriod.selectedItem="Month";
+				Txt_BAddress1.text="";Txt_BAddress2.text="";Txt_BPincode.text="";SalesExecutiveId=0;
+				//Txt_BState.text="";Txt_BCity.text="";Txt_BLocality.text="";
+				CRMId=0;KeyAccountPersonId=0;Txt_DomainName.text="";Txt_IndustryType.text="";
+				Txt_CPhoneNo1.text="";Txt_CPhoneNo2.text="";Txt_CPhoneNo3.text="";Txt_CPhoneNo4.text="";
+				Txt_CPhoneNo5.text="";Id=0;Txt_ContactNo.text="";ClientLogo="";
+				Img_ClientLogo.source="Assets/logout.PNG";Img_ClientLogo.source="Assets/user.jpg";
+				Chk_SameasAddress.selected=false;Mode_changeHandler();
+				Grd_AddNewClient._clear();Grd_ClntGuest._clear();Grd_CustomField._clear();
+				drp_BCity.visible=false;drp_BLocality.visible=false;drp_BState.visible=false;
+				Txt_BState.visible=true;Txt_BCity.visible=true;Txt_BLocality.visible=true;
+				drp_CCity.visible=false;drp_CLocality.visible=false;drp_CState.visible=false;
+				Txt_CState.visible=true;Txt_CCity.visible=true;Txt_CLocality.visible=true; 
+				txt_InCCountry.text="";txt_InBCountry.text="";	
+				//drp_BCity.prompt="Select City";drp_BLocality.prompt="Select Locality";drp_BState.prompt="Select State";
+				//drp_CCity.prompt="Select City";drp_CLocality.prompt="Select Locality";
+				//drp_CState.prompt="Select State";
+				drp_BCity.text="";drp_BLocality.text="";drp_BState.text="";
+				drp_CCity.text="";drp_CLocality.text="";drp_CState.text="";
+				FnHelp();FnHelp_FieldValue();FnHelp_Title();FnHelp_State();
+				drp_CCountry.selectedItem="India";drp_changeHandler1();
+				drp_BCountry.selectedItem="India";drp_changeHandler2();
+				ServiceCharge.selected=false;
+				cursorManager.removeBusyCursor();
+				Img_Client.visible=false;
+				txt_ImageName.text="";
+				Brd_imageUpload.visible=false;
+			}
+			
+			protected function SCtrl_doSearchHandler():void
+			{
+				FilePath.text="";txt_ImageName.text="";ClientId=0;
+				PopUpManager.addPopUp( SearchPopUp , this, true);
+				SearchPopUp.Prc_name="ClientManagement";
+				var SearchParam:Array =new Array();
+				SearchPopUp.HlpIndex="SEARCH";
+				SearchParam[0]=GlobalXml;
+				SearchParam[1]=0;	
+				SearchPopUp.Prc_Param=SearchParam;
+				SearchPopUp.HlpSrchGlobal="";
+				SearchPopUp.dataPanel.focusEnabled=true;
+				SearchPopUp.Pageint();
+				SearchPopUp.addEventListener("PopupEnter",funpopupEnter);
+				SearchPopUp.addEventListener("PopupClose",funpopupClose);
+				PopUpManager.centerPopUp(SearchPopUp);
+			}
+			
+			private function funpopupClose(event:Event):void
+			{
+				
+			}
+			
+			private function funpopupEnter(event:Event):void
+			{				
+				SearchDtls(SearchPopUp.SelectRow.Id);			
+			}
+			
+			private function SearchDtls(Id:int):void
+			{
+				var Load:Array =new Array();
+				Load[0]=GlobalXml; Load[1]=Id;    
+				useWeb("ClientManagement","Search_CUSTOM",Load);
+			}
+		
+			protected function button_hb2_clickHandler(event:MouseEvent):void
+			{
+				Grp_ClientContacts.visible=false;
+				
+			}
+			
+			protected function button_hb3_clickHandler(event:MouseEvent):void
+			{
+				Grp_ClientGuest.visible=false;Save_Flag=true;
+			}
+			
+			protected function button_hb4_clickHandler(event:MouseEvent):void
+			{
+				Grp_CustomField.visible=false;
+			}
+			
+			protected function Grd_AddNewClient__getHlpTxtDataHandler(event:Event):void
+			{
+			
+			}
+			public var ErrStr:String="";
+			public function Custom_Grid_Tab(arrObj:Object,arrObj1:Object,GridMode:Boolean,Index:int):void
+			{				
+				/*if(arrObj.currentTarget.id == "hlpTitle")
+				{
+					if((arrObj1.Title!="Mr")&&(arrObj1.Title!="Ms"))
+					{
+						Grd_AddNewClient._setValuetoCtrl("hlpTitle","");
+					}
+				}
+				if((arrObj.currentTarget.id == "txtEmail"))
+				{
+					if(arrObj1.Email!="")
+					{
+						EmailValidator.validate(arrObj1.Email);
+					}
+				}
+				if(arrObj.currentTarget.id == "txtAlternateEmail")
+				{
+					if(arrObj1.AlternateEmail!="")
+					{
+						EmailValidator.validate(arrObj1.AlternateEmail);
+					}
+				}*/
+			}
+			public var Save_String:String="";
+			public function Custom_Grid_Enter(arrObj:Object, GridMode:Boolean, Index:int):String
+			{
+				/*var Str:String="";
+				if(arrObj.Email != "")
+				{
+					EmailValidator.validate(arrObj.Email);
+					Str=Str+ErrMsg;	
+					return Str;
+				}
+				if(arrObj.EmailId !="")
+				{
+					EmailValidator.validate(arrObj.Email);
+					Str=Str+ErrMsg;	
+					return Str;
+				}*/
+				var Str:String="";
+				if(arrObj.GridId =="AddNewClient")
+				{
+					if(arrObj.EscalationLevel =="")
+					{
+						Str="* Escalation Level is Required.\n";
+						return Str;
+					}
+					if(arrObj.Title =="")
+					{
+						Str=Str+"*  Required Valid Title ( Mr / Ms ).\n";
+						return Str;
+					}
+					if(arrObj.FirstName =="")
+					{
+						Str=Str+"* FirstName is Required.\n";
+						return Str;
+					}
+					if(arrObj.MobileNo =="")
+					{
+						Str=Str+"* MobileNo is Required.\n";
+						return Str;
+					}
+					if(arrObj.Email =="")
+					{
+						Str=Str+"* EmailId is Required.\n";
+						return Str;
+					}
+					if(arrObj.Designation =="")
+					{
+						Str=Str+"* Designation is Required.\n";
+						return Str;
+					}
+					if(arrObj.Email !="")
+					{
+						EmailValidator.validate(arrObj.Email);
+						Str=Str+ErrMsg;	
+						return Str;
+					}
+					if(arrObj.AlternateEmail !="")
+					{
+						EmailValidator1.validate(arrObj.AlternateEmail);
+						Str=Str+ErrMsg1;	
+						return Str;
+					}
+					if(arrObj.MobileNo!="")
+					{
+						var Flg1:Boolean=true;
+						var gmn:String=arrObj.MobileNo;
+						if(gmn.length != 10)
+						{
+							Str=Str+"*  Mobile No is Invalid.\n";
+							return Str;
+						}
+						else
+						{
+							for(var j:int=0;j<gmn.length;j++)
+							{
+								var gmn1:String=gmn.substring(j,j+1);Flg1=false;
+								
+								if((gmn1!="0")&&(gmn1!="1")&&(gmn1!="2")&&(gmn1!="3")&&(gmn1!="4")&&
+									(gmn1!="5")&&(gmn1!="6")&&(gmn1!="7")&&(gmn1!="8")&&(gmn1!="9"))
+								{
+									Str=Str+"*  Mobile No is Invalid.\n";
+									j=gmn.length;
+									return Str;
+								}
+							}
+						}						
+					}
+				}
+				if(arrObj.GridId =="ClntGuest")
+				{
+					if(arrObj.GMobileNo!="")
+					{
+						var Flg:Boolean=true;
+						var mn:String=arrObj.GMobileNo;
+						if((mn.length > 13)||(mn.length < 10))							
+						{
+							Str=Str+"*  Mobile No is Invalid.\n";
+							return Str;
+						}
+						else
+						{
+							for(var i:int=0;i<mn.length;i++)
+							{
+								var mn1:String=mn.substring(i,i+1);Flg=false;
+								
+								if((mn1!="0")&&(mn1!="1")&&(mn1!="2")&&(mn1!="3")&&(mn1!="4")&&(mn1!="5")&&
+									(mn1!="6")&&(mn1!="7")&&(mn1!="8")&&(mn1!="9"))
+								{
+									Str=Str+"*  Mobile No is Invalid.\n";
+									i=mn.length;
+								}
+							}
+						}						
+					}
+					if(arrObj.EmailId =="")
+					{
+						EmailValidator.validate(arrObj.Email);
+						Str=Str+ErrMsg;	
+						return Str;
+					}
+					if(Str=="")
+					{
+						Save_String="ImportGuest";
+						var arrcopysave:ArrayCollection = new ArrayCollection
+							([{
+								EmpCode:arrObj.EmpCode,
+								FirstName:arrObj.FirstName,                       
+								LastName:arrObj.LastName,                                            
+								Grade:arrObj.Grade,                                            
+								MobileNo:arrObj.GMobileNo,                                             
+								EmailId:arrObj.EmailId,                                               
+								Designation:arrObj.Designation,
+								Id:arrObj.Id,
+								ClientId:ClientId,
+								Nationality:'',
+								Column1:'',Column2:'',Column3:'',Column4:'',
+								Column5:'',Column6:'',Column7:'',Column8:'',
+								Column9:'',Column10:''
+								
+							}])
+						var arrcopy:ArrayCollection = new ArrayCollection
+							([{ 
+								ClientId:ClientId 
+							}])
+						
+						GlobalXml="";
+						GlobalXml += "<ROOT>";
+						GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+						GlobalXml += "</ROOT>";		
+						
+						var HdrXml:String=""
+						HdrXml += "<ROOT>";	
+						HdrXml += ObjToXmlStr_Comm(arrcopysave,"HdrXml") 
+						HdrXml += "</ROOT>";
+						var HdrXml1:String=""
+						HdrXml1 += "<ROOT>";	
+						HdrXml1 += ObjToXmlStr_Comm(arrcopy,"Client") 
+						HdrXml1 += "</ROOT>";
+						useWeb("ImportGuest","Save_CUSTOM",[GlobalXml,HdrXml,HdrXml1]); 
+					}
+				}
+				
+				return Str;
+			}
+			
+			public var ErrMsg:String="",ErrMsg1:String="";
+			
+			protected function EmailValidator_invalidHandler(event:ValidationResultEvent):void
+			{
+				ErrMsg="*  Email  "+event.message+".\n";
+			}
+			
+			protected function EmailValidator_validHandler(event:ValidationResultEvent):void
+			{
+				ErrMsg="";
+			}
+			
+			protected function EmailValidator1_invalidHandler(event:ValidationResultEvent):void
+			{
+				ErrMsg1="*  Alternate Email  "+event.message+".\n";
+			}
+			
+			protected function EmailValidator1_validHandler(event:ValidationResultEvent):void
+			{
+				ErrMsg1="";				
+			}
+			public function Custom_Grid_Delete(index:int,arrGrid:ArrayCollection,GrdId:String):void
+			{
+			if(arrGrid[index].Id !="")
+				{												
+					useWeb("ClientManagement","Delete_NEWCUSTOM",[GlobalXml,"MODELDELETE",0,arrGrid[index].Id]);
+				}
+			}
+			
+			protected function drp_changeHandler1():void
+			{
+				if(drp_CCountry.selectedItem == "India")
+				{
+					drp_CCity.dataProvider=null;drp_CLocality.dataProvider=null;
+					//drp_CState.prompt="Select State";drp_CCity.prompt="Select City";
+					//drp_CLocality.prompt="Select Locality";
+					drp_CState.dataProvider=null;
+					txt_InCCountry.text="";Txt_CState.text="";Txt_CCity.text="";Txt_CLocality.text="";
+					Txt_CPincode.text="";
+					
+					drp_CState.visible=true;drp_CCity.visible=true;drp_CLocality.visible=true;
+					txt_InCCountry.visible=false;Txt_CState.visible=false;Txt_CCity.visible=false;
+					Txt_CLocality.visible=false;
+					
+					drp_CState.tabIndex=5;drp_CCity.tabIndex=6;drp_CLocality.tabIndex=7;
+					txt_InCCountry.tabIndex=0;Txt_CState.tabIndex=0;Txt_CCity.tabIndex=0;
+					Txt_CLocality.tabIndex=0;
+					
+					drp_CState.dataProvider=Ac_State;
+				}
+				if(drp_CCountry.selectedItem == "International")
+				{
+					drp_CCity.dataProvider=null;drp_CLocality.dataProvider=null;
+					//drp_CState.prompt="Select State";drp_CCity.prompt="Select City";
+					//drp_CLocality.prompt="Select Locality";
+					drp_CState.dataProvider=null;
+					txt_InCCountry.text="";Txt_CState.text="";Txt_CCity.text="";Txt_CLocality.text="";
+					Txt_CPincode.text="";
+					
+					txt_InCCountry.visible=true;Txt_CState.visible=true;Txt_CCity.visible=true;
+					Txt_CLocality.visible=true;drp_CState.visible=false;drp_CCity.visible=false;
+					drp_CLocality.visible=false;
+					
+					drp_CState.tabIndex=0;drp_CCity.tabIndex=0;drp_CLocality.tabIndex=0;
+					txt_InCCountry.tabIndex=5;Txt_CState.tabIndex=6;Txt_CCity.tabIndex=7;
+					Txt_CLocality.tabIndex=8;
+					
+					drp_CState.dataProvider=Ac_State;
+				}
+				Change();
+			}
+			protected function drp_changeHandler2():void
+			{
+				if(drp_BCountry.selectedItem == "India")
+				{
+					drp_BCity.dataProvider=null;drp_BLocality.dataProvider=null;					
+					//drp_BState.prompt="Select State";drp_BCity.prompt="Select City";
+					//drp_BLocality.prompt="Select Locality";
+					drp_BState.dataProvider=null;
+					txt_InBCountry.text="";Txt_BState.text="";Txt_BCity.text="";Txt_BLocality.text="";
+					Txt_BPincode.text="";
+					
+					txt_InBCountry.visible=false;Txt_BState.visible=false;Txt_BCity.visible=false;
+					Txt_BLocality.visible=false;
+					
+					drp_BState.visible=true;drp_BCity.visible=true;drp_BLocality.visible=true;
+					txt_InBCountry.visible=false;Txt_BState.visible=false;Txt_BCity.visible=false;
+					Txt_BLocality.visible=false;
+					
+					drp_BState.tabIndex=20;drp_BCity.tabIndex=21;drp_BLocality.tabIndex=22;
+					txt_InBCountry.tabIndex=0;Txt_BState.tabIndex=0;Txt_BCity.tabIndex=0;
+					Txt_BLocality.tabIndex=0;
+					
+					drp_BState.dataProvider=Ac_State;
+				}
+				if(drp_BCountry.selectedItem == "International")
+				{
+					drp_BCity.dataProvider=null;drp_BLocality.dataProvider=null;					
+					//drp_BState.prompt="Select State";drp_BCity.prompt="Select City";
+					//drp_BLocality.prompt="Select Locality";
+					drp_BState.dataProvider=null;
+					txt_InBCountry.text="";Txt_BState.text="";Txt_BCity.text="";Txt_BLocality.text="";
+					Txt_BPincode.text="";
+					
+					txt_InBCountry.visible=true;Txt_BState.visible=true;Txt_BCity.visible=true;
+					Txt_BLocality.visible=true;drp_BState.visible=false;drp_BCity.visible=false;
+					drp_BLocality.visible=false;
+					
+					drp_BState.tabIndex=0;drp_BCity.tabIndex=0;drp_BLocality.tabIndex=0;
+					txt_InBCountry.tabIndex=20;Txt_BState.tabIndex=21;Txt_BCity.tabIndex=22;
+					Txt_BLocality.tabIndex=23;
+					
+					drp_BState.dataProvider=Ac_State;
+				}
+			}
+			
+			protected function SCtrl_docDeleteHandler():void
+			{
+				if(Id != 0)
+				{
+					alignAlert(Alert.show("Do you want to Delete this item ?", "Warning !",
+						Alert.YES | Alert.NO,null,removeItem1, iconWarning, Alert.NO),10,"");
+				}
+				else					
+				{
+					alignAlert(Alert.show("This is an Invalid Process.","Alert Message !",
+						Alert.OK, null, null,iconWarning,Alert.OK),10,"");
+				}
+			}
+			
+			private function removeItem1(event:CloseEvent):void 
+			{
+				if (event.detail == Alert.YES) 
+				{
+					var Load:Array = new Array();
+					Load[0]=GlobalXml; Load[1]= Id;
+					useWeb("ClientManagement","Delete_CUSTOM",Load);					
+				}				
+			}		
+			
+			protected function Txt_CAddress1_changeHandler(event:TextOperationEvent):void
+			{
+				if(Chk_SameasAddress.selected == true)
+				{
+					Txt_BAddress1.text=Txt_CAddress1.text;
+				}
+			}
+			
+			protected function Txt_CAddress2_changeHandler(event:TextOperationEvent):void
+			{
+				if(Chk_SameasAddress.selected == true)
+				{
+					Txt_BAddress2.text=Txt_CAddress2.text;
+				}
+			}
+			//Image Upload
+			public var ImageFormat:String="";
+			public function init():void
+			{
+				// This URL should be replaced with your server side URL
+				//				var browserUrl:String = ExternalInterface.call("eval", "window.location.href");
+				//				var arr:Array =browserUrl.split("/");
+				ImageFormat=FilePath.text;				
+				uploadURL.url = "http://sstage.in/clientupload.php?id="+Txt_ClientName.text+"&pid="+ClientId+"&imgcount="+ImageCount+"&imgformat="+ImageFormat;
+				uploadURL.method = "POST"; // OR "POST" as you need it
+				uploadURL.contentType = "multipart/form-data";				
+				// Event Listeners for UI Buttons (Upload/Browse)
+				
+				Filedata.addEventListener(MouseEvent.CLICK, browseFiles);
+				uploadbutton.addEventListener(MouseEvent.CLICK,uploadFiles);
+				fileRef.addEventListener(Event.SELECT, selectHandler);
+				
+				
+			}
+			
+			//Browse for files
+			
+			private function browseFiles(event:Event):void
+			{
+				fileTypes.push(imageTypes);
+				fileTypes.push(documentTypes);
+				fileRef.browse(fileTypes);
+				
+			}
+			
+			// called after user selects a file form the browse window.
+			
+			private function selectHandler(event:Event):void
+			{
+				
+				FilePath.text = event.currentTarget.name.toString();
+				ImageFormat=FilePath.text;	
+				
+				//if()
+				
+			}
+			
+			// called when user clicks on the Upload button to upload the file
+			
+			private function uploadFiles():void
+			{
+				
+				fileRef.addEventListener(Event.COMPLETE, completeHandler);
+				fileRef.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA,dataHandler);
+				fileRef.addEventListener(SecurityErrorEvent.SECURITY_ERROR,securityErrorHandler);
+				fileRef.addEventListener(HTTPStatusEvent.HTTP_STATUS,httpStatusHandler);
+				fileRef.addEventListener(IOErrorEvent.IO_ERROR,ioErrorHandler);
+				fileRef.upload(uploadURL);
+			}
+			
+			// called after a file is uploaded
+			
+			private function completeHandler(event:Event):void
+			{
+				//Alert.show("File Uploaded successfully");
+				
+			}
+			
+			//called after file upload is done and Data has been returned from Server
+			
+			private function dataHandler(event:DataEvent):void
+			{
+				//Alert.show("File Uploaded successfully");
+				var browserUrl:String = ExternalInterface.call("eval", "window.location.href");
+				var arr:Array =browserUrl.split("/");
+				resultsTxtField.text = event.data.toString();
+				if(resultsTxtField.text=="There was an error uploading the file, please try again!")
+				{
+					alignAlert(Alert.show("There was an error uploading the Image, please try again!","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+				}
+				else
+				{
+					useWeb("ClientManagement","ImageUpload_CUSTOM",[GlobalXml,'IMAGEUPLOAD',"http://sstage.in/Client_images/"+resultsTxtField.text+"&"+ImageFormat,ClientId]);
+				}
+			}
+			
+			// called if there is an error detected by flash player browsing or uploading a file
+			
+			private function ioErrorHandler(event:IOErrorEvent):void
+			{
+				mx.controls.Alert.show(String(event),"ioError",0);
+			}
+			// called if a security error
+			
+			private function securityErrorHandler(event:SecurityErrorEvent):void
+			{
+				mx.controls.Alert.show(String(event),"Security Error",0);
+			}
+			// server will return an http status code, code 200 means all is good
+			
+			private function httpStatusHandler(event:HTTPStatusEvent):void
+			{
+				if (event.status != 200)
+				{
+					mx.controls.Alert.show(String(event),"Error",0);
+				}
+			}
+			
+			//Image Download
+			public var PropertyImageId:int=0;			
+			private function init1():void {
+				// Initialize the array collection to an empty collection. 
+				arrColl = new ArrayCollection();
+				
+				// Set up the URL request to download the file specified by the FILE_URL variable. 
+				urlReq = new URLRequest(FILE_URL);
+				
+				// Define file reference object and add a bunch of event listeners. 
+				fileRef = new FileReference();
+				fileRef.addEventListener(Event.CANCEL, doEvent);
+				fileRef.addEventListener(Event.COMPLETE, doEvent);
+				fileRef.addEventListener(Event.OPEN, doEvent);
+				fileRef.addEventListener(Event.SELECT, doEvent);
+				fileRef.addEventListener(HTTPStatusEvent.HTTP_STATUS, doEvent);
+				fileRef.addEventListener(IOErrorEvent.IO_ERROR, doEvent);
+				fileRef.addEventListener(ProgressEvent.PROGRESS, doEvent);
+				fileRef.addEventListener(SecurityErrorEvent.SECURITY_ERROR, doEvent);
+			}
+			
+			private function doEvent(evt:Event):void {
+				
+				FilePath.text="";
+			}
+			
+			private function downloadSourceCodeZip():void {
+				// Clear existing array collection. 
+				//arrColl = new ArrayCollection();
+				//Alert.show(FILE_URL);
+				// Hide the Text control. //
+				//txt.visible = false;
+				// Begin download. 
+				fileRef.download(urlReq);
+			}
+			
+			private function showAlert(item:Object):void {
+				Alert.show(item.eventString, item.type);
+			}
+			
+			
+			
+			
+		]]>
+	</fx:Script>
+	<fx:Style>
+		@namespace s "library://ns.adobe.com/flex/spark";
+		@namespace mx "library://ns.adobe.com/flex/mx";
+		@namespace WrbComp "WrbComp.*";
+		s|TextInput
+		{
+			borderVisible:true;
+		}
+	</fx:Style>
+	<s:VGroup x="0" y="0" width="100%" height="100%" gap="5" horizontalAlign="center" verticalAlign="middle">
+		<s:BorderContainer x="112" width="1039" height="500" backgroundColor="#fbf9f9" borderVisible="false">
+			<s:CheckBox x="617" y="77" label="Same as Address" id="Chk_SameasAddress"
+						change="Chk_SameasAddress_changeHandler(event)" tabIndex="16"/>
+			<s:Label x="9" y="50" text="Client Name"/>
+			<s:Label x="9" y="20" text="Client Information" color="Red"/>
+			<s:Label x="617" y="50" text="Master Client"/>
+			<s:TextInput x="185" y="46" width="220" height="20" id="Txt_ClientName" tabIndex="1" maxChars="50"/>
+			<s:Label x="9" y="81" text="Communication Address 1" />
+			<s:Label x="9" y="111" text="Address 2"/>
+			<s:TextInput id="Txt_CAddress1" x="185" y="77" width="220" height="20"
+						 change="Change()" tabIndex="2"/>
+			<s:Label x="617" y="111" text="Billing Address 1"/>
+			<s:Label x="617" y="141" text="Address 2"/>
+			<s:TextInput id="Txt_BAddress1" x="764" y="107" width="220" maxChars="50" height="20" tabIndex="17"/>
+			<s:TextInput id="Txt_BAddress2" x="765" y="137" width="220" maxChars="50" height="20" tabIndex="18"/>
+			<s:TextInput id="Txt_CAddress2" x="185" y="105" width="220" maxChars="50" height="20"
+						 change="Change()" tabIndex="3"/>
+			<s:Label x="9" y="177" text="State"/>
+			<s:TextInput id="Txt_CState" x="186" y="169" width="220" height="20" maxChars="25"
+						 change="Change()" tabIndex="6"/>
+			<s:Label x="9" y="141" text="Country"/>
+			<s:Label x="617" y="174" text="Country"/>
+			<s:Label x="617" y="205" text="State"/>
+			<s:TextInput id="Txt_BState" x="764" y="201" width="220" height="20" tabIndex="21" maxChars="25"/>
+			<s:Label x="617" y="233" text="City"/>
+			<s:TextInput id="Txt_BCity" x="764" y="229" width="220" height="20" tabIndex="22" maxChars="25"/>
+			<s:Label x="617" y="262" text="Locality"/>
+			<s:TextInput id="Txt_BLocality" x="764" y="258" width="220" height="20" tabIndex="23" maxChars="25"/>
+			<s:Label x="10" y="202" text="City"/>
+			<s:TextInput id="Txt_CCity" x="186" y="197" width="220" height="20"
+						 change="Change()" tabIndex="7" maxChars="50"/>
+			<s:Label x="12" y="229" text="Locality"/>
+			<s:TextInput id="Txt_CLocality" x="185" y="229" width="220" height="20"
+						 change="Change()" tabIndex="8" maxChars="50" />
+			<s:Label x="9" y="261" text="Postal Code"/>
+			<s:Label x="9" y="320" text="Payment Mode"/>
+			<s:TextInput id="Txt_CPincode" x="185" y="257" width="220" height="20" tabIndex="9"
+						 change="Change()" restrict="0-9" maxChars="6"/>
+			<s:Label x="9" y="290" text="Contact No"/>
+			<s:TextInput id="Txt_ContactNo" x="185" y="286" width="140" height="20"
+						 restrict="0-9" maxChars="13"  tabIndex="10"/>
+			<s:Label x="76" y="290" text="*" color="red"/>
+			<s:Label x="617" y="413" text="Domain Name"/>
+			<s:TextInput x="764" y="409" width="220" height="20" id="Txt_DomainName" tabIndex="28"/>
+			<s:Label x="617" y="443" text="Industry Type"/>
+			<s:TextInput x="764" y="439" width="220" height="20" id="Txt_IndustryType" tabIndex="29"/>
+			<s:Label x="9" y="443" text="Status"/>
+			<s:Label x="9" y="382" text="Credit Limit"/>
+			<s:Label x="9" y="351" text="Credit Policy" color="red"/>
+			<s:Label x="477.5" y="290" text="Client Logo" color="red" visible="false"/>
+			<s:Label x="80" y="382" text="*" id="Lbl_CreditLimit" color="red"/>
+			<s:Label x="85" y="50" text="*" color="red"/>
+			<s:Label x="160" y="81" text="*" color="red"/>
+			<s:Label x="55" y="140" color="red"/>
+			<s:Label x="44" y="173" text="*" color="red"/>
+			<s:Label x="37" y="202" text="*" color="red"/>
+			<s:Label x="60" y="229" text="*" color="red"/>
+			<s:Label x="84" y="261" text="*" color="red"/>
+			<s:Label x="710" y="320" text="*" color="red"/>
+			<s:Label x="713" y="111" text="*" color="red"/>
+			<s:Label x="666" y="262" text="*" color="red"/>
+			<s:Label x="645" y="233" text="*" color="red"/>
+			<s:Label x="652" y="205" text="*" color="red"/>
+			<s:Label x="692" y="290" text="*" color="red"/>
+			<s:Label x="650" y="351" text="*" color="red"/>
+			<s:Label x="738" y="382" text="*" color="red"/>
+			<s:Label x="702" y="412" text="*" color="red"/>
+			<s:Label x="129" y="413" text="*" id="Lbl_CreditPeriod" color="red"/>
+			<s:TextInput x="185" y="378" width="220" height="20" id="Txt_CreditLimit" restrict="0-9"
+						 maxChars="8" tabIndex="11"/>
+			<s:Label x="9" y="413" text="Credit Period In Days"/>
+			<s:Label x="617" y="290" text="Postal Code"/>
+			<s:TextInput id="Txt_BPincode" x="764" y="286" width="220" height="20" 
+						 tabIndex="24" restrict="0-9" maxChars="6"/>
+			<s:Label x="617" y="320" text="Sales Executive"/>
+			<s:DropDownList x="764" y="316" width="220" height="20" id="Ddl_SalesExecutive" tabIndex="25"
+							prompt="Select Sales Executive" change="Ddl_SalesExecutive_changeHandler(event)"/>
+			<s:Label x="617" y="351" text="CRM"/>
+			<s:DropDownList x="764" y="347" width="220" height="20" id="Ddl_CRM" tabIndex="26"
+							prompt="Select CRM" change="Ddl_CRM_changeHandler(event)"/>
+			<s:Label x="617" y="382" text="Key  Account  Person"/>
+			<s:DropDownList x="764" y="378" width="220" height="20" id="Ddl_KeyAccountPerson" tabIndex="27"
+							prompt="Select Key  Account  Person" change="Ddl_KeyAccountPerson_changeHandler(event)"/>
+			<s:DropDownList x="185" y="439" width="220" height="20" id="Ddl_Status" selectedItem="Active"
+							tabIndex="14">
+				<mx:ArrayCollection>
+					<fx:String>Active</fx:String>
+					<fx:String>InActive</fx:String>
+					<fx:String>UnApproved</fx:String>
+				</mx:ArrayCollection>
+			</s:DropDownList>
+			<s:DropDownList x="185" y="409" width="100" height="20" id="Ddl_CreditPeriodNumber"
+							selectedItem="Select"  tabIndex="12">
+				<mx:ArrayCollection>
+					<fx:String>Select</fx:String>
+					<fx:String>0</fx:String>
+					<fx:String>1</fx:String>
+					<fx:String>2</fx:String>
+					<fx:String>3</fx:String>
+					<fx:String>4</fx:String>
+					<fx:String>5</fx:String>
+					<fx:String>6</fx:String>
+					<fx:String>7</fx:String>
+					<fx:String>8</fx:String>
+					<fx:String>9</fx:String>
+					<fx:String>10</fx:String>
+					<fx:String>11</fx:String>
+					<fx:String>12</fx:String>
+					<fx:String>13</fx:String>
+					<fx:String>14</fx:String>
+					<fx:String>15</fx:String>
+					<fx:String>16</fx:String>
+					<fx:String>17</fx:String>
+					<fx:String>18</fx:String>
+					<fx:String>19</fx:String>
+					<fx:String>20</fx:String>
+					<fx:String>21</fx:String>
+					<fx:String>22</fx:String>
+					<fx:String>23</fx:String>
+					<fx:String>24</fx:String>
+					<fx:String>25</fx:String>
+					<fx:String>26</fx:String>
+					<fx:String>27</fx:String>
+					<fx:String>28</fx:String>
+					<fx:String>29</fx:String>
+					<fx:String>30</fx:String>
+					<fx:String>31</fx:String>
+					<fx:String>32</fx:String>
+					<fx:String>33</fx:String>
+					<fx:String>34</fx:String>
+					<fx:String>35</fx:String>
+					<fx:String>36</fx:String>
+					<fx:String>37</fx:String>
+					<fx:String>38</fx:String>
+					<fx:String>39</fx:String>
+					<fx:String>40</fx:String>
+					<fx:String>41</fx:String>
+					<fx:String>42</fx:String>
+					<fx:String>43</fx:String>
+					<fx:String>44</fx:String>
+					<fx:String>45</fx:String>
+					<fx:String>46</fx:String>
+					<fx:String>47</fx:String>
+					<fx:String>48</fx:String>
+					<fx:String>49</fx:String>
+					<fx:String>50</fx:String>
+					<fx:String>51</fx:String>
+					<fx:String>52</fx:String>
+					<fx:String>53</fx:String>
+					<fx:String>54</fx:String>
+					<fx:String>55</fx:String>
+					<fx:String>56</fx:String>
+					<fx:String>57</fx:String>
+					<fx:String>58</fx:String>
+					<fx:String>59</fx:String>
+					<fx:String>60</fx:String>
+					<fx:String>61</fx:String>
+					<fx:String>62</fx:String>
+					<fx:String>63</fx:String>
+					<fx:String>64</fx:String>
+					<fx:String>65</fx:String>
+					<fx:String>66</fx:String>
+					<fx:String>67</fx:String>
+					<fx:String>68</fx:String>
+					<fx:String>69</fx:String>
+					<fx:String>70</fx:String>
+					<fx:String>71</fx:String>
+					<fx:String>72</fx:String>
+					<fx:String>73</fx:String>
+					<fx:String>74</fx:String>
+					<fx:String>75</fx:String>
+					<fx:String>76</fx:String>
+					<fx:String>77</fx:String>
+					<fx:String>78</fx:String>
+					<fx:String>79</fx:String>
+					<fx:String>80</fx:String>
+					<fx:String>81</fx:String>
+					<fx:String>82</fx:String>
+					<fx:String>83</fx:String>
+					<fx:String>84</fx:String>
+					<fx:String>85</fx:String>
+					<fx:String>86</fx:String>
+					<fx:String>87</fx:String>
+					<fx:String>88</fx:String>
+					<fx:String>89</fx:String>				
+					<fx:String>90</fx:String>
+				</mx:ArrayCollection>
+			</s:DropDownList>
+			<s:DropDownList x="305" y="409" width="100" height="20" id="Ddl_CreditPeriod"
+							selectedItem="Select" tabIndex="13" visible="false">
+				<mx:ArrayCollection>
+					<fx:String>Select</fx:String>
+					<fx:String>Days</fx:String>
+					<fx:String>Year</fx:String>
+				</mx:ArrayCollection>
+			</s:DropDownList>
+			<s:HGroup x="185" y="317" gap="25">
+				<s:RadioButton label="Direct Pay" groupName="Mode" id="Rdb_DirectPay" focusEnabled="false"/>
+				<s:RadioButton label="BTC" groupName="Mode" id="Rdb_BTC" focusEnabled="false"/>
+			</s:HGroup>
+			<s:HGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle"
+					  id="Grp_ClientContacts" depth="10000" visible="false">
+				<s:BorderContainer width="100%" height="100%" backgroundAlpha="0.1" borderVisible="false">
+					<s:HGroup horizontalAlign="center" verticalAlign="middle" width="100%" height="100%">
+						<s:Panel x="3" y="38" width="947" height="423" title="Create New Client Contacts">
+							<s:Image x="921" y="-24" source="@Embed(source='../Assets/CrossSmall.png')" 
+									 buttonMode="true" toolTip="Close" click="FnClose_Pnl_ClientContacts()"/>
+							<WrbComp:ProDGrid1 x="23" y="21" width="900" height="294" id="Grd_AddNewClient"
+											   _ColDataField="EscalationLevel~Title~FirstName~LastName~MobileNo~Email~AlternateEmail~Designation~Id"
+											   _ColHdrText="EscalationLevel~Title~FirstName~LastName~MobileNo~Email~AlternateEmail~Designation~Id" 
+											   _ColType="hlp~hlp~txt~txt~txt~txt~txt~txt~txt"
+											   _colVisible="1~1~1~1~1~1~1~1~0" 
+											   _ColWidth="110~50~135~125~110~135~135~100~0" 
+											   _editable="1~1~1~1~1~1~1~1~0"
+											   _required="0~0~0~0~0~0~0~0~0" 
+											   _spltChar="~" 
+											   _visibleColNos="8"
+											   ID="ClientContact"
+											   _GridId="AddNewClient"
+											   _tabIndex="30"
+											   _DuplChk="false"/>
+											   <!--_getHlpTxtData="Grd_AddNewClient__getHlpTxtDataHandler(event)"/-->
+							<WrbComp:Button_HB x="431" y="337" _Label="Close" buttonMode="true"
+											   click="button_hb2_clickHandler(event)"/>
+						</s:Panel>
+					</s:HGroup>					
+				</s:BorderContainer>				
+			</s:HGroup>
+			<s:HGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle"
+					  id="Grp_PhoneNo" depth="1" visible="false">
+				<s:BorderContainer width="100%" height="100%" backgroundAlpha="0.1" borderVisible="false">
+					<s:HGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+						<s:Panel x="334" y="56" width="310" height="335" title="Contact Numbers">
+								<s:TextInput x="144" y="30" width="100" height="22" id="Txt_CPhoneNo1"
+											 restrict="0-9" maxChars="13" tabIndex="52"/>
+								<s:TextInput x="144" y="72" width="100" height="22" id="Txt_CPhoneNo2"
+											 restrict="0-9" maxChars="13" tabIndex="53"/>
+								<s:TextInput x="144" y="114" width="100" height="22" id="Txt_CPhoneNo3"
+											 restrict="0-9" maxChars="13"  tabIndex="54"/>
+								<s:TextInput x="144" y="156" width="100" height="22" id="Txt_CPhoneNo4"
+											 restrict="0-9" maxChars="13" tabIndex="55"/>
+								<s:TextInput x="144" y="198" width="100" height="22" id="Txt_CPhoneNo5"
+											 restrict="0-9" maxChars="13" tabIndex="56"/>
+								<s:Label x="50" y="203" text="Contact No 5"/>
+								<s:Label x="50" y="161" text="Contact No 4"/>
+								<s:Label x="50" y="119" text="Contact No 3"/>
+								<s:Label x="50" y="77" text="Contact No 2"/>
+								<s:Label x="50" y="35" text="Contact No 1"/>
+								<s:HGroup x="10" y="253" width="288" height="25" horizontalAlign="center"
+										  verticalAlign="middle">
+									<WrbComp:Button_HB _Label="Close" click="FnClose_Pnl_PhoneNo()"
+													   buttonMode="true"/>
+								</s:HGroup>
+							<s:Image x="282" y="-24" source="@Embed(source='../Assets/CrossSmall.png')" 
+									 buttonMode="true" click="FnClose_Pnl_PhoneNo()" toolTip="Close"/>
+						</s:Panel>
+					</s:HGroup>
+				</s:BorderContainer>				
+			</s:HGroup>
+			<s:HGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle"
+					  id="Grp_ClientGuest" depth="10000" visible="false">
+				<s:BorderContainer width="100%" height="100%" backgroundAlpha="0.1"  borderVisible="false">
+					<s:HGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+						<s:Panel x="-1" y="30" width="943" height="420" title="Client Guest">
+							<WrbComp:ProDGrid1 x="20" y="21" width="900" height="294" id="Grd_ClntGuest"
+											   _ColDataField="EmpCode~FirstName~LastName~Grade~GMobileNo~EmailId~Designation~RangeMin~RangeMax~Id"
+											   _ColHdrText="EmpCode~FirstName~LastName~Grade~GMobileNo~EmailId~Designation~RangeMin~RangeMax~Id" 
+											   _ColType="txt~txt~txt~txt~ntxt~txt~txt~ntxt~txt~txt"
+											   _colVisible="1~1~1~1~1~1~1~0~0~0" 
+											   _ColWidth="120~120~110~110~110~130~150~0~0~0" 
+											   _editable="1~1~1~1~1~1~1~0~0~0"
+											   _required="1~0~1~1~1~1~1~0~0~0" 
+											   _spltChar="~" 
+											   _visibleColNos="7"
+											   ID="ClientGuest"
+											   _GridId="ClntGuest"
+											   _tabIndex="39"/>
+							<s:Image x="917" y="-24" source="@Embed(source='../Assets/CrossSmall.png')" 
+									 buttonMode="true" toolTip="Close" click="FnClose_Pnl_ClientGuest()"/>
+							<WrbComp:Button_HB x="428" y="336" _Label="Close"
+											   click="button_hb3_clickHandler(event)"/>
+						</s:Panel>
+					</s:HGroup>					
+				</s:BorderContainer>
+			</s:HGroup>
+			<s:HGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle"
+					  id="Grp_CustomField" depth="10000" visible="false">
+				<s:BorderContainer width="100%" height="100%" backgroundAlpha="0.1" borderVisible="false">
+					<s:HGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+						<s:Panel x="36" y="41" width="990" height="416" title="Custom Fields">
+							<WrbComp:ProDGrid1 x="21" y="20" width="950" height="294" id="Grd_CustomField"
+											   _ColDataField="FieldName~FieldType~FieldValue~Mandatory~Visible~Id"
+											   _ColHdrText="FieldName~FieldType~FieldValue~Mandatory~Visible~Id" 
+											   _ColType="txt~hlp~txt~Chk~Chk~txt"
+											   _colVisible="1~1~1~1~1~0" 
+											   _ColWidth="100~100~630~70~50~0"
+											   _editable="1~1~1~1~1~1~0"
+											   _required="1~1~0~1~1~0" 
+											   _spltChar="~" 
+											   _visibleColNos="5"
+											   _DuplChk="false"
+											   ID="CustomField"
+											   _GridId="CustomField"
+											   _tabIndex="49"/>
+							<s:Image x="962" y="-24" buttonMode="true" click="FnClose_Pnl_CustomField()"
+									 source="@Embed(source='../Assets/CrossSmall.png')" toolTip="Close"/>
+							<WrbComp:Button_HB x="454" y="335" _Label="Close" buttonMode="true"
+											   click="button_hb4_clickHandler(event)"/>
+						</s:Panel>						
+					</s:HGroup>
+				</s:BorderContainer>
+			</s:HGroup>
+			<WrbComp:Button_HB id="Btn_CustomField" x="456" y="229" width="118" height="32"
+							   _Label="Custom Field" click="FnClick_Btn_CustomField()" depth="0"
+							   buttonMode="true" focusEnabled="false"/>
+			<WrbComp:Button_HB id="Btn_Browse" x="456" y="290" width="118" height="32" buttonMode="true"
+							   _Label="Image Upload" click="FnClick_Btn_Browse()" depth="0" focusEnabled="false" visible="true"/>
+			<WrbComp:Button_HB id="Btn_ClientGuest" x="456" y="168" width="118" height="32"
+							   _Label="Add Client Guest" click="FnClick_Btn_ClientGuest()" depth="0"
+							   buttonMode="true" focusEnabled="false"/>
+			<WrbComp:Button_HB id="Btn_ClientContacts" x="456" y="103" width="118" height="32"
+							   _Label="Client Contacts" click="FnClick_Btn_ClientContacts()" depth="0"
+							   buttonMode="true" focusEnabled="false"/>
+			<s:Image x="462" y="311" width="100" height="100" id="Img_ClientLogo"
+					 source="@Embed(source='../Assets/user.jpg')" visible="false"/>
+			<s:BorderContainer x="333" y="286" width="72" height="20" borderVisible="false" 
+							   backgroundColor="#c2c2c2" cornerRadius="5">
+				<mx:LinkButton x="0" y="0" label="Add More" width="72" height="20" 
+							   click="FnClick_Btn_PhoneNo()" cornerRadius="5" focusEnabled="false"/>
+			</s:BorderContainer>
+			<s:DropDownList x="764" y="168" width="115" id="drp_BCountry" tabIndex="19" 
+							change="drp_changeHandler2()" >
+				<s:ArrayList>
+					<fx:String>India</fx:String>
+					<fx:String>International</fx:String>
+				</s:ArrayList>
+			</s:DropDownList>
+			<!--s:DropDownList x="764" y="200" width="220" id="drp_BState" prompt="Select State" 
+							visible="false" change="ChangeState2()"></s:DropDownList-->
+			<!--s:DropDownList x="764" y="229" width="220" id="drp_BCity" prompt="Select City" 
+							visible="false" change="ChangeCity2()"></s:DropDownList-->
+			<!--s:DropDownList x="764" y="257" width="220" id="drp_BLocality" prompt="Select Locality" 
+							visible="false" change="ChangeLocality2()"></s:DropDownList-->
+			<WrbHelpComp:HelpText x="764" y="200" width="220" id="drp_BState" height="21" pxTabIndex="20"
+								  pxSetColumnsWidth="220,0" onselection="{ChangeState2()}" depth="1000">
+			</WrbHelpComp:HelpText>	
+			<WrbHelpComp:HelpText  x="764" y="229" width="220" id="drp_BCity" height="21" pxTabIndex="21"
+								   pxSetColumnsWidth="0,220" onselection="{ChangeCity2()}" depth="100">
+			</WrbHelpComp:HelpText>	
+			<WrbHelpComp:HelpText  x="764" y="257" width="220" id="drp_BLocality" height="21" pxTabIndex="22"
+								   pxSetColumnsWidth="220,0" onselection="{ChangeLocality2()}" depth="10">
+			</WrbHelpComp:HelpText>	
+			
+			<s:DropDownList x="186" y="135" width="114" id="drp_CCountry" 
+							change="drp_changeHandler1()" tabIndex="4">
+				<s:ArrayList>
+					<fx:String>India</fx:String>
+					<fx:String>International</fx:String>
+				</s:ArrayList>
+			</s:DropDownList>
+			
+			<!--s:DropDownList x="185" y="168" width="220" id="drp_CState" prompt="Select State" 
+							visible="false" change="ChangeState1()"></s:DropDownList>
+			<s:DropDownList x="185" y="197" width="220" id="drp_CCity" prompt="Select City" 
+							visible="false" change="ChangeCity1()"></s:DropDownList>
+			<s:DropDownList x="185" y="228" width="220" id="drp_CLocality" prompt="Select Locality" 
+							visible="false" change="ChangeLocality1()"></s:DropDownList-->
+			<WrbHelpComp:HelpText x="185" y="168" width="220" id="drp_CState" height="21"
+								  pxTabIndex="5" pxSetColumnsWidth="220,0" onselection="{ChangeState1()}" depth="1000" >
+			</WrbHelpComp:HelpText>	
+			<WrbHelpComp:HelpText  x="185" y="197" width="220" id="drp_CCity" height="21"
+								   pxTabIndex="6" pxSetColumnsWidth="0,220" onselection="{ChangeCity1()}" depth="100">
+			</WrbHelpComp:HelpText>	
+			<WrbHelpComp:HelpText  x="185" y="228" width="220" id="drp_CLocality" height="21"
+								   pxTabIndex="7" pxSetColumnsWidth="220,0" onselection="{ChangeLocality1()}" depth="10">
+			</WrbHelpComp:HelpText>
+			
+			<s:TextInput id="txt_InCCountry" visible="true" x="308" y="135" width="110"
+						 change="Change()" tabIndex="5"/> 
+			<s:TextInput id="txt_InBCountry" visible="true" x="887" y="167" width="110" tabIndex="20"/>
+			<!--s:DropDownList x="767" y="44" width="220" id="drp_MasterClient" change="fnGetMasterClient()"
+							tabIndex="15">				
+			</s:DropDownList-->
+			<s:CheckBox id="ServiceCharge" x="344" y="317" label="Service Charge"/>
+			<WrbHelpComp:HelpText x="767" y="44" width="220" id="drp_MasterClient" 
+								  tabIndex="15" depth="2000" onselection="{fnGetMasterClient()}" pxSetColumnsWidth="0,0,0,0,220,0,0,0,0,0">
+			</WrbHelpComp:HelpText>
+			<s:CheckBox x="767" y="77" label="Master Client Address" change="Chk_MasterClientAddress_changeHandler()" id="Chk_MasterAddress"/>
+			<s:Image x="456" y="351" width="118" height="108" id="Img_Client" source="Assets/user.jpg" visible="false"/>
+		</s:BorderContainer>
+		
+		<mx:HRule x="0" y="417" width="100%" strokeColor="#eb1c24"/>
+		<s:HGroup width="100%" height="25" horizontalAlign="center">
+			<WrbComp:SaveControl id="SCtrl" docSave="SCtrl_docSaveHandler()"
+								 docClear="SCtrl_docClearHandler()" docDelete="SCtrl_docDeleteHandler()"
+								 doSearch="SCtrl_doSearchHandler()"/>
+		</s:HGroup>
+	</s:VGroup>
+	<s:BorderContainer x="293" y="95" width="437" height="237" id="Brd_imageUpload" visible="false" borderVisible="true"
+					   backgroundColor="#fbf9f9" cornerRadius="5">
+		<mx:Panel x="37" y="39" title="Image Uploader">
+			<mx:ControlBar>
+				<mx:Spacer width="80%"/>
+				<mx:HBox>
+					<mx:TextInput id="FilePath" width="150"  visible="true"/>
+					<mx:Button id="Filedata" label="Browse File" name="Filedata" />
+					<mx:Button label="UpLoad File" name="uploadbutton" id="uploadbutton" visible="false" width="0" />
+				</mx:HBox>
+				<mx:TextArea id="resultsTxtField"  width="0"  name="resultsTxtField" visible="false"/>
+			</mx:ControlBar>
+		</mx:Panel>
+		<mx:Button id="downloadBtn1" x="247" y="172" height="40" label="Download"
+				   click="downloadSourceCodeZip();"  toolTip="{FILE_URL}"/>
+		<s:TextInput x="37" y="172" width="189" height="40" id="txt_ImageName" enabled="false"/>		
+		
+		<WrbComp:Button_HB x="339" y="172" height="40" _Label="Close" click="{Brd_imageUpload.visible=false;}"/>
+		<WrbComp:Button_HB id="downloadBtn" x="247" y="172" height="40" _Label="Download"
+						   click="downloadSourceCodeZip();"  toolTip="{FILE_URL}"/>
+	</s:BorderContainer>
+</s:Application>

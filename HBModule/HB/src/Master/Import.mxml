@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:WrbComp="WrbComp.*" 
+			   pageTitle="Import Bank Statement"
+			   width="967" height="534" minWidth="955" minHeight="600" 
+			   creationComplete="Pageload()" 
+			   keyDown="application1_keyDownHandler(event)">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Style source="..\\Common\\ApplicationCSS.css" />
+	<fx:Script source="..\\Common\\CommonScript.as" />
+	<fx:Script source="..\\Common\\Functions.as"/>
+	<fx:Script>
+		
+		<![CDATA[
+			import WrbComp.frmsearchwindow;
+			
+			import com.as3xls.xls.Cell;
+			import com.as3xls.xls.ExcelFile;
+			import com.as3xls.xls.Sheet;
+			
+			import flash.events.Event;
+			import flash.net.FileFilter;
+			import flash.net.FileReference;
+			import flash.utils.ByteArray;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Text;
+			import mx.core.Repeater;
+			import mx.graphics.shaderClasses.SaturationShader;
+			import mx.utils.OrderedObject;
+			import mx.utils.object_proxy;
+			
+			import spark.events.GridEvent;
+			private var ef:ExcelFile;        
+			private var ba:ByteArray;   
+			private var fr:FileReference;    
+			
+			public var FltNm:String="";
+			private var FilterAC:ArrayCollection;
+			private var firstTime:Boolean = true;
+			private var myArrayCollection:ArrayCollection;
+			
+			import mx.events.CloseEvent;
+			public var ErrStr:String="";
+			public static var GlobalXml:String="";					
+			public static var Global_AC:ArrayCollection=new ArrayCollection();
+			private var SubGroupId:int=0; 
+			private var Id:int=0,Code:int=0; 
+			public var AddMode:Boolean = true;
+			private var SearchPopUp:frmsearchwindow = new frmsearchwindow();
+			public var myFileReference:FileReference = new FileReference(); 
+			private var HdrpkId:Number=0; 
+			public var grid:ArrayCollection = new ArrayCollection();
+			private const FILE_URL:String= "http://sstage.in/Guest_Import/NewBankSt.xls";
+			public  var fileRef:FileReference=new FileReference();
+			private var urlReq:URLRequest;
+			private var sheet:Sheet; 
+			private var loadedFile:ByteArray;
+			
+			public function Pageload():void
+			{
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				var sav =Global_AC[0].sav;
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";
+				ef = new ExcelFile();                                    
+				ba = new ByteArray();                                    
+				fr = new FileReference();  
+				statsCollection = new ArrayCollection();  
+				SCtrl.setButtonRights("Delete",true);
+				SCtrl.setButtonRights("Reload",true);
+				SCtrl.setButtonRights("Search",true);
+				init();
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				{
+					if(AddMode==true)
+					{
+						alignAlert(Alert.show("Saved Successfully",null,Alert.OK, null, null,iconTickLarge, Alert.OK),10,"");	
+					}
+					else
+					{
+						alignAlert(Alert.show("Updated Successfully",null,Alert.OK, null, null,iconTickLarge, Alert.OK),10,"");
+					}	
+					Clear();
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Search_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{	
+						Dtf_date.text=Ds_Objects.result.Tables.Table.Rows[0].loginDate; 	
+						FilterAC=Import_Grd.dataProvider as ArrayCollection 
+						Import_Grd.dataProvider(Ds_Objects.result.Tables.Table1.Rows as ArrayCollection)
+						Id=Ds_Objects.result.Tables.Table.Rows[0].Id; 
+						myArrayCollection=Import_Grd.dataProvider as ArrayCollection
+						
+						AddMode=false; 
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Delete_CUSTOM")
+				{	
+					alignAlert(Alert.show("Delete Successfully",null,Alert.OK, null, null,iconTickLarge, Alert.OK),10,"");
+					Clear();	
+				}		 
+			}
+			protected function application1_keyDownHandler(event:KeyboardEvent):void
+			{
+				SCtrl.KeyHandler(event);
+			}	
+			protected function Save():void
+			{
+				ErrStr="";
+				
+				if((DG.dataProvider==null)||(DG.dataProvider.length==0))
+				{
+					alignAlert(Alert.show("Import the Excel Sheet ",null,Alert.OK, null, null,iconWarning, Alert.OK),10,"");
+					return
+				} 
+				
+				Validatecheck();
+				if(ErrStr !="")
+				{
+					alignAlert(Alert.show(ErrStr,"Alert",Alert.OK,this,null,iconErrLarge),10,"");
+					return;
+				}  
+			} 		
+	
+			private function Search()
+			{				
+				Clear();
+				
+				PopUpManager.addPopUp( SearchPopUp , this, true);
+				SearchPopUp.Prc_name=""
+				var SearchParam:Array =new Array();
+				SearchPopUp.HlpIndex="SEARCH"
+				SearchParam[0]=0;
+				SearchParam[1]="";
+				SearchParam[2]=0;
+				SearchParam[3]=0;				
+				SearchPopUp.Prc_Param=SearchParam
+				SearchPopUp.HlpSrchGlobal=""
+				SearchPopUp.dataPanel.focusEnabled=true
+				SearchPopUp.Pageint()					
+				SearchPopUp.addEventListener("PopupEnter",funpopupEnter);
+				SearchPopUp.addEventListener("PopupClose",funpopupClose);
+				PopUpManager.centerPopUp(SearchPopUp); 
+			}
+			private function funpopupClose(event:Event)
+			{ 
+			}
+			private function funpopupEnter(event:Event)
+			{				
+				SearchDtls(SearchPopUp.SelectRow.loginDate,0);			
+			}
+			private function SearchDtls(_BIHPk:String,_PrdFk:int):void
+			{
+				var Load:Array =new Array();
+				Load[0]=1; Load[1]=_BIHPk; Load[2]=0; Load[3]=0;  				
+				useWeb("ImportExcel","Search_CUSTOM",Load);
+			}
+
+			private function removeDgridItem(event:CloseEvent):void 
+			{	
+				if (event.detail==Alert.YES) 
+				{	
+					var Load:Array = new Array();
+					Load[0]= Id; Load[1]=""; Load[2]= 0; Load[3]= 0; 
+					useWeb("ImportExcel","Delete_CUSTOM",Load);
+				}
+			} 
+			private function Clear():void
+			{
+				
+				statsCollection.removeAll();
+				TempArr.removeAll();					
+				ef.sheets.length;
+				HdrpkId=0;
+				Id=0;
+				
+				ef = new ExcelFile();                                    
+				ba = new ByteArray();                                    
+				fr = new FileReference(); 
+				Tempar.removeAll();
+				myArrayCollection=null;
+				DG.dataProvider=null;
+				AddMode=true;
+				
+			}
+			[Bindable] 
+			private var statsCollection:ArrayCollection; 
+			private function importXLS(e:Event):void                                                     
+			{               
+				Clear();
+				var fileFilter:FileFilter = new FileFilter("Excel (.xls)", "*.xls;");                         
+				fr.addEventListener(Event.SELECT, selectXLS);                                                 
+				fr.browse([fileFilter]);                                                                      
+			}   
+			
+			private function selectXLS(e:Event):void
+			{  
+				
+				if(fr.type==".xls")
+				{
+					fr = FileReference(e.target);                                                                 
+					fr.addEventListener(Event.COMPLETE, fileIn);                                                  
+					fr.load();                                                                                    
+				}    
+				else
+				{
+					ErrStr=ErrStr+"*File is not Excel Format\n"
+					return;
+				}
+			}
+			public var TempArr:ArrayCollection=new ArrayCollection();
+			private function fileIn(e:Event):void
+			{  
+				loadedFile = e.target.data; 
+				var excelFile:ExcelFile = new ExcelFile(); 
+				excelFile.loadFromByteArray(loadedFile);
+				sheet = excelFile.sheets[0]; // Reads sheet1
+				//Alert.show(sheet.getCell(1,0).value) // getCell(Row, Col)
+				DG.dataProvider=sheet.values; // Imports all excel cells to Datagrid
+				var tRows:int = sheet.rows;                                                                   
+				//tRows=tRows-2;
+				
+//				var excelFile:ExcelFile = new ExcelFile(); 
+//				ba = new ByteArray();  
+//				ba = fr.data;  
+//				ef = new ExcelFile();  
+//				ef.loadFromByteArray(ba);                                                                     
+//				var sheet:Sheet = ef.sheets[0];                                                               
+//				var tCols:int = sheet.cols;                                                                   
+//				sheet = excelFile.sheets[0];
+				//Alert.show("Import Sussesful");
+				//DG.Columns[0].HeaderText = "First Column"; 
+//				DG.dataProvider=sheet.values;
+				//statusLabel.text = ef.sheets.length + " sheets; " + tCols + " columns; " + tRows + " rows";   
+				
+//				statsCollection = new ArrayCollection();                                                      
+//				
+//				var cols: Array = DG.columns;
+//				cols.push(newColumn);
+//				DG.columns = cols;
+//				// The following line is very important
+//				// (otherwise the grid won't be aware of the new columns yet)
+//				DG.validateNow();
+//				// Force the width of a specific column
+//				cols[0].width = 40;
+				
+				
+				
+				for(var i:int=1; i<=tRows; i++)
+				{                                                              
+				    var statsEntry:Object = new Object();                                                   
+					statsEntry.AccountNumber = sheet.getCell(i,0).value;                                                
+					statsEntry.TxnDate = sheet.getCell(i,1).value;                                                                
+					statsEntry.Description = sheet.getCell(i,2).value;                                                
+					statsEntry.RefNo = sheet.getCell(i,3).value;                                                                                        
+					statsEntry.Credit = sheet.getCell(i,4).value;                                               
+					
+					if(statsEntry.Name != "")                                                                 
+					{                                                                                             
+						statsCollection.addItem(statsEntry);                                                  
+					}   
+				}	
+			}    
+			public var ErrStr1:String="";
+			public var Tempar:ArrayCollection=new ArrayCollection();
+			private function Validatecheck():void
+			{   
+				ErrStr=""; 
+				Tempar.removeAll();
+				grid = DG.dataProvider as ArrayCollection;
+				var arr:Array= new Array();
+				arr=grid.source; 
+				
+				for(var i=0;arr[i]<=arr;i++)
+				{ 
+						alignAlert(Alert.show("Do you want to Save this item?", "Warning",Alert.YES | Alert.NO, null,
+							Savesuccess, iconWarning, Alert.NO),10,"");
+					return;  
+				}
+			}
+			
+			private function Savesuccess(event:CloseEvent):void 
+			{	
+				if (event.detail==Alert.YES) 
+				{	
+					var statsEntry:Object = new Object(); 
+					var arrcopysave:ArrayCollection = new ArrayCollection
+						([{
+							AccountNumber:statsEntry.AccountNumber,
+							TxnDate:statsEntry.TxnDate,
+							ValueDate:statsEntry.ValueDate,                       
+							RefNo:statsEntry.RefNo,                                            
+							Description:statsEntry.Description,                                            
+							BranchCode:statsEntry.BranchCode,                                             
+							Credit:statsEntry.Credit                                               
+						}])
+			
+					GlobalXml="";
+					GlobalXml += "<ROOT>";
+					GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+					GlobalXml += "</ROOT>";		
+					
+					var HdrXml:String=""
+					HdrXml += "<ROOT>";	
+					HdrXml += ObjToXmlStr_Comm(statsCollection,"HdrXml") 
+					HdrXml += "</ROOT>";
+					useWeb("ImportExcel","Save_CUSTOM",[GlobalXml,HdrXml]); 
+				} 
+			}
+			
+			protected function clearMyTextInput():void
+			{
+				if (firstTime == true )
+				{
+					firstTime = false;					
+				}		 
+			} 
+			
+			var tempAC:ArrayCollection=new ArrayCollection();
+			public var FltCode:String="";
+			private function filter(Filt:String):void
+			{ 
+				FltCode=Filt;				
+				tempAC = Import_Grd.dataProvider as ArrayCollection;
+				tempAC.refresh();  
+			}	
+			protected function clearMyTextInput1():void
+			{
+				if (firstTime == true )
+				{
+					firstTime = false;					
+				}		 
+			} 
+			private function init():void {
+				urlReq = new URLRequest(FILE_URL);
+				fileRef.addEventListener(Event.CANCEL, doEvent);
+				fileRef.addEventListener(Event.COMPLETE, doEvent);
+				fileRef.addEventListener(Event.OPEN, doEvent);
+				fileRef.addEventListener(Event.SELECT, doEvent);
+				fileRef.addEventListener(HTTPStatusEvent.HTTP_STATUS, doEvent);
+				fileRef.addEventListener(IOErrorEvent.IO_ERROR, doEvent);
+				fileRef.addEventListener(ProgressEvent.PROGRESS, doEvent);
+				fileRef.addEventListener(SecurityErrorEvent.SECURITY_ERROR, doEvent);
+			}
+			private function doEvent(evt:Event):void{
+				//Alert.show(evt.toString());
+			}
+			private function downloadSourceCodeZip():void
+			{	
+				fileRef.download(urlReq);
+			}
+		]]>
+	</fx:Script>
+	<s:BorderContainer x="37" y="24" width="933" height="415" backgroundColor="#fbf9f9" borderVisible="false" borderWeight="2" cornerRadius="10">
+		<s:BorderContainer x="56" y="71" width="663" height="21" backgroundColor="#fbf9f9"
+						   borderVisible="false" depth="1000">
+			
+		</s:BorderContainer>
+		<mx:DataGrid id="Employecode" x="789" y="41" width="127" height="342" visible="false">
+			<mx:columns>
+				<mx:DataGridColumn headerText="ECODE" dataField="ECODE" width="70"/>
+			</mx:columns>
+		</mx:DataGrid> 
+		<s:Button x="727" y="10" width="124" height="36" label="Import XLS" click="importXLS(event)"/>    
+		<mx:Button id="downloadBtn" x="23" y="10" width="163" height="36"
+				   label="Download Sample Excel" click="downloadSourceCodeZip()"
+				   toolTip="{FILE_URL}"/>
+		<!--WrbComp:ProDGrid id="Import_Grd" x="5" y="35" width="904" height="342"
+						  _borderVisible="true"
+						  _ColDataField="PropertyName~Code~Category~PropertDescription~Prefix~Propertaddress~City~Localityarea~State~Postal~Phone~Directions~Keyword~ServicesSwimPool~ServicePub~ServicesGym~ServicesRestaurant~ServicesConfHall~ServicesCyberCafe~ServicesLaundry~ShowOnWebsite~LatitudeLongitude~Date~Status~Id~CreatedBy~CreatedDate~ModifiedBy~ModifiedDate~IsActive~IsDeleted~RowId~StateId~CityId~LocalityId~TotalNoRooms~RackTarrifSingle~PropertyType~RackTarrifDouble~BookingPolicy~CancelPolicy"
+						  _ColHdrText="PropertyName~Code~Category~PropertDescription~Prefix~Propertaddress~City~Localityarea~State~Postal~Phone~Directions~Keyword~ServicesSwimPool~ServicePub~ServicesGym~ServicesRestaurant~ServicesConfHall~ServicesCyberCafe~ServicesLaundry~ShowOnWebsite~LatitudeLongitude~Date~Status~Id~CreatedBy~CreatedDate~ModifiedBy~ModifiedDate~IsActive~IsDeleted~RowId~StateId~CityId~LocalityId~TotalNoRooms~RackTarrifSingle~PropertyType~RackTarrifDouble~BookingPolicy~CancelPolicy"
+						  _ColType="txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt"
+						  _colVisible="1~0~1~1~0~1~1~1~1~0~1~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~1~0~0~0"
+						  _ColWidth="95~0~100~120~0~100~100~100~80~0~80~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~100~0~0~0" 
+						  _editable="1~0~1~1~0~0~0~1~1~0~1~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~1~0~0~0"
+						  _required="1~0~1~1~0~0~0~1~1~0~1~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~1~0~0~0" 
+						  _spltChar="~" _visibleColNos="11" >
+		</WrbComp:ProDGrid--> 
+		<!--WrbComp:ProDGrid id="Import_Grd" x="20" y="35" width="889" height="342" visible="false"
+						  _borderVisible="true"
+						  _ColDataField="AccountNumber~TxnDate~ValueDate~Description~RefNo~BranchCode~Credit"
+						  _ColHdrText="AccountNumber~TxnDate~ValueDate~Description~RefNo/ChequeNo~BranchCode~Credit"
+						  _ColType="txt~txt~txt~txt~txt~txt~txt"
+						  _colVisible="1~1~1~1~1~1~1"
+						  _ColWidth="120~80~80~300~100~100~100" 
+						  _editable="1~1~1~1~1~1~1"
+						  _required="1~1~1~1~1~1~1" 
+						  _spltChar="~" _visibleColNos="7" >
+		</WrbComp:ProDGrid--> 
+		<mx:DateField x="247" y="10" width="111"  selectedDate="{new Date()}" formatString="DD/MM/YYYY" id="Dtf_date" enabled="false"/>
+		<mx:DataGrid dataProvider="{statsCollection}" x="6" y="54" width="900" height="309" id="Import_Grd" visible="false">
+		<mx:columns>
+		<mx:DataGridColumn headerText="UId" dataField="AccountNumber" width="120"/>
+		<mx:DataGridColumn headerText="TxnDate" dataField="TxnDate" width="100"/>
+		<!--mx:DataGridColumn headerText="ValueDate" dataField="ValueDate" width="100"/-->
+		<mx:DataGridColumn headerText="Description" dataField="Description" width="400"/>
+		<mx:DataGridColumn headerText="RefNo/ChequeNo" dataField="RefNo" width="150"/> 
+		<!--mx:DataGridColumn headerText="BranchCode" dataField="BranchCode" width="140"/-->
+		<mx:DataGridColumn headerText="Credit" dataField="Credit" width="140"/>
+			
+		</mx:columns>
+		</mx:DataGrid> 
+		<mx:DataGrid id="DG" x="81" y="72" width="628" height="276"/>
+			<!--mx:columns>
+				<mx:DataGridColumn headerText="UId" dataField="AccountNumber" width="120"/>
+				<mx:DataGridColumn headerText="TxnDate" dataField="TxnDate" width="100"/>
+				<mx:DataGridColumn headerText="Description" dataField="Description" width="400"/>
+				<mx:DataGridColumn headerText="RefNo/ChequeNo" dataField="RefNo" width="150"/> 
+			</mx:columns-->
+	
+	</s:BorderContainer> 
+	<s:BorderContainer x="37" y="451" width="933" height="43" cornerRadius="5" backgroundColor="#fbf9f9">
+		<WrbComp:SaveControl x="192" y="9" depth="1" id="SCtrl" tabIndex="9" docSave="Save()" 
+							 doSearch="Search()" docClear="Clear()">
+		</WrbComp:SaveControl>
+	</s:BorderContainer>
+</s:Application>

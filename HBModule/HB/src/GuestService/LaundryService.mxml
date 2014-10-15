@@ -1,0 +1,575 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:WrbComp="WrbComp.*"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   width="100%" height="100%" creationComplete="PageLoad()">
+	<fx:Declarations>
+		<mx:NumberFormatter id="NF_Two" precision="2" rounding="nearest"/>
+	</fx:Declarations>
+	<fx:Style source = "..\\Common\\ApplicationCSS.css"/>
+	<fx:Script source="..\\Common\\CommonScript.as"/>
+	<fx:Script source="..\\Common\\Functions.as"/>
+	<fx:Script>
+		<![CDATA[
+			import WrbComp.frmsearchwindow;
+			
+			import com.as3xls.xls.Type;
+			
+			import mx.containers.Accordion;
+			import mx.controls.Text;
+			import mx.events.CalendarLayoutChangeEvent;
+			import mx.events.CloseEvent;
+			import mx.events.ColorPickerEvent;
+			import mx.events.FlexEvent;
+			import mx.events.IndexChangedEvent;
+			import mx.events.ListEvent;
+			import mx.messaging.config.ServerConfig;
+			
+			import spark.components.gridClasses.DefaultGridItemEditor;
+			import spark.components.supportClasses.InteractionState;
+			import spark.events.IndexChangeEvent;
+			public var ErrStr:String=""; 
+			public var _HdrArrCol:ArrayCollection;
+			public var HdrAC:ArrayCollection=new ArrayCollection();
+			public var DtlsAC:ArrayCollection=new ArrayCollection();
+			public static var GlobalXml:String="";
+			public static var Global_AC:ArrayCollection=new ArrayCollection();
+			public  var Temp_ACGrid:ArrayCollection=new ArrayCollection();
+			public  var TempProduct_AC:ArrayCollection=new ArrayCollection();
+			private var SearchPopUp:frmsearchwindow = new frmsearchwindow();
+			public var Id:int=0,PropertyId:int=0,Tariff:int=0,BookingId:int=0,RoomId:int=0,GuestId:int=0,ItemId:int=0;
+			public var Price:int=0,Quantity:int=0,CheckInId:int=0;
+			public var RoomNo:String="";
+			protected function PageLoad():void
+			{
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";
+				Help();
+				dt_Date.selectedDate = new Date();
+				SCtrl.setButtonRights("Delete",true);
+				SCtrl.setButtonRights("Search",true);
+				//SCtrl.setButtonRights("Search",true);
+				hlp_Property.setFocus();
+				TempProduct_AC=new ArrayCollection();
+				Grd_Details.dataProvider=TempProduct_AC;
+				
+			}
+			public function Help():void
+			{				
+				useWeb("LaundryService","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","",0,Global_AC[0].UsrId]);
+			}
+			//			public var TempProduct_AC:ArrayCollection = new ArrayCollection();
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "PageLoad_CUSTOM")
+				{
+					if(Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						hlp_Property.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Guest_CUSTOM")
+				{
+					hlp_Guest.dataProvider=null;
+					if(Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						hlp_Guest.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Date_CUSTOM")
+				{
+					hlp_Guest.dataProvider=null;
+					if(Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						hlp_Guest.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+					
+					
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "ToService_CUSTOM")
+				{
+					if(Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_Items.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				{
+					
+					if (Id == 0)
+					{
+						alignAlert(Alert.show("Service Added Successfully.","Message !",Alert.OK| Alert.NO,
+							null, null,	iconTickLarge, Alert.OK),10,"");
+					}
+					else
+					{
+						alignAlert(Alert.show("Service Updated Successfully.","Message !",Alert.OK,
+							null, null,	iconTickLarge, Alert.OK),10,"");
+					}
+					FnClr();					
+				} 
+			}
+			public var NewPropertyId:Number=0;
+			public function OnSelectionPropertyname():void
+			{
+				if(hlp_Property.selected())
+				{
+					NewPropertyId=hlp_Property.Select_Row.PropertyId;
+					hlp_Property.text=hlp_Property.Select_Row.Property;
+					useWeb("LaundryService","Guest_CUSTOM",[GlobalXml,'Property',"","",0,NewPropertyId]);
+					hlp_Guest.enabled=true;
+					dt_Date.enabled=true;
+				}
+				else
+				{
+					hlp_Property.text="";
+					hlp_Guest.enabled=false;
+					dt_Date.enabled=false;
+					PropertyId=0;BookingId=0;
+					RoomId=0;CheckInId=0;
+				}
+				hlp_Guest.setFocus();
+			}
+			public var GetType:String=""; 
+			public function OnSelectionGuestname():void
+			{
+				if(hlp_Guest.selected())
+				{
+					GuestId=hlp_Guest.Select_Row.GuestId;
+					hlp_Guest.text=hlp_Guest.Select_Row.GuestName;
+					lbl_Guest.text=hlp_Guest.Select_Row.GuestName;
+					GetType=hlp_Guest.Select_Row.GetTypeId;
+					lbl_RoomNo.text=hlp_Guest.Select_Row.RoomNoId;
+					Txt_BookingCode.text=hlp_Guest.Select_Row.BookingCodeId;
+					Txt_ClientName.text=hlp_Guest.Select_Row.ClientNameId;
+					PropertyId=hlp_Guest.Select_Row.PropertyId;
+					BookingId=hlp_Guest.Select_Row.BookingId;
+					RoomId=hlp_Guest.Select_Row.RoomId;
+					CheckInId=hlp_Guest.Select_Row.Id;
+					useWeb("LaundryService","ToService_CUSTOM",[GlobalXml,'GuestName',"","",GuestId,CheckInId]);
+					//	useWeb("NewKOTEntry","Show_CUSTOM",[GlobalXml,'Show',"","",0,GuestId]);
+				}
+				else
+				{
+					hlp_Guest.text="";
+					GuestId=0;
+				}
+			}
+			
+			public function Validation():String
+			{
+				ErrStr="";
+				var TxtFlag:Boolean=true;
+				if(hlp_Property.text=="")
+				{
+					if(TxtFlag==true)
+					{
+						hlp_Property.setFocus();TxtFlag=false;
+					}
+					ErrStr=ErrStr+"* Property is Required.\n";					
+				}
+				if(dt_Date.text=="")
+				{
+					if(TxtFlag==true)
+					{
+						dt_Date.setFocus();TxtFlag=false;
+					}
+					ErrStr=ErrStr+"* Date is Required.\n";					
+				}
+				
+				var Temp_AC:ArrayCollection=new ArrayCollection();
+				Temp_AC=Grd_Details.dataProvider as ArrayCollection;
+				if((Temp_AC==null)||(Temp_AC.length==0))
+				{
+					ErrStr=ErrStr+"*  Items are Required.\n";
+				}
+				if(hlp_Guest.text=="")
+					{
+						if(TxtFlag==true)
+						{
+							hlp_Guest.setFocus();TxtFlag=false;
+						}
+						ErrStr=ErrStr+"* Guest Name is Required.\n";					
+					}
+				
+				return ErrStr;
+				
+			}
+			
+			protected function FnSave():void
+			{
+				ErrStr="";
+				ErrStr=Validation()
+				
+				if(ErrStr!="")
+				{
+					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
+					return;					
+				}
+				var Flag:Boolean=true;
+				HdrAC=new ArrayCollection();
+				DtlsAC=new ArrayCollection();
+				
+					var arrHdr:ArrayCollection=new ArrayCollection
+						([{
+							PropertyName:hlp_Property.text,Date:dt_Date.text,PropertyId:NewPropertyId,
+							GuestName:hlp_Guest.text,GuestId:GuestId,GetType:GetType,RoomNo:lbl_RoomNo.text,
+							BookingCode:Txt_BookingCode.text,ClientName:Txt_ClientName.text,TotalAmount:Txt_TotalAmount.text,
+							BookingId:BookingId,RoomId:RoomId,CheckInId:CheckInId,
+							Id:Id
+							
+						}]);
+					var HdrXml:String = ObjToXmlStr_Comm(arrHdr,"HdrXml");
+					var KOT:ArrayCollection= new  ArrayCollection();
+					var ServiceXml:String="";
+					ServiceXml += "<ROOT>";
+					ServiceXml += ObjToXmlStr_Comm(Grd_Details.dataProvider as ArrayCollection,"ServiceXml")
+					ServiceXml += "</ROOT>";
+					HdrAC=arrHdr;
+					DtlsAC=Grd_Details as ArrayCollection;
+					useWeb("LaundryService","Save_CUSTOM",[GlobalXml,HdrXml,ServiceXml]);
+				
+			}
+			protected function FnClr():void
+			{
+				
+				hlp_Property.text="";
+				Id=0;BookingId=0;RoomId=0;CheckInId=0;
+				PropertyId=0;
+				Grd_Items.dataProvider=null;
+				hlp_Guest.text="";
+				Txt_BookingCode.text="";
+				lbl_RoomNo.text="";
+				Txt_ClientName.text="";
+				GuestId=0;lbl_Guest.text="";
+				TempProduct_AC=new ArrayCollection();
+				Grd_Details.dataProvider=TempProduct_AC;
+				//TempAmount_AC=new ArrayCollection();
+				Temp_ACGrid==new ArrayCollection();
+				Txt_TotalAmount.text="0.00";
+				hlp_Guest.enabled=false;
+				
+				Guest.visible=true;lbl_book.visible=true;
+				lbl_Client.visible=true;lbl_RoomNo.visible=true;
+				lbl_Room.visible=true;lbl_Guest1.visible=true;
+				Txt_BookingCode.visible=true;
+				Txt_ClientName.visible=true;
+			}
+			protected function FnSearch():void
+			{
+					PopUpManager.addPopUp( SearchPopUp , this, true);
+					SearchPopUp.Prc_name="LaundryService";
+					var SearchParam:Array =new Array();
+					SearchPopUp.HlpIndex="SEARCH";
+					SearchParam[0]=GlobalXml;
+					SearchParam[1]=0;	
+					SearchParam[2]=0;	
+					SearchParam[3]="";	
+					SearchPopUp.Prc_Param=SearchParam;
+					SearchPopUp.HlpSrchGlobal="";
+					SearchPopUp.dataPanel.focusEnabled=true;
+					SearchPopUp.Pageint();
+					SearchPopUp.addEventListener("PopupEnter",funpopupEnter);
+					SearchPopUp.addEventListener("PopupClose",funpopupClose);
+					PopUpManager.centerPopUp(SearchPopUp);
+				
+			}
+			private function funpopupClose(event:Event):void
+			{
+			}
+			private function funpopupEnter(event:Event):void
+			{
+				SearchDtls(SearchPopUp.SelectRow.Id,0);
+			}			
+			private function SearchDtls(Id:int,_PrdFk:int):void
+			{
+					var Load:Array = new Array();
+					Load[0] = GlobalXml; Load[1] = Id; 				
+					useWeb("LaundryService","Search_CUSTOM",Load);
+				
+			}
+			protected function Delete():void
+			{
+				if(Id == 0)
+				{
+					alignAlert(Alert.show("This is Invalid Process.","Alert Message !",Alert.OK, 
+						null, null,iconWarning, Alert.OK),10,'');					
+					return;
+				}	
+				else
+				{
+					alignAlert(Alert.show("Do you want to Delete this item?", "Warning !",Alert.YES | Alert.NO, 
+						null,removeDgridItem, iconWarning, Alert.NO),10,"");
+				}
+			}
+			private function removeDgridItem(event:CloseEvent):void 
+			{
+				if (event.detail==Alert.YES) 
+				{
+					var Load:Array = new Array();
+					Load[0]= GlobalXml; Load[1]= Id;   
+					useWeb("LaundryService","Delete_CUSTOM",Load);
+				}
+			}
+			var TempGrid:ArrayCollection = new ArrayCollection();
+			public var TempGriddata:ArrayCollection = new ArrayCollection();
+			protected function Grd_Items_doubleClickHandler(event:MouseEvent):void
+			{
+				//Grd_Details.dataProvider=null;
+				TempGrid=new ArrayCollection();
+				TempGriddata=new ArrayCollection();
+				TempGrid=Grd_Items.dataProvider as ArrayCollection;
+				TempGriddata=Grd_Details.dataProvider as ArrayCollection;
+				var Index:int=Grd_Items.selectedIndex;
+				if((TempGriddata.length==0)||(TempGriddata ==null))
+				{
+					var TempCreate_AC:ArrayCollection=new ArrayCollection
+						([{
+							ServiceItem:TempGrid[Index].ServiceItem,TypeService:TempGrid[Index].TypeService,
+							Quantity:TempGrid[Index].Quantity,
+							Price:TempGrid[Index].Price,Amount:TempGrid[Index].Amount,
+							ItemId:TempGrid[Index].ItemId,Id:TempGrid[Index].Id							
+						}]);
+					TempGriddata.addItem(TempCreate_AC[0]);						
+				}
+				else
+				{
+					var AlreadyIdFlag:Boolean=true;
+					for(var i:int=0;i<TempGriddata.length;i++)
+					{
+						if((TempGriddata[i].ItemId==TempGrid[Index].ItemId))
+						{
+							TempGriddata[i].Amount=Number(TempGrid[Index].Amount)+Number(TempGriddata[i].Amount);
+							TempGriddata[i].Quantity=Number(TempGriddata[i].Quantity)+1
+							AlreadyIdFlag=false;
+							i=TempGriddata.length
+						}
+					}
+					if(AlreadyIdFlag==true)
+					{
+						var TempCreate_AC:ArrayCollection=new ArrayCollection
+							([{
+								ServiceItem:TempGrid[Index].ServiceItem,TypeService:TempGrid[Index].TypeService,
+								Quantity:TempGrid[Index].Quantity,
+								Price:TempGrid[Index].Price,Amount:TempGrid[Index].Amount,
+								ItemId:TempGrid[Index].ItemId,Id:TempGrid[Index].Id
+							}]);
+						TempGriddata.addItemAt(TempCreate_AC[0],TempProduct_AC.length)
+					}						
+				}			  
+				
+				Grd_Details.dataProvider = TempGriddata
+				var TotAmt:Number=0,Len:Number=0;
+				var TempGrids:ArrayCollection = Grd_Details.dataProvider as ArrayCollection;
+				for(var i:int=0;i<TempGrids.length;i++)
+				{
+					TotAmt+=Number(TempGrids[i].Amount);
+					Txt_TotalAmount.text="";
+				}
+				var TA:String=NF_Two.format(TotAmt+Txt_TotalAmount.text);
+				Txt_TotalAmount.text=TA.replace(",","");
+				
+				//alignAlert(Alert.show(TempGriddata[i].ServiceItem+" is Already Exists.",Alert.OK,this,null,iconErrLarge),10,"");
+			}
+			
+			protected function Grd_Ingredients_focusOutHandler(event:FocusEvent):void
+			{
+				var temp_Val2:String=event.currentTarget.editable;
+				//var Quantity:int = 1;
+				if(event.currentTarget.editedItemPosition != null)
+				{ 
+					
+					var Val2:Number =event.currentTarget.selectedItem.Quantity
+					var Val3:Number =event.currentTarget.selectedItem.Price						
+					event.currentTarget.selectedItem.Amount = Val2*Val3;
+					var TotAmt:Number=0,Len:Number=0;
+					var TempGrids:ArrayCollection = Grd_Details.dataProvider as ArrayCollection;
+					for(var i:int=0;i<TempGrids.length;i++)
+					{
+						TotAmt+=Number(TempGrids[i].Amount);
+						Txt_TotalAmount.text="";
+					}
+					var TA:String=NF_Two.format(TotAmt+Txt_TotalAmount.text);
+					Txt_TotalAmount.text=TA.replace(",","");
+					//Grd_Details=event.currentTarget.dataProvider;								
+				}
+				else
+				{
+					//event.currentTarget.selectedItem.Amount = Val2*Val3;
+					//Grd_Details=event.currentTarget.dataProvider;
+				}
+			}
+			
+			public function Custom_Grid_Delete(index:int,arrGrid:ArrayCollection)
+			{
+				if(arrGrid[index].Id!="")
+				{												
+					//	useWeb("TransSubsPriceModel","Delete_CUSTOM",[GlobalXml,"MODELDELETE",0,arrGrid[index].Id]);
+				}
+			}
+			private function FnDelete():void
+			{
+				if(Id != 0 )
+				{
+					alignAlert(Alert.show("Do you want to Delete this item ?", "Warning !",Alert.YES | Alert.NO, 
+						null,removeItem, iconWarning, Alert.NO),10,"");
+				}
+				else
+				{
+					alignAlert(Alert.show("This is an Invalid Process.","Alert Message !",Alert.OK, 
+						null, null,iconWarning, Alert.OK),10,'');
+				}
+				return;
+			}
+			private function removeItem(event:CloseEvent):void 
+			{	
+				if (event.detail==Alert.YES) 
+				{
+					var Load:Array = new Array();
+					Load[0]=GlobalXml; Load[1]= Id;
+					//	useWeb("TransSubsPriceModel","Delete_CUSTOM",Load);
+				} 
+			}
+			
+			protected function Grd_KOT_keyDownHandler(event:KeyboardEvent):void
+			{
+				//				selectedindex=event.currentTarget.selectedIndex;
+				//				DtlsId=event.currentTarget.selectedItem.Id;
+				//				if(event.keyCode == Keyboard.DELETE)
+				//				{
+				//					alignAlert(Alert.show("Do you want to delete this item?", "Warning",Alert.YES | Alert.NO, null,
+				//						removeDgridItem1, iconWarning, Alert.NO),10,"");
+				//				}	
+				
+			}
+			
+			protected function Grd_Details_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				
+			}
+			
+			public function DeleteGrid(event:Event):void
+			{
+				var TotAmt:int=0;var total:Number=Math.round(Number(Txt_TotalAmount.text));
+				var Ac_Food:ArrayCollection=new ArrayCollection();
+				Ac_Food=Grd_Details.dataProvider as ArrayCollection;
+				var Foodindex:int=Grd_Details.selectedIndex;
+				var Tmp:ArrayCollection=new ArrayCollection([{ServiceItem:Ac_Food[Foodindex].ServiceItem,
+					Quantity:Ac_Food[Foodindex].Quantity,Price:Ac_Food[Foodindex].Price,
+					Amount:Ac_Food[Foodindex].Amount,ItemId:Ac_Food[Foodindex].ItemId,Id:Ac_Food[Foodindex].Id}]);				
+				Ac_Food.removeItemAt(Foodindex);
+				for(var i:int=0;i<Tmp.length;i++)
+				{
+					TotAmt+=Number(Tmp[i].Amount);
+				}
+				var TB:String=NF_Two.format(total-TotAmt);
+				Txt_TotalAmount.text=TB.replace(",","");
+				
+				Grd_Details.dataProvider=Ac_Food.source;
+				
+				
+			}
+			
+			
+			
+			
+		]]>
+	</fx:Script>
+	<s:VGroup x="0" y="0" width="100%" height="100%" gap="5" horizontalAlign="center" verticalAlign="middle">
+		<s:Group y="21" width="904" height="528" id="Grp_Guest" visible="true">
+			<s:BorderContainer x="29" y="16" width="855" height="122" backgroundColor="#fbf9f9" depth="10">
+				<s:Label x="20" y="20" text="Select Property"/>
+				<s:Label x="20" y="57" text="Date"/>
+				<s:Label x="20" y="89" text="Guest Name" id="Guest"/>
+				<s:Label x="20" y="89" text="User Name" id="lbl_User" visible="false"/>
+				
+				<mx:DateField x="121" y="48" width="100" id="dt_Date" yearNavigationEnabled="false" tabIndex="1" 
+							  formatString="DD/MM/YYYY" selectableRange="{{rangeEnd:new Date()}}" styleName="DisabledDateField"
+							  enabled="false"/>
+				<WrbHelpComp:HelpText id="hlp_Property" x="121" y="16" width="200" height="20"
+									  depth="100" onselection="{OnSelectionPropertyname()}"
+									  pxSetColumnsWidth="200,0" pxSetHeight="183" tabIndex="1">
+				</WrbHelpComp:HelpText>
+				<WrbHelpComp:HelpText x="121" y="86" width="200" id="hlp_Guest" enabled="true"
+									  pxSetColumnsWidth="0,0,0,0,0,199,0,0,0,0"	pxSetHeight="183" depth="46"
+									  onselection="{OnSelectionGuestname()}" tabIndex="2">
+				</WrbHelpComp:HelpText>
+				
+				<s:Label x="510" y="20" text="Booking Code" id="lbl_book"/>
+				<s:TextInput x="602" y="16" width="200" id="Txt_BookingCode" editable="false"/>
+				<s:Label x="510" y="57" text="Client Name" id="lbl_Client"/>
+				<s:TextInput x="602" y="52" width="200" id="Txt_ClientName" editable="false"/>
+			</s:BorderContainer>
+			<s:BorderContainer x="29" y="138" width="252" height="325" depth="5">
+				<mx:DataGrid id="Grd_Items" x="0" y="-1"  verticalAlign="middle" 
+							 doubleClickEnabled="true" doubleClick="Grd_Items_doubleClickHandler(event)"
+							 width="250" height="325" tabIndex="3" >
+					<mx:columns>
+						<mx:DataGridColumn dataField="ServiceItem" width="210" 
+										   headerText="ServiceItem" editable="false" textAlign="left"/>	
+						<mx:DataGridColumn dataField="TypeService" width="50" visible="false" 
+										   headerText="TypeService" editable="false" textAlign="left"/>
+						<mx:DataGridColumn dataField="Quantity" width="10" headerText="Quantity"
+										   editable="true" textAlign="right" visible="false"/>	
+						<mx:DataGridColumn dataField="Price" width="10" headerText="Price"
+										   editable="false" textAlign="right" visible="false"/>
+						<mx:DataGridColumn dataField="Amount" width="10" headerText="Amount"
+										   editable="false" textAlign="right" visible="false"/>
+						<mx:DataGridColumn dataField="ItemId" width="10" visible="false"/>
+						<mx:DataGridColumn dataField="Id" width="10" visible="false"/>
+					</mx:columns>
+				</mx:DataGrid>
+			</s:BorderContainer>
+			<s:BorderContainer x="282" y="138" width="602" height="325" depth="5">
+				<mx:DataGrid id="Grd_Details" x="0" y="62" width="600" height="224" tabIndex="3"
+							 dragEnabled="true" draggableColumns="false" dragMoveEnabled="true"
+							 dropEnabled="true" editable="true" focusEnabled="false" doubleClickEnabled="true" 
+							 keyDown="Grd_KOT_keyDownHandler(event)"
+							 textAlign="center" borderVisible="true" 
+							 focusOut="Grd_Ingredients_focusOutHandler(event)" >
+					<mx:columns>
+						<mx:DataGridColumn dataField="Action" width="50"  editable="false">
+							<mx:itemRenderer>
+								<fx:Component>
+									<mx:HBox horizontalAlign="center" verticalAlign="middle">										
+										<mx:Image source="assets/CrossSmall.png" buttonMode="true"
+												  click="outerDocument.DeleteGrid(event)"/>
+										
+									</mx:HBox>
+								</fx:Component>
+							</mx:itemRenderer>
+						</mx:DataGridColumn>
+						<mx:DataGridColumn dataField="ServiceItem" width="160" 
+										   headerText="Item" editable="false" textAlign="left"/>
+						<mx:DataGridColumn dataField="TypeService" width="50" visible="false" 
+										   headerText="TypeService" editable="false" textAlign="left"/>
+						<mx:DataGridColumn dataField="Quantity" width="90" headerText="Quantity"
+										   editable="true" textAlign="right" />	
+						<mx:DataGridColumn dataField="Price" width="90" headerText="Price"
+										   editable="false" textAlign="right" />
+						<mx:DataGridColumn dataField="Amount" width="90" headerText="Amount"
+										   editable="false" textAlign="right"/>
+						<mx:DataGridColumn dataField="ItemId" width="100" visible="false"/>
+						<mx:DataGridColumn dataField="Id" width="100" visible="false"/>
+					</mx:columns>
+				</mx:DataGrid>				
+				<s:Label x="9" y="37" text="Guest Name:" id="lbl_Guest1" />
+				<s:Label id="lbl_Guest" x="88" y="30" width="150" height="21" textAlign="left" />
+				<s:Label x="257" y="37" text="Room No :" id="lbl_Room"/>
+				<s:Label x="338" y="32" width="200" height="21" id="lbl_RoomNo" textAlign="left" />
+				<s:Label x="401" y="301" text="Total Amount"/>
+				<s:TextInput x="486" y="295" width="113" id="Txt_TotalAmount" textAlign="right"/>
+			</s:BorderContainer>
+			<WrbComp:SaveControl x="305" y="478" id="SCtrl" docSave="FnSave()" docClear="FnClr()"
+								 doSearch="FnSearch()" docDelete="Delete()">
+			</WrbComp:SaveControl>
+			
+		</s:Group>
+	</s:VGroup>
+</s:Application>

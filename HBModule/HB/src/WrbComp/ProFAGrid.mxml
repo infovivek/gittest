@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		 xmlns:s="library://ns.adobe.com/flex/spark"
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 creationComplete="PageInit()" 
+		 xmlns:WrbComp="WrbComp.*" xmlns:WrbHelpComp="WrbHelpComp.*" width="914" height="272">
+	
+	<fx:Script source="..\\Common\\CommonScripts.as"/>
+	
+	<fx:Script>
+		<![CDATA[
+			
+			import WrbHelpComp.HelpText;			
+			import flashx.textLayout.formats.TextAlign;			
+			import mx.collections.ArrayCollection;
+			import mx.collections.ArrayList;
+			import mx.controls.Alert;
+			import mx.controls.DataGrid;
+			import mx.controls.DateField;
+			import mx.controls.TextInput;
+			import mx.controls.dataGridClasses.DataGridColumn;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.events.ListEvent;
+			import mx.managers.PopUpManager;
+			import mx.messaging.channels.AMFChannel;
+			import mx.utils.StringUtil;
+			
+			import spark.components.ComboBox;
+			import spark.components.Label;
+			import spark.components.TextInput;
+			import spark.events.IndexChangeEvent;			
+			
+			private var clsPopup:frmClass
+			private var AttPopup:frmFAAttributes			
+			private var AccFk:int=0,   RefFk:int=0, PrtyTypFk:int=0, LbdFk:int=0;
+			private var ClsFk1:String="",AttFk1:String="";
+			public var GrdAry:ArrayCollection=new ArrayCollection();
+			private var index:int=0,PK:int=0;
+			private var CFlw_Fk:int =0;
+			private var AddMode:Boolean=true;
+			private var Ctot:Number=0,Dtot:Number=0,Amt:Number=0;
+			
+			[Bindable] 
+			public var Ac_RefTyp:ArrayCollection = new ArrayCollection
+				([
+					{data:"0",label:"--Select--"},
+					{data:"1",label:"New Ref"},
+					{data:"2",label:"Agt Ref"},
+					{data:"3",label:"Advance"},
+					{data:"4",label:"On Account"}
+				]);
+			
+			[Bindable]
+			public var GD_Data:ArrayCollection=new ArrayCollection/// Temp loaded data
+				([
+					{DGAcc:"Abcd",AccFk:1,Cls:"class1",ClsFk1:2,RefTyp:2, PrtyTypFk:2, RefNo:"123", RefFk:4,  RefDt:"19/12/2011" , Perd:31,	Dr:500, Cr:100, Narr:"Narr", Att:"Attribute", CshFlw:"CashFlow", LbdFk:9},
+					{DGAcc:"Abcd1",AccFk:11,Cls:"class11",ClsFk1:21,RefTyp:21, PrtyTypFk:21, RefNo:"1231", RefFk:41,  RefDt:"13/12/2011" , Perd:30,	Dr:501, Cr:101, Narr:"Narr1", Att:"Attribute1", CshFlw:"CashFlow1", LbdFk:8}
+				]);
+
+			protected function txtHlpCshFlw_keyDownHandler(event:KeyboardEvent):void
+			{
+				if(event.keyCode==Keyboard.ENTER)
+				{
+					if(txtHlpAcc.text == "" && cmpRefTyp.selectedIndex==0 && txtRefDt.text=="" &&
+						txtHlpRefNo.text == ""  && txtPerd.text == "" && txtDr.text =="" || txtCr.text=="" )
+					{
+						Alert.show("Fill All Details.","Information");
+						txtHlpAcc.Focus=true;
+					}
+					else
+					{
+						GrdAry.source=DGrid.dataProvider.source;
+						AddRow();
+						Clear();
+						GetAmt();
+						txtHlpAcc.Focus=true;
+						txtHlpAcc.text =""; 
+					}
+					
+				}				
+			}
+			
+			public function FillGrdAry():void
+			{
+				if(DGrid.dataProvider!="")
+				{
+					GrdAry.source=DGrid.dataProvider.source;
+				}
+			}
+			private function AddRow():void
+			{				
+				var Addobj:Object=new Object();
+				Addobj.DGAcc=txtHlpAcc.text;
+				Addobj.AccFk=AccFk;
+				Addobj.Cls=txtCls.text;
+				Addobj.ClsFk=ClsFk1;
+				Addobj.RefTyp=cmpRefTyp.selectedIndex;
+				Addobj.PrtyTypFk=PrtyTypFk;
+				Addobj.RefNo=txtHlpRefNo.text;
+				Addobj.RefFk=RefFk;
+				Addobj.RefDt=txtRefDt.text;
+				Addobj.Perd=txtPerd.text;
+				Addobj.Dr=txtDr.text;
+				Addobj.Cr=txtCr.text;
+				Addobj.Narr=txtNarr.text;
+				Addobj.Att=txtAtt.text;
+				Addobj.CshFlw=txtHlpCshFlw.text;
+				Addobj.LbdFk=LbdFk;
+				Addobj.PK=PK;
+				Addobj.AttFk=AttFk1;
+				
+				if(AddMode==false)
+				{
+					GrdAry.addItem(Addobj);
+				}
+				else
+				{
+					GrdAry.addItemAt(Addobj,index);
+				}
+				fnFilGrid();
+			}
+			
+			private function fnFilGrid():void
+			{
+				DGrid.dataProvider=GrdAry;
+			}
+			
+			protected function DGrid_doubleClickHandler(event:MouseEvent):void
+			{
+				if(txtHlpAcc.text == "" && cmpRefTyp.selectedIndex==0 && //txtRefDt.text=="" &&
+					txtHlpRefNo.text == "" && txtPerd.text == "" && txtDr.text == "" && txtCr.text== "" )
+				{
+					if(DGrid.selectedIndex!=-1)
+					{
+						index=DGrid.selectedIndex;
+						AddMode=true;
+						fn_Enable();
+						txtHlpAcc.text=DGrid.dataProvider[index].DGAcc;
+						AccFk=DGrid.dataProvider[index].AccFk;
+						txtCls.text=DGrid.dataProvider[index].Cls;
+						ClsFk1=DGrid.dataProvider[index].ClsFk;
+						cmpRefTyp.selectedIndex=DGrid.dataProvider[index].RefTyp;
+						PrtyTypFk=DGrid.dataProvider[index].PrtyTypFk;
+					
+						if(cmpRefTyp.selectedIndex!=0){txtHlpRefNo.enabled=true;}
+						
+						txtHlpRefNo.text=DGrid.dataProvider[index].RefNo;
+						RefFk=DGrid.dataProvider[index].RefFk;
+						txtRefDt.text=DGrid.dataProvider[index].RefDt;
+						txtPerd.text=DGrid.dataProvider[index].Perd;
+						txtDr.text=DGrid.dataProvider[index].Dr;
+						txtCr.text=DGrid.dataProvider[index].Cr;
+						txtNarr.text=DGrid.dataProvider[index].Narr;
+						txtAtt.text=DGrid.dataProvider[index].Att;
+						AttFk1=DGrid.dataProvider[index].AttFk;
+						txtHlpCshFlw.text=DGrid.dataProvider[index].CshFlw;
+						LbdFk=DGrid.dataProvider[index].LbdFk;
+						PK=DGrid.dataProvider[index].PK;
+						try
+						{
+							GrdAry.removeItemAt(index);
+						}
+						catch(er:Error)
+						{
+							GrdAry.source=DGrid.dataProvider.source;
+							GrdAry.removeItemAt(index);
+						}
+						fnFilGrid();
+						txtRefDt.selectedDate=new Date();
+					}
+				}
+				else{Alert.show("Complete the Edited Record Details...","Alert",Alert.OK);}
+			}
+			
+			private function GetRefno():void
+			{			
+				useWebService("Hlp_IBAS_Finance",txtHlpRefNo.id,["REFNO", AccFk,"",0,"","", "<ROOT>"+GlobalVar+"</ROOT>"]);	
+			} 
+			private function fnGetbal():void
+			{
+				useWebService("Hlp_IBAS_Finance","LBL_CUSTOM",["BAL",AccFk,"","","","","<ROOT>"+GlobalVar+"</ROOT>"]);
+			}
+			
+			public function Clear():void
+			{
+				txtHlpAcc.text=""; txtCls.text=""; cmpRefTyp.selectedIndex=0;
+				txtHlpRefNo.text=""; txtRefDt.selectedDate=new Date(); txtPerd.text="";
+				txtDr.text=""; txtCr.text=""; txtNarr.text="";
+				txtAtt.text=""; txtHlpCshFlw.text="";
+				AccFk=0, ClsFk1="0", AttFk1="0", RefFk=0, PrtyTypFk=0, LbdFk=0;
+				txtRefDt.selectedDate=new Date();
+				fn_Disable();
+			}
+			public function Grd_Clear():void
+			{
+				GrdAry.source=null;DGrid.dataProvider=null;
+			}
+			public function fn_Disable():void
+			{
+				txtCls.enabled =false;cmpRefTyp.selectedIndex=0; cmpRefTyp.enabled =false;
+				txtHlpRefNo.enabled =false; txtRefDt.enabled =false;
+				txtPerd.enabled =false;txtDr.enabled =false; txtCr.enabled =false; txtNarr.enabled =false;
+				txtAtt.enabled =false; txtHlpCshFlw.enabled =false;
+				
+			}
+			
+			public function fn_Enable():void
+			{
+				txtCls.enabled =true; cmpRefTyp.enabled =true;
+				txtHlpRefNo.enabled =false; txtRefDt.enabled =true;txtRefDt.selectedDate=new Date(); 
+				txtPerd.enabled =true;txtDr.enabled =true; txtCr.enabled =true; txtNarr.enabled =true;
+				txtAtt.enabled =true; txtHlpCshFlw.enabled =true;
+				
+			}
+			
+		 	private function fnGetAcc():void
+			{
+				if(txtHlpAcc.selected()==true)
+				{
+					AccFk=txtHlpAcc.Select_Row.AccPk;
+					txtHlpAcc.text=txtHlpAcc.Select_Row.Account;
+					fnGetbal();
+					fn_Enable();
+					txtCls.setFocus();
+				}
+			} 
+			
+			private function fnGetRefNo():void
+			{
+				if(txtHlpRefNo.selected()==true)
+				{
+					RefFk=txtHlpRefNo.Select_Row.DpdFk;
+					txtHlpRefNo.text=txtHlpRefNo.Select_Row.A_Invoice_No;
+					txtRefDt.text =txtHlpRefNo.Select_Row.B_Invoice_Date;
+					txtCr.text=txtHlpRefNo.Select_Row.D_Debit;
+					txtDr.text=txtHlpRefNo.Select_Row.E_Credit;
+					txtNarr.setFocus();
+					txtDr.text=Number(txtDr.text).toFixed(2);
+					txtCr.text=Number(txtCr.text).toFixed(2);
+				}
+			}
+			
+			private function fnGetCshFlow():void
+			{
+				if(txtHlpCshFlw.selected()==true)
+				{	
+					CFlw_Fk = txtHlpCshFlw.Select_Row.hdnPk;	
+					txtHlpCshFlw.text=txtHlpCshFlw.Select_Row.Description;		
+				}
+			}
+			private function GetAmt():void
+			{
+				
+				if(DGrid.dataProvider.source.length >0)
+				{
+					for(var i:int=0;i<=DGrid.dataProvider.source.length -1;i++)
+					{
+						Dtot=Dtot+ Number(DGrid.dataProvider[i].Dr);
+						Ctot=Ctot+ Number(DGrid.dataProvider[i].Cr);
+					}
+					Amt=0;
+				}
+				if(Dtot>Ctot)
+				{Amt=(Number(Dtot)-Number(Ctot))}
+				else{Amt=(Number(Ctot)-Number(Dtot))}
+				Dtot=0; Ctot=0;
+				Amt=Number(Amt);
+				this.parentApplication.FillAmount(Amt.toString());
+			}
+			
+			protected function txtCls_keyDownHandler(event:KeyboardEvent):void
+			{
+				if (event.keyCode == Keyboard.F2)
+				{
+					clsPopup = frmClass(PopUpManager.createPopUp(this,frmClass,true));
+					PopUpManager.centerPopUp(clsPopup);
+				}
+			}
+			
+			public function Assign_ClassValue(ClsNm:String, ClsFk:String, Status:Boolean):void
+			{
+				txtCls.text=ClsNm;
+				ClsFk1=ClsFk;
+			}
+
+			protected function txtAtt_keyDownHandler(event:KeyboardEvent):void
+			{
+				if (event.keyCode == Keyboard.F2)
+				{
+					AttPopup = frmFAAttributes(PopUpManager.createPopUp(this,frmFAAttributes,true));
+					PopUpManager.centerPopUp(AttPopup);
+					txtHlpCshFlw.Focus=true;
+				}
+			}
+			
+			public var SetAtt:String="";
+			public function Assign_AttributeValue(AttNm:String, AttFk:String, Status:Boolean):void
+			{
+				txtAtt.text = AttNm;
+				AttFk1=AttFk;
+				SetAtt="Att";
+			}
+			
+			public function setValue(text:String, pk:String):void
+			{
+				if(SetAtt=="Att")
+				{	
+					txtAtt.text = text;
+				    AttFk1 =pk;
+				}
+				else{txtCls.text=text;
+					ClsFk1=pk;}
+			}
+
+			protected function PageInit():void
+			{				
+				funLoginInfo("<FlexServiceUrl>http://testingserver/IBASDataService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://pro64/IBASflex/</FlexSwfUrl><gVchTypCd>SO-CNTRCT</gVchTypCd><gVchTypDesc>Sales Contract</gVchTypDesc><gVchTypFk>318</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>1</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>654810</gScrId><gCPRights>10101111</gCPRights>")
+				txtHlpRefNo.enabled=false;
+				useWebService("Hlp_IBAS_Finance",txtHlpAcc.id,["AC", "","","","","","<ROOT>"+GlobalVar+"</ROOT>"]);
+				useWebService("Hlp_IBAS_Finance",txtHlpCshFlw.id,["CSHFLW", "","","","","","<ROOT>"+GlobalVar+"</ROOT>"]);
+				fn_Disable();
+				
+			}
+
+			protected function cmpRefTyp_changeHandler(event:IndexChangeEvent):void
+			{
+				txtHlpRefNo.text="";txtCr.text="";txtDr.text="";txtRefDt.text="";
+				
+				if(cmpRefTyp.selectedItem.data==0)
+				{
+					txtHlpRefNo.enabled =false;
+				}
+				else if(cmpRefTyp.selectedItem.data==2)
+				{
+					txtHlpRefNo.enabled =true;
+					GetRefno();
+					return
+				}
+				else if(cmpRefTyp.selectedItem.data!=0)
+				{
+					txtHlpRefNo.enabled =true;
+					txtHlpRefNo.dataProvider=null;
+				}
+			}
+			
+			protected function txtDr_keyDownHandler(event:KeyboardEvent):void
+			{
+				if(event.keyCode==Keyboard.ENTER)
+				{txtCr.setFocus();}
+				else
+				{
+					if(Number(txtDr.text)!=0)
+					{
+						txtCr.text="0";
+					}
+				}						
+			}
+
+
+			protected function txtCr_keyDownHandler(event:KeyboardEvent):void
+			{
+				if(event.keyCode==Keyboard.ENTER){txtNarr.setFocus();}
+				else
+				{
+					if(Number(txtCr.text)!=0)
+					{
+						txtDr.text="0";
+					}
+				}			
+			}
+
+
+			protected function txtCr_focusOutHandler(event:FocusEvent):void
+			{
+			
+			}
+			
+			protected function txtDr_focusOutHandler(event:FocusEvent):void
+			{
+				
+			}
+
+			protected function DGrid_keyDownHandler(event:KeyboardEvent):void
+			{
+				if(event.keyCode==Keyboard.DELETE)
+				{
+					
+					index=DGrid.selectedIndex
+					Alert.show("Are You Sure Want To Delete The Selected Record?","Information",Alert.YES|Alert.NO,this,Alert_Delete);
+				}				
+			}
+			
+			private function Alert_Delete(event:CloseEvent):void
+			{
+				if(event.detail== Alert.YES )
+				{
+					GrdAry.source=DGrid.dataProvider.source;
+					GrdAry.removeItemAt(index);
+					DGrid.dataProvider=GrdAry.source;
+					fnFilGrid();
+				}
+			}
+			
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				if (Ds_Objects.result.Tables.ERRORTBL.Rows.length >= 1)
+				{
+					Alert.show(	Ds_Objects.result.Tables.ERRORTBL.Rows[0].Exception.toString(),"Fault");
+					return;
+				}
+				if (Ds_Objects.currentTarget.description.toString()=="LBL_CUSTOM")
+				{
+					bal_labl.text=Ds_Objects.result.Tables.Table.Rows[0].Column1;
+					return;
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<s:Group x="5" y="0" width="914" height="272">
+		<WrbHelpComp:HelpText x="2" y="32" width="81" id="txtHlpAcc" pxTabIndex="51" onselection="{fnGetAcc()}" depth="30" height="21"/> 
+		<s:TextInput x="84" y="32" width="81" id="txtCls" tabIndex="52" keyDown="txtCls_keyDownHandler(event)"/>
+		<s:ComboBox x="166" y="31.5" width="81" id="cmpRefTyp" selectedIndex="0" tabIndex="53" change="cmpRefTyp_changeHandler(event)" creationComplete="{this.cmpRefTyp.textInput.editable=false;}" dataProvider="{Ac_RefTyp}"/>
+		<WrbHelpComp:HelpText x="248" y="32" width="80" id="txtHlpRefNo" pxTabIndex="54" depth="29" onselection="{fnGetRefNo()}" keyDown="{if(event.keyCode==Keyboard.ENTER){txtRefDt.setFocus();}}" height="21"/>
+		<mx:DateField width="92" id="txtRefDt" y="30.5" x="330" tabIndex="55" formatString="DD/MM/YYYY" change="{txtPerd.setFocus();}"/>
+		<s:TextInput x="423" y="31" width="74" id="txtPerd" tabIndex="56" textAlign="right" restrict="0-9." maxChars="3" keyDown="{if(event.keyCode==Keyboard.ENTER){txtDr.setFocus();}}"/>
+		<s:TextInput x="499" y="31" width="81" id="txtDr" tabIndex="57" textAlign="right" restrict="0-9."  maxChars="12" 
+					 keyDown="txtDr_keyDownHandler(event)" focusOut="txtDr_focusOutHandler(event)"/>
+		<s:TextInput x="581" y="31" width="81" id="txtCr" tabIndex="58"  restrict="0-9."  maxChars="12"  textAlign="right"
+					 keyDown="txtCr_keyDownHandler(event)" focusOut="txtCr_focusOutHandler(event)"/>
+		<s:TextInput x="663" y="31" width="81" id="txtNarr" tabIndex="59"/>
+		<s:TextInput x="745" y="31" width="81" id="txtAtt" tabIndex="60" keyDown="txtAtt_keyDownHandler(event)"/>
+		<WrbHelpComp:HelpText x="827" y="31" width="81" id="txtHlpCshFlw" pxTabIndex="61" keyDown="txtHlpCshFlw_keyDownHandler(event)"
+							  onselection="{fnGetCshFlow()}" depth="28" height="21"/>
+		
+		<s:Label x="24" y="13" text="Account"/>
+		<s:Label x="108" y="13" text="Class"/>
+		<s:Label x="180" y="13" text="Ref.Type"/>
+		<s:Label x="269" y="13" text="Ref.No"/>
+		<s:Label x="347" y="13" text="Ref.Date"/>
+		<s:Label x="436" y="13" text="Period"/>
+		<s:Label x="520" y="13" text="Debit"/>
+		<s:Label x="602" y="13" text="Credit"/>
+		<s:Label x="675" y="13" text="Narration"/>
+		<s:Label x="756" y="13" text="Attributes"/>
+		<s:Label x="831" y="12" text="Cash Flow"/>
+		<mx:DataGrid x="0" y="60" id="DGrid" tabIndex="62" doubleClickEnabled="true" doubleClick="DGrid_doubleClickHandler(event)"
+					 dataProvider="{GD_Data}" depth="1" keyDown="DGrid_keyDownHandler(event)" height="166"  width="911">
+			<mx:columns>
+				<mx:DataGridColumn headerText="Account" dataField="DGAcc"/>
+				<mx:DataGridColumn headerText="Class" dataField="Cls"/>
+				<mx:DataGridColumn headerText="Ref.Type" dataField="RefTyp"/>
+				<mx:DataGridColumn headerText="Ref.No" dataField="RefNo"/>
+				<mx:DataGridColumn headerText="Ref.Date" dataField="RefDt" width="86"/>
+				<mx:DataGridColumn headerText="Period" dataField="Perd" textAlign="right"/>
+				<mx:DataGridColumn headerText="Debit" dataField="Dr" textAlign="right"/>
+				<mx:DataGridColumn headerText="Credit" dataField="Cr" textAlign="right"/>
+				<mx:DataGridColumn headerText="Narration" dataField="Narr"/>
+				<mx:DataGridColumn headerText="Attributes" dataField="Att"/>
+				<mx:DataGridColumn headerText="Cash Flow" dataField="CshFlw"/>
+				
+				<mx:DataGridColumn headerText="AccFk" dataField="AccFk" visible="false"/>
+				<mx:DataGridColumn headerText="ClsFk1" dataField="ClsFk" visible="false"/>
+				<mx:DataGridColumn headerText="AttFk1" dataField="AttFk" visible="false"/>
+				<mx:DataGridColumn headerText="RefFk" dataField="RefFk" visible="false"/>
+				<mx:DataGridColumn headerText="PrtyTypFk" dataField="PrtyTypFk" visible="false"/>
+				<mx:DataGridColumn headerText="LbdFk" dataField="LbdFk" visible="false"/>
+				<mx:DataGridColumn headerText="CshFlw_Fk" dataField="CshFlw_Fk" visible="false"/>
+				<mx:DataGridColumn headerText="PK" dataField="PK" visible="false"/>
+				
+				
+			</mx:columns>
+		</mx:DataGrid>
+		<s:Label x="10" y="234" id="bal_labl" color="#FC0303" width="318" />
+	</s:Group>
+</s:Group>

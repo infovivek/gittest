@@ -1,0 +1,15 @@
+D:\Project\HummingBird\HBService\HB.Entity\bin\Debug\HB.Entity.dll
+D:\Project\HummingBird\HBService\HB.Entity\bin\Debug\HB.Entity.pdb
+D:\Project\HummingBird\HBService\HB.Entity\obj\Debug\ResolveAssemblyReference.cache
+D:\Project\HummingBird\HBService\HB.Entity\obj\Debug\HB.Entity.dll
+D:\Project\HummingBird\HBService\HB.Entity\obj\Debug\HB.Entity.pdb
+D:\Project\HBModule\HBService\HB.Entity\bin\Debug\HB.Entity.dll
+D:\Project\HBModule\HBService\HB.Entity\bin\Debug\HB.Entity.pdb
+D:\Project\HBModule\HBService\HB.Entity\obj\Debug\ResolveAssemblyReference.cache
+D:\Project\HBModule\HBService\HB.Entity\obj\Debug\HB.Entity.dll
+D:\Project\HBModule\HBService\HB.Entity\obj\Debug\HB.Entity.pdb
+E:\project\HBModule\HBService\HB.Entity\bin\Debug\HB.Entity.dll
+E:\project\HBModule\HBService\HB.Entity\bin\Debug\HB.Entity.pdb
+E:\project\HBModule\HBService\HB.Entity\obj\Debug\ResolveAssemblyReference.cache
+E:\project\HBModule\HBService\HB.Entity\obj\Debug\HB.Entity.dll
+E:\project\HBModule\HBService\HB.Entity\obj\Debug\HB.Entity.pdb

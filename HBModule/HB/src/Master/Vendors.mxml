@@ -1,0 +1,633 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:WrbComp="WrbComp.*"
+			   xmlns:Controls="fx.com.adobe.Controls.*"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   xmlns:ns1="*"
+			   width="100%" height="100%" creationComplete="PageLoad()" pageTitle="Vendors">
+	<fx:Declarations>
+		<mx:EmailValidator id="EmailValidator" valid="EmailValidator_validHandler(event)"
+						   invalid="EmailValidator_invalidHandler(event)"/> 
+		<s:RadioButtonGroup id="Mode"  change="CourierChange()"/> 
+	</fx:Declarations>
+	
+	<fx:Style source = "..\\Common\\ApplicationCSS.css"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	<fx:Script>
+		<![CDATA[
+			import WrbComp.frmsearchwindow;
+			
+			import WrbHelpComp.HlpGridHdr;
+					
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.CalendarLayoutChangeEvent;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.events.IndexChangedEvent;
+			import mx.events.ValidationResultEvent;
+			import mx.graphics.codec.PNGEncoder;
+			import mx.graphics.shaderClasses.SaturationShader;
+			
+			import spark.events.IndexChangeEvent;                       
+			private var _isValidEmail:Boolean = true;	
+			import spark.events.IndexChangeEvent;
+			import spark.events.TextOperationEvent;
+			public var validator:ValidationResultEvent;
+			private var SearchPopUp:frmsearchwindow = new frmsearchwindow();
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "",TypeServiceId:int=0,ErrStr:String="",Str_Email:String="";;
+			public var Id:int=0,ErrMsg:String="",PropertyId:int=0,PropertyName:String="",UserId:int=0;
+			public var AddMode:Boolean=true,Flag:Boolean=true,ClientId:int=0,ClientName:String="";
+			public var StateId:int=0,CityId:int=0,CategoryId:int=0,BankId:int=0;
+			public var State:String="",City:String="",PayCircle:String="",Str_Email:String="";
+			public var Category:String="";
+			protected function PageLoad():void
+			{
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>"; 
+				HelpState();
+				Cheque.selected=true;
+				CourierChange();
+				SCTRL.setButtonRights("Delete",true);	
+			}
+			public function HelpState():void
+			{
+				useWeb("Vendors","STATELOAD_CUSTOM",[GlobalXml,"STATELOAD","","",0,0]);
+			//	useWeb("Vendors","CITYLOAD_CUSTOM",[GlobalXml,"CITYLOAD","","",0,0]);	
+				useWeb("Vendors","Pageload_CUSTOM",[GlobalXml,"Pageload","","",0,0]);
+			}	
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "STATELOAD_CUSTOM")
+				{
+					Ddl_State.dataProvider=null; 
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Ddl_State.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}				
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "CITYLOAD_CUSTOM")
+				{
+					Ddl_City.dataProvider=null; 
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Ddl_City.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection	
+					}				
+				}
+				 
+				if (Ds_Objects.currentTarget.description.toString() == "Pageload_CUSTOM")
+				{ 
+					Ddl_Category.dataProvider=null; 
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Ddl_Category.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection	
+					}	
+//					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+//					{
+//						Ddl_Bank.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection	
+//					}	
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				{
+					if (AddMode == true)
+					{
+						alignAlert(Alert.show("Vendor Added Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+					}
+					else
+					{
+						alignAlert(Alert.show("Vendor Updated Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+					}
+					FnClear();
+				} 
+				if (Ds_Objects.currentTarget.description.toString() == "Search_CUSTOM")
+				{ 
+         			Category=Ds_Objects.result.Tables.Table.Rows[0].Category;
+					Ddl_Category.prompt=Category;
+					CategoryId=Ds_Objects.result.Tables.Table.Rows[0].CategoryId;
+ 					txt_VendorName.text=Ds_Objects.result.Tables.Table.Rows[0].VendorName;
+					txt_FirstName.text=Ds_Objects.result.Tables.Table.Rows[0].FirstName;
+					txt_LastName.text=Ds_Objects.result.Tables.Table.Rows[0].LastName;
+					txt_Designation.text=Ds_Objects.result.Tables.Table.Rows[0].Designation;
+					txt_NatureOfService.text=Ds_Objects.result.Tables.Table.Rows[0].NatureOfService;
+					txt_Mobile.text=Ds_Objects.result.Tables.Table.Rows[0].Mobile;
+					txt_Office.text=Ds_Objects.result.Tables.Table.Rows[0].Office;
+					txt_address.text=Ds_Objects.result.Tables.Table.Rows[0].address;
+	
+ 					txt_Email.text=Ds_Objects.result.Tables.Table.Rows[0].Email;
+	 				State=Ds_Objects.result.Tables.Table.Rows[0].State;
+					Ddl_State.prompt=State;
+	 				StateId=Ds_Objects.result.Tables.Table.Rows[0].StateId;
+					City=Ds_Objects.result.Tables.Table.Rows[0].City;
+					Ddl_City.prompt=City;
+					CityId=Ds_Objects.result.Tables.Table.Rows[0].CityId;
+				    txt_Website.text=Ds_Objects.result.Tables.Table.Rows[0].Website;
+ 					txt_Pancard.text=Ds_Objects.result.Tables.Table.Rows[0].Pancard;
+					txt_saletaxnum.text=Ds_Objects.result.Tables.Table.Rows[0].saletaxnum;
+					dt_saletaxdate.text=Ds_Objects.result.Tables.Table.Rows[0].saletaxdate;
+					txt_ServtaxNum.text=Ds_Objects.result.Tables.Table.Rows[0].ServtaxNum;
+					dt_servicetaxdate.text=Ds_Objects.result.Tables.Table.Rows[0].servicetaxdate;	
+					if(Ds_Objects.result.Tables.Table.Rows[0].Cheque==true)
+					{ 
+						Mode.selectedValue=0; 
+						Star_Bank.visible=false;
+						Star_Acc.visible=false;
+						Star_Type.visible=false;
+					}
+					else
+					{   Star_Bank.visible=true;
+						Star_Acc.visible=true;
+						Star_Type.visible=true; 
+						Mode.selectedValue=1; 
+					}
+ 					//Cheque=Ds_Objects.result.Tables.Table.Rows[0].Cheque;
+	 				//OnlineTransfer=Ds_Objects.result.Tables.Table.Rows[0].OnlineTransfer;
+					txt_Bank.text=Ds_Objects.result.Tables.Table.Rows[0].Bank;
+					txt_PayeeName.text=Ds_Objects.result.Tables.Table.Rows[0].PayeeName;
+					txt_IFSC.text=Ds_Objects.result.Tables.Table.Rows[0].IFSC;
+					txt_AccountNo.text=Ds_Objects.result.Tables.Table.Rows[0].AccountNo;
+					txt_AccountType.text=Ds_Objects.result.Tables.Table.Rows[0].AccountType;
+					PayCircle=Ds_Objects.result.Tables.Table.Rows[0].PaymentCircle;
+					Ddl_PaymentCircle.prompt=PayCircle;
+					BankId=Ds_Objects.result.Tables.Table.Rows[0].BankId ;
+					Id=Ds_Objects.result.Tables.Table.Rows[0].Id;
+					AddMode=false;
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Delete_CUSTOM")
+				{	
+					alignAlert(Alert.show("Vendor Deleted Successfully.","Message !",Alert.OK, null, FunCall,iconTickLarge, Alert.OK),10,'');
+					FnClear();	
+				}	
+			} 
+			public function FnSearch():void
+			{
+				FnClear();
+				ErrStr=""; 
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";  
+				var Load:Array =new Array();
+				Load[0]=GlobalXml; Load[1]=ClientId; Load[2]=0;  Load[3]= ClientId; 
+				
+				useWeb("Vendors","Search_CUSTOM1",[GlobalXml,ClientId,0,UserId]);
+			}
+			private function validation():String
+			{
+				var TxtFlag:Boolean=true;var ErrStr:String="";				
+				if(txt_Email.text!="")
+				{
+					EmailValidator.validate(txt_Email.text);
+				}  
+				if(txt_VendorName.text=="")
+				{
+					if(TxtFlag=true)
+					{
+						txt_VendorName.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr +" *  Vendor Name is Required \n";
+				}
+				if(txt_FirstName.text=="")
+				{
+					if(TxtFlag=true)
+					{
+						txt_FirstName.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr +" *  First Name is Required \n";
+				} 
+				if(txt_Mobile.text == "")
+				{
+					if(TxtFlag=true)
+					{
+						txt_Mobile.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr +" *  Mobile is Required \n";
+				}
+				if(txt_Email.text == "")
+				{
+					if(TxtFlag=true)
+					{
+						txt_Email.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr +" *  Email is Required \n";
+				}
+				if(txt_NatureOfService.text == "")
+				{
+					if(TxtFlag=true)
+					{
+						txt_NatureOfService.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr +" *  NatureOfService is Required \n";
+				}
+				if(txt_PayeeName.text == "")
+				{
+					if(TxtFlag=true)
+					{
+						txt_PayeeName.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr +" *  PayeeName is Required \n";
+				}
+				if(txt_IFSC.text == "")
+				{
+					if(TxtFlag=true)
+					{
+						txt_IFSC.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr +" *  IFSC is Required \n";
+				}
+//				if(Cheque.selected==false)
+//				{ 
+//					   if(TxtFlag==true)
+//						{
+//							Cheque.setFocus();
+//							TxtFlag=false;
+//						}
+//						
+//						ErrStr=ErrStr+"*   Payment Mode is Required.\n"; 
+//				}
+				if(Mode.selectedValue==1)
+				{
+					if(txt_Bank.text=="")
+					{
+						if(Flag==true)
+						{
+							txt_Bank.setFocus();Flag=false;
+						}
+						ErrStr=ErrStr+"*   Bank is Required.\n";
+					}
+					if(txt_AccountNo.text=="")
+					{
+						if(Flag==true)
+						{
+							txt_AccountNo.setFocus();Flag=false;
+						}
+						ErrStr=ErrStr+"*   Account Number is Required.\n";
+					}
+					if(txt_AccountType.text=="")
+					{
+						if(Flag==true)
+						{
+							txt_AccountType.setFocus();Flag=false;
+						}
+						ErrStr=ErrStr+"*   Account Type is Required.\n";
+					}
+					if(txt_Email.text !="")
+					{
+						EmailValidator.validate(txt_Email.text);
+					}
+				}
+				return ErrStr;
+			}
+			
+			protected function EmailValidator_validHandler(event:ValidationResultEvent):void
+			{
+				Str_Email="";
+			}
+			
+			protected function EmailValidator_invalidHandler(event:ValidationResultEvent):void
+			{
+				Str_Email=event.message;
+			}
+			
+			protected function txt_Mobile_changeHandler(event:TextOperationEvent):void
+			{
+				if(txt_Mobile.text != "")
+				{		
+					txt_Mobile.errorString = "";	
+				}
+			}
+			protected function txt_Mobile_focusOutHandler():void
+			{
+				if(txt_Mobile.text != "")
+				{
+					if(txt_Mobile.text.length < 10)
+					{
+						txt_Mobile.errorString = "Mobile Number Must be 10 digits.";
+					}
+					if(txt_Mobile.text.length == 10)
+					{
+						var Str:String = txt_Mobile.text;						
+						var Str1:String = Str.substr(0, 1);						
+						if((Str1 != "9") && (Str1 != "8") && (Str1 != "7"))
+						{
+							txt_Mobile.errorString = "Mobile Number Starts With 9 or 8 or 7";
+						}
+						ErrStr=ErrStr+" * Invalid Mobile Number";
+					}	}
+			} 
+			protected function Save():void
+			{ 
+				ErrStr=validation(); 
+				if(Str_Email!="")
+				{
+					if(Flag == true)
+					{
+						txt_Email.setFocus();Flag=false;
+					}
+					ErrStr=ErrStr+Str_Email;
+				}
+				
+				if(ErrStr !="")
+				{
+					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10,"");
+					return; 
+				} 
+				else
+				{
+					var Ac:ArrayCollection=new ArrayCollection
+						([{
+							Category:Category,CategoryId:CategoryId,
+							VendorName:txt_VendorName.text,
+							FirstName:txt_FirstName.text,LastName:txt_LastName.text,
+							Designation:txt_Designation.text,NatureOfService:txt_NatureOfService.text,
+							Mobile:txt_Mobile.text,Office:txt_Office.text,address:txt_address.text,
+							
+							Email:txt_Email.text,State:State,StateId:StateId,
+							City:City,CityId:CityId,Website:txt_Website.text,
+							Pancard:txt_Pancard.text,saletaxnum:txt_saletaxnum.text,
+							saletaxdate:dt_saletaxdate.text,ServtaxNum:txt_ServtaxNum.text,
+							servicetaxdate:dt_servicetaxdate.text,		
+							
+							Cheque:Cheque.selected,OnlineTransfer:OnlineTransfer.selected,
+							Bank:txt_Bank.text,PayeeName:txt_PayeeName.text,
+							IFSC:txt_IFSC.text,AccountNo:txt_AccountNo.text,
+							AccountType:txt_AccountType.text,PaymentCircle:Ddl_PaymentCircle.selectedItem,
+							Id:Id ,BankId:0 
+						}]);
+					var HdrXml:String="";
+					HdrXml += "<ROOT>";
+					HdrXml += ObjToXmlStr_Comm(Ac,"HdrXml")
+					HdrXml += "</ROOT>";
+					useWeb("Vendors","Save_CUSTOM",[GlobalXml,HdrXml]);
+				}
+			}
+			protected function Search():void
+			{
+				PopUpManager.addPopUp( SearchPopUp , this, true);
+				SearchPopUp.Prc_name="Vendors"
+				var SearchParam:Array =new Array();
+				SearchPopUp.HlpIndex="SEARCH"
+				SearchParam[0]=GlobalXml;
+				SearchParam[1]=0;
+				SearchParam[2]=""; 
+				SearchPopUp.Prc_Param=SearchParam
+				SearchPopUp.HlpSrchGlobal=""
+				SearchPopUp.dataPanel.focusEnabled=true
+				SearchPopUp.Pageint()					
+				SearchPopUp.addEventListener("PopupEnter",funpopupEnter);
+				SearchPopUp.addEventListener("PopupClose",funpopupClose);
+				PopUpManager.centerPopUp(SearchPopUp);			
+			}
+			private function funpopupClose(event:Event):void
+			{ 			} 
+			private function funpopupEnter(event:Event):void
+			{	 Searchhb(SearchPopUp.SelectRow.Id,0);		}
+			private function Searchhb(Id:int,_PrdFk:int):void
+			{
+				var Load:Array = new Array(); 
+				Load[0] = GlobalXml; Load[1] = Id; Load[2]="";
+				useWeb("Vendors","Search_CUSTOM",Load);
+			}
+			protected function Delete():void
+			{
+				if(Id == 0)
+				{
+					alignAlert(Alert.show("This is an Invalid Process.","Alert Message !",Alert.OK, 
+						null, null,iconWarning, Alert.OK),10,'');					
+					return;
+				}	
+			//	alignAlert(Alert.show("Do you want to delete this item?", "Warning",Alert.YES | Alert.NO, null,
+			//	removeDgridItem, iconWarning, Alert.NO),10,"");		
+			}
+			private function removeDgridItem(event:CloseEvent):void 
+			{	
+				if (event.detail==Alert.YES) 
+				{	
+					var Load:Array = new Array();
+					Load[0]= GlobalXml; Load[1]= Id;  
+					useWeb("Vendors","Delete_CUSTOM",Load);
+				}
+			}
+			public function FunCall(event:CloseEvent):void
+			{
+				if (event.detail == Alert.OK) 
+				{	 
+					txt_FirstName.setFocus();
+				}
+			}
+			protected function FnClear():void
+			{
+				PageLoad();
+				Ddl_Category.selectedItem=" Select ",txt_VendorName.text="",
+				txt_FirstName.text="",txt_LastName.text="",txt_Designation.text="",
+				txt_NatureOfService.text="",
+				txt_Mobile.text="",txt_Office.text="",txt_address.text="",
+				
+				txt_Email.text="",Ddl_State.selectedItem="",StateId=0,
+				Ddl_City.selectedItem="",CityId=0,txt_Website.text="",
+				txt_Pancard.text="",txt_saletaxnum.text="",
+				dt_saletaxdate.text="",txt_ServtaxNum.text="",
+				dt_servicetaxdate.text="",		
+								
+				Cheque.selected=true,OnlineTransfer.selected=0,
+				txt_Bank.text="",txt_PayeeName.text="",
+				txt_IFSC.text="",txt_AccountNo.text="",
+				txt_AccountType.text="",Ddl_PaymentCircle.selectedItem="",
+				Ddl_Category.dataProvider=null;
+				Ddl_City.dataProvider= null;
+				//Ddl_State.dataProvider= null;
+				Id=0;
+				Ddl_Category.prompt=" Select ";
+				Ddl_City.prompt="Select City ";
+				Ddl_State.prompt="Select State";
+				Ddl_PaymentCircle.prompt="Payment Circle";
+			}
+			private function ChangeState1():void
+			{
+				StateId=Ddl_State.selectedItem.StateId;
+				State=Ddl_State.selectedItem.label;
+				useWeb("Vendors","CITYLOAD_CUSTOM",[GlobalXml,"CITYLOAD","","",StateId,0]);
+			}
+			private function ChangeCity():void
+			{
+				CityId=Ddl_City.selectedItem.CityId;
+				City=Ddl_City.selectedItem.label;
+			}
+			 
+//			protected function Ddl_Bank_changeHandler(event:IndexChangeEvent):void
+//			{
+//				// TODO Auto-generated method stub
+//				BankId=Ddl_Bank.selectedItem.BankId;
+//				Bank=Ddl_Bank.selectedItem.label;
+//			}
+			
+			protected function Ddl_Category_changeHandler(event:IndexChangeEvent):void
+			{
+				// TODO Auto-generated method stub
+				CategoryId=Ddl_Category.selectedItem.CategoryId;
+				Category=Ddl_Category.selectedItem.label;
+			}
+			private function CourierChange():void
+			{
+				if(Mode.selectedValue==1)
+				{ 
+					Star_Bank.visible=true;
+					Star_Acc.visible=true;
+					Star_Type.visible=true; 
+			 	}
+				else
+				{
+					Star_Bank.visible=false;
+					Star_Acc.visible=false;
+					Star_Type.visible=false;
+				}
+			}
+			
+			
+			
+		]]>
+		
+	</fx:Script>
+	<fx:Declarations>
+		
+	</fx:Declarations>
+	<s:BorderContainer x="0" y="0" width="100%" height="479" depth="50" backgroundColor="#fbf9f9" borderVisible="false">
+		<s:BorderContainer x="29" y="-1" width="911" height="480" borderVisible="false"  
+						   cornerRadius="5" id="UserAdd">
+			<mx:Label x="19" y="92" text="Vendor Name"/>
+			<mx:Label x="19" y="48" text="Vendor Category"/>
+			<mx:Label x="19" y="136" text="First Name"/>
+			<mx:Label x="19" y="184" text="Last Name"/>
+			<mx:Label x="19" y="318" text="Mobile No"/>
+			<mx:Label x="19" y="359" text="Office No"/>
+			<s:TextInput id="txt_Office" x="129" y="360" width="158" height="21" maxChars="12"
+						 restrict="0-9" tabIndex="8"/>
+			<mx:Label x="339" y="54" text="Email"/>
+			<mx:Label x="339" y="138" text="City"/>
+			<mx:Label x="339" y="94" text="State"/>
+			<mx:Label x="371" y="90" text="*" color="red"/>
+			<s:DropDownList id="Ddl_State" x="429" y="95" width="158" height="21"
+							prompt="Select State" tabIndex="11" change="ChangeState1()"> 
+			</s:DropDownList>
+			<mx:Label x="641" y="143" text="Bank"/>
+			<mx:Label x="641" y="361" text="Payment Circle"/>
+			<mx:Label x="641" y="89" text="Payment Mode"/>
+			<mx:Label x="726" y="354" text="*" color="red"/>
+			<mx:Label x="723" y="84" text="*" color="red"/>
+			<s:DropDownList id="Ddl_PaymentCircle" x="741" y="360" width="158" height="21"
+							prompt="Payment Circle" tabIndex="25">
+				<s:ArrayList>
+					<fx:String>7 days</fx:String>
+					<fx:String>15 days</fx:String>
+					<fx:String>30 days</fx:String>
+					<fx:String>45 days</fx:String>
+					<fx:String>60 days</fx:String> 
+				</s:ArrayList>
+			</s:DropDownList>
+			<mx:Label x="674" y="140" text="*" color="red" id="Star_Bank"/>
+			<s:TextInput id="txt_Bank" x="744" y="136" width="158" height="21"
+							tabIndex="20"  /> 
+			 
+			<mx:Label x="365" y="135" text="*" color="red"/>
+			<mx:Label x="100" y="87" text="*" color="red"/>
+			<mx:Label x="379" y="49" text="*" color="red"/>
+			<mx:Label x="79" y="317" height="15" color="red" text="*" width="12"/>
+			<mx:Label x="115" y="277" height="15" color="red" text="*" width="12"/>
+			<mx:Label x="86" y="131" text="*" color="red"/>
+			<s:DropDownList id="Ddl_Category" x="129" y="50" width="158" height="21"
+							prompt="Vendor Category" tabIndex="1" change="Ddl_Category_changeHandler(event)"> 
+			</s:DropDownList>
+			<s:DropDownList id="Ddl_City" x="429" y="136" width="158" height="21"
+							prompt="Select City" tabIndex="12"  change="ChangeCity()"/>
+				 
+			<s:TextInput id="txt_FirstName" x="129" y="136" width="158" height="21" maxChars="100"
+						 tabIndex="3"/>
+			<s:TextInput id="txt_LastName" x="129" y="180" width="158" height="21" maxChars="50"
+						 tabIndex="4"/>
+			<mx:Label x="19" y="232" text="Designation"/>
+			<mx:Label x="19" y="276" text="Nature of Service"/>
+			<s:TextInput id="txt_NatureOfService" x="129" y="273" width="158" height="21" maxChars="50"
+						 tabIndex="6"/>
+			<s:TextInput id="txt_Designation" x="129" y="225" width="158" height="21" maxChars="50"
+						  tabIndex="5"/>
+			<mx:Label x="641" y="225" text="IFSC"/>
+			<mx:Label x="641" y="185" text="Payee Name "/>
+			<mx:Label x="715" y="178" text="*" color="red"/>
+			<mx:Label x="672" y="223" text="*" color="red"/>
+			<mx:Label x="706" y="271" text="*" color="red" id="Star_Acc"/>
+			<mx:Label x="712" y="313" text="*" color="red" id="Star_Type"/>
+			<s:TextInput id="txt_IFSC" x="742" y="225" width="158" height="21" maxChars="50"
+						  tabIndex="22"/>
+			<s:TextInput id="txt_PayeeName" x="742" y="180" width="158" height="21" maxChars="50"
+						  tabIndex="21"/>
+			<mx:Label x="641" y="277" text="Account No"/>
+			<mx:Label x="641" y="322" text="Account Type"/>
+			<s:TextInput id="txt_AccountNo" x="742" y="273" width="158" height="21" maxChars="50"
+						 tabIndex="23"/>
+			<s:TextInput id="txt_AccountType" x="742" y="318" width="158" height="21" maxChars="50"
+						 tabIndex="24"/>
+			<mx:Label x="339" y="232" text="Pan Card"/>
+			<s:TextInput id="txt_Pancard" x="429" y="225" width="158" height="21" maxChars="50"
+						 tabIndex="14"/>
+			<s:TextInput id="txt_Mobile" x="129" y="318" width="158" height="21"
+						 change="txt_Mobile_changeHandler(event)"  
+						 focusOut="txt_Mobile_focusOutHandler()" maxChars="10" 
+						 restrict="0-9" tabIndex="7"/>
+			<s:TextInput id="txt_Email" x="429" y="50" width="158" height="21" 
+						 tabIndex="10" maxChars="50"/> 
+			<mx:Label x="339" y="186" text="Website"/>
+			<mx:Label x="339" y="286" width="82" height="37" text="Sale Tax/VAT &#xd;Registration  "/>
+			<mx:Label x="339" y="451" height="18" text="Registration Date"/>
+			<s:TextInput id="txt_Website" x="429" y="180" width="158" height="21" 
+						  tabIndex="13"/>
+			<s:TextInput x="429" y="287" width="158" height="21" 
+						 tabIndex="15" id="txt_saletaxnum"/>
+			<s:TextInput x="429" y="403" width="158" height="21" id="txt_ServtaxNum"
+						 tabIndex="17"/>
+			
+			<s:TextInput id="txt_VendorName" x="129" y="95" width="158" height="21" maxChars="100" 
+						  tabIndex="2" />
+			 
+			<s:TextArea x="129" y="406" width="158" height="62" id="txt_address"
+						maxChars="200" tabIndex="9"/>
+			<s:VGroup x="748" y="72" width="116" height="44" gap="5"  tabIndex="19" >
+				<s:RadioButton id="Cheque" width="107" label="Cheque" buttonMode="true"
+							   groupName="Mode" value="0"/>
+				<s:RadioButton id="OnlineTransfer" width="108" label="Online Transfer"
+							   buttonMode="true" groupName="Mode" value="1"/> 
+			</s:VGroup>
+			<mx:Label x="21" y="408" text="Address"/>
+			<mx:DateField x="489" y="330" width="93" height="21" id="dt_saletaxdate" tabIndex="16"
+						  selectableRange="{{rangeEnd: new Date()}}"  styleName="DisabledDateField" 
+						  yearNavigationEnabled="true"/>
+			<mx:DateField x="489" y="450" width="93" height="21" id="dt_servicetaxdate" tabIndex="18"
+						  selectableRange="{{rangeEnd: new Date()}}"  styleName="DisabledDateField" 
+						  yearNavigationEnabled="true"/>
+			<mx:Label x="641" y="42" text="Payment Information" color="Red"/>
+			<mx:Label x="339" y="262" text="Sale Tax/VAT Registration" color="Red"/>
+			<mx:Label x="339" y="334" width="124" height="18" text="Registration Date"/>
+			<mx:Label x="339" y="374" text="Service  Tax/VAT Registration" color="Red"/>
+			<mx:Label x="339" y="400" height="37" text="Service Tax/VAT&#xd;Registration"/>
+		</s:BorderContainer> 
+	</s:BorderContainer>
+	<s:HGroup x="40" y="487" width="847" height="35" horizontalAlign="center" verticalAlign="middle"
+			  depth="0">
+		<WrbComp:SaveControl docClear="FnClear()" docRefresh="PageLoad()" docSave="Save()" doSearch="Search()"
+							 docDelete="Delete()" id="SCTRL">
+		</WrbComp:SaveControl>
+	</s:HGroup>
+	<mx:HRule x="0" y="482" width="100%" strokeColor="#eb1c24"/>
+</s:Application>

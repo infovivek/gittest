@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" 
+			   xmlns:Controls="fx.com.adobe.Controls.*"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   xmlns:WrbComp="WrbComp.*"
+			   width="100%" height="100%"
+			   creationComplete="PageLoad()"
+			   pageTitle="Transcription Subscription Price Model">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
+	<fx:Script>
+		<![CDATA[
+			import WrbComp.frmsearchwindow;
+			
+			import WrbHelpComp.HlpGridHdr;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.CalendarLayoutChangeEvent;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.events.IndexChangedEvent;
+			import mx.graphics.codec.PNGEncoder;
+			
+			import spark.events.IndexChangeEvent;
+			import spark.events.TextOperationEvent;
+			private var SearchPopUp:frmsearchwindow = new frmsearchwindow();
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "",TypeServiceId:int=0,ErrStr:String="";
+			public var Id:int=0,ErrMsg:String="";
+			public var AddMode:Boolean=true,Flag:Boolean=true;
+			protected function PageLoad():void
+			{
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";
+				FnHelp_Type();
+				SCtrl.setButtonRights("Delete",true);
+			}
+			protected function FnHelp_Type():void
+			{
+				var Tmp:ArrayCollection=new ArrayCollection
+					([{Action:GlobalXml,Param1:"TYPELOAD",Param2:0,Param3:0,prcName:"TransSubsPriceModel",
+						ctrlName:"hlpTypes",grdWidth:"108"}]);				
+				Grd_Trans._bindHlpTextData(Tmp);
+				Tmp=new ArrayCollection();
+				
+				useWeb("TransSubsPriceModel","PAGELOAD_CUSTOM",[GlobalXml,"PAGELOAD",0,0]);
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "PAGELOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_Data.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				{
+					if (AddMode == true)
+					{
+						alignAlert(Alert.show("Details Added Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+					}
+					else
+					{
+						alignAlert(Alert.show("Details Updated Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+					}
+					FnClear();
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Search_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_Trans._setGridSrc=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+					AddMode=false;
+				}
+				if(Ds_Objects.currentTarget.description.toString() == "Delete_NEWCUSTOM")
+				{
+					alignAlert(Alert.show("Deleted Successfully.","Message !",Alert.OK, 
+						null, null, iconTickLarge, Alert.OK),10,""); 
+				}
+			}
+			
+			protected function FnValidation_BeforeSave():String
+			{
+				ErrStr="";
+				var Flag:Boolean=true;
+				if((Grd_Trans._getGridSrc==null)||(Grd_Trans._getGridSrc.length==0))
+					{
+					if(Flag==true)
+					{
+						Grd_Data.setFocus();
+						Flag=false;
+					}
+					ErrStr=ErrStr+"* Tariff Data's is Required.\n";
+				}
+				return ErrStr;
+			}
+			protected function FnSave():void
+			{
+				ErrMsg = ""; Flag = true; 
+				var Str:String=FnValidation_BeforeSave();
+				if(ErrStr !="")
+				{
+					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10,"");
+					return;
+				} 
+				else
+				{
+					var HdrXml:String="";
+					HdrXml += "<ROOT>";
+					HdrXml += ObjToXmlStr_Comm(Grd_Trans._getGridSrc,"HdrXml")
+					HdrXml += "</ROOT>";
+					useWeb("TransSubsPriceModel","Save_CUSTOM",[GlobalXml,HdrXml]);
+				}
+			}
+			
+			protected function FnSearch():void
+			{
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>"; 
+				
+				PopUpManager.addPopUp( SearchPopUp , this, true);
+				SearchPopUp.Prc_name="TransSubsPriceModel"
+				var SearchParam:Array =new Array();
+				SearchPopUp.HlpIndex="SEARCH"
+				SearchParam[0]=GlobalXml;
+				SearchParam[1]=0;
+				SearchParam[2]="";
+				
+				SearchPopUp.Prc_Param=SearchParam
+				SearchPopUp.HlpSrchGlobal=""
+				SearchPopUp.dataPanel.focusEnabled=true
+				SearchPopUp.Pageint()					
+				SearchPopUp.addEventListener("PopupEnter",funpopupEnter);
+				SearchPopUp.addEventListener("PopupClose",funpopupClose);
+				PopUpManager.centerPopUp(SearchPopUp);
+			}
+			private function funpopupClose(event:Event):void
+			{
+				
+			}
+			private function funpopupEnter(event:Event):void
+			{				
+				SearchDtls(SearchPopUp.SelectRow.Id,0);			
+			}
+			private function SearchDtls(Id:int,_PrdFk:int):void
+			{ 
+				var Load:Array =new Array();
+				Load[0]=GlobalXml; Load[1]=Id;Load[2]=0;    
+				useWeb("TransSubsPriceModel","Search_CUSTOM",Load);
+			}
+			
+			public function Custom_Grid_Delete(index:int,arrGrid:ArrayCollection,GrdId:String):void
+			{              
+				if(arrGrid[index].Id!="")
+				{												
+					useWeb("TransSubsPriceModel","Delete_NEWCUSTOM",[GlobalXml,"MODELDELETE","",arrGrid[index].Id]);
+				}
+			}
+			private function FnClear():void
+			{
+				Grd_Trans._clear();
+				Grd_Data.dataProvider=null; 
+				AddMode=true;Id=0;
+				PageLoad();
+			}
+			public function Custom_Grid_Enter(arrObj:Object, GridMode:Boolean, Index:int):String
+			{
+				var Str:String="";
+				if(arrObj.GridId=="AmountDetails")
+				{
+					if(arrObj.GridId=="hlpTypes")
+					{
+						if((arrObj.Types != "Transcription")&&(arrObj.Types != "Subscription"))
+						{
+							Str=Str+"*  Type is Invalid.\n";
+						}
+						return Str;
+					} 
+				}  
+					
+				return Str;
+			}
+			public function Custom_Grid_Tab(arrObj:Object,arrObj1:Object,GridMode:Boolean,Index:int):void
+			{
+				if(arrObj.currentTarget.id=="txtEscalationPercentage")
+				{
+					if(arrObj1.Types=="Transcription")
+					{ 
+						Grd_Trans._setValuetoCtrl("txtAllowedBookings","0") 
+					}  
+					Grd_Trans._setFocus(0);  
+				}
+			}
+		]]>
+	</fx:Script>
+	<s:VGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+		
+		<s:BorderContainer x="12" y="19" width="100%" height="500" backgroundColor="#fbf9f9"
+						   borderVisible="false">
+			<mx:Label x="29" y="17" text=" Transactional/Subscription Information" color="Red"/>
+			<WrbComp:ProDGrid1 id="Grd_Trans" x="9" y="50" width="589" height="286"
+							   _borderVisible="true"
+							   _ColDataField="Types~Name~Amount~AllowedBookings~EscalationTenure~EscalationPercentage~Id"
+							   _ColHdrText="Types~Name~Amount~AllowedBookings~EscalationTenure~Escalation %~Id"
+							   _ColType="hlp~txt~ntxt~ntxt~txt~ntxt~txt"
+							   _colVisible="0~1~1~1~1~1~0"
+							   _ColWidth="0~100~100~100~120~90~0" 
+							   _editable="0~1~1~1~1~1~0"
+							   _required="0~1~1~0~0~0~0" 
+							   _spltChar="~"
+							   ID="AmountDetails"
+							   _DuplChk="false"
+							   _visibleColNos="6"  >
+			</WrbComp:ProDGrid1> 
+			<mx:Label x="699" y="23" text="Transactional/Subscription History" color="Red"/>
+			
+			<!--s:BorderContainer x="637" y="50" width="319" height="287" 
+							   borderVisible="false"-->
+			<mx:DataGrid x="650" y="50" width="355" height="286" id="Grd_Data" 
+						 doubleClickEnabled="true">
+				<mx:columns>						
+					<mx:DataGridColumn dataField="Types" headerText="Types" width="120" visible="false"/>
+					<mx:DataGridColumn dataField="Name" headerText="Name" width="100"/>
+					<mx:DataGridColumn dataField="Amount" headerText="Amount" width="75"/>
+					<mx:DataGridColumn dataField="AllowedBooking" headerText="AllowedBooking" width="115"/>
+					<mx:DataGridColumn dataField="Id"  visible="false"/>
+				</mx:columns>
+			</mx:DataGrid>
+			<mx:HRule x="0" y="403" width="100%" strokeColor="#eb1c24"/> 
+			<s:HGroup x="0" y="421" width="100%" height="41" horizontalAlign="center">
+			<WrbComp:SaveControl id="SCtrl" x="177" y="414" docClear="FnClear()" docRefresh="PageLoad()" docSave="FnSave()"
+								 doSearch="FnSearch()">
+			</WrbComp:SaveControl>
+			</s:HGroup>
+		</s:BorderContainer>
+		
+	</s:VGroup>	
+</s:Application>

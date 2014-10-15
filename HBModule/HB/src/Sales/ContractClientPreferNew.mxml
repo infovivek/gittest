@@ -1,0 +1,514 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:WrbComp="WrbComp.*"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   xmlns:ns1="*"
+			   width="100%" height="100%"
+			   creationComplete="Application_creationCompleteHandler(event)"
+			   pageTitle=" ClientPreferred Management">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<!--mx:EmailValidator id="EmailValidator" valid="EmailValidator_validHandler(event)"
+						   invalid="EmailValidator_invalidHandler(event)"/-->
+	</fx:Declarations>
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
+	<fx:Script>
+		<![CDATA[
+			import WrbComp.frmsearchwindow;
+			
+			import flash.net.FileReference;
+			
+			import flexlib.controls.textClasses.StringBoundaries;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.CloseEvent;
+			import mx.events.DragEvent;
+			import mx.events.FlexEvent;
+			import mx.graphics.codec.PNGEncoder;
+			
+			import spark.events.IndexChangeEvent;
+			import spark.events.TextOperationEvent;
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "";
+			public var Id:int=0,ClientId:int=0;
+			private var SearchPopUp:frmsearchwindow = new frmsearchwindow();
+			public var ErrStr:String="",Flag:Boolean=true;
+			private var firstTime:Boolean = true;
+			import com.as3xls.xls.Cell;
+			import com.as3xls.xls.ExcelFile;
+			import com.as3xls.xls.Sheet;
+			import com.as3xls.xls.Type;
+			private var xlsFile:ExcelFile;
+			
+			
+			protected function Application_creationCompleteHandler(event:FlexEvent):void
+			{
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";
+				FnHelp(); 	 
+				FnHelps();
+				Save_PettyCash.setButtonRights("Search",true);
+				Save_PettyCash.setButtonRights("Delete",true);
+			} 
+			protected function FnHelp():void
+			{ 
+				useWeb("ContractClientPrefer","PageLoad_CUSTOM",[GlobalXml,'PageLoad',0,0]); 
+			}
+			protected function FnHelps():void
+			{
+				var Tmp:ArrayCollection=new ArrayCollection
+					([{Action:GlobalXml,Param1:"GridPropertyManaged",Param2:0,Param3:0,prcName:"ContractClientPrefer",
+						ctrlName:"hlpProperty",grdWidth:"0,200",grdHeight:"50"}]);				
+				Grd_ClientDtls._bindHlpTextData(Tmp);
+				Tmp=new ArrayCollection();   
+			} 
+			private function Custom_WebSer_Result (Ds_Objects:Object):void				
+			{ 
+				if (Ds_Objects.currentTarget.description.toString() == "PageLoad_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Hlp_ClientName.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+					
+					
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "LastData_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Grd_ClientDtls._setGridSrc=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+					
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Id=Ds_Objects.result.Tables.Table.Rows[0].Id;
+						Hlp_ClientName.text=Ds_Objects.result.Tables.Table.Rows[0].ClientName;
+						ClientId=Ds_Objects.result.Tables.Table.Rows[0].ClientId;
+					}
+					if (Ds_Objects.result.Tables.Table2.Rows.length > 0)
+					{
+						Grd_Status1.dataProvider=Ds_Objects.result.Tables.Table2.Rows as ArrayCollection;
+					}
+				}
+				
+				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				{
+					if (Id == 0)
+					{
+						alignAlert(Alert.show("Contract Saved Successfully.","Message !",Alert.OK, 
+							null, null, iconTickLarge, Alert.OK),10,"");
+					}
+					else
+					{
+						alignAlert(Alert.show("Contract Updated Successfully.","Message !",Alert.OK, 
+							null, null, iconTickLarge, Alert.OK),10,"");
+					}
+					SCtrl_ClearHandler();
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Search_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Hlp_ClientName.text=Ds_Objects.result.Tables.Table.Rows[0].ClientName;
+						ClientId=Ds_Objects.result.Tables.Table.Rows[0].ClientId;
+						Id=Ds_Objects.result.Tables.Table.Rows[0].Id;
+					}
+//					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+//					{
+//						Grd_ClientDtls._setGridSrc=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+//					}
+				}
+				if(Ds_Objects.currentTarget.description.toString() == "Lost_CUSTOM")
+				{
+					alignAlert(Alert.show("Deleted Successfully.","Message !",Alert.OK, 
+						null, null, iconTickLarge, Alert.OK),10,"");
+					SCtrl_ClearHandler();
+				}
+			}
+			private function validation():String 
+			{
+				ErrStr="";
+				var TxtFlag:Boolean=true;
+				
+				if(Hlp_ClientName.text=="")
+				{
+					if(TxtFlag==true)
+					{
+						Hlp_ClientName.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+ "*   Client Name \n";
+				}
+				if((Grd_ClientDtls._getGridSrc==null)||(Grd_ClientDtls._getGridSrc.length==0))
+				{
+					if(TxtFlag==true)
+					{ 
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+ "*   Tarif Data Required \n";
+				}
+				return ErrStr;
+			} 
+			protected function SCtrl_SaveHandler():void
+			{
+				
+				ErrStr=validation();
+				if(ErrStr !="")
+				{
+					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10,"");
+					return;
+				} 
+				else
+				{
+					var Ac:ArrayCollection=new ArrayCollection
+						([{ClientName:Hlp_ClientName.text,Id:Id,ClientId:ClientId
+						}]);
+					
+					var HdrXml:String = ObjToXmlStr_Comm(Ac,"HdrXml");
+					var ClientXml:String="";
+					ClientXml += "<ROOT>";
+					ClientXml += ObjToXmlStr_Comm(Grd_ClientDtls._getGridSrc,"ClientXml")
+					ClientXml += "</ROOT>";
+					useWeb("ContractClientPrefer","Save_CUSTOM",[GlobalXml,HdrXml,ClientXml]);
+				}
+			}
+			protected function SCtrl_ClearHandler():void
+			{
+				Hlp_ClientName.text="";
+				Grd_ClientDtls._clear();
+				FnHelp();
+				FnHelps();
+				ClientId=0;
+				Id=0;
+				Ids=0;
+			}
+			protected function SCtrl_SearchHandler():void
+			{  
+				PopUpManager.addPopUp( SearchPopUp , this, true);
+				SearchPopUp.Prc_name="ContractClientPrefer";
+				var SearchParam:Array =new Array();
+				SearchPopUp.HlpIndex="SEARCH";
+				SearchParam[0]=GlobalXml;
+				SearchParam[1]=0;				
+				SearchPopUp.Prc_Param=SearchParam;
+				SearchPopUp.HlpSrchGlobal="";
+				SearchPopUp.dataPanel.focusEnabled=true;
+				SearchPopUp.Pageint();					
+				SearchPopUp.addEventListener("PopupEnter",funpopupEnter);
+				SearchPopUp.addEventListener("PopupClose",funpopupClose);
+				PopUpManager.centerPopUp(SearchPopUp);				
+			}
+			
+			private function funpopupClose(event:Event):void
+			{ 
+			} 
+			private function funpopupEnter(event:Event):void
+			{				
+				Searchmdl(SearchPopUp.SelectRow.Id,0);		
+			}
+			private function Searchmdl(Id:int,_PrdFk:int):void
+			{
+				var Load:Array = new Array(); 
+				Load[0] = GlobalXml; Load[1] = Id;
+				useWeb("ContractClientPrefer","Search_CUSTOM",Load);
+			}
+//			protected function SCtrl_DeleteHandler():void
+//			{
+//				if(Id ==0)
+//				{ 
+//					alignAlert(Alert.show("This is an Invalid Process.","Alert Message !",Alert.OK, 
+//						null, null,iconWarning, Alert.OK),10,'');					
+//					return;
+//				}
+//				else
+//				{
+//					if(Id !=0)
+//					{
+//						alignAlert(Alert.show("Do you want to Delete this item ?", "Warning !",Alert.YES | Alert.NO, 
+//							null,removeItem, iconWarning, Alert.NO),10,"");
+//					}
+//				}
+//			}
+//			private function removeItem(event:CloseEvent):void
+//			{	
+//				if (event.detail==Alert.YES) 
+//				{
+//					var Load:Array = new Array();
+//					Load[0]=GlobalXml; Load[1]= Id;
+//					useWeb("ContractClientPrefer","Delete_CUSTOM",Load);
+//				} 
+//			}
+			var Ids:int=0;
+			public function Custom_Grid_Delete(index:int,arrGrid:ArrayCollection,GrdId:String):void
+			{              
+				if(arrGrid[index].Id!="")
+				{												
+					  Ids =arrGrid[index].Id
+					useWeb("ContractClientPrefer","Lost_CUSTOM",[GlobalXml,"Delete",Ids,0]);
+				}
+			}
+			protected function SCtrl_RefreshHandler():void
+			{
+				FnHelp();
+				FnHelps();
+			}
+			private function ClientData():void
+			{
+				if(Hlp_ClientName.selected())
+				{
+					Grd_ClientDtls._clear();
+					ClientId=Hlp_ClientName.Select_Row.Id;
+					Hlp_ClientName.text=Hlp_ClientName.Select_Row.ClientName;
+					useWeb("ContractClientPrefer","LastData_CUSTOM",[GlobalXml,'LastData',ClientId,0]); 
+				}
+				else
+				{
+					Hlp_ClientName.text="";
+					ClientId=0;
+				}
+				Grd_ClientDtls._setFocus(0);
+			
+			}
+			protected function getHlpData(event:Event):void
+			{ 
+				if(event.currentTarget.ID == "hlpProperty")
+				{	
+					Grd_ClientDtls._setValuetoCtrl("hlpProperty",event.currentTarget.selectedRow.Property);
+					Grd_ClientDtls._setValuetoCtrl("txtPropertyId",event.currentTarget.selectedRow.PropertyId) 
+					var Proptyidhlp=(event.currentTarget.selectedRow.PropertyId) ;
+					event.currentTarget.selectedRow = null;
+					
+//					var Tmp:ArrayCollection=new ArrayCollection
+//						([{Action:GlobalXml,Param1:"GridAprtbed",Param2:Proptyidhlp,Param3:0,prcName:"ContractClientPrefer",
+//							ctrlName:"hlpRoomType",grdWidth:"200,0",grdHeight:"50"}]);				
+//					Grd_ClientDtls._bindHlpTextData(Tmp);
+					//Tmp=new ArrayCollection();  
+					
+				}
+//				 function txt_Email_focusOutHandler(event:FocusEvent):void
+//					{
+//						}
+//				else if(event.currentTarget.ID == "hlpRoomType")
+//				{
+//					Grd_ClientDtls._setValuetoCtrl("hlpRoomType",event.currentTarget.selectedRow.RoomType);
+//					Grd_ClientDtls._setValuetoCtrl("txtRoomId",event.currentTarget.selectedRow.RoomId);
+//					Grd_ClientDtls._setValuetoCtrl("txtId",event.currentTarget.selectedRow.Id);
+//				}
+			}
+			public var ErrString:String="";
+			public function Custom_Grid_Enter(arrObj:Object, GridEdit:Boolean, index:int):String
+			{
+				ErrString="";
+				if(arrObj.PropertyId =="")
+				 {
+					ErrString+="* Please Clear And Select Property.\n";	
+				 }				
+				if(arrObj.RoomType =="")
+				{
+					ErrString+="* RoomType is Required.\n";
+				}	
+				if((arrObj.TariffSingle =="")&&(arrObj.TariffDouble ==""))
+				{
+					ErrString+="* Tariff is Required.\n";
+				}	
+				if((arrObj.Inclusive =="false")&&(arrObj.Tax==""))
+				{
+					if(arrObj.Tax == "")
+					{
+					   ErrString+="* Tax is Required.\n";
+					}
+				}
+				if(arrObj.ContactEmail != "")
+				{
+					var Ac_Email:ArrayCollection= new ArrayCollection();
+					var Email:String="";
+					var Ac_Email1:Array;
+					Email=Grd_ClientDtls.selectedRow.ContactEmail;
+					if(Email!="")
+					{
+						Ac_Email1=Email.split(',');
+						
+						for(var i:int=0;i<Ac_Email1.length;i++)
+						{
+							if(Ac_Email1[i]!="")
+							{
+								//EmailValidator.validate(Ac_Email1[i]);
+							}
+							else
+							{
+								Ac_Email1[i].errorString = "";
+							}
+						}
+					}
+					function txt_Email_changeHandler(event:TextOperationEvent):void
+					{
+						if(Grd_ClientDtls.selectedRow.ContactEmail != "")
+						{
+							Grd_ClientDtls.selectedRow.ContactEmail.errorString = "";
+						}
+					}
+					
+					
+					function EmailValidator_validHandler(event:ValidationResultEvent):void
+					{
+						Grd_ClientDtls.selectedRow.ContactEmail.errorString = "";
+					}
+					
+					function EmailValidator_invalidHandler(event:ValidationResultEvent):void
+					{
+						Grd_ClientDtls.selectedRow.ContactEmail.errorString = event.message;
+					}
+				}
+				return ErrString;
+			}
+			protected function clearMyTextInput1():void
+			{
+				if (firstTime == true )
+				{
+					txt_Filter.text = "";
+					firstTime = false;					
+				}		 
+			} 
+			private function filterMyArrayCollection1(item:Object):Boolean 
+			{
+				var Itm:Boolean=true;				
+				if(txt_Filter.text!="")
+				{
+					var searchString:String = txt_Filter.text.toLowerCase();
+					var itemName:String = (item.Property as String).toLowerCase();
+					Itm=itemName.indexOf(searchString) > -1;
+				}		
+				return Itm;		
+			}
+			public function filter1(Filt:String):void
+			{	 
+				var tempAC1:ArrayCollection=new ArrayCollection();	
+				tempAC1=Grd_ClientDtls._getGridSrc as ArrayCollection
+				tempAC1.filterFunction = filterMyArrayCollection1;
+				tempAC1.refresh();	
+			}
+			//docDelete="SCtrl_DeleteHandler()"
+			protected function ExportExcel(event:MouseEvent):void
+			{
+				
+				if(Grd_Status1.dataProvider !=null)
+				{
+					var arrExportResult:ArrayCollection = Grd_Status1.dataProvider as ArrayCollection;
+					xlsFile = new ExcelFile();
+					var sheet:Sheet = new Sheet();
+					
+					sheet.resize(arrExportResult.length+1,14);
+					
+					sheet.setCell(0,0,'ClientId');
+					sheet.setCell(0,1,'Property');
+					sheet.setCell(0,2,'RoomType');
+					sheet.setCell(0,3,'TariffSingle');
+					sheet.setCell(0,4,'TariffDouble');
+					sheet.setCell(0,5,'TariffTriple');
+					sheet.setCell(0,6,'Facility');
+					sheet.setCell(0,7,'Inclusive');
+					sheet.setCell(0,8,'Tax');
+					sheet.setCell(0,9,'ContactEmail');
+					sheet.setCell(0,10,'ContactName');
+					sheet.setCell(0,11,'ContactPhone');
+					
+					
+					
+					for(var i:int=0;i<arrExportResult.length;i++)
+					{
+						sheet.setCell(i+1, 0, arrExportResult[i].ClientId);
+						sheet.setCell(i+1, 1, arrExportResult[i].Property);
+						sheet.setCell(i+1, 2, arrExportResult[i].RoomType);
+						sheet.setCell(i+1, 3, arrExportResult[i].TariffSingle);
+						sheet.setCell(i+1, 4, arrExportResult[i].TariffDouble);
+						sheet.setCell(i+1, 5, arrExportResult[i].TariffTriple);
+						sheet.setCell(i+1, 6, arrExportResult[i].Facility);
+						sheet.setCell(i+1, 7, arrExportResult[i].Inclusive);
+						sheet.setCell(i+1, 8, arrExportResult[i].Tax);
+						sheet.setCell(i+1, 9, arrExportResult[i].ContactEmail);
+						sheet.setCell(i+1, 10, arrExportResult[i].ContactName);
+						sheet.setCell(i+1, 11, arrExportResult[i].ContactPhone);
+											
+						
+					}
+					Grd_Status1.dataProvider = arrExportResult;
+					xlsFile.sheets.addItem(sheet);      
+					var bytes: ByteArray = xlsFile.saveToByteArray();
+					var fr:FileReference = new FileReference();
+					fr.save(bytes,"SampleExport.xls");
+				}
+				else
+				{
+					alignAlert(Alert.show("Client Prefer Details Required.","Message !",
+						Alert.OK, null, null, iconErrLarge, Alert.OK),10,"");
+				}
+			
+			}
+		]]>
+	</fx:Script> 
+	<s:VGroup x="0" y="0" width="100%" height="500" gap="5" horizontalAlign="center" verticalAlign="middle">
+		<s:BorderContainer y="2" width="100%" height="417" backgroundColor="#fbf9f9"
+						   borderVisible="false"> 
+			<s:Label x="29" y="17" text="Client Information" color="Red"/>
+			
+			<s:Label x="329" y="60" text="Client Name"/>
+			<s:Label x="399" y="56" text="*" color="red"/> 
+			<WrbHelpComp:HelpText id="Hlp_ClientName" x="421" y="55" width="200" height="20" pxTabIndex="1"
+								  onselection="{ClientData()}" pxSetColumnsWidth="200,-1" depth="10">
+			</WrbHelpComp:HelpText>
+			
+			<mx:HRule x="0" y="417" width="100%" strokeColor="#eb1c24"/>
+			
+			<WrbComp:ProDGrid1 x="20" y="96" height="288" id="Grd_ClientDtls"
+							   _ColDataField="Property~RoomType~TariffSingle~TariffDouble~TariffTriple~Facility~Inclusive~Tax~ContactName~ContactPhone~ContactEmail~PropertyId~RoomId~Id"
+							   _ColHdrText="Property~Room Type~Single Tariff~Double Tariff~Triple Tariff~Facility~Inclusive~Tax~Name~Phone~Email~PropertyId~RoomId~Id"
+							   _ColType="hlp~hlp~ntxt~ntxt~ntxt~txt~Chk~txt~txt~txt~txt~txt~txt~txt"
+							   _colVisible="1~1~1~1~1~1~1~1~1~1~1~0~0~0"
+							   _ColWidth="180~80~80~80~80~75~75~75~75~75~75~0~0~0"
+							   _editable="1~1~1~1~1~1~1~1~1~1~1~0~0~0"
+							   _HeaderTxtLbl="true" 
+							   _required="0~0~0~0~0~0~0~0~0~0~0~0~0~0"
+							   _spltChar="~"
+							   _tabIndex="2"
+							   _visibleColNos="11"
+							   _DuplChk="false" 
+							   _getHlpTxtData="getHlpData(event)" ID="ClientDetails"/> 
+			<mx:DataGrid id="Grd_Status1" x="65" y="102" editable="true" width="843" height="309" visible="false">
+				<mx:columns>
+					<mx:DataGridColumn dataField="ClientId" headerText="ClientId" width="200" textAlign="left" editable="false"/>
+					<mx:DataGridColumn dataField="Property" headerText="Property" width="200" textAlign="left" editable="false"/>
+					<mx:DataGridColumn dataField="RoomType" headerText="RoomType" width="150" editable="false" />
+					<mx:DataGridColumn dataField="TariffSingle" headerText="TariffSingle" width="150" editable="false" textAlign="right"/>							
+					<mx:DataGridColumn dataField="TariffDouble" headerText="TariffDouble" width="150" editable="false" textAlign="right"/>
+					<mx:DataGridColumn dataField="TariffTriple" headerText="TariffTriple" width="200" textAlign="left" editable="false"/>
+					<mx:DataGridColumn dataField="Facility" headerText="Facility" width="200" textAlign="left" editable="false"/>
+					<mx:DataGridColumn dataField="Inclusive" headerText="Inclusive" width="150" editable="false" />
+					<mx:DataGridColumn dataField="Tax" headerText="Tax" width="150" editable="false" textAlign="right"/>							
+					<mx:DataGridColumn dataField="ContactEmail" headerText="ContactEmail" width="150" editable="false" textAlign="right"/>
+					<mx:DataGridColumn dataField="ContactName" headerText="ContactName" width="150" editable="false" textAlign="right"/>
+					<mx:DataGridColumn dataField="ContactPhone" headerText="ContactPhone" width="150" editable="false" textAlign="right"/>							
+					
+				</mx:columns>
+			</mx:DataGrid>
+			<s:TextInput x="35" y="390" width="154" id="txt_Filter"  focusIn="clearMyTextInput1()"
+						 change="filter1('Property')" maxChars="100" prompt="Property Filter"/>
+			<mx:Label x="200" y="389.5" text="---Filter by Property"/>
+			<mx:Label x="225" y="388" text="&lt;"/>
+			<s:Button x="480" y="389" label="Export" id="btn_Excel" click="ExportExcel(event)"/>
+		</s:BorderContainer>
+		<s:HGroup y="505" width="100%" height="41" horizontalAlign="center">
+			<WrbComp:SaveControl id="Save_PettyCash" docSave="SCtrl_SaveHandler()" docClear="SCtrl_ClearHandler()"
+								 doSearch="SCtrl_SearchHandler()" docRefresh="SCtrl_RefreshHandler()"/>
+		</s:HGroup>
+	</s:VGroup>
+</s:Application> 
+

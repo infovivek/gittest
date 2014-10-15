@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   xmlns:WrbComp="WrbComp.*"
+			   width="100%" height="100%" backgroundColor="#fbf9f9" creationComplete="page_Load()">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Style source="..\\Common\\ApplicationCSS.css" />
+	<fx:Script source="..\\Common\\CommonScript.as" />
+	<fx:Script source="..\\Common\\Functions.as"/>
+	<fx:Script>
+		<![CDATA[
+			
+			
+			import com.as3xls.xls.ExcelFile;
+			import com.as3xls.xls.Sheet;
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var Temp_AC:ArrayCollection = new ArrayCollection();
+			public static var Help_AC:ArrayCollection = new ArrayCollection();
+			private var xlsFile:ExcelFile;
+			public static var GlobalXml:String = "";
+			public var PropertyId:int=0,DateId:int=0;
+			private function page_Load():void
+			{
+				Global_AC = funLoginInfo("<gScrId>1</gScrId><gUsrFk>1</gUsrFk>");				
+				GlobalXml = "";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";	
+				Temp_AC=new ArrayCollection();
+				hlp_Date.dataProvider=Temp_AC;
+				change();
+			}			
+			public function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "Month_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						hlp_Date.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;						
+					}
+					else
+					{
+						hlp_Date.dataProvider=null;						
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Genarate_CUSTOM")
+				{
+					if(Drp_Reporttype.selectedIndex==0)
+					{
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{
+							Grd_Rentals.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;						
+						}
+						else
+						{
+							Grd_Rentals.dataProvider=null;						
+						}						
+					}
+					else if(Drp_Reporttype.selectedIndex==1)
+					{
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{
+							Grd_ManagedGuest.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;						
+						}
+						else
+						{
+							Grd_ManagedGuest.dataProvider=null;						
+						}
+						
+					}
+					else if(Drp_Reporttype.selectedIndex==2)
+					{
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{
+							Grd_Receivables.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;						
+						}
+						else
+						{
+							Grd_Receivables.dataProvider=null;						
+						}
+					}
+					else
+					{
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{
+							Grd_ManagedGuest.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;						
+						}
+						else
+						{
+							Grd_ManagedGuest.dataProvider=null;						
+						}
+					}
+					
+				}
+			}			
+			private function fnGetLocation():void
+			{
+				if(hlp_Date.selected())
+				{
+					hlp_Date.text=hlp_Date.Select_Row.LastMonth
+					DateId=hlp_Date.Select_Row.Id
+					//dt_From.setFocus();
+				}
+				else
+				{
+					hlp_Date.text="";
+					DateId=0;
+				}
+			}
+			protected function button_hb1_clickHandler(event:MouseEvent):void
+			{	
+				if(DateId==0)
+				{
+					alignAlert(Alert.show("* Month is Required..","Required !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+					return;
+				}
+				else
+				{
+					useWeb("Report","Genarate_CUSTOM", [GlobalXml, "Genarate",DateId, 0,"",Drp_Type.selectedItem,Drp_Reporttype.selectedItem]);
+				}				
+			}
+			protected function ExportExcel(event:MouseEvent):void
+			{
+				var arrExportResult:ArrayCollection = new ArrayCollection();					
+				xlsFile = new ExcelFile();
+				var sheet:Sheet = new Sheet();
+				
+				
+				if(Drp_Reporttype.selectedIndex==0)
+				{
+					arrExportResult=Grd_Rentals.dataProvider as ArrayCollection;
+					sheet.resize(arrExportResult.length+10,18);
+					if(arrExportResult.length!=0)
+					{
+						sheet.setCell(0,4,Drp_Reporttype.selectedItem+" Report");
+						sheet.setCell(1,0,'Owner Name');
+						sheet.setCell(1,1,'Property Name');
+						sheet.setCell(1,2,'ApartmentNo');
+						sheet.setCell(1,3,'Rentel Amount');
+						sheet.setCell(1,4,'TDS Amount');
+						sheet.setCell(1,5,'TIA Credit');
+						sheet.setCell(1,6,'TIA Debit');
+						sheet.setCell(1,7,'NTIA Credit');
+						sheet.setCell(1,8,'NTIA Debit');
+						sheet.setCell(1,9,'Rent Type');
+						sheet.setCell(1,10,'Type');
+						
+						for(var i:int=0;i<arrExportResult.length;i++)
+						{
+							sheet.setCell(i+2, 0, arrExportResult[i].OwnerName);
+							sheet.setCell(i+2, 1, arrExportResult[i].PropertyName);
+							sheet.setCell(i+2, 2, arrExportResult[i].ApartmentNo);
+							sheet.setCell(i+2, 3, arrExportResult[i].RentelAmount);
+							sheet.setCell(i+2, 4, arrExportResult[i].TDSAMOUNT);
+							sheet.setCell(i+2, 5, arrExportResult[i].TIACredit);
+							sheet.setCell(i+2, 6, arrExportResult[i].TIADebit);
+							sheet.setCell(i+2, 7, arrExportResult[i].NTIACredit);
+							sheet.setCell(i+2, 8, arrExportResult[i].NTIACredit);
+							sheet.setCell(i+2, 9, arrExportResult[i].RentType);
+							sheet.setCell(i+2, 10, arrExportResult[i].Type);
+						}
+						Grd_Rentals.dataProvider=arrExportResult
+						xlsFile.sheets.addItem(sheet);      
+						var bytes: ByteArray = xlsFile.saveToByteArray();
+						var fr:FileReference = new FileReference();
+						fr.save(bytes,Drp_Reporttype.selectedItem+".xls");
+					}
+					else
+					{
+						
+						alignAlert(Alert.show("* No Records Found.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+						return;
+					}
+					
+					
+				}
+				else if(Drp_Reporttype.selectedIndex==3)
+				{
+					arrExportResult=Grd_Maintenance.dataProvider as ArrayCollection;
+					sheet.resize(arrExportResult.length+1,14);
+					if(arrExportResult.length!=0)
+					{
+						sheet.setCell(0,1,Drp_Reporttype.selectedItem+" Report");
+						sheet.setCell(1,0,'Owner Name');
+						sheet.setCell(1,1,'Property Name');
+						sheet.setCell(1,2,'ApartmentNo');
+						sheet.setCell(1,3,'Rentel Amount');
+						sheet.setCell(1,4,'Rent Type');
+						
+						for(var i:int=0;i<arrExportResult.length;i++)
+						{
+							sheet.setCell(i+2, 0, arrExportResult[i].OwnerName);
+							sheet.setCell(i+2, 1, arrExportResult[i].PropertyName);
+							sheet.setCell(i+2, 2, arrExportResult[i].ApartmentNo);
+							sheet.setCell(i+2, 3, arrExportResult[i].RentelAmount);
+							sheet.setCell(i+2, 4, arrExportResult[i].RentType);
+							
+						}
+						Grd_Maintenance.dataProvider=arrExportResult
+						xlsFile.sheets.addItem(sheet);      
+						var bytes: ByteArray = xlsFile.saveToByteArray();
+						var fr:FileReference = new FileReference();
+						fr.save(bytes,Drp_Reporttype.selectedItem+".xls");
+					}						
+					else
+					{
+						
+						alignAlert(Alert.show("* No Records Found.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+						return;
+					}
+				}
+				else if(Drp_Reporttype.selectedIndex==4)
+				{
+					arrExportResult=Grd_Receivables.dataProvider as ArrayCollection;
+					sheet.resize(arrExportResult.length+1,14);
+					if(arrExportResult.length!=0)
+					{
+						sheet.setCell(0,1,Drp_Reporttype.selectedItem+" Report");
+						sheet.setCell(0,2,Drp_Reporttype.selectedItem+" Report");
+						sheet.setCell(1,0,'Client Name');
+						sheet.setCell(1,1,'Type');						
+						sheet.setCell(1,2,'Rentel Amount');
+						
+						for(var i:int=0;i<arrExportResult.length;i++)
+						{
+							sheet.setCell(i+2, 0, arrExportResult[i].ClientName);
+							sheet.setCell(i+2, 1, arrExportResult[i].Type);
+							sheet.setCell(i+2, 2, arrExportResult[i].RentelAmount);
+						}
+						Grd_Receivables.dataProvider=arrExportResult
+						xlsFile.sheets.addItem(sheet);      
+						var bytes: ByteArray = xlsFile.saveToByteArray();
+						var fr:FileReference = new FileReference();
+						fr.save(bytes,Drp_Reporttype.selectedItem+".xls");
+					}						
+					else
+					{
+						
+						alignAlert(Alert.show("* No Records Found.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+						return;
+					}
+				}	
+				else
+				{
+					arrExportResult=Grd_ManagedGuest.dataProvider as ArrayCollection;
+					sheet.resize(arrExportResult.length+1,14);
+					if(arrExportResult.length!=0)
+					{
+						sheet.setCell(0,1,Drp_Reporttype.selectedItem+" Report");
+						sheet.setCell(0,2,Drp_Reporttype.selectedItem+" Report");
+						sheet.setCell(1,0,'Client Name');
+						sheet.setCell(1,1,'Type');						
+						sheet.setCell(1,2,'Rentel Amount');						
+						for(var i:int=0;i<arrExportResult.length;i++)
+						{
+							sheet.setCell(i+2, 0, arrExportResult[i].ClientName);
+							sheet.setCell(i+2, 1, arrExportResult[i].Type);
+							sheet.setCell(i+2, 2, arrExportResult[i].RentelAmount);
+						}
+						Grd_ManagedGuest.dataProvider=arrExportResult
+						xlsFile.sheets.addItem(sheet);      
+						var bytes: ByteArray = xlsFile.saveToByteArray();
+						var fr:FileReference = new FileReference();
+						fr.save(bytes,Drp_Reporttype.selectedItem+".xls");
+					}						
+					else
+					{
+						
+						alignAlert(Alert.show("* No Records Found.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+						return;
+					}
+					
+				}
+				
+				
+				
+				//Grd_BCFC.visible=false;
+				Grd_Rentals.dataProvider=null;
+				clear();
+				
+			}
+			private function clear():void
+			{
+				
+				hlp_Date.text="";
+				DateId=0;				
+				Temp_AC=new ArrayCollection();
+				Grd_Rentals.dataProvider=Temp_AC;				
+				Grd_Maintenance.dataProvider=Temp_AC;
+				Grd_Receivables.dataProvider=Temp_AC;
+				Grd_ManagedGuest.dataProvider=Temp_AC
+				change()
+			}
+			public function change()
+			{
+				hlp_Date.text="";
+				DateId=0;
+				Grd_Rentals.dataProvider=Temp_AC;				
+				Grd_Maintenance.dataProvider=Temp_AC;
+				Grd_Receivables.dataProvider=Temp_AC;
+				Grd_ManagedGuest.dataProvider=Temp_AC;
+				Drp_Type.visible=false;
+				if(Drp_Reporttype.selectedIndex==0)
+				{
+					Grd_Rentals.visible=true;
+					Grd_Maintenance.visible=false;
+					Grd_Receivables.visible=false;
+					Grd_ManagedGuest.visible=false;
+					
+				}
+				else if(Drp_Reporttype.selectedIndex==1)
+				{
+					Grd_Rentals.visible=false;
+					Grd_Maintenance.visible=false;
+					Grd_Receivables.visible=false;
+					Grd_ManagedGuest.visible=true;
+					
+				}
+				else if(Drp_Reporttype.selectedIndex==4)
+				{
+					Grd_Rentals.visible=false;
+					Grd_Maintenance.visible=false;
+					Grd_Receivables.visible=true;
+					Grd_ManagedGuest.visible=false;
+					Drp_Type.visible=true;
+				}
+				else
+				{
+					Grd_Rentals.visible=false;
+					Grd_Maintenance.visible=false;
+					Grd_Receivables.visible=false;
+					Grd_ManagedGuest.visible=true;
+				}
+				useWeb("Report","Month_CUSTOM", [GlobalXml, "Month",0, 0,"","",Drp_Reporttype.selectedItem]);
+			}
+		]]>
+	</fx:Script>	
+	<s:HGroup x="0" y="0" width="100%" height="100%" verticalAlign="middle" horizontalAlign="center">
+		<s:Group x="39" y="21" width="863" height="506">
+			<mx:Label x="1" y="26" text="Report " id="lbl_PricingModel1" />
+			<s:DropDownList x="52" y="26.5" width="261" height="20" id="Drp_Reporttype" tabIndex="1" selectedIndex="0" change="change()" >
+				<mx:ArrayCollection> 			
+					<fx:String>Rentals</fx:String>						
+					<fx:String>Managed Guest House Receivables</fx:String>	
+				</mx:ArrayCollection>
+			</s:DropDownList>
+			<s:DropDownList x="502" y="26.5" width="66" height="20" id="Drp_Type" tabIndex="1" selectedIndex="0"  >
+				<mx:ArrayCollection> 			
+					<fx:String>BTC</fx:String>
+					<fx:String>TAC</fx:String>					
+				</mx:ArrayCollection>
+			</s:DropDownList>
+			<mx:Label x="331" y="26" text="Month" id="lbl_PricingModel0" />
+			<WrbHelpComp:HelpText x="380" y="26.5" width="99" depth="10" pxTabIndex="3" id="hlp_Date" dataProvider="{Help_AC}" pxSetColumnsWidth="300,0" onselection="{fnGetLocation()}">
+			</WrbHelpComp:HelpText>
+			<mx:DataGrid id="Grd_Rentals" x="1" y="74"  verticalAlign="middle" editable="true" 
+						 width="883" height="411" tabIndex="93" depth="8" visible="false">
+				<mx:columns>
+					<mx:DataGridColumn dataField="OwnerName" headerText="Owner Name" editable="false" width="130" />
+					<mx:DataGridColumn dataField="PropertyName" headerText="Property Name" textAlign="left" editable="false" width="150" />
+					<mx:DataGridColumn dataField="ApartmentNo" headerText="ApartmentNo" textAlign="left" editable="false" width="80" id="Col_NDD" />
+					<mx:DataGridColumn dataField="RentelAmount" headerText="Rentel Amount" textAlign="right" editable="false" width="100" id="Col_DD" />
+					<mx:DataGridColumn dataField="TDSAMOUNT" headerText="TDS Amount" editable="false" textAlign="right" width="100" />
+					<mx:DataGridColumn dataField="TIACredit" headerText="TIA Credit" editable="false" textAlign="right" width="100" />
+					<mx:DataGridColumn dataField="TIADebit" headerText="TIA Debit" editable="false" textAlign="right" width="100" />
+					<mx:DataGridColumn dataField="NTIACredit" headerText="NTIA Credit" editable="false" textAlign="right" width="100" />
+					<mx:DataGridColumn dataField="NTIADebit" headerText="NTIA Debit" editable="false" textAlign="right" width="100" />
+					<mx:DataGridColumn dataField="RentType" headerText="Rent Type" editable="false" textAlign="left" width="100" />
+					<mx:DataGridColumn dataField="Type" headerText="Type" editable="false" textAlign="left" width="100" />
+				</mx:columns>
+			</mx:DataGrid>
+			<WrbComp:Button_HB x="584" y="20.5" _Label="Genarate" click="button_hb1_clickHandler(event)">
+			</WrbComp:Button_HB>
+			<WrbComp:Button_HB x="690" y="20.5" Lable_val="Export" id="btn_Excel" click="ExportExcel(event)">
+			</WrbComp:Button_HB>
+			<WrbComp:Button_HB x="798" y="20.5" Lable_val="Clear" id="btn_Clear" click="clear()">
+			</WrbComp:Button_HB>
+			<mx:DataGrid id="Grd_Maintenance" x="1" y="74"  verticalAlign="middle" editable="true" 
+						 width="883" height="411" tabIndex="93" depth="8" visible="false">
+				<mx:columns>
+					<mx:DataGridColumn dataField="OwnerName" headerText="Owner Name" editable="false" width="200" />
+					<mx:DataGridColumn dataField="PropertyName" headerText="Property Name" textAlign="left" editable="false" width="200" />
+					<mx:DataGridColumn dataField="ApartmentNo" headerText="ApartmentNo" textAlign="left" editable="false" width="170" id="Col_NDD0" />
+					<mx:DataGridColumn dataField="RentelAmount" headerText="RentelAmount" textAlign="right" editable="false" width="170" id="Col_DD0" />
+					<mx:DataGridColumn dataField="RentType" headerText="Type" editable="false" textAlign="left" width="100" />
+				</mx:columns>
+			</mx:DataGrid>
+			<mx:DataGrid id="Grd_Receivables" x="151" y="74"  verticalAlign="middle" editable="true" 
+						 width="593" height="411" tabIndex="93" depth="8" visible="false">
+				<mx:columns>
+					<mx:DataGridColumn dataField="ClientName" headerText="Client Name" editable="false" width="200" />
+					<mx:DataGridColumn dataField="Type" headerText="Type" textAlign="left" editable="false" width="80" />					
+					<mx:DataGridColumn dataField="RentelAmount" headerText="RentelAmount" textAlign="right" editable="false" width="100" id="Col_DD1" />								
+				</mx:columns>
+			</mx:DataGrid>
+			<mx:DataGrid id="Grd_ManagedGuest" x="151" y="74"  verticalAlign="middle" editable="true" 
+						 width="593" height="411" tabIndex="93" depth="8" visible="true">
+				<mx:columns>
+					<mx:DataGridColumn dataField="ClientName" headerText="Client Name" editable="false" width="200" />
+					<mx:DataGridColumn dataField="Type" headerText="Type" textAlign="left" editable="false" width="80" />					
+					<mx:DataGridColumn dataField="RentelAmount" headerText="RentelAmount" textAlign="right" editable="false" width="100" id="Col_DD2" />								
+				</mx:columns>
+			</mx:DataGrid>
+		</s:Group>
+	</s:HGroup>
+</s:Application>

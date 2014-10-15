@@ -1,0 +1,776 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:WrbComp="WrbComp.*"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   xmlns:ns1="*"
+			   width="100%" height="564" creationComplete="PageLoad(event)" pageTitle="CheckOut">
+	<fx:Declarations>
+		<mx:NumberFormatter id="NF_Two" precision="2" rounding="nearest"/>
+	</fx:Declarations>
+	<fx:Style source = "..\\Common\\ApplicationCSS.css"/>
+	<fx:Script source="..\\Common\\CommonScript.as"/>
+	<fx:Script source="..\\Common\\Functions.as"/>
+	<fx:Script>
+		<![CDATA[
+			import WrbComp.frmsearchwindow;
+			
+			import com.as3xls.xls.Type;
+			
+			import mx.collections.ArrayCollection;
+			import mx.containers.Accordion;
+			import mx.controls.Alert;
+			import mx.controls.Text;
+			import mx.events.CalendarLayoutChangeEvent;
+			import mx.events.CloseEvent;
+			import mx.events.ColorPickerEvent;
+			import mx.events.FlexEvent;
+			import mx.events.IndexChangedEvent;
+			import mx.events.ListEvent;
+			import mx.graphics.codec.PNGEncoder;
+			import mx.managers.PopUpManager;
+			import mx.rpc.http.mxml.HTTPService;
+			
+			import spark.events.IndexChangeEvent;
+			import spark.events.TextOperationEvent;
+			public var ErrStr:String=""; 
+			public var Str_ChkOut:String="";
+			public var _HdrArrCol:ArrayCollection;
+			public static var GlobalXml:String="";
+			public static var Global_AC:ArrayCollection=new ArrayCollection();
+			private var SearchPopUp:frmsearchwindow = new frmsearchwindow();
+			public var Id:int=0,CheckInHdrId:int=0,CheckOutHdrId:int=0,Tariff:int=0,StateId:int=0,PrintChkOutId:int=0;
+			
+			protected function PageLoad(event:FlexEvent):void
+			{
+				// TODO Auto-generated method stub
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";
+				// Rdlc Print
+				Str_ChkOut="http://localhost:49364/GuestCheckOutTariff.aspx?";
+				//Str_ChkOut="/HBReport/GuestCheckOutTariff.aspx?";
+				Help();
+				FnHelps();
+			}
+			
+			protected function Help():void
+			{				
+				//useWeb("GuestCheckOut","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0]);
+				Txt_ServiceBillAmt.editable=false;
+				Txt_ServiceLuxTax.editable=false;
+				Txt_ServiceVat.editable=false;
+				Txt_SerivceTax.editable=false;
+				Txt_ServiceNetAmount.editable=false;
+				Txt_Stay.editable=false;
+				Txt_type.editable=false;
+				Txt_bookinlevel.editable=false;
+				Txt_Billdate.editable=false;
+				Txt_Client.editable=false;
+				Txt_Property.editable=false;
+				Txt_TotalTariff.editable=false;
+				Txt_NetAmount.editable=false;
+				Txt_AdditionalCharge.editable=false;
+				Txt_Discount.editable=false;
+				Txt_Totaldiscount.editable=false;
+				Txt_Luxury.editable=false;
+				Txt_ServiceTax12.editable=false;
+				Txt_NetAmount.editable=false;
+				Txt_referance.editable=true;
+				Txt_Discount.editable=true;
+				Txt_Totaldiscount.editable=false;
+				Txt_ServiceCharge2.editable=false;
+				Txt_Servicecharge12.editable=false;
+				Txt_ServiceTax7.editable=false;
+				Txt_Cess.editable=false;
+				Txt_HECess.editable=false;
+				Txt_ChkoutNo.editable=false;
+											
+			}
+			protected function FnHelps():void
+			{
+//				var arrParam:ArrayCollection = new ArrayCollection
+//				([{Action:GlobalXml,Param1:"ProductLoad",Param2:'',Param3:0,prcName:"CheckOutServiceHdr",
+//					ctrlName:"hlpItem",grdWidth:"200,100,0",grdHeight:"50"}]);				
+//				Grid_Service._bindHlpTextData(arrParam);
+//				arrParam = new ArrayCollection();
+		}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "PageLoad_CUSTOM")
+				{
+					if(Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Txt_ChkoutNo.text=Ds_Objects.result.Tables.Table.Rows[0].CheckoutNo;						
+					}
+					if(Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						hlp_GuestName.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+										
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Guest_CUSTOM")
+				{
+					if(Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Txt_Stay.text=Ds_Objects.result.Tables.Table.Rows[0].Stay;
+						Txt_Property.text=Ds_Objects.result.Tables.Table.Rows[0].Property;
+						lbl_Nettariff.text=Ds_Objects.result.Tables.Table.Rows[0].Tariff;
+					}
+					if(Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Txt_Billdate.text=Ds_Objects.result.Tables.Table1.Rows[0].BillDate;
+					}
+					if(Ds_Objects.result.Tables.Table2.Rows.length > 0)
+					{
+						Txt_type.text=Ds_Objects.result.Tables.Table2.Rows[0].EmpCode;
+						Txt_bookinlevel.text=Ds_Objects.result.Tables.Table2.Rows[0].RoomNo;
+					}
+					if(Ds_Objects.result.Tables.Table3.Rows.length > 0)
+					{
+						Txt_Client.text=Ds_Objects.result.Tables.Table3.Rows[0].ClientName;
+					}
+					if(Ds_Objects.result.Tables.Table4.Rows.length > 0)
+					{
+						lbl_tariff.text=Ds_Objects.result.Tables.Table4.Rows[0].NoofDays;
+					}
+					if(Ds_Objects.result.Tables.Table5.Rows.length > 0)
+					{
+						// lbl_tariff.text=Ds_Objects.result.Tables.Table1.Rows[0].TariffDays;
+						Txt_TotalTariff.text=Ds_Objects.result.Tables.Table5.Rows[0].NetTariff;
+					
+					}
+					if(Ds_Objects.result.Tables.Table6.Rows.length > 0)
+					{
+						Txt_Luxury.text=NF_Two.format(Ds_Objects.result.Tables.Table6.Rows[0].LuxuryTax);
+						Txt_ServiceTax12.text=NF_Two.format(Ds_Objects.result.Tables.Table6.Rows[0].ServiceTax);
+						lbl_tarffLT.text=NF_Two.format(Ds_Objects.result.Tables.Table6.Rows[0].LT);
+						lbl_TariffST.text=NF_Two.format(Ds_Objects.result.Tables.Table6.Rows[0].ST);
+					}
+					var total:Number=Math.round(Number(Txt_TotalTariff.text));
+					var luxury:Number=Math.round(Number(Txt_Luxury.text));
+					var service:Number=Math.round(Number(Txt_ServiceTax12.text));
+					var Charges:Number=Math.round(Number(Txt_ServiceCharge2.text));
+					Charges=Number(total*2.5/100);
+					Txt_ServiceCharge2.text=NF_Two.format(Charges);
+					var ServiceTax:Number=Math.round(Number(Txt_Servicecharge12.text));
+					ServiceTax=Number(Charges*12.36/100);
+					Txt_Servicecharge12.text=NF_Two.format(ServiceTax);
+					var Cess:Number=Math.round(Number(Txt_Cess.text));
+					Cess=Number(service*2/100);
+					Txt_Cess.text=NF_Two.format(Cess);
+					var HECess:Number=Math.round(Number(Txt_HECess.text));
+					HECess=Number(service*1/100);
+					Txt_HECess.text=NF_Two.format(HECess);
+					Txt_NetAmount.text=NF_Two.format(Number(total+luxury+service+Charges+ServiceTax+Cess+HECess)).toString();
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				{
+					if(F1=="First")
+					{
+					PrintChkOutId=0;
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						PrintChkOutId=Ds_Objects.result.Tables.Table.Rows[0].Id;
+						ExternalInterface.call("changeDocumentTitle",Str_ChkOut+PrintChkOutId);
+//						alignAlert(Alert.show("Check Out Successfully.","Message !",Alert.OK,
+//							null, FnOk,	iconTickLarge, Alert.OK),10,"");
+					}
+					else
+					{
+						alignAlert(Alert.show("Check Out Successfully.","Message !",Alert.OK,
+							null, FnOk,	iconTickLarge, Alert.OK),10,"");
+					}
+					FnClear();
+					}
+					if(F2=="Second")
+					{
+						 
+						{
+							alignAlert(Alert.show("Check Services Saved Successfully.","Message !",Alert.OK,
+								null, FnOk,	iconTickLarge, Alert.OK),10,"");
+						}
+						FnServiceClr();
+						FnClear();
+					}
+				} 
+				if (Ds_Objects.currentTarget.description.toString() == "Search_CUSTOM")
+				{
+					Txt_ChkoutNo.text=Ds_Objects.result.Tables.Table.Rows[0].CheckOutNo;
+					hlp_GuestName.text=Ds_Objects.result.Tables.Table.Rows[0].GuestName;	
+					Txt_Stay.text=Ds_Objects.result.Tables.Table.Rows[0].Stay;
+					Txt_Property.text=Ds_Objects.result.Tables.Table.Rows[0].Property;
+					Txt_Billdate.text=Ds_Objects.result.Tables.Table.Rows[0].BillDate;
+					Txt_type.text=Ds_Objects.result.Tables.Table.Rows[0].Type;
+					Txt_bookinlevel.text=Ds_Objects.result.Tables.Table.Rows[0].BookingLevel;
+					Txt_Client.text=Ds_Objects.result.Tables.Table.Rows[0].ClientName;
+					Txt_TotalTariff.text=Ds_Objects.result.Tables.Table.Rows[0].TotalTariff;
+					Txt_Luxury.text=NF_Two.format(Ds_Objects.result.Tables.Table.Rows[0].LuxuryTax);
+					Txt_ServiceTax12.text=NF_Two.format(Ds_Objects.result.Tables.Table.Rows[0].SerivceTax);
+					//Txt_ServiceTax7.text=NF_Two.format(Ds_Objects.result.Tables.Table.Rows[0].ServiceNet);
+					//Txt_ServiceCharge2.text=NF_Two.format(Ds_Objects.result.Tables.Table.Rows[0].ServiceNet);
+					Txt_NetAmount.text=NF_Two.format(Ds_Objects.result.Tables.Table.Rows[0].NetAmount);
+					Txt_Totaldiscount.text=NF_Two.format(Ds_Objects.result.Tables.Table.Rows[0].TotalDiscount);
+					Id=Ds_Objects.result.Tables.Table.Rows[0].Id;
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "TariffLoad_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+		//				Grd_Settle.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+			}
+			public function FnOk(event:CloseEvent):void
+			{
+				if(event.detail==Alert.OK)
+				{
+					hlp_GuestName._setFocus();
+				}
+			}
+			public 	var F1:String="";
+			protected function FnSave():void
+			{
+				F1="First";
+				var ErrStr:String="";var Flag:Boolean=true;
+				if(hlp_GuestName.text=="")
+				{
+					if(Flag==true)
+					{
+						hlp_GuestName.setFocus();Flag=false;
+					}
+					ErrStr=ErrStr+"*  Guest Name is Required.\n";					
+				}
+				if(ErrStr!="")
+				{
+					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
+					return;					
+				}
+				var Ac_Hdr:ArrayCollection=new ArrayCollection
+					([{
+						CheckOutNo:Txt_ChkoutNo.text,GuestName:hlp_GuestName.text,Stay:Txt_Stay.text,
+						Type:Txt_type.text,BookingLevel:Txt_bookinlevel.text,BillDate:Txt_Billdate.text,
+						ClientName:Txt_Client.text,Property:Txt_Property.text,TotalTariff:Txt_TotalTariff.text,
+						NetAmount:Txt_NetAmount.text,AdditionalCharge:Txt_AdditionalCharge.text,Discountperday:Txt_Discount.text,
+						TotalDiscount:Txt_Totaldiscount.text,LuxuryTax:Txt_Luxury.text,
+						SerivceTax:Txt_ServiceTax12.text,SerivceNet:Txt_ServiceTax7.text,
+						ServiceCharge:Txt_ServiceCharge2.text,ServiceTaxService:Txt_Servicecharge12.text,
+						Cess:Txt_Cess.text,HECess:Txt_HECess.text,
+						NetAmount:Txt_NetAmount.text,Referance:Txt_referance.text,
+						Id:Id,ChkInHdrId:CheckInHdrId
+					}]);
+				
+				
+				var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");	
+				useWeb("GuestCheckOut","Save_CUSTOM",[GlobalXml,HdrXml]);
+				
+			}
+			
+			public function OnSelectionGuestname():void
+			{
+				if(hlp_GuestName.selected())
+				{
+					hlp_GuestName.text=hlp_GuestName.Select_Row.GuestName;
+					Tariff=hlp_GuestName.Select_Row.Tariff;
+					StateId=hlp_GuestName.Select_Row.StateId;
+					CheckInHdrId=hlp_GuestName.Select_Row.CheckInHdrId;
+					//					Txt_Stay.text=hlp_GuestName.Select_Row.Stay;
+					//					Txt_type.text=hlp_GuestName.Select_Row.Type;
+					//					Txt_bookinlevel.text=hlp_GuestName.Select_Row.Booking;
+					//					Txt_Billno.text=hlp_GuestName.Select_Row.BillNo;
+					//					Txt_Billdate.text=hlp_GuestName.Select_Row.BillDate;
+					//					Txt_Billduration.text=hlp_GuestName.Select_Row.Billduration;
+					//					Txt_Property.text=hlp_GuestName.Select_Row.Property;
+					//					Txt_TotalTariff.text=hlp_GuestName.Select_Row.TotalTariff;
+					useWeb("GuestCheckOut","Guest_CUSTOM",[GlobalXml,"CHKINROOMDETAILS","",CheckInHdrId,Tariff,StateId]);
+					useWeb("GuestCheckOut","TariffLoad_CUSTOM",[GlobalXml,"Print","",CheckInHdrId,0,0]);
+					
+					
+				}
+				
+			}
+			
+			protected function FnSearch():void
+			{
+				// TODO Auto-generated method stub
+				PopUpManager.addPopUp( SearchPopUp , this, true);
+				SearchPopUp.Prc_name="GuestCheckOut";
+				var SearchParam:Array =new Array();
+				SearchPopUp.HlpIndex="SEARCH";
+				SearchParam[0]=GlobalXml;
+				SearchParam[1]=0;				
+				SearchPopUp.Prc_Param=SearchParam;
+				SearchPopUp.HlpSrchGlobal="";
+				SearchPopUp.dataPanel.focusEnabled=true;
+				SearchPopUp.Pageint();
+				SearchPopUp.addEventListener("PopupEnter",funpopupEnter);
+				SearchPopUp.addEventListener("PopupClose",funpopupClose);
+				PopUpManager.centerPopUp(SearchPopUp);
+			}
+			
+			private function funpopupClose(event:Event):void{}
+			private function funpopupEnter(event:Event):void{SearchDtls(SearchPopUp.SelectRow.Id,0);}			
+			private function SearchDtls(Id:int,_PrdFk:int):void
+			{
+				var Load:Array = new Array();
+				Load[0] = GlobalXml; Load[1] = Id;  				
+				useWeb("GuestCheckOut","Search_CUSTOM",Load);
+			}
+			
+			
+			
+			protected function FnClear():void
+			{
+			 //Txt_ChkoutNo.text ="";
+//			 hlp_GuestName.text="";
+//			 Txt_Stay.text="";
+//			 Txt_type.text="";
+//		     Txt_bookinlevel.text="";
+//			 Txt_Billdate.text="";
+//			 Txt_Client.text="";
+//			 Txt_Property.text="";
+			 Txt_TotalTariff.text="";
+			 Txt_NetAmount.text="";
+			 Txt_AdditionalCharge.text="";
+			 Txt_Discount.text="";
+		     Txt_Totaldiscount.text="";
+			 Txt_Luxury.text="";
+			 Txt_ServiceTax12.text="";
+			 Txt_NetAmount.text="";
+			 Txt_referance.text="";
+			 Txt_Discount.text="";
+			 Txt_Totaldiscount.text="";
+			 Id=0;lbl_Nettariff.text="";
+			 lbl_tarffLT.text="";lbl_ServiceLT.text="";
+			 Txt_ServiceCharge2.text="";
+			 Txt_Servicecharge12.text="";
+			 Txt_ServiceTax7.text="";
+			 Txt_Cess.text="";
+			 Txt_HECess.text="";F1="";
+			}
+			
+			protected function Txt_Discount_changeHandler():void
+			{
+				if(Number(Txt_Discount.text)!=0)
+				{
+					var Net:String=NF_Two.format(Txt_NetAmount.text)
+					Txt_NetAmount.text=Net.replace(",","");
+					var Tmp:Number=Math.round(Number(Txt_Discount.text));
+					var days:Number=Math.round(Number(lbl_tariff.text));
+					Txt_Totaldiscount.text=NF_Two.format(Number(Tmp*days).toString());
+					Txt_NetAmount.text=NF_Two.format(Number(Txt_NetAmount.text)-Number(Txt_Totaldiscount.text));	
+				}
+				else
+				{
+					Txt_Totaldiscount.text="";
+				}
+			}
+    		protected function Add_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				Grp_Service.visible=true;
+			}
+			protected function FNClose(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				Grp_Service.visible=false;
+			}
+			protected function Tariff_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				Grp_Tariff.visible=true;
+			}
+			protected function FnClosetariff_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				Grp_Tariff.visible=false;
+			}
+			protected function getHlpData(event:Event):void
+			{
+				if(event.currentTarget.ID == "hlpItem")
+				{
+					
+					Grid_Service._setValuetoCtrl("hlpItem",event.currentTarget.selectedRow.Item);
+					Grid_Service._setValuetoCtrl("txtAmount",NF_Two.format(event.currentTarget.selectedRow.Amount));
+					Grid_Service._setValuetoCtrl("txtId",event.currentTarget.selectedRow.Id);
+					event.currentTarget.selectedRow = null;
+				}
+			}
+			public function Custom_Grid_Tab(arrObj:Object,arrObj1:Object,GridMode:Boolean,Index:int):void
+			{
+				if(Number(arrObj1.Amount)!=0)
+				{
+					var TotalAmount:Number=0,Quantity:Number=0;
+					
+					if(arrObj.currentTarget.id=="txtQuantity")
+					{
+						TotalAmount=Number(arrObj1.Amount)*Number(arrObj1.Quantity);
+						var Amt:String=NF_Two.format(TotalAmount);
+						Grid_Service._setValuetoCtrl("txtTotalAmount",Amt);
+						
+					}
+				}
+			}
+			public function Custom_Grid_Enter(arrObj:Object, GridMode:Boolean, Index:int):String
+			{
+				var Len:Number=0,TotAmt:Number=0;var VT:Number=0,ST:Number=0;
+				var VAT:Number=4.94,ServiceTax:Number=12.36;
+				var Ac_Tmp:ArrayCollection=new ArrayCollection();
+				Ac_Tmp=Grid_Service._getGridSrc as ArrayCollection;	
+				Txt_ServiceNetAmount.text="";
+				Txt_ServiceVat.text="";
+				Txt_SerivceTax.text="";
+				Txt_ServiceBillAmt.text="";
+				if(Ac_Tmp == null)
+				{
+					var TA:String=NF_Two.format(TotAmt+Number(arrObj.TotalAmount));
+					Txt_ServiceBillAmt.text=TA.replace(",","");
+					var Net:Number=Number(Txt_ServiceBillAmt.text);
+					var TT:String=NF_Two.format(Net*VAT/100);
+					Txt_ServiceVat.text=TT.replace(",","");
+					var TT:String=NF_Two.format(Net*ServiceTax/100);
+					Txt_SerivceTax.text=TT.replace(",","");
+					var Tmp:Number=Number(Txt_ServiceBillAmt.text)+Number(Txt_ServiceVat.text)+Number(Txt_SerivceTax.text);	
+					Txt_ServiceNetAmount.text=NF_Two.format(Math.round(Tmp));
+				}
+				else
+				{
+					Len=Ac_Tmp.length;
+				}
+				for(var i:int=0;i<Len;i++)
+				{
+					TotAmt+=Number(Ac_Tmp[i].TotalAmount);					
+				}
+				var TA:String=NF_Two.format(TotAmt+Number(arrObj.TotalAmount));
+				Txt_ServiceBillAmt.text=TA.replace(",","");
+				var Net:Number=Number(Txt_ServiceBillAmt.text);
+				var TT:String=NF_Two.format(Net*VAT/100);
+				Txt_ServiceVat.text=TT.replace(",","");
+				var TT:String=NF_Two.format(Net*ServiceTax/100);
+				Txt_SerivceTax.text=TT.replace(",","");
+				var Tmp:Number=Number(Txt_ServiceBillAmt.text)+Number(Txt_ServiceVat.text)+Number(Txt_SerivceTax.text);	
+				Txt_ServiceNetAmount.text=NF_Two.format(Math.round(Tmp));		
+				return "";	
+			}
+			public 	var F2:String="";
+			protected function FnServiceSave(event:MouseEvent):void
+			{
+				{
+					F2="Second";
+					var ErrStr:String="";var Flag:Boolean=true;
+					if(hlp_GuestName.text=="")
+					{
+						if(Flag==true)
+						{
+							hlp_GuestName.setFocus();Flag=false;
+						}
+						ErrStr=ErrStr+"*  Guest Name is Required.\n";					
+					}
+				if(ErrStr!="")
+					{
+						alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
+						return;					
+					}
+				var Ac_Hdr:ArrayCollection=new ArrayCollection
+					([{
+						CheckOutHdrId:PrintChkOutId,ChkOutServiceAmtl:Txt_ServiceBillAmt.text,
+						ChkOutserviceVat:Txt_ServiceVat.text,ChkOutServiceLT:Txt_ServiceLuxTax.text,
+						ChhkOutserviceST:Txt_SerivceTax.text,NetAmount:Txt_ServiceNetAmount.text,
+						Id:Id}]);
+				var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
+				var ServiceXml:String="";
+				ServiceXml += "<ROOT>";
+				ServiceXml += ObjToXmlStr_Comm(Grid_Service._getGridSrc,"ServiceXml")
+				ServiceXml += "</ROOT>";
+				useWeb("CheckOutServiceHdr","Save_CUSTOM",[GlobalXml,HdrXml,ServiceXml]);
+			}
+			}
+			protected function FnServiceClr():void
+			{
+				FnClear();
+				Grid_Service._clear();
+				CheckOutHdrId=0;
+				Txt_ServiceBillAmt.text="";Txt_ServiceLuxTax.text="";
+				Txt_ServiceVat.text="";Txt_SerivceTax.text="";
+				Txt_ServiceNetAmount.text="";Grid_Service._clear();
+				hlp_GuestName.text="";Txt_Stay.text="";
+				Txt_type.text="";Txt_bookinlevel.text="";
+				Txt_Billdate.text="";Txt_Client.text="";
+				Txt_Property.text="";Txt_TotalTariff.text="";
+				Txt_NetAmount.text="";Txt_AdditionalCharge.text="";
+				Txt_Discount.text="";Txt_Totaldiscount.text="";
+				Txt_Luxury.text="";Txt_ServiceTax12.text="";
+				Txt_NetAmount.text="";Txt_referance.text="";
+				Txt_Discount.text="";Txt_Totaldiscount.text="";
+				Id=0;Help();Txt_ServiceCharge2.text="";
+				Txt_Servicecharge12.text="";Txt_ServiceTax7.text="";
+				Txt_Cess.text="";Txt_HECess.text="";F1="";
+				F2="";
+			}
+			protected function Chk_change_changeHandler(event:Event):void
+			{
+				if(Chk_change.selected==true)
+				{
+					Txt_AdditionalCharge.editable=true;
+					//Txt_AdditionalCharge.text;
+				}
+				else
+				{
+					Txt_AdditionalCharge.editable=false;
+				}
+				Txt_AdditionalCharge.text="";
+			}
+			protected function FnAdd():void
+			{
+				var TT:String=NF_Two.format(Number(txt_itemdays.text)* Number(txt_itemamt.text));
+				txt_itemamt.text=TT.replace(",","");
+				var TM:String=NF_Two.format(Number(Txt_TotalTariff.text)+ Number(txt_itemamt.text));
+				Txt_description.text=TM.replace(",","");
+				var TO:String=NF_Two.format(Number(Txt_description.text)*Number(7.20)/Number(100));
+				Txt_ServiceTax7.text=TO..replace(",","");
+				var Net:String=NF_Two.format(Txt_NetAmount.text)
+				Txt_NetAmount.text=Net.replace(",","");
+				var ST:String=NF_Two.format(txt_itemamt.text)
+				var Tmp:Number=Number(Txt_NetAmount.text)+Number(txt_itemamt.text)+Number(Txt_ServiceTax7.text);
+				Txt_NetAmount.text=NF_Two.format(Math.round(Tmp));
+				Grp_Tariff.visible=false;
+				txt_itemamt.text="";
+				txt_itemdays.text="";
+				Txt_description.text="";
+			}
+		]]>
+	</fx:Script>
+	<s:VGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle" >
+		<s:Group x="3" y="-5" width="914" height="594">
+			<s:BorderContainer x="1" y="25" width="273" height="526" depth="42" backgroundColor="#fbf9f9">
+				<s:Label x="10" y="47" text="Guest Name"/>
+				<s:Label x="10" y="124" width="36" text="Stay"/>
+				<s:TextInput x="93" y="120" width="168" id="Txt_Stay"/>
+				<s:Label x="10" y="164" text="Type" visible="false"/>
+				<s:TextInput x="93" y="159" width="168" id="Txt_type" visible="false"/>
+				<s:Label x="10" y="208" text="Room"/>
+				<s:TextInput x="93" y="204" width="168" id="Txt_bookinlevel"/>
+				<s:Label x="10" y="294" text="Client"/>
+				<s:TextInput x="93" y="290" width="168" id="Txt_Client"/>
+				<s:Label x="10" y="334" text="Property"/>
+				<s:TextInput x="93" y="327" width="168" id="Txt_Property"/>
+				<WrbHelpComp:HelpText x="93" y="43" width="168" id="hlp_GuestName" 
+									  	pxSetHeight="183" depth="46"
+										pxSetColumnsWidth="0,166,0"
+									  onselection="{OnSelectionGuestname()}">
+				</WrbHelpComp:HelpText>
+				<s:Label x="10" y="87" text="BillNo"/>
+				<s:TextInput x="93" y="82" width="168" id="Txt_ChkoutNo"/>
+				<s:Label x="10" y="251" text="Bill Date"/>
+				<s:TextInput x="93" y="250" width="168" id="Txt_Billdate"/>
+				
+				
+				
+			</s:BorderContainer>
+			<mx:TabNavigator x="273" y="1" width="641" height="549">
+				<s:NavigatorContent width="100%" height="100%" label="Tariff" id="tab_Tariff" backgroundColor="#fbf9f9">
+					<s:Scroller x="0" y="0" width="640" height="526" depth="1">
+						<s:Group width="100%" height="100%" id="TabtariffCntl" depth="200">
+							<s:Label x="10" y="13" width="169" text="Tariff - New Tariff Bill"/>
+							<mx:HRule x="17" y="30" width="550" height="2"/>
+							<mx:HRule x="17" y="197" width="550" height="2"/>
+							<s:Label x="18" y="47" width="64" text="Total Tariff :"/>
+							<s:Label x="81" y="47" width="37" text="" id="lbl_tariff"/>
+							<s:Label x="118" y="47" width="40" text="days" id="lbl_tariff1"/>
+							<s:TextInput x="412" y="41" width="100" id="Txt_TotalTariff" textAlign="right" 
+										 editable="false" prompt="0.00"/>
+							<s:Label x="18" y="83" width="136" text="Additional days charge :"/>
+							<s:CheckBox x="371" y="78" visible="true" id="Chk_change"  
+										change="Chk_change_changeHandler(event)" />
+							<s:TextInput x="412" y="77" width="100" id="Txt_AdditionalCharge" editable="false" prompt="0.00" textAlign="right"/>
+							<s:Label x="18" y="120" width="91" text="Discount / Day"/>
+							<s:TextInput x="117" y="114" id="Txt_Discount" change="Txt_Discount_changeHandler()" textAlign="right" prompt="0.00"/>
+							<s:TextInput x="412" y="114" width="100" id="Txt_Totaldiscount"
+										 textAlign="right" editable="false" prompt="0.00"/>
+							<s:Label x="17" y="208" text="Tariff Items" visible="false"/>
+							<mx:HRule x="17" y="231" width="550" height="2" visible="false"/>
+							<mx:HRule x="17" y="145" width="550" height="2" visible="true"/>
+							<mx:HRule x="17" y="487" width="550" height="2"/>
+							<s:Label x="17" y="218" text="Luxury Tax @("/>
+							<s:TextInput x="412" y="211" width="100" id="Txt_Luxury" textAlign="right" editable="false" prompt="0.00"/>
+							<s:Label x="17" y="251" text="Service Tax @(7.20%) applied on Tariff &amp; ExtraMatress"/>
+							<s:TextInput x="412" y="244" width="100" id="Txt_ServiceTax7" textAlign="right" editable="false" prompt="0.00"/>
+							<s:Label x="118" y="284" text="%)applied on tariff items"/>
+							<s:TextInput x="412" y="274" width="100" id="Txt_ServiceTax12" textAlign="right" editable="false" prompt="0.00"/>
+							<mx:HRule x="17" y="307" width="550" height="2"/>
+							<mx:VRule x="580" y="13" width="3" height="550" visible="false"/>							<s:Label x="17" y="323" text="Service Charges @(2.5%) applied on Tariff Amount"/>
+							<s:TextInput x="412" y="317" width="100" id="Txt_ServiceCharge2" prompt="0.00" textAlign="right"/>
+							<s:Label x="17" y="357" text="Service Tax @(12.36%) applied on Service Charges"/>
+							<s:TextInput x="412" y="351" width="100" id="Txt_Servicecharge12" prompt="0.00" textAlign="right"/>
+							<s:Label x="17" y="386" text="Cess @(2%) applied on ServiceTax"/>
+							<s:TextInput x="412" y="380" width="100" id="Txt_Cess" prompt="0.00" textAlign="right"/>
+							<s:Label x="17" y="420" text="HECess @(1%) applied on ServiceTax"/>
+							<s:TextInput x="412" y="414" width="100" id="Txt_HECess" prompt="0.00" textAlign="right"/>
+							<s:Label x="17" y="463" text="Net Amount"/>
+							<s:TextInput x="412" y="455" width="100" id="Txt_NetAmount" textAlign="right" editable="false"  prompt="0.00"/>
+							<mx:HRule x="17" y="445" width="550" height="2"/>
+							<s:Label x="17" y="498" text="Reference :"/>
+							<s:TextInput x="84" y="496" width="200" id="Txt_referance" depth="10"/>
+							<s:Label id="lbl_tarffLT" x="92" y="218" width="25" height="22" text=""/>
+							<s:Label x="119" y="218" text="%)applied on Net Tariff"/>
+							<WrbComp:Button_HB x="391" y="154" width="130" click="Tariff_clickHandler(event)"
+											   Lable_val="ExtraMatress" visible="true">
+							</WrbComp:Button_HB>
+							<s:HGroup x="103" y="63" width="300" height="320" id="Grp_Tariff" visible="false">
+								<s:BorderContainer width="301" height="329">
+									<s:HGroup x="0" y="0" width="299" height="317">
+										<s:Panel width="300" height="321" title="Tariff Items">
+											<s:Image x="276" y="-24" source="@Embed(source='../Assets/CrossSmall.png')" 
+													 buttonMode="true" toolTip="Close" click="FnClosetariff_clickHandler(event)"/>
+											<s:DropDownList x="119" y="35" width="134" prompt="Please Select Items" id="ddl_Items">
+												<s:ArrayList>
+													<fx:String>Extra Matress</fx:String>
+												</s:ArrayList>
+											</s:DropDownList>
+											<s:Label x="36" y="41" text="Items"/>
+											<s:TextInput x="119" y="84" width="113" prompt="No of days" id="txt_itemdays"/>
+											<s:TextInput x="119" y="176" width="139" prompt="Description" id="txt_itemsdescription"/>
+											<s:Label x="36" y="87" text="Days"/>
+											<s:TextInput x="119" y="128" width="113" id="txt_itemamt"/>
+											<s:Label x="36" y="136" text="Amount"/>
+											<s:Label x="36" y="181" text="Description" id="Txt_description"/>
+											<WrbComp:Button_HB x="107" y="232" Lable_val="Add" id="Extra" click="FnAdd()">
+											</WrbComp:Button_HB>
+										</s:Panel>
+									</s:HGroup>
+								</s:BorderContainer>
+							</s:HGroup>
+							<WrbComp:Button_BB id="Sctrl" x="423" y="493" height="30"
+											   click="FnSave()" Lable_val="Save">
+							</WrbComp:Button_BB>
+							<s:Label x="17" y="284" text="ServiceTax("/>
+							<s:Label id="lbl_TariffST" x="82" y="285" width="35" height="22" text=""/>
+							<s:Label id="lbl_Nettariff" x="151" y="85" width="50" height="22" text=""/>
+							<s:Label x="202" y="84" width="41" height="22" text="/Day"/>
+						<!--	<WrbComp:Button_BB x="446" y="563" id="Sctrl1" click="FnClear()" Lable_val="Clear">
+							</WrbComp:Button_BB> -->
+							
+						</s:Group>
+					</s:Scroller>
+				</s:NavigatorContent>
+				<s:NavigatorContent width="100%" height="100%" label="Services" backgroundColor="#fbf9f9" creationPolicy="all">
+					<s:Scroller x="0" y="0" width="621" height="527" depth="1">
+						<s:Group width="100%" height="100%" depth="100">
+							<mx:VRule x="580" y="13" width="3" height="500" visible="false"/>
+							<s:BorderContainer x="0" y="29" width="593" height="190" >
+								<s:Scroller x="0" y="-1" width="595" height="190">
+									<s:Group width="593" height="190" >
+									<!--	<mx:DataGrid id="Grd_Details" x="0" y="1"  verticalAlign="middle" editable="true" 
+													 width="592" height="189" tabIndex="4" >
+											<mx:columns>
+												<mx:DataGridColumn dataField="Id" headerText="Id" width="50" editable="false" visible="false"/>
+												<mx:DataGridColumn dataField="PropertyId" headerText="PropertyId" width="50" editable="false" visible="false"/>
+												<mx:DataGridColumn dataField="BookingId" headerText="BookingId" width="50" editable="false" visible="false"/>
+												<mx:DataGridColumn dataField="RoomId" headerText="RoomId" width="50" editable="false" visible="false"/>
+												<mx:DataGridColumn dataField="Action" headerText="Action" width="50" editable="false"/>
+												<mx:DataGridColumn dataField="Include" headerText="Include" width="50" editable="false">
+												<mx:itemRenderer >
+													<fx:Component>
+														<mx:HBox horizontalAlign="center" verticalAlign="middle">
+															<mx:CheckBox selected="{data.checks}"  
+																		 />
+														</mx:HBox>	
+													</fx:Component>
+												</mx:itemRenderer>
+												</mx:DataGridColumn>
+												<mx:DataGridColumn dataField="Date" headerText="Date" width="100" editable="false"/>
+												<mx:DataGridColumn dataField="Item" headerText="Item" width="100" editable="false"/>
+												<mx:DataGridColumn dataField="Amount" headerText="Amount" width="80" editable="false"/>
+												<mx:DataGridColumn dataField="NetAmount" headerText="NetAmount" width="80" editable="false"/>
+											</mx:columns>
+										</mx:DataGrid> -->
+										<WrbComp:ProDGrid1 x="0.5" y="0.5" width="583" height="185" id="Grid_Service"
+														   _ColDataField="Item~Date~Amount~Quantity~TotalAmount~ProductId"
+														   _ColHdrText="ItemName~Date~Amount~Quantity~TotalAmount~ProductId"
+														   _ColType="hlp~dtf~ntxt~ntxt~ntxt~txt~txt"
+														   _colVisible="1~1~1~1~1~0~0"
+														   _ColWidth="160~110~105~115~100~0~0"
+														   _editable="1~1~1~1~1~0~0"
+														   _HeaderTxtLbl="true" 
+														   _required="1~1~1~1~0~0~0"
+														   _spltChar="~"
+														   _tabIndex="2"
+														   _visibleColNos="5"
+														   _DuplChk="false" 
+														   _getHlpTxtData="getHlpData(event)"  />
+										
+									</s:Group>
+								</s:Scroller>
+							</s:BorderContainer>	
+							<s:Label x="10" y="9" text="Service - New Service Bill"/>
+							<s:Label x="10" y="236" text="Total Service Bill Amount"/>
+							<s:TextInput x="431" y="231" id="Txt_ServiceBillAmt" textAlign="right" prompt="0.00" editable="false"/>
+							<s:Label x="10" y="264" text="Vat @  " id="lbl_ServiceVat"/>
+							<s:TextInput x="431" y="260" id="Txt_ServiceVat" textAlign="right" prompt="0.00" editable="false"/>
+							<s:Label x="10" y="291" text="Luxury Tax @ 0.00 %" id="lbl_ServiceLT"/>
+							<s:TextInput x="431" y="287" id="Txt_ServiceLuxTax" textAlign="right" prompt="0.00" editable="false"/>
+							<s:Label x="10" y="318" text="Service Tax @ "/>
+							<s:TextInput x="431" y="313" id="Txt_SerivceTax" prompt="0.00" textAlign="right" editable="false"/>
+							<s:Label x="10" y="345" text="ST @ 7.20% on BillAmount "/>
+							<s:TextInput x="431" y="341" id="Txt_ServiceTax1" prompt="0.00" textAlign="right" editable="false"/>
+							<s:Label x="10" y="373" text="ST @ 4.94 %"/>
+							<s:TextInput x="431" y="371" id="Txt_serNetAmount" prompt="0.00" textAlign="right" editable="false"/>
+							<WrbComp:Button_HB x="445" y="227" width="99" Lable_val="Add Services" click="Add_clickHandler(event)" visible="false">
+							</WrbComp:Button_HB>
+							<s:HGroup x="125" y="10" width="347" height="338" id="Grp_Service" depth="10000" visible="false">
+								<s:BorderContainer width="346" height="337" borderVisible="false" backgroundAlpha="0.1">
+									<s:HGroup x="0" y="4" width="347" height="338">
+										<s:Panel width="346" height="333" title="Add New Service">
+											<s:Image x="319" y="-24" source="@Embed(source='../Assets/CrossSmall.png')" 
+													 buttonMode="true" toolTip="Close" click="FNClose(event)"/>
+											<s:Label x="45" y="32" text="Item"/>
+											<WrbHelpComp:HelpText x="123" y="28" width="162">
+											</WrbHelpComp:HelpText>
+											<s:Label x="45" y="85" text="Amount"/>
+											<s:TextInput x="123" y="79"/>
+											<s:Label x="45" y="137" text="Date" />
+											<mx:DateField x="123" y="130" width="126" yearNavigationEnabled="true" 
+														  formatString="DD/MM/YYYY" selectableRange="{{rangeEnd:new Date()}}"/>
+											<s:Label x="45" y="193" text="Description"/>
+											<s:TextInput x="123" y="189"/>
+											
+											<WrbComp:Button_HB x="129" y="242" Lable_val="Add">
+											</WrbComp:Button_HB>
+										</s:Panel>
+										
+									</s:HGroup>
+								</s:BorderContainer>
+							</s:HGroup>
+							<mx:HRule x="7" y="406" width="550"/>
+							<s:Label x="11" y="421" text="Net Amount"/>
+							<s:TextInput x="431" y="415" id="Txt_ServiceNetAmount" prompt="0.00" textAlign="right" editable="false"/>
+							<mx:HRule x="10" y="442"  width="550"/>
+							<WrbComp:Button_BB x="360" y="463" click="FnServiceSave(event)" Lable_val="Save">
+							</WrbComp:Button_BB>
+							<WrbComp:Button_BB x="476" y="463" click="FnServiceClr()" Lable_val="Clear">
+							</WrbComp:Button_BB>
+							<s:Label id="lbl_ServiceVAT" x="46" y="264" width="29" height="19"
+									 text=""/>
+							<s:Label x="76" y="265" height="19" text="%"/>
+							<s:Label x="88" y="319" width="33" height="15"/>
+							<s:Label x="125" y="319" text="%"/>
+							
+							
+						</s:Group>
+					</s:Scroller>
+				</s:NavigatorContent>
+			</mx:TabNavigator>
+		<!--	<s:HGroup x="278" y="496" width="614" height="39" horizontalAlign="right" verticalAlign="middle" visible="false">
+				<WrbComp:SaveControl id="Sctrl" docSave="FnSave()" doSearch="FnSearch()" 
+									 docClear="FnClear()" visible="false">
+				</WrbComp:SaveControl>
+			</s:HGroup> -->
+			
+		</s:Group>
+	</s:VGroup>
+	
+</s:Application>
