@@ -51,7 +51,7 @@ BEGIN
 	ChkOutHdrId=@ChkOutHdrId,
 	InvoiceNo=@InvoiceNo,
 	InvoiceType=@InvoiceType,
-	InvoiceDate=CONVERT(DATE,InvoiceDate,103),
+	InvoiceDate=CONVERT(DATE,@InvoiceDate,103),
 	DepositDetilsId=@DepositDetilsId,
 	ModifiedBy=@CreatedBy,
 	ModifiedDate=GETDATE(),	

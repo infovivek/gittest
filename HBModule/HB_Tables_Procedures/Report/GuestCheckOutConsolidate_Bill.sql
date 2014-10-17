@@ -30,7 +30,7 @@ BEGIN
 IF @Action='PageLoad'
 	BEGIN
 	
-	DECLARE @CompanyName VARCHAR(100),@Address NVARCHAR(100),@PanCardNo VARCHAR(100),
+DECLARE @CompanyName VARCHAR(100),@Address NVARCHAR(100),@PanCardNo VARCHAR(100),
 	@ServiceTaxNo VARCHAR(100),@LOGO VARCHAR(MAX),@LuxuryTax NVARCHAR(100),
 	@TariffAmount DECIMAL(27,2),@ClientAddress NVARCHAR(500),@ClientId BIGINT,
 	@Miscellaneous DECIMAL(27,2),@MiscellaneousRemarks NVARCHAR(100),@Food DECIMAL(27,2),
@@ -99,7 +99,12 @@ IF @Action='PageLoad'
 	 +'CIN No: U72900KA2005PTC035942' as TaxNo,
 	 'Service Tax Regn. No : AABCH5874RST001' as ServiceTaxNo,
 	'Taxable Category : Accommodation Service,Business Support Services and Restaurant Services' as Taxablename,
-	(isnull(h.ChkOutTariffNetAmount+sum(CS.ChkOutServiceNetAmount),0)) as BillAmount,
+	--(isnull(h.ChkOutTariffNetAmount+sum(CS.ChkOutServiceNetAmount),0)) as BillAmount,
+	(round(isnull(h.ChkOutTariffTotal,0),0)+round(isnull(ChkOutTariffExtraAmount,0),0)+round(isnull(@Food,0),0)+
+	round(isnull(@Laundry,0),0)+round(isnull(@Service,0),0)+round(isnull(@Miscellaneous,0),0)+round(isnull(h.ChkOutTariffLT,0),0)+
+	round(isnull(h.ChkOutTariffST1,0),0)+round(isnull(h.ChkOutTariffSC,0),0)+round(sum(CS.ChkOutServiceST),0)+round(sum(CS.OtherService),0)+
+	(round (isnull(h.ChkOutTariffST3,0),0)+round(isnull(h.ChkOutTariffCess,0),0)+round(sum(cs.Cess),0))+
+	(round(isnull(h.ChkOutTariffHECess,0),0)+round(sum(cs.HECess),0))) as 	BillAmount,
 	@ClientAddress as Address,'Service Tax Regn. No : AABCH5874RST001' as ServiceTaxNo,
 	'Luxury Tax @ '+CAST(H.LuxuryTaxPer AS NVARCHAR)+'%' LTPer,
 	 'Service Tax @ '+CAST(H.ServiceTaxPer AS NVARCHAR)+'%' STPer,
@@ -138,6 +143,7 @@ IF @Action='PageLoad'
     H.VATPer,h.RestaurantSTPer ,
     h.BusinessSupportST,h.ChkOutTariffST1 ,H.LuxuryTaxPer,H.ServiceTaxPer,h.ChkOutTariffExtraAmount,
     h.InVoiceNo
+    
     
     
 	END

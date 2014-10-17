@@ -68,6 +68,7 @@
     <Compile Include="APIBookingMailDAO.cs" />
     <Compile Include="APICreateReservationDAO.cs" />
     <Compile Include="APIDynamicDAO.cs" />
+    <Compile Include="APIStaticDataDAO.cs" />
     <Compile Include="ApprovedPettyCasDAO.cs" />
     <Compile Include="BedBookingMailDAO.cs" />
     <Compile Include="BedBookingPropertyAssignedGuestDAO.cs" />
@@ -87,6 +88,7 @@
     <Compile Include="BTCSPaymentDAO.cs" />
     <Compile Include="BTCSubmissionDAO.cs" />
     <Compile Include="CheckInDtlsDAO.cs" />
+    <Compile Include="CheckoutAndIntermediateDao.cs" />
     <Compile Include="CheckOutPaymentCardDao.cs" />
     <Compile Include="CheckOutPaymentCashDao.cs" />
     <Compile Include="CheckOutPaymentChequeDao.cs" />
@@ -208,6 +210,7 @@
     <Compile Include="TaxMasterDAO.cs" />
     <Compile Include="TDSDeclarationDAO.cs" />
     <Compile Include="TIAandATIADAO.cs" />
+    <Compile Include="TodaysCheckinCheckoutDAO.cs" />
     <Compile Include="TransSubsPriceModelDAO.cs" />
     <Compile Include="TravelDeskDao.cs" />
     <Compile Include="TRLinkDAO.cs" />

@@ -34,6 +34,7 @@ namespace HB.Dao
 
             if (BTCS.Mode == "Cash")
             {
+                BTCS.ClientId = Convert.ToInt32(document.SelectSingleNode("//HdrXml").Attributes["ClientId"].Value);
                 BTCS.Amount = Convert.ToDecimal(document.SelectSingleNode("HdrXml").Attributes["Amount"].Value);
                 BTCS.ReceivedDate = document.SelectSingleNode("HdrXml").Attributes["ReceivedDate"].Value;
                 BTCS.ReceivedBy = document.SelectSingleNode("HdrXml").Attributes["ReceivedBy"].Value;
@@ -48,6 +49,7 @@ namespace HB.Dao
                 
 
                 command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.Add("@ClientId", SqlDbType.Int).Value = BTCS.ClientId;
                 command.Parameters.Add("@Amount", SqlDbType.Decimal).Value = BTCS.Amount;
                 command.Parameters.Add("@ReceivedOn", SqlDbType.NVarChar).Value = BTCS.ReceivedDate;
                 command.Parameters.Add("@ReceivedBy", SqlDbType.NVarChar).Value = BTCS.ReceivedBy;
@@ -58,6 +60,7 @@ namespace HB.Dao
             }
             else if (BTCS.Mode == "Card")
             {
+                BTCS.ClientId = Convert.ToInt32(document.SelectSingleNode("//HdrXml").Attributes["ClientId"].Value);
                 BTCS.Amount = Convert.ToDecimal(document.SelectSingleNode("HdrXml").Attributes["Amount"].Value);
                 BTCS.CardBrand = document.SelectSingleNode("HdrXml").Attributes["CardBrand"].Value;
                 BTCS.Nameoncard = document.SelectSingleNode("HdrXml").Attributes["Nameoncard"].Value;
@@ -79,6 +82,7 @@ namespace HB.Dao
                 command.CommandText = StoredProcedures.BTCSubmissionCard_Insert;
 
                 command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.Add("@ClientId", SqlDbType.Int).Value = BTCS.ClientId;
                 command.Parameters.Add("@Amount", SqlDbType.Decimal).Value = BTCS.Amount;
                 command.Parameters.Add("@CCBrand", SqlDbType.NVarChar).Value = BTCS.CardBrand;
                 command.Parameters.Add("@Name", SqlDbType.NVarChar).Value = BTCS.Nameoncard;
@@ -96,6 +100,7 @@ namespace HB.Dao
             }
             else if (BTCS.Mode == "Cheque")
             {
+                BTCS.ClientId = Convert.ToInt32(document.SelectSingleNode("//HdrXml").Attributes["ClientId"].Value);
                 BTCS.Amount = Convert.ToDecimal(document.SelectSingleNode("HdrXml").Attributes["Amount"].Value);
                 BTCS.ChequeNo = document.SelectSingleNode("HdrXml").Attributes["ChequeNo"].Value;
                 BTCS.Bank = document.SelectSingleNode("HdrXml").Attributes["Bank"].Value;
@@ -111,6 +116,7 @@ namespace HB.Dao
                 command.CommandText = StoredProcedures.BTCSubmissionCheque_Insert;
 
                 command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.Add("@ClientId", SqlDbType.Int).Value = BTCS.ClientId;
                 command.Parameters.Add("@Amount", SqlDbType.Decimal).Value = BTCS.Amount;
                 command.Parameters.Add("@ChequeNo", SqlDbType.NVarChar).Value = BTCS.ChequeNo;
                 command.Parameters.Add("@Bank", SqlDbType.NVarChar).Value = BTCS.Bank;
@@ -122,6 +128,7 @@ namespace HB.Dao
             }
             else if (BTCS.Mode == "NEFT")
             {
+                BTCS.ClientId = Convert.ToInt32(document.SelectSingleNode("//HdrXml").Attributes["ClientId"].Value);
                 BTCS.Amount = Convert.ToDecimal(document.SelectSingleNode("HdrXml").Attributes["Amount"].Value);
                 BTCS.ReferenceNo = document.SelectSingleNode("HdrXml").Attributes["ReferenceNo"].Value;
                 BTCS.Bank = document.SelectSingleNode("HdrXml").Attributes["Bank"].Value;
@@ -137,6 +144,7 @@ namespace HB.Dao
                 command.CommandText = StoredProcedures.BTCSubmissionNEFT_Insert;
 
                 command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.Add("@ClientId", SqlDbType.Int).Value = BTCS.ClientId;
                 command.Parameters.Add("@Amount", SqlDbType.Decimal).Value = BTCS.Amount;
                 command.Parameters.Add("@ReferenceNo", SqlDbType.NVarChar).Value = BTCS.ReferenceNo;
                 command.Parameters.Add("@Bank", SqlDbType.NVarChar).Value = BTCS.Bank;
@@ -146,127 +154,6 @@ namespace HB.Dao
                 command.Parameters.Add("@Mode", SqlDbType.NVarChar).Value = BTCS.Mode;
                 ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
             }
-            document = new XmlDocument();
-          //  document.LoadXml(Hdrval[2]);
-            XmlDocument doc = new XmlDocument();
-
-            doc.LoadXml(Hdrval[2].ToString());
-            BTCS.ModeId = Convert.ToInt32(ds.Tables[0].Rows[0][0]);
-            int n;
-            n = (doc).SelectNodes("//GridXml").Count;
-            for (int i = 0; i < n; i++)
-            {
-                if (doc.SelectNodes("//GridXml")[i].Attributes["Id"].Value == "")
-                {
-                    BTCS.Id = 0;
-                }
-                else
-                {
-                    BTCS.Id = Convert.ToInt32(doc.SelectNodes("//GridXml")[i].Attributes["Id"].Value);
-                }
-                if (doc.SelectNodes("//GridXml")[i].Attributes["ClientId"].Value == "")
-                {
-                    BTCS.ClientId = 0;
-                }
-                else
-                {
-                    BTCS.ClientId = Convert.ToInt32(doc.SelectNodes("//GridXml")[i].Attributes["ClientId"].Value);
-                }
-                if (doc.SelectNodes("//GridXml")[i].Attributes["SubmittedDate"].Value == "")
-                {
-                    BTCS.SubmittedOn = "";
-                }
-                else
-                {
-                    BTCS.SubmittedOn = doc.SelectNodes("//GridXml")[i].Attributes["SubmittedDate"].Value;
-                }
-                if (doc.SelectNodes("//GridXml")[i].Attributes["DepositDetilsId"].Value == "")
-                {
-                    BTCS.DepositDetilsId = 0;
-                }
-                else
-                {
-                    BTCS.DepositDetilsId = Convert.ToInt32(doc.SelectNodes("//GridXml")[i].Attributes["DepositDetilsId"].Value);
-                }
-                if (doc.SelectNodes("//GridXml")[i].Attributes["ChkOutHdrId"].Value == "")
-                {
-                    BTCS.ChkOutHdrId = 0;
-                }
-                else
-                {
-                    BTCS.ChkOutHdrId = Convert.ToInt32(doc.SelectNodes("//GridXml")[i].Attributes["ChkOutHdrId"].Value);
-                }
-                if (doc.SelectNodes("//GridXml")[i].Attributes["InvoiceNo"].Value == "")
-                {
-                    BTCS.InvoiceNo = "";
-                }
-                else
-                {
-                    BTCS.InvoiceNo = doc.SelectNodes("//GridXml")[i].Attributes["InvoiceNo"].Value;
-                }
-                if (doc.SelectNodes("//GridXml")[i].Attributes["InvoiceType"].Value == "")
-                {
-                    BTCS.InvoiceType = "";
-                }
-                else
-                {
-                    BTCS.InvoiceType = doc.SelectNodes("//GridXml")[i].Attributes["InvoiceType"].Value;
-                }
-                if (doc.SelectNodes("//GridXml")[i].Attributes["InvoiceDate"].Value == "")
-                {
-                    BTCS.InvoiceDate = "";
-                }
-                else
-                {
-                    BTCS.InvoiceDate = doc.SelectNodes("//GridXml")[i].Attributes["InvoiceDate"].Value;
-                }
-                if (doc.SelectNodes("//GridXml")[i].Attributes["CollectionStatus"].Value == "")
-                {
-                    BTCS.CollectionStatus = "";
-                }
-                else
-                {
-                    BTCS.CollectionStatus = doc.SelectNodes("//GridXml")[i].Attributes["CollectionStatus"].Value;
-                }
-                if (doc.SelectNodes("//GridXml")[i].Attributes["Id"].Value == "")
-                {
-                    BTCS.DetailsId = 0;
-                }
-                else
-                {
-                    BTCS.DetailsId = Convert.ToInt32(doc.SelectNodes("//GridXml")[i].Attributes["Id"].Value);
-                }
-               
-                command = new SqlCommand();
-
-              
-                UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
-                    "', SctId:" + user.SctId + ", Service:BTC Submission Insert" + ", ProcName:'" + StoredProcedures.BTCSubmission_Save;
-
-                command.CommandText = StoredProcedures.BTCSubmissionDetails_Insert;
-              
-                command.CommandType = CommandType.StoredProcedure;
-                command.Parameters.Add("@ClientId", SqlDbType.BigInt).Value = BTCS.ClientId;
-                command.Parameters.Add("@SubmittedOn", SqlDbType.NVarChar).Value = BTCS.SubmittedOn;
-                command.Parameters.Add("@Expected", SqlDbType.NVarChar).Value = "";//BTCS.Expected;
-                command.Parameters.Add("@Physical", SqlDbType.NVarChar).Value = "";//BTCS.Physical;
-                command.Parameters.Add("@Acknowledged", SqlDbType.NVarChar).Value = "";// BTCS.Acknowledged;
-                command.Parameters.Add("@Comments", SqlDbType.NVarChar).Value = "";// BTCS.Comments;
-                command.Parameters.Add("@Filename", SqlDbType.NVarChar).Value = "";// BTCS.Filename;
-                command.Parameters.Add("@CollectionStatus", SqlDbType.NVarChar).Value = BTCS.CollectionStatus;
-                command.Parameters.Add("@CreatedBy", SqlDbType.BigInt).Value = user.Id;
-                command.Parameters.Add("@Id", SqlDbType.Int).Value = BTCS.Id;
-                command.Parameters.Add("@ChkOutHdrId", SqlDbType.BigInt).Value = BTCS.ChkOutHdrId;
-                command.Parameters.Add("@InvoiceNo", SqlDbType.NVarChar).Value = BTCS.InvoiceNo;
-                command.Parameters.Add("@InvoiceType", SqlDbType.NVarChar).Value = BTCS.InvoiceType;
-                command.Parameters.Add("@InvoiceDate", SqlDbType.NVarChar).Value = BTCS.InvoiceDate;
-                command.Parameters.Add("@DepositDetilsId", SqlDbType.BigInt).Value = BTCS.DepositDetilsId;
-                command.Parameters.Add("@Mode", SqlDbType.NVarChar).Value = BTCS.Mode;
-                command.Parameters.Add("@ModeId", SqlDbType.BigInt).Value = BTCS.ModeId;
-                ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
-
-            }  
-            
             return ds;
         }
     }

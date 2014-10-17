@@ -23,6 +23,7 @@ GO
 */
 CREATE PROCEDURE [dbo].[Sp_BTCSubmissionCash_Insert]
 (
+@ClientId			INT,
 @Amount				DECIMAL(27,2),
 @ReceivedOn			NVARCHAR(100),
 @ReceivedBy			NVARCHAR(100),
@@ -33,10 +34,13 @@ CREATE PROCEDURE [dbo].[Sp_BTCSubmissionCash_Insert]
 AS
 BEGIN
 INSERT INTO WRBHBBTCSubmissionCash(Amount,ReceivedOn,ReceivedBy,Comments,IsActive,IsDeleted,CreatedBy,CreatedDate,
-			ModifiedBy,ModifiedDate,RowId,Mode)
+			ModifiedBy,ModifiedDate,RowId,Mode,ClientId)
 VALUES (@Amount,CONVERT(date,@ReceivedOn,103),@ReceivedBy,@Comments,1,0,@CreatedBy,GETDATE(),@CreatedBy,GETDATE(),
-		NEWID(),@Mode)
+		NEWID(),@Mode,@ClientId)
 		
  SELECT Id,RowId FROM WRBHBBTCSubmissionCash WHERE Id=@@IDENTITY;
+ 
+  UPDATE WRBHBBTCSubmission SET CollectionStatus='Cash Payment',Mode=@Mode,ModeId=@@IDENTITY
+ WHERE ClientId=@ClientId AND CollectionStatus='Submitted'	
  
 END		

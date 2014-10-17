@@ -45,7 +45,7 @@ BEGIN
 
 	SELECT 'Dedicated' AS GetType,B.BookingCode AS BookingId,CH.Id AS BillId,CH.InVoiceNo,P.PropertyName,
 	C.ClientName,M.ClientName,(BP.FirstName+''+BP.LastName) AS Guest,CH.CheckInDate,CH.CheckOutDate,
-	B.CityName,CH.NoOfDays,CH.ChkOutTariffNetAmount,CH.BillDate,CH.BillFromDate,CH.BillEndDate,'Bill'AS BillType
+	B.CityName,CH.NoOfDays,CH.ChkOutTariffNetAmount,CH.BillDate,CH.CheckInDate,CH.CheckOutDate,'Bill'AS BillType
 	FROM WRBHBBooking  B
 	JOIN WRBHBBookingPropertyAssingedGuest BP WITH(NOLOCK)ON B.Id=BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0
 	JOIN WRBHBBookingProperty BT WITH(NOLOCK)ON B.Id=BT.BookingId AND BT.IsActive=1 AND BT.IsDeleted=0
@@ -65,7 +65,7 @@ BEGIN
 
 	SELECT 'Non-Dedicated' AS GetType,B.BookingCode AS BookingId,CH.Id AS BillId,CH.InVoiceNo,P.PropertyName,
 	C.ClientName,M.ClientName,(BP.FirstName+''+BP.LastName) AS Guest,CH.CheckInDate,CH.CheckOutDate,
-	B.CityName,CH.NoOfDays,CH.ChkOutTariffNetAmount,CH.BillDate,CH.BillFromDate,CH.BillEndDate,'Bill'AS BillType
+	B.CityName,CH.NoOfDays,CH.ChkOutTariffNetAmount,CH.BillDate,CH.CheckInDate,CH.CheckOutDate,'Bill'AS BillType
 	FROM WRBHBBooking  B
 	JOIN WRBHBBookingPropertyAssingedGuest BP WITH(NOLOCK)ON B.Id=BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0
 	JOIN WRBHBBookingProperty BT WITH(NOLOCK)ON B.Id=BT.BookingId AND BT.IsActive=1 AND BT.IsDeleted=0
@@ -86,7 +86,7 @@ BEGIN
 	SELECT 'Dedicated' AS GetType,B.BookingCode AS BookingId,CH.Id AS BillId,CH.InVoiceNo,P.PropertyName,
 	C.ClientName,M.ClientName ,(BP.FirstName+''+BP.LastName) AS Guest,CH.CheckInDate,CH.CheckOutDate,
 	B.CityName,CH.NoOfDays,CH.ChkOutTariffNetAmount,CH.BillDate,
-	CH.BillFromDate,CH.BillEndDate,'Bill'AS BillType
+	CH.CheckInDate,CH.CheckOutDate,'Bill'AS BillType
 	FROM WRBHBBooking  B
 	JOIN WRBHBBedBookingPropertyAssingedGuest BP WITH(NOLOCK)ON B.Id=BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0
 	JOIN WRBHBBookingProperty BT WITH(NOLOCK)ON BP.BookingPropertyTableId=BT.Id AND BT.IsActive=1 AND BT.IsDeleted=0
@@ -106,7 +106,7 @@ BEGIN
 
 	SELECT 'Non-Dedicated' AS GetType,B.BookingCode AS BookingId,CH.Id AS BillId,CH.InVoiceNo,P.PropertyName,
 	C.ClientName,M.ClientName ,(BP.FirstName+''+BP.LastName) AS Guest,CH.CheckInDate,CH.CheckOutDate,
-	B.CityName,CH.NoOfDays,CH.ChkOutTariffNetAmount,CH.BillDate,CH.BillFromDate,CH.BillEndDate,'Bill'AS BillType
+	B.CityName,CH.NoOfDays,CH.ChkOutTariffNetAmount,CH.BillDate,CH.CheckInDate,CH.CheckOutDate,'Bill'AS BillType
 	FROM WRBHBBooking  B
 	JOIN WRBHBBedBookingPropertyAssingedGuest BP WITH(NOLOCK)ON B.Id=BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0
 	JOIN WRBHBBookingProperty BT WITH(NOLOCK)ON BP.BookingPropertyTableId=BT.Id AND BT.IsActive=1 AND BT.IsDeleted=0
@@ -127,7 +127,7 @@ BEGIN
 
 	select 'Dedicated' AS GetType,B.BookingCode AS BookingId,CH.Id AS BillId,CH.InVoiceNo,P.PropertyName,
 	C.ClientName,M.ClientName ,(BP.FirstName+''+BP.LastName) AS Guest,CH.CheckInDate,CH.CheckOutDate,
-	B.CityName,CH.NoOfDays,CH.ChkOutTariffNetAmount,CH.BillDate,CH.BillFromDate,CH.BillEndDate,'Bill'AS BillType
+	B.CityName,CH.NoOfDays,CH.ChkOutTariffNetAmount,CH.BillDate,CH.CheckInDate,CH.CheckOutDate,'Bill'AS BillType
 	FROM WRBHBBooking  B
 	JOIN WRBHBApartmentBookingPropertyAssingedGuest BP WITH(NOLOCK)ON B.Id=BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0
 	JOIN WRBHBBookingProperty BT WITH(NOLOCK)ON BP.BookingPropertyTableId=BT.Id AND BT.IsActive=1 AND BT.IsDeleted=0
@@ -147,7 +147,7 @@ BEGIN
 
 	SELECT 'Non-Dedicated' AS GetType,B.BookingCode AS BookingId,CH.Id AS BillId,CH.InVoiceNo,P.PropertyName,
 	C.ClientName,M.ClientName ,(BP.FirstName+''+BP.LastName) AS Guest,CH.CheckInDate,CH.CheckOutDate,
-	B.CityName,CH.NoOfDays,CH.ChkOutTariffNetAmount,CH.BillDate,CH.BillFromDate,CH.BillEndDate,'Bill'AS BillType
+	B.CityName,CH.NoOfDays,CH.ChkOutTariffNetAmount,CH.BillDate,CH.CheckInDate,CH.CheckOutDate,'Bill'AS BillType
 	FROM WRBHBBooking  B
 	JOIN WRBHBApartmentBookingPropertyAssingedGuest BP WITH(NOLOCK)ON B.Id=BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0
 	JOIN WRBHBBookingProperty BT WITH(NOLOCK)ON BP.BookingPropertyTableId=BT.Id AND BT.IsActive=1 AND BT.IsDeleted=0
@@ -219,7 +219,7 @@ BEGIN
 	FROM #Booking B
 	JOIN #CheckOut C ON B.BillId=C.ChkId
 	
-	SELECT Id AS SNo,BookingType,BookingId,BillId,InVoiceNo,PropertyName,ClientName,
+	SELECT Id AS SNo,BookingType,BookingId AS BookingCode,BillId,InVoiceNo,PropertyName,ClientName,
 	MasterClientName,GuestName,CheckInDate,CheckOutDate,Location,NoOfDays,
 	TotalAmount,Type,PaymentMode,BillDate,BillStartDate,
 	BillEndDate,BillType  FROM #Final

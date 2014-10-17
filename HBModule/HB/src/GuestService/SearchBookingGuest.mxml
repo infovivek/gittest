@@ -44,7 +44,7 @@
 			private var SearchPopUp:frmsearchwindow = new frmsearchwindow();
 			public static var Global_AC:ArrayCollection = new ArrayCollection();
 			public static var GlobalXml:String = "";
-			public var Id:int=0,ErrMsg:String="",PropertyId:int=0,PropertyName:String="",UserId:int=0;
+			public var Id:int=0,ErrMsg:String="",PropertyId:String="0",PropertyName:String="",UserId:int=0;
 			public var AddMode:Boolean=true,Flag:Boolean=true,PropretyType:String="";
 			public var ClientName:String="",ClientId:int=0,Guest:String="",GuestId:int=0;
 			
@@ -54,16 +54,16 @@
 				GlobalXml="";
 				GlobalXml += "<ROOT>";
 				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
-				GlobalXml += "</ROOT>";
-				SCtrl.setButtonRights("Search",true);
-				SCtrl.setButtonRights("Save",true);
-				SCtrl.setButtonRights("Delete",true);
-				SCtrl.setButtonRights("Refresh",true);
+				GlobalXml += "</ROOT>";				
 				//dt_From.selectedDate = new Date();
 				Grd_Details.dataProvider=null;
 				lbl.visible=true;
 				
 				hlp_Property.enabled=true;
+				Help();
+			}
+			public function Help():void
+			{
 				useWeb("BookingSearchGuest","PAGELOAD_CUSTOM",[GlobalXml,'PAGELOAD',0,0,"","",""]);
 			}
 			private function Custom_WebSer_Result (Ds_Objects:Object):void				
@@ -120,11 +120,17 @@
 				SearchParam[7]=Action;
 				SearchPopUp.addEventListener("PopupEnter",funpopupEnter);
 				SearchPopUp.addEventListener("PopupClose",funpopupClose);
-				var Load:Array = new Array(); 
+				if(rbtn_Booking.selected==true)
+					Action="Booking";
+				else
+					Action="CheckIn";
+				var Load:Array = new Array(); 				
 				Load[0] = GlobalXml; Load[1] = Id; Load[2]=PropertyId;Load[3]=drp_Status.selectedItem;
 				Load[4]=txt_BookingCodes.text;Load[5]=dt_From.text;Load[6]=dt_To.text;Load[7]=Action;
 				Load[8]=ClientId;Load[9]=GuestId;
+				
 				useWeb("BookingSearchGuest","Search_CUSTOM",Load);
+				
 			}
 			private function funpopupClose(event:Event):void
 			{ 
@@ -153,6 +159,7 @@
 				else
 				{
 					hlp_Property.text="";
+					PropertyId="0";
 				}
 			}
 			public function Ddl_Guest_changeHandler():void
@@ -166,6 +173,7 @@
 				else
 				{
 					hlp_Guest.text="";
+					GuestId=0
 				}
 			}	
 			public function Ddl_Client_changeHandler():void
@@ -179,6 +187,7 @@
 				else
 				{
 					hlp_ClientName.text="";
+					ClientId=0;
 				}
 			}	
 			protected function FnClear():void
@@ -188,12 +197,12 @@
 				hlp_Property.Select_Row.Property="";
 				hlp_Property.Select_Row.zId=0;
 				hlp_Property.text="";
-				PropertyId=0;
+				PropertyId="0";
 				drp_Status.selectedItem="Select Status";
 				Grd_Details.dataProvider=null;
 				dt_From.text="";
 				dt_To.text="";
-				PageLoad();
+				Help();
 				lbl.visible=true;
 				hlp_ClientName.text="";
 				ClientId=0;
@@ -240,8 +249,8 @@
 					sheet.setCell(0,6,'CheckOutDate');
 					sheet.setCell(0,7,'Status');
 					sheet.setCell(0,8,'PaymentMode');
-					sheet.setCell(0,9,'BookingMode');
-					sheet.setCell(0,10,'TotalTariff');
+					//sheet.setCell(0,9,'BookingMode');
+					sheet.setCell(0,9,'TotalTariff');
 					
 					for(var i:int=0;i<arrExportResult.length;i++)
 					{
@@ -254,8 +263,8 @@
 						sheet.setCell(i+1, 6, arrExportResult[i].CheckOutDate);
 						sheet.setCell(i+1, 7, arrExportResult[i].Status);
 						sheet.setCell(i+1, 8, arrExportResult[i].PaymentMode);
-						sheet.setCell(i+1, 9, arrExportResult[i].BookingMode);
-						sheet.setCell(i+1, 10, arrExportResult[i].TotalTariff);
+						//sheet.setCell(i+1, 9, arrExportResult[i].BookingMode);
+						sheet.setCell(i+1, 9, arrExportResult[i].TotalTariff);
 					}
 					Grd_Details.dataProvider = arrExportResult;
 					xlsFile.sheets.addItem(sheet);      
@@ -293,76 +302,25 @@
 		<s:HGroup x="6" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
 			<s:BorderContainer x="102" y="0" width="100%" height="100%" backgroundColor="#fbf9f9"
 							   borderVisible="false">
-				<s:Label x="19" y="41" text="Property"/>
-				<WrbHelpComp:HelpText id="hlp_Property" x="77" y="36" width="220" height="22" pxSetColumnsWidth="220,0" 
-									  onselection="{Ddl_Property_changeHandler()}"  pxTabIndex="1" depth="10"
-									  pxSetPrompt="Select Property">
-				</WrbHelpComp:HelpText>
-				<mx:DataGrid x="0" y="220"  verticalAlign="middle" editable="true" visible="true"
-							 width="100%" height="98%" tabIndex="4" id="Grd_Details" 
+				<mx:DataGrid x="0" y="183"  verticalAlign="middle" editable="true" visible="true"
+							 width="100%" height="100%" tabIndex="4" id="Grd_Details" 
 							 doubleClickEnabled="true" doubleClick="Grd_Details_doubleClickHandler(event)">
 					<mx:columns>
-						<mx:DataGridColumn dataField="BookingCode" headerText="B.Code" editable="false"/>
-						<mx:DataGridColumn dataField="OccupancyLevel" headerText="Occupancy Level" editable="false"/>
-						<mx:DataGridColumn dataField="Guests" headerText="Guests" width="100" editable="false"/>
-						<mx:DataGridColumn dataField="Client" headerText="Client" editable="false"/>
-						<mx:DataGridColumn dataField="Property" headerText="Property" editable="false"/>
-						<mx:DataGridColumn dataField="BookingDate" headerText="Booking Date" editable="false"/>
-						<mx:DataGridColumn dataField="CheckInDate" headerText="CheckIn Date" editable="false"/>
-						<mx:DataGridColumn dataField="CheckOutDate" headerText="CheckOut Date" editable="false"/>
-						<mx:DataGridColumn dataField="Status" headerText="Status" editable="false"/>
-						<mx:DataGridColumn dataField="PaymentMode" headerText="PaymentMode" editable="false"/>
-						<mx:DataGridColumn dataField="BookingMode" headerText="Booking Mode" editable="false"/>
-						<mx:DataGridColumn dataField="TotalTariff" headerText="Tariff *" editable="false"/>
+						<mx:DataGridColumn width="40" dataField="BookingCode" headerText="B.Code"  textAlign="left" editable="false"/>
+						<mx:DataGridColumn width="50" dataField="OccupancyLevel" headerText="Occupancy Level" textAlign="left" editable="false"/>
+						<mx:DataGridColumn width="100" dataField="Guests" headerText="Guests"  textAlign="left" editable="false"/>
+						<mx:DataGridColumn width="100" dataField="Client" headerText="Client" textAlign="left"  editable="false"/>
+						<mx:DataGridColumn width="100" dataField="Property" headerText="Property" textAlign="left" editable="false"/>
+						<mx:DataGridColumn width="80" dataField="BookingDate" headerText="Booking Date" textAlign="left" editable="false"/>
+						<mx:DataGridColumn width="80" dataField="CheckInDate" headerText="CheckIn Date" textAlign="left"  editable="false"/>
+						<mx:DataGridColumn width="80" dataField="CheckOutDate" headerText="CheckOut Date" textAlign="left" editable="false"/>
+						<mx:DataGridColumn width="80" dataField="Status" headerText="Status" editable="false" textAlign="left"/>
+						<mx:DataGridColumn width="80" dataField="PaymentMode" headerText="PaymentMode" editable="false" textAlign="left" />
+						<mx:DataGridColumn width="0" dataField="BookingMode" headerText="Booking Mode" textAlign="left" editable="false" visible="false"/>
+						<mx:DataGridColumn width="80" dataField="TotalTariff" headerText="Tariff *" editable="false" textAlign="right"/>
 					</mx:columns>
 				</mx:DataGrid>
-				<s:Label x="21" y="85" text="Status"/>
-				<s:DropDownList id="drp_Status" x="80" y="80.5" width="145" prompt="Select Status">
-					<mx:ArrayCollection>
-						<fx:String>All Status</fx:String>
-						<fx:String>Booked</fx:String>
-						<!--fx:String>Direct Booked</fx:String-->
-						<fx:String>Cancelled</fx:String>
-						<fx:String>CheckIn</fx:String>
-						<fx:String>CheckOut</fx:String>
-						<!--fx:String>No Show</fx:String-->
-					</mx:ArrayCollection>
-				</s:DropDownList>
-				<mx:DateField x="82" y="124.5" width="93" height="21" id="dt_From" tabIndex="16"
-							  selectableRange="{{rangeEnd: new Date()}}" formatString="DD/MM/YYYY" styleName="DisabledDateField" 
-							  yearNavigationEnabled="true" change="dt_From_changeHandler(event)"/>
-				<mx:DateField id="dt_To" x="237" y="123.5" selectableRange="{{rangeEnd: new Date()}}" formatString="DD/MM/YYYY"
-							  enabled="false"/>
-				<s:Label x="20" y="129" text="Date From"/>
-				<s:Label x="191" y="129" text="Date To"/>
 				<mx:HRule x="0" y="472" width="100%" strokeColor="#eb1c24" visible="false"/>
-				<s:VGroup x="0" y="165" width="100%" height="30" horizontalAlign="center">
-					<WrbComp:SaveControl id="SCtrl" x="231" y="490" docClear="FnClear()">
-					</WrbComp:SaveControl>
-				</s:VGroup>
-				<s:Label x="15" y="15" text="Search Booking" color="red"/>
-				<s:Button x="592" y="118" width="70" height="34" label="Search" click="Search()"/>
-				<WrbComp:Button_HB id="btn_Excel" x="697" y="119" width="88" click="ExportExcel(event)"
-								   Lable_val="Export To Excel">
-				</WrbComp:Button_HB>
-				<s:Image x="331" y="123.5" width="22" height="23"
-						 source="@Embed(source='../Assets/Warning2.png')"
-						 toolTip="Recommended to have 30 days search for quicker results"/>
-				<s:Label id="lbl" x="10" y="202" text="Last 30 Days Booking"/>
-				<s:Label x="318" y="85" text="Booking Code"/>
-				<s:TextInput id="txt_BookingCodes" x="417" y="81" width="220" prompt="123,456" maxChars="100"
-							 restrict="0-9,"/>
-				<s:Label x="320" y="41" text="Client Name"/>
-				<WrbHelpComp:HelpText id="hlp_ClientName" x="396" y="36" width="220" height="22" pxSetColumnsWidth="220,0"
-									  onselection="{Ddl_Client_changeHandler()}"  pxTabIndex="1" depth="100"
-									  pxSetPrompt="Select Client" >
-				</WrbHelpComp:HelpText>
-				<s:Label x="636" y="41" text="Guest Name"/>
-				<WrbHelpComp:HelpText id="hlp_Guest" x="719" y="36" width="184" height="22" pxSetColumnsWidth="220,0"
-									  onselection="{Ddl_Guest_changeHandler()}"  pxTabIndex="1" depth="10"
-									  pxSetPrompt="Select Guest" >
-				</WrbHelpComp:HelpText>
-				<s:Label x="762" y="203" text="* Approximate" color="red"/>
 				<s:BorderContainer x="87" y="15" width="751" height="515" id="bdr_Intermidiate" visible="false">
 					<s:Scroller x="0" y="0" width="749" height="513">
 						<s:VGroup width="100%" height="100%">
@@ -393,7 +351,64 @@
 						</s:VGroup>
 					</s:Scroller>
 				</s:BorderContainer>
-				
+				<s:HGroup x="0" y="0" width="100%" height="175" horizontalAlign="center" verticalAlign="middle">
+				<s:BorderContainer x="10" y="5" width="880" height="90%" borderVisible="false" backgroundColor="#fbf9f9">
+					<s:Label x="15" y="31" text="Property"/>
+					<WrbHelpComp:HelpText id="hlp_Property" x="96" y="26" width="220" height="22" pxSetColumnsWidth="220,0" 
+										  onselection="{Ddl_Property_changeHandler()}"  pxTabIndex="1" depth="10"
+										  pxSetPrompt="Select Property">
+					</WrbHelpComp:HelpText>
+					<s:Label x="671" y="31" text="Status"/>
+					<s:DropDownList id="drp_Status" x="730" y="26.5" width="145" prompt="Select Status">
+						<mx:ArrayCollection>
+							<fx:String>All Status</fx:String>
+							<fx:String>Booked</fx:String>
+							<!--fx:String>Direct Booked</fx:String-->
+							<fx:String>Canceled</fx:String>
+							<fx:String>CheckIn</fx:String>
+							<fx:String>CheckOut</fx:String>
+							<!--fx:String>No Show</fx:String-->
+						</mx:ArrayCollection>
+					</s:DropDownList>
+					<mx:DateField x="96" y="114.5" width="93" height="21" id="dt_From" tabIndex="16"
+								  selectableRange="{{rangeEnd: new Date()}}" formatString="DD/MM/YYYY" styleName="DisabledDateField" 
+								  yearNavigationEnabled="true" change="dt_From_changeHandler(event)"/>
+					<mx:DateField id="dt_To" x="257" y="113.5" selectableRange="{{rangeEnd: new Date()}}" formatString="DD/MM/YYYY"
+								  enabled="false"/>
+					<s:Label x="15" y="119" text="Date From"/>
+					<s:Label x="201" y="119" text="Date To"/>
+					<s:Label x="15" y="5" text="Search Booking" color="red"/>
+					<WrbComp:Button_HB id="btn_Excel" x="771" y="108" width="104" click="ExportExcel(event)"
+									   Lable_val="Export To Excel">
+					</WrbComp:Button_HB>
+					<s:Image x="361" y="113.5" width="22" height="23"
+							 source="@Embed(source='../Assets/Warning2.png')"
+							 toolTip="Recommended to have 30 days search for quicker results"/>
+					<s:Label x="346" y="75" text="Booking Code"/>
+					<s:TextInput id="txt_BookingCodes" x="437" y="71" width="184" prompt="123,456" maxChars="100"
+								 restrict="0-9,"/>
+					<s:Label x="15" y="71" text="Client Name"/>
+					<WrbHelpComp:HelpText id="hlp_ClientName" x="96" y="66" width="220" height="22" pxSetColumnsWidth="220,0"
+										  onselection="{Ddl_Client_changeHandler()}"  pxTabIndex="1" depth="9"
+										  pxSetPrompt="Select Client" >
+					</WrbHelpComp:HelpText>
+					<s:Label x="346" y="31" text="Guest Name"/>
+					<WrbHelpComp:HelpText id="hlp_Guest" x="437" y="26" width="184" height="22" pxSetColumnsWidth="220,0"
+										  onselection="{Ddl_Guest_changeHandler()}"  pxTabIndex="1" depth="10"
+										  pxSetPrompt="Select Guest" >
+					</WrbHelpComp:HelpText>
+					<s:RadioButton id="rbtn_Booking" x="669" y="75" label="Booking" selected="true" />
+					<s:RadioButton id="rbtn_CheckIn" x="753" y="75" label="CheckIn" />
+					<WrbComp:Button_HB x="588" y="108" _Label="Search" click="Search()">
+					</WrbComp:Button_HB>
+					<WrbComp:Button_HB x="680" y="108" _Label="Clear" click="FnClear()">
+					</WrbComp:Button_HB>
+					<s:Label id="lbl" x="15" y="157" text="Last 30 Days Booking"/>
+					<s:Label x="762" y="157" text="* Approximate" color="red"/>
+					
+					
+				</s:BorderContainer>
+				</s:HGroup>
 				
 			</s:BorderContainer>
 		</s:HGroup>

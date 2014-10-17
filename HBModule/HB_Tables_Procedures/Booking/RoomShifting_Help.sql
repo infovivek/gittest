@@ -123,23 +123,44 @@ IF @Action = 'DateLoad'
   CAST(YEAR(@Dtt) AS VARCHAR)+'/'+CAST(MONTH(@Dtt) AS VARCHAR)
   +'/'+CAST(DAY(@Dtt) AS VARCHAR) AS ChkInRangeStart1;
   --
-  SELECT TOP 1 BP.PropertyType FROM WRBHBBookingProperty BP
+  SELECT TOP 1 BP.PropertyType,BG.TariffPaymentMode,
+  BG.ServicePaymentMode FROM WRBHBBookingProperty BP
   LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
   BG.BookingId=BP.BookingId AND BG.BookingPropertyTableId=BP.Id AND
   BG.BookingPropertyId=BP.PropertyId
   WHERE BG.IsActive=1 AND BG.IsDeleted=0 AND BP.IsActive=1 AND
-  BP.IsDeleted=0 AND BP.BookingId=@BookingId;  
+  BP.IsDeleted=0 AND BP.BookingId=@BookingId AND 
+  BG.RoomCaptured = @Id1
+  GROUP BY BP.PropertyType,BG.TariffPaymentMode,BG.ServicePaymentMode;
+  --
+  DECLARE @BTC BIT=0;
+  CREATE TABLE #PAYMENT(label NVARCHAR(100));
+  SET @BTC=(SELECT ISNULL(BTC,0) FROM WRBHBClientManagement
+  WHERE Id=(SELECT ClientId FROM WRBHBBooking WHERE Id=@BookingId));
+  IF @BTC = 1
+   BEGIN
+    INSERT INTO #PAYMENT(label) SELECT 'Bill to Company (BTC)';
+    INSERT INTO #PAYMENT(label) SELECT 'Direct';
+   END
+  ELSE
+   BEGIN
+    INSERT INTO #PAYMENT(label) SELECT 'Direct';
+   END
+  --
+  SELECT * FROM #PAYMENT;  
  END
 IF @Action = 'AvaliableRooms'
  BEGIN
   -- Get Type & Property Type & Property Id
-  DECLARE @GetType NVARCHAR(100),@PropertyType NVARCHAR(100);
-  DECLARE @PropertyId INT;
-  SELECT @GetType=GetType,@PropertyType=PropertyType,
+  DECLARE @GetType NVARCHAR(100),@PropertyType NVARCHAR(100),@PropertyId INT;
+  SELECT TOP 1 @GetType=GetType,@PropertyType=PropertyType,
   @PropertyId=PropertyId FROM WRBHBBookingProperty 
   WHERE Id = (SELECT BookingPropertyTableId
   FROM WRBHBBookingPropertyAssingedGuest WHERE BookingId=@BookingId
   GROUP BY BookingPropertyTableId);
+  --
+  CREATE TABLE #TMPTABLE(label NVARCHAR(100),RoomId BIGINT);
+  --
 /*  -- Get Check In Date & Check Out Date
   DECLARE @ChkInDt NVARCHAR(100),@ChkOutDt NVARCHAR(100);
   SELECT TOP 1 @ChkInDt=(CAST(ChkInDt AS VARCHAR)+' '+
@@ -187,6 +208,7 @@ IF @Action = 'AvaliableRooms'
     GROUP BY PG.RoomId;
     -- Booked Room End
     -- Avaliable Rooms
+    INSERT INTO #TMPTABLE(label,RoomId)
     SELECT B.BlockName+' - '+R.RoomNo AS label,R.Id AS RoomId     
     FROM WRBHBProperty P
     LEFT OUTER JOIN WRBHBPropertyBlocks B WITH(NOLOCK)ON
@@ -315,6 +337,7 @@ IF @Action = 'AvaliableRooms'
     A.Id NOT IN (SELECT ApartmentId FROM #ExDdPApartmnt1) 
     ORDER BY B.BlockName,A.ApartmentNo,R.RoomNo;
     --
+    INSERT INTO #TMPTABLE(label,RoomId)
     SELECT label,RoomId FROM #DdP 
     GROUP BY label,RoomId ORDER BY RoomId;
    END  
@@ -478,8 +501,396 @@ IF @Action = 'AvaliableRooms'
     --
     --select * from #BookedRoomsInP;
     --select * from #Tmp_InternalRoom;return;
+    INSERT INTO #TMPTABLE(label,RoomId)
     SELECT label,RoomId FROM #Tmp_InternalRoom
     WHERE RoomId NOT IN (SELECT RoomId FROM #BookedRoomsInP);
+   END
+  -- Avaliable rooms
+  SELECT label,RoomId FROM #TMPTABLE;
+ END
+IF @Action = 'AvaliableFromRoom'
+ BEGIN
+  -- Get Type & Property Type & Property Id
+  DECLARE @GetType1 NVARCHAR(100),@PropertyType1 NVARCHAR(100),@PropertyId1 INT;
+  SELECT TOP 1 @GetType1=GetType,@PropertyType1=PropertyType,
+  @PropertyId1=PropertyId FROM WRBHBBookingProperty 
+  WHERE Id = (SELECT BookingPropertyTableId
+  FROM WRBHBBookingPropertyAssingedGuest WHERE BookingId=@BookingId
+  GROUP BY BookingPropertyTableId);
+  --
+  CREATE TABLE #AgedGst(Id BIGINT);
+  INSERT INTO #AgedGst(Id)
+  SELECT Id FROM WRBHBBookingPropertyAssingedGuest WHERE BookingId=@BookingId AND
+  RoomId=@RoomId AND RoomCaptured=@Id1 AND ISNULL(RoomShiftingFlag,0)=0;
+  --
+  CREATE TABLE #TMPTABLE1(label NVARCHAR(100),RoomId BIGINT);
+  --
+/*  -- Get Check In Date & Check Out Date
+  DECLARE @ChkInDt NVARCHAR(100),@ChkOutDt NVARCHAR(100);
+  SELECT TOP 1 @ChkInDt=(CAST(ChkInDt AS VARCHAR)+' '+
+  CAST(ExpectChkInTime+' '+AMPM AS VARCHAR)),
+  @ChkOutDt=CAST(ChkOutDt AS VARCHAR)+' '+'11:59:00 AM'
+  FROM WRBHBBookingPropertyAssingedGuest
+  WHERE BookingId=@BookingId AND RoomId=@RoomId AND RoomShiftingFlag=0;*/
+  IF @PropertyType1 = 'MGH'
+   BEGIN
+    CREATE TABLE #ExistingManagedGHProperty12(RoomId BIGINT);
+    -- Booked Room Begin
+    INSERT INTO #ExistingManagedGHProperty12(RoomId) 
+    SELECT PG.RoomId FROM WRBHBBookingPropertyAssingedGuest PG
+    WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND 
+    CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
+    CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
+    CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
+    PG.Id NOT IN (SELECT Id FROM #AgedGst) AND
+    PG.BookingPropertyId=@PropertyId1 GROUP BY PG.RoomId;
+    -- 
+    INSERT INTO #ExistingManagedGHProperty12(RoomId) 
+    SELECT PG.RoomId FROM WRBHBBookingPropertyAssingedGuest PG
+    WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND 
+    CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) BETWEEN 
+    CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
+    PG.Id NOT IN (SELECT Id FROM #AgedGst) AND
+    PG.BookingPropertyId=@PropertyId1 GROUP BY PG.RoomId;
+    -- 
+    INSERT INTO #ExistingManagedGHProperty12(RoomId) 
+    SELECT PG.RoomId FROM WRBHBBookingPropertyAssingedGuest PG
+    WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND
+    CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
+    CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
+    CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
+    CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) BETWEEN 
+    CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
+    PG.Id NOT IN (SELECT Id FROM #AgedGst) AND
+    PG.BookingPropertyId=@PropertyId1 GROUP BY PG.RoomId;
+    -- 
+    INSERT INTO #ExistingManagedGHProperty12(RoomId)
+    SELECT PG.RoomId FROM WRBHBBookingPropertyAssingedGuest PG
+    WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND 
+    CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
+    CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) <= 
+    CAST(@ChkInDt AS DATETIME) AND
+    CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) >=
+    CAST(@ChkOutDt AS DATETIME) AND PG.BookingPropertyId=@PropertyId1 AND
+    PG.Id NOT IN (SELECT Id FROM #AgedGst)
+    GROUP BY PG.RoomId;
+    -- Booked Room End
+    -- Avaliable Rooms
+    INSERT INTO #TMPTABLE1(label,RoomId)
+    SELECT B.BlockName+' - '+R.RoomNo AS label,R.Id AS RoomId     
+    FROM WRBHBProperty P
+    LEFT OUTER JOIN WRBHBPropertyBlocks B WITH(NOLOCK)ON
+    B.PropertyId=P.Id
+    LEFT OUTER JOIN WRBHBPropertyRooms R WITH(NOLOCK)ON 
+    R.BlockId=B.Id AND R.PropertyId=P.Id 
+    WHERE P.IsActive=1 AND P.IsDeleted=0 AND B.IsActive=1 AND 
+    B.IsDeleted=0 AND R.IsActive=1 AND R.IsDeleted=0 AND 
+    P.Id=@PropertyId1 AND P.Category='Managed G H' AND
+    R.Id NOT IN (SELECT RoomId FROM #ExistingManagedGHProperty12);
+   END
+  IF @PropertyType1 = 'DdP'
+   BEGIN 
+    CREATE TABLE #ExDdPApartmnt12(ApartmentId BIGINT);
+    CREATE TABLE #ExistingDedicatedProperty12(RoomId BIGINT);
+    -- Booked Room Begin
+    INSERT INTO #ExistingDedicatedProperty12(RoomId) 
+    SELECT PG.RoomId FROM WRBHBBookingPropertyAssingedGuest PG
+    WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND 
+    CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
+    CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
+    CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
+    PG.Id NOT IN (SELECT Id FROM #AgedGst) AND
+    PG.BookingPropertyId=@PropertyId1 GROUP BY PG.RoomId;
+    -- 
+    INSERT INTO #ExistingDedicatedProperty12(RoomId) 
+    SELECT PG.RoomId FROM WRBHBBookingPropertyAssingedGuest PG
+    WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND 
+    CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) BETWEEN 
+    CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
+    PG.Id NOT IN (SELECT Id FROM #AgedGst) AND
+    PG.BookingPropertyId=@PropertyId1 GROUP BY PG.RoomId;
+    -- 
+    INSERT INTO #ExistingDedicatedProperty12(RoomId) 
+    SELECT PG.RoomId FROM WRBHBBookingPropertyAssingedGuest PG
+    WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND 
+    CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
+    CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
+    CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
+    CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) BETWEEN 
+    CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
+    PG.Id NOT IN (SELECT Id FROM #AgedGst) AND
+    PG.BookingPropertyId=@PropertyId1 GROUP BY PG.RoomId;
+    -- 
+    INSERT INTO #ExistingDedicatedProperty12(RoomId)
+    SELECT PG.RoomId FROM WRBHBBookingPropertyAssingedGuest PG
+    WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND
+    CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
+    CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) <= 
+    CAST(@ChkInDt AS DATETIME) AND
+    CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) >=
+    CAST(@ChkOutDt AS DATETIME) AND PG.BookingPropertyId=@PropertyId1 AND
+    PG.Id NOT IN (SELECT Id FROM #AgedGst)
+    GROUP BY PG.RoomId;
+    -- Booked Room End
+    -- Booked Apartment Begin
+    INSERT INTO #ExDdPApartmnt12(ApartmentId) 
+    SELECT PG.ApartmentId FROM WRBHBApartmentBookingPropertyAssingedGuest PG
+    WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND
+    CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
+    CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
+    CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
+    PG.BookingPropertyId=@PropertyId1 GROUP BY PG.ApartmentId;
+    --
+    INSERT INTO #ExDdPApartmnt12(ApartmentId) 
+    SELECT PG.ApartmentId FROM WRBHBApartmentBookingPropertyAssingedGuest PG
+    WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND
+    CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) BETWEEN 
+    CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
+    PG.BookingPropertyId=@PropertyId1 GROUP BY PG.ApartmentId;
+    --
+    INSERT INTO #ExDdPApartmnt12(ApartmentId) 
+    SELECT PG.ApartmentId FROM WRBHBApartmentBookingPropertyAssingedGuest PG
+    WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND
+    CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
+    CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
+    CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
+    CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) BETWEEN 
+    CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
+    PG.BookingPropertyId=@PropertyId1 GROUP BY PG.ApartmentId;
+    -- 
+    INSERT INTO #ExDdPApartmnt12(ApartmentId) 
+    SELECT PG.ApartmentId FROM WRBHBApartmentBookingPropertyAssingedGuest PG
+    WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND 
+    CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
+    CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) <= 
+    CAST(@ChkInDt AS DATETIME) AND
+    CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) >=
+    CAST(@ChkOutDt AS DATETIME) AND PG.BookingPropertyId=@PropertyId1
+    GROUP BY PG.ApartmentId;
+    -- Booked Apartment End
+    -- Avaliable Rooms
+    CREATE TABLE #DdP1(label NVARCHAR(100),RoomId BIGINT);
+    INSERT INTO #DdP1(label,RoomId)
+    SELECT B.BlockName+' - '+A.ApartmentNo+' - '+R.RoomNo AS label,
+    R.Id AS RoomId FROM WRBHBContractManagementTariffAppartment D
+    LEFT OUTER JOIN WRBHBPropertyRooms R WITH(NOLOCK)ON
+    R.PropertyId=D.PropertyId AND R.Id=D.RoomId    
+    LEFT OUTER JOIN WRBHBPropertyApartment A WITH(NOLOCK)ON 
+    A.PropertyId=D.PropertyId AND A.Id=R.ApartmentId
+    LEFT OUTER JOIN WRBHBPropertyBlocks B WITH(NOLOCK)ON 
+    B.PropertyId=D.PropertyId AND B.Id=A.BlockId
+    WHERE D.IsDeleted=0 AND D.IsActive=1 AND R.IsDeleted=0 AND 
+    R.IsActive=1 AND B.IsDeleted=0 AND B.IsActive=1 AND 
+    A.IsActive=1 AND A.IsDeleted=0 AND 
+    A.SellableApartmentType != 'HUB' AND
+    A.Status='Active' AND R.RoomStatus='Active' AND
+    D.PropertyId=@PropertyId1 AND
+    R.Id NOT IN (SELECT RoomId FROM #ExistingDedicatedProperty12) AND
+    A.Id NOT IN (SELECT ApartmentId FROM #ExDdPApartmnt12) 
+    ORDER BY B.BlockName,A.ApartmentNo,R.RoomNo;
+    --
+    INSERT INTO #DdP1(label,RoomId)
+    SELECT B.BlockName+' - '+A.ApartmentNo+' - '+R.RoomNo AS label,
+    R.Id AS RoomId FROM WRBHBContractManagementAppartment D
+    LEFT OUTER JOIN WRBHBPropertyRooms R WITH(NOLOCK)ON
+    R.PropertyId=D.PropertyId
+    LEFT OUTER JOIN WRBHBPropertyApartment A WITH(NOLOCK)ON 
+    A.PropertyId=D.PropertyId AND A.Id=R.ApartmentId AND
+    A.Id=D.ApartmentId
+    LEFT OUTER JOIN WRBHBPropertyBlocks B WITH(NOLOCK)ON 
+    B.PropertyId=D.PropertyId AND B.Id=A.BlockId
+    WHERE D.IsDeleted=0 AND D.IsActive=1 AND R.IsDeleted=0 AND 
+    R.IsActive=1 AND B.IsDeleted=0 AND B.IsActive=1 AND 
+    A.IsActive=1 AND A.IsDeleted=0 AND 
+    A.SellableApartmentType != 'HUB' AND
+    A.Status='Active' AND R.RoomStatus='Active' AND
+    D.PropertyId=@PropertyId1 AND
+    R.Id NOT IN (SELECT RoomId FROM #ExistingDedicatedProperty12) AND
+    A.Id NOT IN (SELECT ApartmentId FROM #ExDdPApartmnt12) 
+    ORDER BY B.BlockName,A.ApartmentNo,R.RoomNo;
+    --
+    INSERT INTO #TMPTABLE1(label,RoomId)
+    SELECT label,RoomId FROM #DdP1 
+    GROUP BY label,RoomId ORDER BY RoomId;
+   END  
+  IF @PropertyType1 = 'InP'
+   BEGIN
+    -- Get Property All Rooms 
+    CREATE TABLE #Tmp_InternalRoom1(label NVARCHAR(100),RoomId BIGINT);
+    INSERT INTO #Tmp_InternalRoom1(label,RoomId)
+    SELECT B.BlockName+' - '+A.ApartmentNo+' - '+R.RoomNo+' - '+
+    R.RoomType AS label,R.Id AS RoomId
+    FROM WRBHBProperty P
+    LEFT OUTER JOIN WRBHBPropertyBlocks B WITH(NOLOCK)ON B.PropertyId=P.Id
+    LEFT OUTER JOIN WRBHBPropertyApartment A WITH(NOLOCK)ON 
+    A.PropertyId=P.Id AND A.BlockId=B.Id
+    LEFT OUTER JOIN WRBHBPropertyRooms R WITH(NOLOCK)ON
+    R.PropertyId=P.Id AND R.ApartmentId=A.Id
+    WHERE P.IsActive=1 AND P.IsDeleted=0 AND R.IsActive=1 AND 
+    R.IsDeleted=0 AND A.IsActive=1 AND A.IsDeleted=0 AND 
+    B.IsActive=1 AND B.IsDeleted=0 AND 
+    A.SellableApartmentType != 'HUB' AND
+    A.Status='Active' AND R.RoomStatus='Active' AND
+    P.Id=@PropertyId1;
+-- Property Booked Rooms Begin
+    CREATE TABLE #BookedRoomsInP1(RoomId BIGINT);
+    -- Dedicated Rooms
+    INSERT INTO #BookedRoomsInP1(RoomId)
+    SELECT RoomId FROM WRBHBContractManagementTariffAppartment
+    WHERE IsActive=1 AND IsDeleted=0 AND RoomId != 0 AND
+    PropertyId=@PropertyId1;
+    -- Dedicated Apartment
+    INSERT INTO #BookedRoomsInP1(RoomId)  
+    SELECT R.Id FROM WRBHBPropertyRooms R
+    LEFT OUTER JOIN WRBHBContractManagementAppartment T 
+    WITH(NOLOCK)ON T.ApartmentId=R.ApartmentId
+    WHERE R.IsActive=1 AND R.IsDeleted=0 AND T.IsActive=1 AND 
+    T.IsDeleted=0 AND T.ApartmentId != 0 AND 
+    R.ApartmentId=T.ApartmentId AND T.PropertyId=@PropertyId1;
+    -- Booked Rooms Begin
+    INSERT INTO #BookedRoomsInP1(RoomId) 
+    SELECT PG.RoomId FROM WRBHBBookingPropertyAssingedGuest PG
+    WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND 
+    CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
+    CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
+    CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
+    PG.Id NOT IN (SELECT Id FROM #AgedGst) AND
+    PG.BookingPropertyId=@PropertyId1 GROUP BY PG.RoomId;
+    --
+    INSERT INTO #BookedRoomsInP1(RoomId) 
+    SELECT PG.RoomId FROM WRBHBBookingPropertyAssingedGuest PG
+    WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND 
+    CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) BETWEEN 
+    CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
+    PG.Id NOT IN (SELECT Id FROM #AgedGst) AND
+    PG.BookingPropertyId=@PropertyId1 GROUP BY PG.RoomId;
+    -- 
+    INSERT INTO #BookedRoomsInP1(RoomId) 
+    SELECT PG.RoomId FROM WRBHBBookingPropertyAssingedGuest PG
+    WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND 
+    CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
+    CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
+    CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
+    CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) BETWEEN 
+    CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
+    PG.Id NOT IN (SELECT Id FROM #AgedGst) AND
+    PG.BookingPropertyId=@PropertyId1 GROUP BY PG.RoomId;
+    -- 
+    INSERT INTO #BookedRoomsInP1(RoomId)
+    SELECT PG.RoomId FROM WRBHBBookingPropertyAssingedGuest PG
+    WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND 
+    CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
+    CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) <= 
+    CAST(@ChkInDt AS DATETIME) AND
+    CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) >=
+    CAST(@ChkOutDt AS DATETIME) AND PG.BookingPropertyId=@PropertyId1 AND
+    PG.Id NOT IN (SELECT Id FROM #AgedGst)
+    GROUP BY PG.RoomId;
+    -- Booked Rooms End
+    -- Booked Beds Begin
+    INSERT INTO #BookedRoomsInP1(RoomId) 
+    SELECT PG.RoomId FROM WRBHBBedBookingPropertyAssingedGuest PG
+    WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND 
+    CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
+    CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
+    CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
+    PG.BookingPropertyId=@PropertyId1 GROUP BY PG.RoomId;
+    --
+    INSERT INTO #BookedRoomsInP1(RoomId) 
+    SELECT PG.RoomId FROM WRBHBBedBookingPropertyAssingedGuest PG
+    WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND 
+    CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) BETWEEN 
+    CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
+    PG.BookingPropertyId=@PropertyId1 GROUP BY PG.RoomId;
+    -- 
+    INSERT INTO #BookedRoomsInP1(RoomId) 
+    SELECT PG.RoomId FROM WRBHBBedBookingPropertyAssingedGuest PG
+    WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND 
+    CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
+    CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
+    CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
+    CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) BETWEEN 
+    CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
+    PG.BookingPropertyId=@PropertyId1 GROUP BY PG.RoomId;
+    -- 
+    INSERT INTO #BookedRoomsInP1(RoomId)
+    SELECT PG.RoomId FROM WRBHBBedBookingPropertyAssingedGuest PG
+    WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND 
+    CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
+    CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) <= 
+    CAST(@ChkInDt AS DATETIME) AND
+    CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) >=
+    CAST(@ChkOutDt AS DATETIME) AND PG.BookingPropertyId=@PropertyId1
+    GROUP BY PG.RoomId;
+    -- Booked Beds End
+    -- Booked Apartment Begin
+    INSERT INTO #BookedRoomsInP1(RoomId)
+    SELECT R.Id FROM WRBHBPropertyRooms R
+    LEFT OUTER JOIN WRBHBApartmentBookingPropertyAssingedGuest PG
+    WITH(NOLOCK)ON PG.BookingPropertyId=R.PropertyId AND
+    PG.ApartmentId=R.ApartmentId
+    WHERE R.IsActive=1 AND R.IsDeleted=0 AND PG.IsActive=1 AND 
+    PG.IsDeleted=0 AND R.ApartmentId=PG.ApartmentId AND 
+    CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
+    CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
+    CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
+    PG.BookingPropertyId=@PropertyId1 GROUP BY R.Id;    
+    --
+    INSERT INTO #BookedRoomsInP1(RoomId)
+    SELECT R.Id FROM WRBHBPropertyRooms R
+    LEFT OUTER JOIN WRBHBApartmentBookingPropertyAssingedGuest PG
+    WITH(NOLOCK)ON PG.BookingPropertyId=R.PropertyId AND
+    PG.ApartmentId=R.ApartmentId
+    WHERE R.IsActive=1 AND R.IsDeleted=0 AND PG.IsActive=1 AND 
+    PG.IsDeleted=0 AND R.ApartmentId=PG.ApartmentId AND 
+    CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) BETWEEN 
+    CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
+    PG.BookingPropertyId=@PropertyId1 GROUP BY R.Id;    
+    --
+    INSERT INTO #BookedRoomsInP1(RoomId)
+    SELECT R.Id FROM WRBHBPropertyRooms R
+    LEFT OUTER JOIN WRBHBApartmentBookingPropertyAssingedGuest PG
+    WITH(NOLOCK)ON PG.BookingPropertyId=R.PropertyId AND
+    PG.ApartmentId=R.ApartmentId
+    WHERE R.IsActive=1 AND R.IsDeleted=0 AND PG.IsActive=1 AND 
+    PG.IsDeleted=0 AND R.ApartmentId=PG.ApartmentId AND 
+    CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
+    CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
+    CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
+    CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) BETWEEN 
+    CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
+    PG.BookingPropertyId=@PropertyId1 GROUP BY R.Id;
+    -- 
+    INSERT INTO #BookedRoomsInP1(RoomId)
+    SELECT R.Id FROM WRBHBPropertyRooms R
+    LEFT OUTER JOIN WRBHBApartmentBookingPropertyAssingedGuest PG
+    WITH(NOLOCK)ON PG.BookingPropertyId=R.PropertyId AND
+    PG.ApartmentId=R.ApartmentId
+    WHERE R.IsActive=1 AND R.IsDeleted=0 AND PG.IsActive=1 AND 
+    PG.IsDeleted=0 AND R.ApartmentId=PG.ApartmentId AND 
+    CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
+    CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) <= 
+    CAST(@ChkInDt AS DATETIME) AND
+    CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) >=
+    CAST(@ChkOutDt AS DATETIME) AND PG.BookingPropertyId=@PropertyId1
+    GROUP BY R.Id;
+    --
+    --select * from #BookedRoomsInP;
+    --select * from #Tmp_InternalRoom;return;
+    INSERT INTO #TMPTABLE1(label,RoomId)
+    SELECT label,RoomId FROM #Tmp_InternalRoom1
+    WHERE RoomId NOT IN (SELECT RoomId FROM #BookedRoomsInP1);
+   END
+  -- Avaliable rooms
+  DECLARE @AvaRoomCnt INT;
+  SET @AvaRoomCnt =(SELECT COUNT(*) FROM #TMPTABLE1 WHERE RoomId = @RoomId);
+  IF @AvaRoomCnt = 0
+   BEGIN
+    SELECT '*  Room Not Avliable' AS RoomSts;
+   END
+  ELSE
+   BEGIN
+    SELECT '' AS RoomSts;
    END
  END
 END

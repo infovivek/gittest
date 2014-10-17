@@ -1324,7 +1324,8 @@
 	</WrbComp:Button_HB>
 	<WrbHelpComp:HelpText x="188" y="72.5" depth="5" pxTabIndex="1" width="303" id="hlp_Property" onselection="{fnGetProperty()}" pxSetColumnsWidth="300,150,300">
 	</WrbHelpComp:HelpText>
-	<s:BorderContainer x="0" y="54" width="100%" height="479" id="Brd_BookingModification" visible="false" depth="10" backgroundColor="#E5E4E2">
+	<s:BorderContainer x="0" y="54" width="100%" height="479" id="Brd_BookingModification" visible="false" 
+					   depth="10" backgroundColor="#E5E4E2">
 		<mx:Label x="74" y="76" text="Filter"/>
 		<mx:Label x="295" y="36" text="Client"/>
 		<mx:Label x="85" y="346" text="Remarks"/>

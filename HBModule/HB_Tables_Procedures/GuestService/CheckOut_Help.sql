@@ -1,4 +1,4 @@
-USE [HBNest]
+
 GO
 /****** Object:  StoredProcedure [dbo].[Sp_Checkout_Help]    Script Date: 10/10/2014 18:32:00 ******/
 SET ANSI_NULLS ON
@@ -109,7 +109,7 @@ BEGIN
 		INSERT INTO #GUEST(GuestName,GuestId,StateId,CheckInHdrId,PropertyId,RoomId,ApartmentId,  
 		BookingId,BedId,Type,Flag,BookingCode)
 		
-		SELECT   h.GuestName,h.GuestId,h.StateId,h.Id AS CheckInHdrId,h.PropertyId,h.RoomId,h.ApartmentId,  
+		SELECT   h.ChkInGuest,h.GuestId,h.StateId,h.Id AS CheckInHdrId,h.PropertyId,h.RoomId,h.ApartmentId,  
 		h.BookingId,h.BedId,h.Type as Level,0 as Flag,h.BookingCode --,ChkoutDate
 		From WRBHBCheckInHdr h
 		join WRBHBBookingPropertyAssingedGuest d on h.Id = d.CheckInHdrId and
@@ -123,12 +123,12 @@ BEGIN
 		CONVERT(date,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) and
 		h.Id NOT IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where IsActive = 1 and IsDeleted = 0)
 		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
-		h.BookingId,h.BedId,h.Type,h.BookingCode 
+		h.BookingId,h.BedId,h.Type,h.BookingCode ,h.ChkInGuest
  -- New Entry Bed	
 		INSERT INTO #GUEST(GuestName,GuestId,StateId,CheckInHdrId,PropertyId,RoomId,ApartmentId,  
 		BookingId,BedId,Type,Flag,BookingCode)
 		
-		SELECT   h.GuestName,h.GuestId,h.StateId,h.Id AS CheckInHdrId,h.PropertyId,h.RoomId,h.ApartmentId,  
+		SELECT   h.ChkInGuest,h.GuestId,h.StateId,h.Id AS CheckInHdrId,h.PropertyId,h.RoomId,h.ApartmentId,  
 		h.BookingId,h.BedId,h.Type as Level,0 as Flag,h.BookingCode --,ChkoutDate
 		From WRBHBCheckInHdr h
 		join WRBHBBedBookingPropertyAssingedGuest d on h.bookingId = d.bookingId and
@@ -141,12 +141,12 @@ BEGIN
 		CONVERT(date,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) and
 		h.Id NOT IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where IsActive = 1 and IsDeleted = 0)
 		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
-		h.BookingId,h.BedId,h.Type,h.BookingCode 
+		h.BookingId,h.BedId,h.Type,h.BookingCode ,h.ChkInGuest
  -- New Entry Apartment
 		INSERT INTO #GUEST(GuestName,GuestId,StateId,CheckInHdrId,PropertyId,RoomId,ApartmentId,  
 		BookingId,BedId,Type,Flag,BookingCode)
 		
-		SELECT   h.GuestName,h.GuestId,h.StateId,h.Id AS CheckInHdrId,h.PropertyId,h.RoomId,h.ApartmentId,  
+		SELECT   h.ChkInGuest,h.GuestId,h.StateId,h.Id AS CheckInHdrId,h.PropertyId,h.RoomId,h.ApartmentId,  
 		h.BookingId,h.BedId,h.Type as Level,0 as Flag,h.BookingCode --,ChkoutDate
 		From WRBHBCheckInHdr h
 		join WRBHBApartmentBookingPropertyAssingedGuest d on h.bookingId = d.bookingId and
@@ -159,13 +159,13 @@ BEGIN
 		CONVERT(date,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) and
 		h.Id NOT IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where IsActive = 1 and IsDeleted = 0)
 		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
-		h.BookingId,h.BedId,h.Type,h.BookingCode 
+		h.BookingId,h.BedId,h.Type,h.BookingCode ,h.ChkInGuest
 		
 	-- Flag 0 Entry	Room
 		INSERT INTO #GUEST(GuestName,GuestId,StateId,CheckInHdrId,PropertyId,RoomId,ApartmentId,  
 		BookingId,BedId,Type,Flag,BookingCode)
 		
-		SELECT  h.GuestName,h.GuestId,h.StateId,h.Id AS CheckInHdrId,h.PropertyId,h.RoomId,h.ApartmentId,  
+		SELECT  h.ChkInGuest,h.GuestId,h.StateId,h.Id AS CheckInHdrId,h.PropertyId,h.RoomId,h.ApartmentId,  
 		h.BookingId,h.BedId,h.Type as Level,0 as Flag,h.BookingCode  
 		From WRBHBCheckInHdr h
 		join WRBHBBookingPropertyAssingedGuest d on h.Id = d.CheckInHdrId and
@@ -180,13 +180,13 @@ BEGIN
 		h.Id  IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where isnull(Flag,0) = 0 and  
 		IsActive = 1 and IsDeleted = 0 )
 		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
-		h.BookingId,h.BedId,h.Type,h.BookingCode 
+		h.BookingId,h.BedId,h.Type,h.BookingCode ,h.ChkInGuest
 		
 		INSERT INTO #GUEST(GuestName,GuestId,StateId,CheckInHdrId,PropertyId,RoomId,ApartmentId,  
 		BookingId,BedId,Type,Flag,BookingCode)
 		
 	-- Flag 0 Entry Bed	
-		SELECT  h.GuestName,h.GuestId,h.StateId,h.Id AS CheckInHdrId,h.PropertyId,h.RoomId,h.ApartmentId,  
+		SELECT  h.ChkInGuest,h.GuestId,h.StateId,h.Id AS CheckInHdrId,h.PropertyId,h.RoomId,h.ApartmentId,  
 		h.BookingId,h.BedId,h.Type as Level,0 as Flag,h.BookingCode  
 		From WRBHBCheckInHdr h
 		join WRBHBBedBookingPropertyAssingedGuest d on h.BookingId = d.BookingId and
@@ -201,13 +201,13 @@ BEGIN
 		h.Id  IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where isnull(Flag,0) = 0 and  
 		IsActive = 1 and IsDeleted = 0 )
 		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
-		h.BookingId,h.BedId,h.Type,h.BookingCode 
+		h.BookingId,h.BedId,h.Type,h.BookingCode ,h.ChkInGuest
 		
 		INSERT INTO #GUEST(GuestName,GuestId,StateId,CheckInHdrId,PropertyId,RoomId,ApartmentId,  
 		BookingId,BedId,Type,Flag,BookingCode)
 		
 	-- Flag 0 Entry Apartment	
-		SELECT  h.GuestName,h.GuestId,h.StateId,h.Id AS CheckInHdrId,h.PropertyId,h.RoomId,h.ApartmentId,  
+		SELECT h.ChkInGuest,h.GuestId,h.StateId,h.Id AS CheckInHdrId,h.PropertyId,h.RoomId,h.ApartmentId,  
 		h.BookingId,h.BedId,h.Type as Level,0 as Flag,h.BookingCode  
 		From WRBHBCheckInHdr h
 		join WRBHBApartmentBookingPropertyAssingedGuest d on h.BookingId = d.BookingId and
@@ -220,7 +220,7 @@ BEGIN
 		h.Id  IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where isnull(Flag,0) = 0 and  
 		IsActive = 1 and IsDeleted = 0 )
 		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
-		h.BookingId,h.BedId,h.Type,h.BookingCode
+		h.BookingId,h.BedId,h.Type,h.BookingCode,h.ChkInGuest
 
 		SELECT  GuestName,GuestId,StateId, CheckInHdrId,PropertyId,RoomId,ApartmentId,  
 		BookingId,BedId,Type as Level,BookingCode  
@@ -368,7 +368,7 @@ If @BookingLevel = 'Apartment'
 		--SELECT ClientName,Direct,BTC,Id From  WRBHBCheckInHdr    
 		--WHERE Id=@CheckInHdrId AND IsActive=1 AND IsDeleted=0  
    
-		SELECT ClientName,@TariffPaymentMode as TariffPaymentMode,@ServicePaymentMode as ServicePaymentMode,  
+		SELECT ClientName,ClientId,CityId,ServiceCharge as ServiceChargeChk,@TariffPaymentMode as TariffPaymentMode,@ServicePaymentMode as ServicePaymentMode,  
 		Id From  WRBHBCheckInHdr    
 		WHERE Id=@CheckInHdrId AND IsActive=1 AND IsDeleted=0  
 		--Day Count  

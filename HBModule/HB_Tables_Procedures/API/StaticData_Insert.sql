@@ -30,8 +30,8 @@ CREATE PROCEDURE [dbo].[Sp_StaticData_Insert](
 --@AlternateName   NVARCHAR(100),    
 @DateUpdated   NVARCHAR(100),    
 @State     NVARCHAR(100),    
---@Latitude    NVARCHAR(100),    
---@Longitude    NVARCHAR(100),    
+@Latitude    NVARCHAR(100),    
+@Longitude    NVARCHAR(100),    
 @Email     NVARCHAR(100),    
 --@Fax     NVARCHAR(100),    
 --@Mobile     NVARCHAR(100),    
@@ -42,7 +42,7 @@ CREATE PROCEDURE [dbo].[Sp_StaticData_Insert](
 @CheckInTime   NVARCHAR(100),    
 --@Contact    NVARCHAR(100),    
 --@Currency    NVARCHAR(100),    
-@Description   NVARCHAR(MAX),    
+@Description   NVARCHAR(250),    
 @HotalName    NVARCHAR(100),    
 --@Overallrating   NVARCHAR(100),    
 --@Recommended   NVARCHAR(100),    
@@ -52,21 +52,43 @@ CREATE PROCEDURE [dbo].[Sp_StaticData_Insert](
 @WebAddress    NVARCHAR(100),    
 @TwentyFourHourCheckinAllowed NVARCHAR(100),    
 @Image     NVARCHAR(MAX),    
-@Amenity    NVARCHAR(100)=NULL ,
+--@Amenity    NVARCHAR(100)=NULL ,
 @HotelCount   INT
 )     
 AS    
 BEGIN    
- --INSERT   
- INSERT INTO WRBHBStaticHotels(HotalId,Area,City,CityCode,Country,CountryCode,
- Line1,Line2,Pincode,DateUpdated,State,Email,ContactPerson,Phone,CheckOutTime,
- CheckInTime,Description,HotalName,StarRating,TwentyFourHourCheckinAllowed,    
- WebAddress,Image,Amenity,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,    
- IsActive,IsDeleted,RowId,HotelCount)
- VALUES(@HotalId,@Area,@City,@CityCode,@Country,@CountryCode,@Line1,    
- @Line2,@Pincode,@DateUpdated,@State,@Email,@ContactPerson,@Phone,@CheckOutTime,
- @CheckInTime,@Description,@HotalName,@StarRating,@TwentyFourHourCheckinAllowed,    
- @WebAddress,@Image,@Amenity,0,GETDATE(),0,GETDATE(),1,0,NEWID(),@HotelCount);     
- SELECT Id,RowId FROM WRBHBStaticHotels WHERE Id=@@IDENTITY;    
+ --INSERT
+ IF EXISTS (SELECT NULL FROM WRBHBStaticHotels WHERE IsActive = 1 AND 
+ IsDeleted = 0 AND CityCode = @CityCode AND HotalId = @HotalId)
+  BEGIN
+   UPDATE WRBHBStaticHotels SET Area = @Area,City = @City,Country = @Country,
+   CountryCode = @CountryCode, Line1 = @Line1,Line2 = @Line2,Pincode = @Pincode,
+   DateUpdated = @DateUpdated,State = @State,Email = @Email,
+   ContactPerson = @ContactPerson,Phone = @Phone,CheckOutTime = @CheckOutTime,
+   CheckInTime = @CheckInTime,Description = @Description,
+   HotalName = @HotalName,StarRating = @StarRating,
+   TwentyFourHourCheckinAllowed = @TwentyFourHourCheckinAllowed,
+   WebAddress = @WebAddress,Image = @Image,ModifiedDate = GETDATE(),
+   Latitude = @Latitude,Longitude = @Longitude
+   WHERE IsActive = 1 AND IsDeleted = 0 AND CityCode = @CityCode AND 
+   HotalId = @HotalId;
+   SELECT Id,RowId FROM WRBHBStaticHotels
+   WHERE IsActive = 1 AND IsDeleted = 0 AND CityCode = @CityCode AND 
+   HotalId = @HotalId;
+  END
+ ELSE
+  BEGIN
+   INSERT INTO WRBHBStaticHotels(HotalId,Area,City,CityCode,Country,CountryCode,
+   Line1,Line2,Pincode,DateUpdated,State,Email,ContactPerson,Phone,CheckOutTime,
+   CheckInTime,Description,HotalName,StarRating,TwentyFourHourCheckinAllowed,
+   WebAddress,Image,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,
+   IsActive,IsDeleted,RowId,HotelCount,Latitude,Longitude)
+   VALUES(@HotalId,@Area,@City,@CityCode,@Country,@CountryCode,@Line1,
+   @Line2,@Pincode,@DateUpdated,@State,@Email,@ContactPerson,@Phone,
+   @CheckOutTime,@CheckInTime,@Description,@HotalName,@StarRating,
+   @TwentyFourHourCheckinAllowed,@WebAddress,@Image,0,GETDATE(),0,GETDATE(),
+   1,0,NEWID(),@HotelCount,@Latitude,@Longitude);
+   SELECT Id,RowId FROM WRBHBStaticHotels WHERE Id = @@IDENTITY;
+  END
 END
     

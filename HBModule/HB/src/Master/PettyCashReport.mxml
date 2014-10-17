@@ -415,9 +415,13 @@
 				{
 					useWeb("PettyCashReport","Gridload_CUSTOM",[GlobalXml,"GRIDLOAD",PropertyId,UserId,"First",MFromDate]);
 				}
-				else
+				else if(Rbtn_Second.selected==true)
 				{
 					useWeb("PettyCashReport","Gridload_CUSTOM",[GlobalXml,"GRIDLOAD",PropertyId,UserId,"Second",MFromDate]);
+				}
+				else if(Rbtn_All.selected==true)
+				{
+					useWeb("PettyCashReport","Gridload_CUSTOM",[GlobalXml,"GRIDLOAD",PropertyId,UserId,"All",MFromDate]);
 				}
 				Grd_Details.visible=true;
 			}
@@ -494,18 +498,19 @@
 								  onselection="{GuestNameLoad()}" pxSetColumnsWidth="0,200">
 			</WrbHelpComp:HelpText>
 			
-			<mx:DateChooser id="dt_Date1" visible="true" x="343" y="73" height="31"
+			<mx:DateChooser id="dt_Date1" visible="true" x="333" y="73" height="31"
 							focusEnabled="false" selectedDate="{new Date()}" 
 							yearNavigationEnabled="true" selectableRange="{{rangeEnd: new Date()}}" />
-			<s:BorderContainer x="344" y="104" width="183" height="21" backgroundColor="#fbf9f9"
+			<s:BorderContainer x="334" y="104" width="183" height="21" backgroundColor="#fbf9f9"
 							   borderVisible="false" depth="4">
 				</s:BorderContainer>
 				
 			
-			<s:BorderContainer id="brd_Rbtn_Deposite" x="573" y="74" width="224" height="34" 
+			<s:BorderContainer id="brd_Rbtn_Deposite" x="529" y="76" width="269" height="34" 
 							   borderVisible="false" visible="true">
-				<s:RadioButton id="Rbtn_First" x="4" y="0" label="First Fortnight" selected="true"/>
-				<s:RadioButton id="Rbtn_Second" x="105" y="0" label="Second Fortnight"/>
+				<s:RadioButton id="Rbtn_All" x="4" y="0" label="All" selected="true"/>
+				<s:RadioButton id="Rbtn_First" x="44" y="0" label="First Fortnight" />
+				<s:RadioButton id="Rbtn_Second" x="145" y="0" label="Second Fortnight"/>
 			</s:BorderContainer>
 			
 			<mx:Label x="83" y="40" text="Property"/>

@@ -25,7 +25,7 @@ CREATE PROCEDURE [dbo].[Sp_VendorSettlementInvoiceAmount_Insert](
 @PropertyId		BIGINT,  
 @InvoiceId		BIGINT,  
 @InvoiceNo		NVARCHAR(100),  
-@InvoiceDate	DATE,  
+@InvoiceDate	NVARCHAR(100),  
 @InvoiceAmount	DECIMAL(27,2),  
 @Status			NVARCHAR(100),  
 @POCount		NVARCHAR(100),  
@@ -44,10 +44,10 @@ BEGIN
    
  SELECT @HdrId=@@IDENTITY  
 END  
-  
+ 
 INSERT INTO WRBHBVendorSettlementInvoiceAmount(VendorSettlementHdId,InvoiceId,InvoiceNo,InvoiceDate,InvoiceAmount,  
 Status,POCount,Adjusment,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate, IsActive,IsDeleted,RowId,Flag)  
-VALUES(@HdrId,@InvoiceId,@InvoiceNo,@InvoiceDate,@InvoiceAmount,  
+VALUES(@HdrId,@InvoiceId,@InvoiceNo,convert(date,@InvoiceDate,103),@InvoiceAmount,  
 @Status,@POCount,@Adjusment,@CreatedBy,GETDATE(),@CreatedBy,GETDATE(),1,0,NEWID(),@Flag)  
   
 SELECT @HdrId   

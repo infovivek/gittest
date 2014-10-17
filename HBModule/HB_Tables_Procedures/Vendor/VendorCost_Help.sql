@@ -43,16 +43,30 @@ BEGIN
 			FROM WRBHBVendorCost
 			WHERE IsActive=1 AND IsDeleted=0 AND VendorId=@Id
 			
-			SELECT DISTINCT ProductName AS ServiceItem,ItemId,Cost,Id,Flag 
-			FROM WRBHBVendorCost
-			WHERE IsActive=1 AND IsDeleted=0 AND VendorId=@Id
+			CREATE TABLE #Products(ServiceItem NVARCHAR(100),ItemId INT,Cost DECIMAL(27,2),Id INT,Flag INT)
+		    INSERT INTO #Products(ServiceItem,ItemId,Cost,Id,Flag)
+			
+			SELECT DISTINCT ProductName,ItemId,Cost,Id,Flag
+			FROM WRBHBVendorCost 
+			WHERE IsActive=1 AND IsDeleted=0 AND VendorId=8
+			
+			CREATE TABLE #Product2(ServiceItem NVARCHAR(100),ItemId INT,Cost DECIMAL(27,2),Id INT,Flag INT)
+			INSERT INTO #Product2(ServiceItem,ItemId,Cost,Id,Flag)
+		    SELECT ProductName AS ServiceItem,Id AS ItemId,0 As Cost,0 AS Id,0 AS Flag 
+		    FROM WRBHBContarctProductMaster
+		    WHERE IsActive=1 AND IsDeleted=0 AND TypeService='Food And Beverages';
 		    
-			--History
-		   
-			SELECT DISTINCT ISNULL(CONVERT(NVARCHAR(100),EffectiveFrom,103),'') AS EffectiveFrom,
+		    SELECT DISTINCT P1.ServiceItem,ISNULL(P1.ItemId,0) AS ItemId,ISNULL(P.Cost,0) AS Cost,
+		    ISNULL(P.Id,0) AS Id,ISNULL(P.Flag ,0) AS Flag
+		    FROM #Product2 P1
+		    LEFT OUTER JOIN #Products P ON P1.ItemId=P.ItemId
+		    ORDER BY ServiceItem
+		    
+		   	--History
+		   	SELECT DISTINCT ISNULL(CONVERT(NVARCHAR(100),EffectiveFrom,103),'') AS EffectiveFrom,
 			ISNULL(CONVERT(NVARCHAR(100),EffectiveTo,103),'') AS EffectiveTo,'History' AS History 
 			FROM WRBHBVendorCost 
-			WHERE  VendorId=@Id;
+			WHERE  VendorId=8;
 	    
 	  END
 	  ELSE

@@ -88,25 +88,57 @@ IF @Action = 'SingleDoubleRateLoad'
  END
 IF @Action = 'CityCode'
  BEGIN
-  SELECT dbo.TRIM(CityCode) FROM WRBHBAPICityCode 
-  WHERE ISNULL(CityCode,'') != '' --AND Id > 651
-  ORDER BY Id ASC;
+  select 'SRS';
+  /*create table #dffd(cc nvarchar(100));
+  insert into #dffd(cc)
+  select CityCode from WRBHBAPICityCode
+  where CityCode not in (select CityCode from WRBHBStaticHotels123
+  group by CityCode);
+  select cc from #dffd;*/
+  /*SELECT dbo.TRIM(CityCode) FROM WRBHBAPICityCode 
+  WHERE ISNULL(CityCode,'') != '' --AND Id > 628
+  ORDER BY Id ASC;*/
   --SELECT CityCode FROM WRBHBAPICityCode WHERE Id=267;
   --SELECT 'TCC';
   --SELECT 'NYT';  
-  --SELECT * FROM WRBHBAPICityCode WHERE CityCode='NYT'  
+  --SELECT * FROM WRBHBAPICityCode WHERE CityCode='NYT'
+  --SELECT 'XSL';
  END 
 IF @Action = 'GetCityId'
  BEGIN
   /*SELECT Id FROM WRBHBCity 
   WHERE ISNULL(CityCode,'') != '' AND IsActive=1 AND IsDeleted=0
   ORDER BY Id ASC;*/
-  --
-  --SELECT Id FROM WRBHBCity WHERE citycode IN ('DEL','JAI');
-  --
-  --SELECT 1107 AS Id; BANGLORE
-  SELECT 0 AS Id; -- COIMBATORE
+  --SELECT 1107 AS Id; --BANGLORE
+  --SELECT 2423 AS Id; --COIMBATORE
   --SELECT * FROM WRBHBCity WHERE CityCode='CJB'
   --SELECT * FROM WRBHBCity WHERE CityCode='BLR'
+  SELECT 0 AS Id;
+  /*---------------
+  select a.CityCode,a.CityId,count(b.HotelCount),b.HotelCount,a.IsActive 
+  from WRBHBAPIHeader a
+  left outer join WRBHBAPIHotelHeader b on b.HeaderId=a.Id
+  group by a.CityCode,a.CityId,b.HotelCount,a.IsActive;
+  --------------
+  select * from WRBHBAPIHeader
+  select * from WRBHBAPIHotelHeader
+  select * from WRBHBAPIRateMealPlanInclusionDtls
+  select * from WRBHBAPIRoomRateDtls
+  select * from WRBHBAPIRoomTypeDtls
+  select * from WRBHBAPITariffDtls
+  /*truncate table WRBHBAPIHeader
+  truncate table WRBHBAPIHotelHeader
+  truncate table WRBHBAPIRateMealPlanInclusionDtls
+  truncate table WRBHBAPIRoomRateDtls
+  truncate table WRBHBAPIRoomTypeDtls
+  truncate table WRBHBAPITariffDtls*/
+  -------------
+  select count(*) from WRBHBAPIHeader--581
+  select count(*) from WRBHBAPIHotelHeader--11162
+  select COUNT(*) from WRBHBAPIRateMealPlanInclusionDtls--25924
+  select COUNT(*) from WRBHBAPIRoomRateDtls--25924
+  select COUNT(*) from WRBHBAPIRoomTypeDtls--21224
+  select COUNT(*) from WRBHBAPITariffDtls--117572
+  -------------*/
  END 
 END

@@ -330,7 +330,8 @@ IF @Action = 'RoomBookingConfirmed'
    END  
   -- dataset table 4
   SELECT CAST(EmailtoGuest AS INT),
-  'D:/admonk/Backend/flex_bin/Company_Images/Proof_of_Stay.pdf',
+  'D:/Backend/flex_bin/Company_Images/Proof_of_Stay.pdf',
+  --'D:/admonk/Backend/flex_bin/Company_Images/Proof_of_Stay.pdf',
   'Proof_of_Stay.pdf',@PName,@MobileNo,@SecurityPolicy,
   @CancelationPolicy,@Taxes FROM WRBHBBooking WHERE Id=@Id;
   -- dataset table 5

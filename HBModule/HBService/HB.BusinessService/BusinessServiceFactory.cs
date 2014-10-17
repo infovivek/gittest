@@ -347,6 +347,12 @@ namespace HB.BusinessService
                 case "PendingCkinReport":
                     _businessService = new PendingCkinReportService();
                     break;
+                case "CheckoutAndIntermediate":
+                    _businessService = new CheckoutAndIntermediateService();
+                    break;
+                case "TodaysCheckinCheckout":
+                    _businessService = new TodaysCheckinCheckoutService();
+                    break;
             }
             return _businessService;
         }

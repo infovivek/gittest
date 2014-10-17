@@ -23,11 +23,17 @@ CREATE PROCEDURE [dbo].[SP_RoomShifting_Insert](@BookingId BIGINT,
 @FromRoomId INT,@ToRoomId INT,@ChkInDt NVARCHAR(100),
 @ChkOutDt NVARCHAR(100),@ToRoomNo NVARCHAR(100),
 @BookingLevel NVARCHAR(100),@UsrId BIGINT,@RoomCaptured INT,
-@CurrentStatus NVARCHAR(100))
+@CurrentStatus NVARCHAR(100),@TariffMode NVARCHAR(100),
+@ServiceMode NVARCHAR(100))
 AS
 BEGIN
 IF @BookingLevel = 'Room'
  BEGIN
+  -- UPDATE PAYMENT MODE
+  UPDATE WRBHBBookingPropertyAssingedGuest SET TariffPaymentMode = @TariffMode,
+  ServicePaymentMode = @ServiceMode WHERE BookingId = @BookingId AND
+  RoomCaptured = @RoomCaptured;
+  --
   DECLARE @PropertyType NVARCHAR(100) = '';
   SELECT TOP 1 @PropertyType = BP.PropertyType FROM WRBHBBookingProperty BP
   LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
@@ -66,7 +72,9 @@ IF @BookingLevel = 'Room'
      WHERE Id IN (SELECT Id FROM #AssignedGuestTableId);
      -- Update existing entry
      UPDATE WRBHBBookingPropertyAssingedGuest SET IsActive=0,IsDeleted=1,
-     ModifiedBy=@UsrId,ModifiedDate=GETDATE(),CancelRemarks='Room Shifting',
+     ModifiedBy=@UsrId,ModifiedDate=GETDATE(),
+     CancelRemarks='Room Shifting'+','+@ChkInDt+','+@ChkOutDt+','+
+     @TariffMode+','+@ServiceMode,
      RoomShiftingFlag=1 WHERE Id IN (SELECT Id FROM #AssignedGuestTableId);
     END
    END
@@ -104,7 +112,10 @@ IF @BookingLevel = 'Room'
         WHERE Id IN (SELECT Id FROM #AssignedGuestTableId);
         -- Update existing entry
         UPDATE WRBHBBookingPropertyAssingedGuest SET IsActive=0,IsDeleted=1,
-        ModifiedBy=@UsrId,ModifiedDate=GETDATE(),CancelRemarks='Room Shifting',
+        ModifiedBy=@UsrId,ModifiedDate=GETDATE(),
+        CancelRemarks='Room Shifting'+','+@ChkInDt+','+@ChkOutDt+','+
+        @TariffMode+','+@ServiceMode+','+CAST(@FromRoomId AS VARCHAR)+','+
+        CAST(@ToRoomId AS VARCHAR),
         RoomShiftingFlag=1
         WHERE Id IN (SELECT Id FROM #AssignedGuestTableId);
        END
@@ -138,7 +149,10 @@ IF @BookingLevel = 'Room'
         WHERE Id IN (SELECT Id FROM #AssignedGuestTableId);
         -- Update existing entry
         UPDATE WRBHBBookingPropertyAssingedGuest SET ModifiedBy=@UsrId,
-        ModifiedDate=GETDATE(),CancelRemarks='Room Shifting',RoomShiftingFlag=1,
+        ModifiedDate=GETDATE(),RoomShiftingFlag=1,
+        CancelRemarks='Room Shifting'+','+@ChkInDt+','+@ChkOutDt+','+
+        @TariffMode+','+@ServiceMode+','+CAST(@FromRoomId AS VARCHAR)+','+
+        CAST(@ToRoomId AS VARCHAR),
         ChkOutDt=CONVERT(DATE,@ChkInDt,103)
         WHERE Id IN (SELECT Id FROM #AssignedGuestTableId);
         -- Same CheckIn date is inactive room

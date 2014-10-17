@@ -88,24 +88,26 @@
 					var arrExportResult:ArrayCollection = Grd_BookingDtls.dataProvider as ArrayCollection;
 					var xlsFile:ExcelFile = new ExcelFile();
 					var sheet:Sheet = new Sheet();					
-					sheet.resize(arrExportResult.length+1,17);					
+					sheet.resize(arrExportResult.length+1,19);					
 					sheet.setCell(0,0,'SNo');
 					sheet.setCell(0,1,'BookingCode');
 					sheet.setCell(0,2,'MasterClientName');
 					sheet.setCell(0,3,'ClientName');
 					sheet.setCell(0,4,'CRMName');
-					sheet.setCell(0,5,'PropertyName');
-					sheet.setCell(0,6,'GuestName');
-					sheet.setCell(0,7,'CheckInDt');
-					sheet.setCell(0,8,'CheckOutDt');
-					sheet.setCell(0,9,'StayDays');
-					sheet.setCell(0,10,'Tariff / Day');
-					sheet.setCell(0,11,'Total Tariff');
-					sheet.setCell(0,12,'Booking Level');
-					sheet.setCell(0,13,'Tariff Payment Mode');					
-					sheet.setCell(0,14,'Status');
-					sheet.setCell(0,15,'UserName');
-					sheet.setCell(0,16,'BookingDate');					
+					sheet.setCell(0,5,'Property Name');
+					sheet.setCell(0,6,'Property Category');
+					sheet.setCell(0,7,'City');					
+					sheet.setCell(0,8,'GuestName');
+					sheet.setCell(0,9,'CheckInDt');
+					sheet.setCell(0,10,'CheckOutDt');
+					sheet.setCell(0,11,'StayDays');
+					sheet.setCell(0,12,'Tariff / Day');
+					sheet.setCell(0,13,'Total Tariff');
+					sheet.setCell(0,14,'Booking Level');
+					sheet.setCell(0,15,'Tariff Payment Mode');					
+					sheet.setCell(0,16,'Status');
+					sheet.setCell(0,17,'UserName');
+					sheet.setCell(0,18,'BookingDate');					
 					for(var i:int = 0; i < arrExportResult.length; i++)
 					{
 						sheet.setCell(i+1, 0, arrExportResult[i].SNo);
@@ -114,17 +116,19 @@
 						sheet.setCell(i+1, 3, arrExportResult[i].ClientName);
 						sheet.setCell(i+1, 4, arrExportResult[i].CRMName);
 						sheet.setCell(i+1, 5, arrExportResult[i].PropertyName);
-						sheet.setCell(i+1, 6, arrExportResult[i].GuestName);
-						sheet.setCell(i+1, 7, arrExportResult[i].CheckInDt);
-						sheet.setCell(i+1, 8, arrExportResult[i].CheckOutDt);
-						sheet.setCell(i+1, 9, arrExportResult[i].StayDays);
-						sheet.setCell(i+1, 10, arrExportResult[i].Tariff);
-						sheet.setCell(i+1, 11, arrExportResult[i].TotalTariff);
-						sheet.setCell(i+1, 12, arrExportResult[i].BookingLevel);
-						sheet.setCell(i+1, 13, arrExportResult[i].TariffPaymentMode);
-						sheet.setCell(i+1, 14, arrExportResult[i].Status);
-						sheet.setCell(i+1, 15, arrExportResult[i].UserName);
-						sheet.setCell(i+1, 16, arrExportResult[i].BookingDate);
+						sheet.setCell(i+1, 6, arrExportResult[i].PropertyCategory);
+						sheet.setCell(i+1, 7, arrExportResult[i].City);
+						sheet.setCell(i+1, 8, arrExportResult[i].GuestName);
+						sheet.setCell(i+1, 9, arrExportResult[i].CheckInDt);
+						sheet.setCell(i+1, 10, arrExportResult[i].CheckOutDt);
+						sheet.setCell(i+1, 11, arrExportResult[i].StayDays);
+						sheet.setCell(i+1, 12, arrExportResult[i].Tariff);
+						sheet.setCell(i+1, 13, arrExportResult[i].TotalTariff);
+						sheet.setCell(i+1, 14, arrExportResult[i].BookingLevel);
+						sheet.setCell(i+1, 15, arrExportResult[i].TariffPaymentMode);
+						sheet.setCell(i+1, 16, arrExportResult[i].Status);
+						sheet.setCell(i+1, 17, arrExportResult[i].UserName);
+						sheet.setCell(i+1, 18, arrExportResult[i].BookingDate);
 					}
 					xlsFile.sheets.addItem(sheet);      
 					var bytes:ByteArray = xlsFile.saveToByteArray();
@@ -201,8 +205,8 @@
 	<fx:Script source = "..\\Common\\Functions.as"/>
 	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
 	<s:VGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
-		<s:BorderContainer width="100%" height="100%" backgroundColor="#fbf9f9" borderVisible="false">
-			<mx:DataGrid id="Grd_BookingDtls" x="0" y="55" width="100%" height="100%"
+		<s:BorderContainer width="1000" height="100%" backgroundColor="#fbf9f9" borderVisible="false">
+			<mx:DataGrid id="Grd_BookingDtls" x="0" y="53" width="100%" height="100%"
 						 horizontalScrollPolicy="off">
 				<mx:columns>
 					<mx:DataGridColumn width="50" dataField="SNo"/>
@@ -211,6 +215,8 @@
 					<mx:DataGridColumn dataField="ClientName"/>
 					<mx:DataGridColumn dataField="CRMName"/>
 					<mx:DataGridColumn dataField="PropertyName"/>
+					<mx:DataGridColumn dataField="PropertyCategory"/>
+					<mx:DataGridColumn dataField="City"/>
 					<mx:DataGridColumn dataField="GuestName"/>
 					<mx:DataGridColumn dataField="CheckInDt"/>
 					<mx:DataGridColumn dataField="CheckOutDt"/>
@@ -227,19 +233,18 @@
 			<WrbHelpComp:HelpText id="Hlp_ClientName" x="66" y="17.5" width="200" height="23"
 								  onselection="{FnOnselection_Client()}" pxSetColumnsWidth="198,0"/>
 			<mx:Label x="10" y="18.5" text="Client"/>
-			<s:HGroup x="274" y="13" width="640" height="32" horizontalAlign="center" 
-					  verticalAlign="middle" gap="20">
-				<mx:Label text="From Date"/>
-				<mx:DateField id="Dt_FromDt" change="Dt_FromDt_changeHandler(event)"
-							  formatString="DD/MM/YYYY"/>
-				<mx:Label text="To Date"/>
-				<mx:DateField id="Dt_ToDt" formatString="DD/MM/YYYY"/>
-				<WrbComp:Button_BB id="Btn_Show" _Label="Show" click="Btn_Show_clickHandler(event)"/>
-				<WrbComp:Button_BB id="Btn_ExporttoExcel" width="100" _Label="Export to Excel"
-								   click="Btn_ExporttoExcel_clickHandler(event)"/>
-				<s:Image buttonMode="true" source="@Embed(source='../Assets/Warning2.png')"
-						 toolTip="Recommend to have 30 days search for quicker results"/>
-			</s:HGroup>
+			<s:Image x="958" y="13" buttonMode="true" source="@Embed(source='../Assets/Warning2.png')"
+					 toolTip="Recommend to have 30 days search for quicker results"/>
+			<WrbComp:Button_BB id="Btn_ExporttoExcel" x="825" y="13" width="100"
+							   _Label="Export to Excel"
+							   click="Btn_ExporttoExcel_clickHandler(event)"/>
+			<WrbComp:Button_BB id="Btn_Show" x="711" y="13" _Label="Show"
+							   click="Btn_Show_clickHandler(event)"/>
+			<mx:DateField id="Dt_ToDt" x="574" y="17.5" formatString="DD/MM/YYYY"/>
+			<mx:Label x="511" y="18.5" text="To Date"/>
+			<mx:DateField id="Dt_FromDt" x="376" y="17.5" change="Dt_FromDt_changeHandler(event)"
+						  formatString="DD/MM/YYYY"/>
+			<mx:Label x="298" y="18.5" text="From Date"/>
 		</s:BorderContainer>
 	</s:VGroup>
 </s:Application>

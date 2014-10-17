@@ -104,12 +104,13 @@
 				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Apartment',2027]);
 				//useWeb("BookingMail","RecommendMail_CUSTOM",[GlobalXml,'Recommend',1722]);
 				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'MMT',4]);				
-				//var ChkInDt:String="2014-11-25 12:00:00 PM";
-				//var ChkOutDt:String="2014-11-26 12:00:00 PM";
+				//var ChkInDt:String="2014-11-14 12:00:00 PM";
+				//var ChkOutDt:String="2014-11-15 12:00:00 PM";
 				//CityId=2905;
 				//CityId = 1107;
 				//CityId = 0;
-				//useWeb("API","API_CUSTOM",[GlobalXml,'GetAPIdata',CityId,ChkInDt,ChkOutDt]);				
+				//useWeb("API","API_CUSTOM",[GlobalXml,'GetAPIdata',CityId,ChkInDt,ChkOutDt]);
+				//useWeb("API","123_CUSTOM",[GlobalXml,'StaticData']);				
 				//useWeb("API","MMT_CUSTOM",[GlobalXml,'MMTdata','','','','',31,0,0,0]);				
 				//StringValid.source("s!a@");
 				/*var dsfsd:String=",@#$%^";
@@ -440,7 +441,7 @@
 						Ac_Gst1=Grd_Guest._getGridSrc as ArrayCollection;
 						// again pre load in MMT
 						useWeb("BOOKING","Tab3_to_Tab2_CUSTOM",[GlobalXml,'Property',GradeName,GuestIds,
-							ChkInDt,ChkOutDt,APIHdrId,CityId,ClientId,Ac_Gst1.length,GradeId,Id,123]);
+							ChkInDt,ChkOutDt,APIHdrId,CityId,ClientId,Ac_Gst1.length,GradeId,BookedId,123]);
 						//
 						//alignAlert(Alert.show("No Rooms Avaliable.","Alert Message !",Alert.OK,null,null,iconWarning,Alert.OK),10,"");
 						alignAlert(Alert.show(Ds_Objects.result.Tables.Table.Rows[0].Strg,"Alert Message !",Alert.OK,
@@ -3135,7 +3136,8 @@
 					I = DataGridItemRenderer(event.itemRenderer).data.Inclusions;
 					M = DataGridItemRenderer(event.itemRenderer).data.MealPlan;
 					T = DataGridItemRenderer(event.itemRenderer).data.PropertyType;
-					if(T == "ExP")
+					//if(T == "ExP")
+					if(T != "MMT")
 					{
 						if (I == "")
 						{
@@ -3175,7 +3177,8 @@
 					I = DataGridItemRenderer(event.itemRenderer).data.Inclusions;
 					M = DataGridItemRenderer(event.itemRenderer).data.MealPlan;
 					T = DataGridItemRenderer(event.itemRenderer).data.PropertyType;
-					if(T == "ExP")
+					//if(T == "ExP")
+					if(T != "MMT")
 					{
 						if (I == "")
 						{

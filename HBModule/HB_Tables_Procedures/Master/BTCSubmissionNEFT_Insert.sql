@@ -23,6 +23,7 @@ GO
 */
 CREATE PROCEDURE [dbo].[Sp_BTCSubmissionNEFT_Insert]
 (
+@ClientId			INT,
 @Amount				DECIMAL(27,2),
 @ReferenceNo		NVARCHAR(100),
 @Bank				NVARCHAR(100),
@@ -34,8 +35,11 @@ CREATE PROCEDURE [dbo].[Sp_BTCSubmissionNEFT_Insert]
 AS
 BEGIN
 INSERT INTO WRBHBBTCSubmissionNEFT(Amount,ReferenceNo,BankName,DateOfNEFT,Comments,IsActive,IsDeleted,CreatedBy,CreatedDate,
-			ModifiedBy,ModifiedDate,RowId,Mode)
-VALUES (@Amount,@ReferenceNo,@Bank,@NEFTDate,@Comments,1,0,@CreatedBy,GETDATE(),@CreatedBy,GETDATE(),NEWID(),@Mode)
+			ModifiedBy,ModifiedDate,RowId,Mode,ClientId)
+VALUES (@Amount,@ReferenceNo,@Bank,@NEFTDate,@Comments,1,0,@CreatedBy,GETDATE(),@CreatedBy,GETDATE(),NEWID(),@Mode,@ClientId)
 		
- SELECT Id,RowId FROM WRBHBBTCSubmissionNEFT WHERE Id=@@IDENTITY;		
+ SELECT Id,RowId FROM WRBHBBTCSubmissionNEFT WHERE Id=@@IDENTITY;	
+ 
+ UPDATE WRBHBBTCSubmission SET CollectionStatus='NEFT Payment',Mode=@Mode,ModeId=@@IDENTITY
+ WHERE ClientId=@ClientId AND CollectionStatus='Submitted'		
 END		

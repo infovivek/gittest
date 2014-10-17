@@ -45,6 +45,7 @@
     <Compile Include="ApartmentBookingProperty.cs" />
     <Compile Include="ApartmentBookingPropertyAssignedGuest.cs" />
     <Compile Include="APIDynamic.cs" />
+    <Compile Include="APIStaticData.cs" />
     <Compile Include="ApprovedPettyCash.cs" />
     <Compile Include="BedBookingProperty.cs" />
     <Compile Include="BedBookingPropertyAssignedGuest.cs" />
@@ -56,6 +57,7 @@
     <Compile Include="BTCSubmission.cs" />
     <Compile Include="ChangePassword.cs" />
     <Compile Include="CheckInDtls.cs" />
+    <Compile Include="CheckoutAndIntermediate.cs" />
     <Compile Include="CheckOutPayment.cs" />
     <Compile Include="CheckOutPaymentCard.cs" />
     <Compile Include="CheckOutPaymentCash.cs" />

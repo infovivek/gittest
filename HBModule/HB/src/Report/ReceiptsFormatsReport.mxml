@@ -126,7 +126,7 @@
 					
 					sheet.setCell(0,0,'SNo');
 					sheet.setCell(0,1,'BookingType');
-					sheet.setCell(0,2,'BookingId');
+					sheet.setCell(0,2,'BookingCode');
 					sheet.setCell(0,3,'BillId');
 					sheet.setCell(0,4,'InVoiceNo');
 					sheet.setCell(0,5,'PropertyName');
@@ -150,7 +150,7 @@
 					{
 						sheet.setCell(i+1, 0, arrExportResult[i].SNo);
 						sheet.setCell(i+1, 1, arrExportResult[i].BookingType);
-						sheet.setCell(i+1, 2, arrExportResult[i].BookingId);
+						sheet.setCell(i+1, 2, arrExportResult[i].BookingCode);
 						sheet.setCell(i+1, 3, arrExportResult[i].BillId);
 						sheet.setCell(i+1, 4, arrExportResult[i].InVoiceNo);
 						sheet.setCell(i+1, 5, arrExportResult[i].PropertyName);
@@ -214,9 +214,9 @@
 		<mx:DataGrid id="Grd_Booking" x="0" y="70" width="1990" height="450"  editable="false" tabIndex="3"
 				 verticalAlign="middle">
 		<mx:columns>
-			<mx:DataGridColumn dataField="SNo" headerText="S.No" editable="false" width="40" textAlign="center"/>	
+			<mx:DataGridColumn dataField="SNo" headerText="SNo" editable="false" width="40" textAlign="center"/>	
 			<mx:DataGridColumn dataField="BookingType" headerText="BookingType" textAlign="right" visible="true" width="100" editable="false"/>
-			<mx:DataGridColumn dataField="BookingId" headerText="BookingCode" textAlign="center" visible="true" width="100" editable="false"/>
+			<mx:DataGridColumn dataField="BookingCode" headerText="BookingCode" textAlign="center" visible="true" width="100" editable="false"/>
 			<mx:DataGridColumn dataField="BillId" headerText="BillId"  width="100" editable="false" textAlign="center" visible="true"/>
 			<mx:DataGridColumn dataField="InVoiceNo" headerText="InVoiceNo"  width="100" editable="false" textAlign="center" visible="true"/>
 			<mx:DataGridColumn dataField="PropertyName" headerText="PropertyName"  width="150" textAlign="right" editable="false" visible="true"/>
@@ -230,7 +230,7 @@
 			<mx:DataGridColumn dataField="NoOfDays" headerText="NoOfDays" textAlign="center" editable="false" visible="true"   width="100" />
 			<mx:DataGridColumn dataField="TotalAmount" headerText="TotalAmount" textAlign="left" editable="false" visible="true"   width="100" />
 			<mx:DataGridColumn dataField="PaymentMode" headerText="PaymentMode" textAlign="left" editable="false" visible="true"   width="100" />
-			<mx:DataGridColumn dataField="BillDate" headerText="PaymentDate" textAlign="right" editable="false" visible="true"   width="100" />
+			<mx:DataGridColumn dataField="BillDate" headerText="BillDate" textAlign="right" editable="false" visible="true"   width="100" />
 			<mx:DataGridColumn dataField="BillStartDate" headerText="BillStartDate" textAlign="center" editable="false" visible="true"   width="100" />
 			<mx:DataGridColumn dataField="BillEndDate" headerText="BillEndDate" textAlign="center" editable="false" visible="true"   width="100" />
 			<mx:DataGridColumn dataField="BillType" headerText="BillType" textAlign="right" editable="false" visible="true"   width="100" />

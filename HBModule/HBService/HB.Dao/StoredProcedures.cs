@@ -639,15 +639,15 @@ namespace HB.Dao
         public const string BTCSubmission_Search = "Sp_BTCSubmission_Select";
         public const string BTCSubmission_Delete = "SP_BTCSubmission_Delete";
 
-        public const string BTCSubmissionDetails_Save = "SP_BTCSubmissionDetails_Save";
-        public const string BTCSubmissionDetails_Update = "SP_BTCSubmissionDetails_Update";
+       // public const string BTCSubmissionDetails_Save = "SP_BTCSubmissionDetails_Save";
+        //public const string BTCSubmissionDetails_Update = "SP_BTCSubmissionDetails_Update";
 
         public const string BTCSubmissionCash_Insert = "Sp_BTCSubmissionCash_Insert";
         public const string BTCSubmissionCard_Insert = "Sp_BTCSubmissionCard_Insert";
         public const string BTCSubmissionCheque_Insert = "Sp_BTCSubmissionCheque_Insert";
         public const string BTCSubmissionNEFT_Insert = "Sp_BTCSubmissionNEFT_Insert";
 
-        public const string BTCSubmissionDetails_Insert = "Sp_BTCSubmissionModeDetail_Insert";
+      //  public const string BTCSubmissionDetails_Insert = "Sp_BTCSubmissionModeDetail_Insert";
 
 
         // API
@@ -729,8 +729,13 @@ namespace HB.Dao
         //External CheckOutTAC MAil
         public const string ExternalCheckOutTariffMail_Report = "SP_ExternalCheckOutTariffMail_Report";
 
-
-        //External CheckOutTAC MAil
         public const string  PendingChkinReport_Help = "Sp_PendingChkinReport_Help"; 
+       
+        //CheckoutIntemediate
+        public const string CheckoutIntermediate_Help = "Sp_CheckoutIntermediate_Help";
+        public const string CheckoutIntermediate_Insert = "Sp_CheckoutIntermediate_Insert";
+
+        //_TodaysCheckinChkout
+        public const String TodaysCheckinChkout_Help = "Sp_TodaysCheckinChkout_Help";
     }
 }

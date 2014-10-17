@@ -61,6 +61,7 @@
     <Compile Include="BookingPropertyBO.cs" />
     <Compile Include="BTCSubmissionBO.cs" />
     <Compile Include="CheckInDtlsBo.cs" />
+    <Compile Include="CheckoutAndIntermediateBO.cs" />
     <Compile Include="CheckOutPaymentBO.cs" />
     <Compile Include="CheckOutPaymentCardBO.cs" />
     <Compile Include="CheckOutPaymentCashBO.cs" />

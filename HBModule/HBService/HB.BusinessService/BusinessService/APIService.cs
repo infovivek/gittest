@@ -43,6 +43,10 @@ namespace HB.BusinessService.BusinessService
             {
                 ds = new APIAvailabilityExistingDataDAO().FnAvailabilityExistingData(data, user);
             }
+            if (data[1].ToString() == "StaticData")
+            {
+                ds = new APIStaticDataDAO().FnstaticData(user);
+            }
             return ds;
         }
     }

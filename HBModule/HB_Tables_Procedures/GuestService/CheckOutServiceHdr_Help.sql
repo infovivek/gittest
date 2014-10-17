@@ -206,7 +206,7 @@ BEGIN
 		KD.Id,KD.ItemId,'Food And Beverages' as ServiceType
 		FROM WRBHBNewKOTEntryDtl KD  
 		JOIN WRBHBNewKOTEntryHdr KH ON KD.NewKOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0  
-		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KH.GuestId=20223 AND BookingId=@BookingId ;
+		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KH.GuestId=@CheckInHdrId AND BookingId=@BookingId ;
 		
 		
 		SELECT VAT,RestaurantST,BusinessSupportST ,Cess,HECess --,'Food And Beverages' as Type  

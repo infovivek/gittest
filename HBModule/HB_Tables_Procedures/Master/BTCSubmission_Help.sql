@@ -27,13 +27,14 @@ IF @Action ='Client'
 BEGIN
 	SELECT ClientName ,Id ZId FROM WRBHBClientManagement
 	WHERE IsActive=1 AND IsDeleted=0 
-	--and id=857 
+	--and id=1528 
 	
 	SELECT FirstName,Id ZId FROM WRBHBUser WHERE IsActive=1 AND IsDeleted=0
 END	
 IF @Action ='Not Submitted'
 BEGIN
-	SELECT CONVERT(NVARCHAR,H.DepositedDate,103) as SubmittedDate,D.InvoiceNo InvoiceNo,BillType InvoiceType,CONVERT(NVARCHAR,R.CreatedDate,103) InvoiceDate,
+	SELECT CONVERT(NVARCHAR,H.DepositedDate,103) as SubmittedDate,D.InvoiceNo InvoiceNo,
+	BillType InvoiceType,CONVERT(NVARCHAR,R.CreatedDate,103) InvoiceDate,
 	'Not Submitted' CollectionStatus,D.ChkOutHdrId,D.ClientId,D.Id DepositDetilsId,
 	0 Id,0 checks
 	FROM WRBHBDeposits H
@@ -51,7 +52,8 @@ BEGIN
 	
 	INSERT INTO #TEMPSubmitted(SubmittedDate,InvoiceNo,InvoiceType,InvoiceDate,CollectionStatus,ChkOutHdrId,
 	ClientId,DepositDetilsId,Id,checks,Total)
-	SELECT CONVERT(NVARCHAR,H.DepositedDate,103) as SubmittedDate,D.InvoiceNo InvoiceNo,BillType InvoiceType,CONVERT(NVARCHAR,R.CreatedDate,103) InvoiceDate,
+	SELECT CONVERT(NVARCHAR,H.DepositedDate,103) as SubmittedDate,D.InvoiceNo InvoiceNo,
+	BillType InvoiceType,CONVERT(NVARCHAR,R.CreatedDate,103) InvoiceDate,
 	'Submitted' CollectionStatus,D.ChkOutHdrId,D.ClientId,D.Id DepositDetilsId,
 	0 Id,0 checks,R.ChkOutTariffTotal 
 	FROM WRBHBDeposits H
@@ -67,7 +69,7 @@ BEGIN
 	ClientId,ISNULL(DepositDetilsId,0),B.Id,0,COH.ChkOutTariffTotal
 	FROM WRBHBBTCSubmission B
 	JOIN WRBHBChechkOutHdr COH ON B.ChkOutHdrId=COH.Id 
-	WHERE B.IsActive=1 AND B.IsDeleted=0 AND CollectionStatus='Submitted'
+	WHERE B.IsActive=1 AND B.IsDeleted=0 AND CollectionStatus='Submitted' AND B.ClientId=@Param1
 	
 	SELECT SubmittedDate,InvoiceNo,InvoiceType,InvoiceDate,CollectionStatus,ChkOutHdrId,
 	ClientId,DepositDetilsId,Id,checks,Total FROM #TEMPSubmitted	

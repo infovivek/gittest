@@ -30,12 +30,12 @@
 			import WrbComp.frmsearchwindow;
 			
 			import spark.events.IndexChangeEvent;
-			public var ClientId:Number=0;
+			public var ClientId:int=0;
 			public static var Global_AC:ArrayCollection = new ArrayCollection();
 			public static var GlobalXml:String = "";
 			public var ErrorFlag:Boolean=true;
 			public var Ac:ArrayCollection=new ArrayCollection();
-			public var Id:Number=0;
+			public var Id:int=0;
 			public var BTCSId:Number=0;
 			public var BTCID_AC:ArrayCollection=new ArrayCollection();
 			private var SearchPopUp:frmsearchwindow = new frmsearchwindow();
@@ -70,13 +70,16 @@
 				GlobalXml += "</ROOT>";	
 				Grp_Submission.visible=false;
 				//Grp_Payment.visible=false;
+				
 				help();
 				init();	
 			}
 			private function help():void
-			{				
+			{	
+				Grd_Submission.dataProvider=null;
+				Grd_Submission1.dataProvider=null;
+				Grd_Submission2.dataProvider=null;
 				useWeb("BTCSubmission","Client_CUSTOM", [GlobalXml, "Client",0, 0,"","",""]);
-				
 			}
 			private function Custom_WebSer_Result (Ds_Objects:Object):void
 			{
@@ -174,7 +177,14 @@
 					}
 				}
 				Chk_Selectall.selected=flage;
-				btn_AddPayment.visible=true;
+				if(Drp_CollectionStatus.selectedIndex==1)
+				{
+					btn_AddPayment.visible=true;
+				}
+				else
+				{
+					btn_AddPayment.visible=false;
+				}
 			}			
 			protected function Chk_Selectall_changeHandler(event:Event):void
 			{
@@ -188,7 +198,14 @@
 					}
 					Grd_Submission.dataProvider=TempArr;
 				}				
-				btn_AddPayment.visible=true;
+				if(Drp_CollectionStatus.selectedIndex==1)
+				{
+					btn_AddPayment.visible=true;
+				}
+				else
+				{
+					btn_AddPayment.visible=false;
+				}
 			}
 			public function Search():void
 			{			
@@ -235,6 +252,20 @@
 				//btn_Resubmission.visible=false;	
 				//btn_Resubmission.width=0;	
 				btn_Submit._Label1="Submit Invoice";
+				//Grd_Submission2.dataProvider=null;
+				lbl_SubmittedOn2.text="0";
+				chk_Cash.selected=true;chk_Card.selected=false
+				chk_NEFT.selected=false;chk_Cheque.selected=false
+				txt_AmountPaid.text="";DT_CashReceived.text="";
+				grp_Card.visible=false;Drp_CCBrand.selectedIndex=0;
+				txt_NameontheCreditCard.text="";txt_SOCBatchCloseNo.text="";
+				txt_AmountSwipedFor.text="";txt_Remarks.text="";txt_CreditCardNumber.text="";
+				txt_ROC.text="";txt_CardComments.text="";Drp_Month.selectedIndex=0;
+				Drp_Year.selectedIndex=0;txt_ChequeNumber.text="";txt_BankName.text="";
+				txt_ChequeComments.text="";Dt_DateIssued.text="";txt_ReferenceNumber.text="";
+				txt_BankNameNEFT.text="";txt_NEFTComments.text="";grp_Cash.visible=false;
+				hlp_CashReceived.dataProvider=null;hlp_CashReceived.text="";
+				txt_CashComments.text="";Grp_Payment.visible=false;help();
 			}
 			public function fnGetUser():void
 			{
@@ -357,7 +388,7 @@
 							CollectionStatus:Drp_CollectionStatus.selectedItem,
 							Id:Id														
 						}]);				
-								
+					
 					var HdrXml:String = ObjToXmlStr_Comm(arrHdr1,"HdrXml") 
 					var GridXml:String ="";
 					GridXml += "<ROOT>";
@@ -365,7 +396,7 @@
 					GridXml += "</ROOT>";
 					
 					useWeb("BTCSubmission","Save_CUSTOM",[GlobalXml,HdrXml,GridXml]);
-														
+					
 				}
 			}
 			//Save Payment
@@ -492,30 +523,30 @@
 						ErrStr=ErrStr+" *  Date Issued is Required \n";
 					}
 				}
-					if(Mode=="NEFT")
+				if(Mode=="NEFT")
+				{
+					if(txt_BankNameNEFT.text=="")
 					{
-						if(txt_BankNameNEFT.text=="")
+						if(TxtFlag=true)
 						{
-							if(TxtFlag=true)
-							{
-								txt_BankNameNEFT.setFocus();
-								TxtFlag=false;
-							}
-							ErrStr=ErrStr+" *  Bank Name is Required \n";
+							txt_BankNameNEFT.setFocus();
+							TxtFlag=false;
 						}
-						if(Dt_DateofNEFT.text=="")
-						{
-							if(TxtFlag=true)
-							{
-								Dt_DateofNEFT.setFocus();
-								TxtFlag=false;
-							}
-							ErrStr=ErrStr+" *  Date of NEFt is Required \n";
-						}
+						ErrStr=ErrStr+" *  Bank Name is Required \n";
 					}
-					return ErrStr;
-//				}
-//				return ErrStr;
+					if(Dt_DateofNEFT.text=="")
+					{
+						if(TxtFlag=true)
+						{
+							Dt_DateofNEFT.setFocus();
+							TxtFlag=false;
+						}
+						ErrStr=ErrStr+" *  Date of NEFt is Required \n";
+					}
+				}
+				return ErrStr;
+				//				}
+				//				return ErrStr;
 			}
 			public function SavePayment():void
 			{
@@ -528,10 +559,12 @@
 					return;
 				} 
 				else
-				if(Mode=="Cash")
-				{
-					var arrcopy:ArrayCollection=new ArrayCollection
+					if(Mode=="Cash")
+					{
+						var arrcopy:ArrayCollection=new ArrayCollection
+							
 							([{ 
+								ClientId:ClientId,
 								Amount:txt_AmountPaid.text,
 								ReceivedDate:DT_CashReceived.text,
 								ReceivedBy:UserId,
@@ -539,11 +572,13 @@
 								Mode:Mode,
 								Id:Id
 							}]);
-				}
+					}
 				if(Mode=="Card")
 				{
 					var arrcopy:ArrayCollection=new ArrayCollection
+						
 						([{ 
+							ClientId:ClientId,
 							Amount:txt_AmountPaid.text,
 							CardBrand:Drp_CCBrand.selectedItem,
 							Nameoncard:txt_NameontheCreditCard.text,
@@ -562,7 +597,9 @@
 				if(Mode=="Cheque")
 				{
 					var arrcopy:ArrayCollection=new ArrayCollection
+						
 						([{ 
+							ClientId:ClientId,
 							Amount:txt_AmountPaid.text,
 							ChequeNo:txt_ChequeNumber.text,
 							Bank:txt_BankName.text,
@@ -575,7 +612,9 @@
 				if(Mode=="NEFT")
 				{
 					var arrcopy:ArrayCollection=new ArrayCollection
+						
 						([{ 
+							ClientId:ClientId,
 							Amount:txt_AmountPaid.text,
 							ReferenceNo:txt_ReferenceNumber.text,
 							Bank:txt_BankNameNEFT.text,
@@ -586,16 +625,11 @@
 						}]);
 				}
 				
-						var HdrXml:String=""
-						HdrXml += ObjToXmlStr_Comm(arrcopy,"HdrXml")
-							
-						var HdrXml1:String="";
-						HdrXml1 += "<ROOT>";
-						HdrXml1 += ObjToXmlStr_Comm(Grd_Submission2.dataProvider as ArrayCollection ,"GridXml")
-						HdrXml1 += "</ROOT>";
-						
-						useWeb("BTCPayment","Save_CUSTOM", [GlobalXml,HdrXml,HdrXml1]);
-				}
+				var HdrXml:String=""
+				HdrXml += ObjToXmlStr_Comm(arrcopy,"HdrXml")
+				
+				useWeb("BTCPayment","Save_CUSTOM", [GlobalXml,HdrXml]);
+			}
 			
 			public function Change(LabelName:String):void
 			{
@@ -669,15 +703,15 @@
 			{
 				if(Drp_CollectionStatus.selectedIndex==1)
 				{
-					//btn_Resubmission.visible=true;					
-					//btn_Resubmission.width=152;
 					btn_Submit._Label1="Resubmit Invoice";
+					btn_AddPayment.visible=true;
+					Grd_Submission.dataProvider=null;
 				}
 				else
 				{
-					//btn_Resubmission.visible=false;	
-					//btn_Resubmission.width=0;	
 					btn_Submit._Label1="Submit Invoice";
+					btn_AddPayment.visible=false;
+					Grd_Submission.dataProvider=null;
 				}
 			}
 			//IMAGE UPLOAD
@@ -898,7 +932,8 @@
 			<mx:HRule width="100%"/>
 			<s:Group x="74" y="28" width="792" height="64" depth="15">
 				<mx:Label x="363" y="19" text="Collection Status" id="lbl_PricingModel" />
-				<s:DropDownList x="470" y="19.5" width="156" height="20" id="Drp_CollectionStatus" tabIndex="2" selectedIndex="0" change="Drp_CollectionStatus_changeHandler(event)" >
+				<s:DropDownList x="470" y="19.5" width="156" height="20" id="Drp_CollectionStatus" tabIndex="2" 
+								selectedIndex="0" change="Drp_CollectionStatus_changeHandler(event)" >
 					<mx:ArrayCollection> 
 						<fx:String>Not Submitted</fx:String> 
 						<fx:String>Submitted</fx:String>										
@@ -917,7 +952,7 @@
 	</s:BorderContainer>
 	<s:BorderContainer x="0" y="100" width="100%" height="100%" backgroundColor="#f2eeee"
 					   borderVisible="false" depth="5" id="Contract">
-		<s:Scroller x="0" y="30" width="100%" height="250" depth="3" >
+		<s:Scroller x="0" y="40" width="100%" height="250" depth="3" >
 			<s:VGroup width="100%" height="250" depth="2" verticalAlign="top" horizontalAlign="center" >
 				<mx:DataGrid id="Grd_Submission" width="800" height="100%" depth="1" editable="true"
 							 tabIndex="93" verticalAlign="middle"  >
@@ -946,8 +981,8 @@
 				</mx:DataGrid>
 			</s:VGroup>
 		</s:Scroller>	
-		<s:CheckBox x="93" y="6" label="Select All" id="Chk_Selectall" change="Chk_Selectall_changeHandler(event)" tabIndex="3"/>
-		<s:HGroup x="0" y="287" width="100%" height="32" verticalAlign="baseline" horizontalAlign="center"> 
+		<s:CheckBox x="112" y="6" label="Select All" id="Chk_Selectall" change="Chk_Selectall_changeHandler(event)" tabIndex="3"/>
+		<s:HGroup x="0" y="327" width="100%" height="32" verticalAlign="baseline" horizontalAlign="center"> 
 			<WrbComp:Button_HB x="403" width="134" _Label="Submit Invoice" click="Submit()" id="btn_Submit">
 			</WrbComp:Button_HB>
 			<WrbComp:Button_HB x="500" width="134" _Label="Add Payment" click="Payment()" id="btn_AddPayment"
@@ -1014,12 +1049,12 @@
 						</mx:ControlBar>
 					</mx:Panel>
 					<mx:Button id="downloadBtn1" x="247" y="172" height="40" label="Download"
-							    visible="false"/>
+							   visible="false"/>
 					<s:TextInput x="37" y="172" width="189" height="40" id="txt_ImageName" enabled="false" visible="false"/>		
 					
 					<WrbComp:Button_HB x="339" y="172" height="40" _Label="Close" click="{Brd_imageUpload.visible=false;}" visible="false"/>
 					<WrbComp:Button_HB id="downloadBtn" x="247" y="172" height="40" _Label="Download"
-									    visible="false"/>
+									   visible="false"/>
 				</s:BorderContainer>
 				<s:TextArea x="508" y="312" width="291" height="69" prompt="Comments" tabIndex="10" id="txt_Comments"/>
 				<mx:Label x="175" y="212" width="13" height="21" id="lbl_SubmittedOnsTAR" color="red" fontSize="18" text="*" fontWeight="bold"/>
@@ -1028,7 +1063,8 @@
 			</s:BorderContainer>
 		</s:HGroup>		 
 	</s:BorderContainer>
-	<s:HGroup x="0" y="9" width="100%" height="521" verticalAlign="baseline" horizontalAlign="center" depth="50"  id="Grp_Payment" visible="false">
+	<s:HGroup x="0" y="9" width="100%" height="521" verticalAlign="baseline" horizontalAlign="center" depth="50"  
+			  id="Grp_Payment" visible="false">
 		<s:BorderContainer x="49" y="57" width="843" height="100%" borderVisible="false" cornerRadius="10">
 			<s:BorderContainer x="0" y="0" width="100%" height="32" backgroundColor="#969393" borderVisible="false" cornerRadius="10">
 				<mx:Label x="18" y="6" text="Add Payment" color="White"/>
@@ -1177,5 +1213,6 @@
 				<mx:Label x="96" y="67" width="13" height="21" id="Lbl_FdStar5" color="red" fontSize="18" text="*" fontWeight="bold"/>
 			</s:Group>
 		</s:BorderContainer>	
-    </s:HGroup>	
+	</s:HGroup>	
 </s:Application>
+

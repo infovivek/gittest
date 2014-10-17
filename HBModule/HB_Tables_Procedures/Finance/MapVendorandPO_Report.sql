@@ -266,27 +266,29 @@ BEGIN
 		CompanyName NVARCHAR(100),GuestName NVARCHAR(100),BillStartDate NVARCHAR(100),
 		BillEndDate NVARCHAR(100),NoOFDays BIGINT,Tariff DECIMAL(27,2),MarkUpTotalTariff DECIMAL(27,2),
 		ServiceTax DECIMAL(27,2),VendorTariff DECIMAL(27,2),VendorTotal DECIMAL(27,2),DifferanceAmount DECIMAL(27,2),
-		PropertyId BIGINT,ClientId BIGINT)	
+		PropertyId BIGINT,ClientId BIGINT,VendorInvoiceNo NVARCHAR(100),ModeOfPayment NVARCHAR(100),
+		PaymentStatus NVARCHAR(100),CheckOutHdrId BIGINT,InvoiceId BIGINT)	
 		
 		CREATE TABLE #ExternalDateFinal(BookingDate NVARCHAR(100),BillNumber NVARCHAR(100),PropertyName NVARCHAR(100),
 		CompanyName NVARCHAR(100),GuestName NVARCHAR(100),BillStartDate NVARCHAR(100),
 		BillEndDate NVARCHAR(100),NoOFDays BIGINT,Tariff DECIMAL(27,2),MarkUpTotalTariff DECIMAL(27,2),
 		ServiceTax DECIMAL(27,2),VendorTariff DECIMAL(27,2),VendorTotal DECIMAL(27,2),DifferanceAmount DECIMAL(27,2),
-		PropertyId BIGINT,ClientId BIGINT,PID INT PRIMARY KEY IDENTITY(1,1))	
+		PropertyId BIGINT,ClientId BIGINT,PID INT PRIMARY KEY IDENTITY(1,1),TotalHBAmount DECIMAL(27,2),
+		VendorInvoiceNo NVARCHAR(100),ModeOfPayment NVARCHAR(100),PaymentStatus NVARCHAR(100),CheckOutHdrId BIGINT)	
 		
 		DECLARE @CountTotal INT;
 		
 		INSERT INTO #ExternalDate(BookingDate,BillNumber,PropertyName,CompanyName,GuestName,BillStartDate,
 		BillEndDate,NoOFDays,Tariff,MarkUpTotalTariff,ServiceTax,VendorTariff,VendorTotal,DifferanceAmount,
-		PropertyId,ClientId)
+		PropertyId,ClientId,CheckOutHdrId,PaymentStatus)
 		
-		SELECT CONVERT(NVARCHAR,B.CreatedDate,110) BookingDate,H.InVoiceNo BillNumber,PP.PropertyName,
-		C.ClientName,G.FirstName GuestName,CONVERT(NVARCHAR,CONVERT(DATE,H.BillFromDate,103),110) BillFromDate,
-		CONVERT(NVARCHAR,CONVERT(DATE,H.BillEndDate,103),110) BillEndDate,
+		SELECT CONVERT(NVARCHAR,H.CreatedDate,110) BookingDate,H.InVoiceNo BillNumber,PP.PropertyName,
+		C.ClientName,G.FirstName GuestName,CONVERT(NVARCHAR,CONVERT(DATE,H.CheckInDate,103),110) BillFromDate,
+		CONVERT(NVARCHAR,CONVERT(DATE,H.CheckOutDate,103),110) BillEndDate,
 		H.NoOFDays,G.Tariff,H.NoOFDays*G.Tariff ,H.ChkOutTariffST1+H.ChkOutTariffST3+
 		H.ChkOutTariffCess+H.ChkOutTariffHECess ServiceTax,P.SingleTariff AggredTariff,
 		P.SingleTariff*H.NoOFDays AggredTariffTotal,
-		(H.NoOFDays*G.Tariff)-(P.SingleTariff*H.NoOFDays) DiffreanceAmount,PP.Id,C.Id   
+		(H.NoOFDays*G.Tariff)-(P.SingleTariff*H.NoOFDays) DiffreanceAmount,PP.Id,C.Id,H.Id,'Payment Yet to Receive'   
 		FROM  WRBHBChechkOutHdr H
 		JOIN WRBHBBooking B WITH(NOLOCK) ON B.Id=H.BookingId AND B.IsActive=1 AND B.IsDeleted=0
 		JOIN dbo.WRBHBBookingPropertyAssingedGuest  G WITH(NOLOCK) ON B.Id=G.BookingId AND H.GuestId=G.GuestId
@@ -303,14 +305,14 @@ BEGIN
 		
 		INSERT INTO #ExternalDate(BookingDate,BillNumber,PropertyName,CompanyName,GuestName,BillStartDate,
 		BillEndDate,NoOFDays,Tariff,MarkUpTotalTariff,ServiceTax,VendorTariff,VendorTotal,DifferanceAmount,
-		PropertyId,ClientId)
-		SELECT CONVERT(NVARCHAR,B.CreatedDate,110) BookingDate,H.InVoiceNo BillNumber,PP.PropertyName,
-		C.ClientName,G.FirstName GuestName,CONVERT(NVARCHAR,CONVERT(DATE,H.BillFromDate,103),110) BillFromDate,
-		CONVERT(NVARCHAR,CONVERT(DATE,H.BillEndDate,103),110) BillEndDate,
+		PropertyId,ClientId,CheckOutHdrId,PaymentStatus)
+		SELECT CONVERT(NVARCHAR,H.CreatedDate,110) BookingDate,H.InVoiceNo BillNumber,PP.PropertyName,
+		C.ClientName,G.FirstName GuestName,CONVERT(NVARCHAR,CONVERT(DATE,H.CheckInDate,103),110) BillFromDate,
+		CONVERT(NVARCHAR,CONVERT(DATE,H.CheckOutDate,103),110) BillEndDate,
 		H.NoOFDays,G.Tariff,H.NoOFDays*G.Tariff,H.ChkOutTariffST1+H.ChkOutTariffST3+
 		H.ChkOutTariffCess+H.ChkOutTariffHECess ServiceTax,P.DoubleTariff AggredTariff,
 		P.DoubleTariff*H.NoOFDays AggredTariffTotal,
-		(H.NoOFDays*G.Tariff)-(P.DoubleTariff*H.NoOFDays) DiffreanceAmount,PP.Id,C.Id      
+		(H.NoOFDays*G.Tariff)-(P.DoubleTariff*H.NoOFDays) DiffreanceAmount,PP.Id,C.Id,H.Id,'Payment Yet to Receive'      
 		FROM  WRBHBChechkOutHdr H
 		JOIN WRBHBBooking B WITH(NOLOCK) ON B.Id=H.BookingId AND B.IsActive=1 AND B.IsDeleted=0
 		JOIN dbo.WRBHBBookingPropertyAssingedGuest  G WITH(NOLOCK) ON B.Id=G.BookingId AND H.GuestId=G.GuestId
@@ -326,14 +328,14 @@ BEGIN
 		
 		INSERT INTO #ExternalDate(BookingDate,BillNumber,PropertyName,CompanyName,GuestName,BillStartDate,
 		BillEndDate,NoOFDays,Tariff,MarkUpTotalTariff,ServiceTax,VendorTariff,VendorTotal,DifferanceAmount,
-		PropertyId,ClientId)
-		SELECT CONVERT(NVARCHAR,B.CreatedDate,110) BookingDate,H.InVoiceNo BillNumber,PP.PropertyName,
-		C.ClientName,G.FirstName GuestName,CONVERT(NVARCHAR,CONVERT(DATE,H.BillFromDate,103),110) BillFromDate,
-		CONVERT(NVARCHAR,CONVERT(DATE,H.BillEndDate,103),110) BillEndDate,
+		PropertyId,ClientId,CheckOutHdrId,PaymentStatus)
+		SELECT CONVERT(NVARCHAR,H.CreatedDate,110) BookingDate,H.InVoiceNo BillNumber,PP.PropertyName,
+		C.ClientName,G.FirstName GuestName,CONVERT(NVARCHAR,CONVERT(DATE,H.CheckInDate,103),110) BillFromDate,
+		CONVERT(NVARCHAR,CONVERT(DATE,H.CheckOutDate,103),110) BillEndDate,
 		H.NoOFDays,G.Tariff,H.NoOFDays*G.Tariff,H.ChkOutTariffST1+H.ChkOutTariffST3+
 		H.ChkOutTariffCess+H.ChkOutTariffHECess ServiceTax,P.TripleTariff AggredTariff,
 		P.TripleTariff*H.NoOFDays AggredTariffTotal,
-		(H.NoOFDays*G.Tariff)-(P.TripleTariff*H.NoOFDays) DiffreanceAmount,PP.Id,C.Id      
+		(H.NoOFDays*G.Tariff)-(P.TripleTariff*H.NoOFDays) DiffreanceAmount,PP.Id,C.Id,H.Id,'Payment Yet to Receive'      
 		FROM  WRBHBChechkOutHdr H
 		JOIN WRBHBBooking B WITH(NOLOCK) ON B.Id=H.BookingId AND B.IsActive=1 AND B.IsDeleted=0
 		JOIN dbo.WRBHBBookingPropertyAssingedGuest  G WITH(NOLOCK) ON B.Id=G.BookingId AND H.GuestId=G.GuestId
@@ -346,19 +348,47 @@ BEGIN
 		WHERE H.IsDeleted=0 AND H.IsActive=1 AND G.Occupancy='Triple'
 		ORDER BY H.Id ASC
 		
+		--TAC NO UPDATE
+		UPDATE #ExternalDate SET BillNumber=TACInvoiceNo FROM  #ExternalDate H
+		JOIN WRBHBExternalChechkOutTAC D ON H.CheckOutHdrId=D.ChkOutHdrId
+		WHERE BillNumber='0'		
+		
+		--PAYMENT MODE UPDATE
+		UPDATE #ExternalDate SET ModeOfPayment=ISNULL(BTC,'') FROM  #ExternalDate H
+		JOIN WRBHBChechkOutHdr D ON H.CheckOutHdrId=D.Id 	
+		
+		
+		--PAYMENT MODE UPDATE
+		UPDATE #ExternalDate SET ModeOfPayment=ISNULL(Direct,'') FROM  #ExternalDate H
+		JOIN WRBHBChechkOutHdr D ON H.CheckOutHdrId=D.Id AND ISNULL(ModeOfPayment,'')=''
+		
+		
+		--VENDOR INVOICE NO UPDATE
+		UPDATE #ExternalDate SET VendorInvoiceNo=ISNULL(H1.InvoiceNo,''),InvoiceId=H1.Id FROM  #ExternalDate H
+		JOIN WRBHBMapPOAndVendorPaymentDtls D ON H.CheckOutHdrId=D.CheckOutId
+		JOIN dbo.WRBHBMapPOAndVendorPaymentHdr H1 ON H1.Id=D.MapPOAndVendorPaymentHdrId
+		
+		--PAYMENT  UPDATE
+		UPDATE #ExternalDate SET PaymentStatus='Payment Received' FROM  #ExternalDate H
+		JOIN dbo.WRBHBVendorSettlementInvoiceAmount D ON H.InvoiceId=D.InvoiceId
+		
+		
 		IF @Param1='All'
 		BEGIN
 		
 			INSERT INTO #ExternalDateFinal(BookingDate,BillNumber,PropertyName,CompanyName,GuestName,BillStartDate,
 			BillEndDate,NoOFDays,Tariff,MarkUpTotalTariff,ServiceTax,VendorTariff,VendorTotal,DifferanceAmount,
-			PropertyId,ClientId)
+			PropertyId,ClientId,TotalHBAmount,ModeOfPayment,VendorInvoiceNo,PaymentStatus)
 			SELECT ISNULL(BookingDate,'') BookingDate,ISNULL(BillNumber,'') BillNumber,ISNULL(PropertyName,'') PropertyName,
 			ISNULL(CompanyName,'')CompanyName,ISNULL(GuestName,'')GuestName,ISNULL(BillStartDate,'')BillStartDate,
 			ISNULL(BillEndDate,'') BillEndDate,ISNULL(NoOFDays,0) NoOFDays,ISNULL(Tariff,0) Tariff,
 			ISNULL(MarkUpTotalTariff,0) MarkUpTotalTariff,ISNULL(ServiceTax,0) ServiceTax,
 			ISNULL(VendorTariff,0) VendorTariff,ISNULL(VendorTotal,0) VendorTotal,
 			ISNULL(DifferanceAmount,0) DifferanceAmount,
-			PropertyId,ClientId FROM #ExternalDate
+			PropertyId,ClientId,ISNULL(ServiceTax,0)+ISNULL(MarkUpTotalTariff,0),
+			ISNULL(ModeOfPayment,''),ISNULL(VendorInvoiceNo,''),PaymentStatus 
+			FROM #ExternalDate
+			WHERE BillNumber NOT IN('0','')
 			
 			SELECT @CountTotal=COUNT(* ) FROM #ExternalDateFinal
 		
@@ -366,16 +396,16 @@ BEGIN
 			BEGIN
 				INSERT INTO #ExternalDateFinal(BookingDate,BillNumber,PropertyName,CompanyName,GuestName,BillStartDate,
 				BillEndDate,NoOFDays,Tariff,MarkUpTotalTariff,ServiceTax,VendorTariff,VendorTotal,DifferanceAmount,
-				PropertyId,ClientId)
+				PropertyId,ClientId,TotalHBAmount,ModeOfPayment,VendorInvoiceNo,PaymentStatus)
 				
 				SELECT 'Total','','','','','','',SUM(NoOFDays),SUM(Tariff),SUM(MarkUpTotalTariff),SUM(ServiceTax),
-				SUM(VendorTariff),SUM(VendorTotal),SUM(DifferanceAmount),0,0
+				SUM(VendorTariff),SUM(VendorTotal),SUM(DifferanceAmount),0,0,SUM(TotalHBAmount),'','',''
 				FROM #ExternalDateFinal
 			END
 			
 			SELECT BookingDate,BillNumber,PropertyName,CompanyName,GuestName,BillStartDate,
 			BillEndDate,NoOFDays,Tariff,MarkUpTotalTariff,ServiceTax,VendorTariff,VendorTotal,DifferanceAmount,
-			PropertyId,ClientId FROM #ExternalDateFinal
+			PropertyId,ClientId,TotalHBAmount,ModeOfPayment,VendorInvoiceNo,PaymentStatus FROM #ExternalDateFinal
 			
 			SELECT TOP 1 MarkUpTotalTariff,DifferanceAmount,DifferanceAmount/MarkUpTotalTariff*100 PER
 			FROM #ExternalDateFinal
@@ -388,14 +418,17 @@ BEGIN
 			BEGIN
 				INSERT INTO #ExternalDateFinal(BookingDate,BillNumber,PropertyName,CompanyName,GuestName,BillStartDate,
 				BillEndDate,NoOFDays,Tariff,MarkUpTotalTariff,ServiceTax,VendorTariff,VendorTotal,DifferanceAmount,
-				PropertyId,ClientId)
+				PropertyId,ClientId,TotalHBAmount,ModeOfPayment,VendorInvoiceNo,PaymentStatus)
 				SELECT ISNULL(BookingDate,'') BookingDate,ISNULL(BillNumber,'') BillNumber,ISNULL(PropertyName,'') PropertyName,
 				ISNULL(CompanyName,'')CompanyName,ISNULL(GuestName,'')GuestName,ISNULL(BillStartDate,'')BillStartDate,
 				ISNULL(BillEndDate,'') BillEndDate,ISNULL(NoOFDays,0) NoOFDays,ISNULL(Tariff,0) Tariff,
 				ISNULL(MarkUpTotalTariff,0) MarkUpTotalTariff,ISNULL(ServiceTax,0) ServiceTax,
 				ISNULL(VendorTariff,0) VendorTariff,ISNULL(VendorTotal,0) VendorTotal,
 				ISNULL(DifferanceAmount,0) DifferanceAmount,
-				PropertyId,ClientId  FROM #ExternalDate WHERE PropertyId=@PropertyId
+				PropertyId,ClientId ,ISNULL(ServiceTax,0)+ISNULL(MarkUpTotalTariff,0),
+				ISNULL(ModeOfPayment,''),ISNULL(VendorInvoiceNo,''),PaymentStatus  
+				FROM #ExternalDate WHERE PropertyId=@PropertyId
+				AND  BillNumber NOT IN('0','')
 				
 				SELECT @CountTotal=COUNT(* ) FROM #ExternalDateFinal
 		
@@ -403,14 +436,15 @@ BEGIN
 				BEGIN
 					INSERT INTO #ExternalDateFinal(BookingDate,BillNumber,PropertyName,CompanyName,GuestName,BillStartDate,
 					BillEndDate,NoOFDays,Tariff,MarkUpTotalTariff,ServiceTax,VendorTariff,VendorTotal,DifferanceAmount,
-					PropertyId,ClientId)
+					PropertyId,ClientId,TotalHBAmount,ModeOfPayment,VendorInvoiceNo,PaymentStatus)
 					SELECT 'Total','','','','','','',SUM(NoOFDays),SUM(Tariff),SUM(MarkUpTotalTariff),SUM(ServiceTax),SUM(VendorTariff),
-					SUM(VendorTotal),SUM(DifferanceAmount),0,0
+					SUM(VendorTotal),SUM(DifferanceAmount),0,0,SUM(TotalHBAmount),'','',''
 					FROM #ExternalDateFinal
 				END
 				SELECT BookingDate,BillNumber,PropertyName,CompanyName,GuestName,BillStartDate,
 				BillEndDate,NoOFDays,Tariff,MarkUpTotalTariff,ServiceTax,VendorTariff,VendorTotal,DifferanceAmount,
-				PropertyId,ClientId FROM #ExternalDateFinal
+				PropertyId,ClientId,TotalHBAmount,ModeOfPayment,VendorInvoiceNo,PaymentStatus
+				FROM #ExternalDateFinal
 				
 				SELECT TOP 1 MarkUpTotalTariff,DifferanceAmount,DifferanceAmount/MarkUpTotalTariff*100 PER
 				FROM #ExternalDateFinal
@@ -421,14 +455,16 @@ BEGIN
 			BEGIN
 				INSERT INTO #ExternalDateFinal(BookingDate,BillNumber,PropertyName,CompanyName,GuestName,BillStartDate,
 				BillEndDate,NoOFDays,Tariff,MarkUpTotalTariff,ServiceTax,VendorTariff,VendorTotal,DifferanceAmount,
-				PropertyId,ClientId)
+				PropertyId,ClientId,TotalHBAmount,ModeOfPayment,VendorInvoiceNo,PaymentStatus)
 				SELECT ISNULL(BookingDate,'') BookingDate,ISNULL(BillNumber,'') BillNumber,ISNULL(PropertyName,'') PropertyName,
 				ISNULL(CompanyName,'')CompanyName,ISNULL(GuestName,'')GuestName,ISNULL(BillStartDate,'')BillStartDate,
 				ISNULL(BillEndDate,'') BillEndDate,ISNULL(NoOFDays,0) NoOFDays,ISNULL(Tariff,0) Tariff,
 				ISNULL(MarkUpTotalTariff,0) MarkUpTotalTariff,ISNULL(ServiceTax,0) ServiceTax,
 				ISNULL(VendorTariff,0) VendorTariff,ISNULL(VendorTotal,0) VendorTotal,
 				ISNULL(DifferanceAmount,0) DifferanceAmount,
-				PropertyId,ClientId  FROM #ExternalDate WHERE ClientId=@Param2
+				PropertyId,ClientId,ISNULL(ServiceTax,0)+ISNULL(MarkUpTotalTariff,0),
+				ISNULL(ModeOfPayment,''),ISNULL(VendorInvoiceNo,''),PaymentStatus   
+				FROM #ExternalDate WHERE ClientId=@Param2 AND  BillNumber NOT IN('0','')
 				
 				SELECT @CountTotal=COUNT(* ) FROM #ExternalDateFinal
 		
@@ -436,15 +472,16 @@ BEGIN
 				BEGIN
 					INSERT INTO #ExternalDateFinal(BookingDate,BillNumber,PropertyName,CompanyName,GuestName,BillStartDate,
 					BillEndDate,NoOFDays,Tariff,MarkUpTotalTariff,ServiceTax,VendorTariff,VendorTotal,DifferanceAmount,
-					PropertyId,ClientId)
+					PropertyId,ClientId,TotalHBAmount,ModeOfPayment,VendorInvoiceNo,PaymentStatus)
 					SELECT 'Total','','','','','','',SUM(NoOFDays),SUM(Tariff),SUM(MarkUpTotalTariff),SUM(ServiceTax),SUM(VendorTariff),
-					SUM(VendorTotal),SUM(DifferanceAmount),0,0
+					SUM(VendorTotal),SUM(DifferanceAmount),0,0,SUM(TotalHBAmount),'','',''
 					FROM #ExternalDateFinal
 				END
 				
 				SELECT BookingDate,BillNumber,PropertyName,CompanyName,GuestName,BillStartDate,
 				BillEndDate,NoOFDays,Tariff,MarkUpTotalTariff,ServiceTax,VendorTariff,VendorTotal,DifferanceAmount,
-				PropertyId,ClientId FROM #ExternalDateFinal
+				PropertyId,ClientId,TotalHBAmount,ModeOfPayment,VendorInvoiceNo,PaymentStatus
+				FROM #ExternalDateFinal
 				
 				SELECT TOP 1 MarkUpTotalTariff,DifferanceAmount,DifferanceAmount/MarkUpTotalTariff*100 PER
 				FROM #ExternalDateFinal

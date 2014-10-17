@@ -17,6 +17,10 @@
 			public var ToRoomId:int=0,ToRoomNo:String="",Id:int=0,RoomCaptured:int=0;
 			public var CurrentStatus:String="",PropertyType:String="";
 			public var TodayDt:String="",TomoDt:String="";
+			public var Dt1:String = "",Dt2:String = "",Dt3:String = "",Dt4:String = "";
+			public var MailSts:String = "",ProcessSts:String = "";
+			public var TariffPM:String = "",ServicePM:String = "";
+			public var OldTariffPM:String = "",OldServicePM:String = "";
 			
 			protected function application1_creationCompleteHandler(event:FlexEvent):void
 			{
@@ -45,6 +49,7 @@
 					var dsa:ArrayCollection=new ArrayCollection();
 					Ddl_Room.dataProvider=dsa;Ddl_Room.prompt="Please Select Room";
 					ToRoomId=0;ToRoomNo="";TodayDt="";TomoDt="";
+					TariffPM = "";ServicePM = "";OldTariffPM = "";OldServicePM = "";
 					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
 					{
 						Hlp_BookingCode.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
@@ -88,11 +93,28 @@
 						//Dt_ChkOutDt.selectedDate = new Date(ChkOutRangeStart);
 						Dt_ChkInDtExists.selectedDate = new Date(ChkInRangeStart1);
 						Dt_ChkOutDtExists.selectedDate = new Date(ChkInRangeEnd);
-					}					
+					}
+					var dsa1:ArrayCollection = new ArrayCollection();
+					Ddl_ServicePM.dataProvider = null; Ddl_ServicePM.dataProvider = dsa1;
+					Ddl_TariffPM.dataProvider = null; Ddl_TariffPM.dataProvider = dsa1;
+					Ddl_ServicePM.prompt = "Service Payment Mode";
+					Ddl_TariffPM.prompt = "Tariff Payment Mode";
+					TariffPM = "";ServicePM = "";OldTariffPM = "";OldServicePM = "";
+					if (Ds_Objects.result.Tables.Table2.Rows.length > 0)
+					{
+						Ddl_ServicePM.dataProvider = Ds_Objects.result.Tables.Table2.Rows as ArrayCollection;
+						Ddl_TariffPM.dataProvider = Ds_Objects.result.Tables.Table2.Rows as ArrayCollection;
+					}
 					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
 					{
-						PropertyType = Ds_Objects.result.Tables.Table1.Rows[0].PropertyType;						
-					}
+						PropertyType = Ds_Objects.result.Tables.Table1.Rows[0].PropertyType;
+						Ddl_TariffPM.prompt = Ds_Objects.result.Tables.Table1.Rows[0].TariffPaymentMode;
+						Ddl_ServicePM.prompt = Ds_Objects.result.Tables.Table1.Rows[0].ServicePaymentMode;
+						TariffPM = Ds_Objects.result.Tables.Table1.Rows[0].TariffPaymentMode;
+						ServicePM = Ds_Objects.result.Tables.Table1.Rows[0].ServicePaymentMode;
+						OldTariffPM = Ds_Objects.result.Tables.Table1.Rows[0].TariffPaymentMode;
+						OldServicePM = Ds_Objects.result.Tables.Table1.Rows[0].ServicePaymentMode;
+					}					
 					if((PropertyType == "ExP")||(PropertyType == "CPP"))
 					{
 						Btn_Avaliable.enabled = false;
@@ -137,9 +159,58 @@
 						Ddl_Room.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
 					}
 				}
+				if (Ds_Objects.currentTarget.description.toString() == "AvaliableFromRooms_CUSTOM")
+				{
+					var RoomSts:String = "";
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						RoomSts = Ds_Objects.result.Tables.Table.Rows[0].RoomSts;
+						if(RoomSts != "")
+						{
+							alignAlert(Alert.show(RoomSts,"Alert Message !",
+								Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+						}
+						if(RoomSts == "")
+						{
+							MailSts = "No";
+							if(Chk_Email.selected == true)
+							{
+								if(ProcessSts == "Modification")
+								{
+									MailSts = "Yes";
+								}
+								/*if((CurrentStatus == "Booked")&&(ToRoomId == 0))
+								{
+									Mail = "Yes";
+								}*/
+							}
+							var Ac_Hdr:ArrayCollection=new ArrayCollection
+								([{BookingId:BookingId,FromRoomId:FromRoomId,ChkInDt:Dt_ChkInDt.text,
+									ChkOutDt:Dt_ChkOutDt.text,ToRoomId:FromRoomId,ToRoomNo:Txt_FromRoom.text,
+									BookingLevel:BookingLevel,Id:Id,RoomCaptured:RoomCaptured,
+									CurrentStatus:CurrentStatus,
+									//
+									TariffMode:TariffPM,ServiceMode:ServicePM,
+									//
+									Mail:MailSts}]);
+							var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");				
+							useWeb("RoomShifting","Save_CUSTOM",[GlobalXml,HdrXml]);
+						}
+					}
+				}
 				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
 				{
-					if(PropertyType == "ExP")
+					if(ProcessSts == "Modification")
+					{
+						alignAlert(Alert.show("Stay Modified Successfully.",
+							"Message !",Alert.OK,null, null, iconTickLarge, Alert.OK),10,"");
+					}
+					else
+					{
+						alignAlert(Alert.show("Room Shifted Successfully.",
+							"Message !",Alert.OK,null, null, iconTickLarge, Alert.OK),10,"");
+					}
+					/*if(PropertyType == "ExP")
 					{
 						alignAlert(Alert.show("Stay Modified Successfully.",
 							"Message !",Alert.OK,null, null, iconTickLarge, Alert.OK),10,"");
@@ -156,7 +227,7 @@
 							alignAlert(Alert.show("Room Shifted Successfully.",
 								"Message !",Alert.OK,null, null, iconTickLarge, Alert.OK),10,"");
 						}
-					}
+					}*/
 					FnClear();
 				}
 			}
@@ -226,7 +297,7 @@
 				var TD:String = TDt.substr(0,2);
 				var ChkOutDt:String=TY+'-'+TM+'-'+TD+' '+'11:59:00 AM';
 				useWeb("RoomShifting","AvaliableRooms_CUSTOM",[GlobalXml,'AvaliableRooms',
-					BookingLevel,'',ChkInDt,ChkOutDt,BookingId,FromRoomId,0,0]);
+					BookingLevel,'',ChkInDt,ChkOutDt,BookingId,FromRoomId,RoomCaptured,0]);
 			}
 			
 			protected function Dt_ChkInDt_changeHandler(event:CalendarLayoutChangeEvent):void
@@ -309,6 +380,118 @@
 				ToRoomNo=Ddl_Room.selectedItem.label;
 			}
 			
+			protected function FnInPMGHDdPSave():void
+			{
+				var Err1:String = "";
+				if((BookingId == 0)||(FromRoomId == 0)||(BookingLevel == ""))
+				{
+					alignAlert(Alert.show("*  Booking Code is Required.\n","Required Field(s) !",
+						Alert.OK,null,null,iconErrLarge,Alert.OK),10,"");
+					return;
+				}
+				if(ToRoomId == 0)
+				{					
+					if(CurrentStatus == "CheckIn")
+					{
+						Dt1 = Dt_ChkOutDtExists.text;
+						Dt2 = Dt_ChkOutDt.text;
+						//Dt3 = Dt1.substr(6,10)+'/'+Dt1.substr(3,2)+'/'+Dt1.substr(0,2);
+						//Dt4 = Dt2.substr(6,10)+'/'+Dt2.substr(3,2)+'/'+Dt2.substr(0,2);
+						//if(new Date(Dt3) < new Date(Dt4))
+						if((Dt1 != Dt2) || (TariffPM != OldTariffPM) || (ServicePM != OldServicePM))
+						{
+							ProcessSts = "Modification";
+							var FDt:String=Dt_ChkInDt.text;					
+							var FY:String = FDt.substr(6,10);
+							var FM:String = FDt.substr(3,2);
+							var FD:String = FDt.substr(0,2);
+							var ChkInDt:String=FY+'-'+FM+'-'+FD+' '+'12:00:00 PM';
+							var TDt:String=Dt_ChkOutDt.text;
+							var TY:String = TDt.substr(6,10);
+							var TM:String = TDt.substr(3,2);
+							var TD:String = TDt.substr(0,2);
+							var ChkOutDt:String=TY+'-'+TM+'-'+TD+' '+'11:59:00 AM';
+							useWeb("RoomShifting","AvaliableFromRooms_CUSTOM",[GlobalXml,'AvaliableFromRoom',
+								BookingLevel,'',ChkInDt,ChkOutDt,BookingId,FromRoomId,RoomCaptured,0]);
+						}
+						else
+						{
+							alignAlert(Alert.show("*  Invalid Process.\n","Alert Message !",
+								Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+							return;
+						}
+					}
+					if(CurrentStatus == "Booked")
+					{
+						Dt1 = Dt_ChkInDtExists.text;
+						Dt2 = Dt_ChkInDt.text;
+						Dt3 = Dt_ChkOutDtExists.text;
+						Dt4 = Dt_ChkOutDt.text;
+						//
+						Dt3 = Dt1.substr(6,10)+'/'+Dt1.substr(3,2)+'/'+Dt1.substr(0,2);
+						Dt4 = Dt2.substr(6,10)+'/'+Dt2.substr(3,2)+'/'+Dt2.substr(0,2);
+						//
+						if((Dt_ChkInDtExists.text != Dt_ChkInDt.text) || 
+							(Dt_ChkOutDtExists.text != Dt_ChkOutDt.text) ||
+							(TariffPM != OldTariffPM) || (ServicePM != OldServicePM))
+						{
+							ProcessSts = "Modification";
+							var FDt1:String=Dt_ChkInDt.text;					
+							var FY1:String = FDt1.substr(6,10);
+							var FM1:String = FDt1.substr(3,2);
+							var FD1:String = FDt1.substr(0,2);
+							var ChkInDt1:String=FY1+'-'+FM1+'-'+FD1+' '+'12:00:00 PM';
+							var TDt1:String=Dt_ChkOutDt.text;
+							var TY1:String = TDt1.substr(6,10);
+							var TM1:String = TDt1.substr(3,2);
+							var TD1:String = TDt1.substr(0,2);
+							var ChkOutDt1:String=TY1+'-'+TM1+'-'+TD1+' '+'11:59:00 AM';
+							useWeb("RoomShifting","AvaliableFromRooms_CUSTOM",[GlobalXml,'AvaliableFromRoom',
+								BookingLevel,'',ChkInDt1,ChkOutDt1,BookingId,FromRoomId,RoomCaptured,0]);
+						}
+						else
+						{
+							alignAlert(Alert.show("*  Invalid Process.\n","Alert Message !",
+								Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+							return;
+						}
+					}					
+				}
+				if(ToRoomId != 0)
+				{
+					if((Dt_ChkInDtExists.text != Dt_ChkInDt.text) || 
+						(Dt_ChkOutDtExists.text != Dt_ChkOutDt.text))
+					{
+						ProcessSts = "Modification";
+					}
+					if((Dt_ChkInDtExists.text == Dt_ChkInDt.text) && 
+						(Dt_ChkOutDtExists.text == Dt_ChkOutDt.text))
+					{
+						ProcessSts = "Shifting";
+					}
+					MailSts = "No";
+					if(Chk_Email.selected == true)
+					{
+						if(ProcessSts == "Modification")
+						{
+							MailSts = "Yes";
+						}						
+					}
+					var Ac_Hdr:ArrayCollection=new ArrayCollection
+						([{BookingId:BookingId,FromRoomId:FromRoomId,ChkInDt:Dt_ChkInDt.text,
+							ChkOutDt:Dt_ChkOutDt.text,ToRoomId:ToRoomId,ToRoomNo:ToRoomNo,
+							BookingLevel:BookingLevel,Id:Id,RoomCaptured:RoomCaptured,
+							CurrentStatus:CurrentStatus,
+							//
+							TariffMode:TariffPM,
+							ServiceMode:ServicePM,
+							//
+							Mail:MailSts}]);
+					var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");				
+					useWeb("RoomShifting","Save_CUSTOM",[GlobalXml,HdrXml]);
+				}
+			}
+			
 			protected function FnSave():void
 			{
 				Ddl_Room.setFocus();
@@ -326,14 +509,7 @@
 				}
 				if((PropertyType == "InP")||(PropertyType == "MGH")||(PropertyType == "DdP"))
 				{
-					if((BookingId == 0)||(FromRoomId == 0)||(BookingLevel == ""))
-					{
-						Err = Err + "*  Booking Code is Required.\n";
-					}
-					if(ToRoomId == 0)
-					{
-						Err = Err + "*  To Room is Required.\n";
-					}
+					FnInPMGHDdPSave();
 				}
 				if((PropertyType == "ExP")||(PropertyType == "CPP"))
 				{
@@ -341,37 +517,40 @@
 					{
 						Err = Err + "*  Booking Code is Required.\n";
 					}
-				}
-				if(Err != "")
-				{
-					alignAlert(Alert.show(Err,"Requierd Field(s) !",
-						Alert.OK,null,null,iconErrLarge,Alert.OK),10,"");
-					return;
-				}
-				var Mail:String = "No";
-				if(Chk_Email.selected == true)
-				{
-					if(PropertyType == "ExP")
+					if(Err != "")
 					{
-						Mail = "Yes";
+						alignAlert(Alert.show(Err,"Required Field(s) !",
+							Alert.OK,null,null,iconErrLarge,Alert.OK),10,"");
+						return;
 					}
-					if((PropertyType == "InP")||(PropertyType == "MGH")||(PropertyType == "DdP"))
+					MailSts = "No";ProcessSts = "Modification";
+					if(Chk_Email.selected == true)
 					{
-						if(CurrentStatus == "Booked")
+						MailSts = "Yes";
+						/*if(PropertyType == "ExP")
 						{
 							Mail = "Yes";
 						}
+						if((PropertyType == "InP")||(PropertyType == "MGH")||(PropertyType == "DdP"))
+						{
+							if(CurrentStatus == "Booked")
+							{
+								Mail = "Yes";
+							}
+						}*/
 					}
-				}
-				var Ac_Hdr:ArrayCollection=new ArrayCollection
-					([{BookingId:BookingId,FromRoomId:FromRoomId,ChkInDt:Dt_ChkInDt.text,
-						ChkOutDt:Dt_ChkOutDt.text,ToRoomId:ToRoomId,ToRoomNo:ToRoomNo,
-						BookingLevel:BookingLevel,Id:Id,RoomCaptured:RoomCaptured,
-						CurrentStatus:CurrentStatus,
-						//
-						Mail:Mail}]);
-				var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");				
-				useWeb("RoomShifting","Save_CUSTOM",[GlobalXml,HdrXml]);
+					var Ac_Hdr:ArrayCollection=new ArrayCollection
+						([{BookingId:BookingId,FromRoomId:FromRoomId,ChkInDt:Dt_ChkInDt.text,
+							ChkOutDt:Dt_ChkOutDt.text,ToRoomId:ToRoomId,ToRoomNo:ToRoomNo,
+							BookingLevel:BookingLevel,Id:Id,RoomCaptured:RoomCaptured,
+							CurrentStatus:CurrentStatus,
+							//
+							TariffMode:TariffPM,ServiceMode:ServicePM,
+							//
+							Mail:MailSts}]);
+					var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");				
+					useWeb("RoomShifting","Save_CUSTOM",[GlobalXml,HdrXml]);
+				}				
 			}
 			
 			protected function FnClear():void
@@ -381,9 +560,26 @@
 				var dsa:ArrayCollection=new ArrayCollection();
 				Ddl_Room.dataProvider=dsa;Ddl_Room.prompt="Please Select Room";
 				ToRoomId=0;ToRoomNo="";Id=0;RoomCaptured=0;CurrentStatus="";
-				FnHelp_PageLoad();PropertyType="";Txt_Status.text="";
+				PropertyType="";Txt_Status.text="";
 				Dt_ChkInDt.text="";Dt_ChkInDtExists.text="";
 				Dt_ChkOutDt.text="";Dt_ChkOutDtExists.text="";Chk_Email.selected = true;
+				var dsa1:ArrayCollection = new ArrayCollection();
+				Ddl_ServicePM.dataProvider = null; Ddl_ServicePM.dataProvider = dsa1;
+				Ddl_TariffPM.dataProvider = null; Ddl_TariffPM.dataProvider = dsa1;
+				Ddl_ServicePM.prompt = "Service Payment Mode";
+				Ddl_TariffPM.prompt = "Tariff Payment Mode";
+				TariffPM = "";ServicePM = "";OldTariffPM = "";OldServicePM = "";
+				FnHelp_PageLoad();
+			}
+			
+			protected function Ddl_TariffPM_changeHandler(event:IndexChangeEvent):void
+			{
+				TariffPM = Ddl_TariffPM.selectedItem.label;
+			}
+			
+			protected function Ddl_ServicePM_changeHandler(event:IndexChangeEvent):void
+			{
+				ServicePM = Ddl_ServicePM.selectedItem.label;
 			}
 			
 		]]>
@@ -410,49 +606,56 @@
 			disabledColor:#431d1c;
 		}
 	</fx:Style>
-	<s:VGroup x="0" y="0" width="100%" height="100%">
-		<s:BorderContainer width="100%" height="100%" backgroundColor="#fbf9f9" borderVisible="false">
-			<mx:Label x="243" y="45" text="Booking Code" fontWeight="bold"/>
-			<mx:Label x="243" y="89" text="Guest" fontWeight="bold"/>
-			<mx:Label x="243" y="290" text="CheckIn Date" fontWeight="bold"/>
-			<mx:Label x="333" y="268" text="Old" fontWeight="bold"/>
-			<mx:Label x="333" y="312" text="New" fontWeight="bold"/>
-			<mx:Label x="493" y="290" text="CheckOut Date" fontWeight="bold"/>
-			<mx:Label x="243" y="408" text="To Room" fontWeight="bold"/>
-			<WrbHelpComp:HelpText id="Hlp_BookingCode" x="377" y="44" width="200" height="23"
+	<s:HGroup x="0" y="0" width="100%" height="100%" verticalAlign="middle" horizontalAlign="center">
+		<s:BorderContainer x="4" y="6" width="915" height="529" backgroundColor="#fbf9f9"
+						   borderVisible="false">
+			<mx:Label x="243" y="31" text="Booking Code" fontWeight="bold"/>
+			<mx:Label x="478.5" y="86" text="Guest" fontWeight="bold"/>
+			<mx:Label x="127" y="271" text="CheckIn Date" fontWeight="bold"/>
+			<mx:Label x="238.5" y="249" text="Old" fontWeight="bold"/>
+			<mx:Label x="238.5" y="302" text="New" fontWeight="bold"/>
+			<mx:Label x="478.5" y="271" text="CheckOut Date" fontWeight="bold"/>
+			<mx:Label x="243" y="419" text="To Room" fontWeight="bold"/>
+			<WrbHelpComp:HelpText id="Hlp_BookingCode" x="377" y="30" width="200" height="23"
 								  depth="1" onselection="{FnOnselection_Booking()}"
 								  pxSetColumnsWidth="110,0,0,0,0,150,150,0,0,0" pxTabIndex="1"/>
-			<s:TextInput id="Txt_Guest" x="377" y="88" width="200" height="23" editable="false"
+			<s:TextInput id="Txt_Guest" x="583" y="85" width="200" height="23" editable="false"
 						 focusEnabled="false"/>
-			<mx:Label x="243" y="224" text="Status" fontWeight="bold"/>
-			<s:TextInput id="Txt_Status" x="377" y="223" width="200" height="23" editable="false"
+			<mx:Label x="478.5" y="141" text="Status" fontWeight="bold"/>
+			<s:TextInput id="Txt_Status" x="583" y="140" width="200" height="23" editable="false"
 						 focusEnabled="false"/>
-			<mx:Label x="243" y="133" text="Property Name" fontWeight="bold"/>
-			<s:TextInput id="Txt_PropertyName" x="377" y="132" width="200" height="23"
+			<mx:Label x="127" y="86" text="Property Name" fontWeight="bold"/>
+			<s:TextInput id="Txt_PropertyName" x="238.5" y="85" width="200" height="23"
 						 editable="false" focusEnabled="false"/>
-			<mx:Label x="243" y="178" text="From Room" fontWeight="bold"/>
-			<s:TextInput id="Txt_FromRoom" x="377" y="177" width="200" height="23" editable="false"
+			<mx:Label x="127" y="141" text="From Room" fontWeight="bold"/>
+			<mx:Label x="127" y="195" text="Tariff  Mode" fontWeight="bold"/>
+			<mx:Label x="478.5" y="195" text="Service  Mode" fontWeight="bold"/>
+			<s:TextInput id="Txt_FromRoom" x="238.5" y="140" width="200" height="23" editable="false"
 						 focusEnabled="false"/>
-			<s:DropDownList id="Ddl_Room" x="377" y="407" width="200" height="23" tabIndex="4"
+			<s:DropDownList id="Ddl_Room" x="377" y="418" width="200" height="23" tabIndex="4"
 							change="Ddl_Room_changeHandler(event)" prompt="Please Select Room"/>
-			<WrbComp:Button_HB id="Btn_Avaliable" x="415.5" y="355" _Label="Show"
+			<WrbComp:Button_HB id="Btn_Avaliable" x="415.5" y="356" _Label="Show"
 							   click="Btn_Avaliable_clickHandler(event)"/>
-			<mx:DateField x="377" y="311" id="Dt_ChkInDt" formatString="DD/MM/YYYY"
+			<mx:DateField x="291" y="301" id="Dt_ChkInDt" formatString="DD/MM/YYYY"
 						  change="Dt_ChkInDt_changeHandler(event)" enabled="true" tabIndex="2"/>
 			<!--styleName="DisabledDateField" focusEnabled="false"/-->
-			<mx:DateField x="596" y="311" id="Dt_ChkOutDt" formatString="DD/MM/YYYY"
+			<mx:DateField x="583" y="301" id="Dt_ChkOutDt" formatString="DD/MM/YYYY"
 						  change="Dt_ChkOutDt_changeHandler(event)" tabIndex="3"/>
-			<mx:DateField x="377" y="267" id="Dt_ChkInDtExists" formatString="DD/MM/YYYY"
+			<mx:DateField x="291" y="248" id="Dt_ChkInDtExists" formatString="DD/MM/YYYY"
 						  styleName="DisabledDateField" enabled="false"/>
-			<mx:DateField x="596" y="267" id="Dt_ChkOutDtExists" formatString="DD/MM/YYYY"
+			<mx:DateField x="583" y="248" id="Dt_ChkOutDtExists" formatString="DD/MM/YYYY"
 						  styleName="DisabledDateField" enabled="false"/>
-			<s:HGroup x="11" y="452" width="893" height="35" horizontalAlign="center" verticalAlign="middle">
+			<s:HGroup x="11" y="471" width="893" height="35" horizontalAlign="center" verticalAlign="middle">
 				<WrbComp:Button_HB _Label="Save" click="FnSave()"/>
 				<WrbComp:Button_HB _Label="Clear" click="FnClear()"/>
 			</s:HGroup>
-			<s:Label x="364" y="49.5" text="*" color="red"/>
-			<s:Label x="364" y="412.5" text="*" color="red" id="Lbl_ToRoomMandatory"/>
-			<s:CheckBox x="617" y="409.5" label="EMail" id="Chk_Email"/>
+			<s:Label x="364" y="35.5" text="*" color="red"/>
+			<s:Label x="364" y="423.5" text="*" color="red" id="Lbl_ToRoomMandatory"/>
+			<s:CheckBox x="617" y="420.5" label="EMail" id="Chk_Email"/>
+			<s:DropDownList id="Ddl_TariffPM" x="238.5" y="194" width="200" height="23"
+							prompt="Tariff Payment Mode" change="Ddl_TariffPM_changeHandler(event)"/>
+			<s:DropDownList id="Ddl_ServicePM" x="583" y="194" width="200" height="23"
+							prompt="Service Payment Mode" change="Ddl_ServicePM_changeHandler(event)"/>
 		</s:BorderContainer>
-	</s:VGroup>
+	</s:HGroup>
 </s:Application>

@@ -255,7 +255,7 @@
 							xlsFile = new ExcelFile();
 							sheet = new Sheet();
 							
-							sheet.resize(arrExportResult.length+2,27);
+							sheet.resize(arrExportResult.length+2,28);
 							
 							if(Rd_Bill.selected==true)
 							{
@@ -276,23 +276,24 @@
 							sheet.setCell(1,7,'Guest Name');
 							sheet.setCell(1,8,'Total Amount');							
 							sheet.setCell(1,9,'Total Tariff');
-							sheet.setCell(1,10,'BroadBand');
-							sheet.setCell(1,11,'Food Beverages');
-							sheet.setCell(1,12,'Laundry');
-							sheet.setCell(1,13,'Extra Matress');
-							sheet.setCell(1,14,'Service Charge');
-							sheet.setCell(1,15,'Luxury Tax');
-							sheet.setCell(1,16,'ST@7.20');
-							sheet.setCell(1,17,'ST@12.00');
-							sheet.setCell(1,18,'ST@4.80');							
-							sheet.setCell(1,19,'Cess');
-							sheet.setCell(1,20,'Hcess');
-							sheet.setCell(1,21,'Check-In Date');
-							sheet.setCell(1,22,'Check-Out Date');
-							sheet.setCell(1,23,'Location');
-							sheet.setCell(1,24,'Bill Start Date');
-							sheet.setCell(1,25,'Bill End Date');
-							sheet.setCell(1,26,'VAT');							
+							sheet.setCell(1,10,'Discount Amount');
+							sheet.setCell(1,11,'BroadBand');
+							sheet.setCell(1,12,'Food Beverages');
+							sheet.setCell(1,13,'Laundry');
+							sheet.setCell(1,14,'Extra Matress');
+							sheet.setCell(1,15,'Service Charge');
+							sheet.setCell(1,16,'Luxury Tax');
+							sheet.setCell(1,17,'ST@7.20');
+							sheet.setCell(1,18,'ST@12.00');
+							sheet.setCell(1,19,'ST@4.80');							
+							sheet.setCell(1,20,'Cess');
+							sheet.setCell(1,21,'Hcess');
+							sheet.setCell(1,22,'Check-In Date');
+							sheet.setCell(1,23,'Check-Out Date');
+							sheet.setCell(1,24,'Location');
+							sheet.setCell(1,25,'Bill Start Date');
+							sheet.setCell(1,26,'Bill End Date');
+							sheet.setCell(1,27,'VAT');							
 							for(var i:int=0;i<arrExportResult.length;i++)
 							{
 								sheet.setCell(i+2, 0, arrExportResult[i].CreatedDate);
@@ -305,23 +306,24 @@
 								sheet.setCell(i+2, 7, arrExportResult[i].GuestName);
 								sheet.setCell(i+2, 8, arrExportResult[i].TotalAmount);
 								sheet.setCell(i+2, 9, arrExportResult[i].TariffAmount);
-								sheet.setCell(i+2, 10, arrExportResult[i].Broadband);
-								sheet.setCell(i+2, 11, arrExportResult[i].FOODANDBeverages);
-								sheet.setCell(i+2, 12, arrExportResult[i].Laundry);
-								sheet.setCell(i+2, 13, arrExportResult[i].ExtraAmount);
-								sheet.setCell(i+2, 14, arrExportResult[i].ServiceCharge);
-								sheet.setCell(i+2, 15, arrExportResult[i].LuxuryTax);
-								sheet.setCell(i+2, 16, arrExportResult[i].SerivceTax7);
-								sheet.setCell(i+2, 17, arrExportResult[i].Servicetax12);
-								sheet.setCell(i+2, 18, arrExportResult[i].SerivceTax4);
-								sheet.setCell(i+2, 19, arrExportResult[i].Cess);
-								sheet.setCell(i+2, 20, arrExportResult[i].Hcess);
-								sheet.setCell(i+2, 21, arrExportResult[i].CheckInDate);
-								sheet.setCell(i+2, 22, arrExportResult[i].CheckOutDate);
-								sheet.setCell(i+2, 23, arrExportResult[i].Location);
-								sheet.setCell(i+2, 24, arrExportResult[i].BillStartDate);
-								sheet.setCell(i+2, 25, arrExportResult[i].BillEndDate);
-								sheet.setCell(i+2, 26, arrExportResult[i].VAT);								
+								sheet.setCell(i+2, 10, arrExportResult[i].DiscountAmount);
+								sheet.setCell(i+2, 11, arrExportResult[i].Broadband);
+								sheet.setCell(i+2, 12, arrExportResult[i].FOODANDBeverages);
+								sheet.setCell(i+2, 13, arrExportResult[i].Laundry);
+								sheet.setCell(i+2, 14, arrExportResult[i].ExtraAmount);
+								sheet.setCell(i+2, 15, arrExportResult[i].ServiceCharge);
+								sheet.setCell(i+2, 16, arrExportResult[i].LuxuryTax);
+								sheet.setCell(i+2, 17, arrExportResult[i].SerivceTax7);
+								sheet.setCell(i+2, 18, arrExportResult[i].Servicetax12);
+								sheet.setCell(i+2, 19, arrExportResult[i].SerivceTax4);
+								sheet.setCell(i+2, 20, arrExportResult[i].Cess);
+								sheet.setCell(i+2, 21, arrExportResult[i].Hcess);
+								sheet.setCell(i+2, 22, arrExportResult[i].CheckInDate);
+								sheet.setCell(i+2, 23, arrExportResult[i].CheckOutDate);
+								sheet.setCell(i+2, 24, arrExportResult[i].Location);
+								sheet.setCell(i+2, 25, arrExportResult[i].BillStartDate);
+								sheet.setCell(i+2, 26, arrExportResult[i].BillEndDate);
+								sheet.setCell(i+2, 27, arrExportResult[i].VAT);								
 								
 							}						
 							
@@ -582,7 +584,7 @@
 						   borderVisible="false" depth="10" id="Bill" visible="false">
 			<s:Scroller x="0" y="0" width="100%" height="100%" depth="3"  >
 				<s:VGroup width="100%" height="100%" depth="2" >
-					<mx:DataGrid id="Grd_Invoice" width="3500" height="100%" depth="1" editable="true"
+					<mx:DataGrid id="Grd_Invoice" width="3600" height="100%" depth="1" editable="true"
 								 tabIndex="93" verticalAlign="middle"  >
 						<mx:columns>
 							<mx:DataGridColumn dataField="CreatedDate" headerText="Created Date" editable="false" width="80" textAlign="center"/>
@@ -595,6 +597,7 @@
 							<mx:DataGridColumn dataField="GuestName" headerText="Guest Name" textAlign="left" editable="false" width="130"/>					
 							<mx:DataGridColumn dataField="TotalAmount" headerText="Total Amount" textAlign="right"  editable="false" width="100"/>
 							<mx:DataGridColumn dataField="TariffAmount" headerText="Total Tariff" textAlign="right"  editable="false" width="100"/>
+							<mx:DataGridColumn dataField="DiscountAmount" headerText="Discount Amount" textAlign="right"  editable="false" width="100"/>
 							<mx:DataGridColumn dataField="Broadband" headerText="BroadBand" textAlign="right"  editable="false" width="100"/>
 							<mx:DataGridColumn dataField="FOODANDBeverages" headerText="Food Beverages" textAlign="right"  editable="false" width="100"/>
 							<mx:DataGridColumn dataField="Laundry" headerText="Laundry" textAlign="right"  editable="false" width="100"/>

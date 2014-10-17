@@ -58,6 +58,7 @@
     <Compile Include="BusinessService\BTCPaymentService.cs" />
     <Compile Include="BusinessService\BTCSubmissionService.cs" />
     <Compile Include="BusinessService\ChangePasswordService.cs" />
+    <Compile Include="BusinessService\CheckoutAndIntermediateService.cs" />
     <Compile Include="BusinessService\CheckOutPaymentCardService.cs" />
     <Compile Include="BusinessService\CheckOutPaymentCashService.cs" />
     <Compile Include="BusinessService\CheckOutPaymentChequeService.cs" />
@@ -144,6 +145,7 @@
     <Compile Include="BusinessService\TaxMasterService.cs" />
     <Compile Include="BusinessService\TDSDeclarationService.cs" />
     <Compile Include="BusinessService\TIAandATIAService.cs" />
+    <Compile Include="BusinessService\TodaysCheckinCheckoutService.cs" />
     <Compile Include="BusinessService\TransSubsPriceModelService.cs" />
     <Compile Include="BusinessService\TravelDeskService.cs" />
     <Compile Include="BusinessService\TRLinkService.cs" />

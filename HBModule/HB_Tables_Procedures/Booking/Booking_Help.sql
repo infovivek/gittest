@@ -1485,7 +1485,7 @@ IF @Action = 'Property'
   TripleandMarkup,TAC,Facility,DiscountModeRS,DiscountModePer,
   DiscountAllowed,MarkupId,TaxAdded)
   SELECT PropertyName,Id,GetType,PropertyType,'',0,0,0,0,0,0,0,
-  'CP+Wifi',0,0,0,0,'' FROM #ManagedGH 
+  'CP',0,0,0,0,'' FROM #ManagedGH 
   GROUP BY PropertyName,Id,GetType,PropertyType
   ORDER BY PropertyName ASC;
   -- Dedicated
@@ -1494,7 +1494,7 @@ IF @Action = 'Property'
   TripleandMarkup,TAC,Facility,DiscountModeRS,DiscountModePer,
   DiscountAllowed,MarkupId,TaxAdded)
   SELECT P.PropertyName,I.Id,I.GetType,I.PropertyType,'',0,0,0,0,0,0,0,
-  'CP+Wifi',0,0,0,0,'' FROM #Dedicated I
+  'CP',0,0,0,0,'' FROM #Dedicated I
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id=I.Id
   LEFT OUTER JOIN WRBHBPropertyBlocks B WITH(NOLOCK)ON B.PropertyId=I.Id
   LEFT OUTER JOIN WRBHBPropertyApartment A WITH(NOLOCK)ON
@@ -1526,7 +1526,7 @@ IF @Action = 'Property'
   TripleandMarkup,TAC,Facility,DiscountModeRS,DiscountModePer,
   DiscountAllowed,MarkupId,TaxAdded)
   SELECT I.PropertyName,I.Id,I.GetType,I.PropertyType,I.RoomType,
-  I.SingleTariff,I.DoubleTariff,0,I.SingleTariff,I.DoubleTariff,0,0,'CP+Wifi',
+  I.SingleTariff,I.DoubleTariff,0,I.SingleTariff,I.DoubleTariff,0,0,'CP',
   I.DiscountModeRS,I.DiscountModePer,I.DiscountAllowed,0,'' FROM #Internal I
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id=I.Id
   LEFT OUTER JOIN WRBHBPropertyBlocks B WITH(NOLOCK)ON B.PropertyId=I.Id

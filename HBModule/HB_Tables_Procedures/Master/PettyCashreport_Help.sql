@@ -73,6 +73,17 @@ BEGIN
 			Convert(date,@Str1,103)
 			group by S.FirstName,S.LastName,U.CreatedDate,U.Amount
 		END
+		ELSE IF(@Str ='All')
+		BEGIN
+		INSERT INTO #Final(UserName,ProcessedOn,TransferredAmount,Fortnight)
+			SELECT (S.FirstName+''+S.LastName) AS UserName,
+			CONVERT(NVARCHAR,CAST(U.CreatedDate AS Date),103) AS ProcessedOn,U.Amount,3 
+			FROM WRBHBPettyCashStatus U 
+			JOIN WRBHBUser S ON U.UserId=S.Id AND S.IsActive=1 AND S.IsDeleted=0
+			WHERE U.UserId=@UserId AND U.PropertyId=@Id AND U.IsActive=0 AND U.IsDeleted=1
+			AND MONTH(CONVERT (date,U.CreatedDate,103))=MONTH(Convert(date,@Str1,103))
+			group by S.FirstName,S.LastName,U.CreatedDate,U.Amount
+		END
 		
 		CREATE TABLE #FinalReport(UserName NVARCHAR(100),ProcessedOn NVARCHAR(100),
 		TransferredAmount DECIMAL(27,2))
@@ -88,6 +99,12 @@ BEGIN
 		SELECT UserName,ProcessedOn,SUM(TransferredAmount)AS TransferredAmount
 		FROM #Final
 		WHERE (day(Convert(datetime,ProcessedOn)-1) / 15) + 1=2 AND Fortnight=2
+		GROUP BY UserName,ProcessedOn
+		
+		INSERT #FinalReport(UserName,ProcessedOn,TransferredAmount)
+		SELECT UserName,ProcessedOn,SUM(TransferredAmount)AS TransferredAmount
+		FROM #Final
+		WHERE  Fortnight=3
 		GROUP BY UserName,ProcessedOn
 		
 		SELECT UserName,ProcessedOn,TransferredAmount FROM #FinalReport
@@ -232,25 +249,38 @@ BEGIN
 		DECLARE @Cnt int
 			
         CREATE TABLE #PCNEW(Requestedby NVARCHAR(100),RequestedOn NVARCHAR(100),
-        ExpenseHead NVARCHAR(100),Description NVARCHAR(100),Amount DECIMAL(27,2),
+        ExpenseHead NVARCHAR(100),ExpenseItem NVARCHAR(100),Description NVARCHAR(100),Amount DECIMAL(27,2),
+        BillDate NVARCHAR(100),BillStartDate NVARCHAR(100),BillEndDate NVARCHAR(100),Property NVARCHAR(100),
         Id bigint IDENTITY(1,1)  NOT NULL PRIMARY KEY)
         
         
-		INSERT INTO #PCNEW(Requestedby,RequestedOn,ExpenseHead,Description,Amount)
+		INSERT INTO #PCNEW(Requestedby,RequestedOn,ExpenseHead,ExpenseItem,Description,Amount,
+		BillDate,BillStartDate,BillEndDate,Property)
 	
-		SELECT DISTINCT (U.FirstName+''+U.LastName) AS Requestedby,Convert(VARCHAR(100),PH.Date,103) 
-		AS RequestedOn,	ExpenseHead,Description,Amount 
+		SELECT (U.FirstName+''+U.LastName) AS Requestedby,Convert(VARCHAR(100),PH.Date,103) 
+		AS RequestedOn,EG.ExpenseHead,PC.ExpenseHead AS ExpenseItem,PC.Description,ApprovedAmount AS Amount,
+		CONVERT(NVARCHAR,PS.BillDate,103),@Str AS Startdate,
+		@Str1 AS EndDate,P.PropertyName 
 		FROM WRBHBPettyCash PC  
 		JOIN WRBHBPettyCashHdr PH ON PC.PettyCashHdrId= PH.Id AND PH.IsActive=0 AND PH.IsDeleted=1
+		JOIN WRBHBPettyCashStatus PS ON PH.ClosingBalance=PS.Balance AND PS.IsActive=0 AND PS.IsDeleted=1
+		JOIN WRBHBExpenseHeads EX ON PC.ExpenseHead=EX.HeaderName
+		JOIN WRBHBExpenseGroup EG ON EX.ExpenseGroupId=EG.Id
 		JOIN WRBHBUser U ON PH.UserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
-		WHERE PropertyId=@Id AND UserId=@UserId AND
-		PH.Date BETWEEN CONVERT(date,@Str,103) AND CONVERT(date,@Str1,103)
+		JOIN WRBHBProperty P ON PH.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
+		WHERE PC.IsActive=1 AND PC.IsDeleted=0 
+		AND	PH.Date BETWEEN CONVERT(date,@Str,103) AND CONVERT(date,@Str1,103)
+		GROUP BY U.FirstName,U.LastName,PH.Date,EG.ExpenseHead,PC.ExpenseHead,PC.Description,
+		ApprovedAmount,PS.BillDate,P.PropertyName
+		ORDER BY PH.Date
 		
-		SELECT Id as SerialNo,Requestedby,RequestedOn,ExpenseHead,Description,Amount
-		FROM #PCNEW ORDER BY RequestedOn
+		SELECT Id as SNo,Requestedby,RequestedOn,ExpenseHead,ExpenseItem,Description,Amount,
+		BillDate,BillStartDate,BillEndDate,Property	FROM #PCNEW 
+			
 		
 END	
 END
+
 
 
  

@@ -23,6 +23,7 @@ GO
 */
 CREATE PROCEDURE [dbo].[Sp_BTCSubmissionCheque_Insert]
 (
+@ClientId			INT,
 @Amount				DECIMAL(27,2),
 @ChequeNo			NVARCHAR(100),
 @Bank				NVARCHAR(100),
@@ -34,8 +35,12 @@ CREATE PROCEDURE [dbo].[Sp_BTCSubmissionCheque_Insert]
 AS
 BEGIN
 INSERT INTO WRBHBBTCSubmissionCheque(Amount,ChequeNo,BankName,DateIssued,Comments,IsActive,IsDeleted,CreatedBy,CreatedDate,
-			ModifiedBy,ModifiedDate,RowId,Mode)
-VALUES (@Amount,@ChequeNo,@Bank,@IssueDate,@Comments,1,0,@CreatedBy,GETDATE(),@CreatedBy,GETDATE(),NEWID(),@Mode)
+			ModifiedBy,ModifiedDate,RowId,Mode,ClientId)
+VALUES (@Amount,@ChequeNo,@Bank,@IssueDate,@Comments,1,0,@CreatedBy,GETDATE(),@CreatedBy,GETDATE(),NEWID(),@Mode,@ClientId)
 		
  SELECT Id,RowId FROM WRBHBBTCSubmissionCheque WHERE Id=@@IDENTITY;		
+ 
+ UPDATE WRBHBBTCSubmission SET CollectionStatus='Cheque Payment',Mode=@Mode,ModeId=@@IDENTITY
+ WHERE ClientId=@ClientId AND CollectionStatus='Submitted'
+ 
 END		

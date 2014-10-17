@@ -164,7 +164,7 @@ BEGIN
 		
 	SELECT Id AS SNo,GetType AS BookingType,BookingId AS BookingCode,BillId,InVoiceNo,PropertyName,
 	ClientName,MasterClientName,Guest AS GuestName,CheckInDate,CheckOutDate,CityName AS Location,
-	BillStartDate,BillEndDate,TotalAmount,Amount,FBAmount AS FoodAndBeverages,SAmount AS Service,
+	BillStartDate,BillEndDate,ISNULL(TotalAmount,0) AS TotalAmount,Amount,FBAmount AS FoodAndBeverages,SAmount AS Service,
 	LAmount AS Laundry,Mis AS Miscellaneous,OtherService AS OtherService,LT AS LuxuryTax,STT,STTC,
 	STC,SC AS ServiceCharge,VAT FROM #Final
 	group by Id  ,GetType ,BookingId  ,BillId,InVoiceNo,PropertyName,

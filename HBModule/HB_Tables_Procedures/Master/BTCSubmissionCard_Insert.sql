@@ -23,6 +23,7 @@ GO
 */
 CREATE PROCEDURE [dbo].[Sp_BTCSubmissionCard_Insert]
 (
+@ClientId			INT,
 @Amount				DECIMAL(27,2),
 @CCBrand			NVARCHAR(100),
 @Name				NVARCHAR(100),
@@ -39,11 +40,16 @@ CREATE PROCEDURE [dbo].[Sp_BTCSubmissionCard_Insert]
 ) 
 AS
 BEGIN
+
+
 INSERT INTO WRBHBBTCSubmissionCard(Amount,CCBrand,NameOnTheCard,CardNumber,ExpiryMonth,ExpiryYear,ROC,
 			SOCBatchCloseNo,SwipedFor,Remarks,Comments,IsActive,IsDeleted,CreatedBy,CreatedDate,
-			ModifiedBy,ModifiedDate,RowId,Mode)
+			ModifiedBy,ModifiedDate,RowId,Mode,ClientId)
 VALUES (@Amount,@CCBrand,@Name,@CardNumber,@ExpiryMonth,@ExpiryYear,@ROC,@SOC,@Swipedfor,@Remarks,@Comments,
-		1,0,@CreatedBy,GETDATE(),@CreatedBy,GETDATE(),NEWID(),@Mode)
+		1,0,@CreatedBy,GETDATE(),@CreatedBy,GETDATE(),NEWID(),@Mode,@ClientId)
 		
- SELECT Id,RowId FROM WRBHBBTCSubmissionCard WHERE Id=@@IDENTITY;		
+ SELECT Id,RowId FROM WRBHBBTCSubmissionCard WHERE Id=@@IDENTITY;	
+ 
+ UPDATE WRBHBBTCSubmission SET CollectionStatus='Card Payment',Mode=@Mode,ModeId=@@IDENTITY
+ WHERE ClientId=@ClientId AND CollectionStatus='Submitted'	
 END		

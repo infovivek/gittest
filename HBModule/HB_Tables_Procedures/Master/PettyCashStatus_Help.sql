@@ -88,18 +88,19 @@ BEGIN
 	BEGIN
 		CREATE TABLE #Final(ExpenseHead NVARCHAR(100),Description NVARCHAR(100),Status NVARCHAR(100),
 		Amount DECIMAL(27,2),Paid DECIMAL(27,2),Id INT,TotalAmount DECIMAL(27,2),
-		ExpenseId INT,FilePath NVARCHAR(100))
+		ExpenseId INT,FilePath NVARCHAR(100),BillDate NVARCHAR(100))
 		
-		INSERT INTO #Final(ExpenseHead,Description,Status,Amount,Paid,Id,TotalAmount,ExpenseId,FilePath)
+		INSERT INTO #Final(ExpenseHead,Description,Status,Amount,Paid,Id,TotalAmount,ExpenseId,FilePath,
+		BillDate)
 		
-		SELECT ExpenseHead,Description,'' AS Status,ApprovedAmount,0 AS Paid,
-		0 AS Id,TotalAmount,P.Id AS ExpenseId,'' AS FilePath
+		SELECT ExpenseHead,Description,CONVERT(NVARCHAR,PC.Date,103) AS Status,ApprovedAmount,0 AS Paid,
+		0 AS Id,TotalAmount,P.Id AS ExpenseId,'' AS FilePath,'' As BillDate
 		FROM WRBHBPettyCash	P
 		JOIN WRBHBPettyCashHdr PC ON P.PettyCashHdrId=PC.Id AND PC.IsActive=1 AND PC.IsDeleted=0
 		WHERE P.IsActive=1 AND P.IsDeleted=0 AND PC.PropertyId=@Id AND PC.UserId=@UserId
 		AND PC.Flag=1 AND CONVERT(date,PC.Date,103)=CONVERT(date,@Str,103)
 		
-		SELECT ExpenseHead,Description,Status,Amount,Paid,Id,TotalAmount,ExpenseId,FilePath
+		SELECT ExpenseHead,Description,Status,Amount,Paid,Id,TotalAmount,ExpenseId,FilePath,BillDate
 		FROM #Final
 				
 		--Expense

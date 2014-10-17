@@ -32,7 +32,8 @@ CREATE PROCEDURE Sp_PettyCashStatus_Insert
 @Paid		    DECIMAL(27,2),
 @PropertyId     BIGINT,
 @BillLogo       NVARCHAR(1000),
-@ExpenseId		    BIGINT,
+@ExpenseId		BIGINT,
+@BillDate       NVARCHAR(1000),
 @UserId		    BIGINT
 )
 AS
@@ -46,9 +47,9 @@ BEGIN
 	
 	INSERT INTO WRBHBPettyCashStatus(PropertyId,ExpenseHead,Status,Description,Amount,
 	Paid,UserId,IsActive,IsDeleted,Createdby,Createddate,Modifiedby,Modifieddate,
-	RowId,Flag,BillLogo,ExpenseId)
+	RowId,Flag,BillLogo,ExpenseId,BillDate)
 	VALUES(@PropertyId,@ExpenseHead,@Status,@Description,@Amount,@Paid,@UserId,1,0,@UserId,
-	GETDATE(),@UserId,GETDATE(),NEWID(),1,@BillLogo,@ExpenseId)
+	GETDATE(),@UserId,GETDATE(),NEWID(),1,@BillLogo,@ExpenseId,@BillDate)
 	
 	SET  @Identity=@@IDENTITY
 	SELECT Id,RowId FROM WRBHBPettyCashStatus WHERE Id=@Identity;

@@ -109,7 +109,7 @@ namespace HB.Dao
                 command.Parameters.Add("@Id3", SqlDbType.NVarChar).Value = data[9].ToString();
             }
             command.Parameters.Add("@Action", SqlDbType.NVarChar).Value = data[7].ToString();
-            command.Parameters.Add("@Id", SqlDbType.Int).Value = Convert.ToInt32(data[2].ToString());
+            command.Parameters.Add("@Id", SqlDbType.BigInt).Value = Convert.ToInt64(data[2].ToString());
             command.Parameters.Add("@UserId", SqlDbType.Int).Value = Convert.ToInt32(user.Id);
             return new WrbErpConnection().ExecuteDataSet(command, UserData);
         }

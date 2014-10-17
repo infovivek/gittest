@@ -477,6 +477,7 @@
 					var Ac_PettyCash:ArrayCollection=new ArrayCollection();
 					Ac_PettyCash=Grd_User.dataProvider as ArrayCollection;
 					var Uploadindex:int=Grd_User.selectedIndex;
+					Ac_PettyCash[Uploadindex].BillDate=dt_DateFrom.text;
 					Ac_PettyCash[Uploadindex].FilePath="http://sstage.in/Bill_images/"+resultsTxtField.text;				
 					
 					Grd_User.dataProvider=Ac_PettyCash;
@@ -744,7 +745,8 @@
 						<mx:DataGridColumn dataField="FilePath" headerText="FilePath" width="50" editable="true" visible="false"/>
 						<mx:DataGridColumn dataField="Id" headerText="Id" width="10" editable="true" visible="false"/>
 						<mx:DataGridColumn dataField="ExpenseId" headerText="ExpenseId" width="10" editable="true" visible="false"/>
-						<mx:DataGridColumn dataField="Total" headerText="Total" width="10" editable="false" visible="false"/>
+						<mx:DataGridColumn dataField="BillDate" headerText="BillDate" width="10" editable="false" visible="false"/>
+						<mx:DataGridColumn dataField="Status" headerText="Status" width="10" editable="false" visible="false"/>
 					</mx:columns>
 				</mx:DataGrid>
 				
@@ -803,11 +805,15 @@
 					</s:BorderContainer>
 				<mx:Label x="236" y="122" text="ExpenseHead" id="lbl_ExpenseUpload"/>
 				<mx:Label x="236" y="172" text="Description" id="lbl_DesUpload"/>
-				<mx:Label x="242" y="232" text="Attachment"/>
-				
+				<mx:Label x="242" y="262" text="Attachment"/>
+				<mx:Label x="236" y="210" text="BillDate"/>
+				<mx:DateField id="dt_DateFrom" x="326" y="210" width="135" height="23" enabled="true"
+							  formatString="DD/MM/YYYY" selectableRange="{{rangeEnd:new Date()}}"
+							  styleName="DisabledDateField" tabIndex="3"
+							  yearNavigationEnabled="false"/>
 				<mx:TextInput id="Txt_desupload" x="326" y="172" width="190" height="23" tabIndex="2"/>
 				<mx:TextInput id="Txt_ExpenseHead" x="326" y="121" width="190" height="23" tabIndex="2"/>
-				<WrbComp:Button_HB id="Btn_Browse" x="372" y="225" width="118" height="32" buttonMode="true"
+				<WrbComp:Button_HB id="Btn_Browse" x="372" y="255" width="118" height="32" buttonMode="true"
 								   _Label="Bill Upload" click="FnClick_Btn_Browse()" depth="0" focusEnabled="false" visible="true"/>
 				
 				</s:BorderContainer>
