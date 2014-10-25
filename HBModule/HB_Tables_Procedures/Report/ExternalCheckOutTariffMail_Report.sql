@@ -48,7 +48,7 @@ IF @Action='PageLoad'
 	WHERE H.Id=@ClientId
 	
 	
-	select h.GuestName as GuestName,h.Name,h.Stay,h.Type,d.Type as BookingLevel,convert(nvarchar(100),h.CheckOutDate,103) as BillDate,  
+	select h.GuestName as GuestName,h.Name,h.Stay,h.Type,d.Type as BookingLevel,convert(nvarchar(100),CONVERT(DATE,h.CheckOutDate,103),110) as BillDate,  
 	 h.ClientName,h.CheckOutNo,T.TACInvoiceNo InVoiceNo,  
 	 T.Rate as Tariff,T.MarkUpAmount as TotalTariff,round(T.TACAmount,0) as NetAmount,  
 	 T.TotalBusinessSupportST as SerivceTax,T.ChkOutTariffCess as Cess,T.NoOfDays,  
@@ -68,7 +68,7 @@ IF @Action='PageLoad'
 	 'TIN : 29340489869' as Tin,'Taxable Category : Accommodation Service,Business Support Services and Restaurant Services' as Taxablename,  
 	 'Service Tax Regn. No : AABCH5874RST001' as ServiceTaxNo,'Luxury Tax @ '+CAST(H.LuxuryTaxPer AS NVARCHAR)+'%' LTPer,
 	 'Service Tax @ '+CAST(H.ServiceTaxPer AS NVARCHAR)+'%' STPer,
-	 'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),GETDATE(),103) as InVoicedate
+	 'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),CONVERT(DATE,GETDATE(),103),110) as InVoicedate
 	   
 	 from WRBHBChechkOutHdr h  
 	 join WRBHBExternalChechkOutTAC T on h.Id = T.ChkOutHdrId

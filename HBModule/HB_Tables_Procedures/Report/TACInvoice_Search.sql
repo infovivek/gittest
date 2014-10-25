@@ -40,7 +40,7 @@ BEGIN												--drop table #TEMP
 		INSERT INTO #TEMP(BillNo,CreatedDate,InvoiceNo,Property,PropertyId,Amount,Tax,TotalAmount,Guests,
 		Client,ChkInDate,ChkOutDate,NOOfDays,PerdayRate)
 	
-		SELECT C.CheckOutNo as BillId,Convert(NVARCHAR(100),CT.CreatedDate,103) AS CreatedDate,
+		SELECT C.CheckOutNo as BillId,Convert(NVARCHAR(100),CONVERT(DATE,CT.CreatedDate,103),110) AS CreatedDate,
 		CT.TACInvoiceNo InvoiceNo,P.PropertyName Property,C.PropertyId,CT.MarkUpAmount as Amount,
 		CT.TotalBusinessSupportST as Tax,CT.TACAmount TotalAmount,C.GuestName AS Guest,C.ClientName AS Client,
 		CT.CheckInDate as ChkInDt,CT.CheckOutDate AS ChkOutDt,ct.NoOfDays,ct.Rate
@@ -65,15 +65,17 @@ BEGIN												--drop table #TEMP
 --FROM DATE AND TO DATE ARE GIVEN		
 	IF @PId=0 AND @FromDate!='' AND @ToDate!='' 
 	BEGIN
-		SELECT Id,BillNo,CreatedDate,InvoiceNo,Property,Amount,Tax,TotalAmount,Guests,Client,ChkInDate,
-		ChkOutDate ,NOOfDays TotalDays,PerdayRate Perday,NOOfDays TotalDays,PerdayRate Perday 
+		SELECT Id,BillNo,CONVERT(NVARCHAR,CONVERT(Date,CreatedDate,103),110) AS CreatedDate,
+		InvoiceNo,Property,Amount,Tax,TotalAmount,Guests,Client,CONVERT(NVARCHAR,CONVERT(Date,ChkInDate,103),110)
+		 AS ChkInDate,CONVERT(NVARCHAR,CONVERT(Date,ChkOutDate,103),110) AS ChkOutDate ,
+		 NOOfDays TotalDays,PerdayRate Perday,NOOfDays TotalDays,PerdayRate Perday 
 		FROM #TEMP WHERE CONVERT(DATE,CreatedDate,103) BETWEEN CONVERT(DATE,@FromDate,103)
 		AND CONVERT(DATE,@ToDate,103) 
 	END
 --PROPERTY,FROM DATE AND TO DATE ARE GIVEN		
 	IF @PId!=0 AND @FromDate!='' AND @ToDate!='' 
 	BEGIN
-		SELECT Id,BillNo,CreatedDate,InvoiceNo,Property,Amount,Tax,TotalAmount,Guests,Client,ChkInDate,
+		SELECT Id,BillNo,Convert(NVARCHAR(100),CONVERT(DATE,CreatedDate,103),110) AS CreatedDate,InvoiceNo,Property,Amount,Tax,TotalAmount,Guests,Client,ChkInDate,
 		ChkOutDate ,NOOfDays TotalDays,PerdayRate Perday
 		FROM #TEMP  WHERE CONVERT(DATE,CreatedDate,103) BETWEEN CONVERT(DATE,@FromDate,103)
 		AND CONVERT(DATE,@ToDate,103) AND PropertyId=@PId

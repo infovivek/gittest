@@ -122,7 +122,7 @@ BEGIN
 	  FROM #BankTransact
 	 
 END
-IF @Mode='Bill'
+IF @Mode='Bill' 
 BEGIN
 	IF(@Type='BTC')
 	BEGIN
@@ -223,7 +223,7 @@ BEGIN
 		 
 	IF(@Type='CASH')
 	BEGIN
-		IF @Datefrom ='' AND @DateTo='' AND @PropertyId='' AND @ClientId='' AND @ChequeNo=''
+		IF @Datefrom ='' AND @DateTo='' AND @PropertyId='' AND @ClientId='' AND @ChequeNo=''  
 		BEGIN 
 			SELECT isnull(Dt.BIllType,0) Chkrefno,Dt.Amount Amount,ISNULL(Dt.InVoiceNo,0) AS InVoiceNo,
 			Dt.Amount AS AmttobeReconciled, 0 as Billchecks,0 as AmttobeReconciled ,
@@ -360,11 +360,12 @@ BEGIN
 			AND Dt.InVoiceNo  NOT IN( SELECT P.InvoiceNo FROM WRBHBReconcilePayment P 
 									WHERE P.IsActive=1 AND P.IsDeleted=0 )
 		END
+		 
 	END
 
 	IF(@Type='CHEQUE')
 	BEGIN
-		IF @Datefrom ='' AND @DateTo='' AND @PropertyId='' AND @ClientId='' AND @ChequeNo=''
+		IF @Datefrom ='' AND @DateTo='' AND @PropertyId='' AND @ClientId='' AND @ChequeNo=''   
 		BEGIN
 			SELECT isnull(D.ChequeNo,0) Chkrefno,Dt.Amount Amount,ISNULL(Dt.InVoiceNo,0) AS InVoiceNo,
 			Dt.Amount AS AmttobeReconciled, 0 as Billchecks,0 as AmttobeReconciled ,
@@ -480,6 +481,7 @@ BEGIN
 									WHERE P.IsActive=1 AND P.IsDeleted=0 )
 		END
 		 
+		 
 	END
 
 	IF(@Type='CREDITCARD')
@@ -490,7 +492,7 @@ BEGIN
 	 Create table #CreditCardDtlsF(Chkrefno nvarchar(100),Amount Decimal(27,2),InvoiceDate nvarchar(50),
 	 InVoiceNo nvarchar(100),AmttobeReconciled Decimal(27,2),Billchecks int,CardType Nvarchar(100))
 	 
-		IF @Datefrom ='' AND @DateTo='' AND @PropertyId='' AND @ClientId='' AND @ChequeNo=''
+		IF @Datefrom ='' AND @DateTo='' AND @PropertyId='' AND @ClientId='' AND @ChequeNo='' and @TransactionId=''
 		BEGIN 
 		Insert into #CreditCardDtls(Chkrefno,Amount,InvoiceDate,InVoiceNo,AmttobeReconciled,Billchecks,CardType)
 			SELECT ISNULL(CI.SOCBatchCloseNo ,0) AS Chkrefno,CI.AmountPaid Amount,
@@ -673,11 +675,25 @@ BEGIN
 			AND CH.InVoiceNo  NOT IN( SELECT P.InvoiceNo FROM WRBHBReconcilePayment P 
 									WHERE P.IsActive=1 AND P.IsDeleted=0 )
 		END
+		IF @Datefrom ='' AND @DateTo='' AND @PropertyId='' AND @ClientId='' AND @ChequeNo='' and @TransactionId!=''
+		BEGIN 
+		Insert into #CreditCardDtls(Chkrefno,Amount,InvoiceDate,InVoiceNo,AmttobeReconciled,Billchecks,CardType)
+			SELECT ISNULL(CI.SOCBatchCloseNo ,0) AS Chkrefno,CI.AmountPaid Amount,
+			CONVERT(Nvarchar(100),CI.CreatedDate,103) AS InvoiceDate,ISNULL(CH.InVoiceNo,0) AS InVoiceNo,
+			CI.AmountPaid AS AmttobeReconciled , 0 as Billchecks,CI.CCBrand
+			FROM WRBHBChechkOutPaymentCard CI
+			JOIN WRBHBChechkOutHdr CH ON CI.ChkOutHdrId=CH.Id AND Ch.IsActive=1 AND CH.IsDeleted=0
+			WHERE CI.IsActive=1 AND CI.IsDeleted=0 
+			AND CH.InVoiceNo  NOT IN( SELECT isnull(InvoiceNo,'') FROM WRBHBReconcilePaymentRef  
+			where isnull(InvoiceNo,'')!='' ) and Ci.CCBrand=@TransactionId
+		END
+		
+		
 		Insert into #CreditCardDtlsF(Chkrefno,Amount,InvoiceDate,InVoiceNo,AmttobeReconciled,Billchecks,CardType)
 		Select Chkrefno,Amount,InvoiceDate,
 		InVoiceNo,AmttobeReconciled-(Amount/100)*(1.79),Billchecks, CardType 
 		from #CreditCardDtls
-		WHERE CardType IN (UPPER('VISACard'),UPPER('MasterCard'),UPPER('AmericanExpress'),UPPER('MaestroCard'))
+		WHERE CardType IN (UPPER('VISACard'),UPPER('MasterCard'),UPPER('AmericanExpress'),UPPER('MaestroCard'),UPPER('Discover'))
 		
 		Insert into #CreditCardDtlsF(Chkrefno,Amount,InvoiceDate,InVoiceNo,AmttobeReconciled,Billchecks,CardType)
 		Select Chkrefno,Amount,InvoiceDate,InVoiceNo,
@@ -693,7 +709,7 @@ BEGIN
 
 	IF(@Type='NEFT')
 	BEGIN
-		IF @Datefrom ='' AND @DateTo='' AND @PropertyId='' AND @ClientId='' AND @ChequeNo=''
+		IF @Datefrom ='' AND @DateTo='' AND @PropertyId='' AND @ClientId='' AND @ChequeNo=''  
 		BEGIN
 			SELECT ISNULL(CI.ReferenceNumber ,0) AS Chkrefno,CI.AmountPaid Amount,
 			CONVERT(Nvarchar(100),CI.CreatedDate,103) AS InvoiceDate,ISNULL(CH.InVoiceNo,0) AS InVoiceNo,
@@ -848,20 +864,22 @@ BEGIN
 			AND CH.InVoiceNo  NOT IN( SELECT P.InvoiceNo FROM WRBHBReconcilePayment P 
 									WHERE P.IsActive=1 AND P.IsDeleted=0 )
 		END
+		 
+		 
 	END
 
 	IF(@Type='Contract')
 	Begin
 	 
 	 
-	IF @Datefrom ='' AND @DateTo='' AND @PropertyId='' AND @ClientId='' AND @ChequeNo=''
+	IF @Datefrom ='' AND @DateTo='' AND @PropertyId='' AND @ClientId='' AND @ChequeNo='' and @TransactionId=''
 	BEGIN
 		   SELECT ISNULL(C.ReferenceNo ,0) AS Chkrefno,isnull(C.TotalAmount,0) Amount,
 			CONVERT(Nvarchar(100),C.RentDate,103) AS InvoiceDate,ISNULL(InvoiceNo,0) AS InVoiceNo,
 			isnull(C.TotalAmount,0) AS AmttobeReconciled , 0 as Billchecks 
 			from WRBHBInvoiceManagedGHAmount C WHERE IsActive=1 AND IsDeleted=0
 			AND ISNULL(InvoiceNo,0)  NOT IN(  SELECT isnull(InvoiceNo,'') FROM WRBHBReconcilePaymentRef  
-			where isnull(InvoiceNo,'')!=''  )
+			where isnull(InvoiceNo,'')!=''  ) and isnull(C.TotalAmount,0)!=0
 		 
 	END		
 	 IF @Datefrom !='' AND @DateTo! ='' AND @PropertyId='' AND @ClientId='' AND @ChequeNo=''
@@ -922,7 +940,16 @@ BEGIN
 								   WHERE P.IsActive=1 AND P.IsDeleted=0 )
 		 
 	END	
-
+     IF @Datefrom ='' AND @DateTo='' AND @PropertyId='' AND @ClientId='' AND @ChequeNo='' and @TransactionId!=''
+	BEGIN
+		   SELECT ISNULL(C.ReferenceNo ,0) AS Chkrefno,isnull(C.TotalAmount,0) Amount,
+			CONVERT(Nvarchar(100),C.RentDate,103) AS InvoiceDate,ISNULL(InvoiceNo,0) AS InVoiceNo,
+			isnull(C.TotalAmount,0) AS AmttobeReconciled , 0 as Billchecks 
+			from WRBHBInvoiceManagedGHAmount C WHERE IsActive=1 AND IsDeleted=0
+			AND ISNULL(InvoiceNo,0)  NOT IN(  SELECT isnull(InvoiceNo,'') FROM WRBHBReconcilePaymentRef  
+			where isnull(InvoiceNo,'')!=''  ) and c.Type=''+@TransactionId+' ' and isnull(C.TotalAmount,0)!=0
+		 
+	END		
 		
 	END
 

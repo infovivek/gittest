@@ -427,6 +427,12 @@ namespace HBReport {
             
             private global::System.Data.DataColumn columnInVoicedate;
             
+            private global::System.Data.DataColumn columnPIInvoice;
+            
+            private global::System.Data.DataColumn columnChkinDT;
+            
+            private global::System.Data.DataColumn columnChkoutDT;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public DataTable1DataTable() {
@@ -1054,6 +1060,30 @@ namespace HBReport {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn PIInvoiceColumn {
+                get {
+                    return this.columnPIInvoice;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn ChkinDTColumn {
+                get {
+                    return this.columnChkinDT;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn ChkoutDTColumn {
+                get {
+                    return this.columnChkoutDT;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -1163,7 +1193,10 @@ namespace HBReport {
                         string HECess, 
                         string CessService, 
                         string CINNo, 
-                        string InVoicedate) {
+                        string InVoicedate, 
+                        string PIInvoice, 
+                        string ChkinDT1, 
+                        string ChkoutDT1) {
                 DataTable1Row rowDataTable1Row = ((DataTable1Row)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         CheckoutNo,
@@ -1239,7 +1272,10 @@ namespace HBReport {
                         HECess,
                         CessService,
                         CINNo,
-                        InVoicedate};
+                        InVoicedate,
+                        PIInvoice,
+                        ChkinDT1,
+                        ChkoutDT1};
                 rowDataTable1Row.ItemArray = columnValuesArray;
                 this.Rows.Add(rowDataTable1Row);
                 return rowDataTable1Row;
@@ -1336,6 +1372,9 @@ namespace HBReport {
                 this.columnCessService = base.Columns["CessService"];
                 this.columnCINNo = base.Columns["CINNo"];
                 this.columnInVoicedate = base.Columns["InVoicedate"];
+                this.columnPIInvoice = base.Columns["PIInvoice"];
+                this.columnChkinDT = base.Columns["ChkinDT"];
+                this.columnChkoutDT = base.Columns["ChkoutDT"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -1493,6 +1532,12 @@ namespace HBReport {
                 base.Columns.Add(this.columnCINNo);
                 this.columnInVoicedate = new global::System.Data.DataColumn("InVoicedate", typeof(string), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnInVoicedate);
+                this.columnPIInvoice = new global::System.Data.DataColumn("PIInvoice", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnPIInvoice);
+                this.columnChkinDT = new global::System.Data.DataColumn("ChkinDT", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnChkinDT);
+                this.columnChkoutDT = new global::System.Data.DataColumn("ChkoutDT", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnChkoutDT);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -2819,6 +2864,54 @@ namespace HBReport {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public string PIInvoice {
+                get {
+                    try {
+                        return ((string)(this[this.tableDataTable1.PIInvoiceColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'PIInvoice\' in table \'DataTable1\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableDataTable1.PIInvoiceColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public string ChkinDT {
+                get {
+                    try {
+                        return ((string)(this[this.tableDataTable1.ChkinDTColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'ChkinDT\' in table \'DataTable1\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableDataTable1.ChkinDTColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public string ChkoutDT {
+                get {
+                    try {
+                        return ((string)(this[this.tableDataTable1.ChkoutDTColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'ChkoutDT\' in table \'DataTable1\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableDataTable1.ChkoutDTColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public bool IsCheckoutNoNull() {
                 return this.IsNull(this.tableDataTable1.CheckoutNoColumn);
             }
@@ -3703,6 +3796,42 @@ namespace HBReport {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public void SetInVoicedateNull() {
                 this[this.tableDataTable1.InVoicedateColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsPIInvoiceNull() {
+                return this.IsNull(this.tableDataTable1.PIInvoiceColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetPIInvoiceNull() {
+                this[this.tableDataTable1.PIInvoiceColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsChkinDTNull() {
+                return this.IsNull(this.tableDataTable1.ChkinDTColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetChkinDTNull() {
+                this[this.tableDataTable1.ChkinDTColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsChkoutDTNull() {
+                return this.IsNull(this.tableDataTable1.ChkoutDTColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetChkoutDTNull() {
+                this[this.tableDataTable1.ChkoutDTColumn] = global::System.Convert.DBNull;
             }
         }
         

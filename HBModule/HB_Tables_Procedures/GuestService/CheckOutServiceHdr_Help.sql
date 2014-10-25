@@ -115,6 +115,9 @@ BEGIN
 		   		    
 		END
 		 
+		 UPDATE #SERVICRAMOUNT SET Price=0 
+		 WHERE Complimentary=1
+		 
 		INSERT INTO #SERVICRAMOUNTFinal(Id,Complimentary,ServiceName,Price,Enable,ProductId,TypeService,Type)
 		SELECT Id,ISComplimentary,ProductName,PerQuantityprice,Enable,Id,TypeService,'ProductMaster' 
 		FROM WRBHBContarctProductMaster 
@@ -206,7 +209,7 @@ BEGIN
 		KD.Id,KD.ItemId,'Food And Beverages' as ServiceType
 		FROM WRBHBNewKOTEntryDtl KD  
 		JOIN WRBHBNewKOTEntryHdr KH ON KD.NewKOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0  
-		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KH.GuestId=@CheckInHdrId AND BookingId=@BookingId ;
+		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KH.GuestId=20223 AND BookingId=@BookingId ;
 		
 		
 		SELECT VAT,RestaurantST,BusinessSupportST ,Cess,HECess --,'Food And Beverages' as Type  

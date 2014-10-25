@@ -88,7 +88,7 @@ DECLARE @CompanyName VARCHAR(100),@Address NVARCHAR(100),@PanCardNo VARCHAR(100)
 	p.Phone,p.Email,
 	sum(cs.ChkOutServiceLT) ChkOutServiceLT,sum(cs.ChkOutServiceST) as ServiceTax,
 	sum(Cs.ChkOutServiceNetAmount) ChkOutServiceNetAmount,sum(cs.ChkOutServiceAmtl) as Amount,	
-	sum(CS.ChkOutServiceNetAmount) as ServiceNetAmt,
+	sum(CS.ChkOutServiceNetAmount) as ServiceNetAmt,sum(cs.ChkOutServiceVat) as Vat,
 	@CompanyName as CompanyName,'PAN NO :'+@PanCardNo AS PanCardNo,@LOGO AS logo,
 	'Regd Office : No. 122, Amarjyothi Layout, Domlur, Bangalore - 560071'+'.'+'www.hummingbirdindia.com' as CompanyAddress,
 	'INVOICE : For any invoice clarification revert within 7 days from the date of receipt' as Invoice,
@@ -104,10 +104,11 @@ DECLARE @CompanyName VARCHAR(100),@Address NVARCHAR(100),@PanCardNo VARCHAR(100)
 	round(isnull(@Laundry,0),0)+round(isnull(@Service,0),0)+round(isnull(@Miscellaneous,0),0)+round(isnull(h.ChkOutTariffLT,0),0)+
 	round(isnull(h.ChkOutTariffST1,0),0)+round(isnull(h.ChkOutTariffSC,0),0)+round(sum(CS.ChkOutServiceST),0)+round(sum(CS.OtherService),0)+
 	(round (isnull(h.ChkOutTariffST3,0),0)+round(isnull(h.ChkOutTariffCess,0),0)+round(sum(cs.Cess),0))+
-	(round(isnull(h.ChkOutTariffHECess,0),0)+round(sum(cs.HECess),0))) as 	BillAmount,
+	(round(isnull(h.ChkOutTariffHECess,0),0)+round(sum(cs.HECess),0)+round(sum(cs.ChkOutServiceVat),0))) as 	BillAmount,
 	@ClientAddress as Address,'Service Tax Regn. No : AABCH5874RST001' as ServiceTaxNo,
 	'Luxury Tax @ '+CAST(H.LuxuryTaxPer AS NVARCHAR)+'%' LTPer,
 	 'Service Tax @ '+CAST(H.ServiceTaxPer AS NVARCHAR)+'%' STPer,
+	 'VAT @'+CAST(H.VATPer AS NVARCHAR(100))+'%' VATPer,
 	 ISNULL(@Food,0) AS Food,ISNULL(@Laundry,0) Laundry,ISNULL(@Service,0) Service,
     ISNULL(@Miscellaneous,0) Miscellaneous,'Miscellaneous - '+@MiscellaneousRemarks MiscellaneousRemarks,
     'Service Tax @'+CAST(h.RestaurantSTPer  AS NVARCHAR)+'% on Food and Beverages' ServiceFB,

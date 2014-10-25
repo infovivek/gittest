@@ -34,19 +34,42 @@ CREATE PROCEDURE [dbo].[SP_CheckOutPaymentCheque_Insert](
 AS
 BEGIN
 DECLARE @Id INT;
- -- INSERT
-INSERT INTO WRBHBChechkOutPaymentCheque(ChkOutHdrId,Payment,PayeeName,Address,
-AmountPaid,ChequeNumber,BankName,DateIssued,DateIssueMonth,DateIssueYear,PaymentMode,
-OutStanding,
-CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId)
+DECLARE @IntermediateFlag NVARCHAR(100)
+SET @IntermediateFlag = (SELECT IntermediateFlag FROM WRBHBChechkOutHdr WHERE Id = @ChkOutHdrId)
 
-VALUES(@ChkOutHdrId,@Payment,@PayeeName,@Address,@AmountPaid,@ChequeNumber,@BankName,
-@DateIssued,@DateIssueMonth,@DateIssueYear,@PaymentMode,@OutStanding,@CreatedBy,
-GETDATE(),@CreatedBy,GETDATE(),1,0,NEWID())
+IF @IntermediateFlag = '1'
+BEGIN
+	-- INSERT
+	INSERT INTO WRBHBChechkOutPaymentCheque(ChkOutHdrId,Payment,PayeeName,Address,
+	AmountPaid,ChequeNumber,BankName,DateIssued,DateIssueMonth,DateIssueYear,PaymentMode,
+	OutStanding,
+	CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId)
+
+	VALUES(@ChkOutHdrId,@Payment,@PayeeName,@Address,@AmountPaid,@ChequeNumber,@BankName,
+	@DateIssued,@DateIssueMonth,@DateIssueYear,@PaymentMode,@OutStanding,@CreatedBy,
+	GETDATE(),@CreatedBy,GETDATE(),0,0,NEWID())
 
 
-SET @Id=@@IDENTITY;
-SELECT  Id,RowId FROM WRBHBChechkOutPaymentCheque WHERE Id=@Id;
+	SET @Id=@@IDENTITY;
+	SELECT  Id,RowId FROM WRBHBChechkOutPaymentCheque WHERE Id=@Id;
+END
+ELSE
+BEGIN
+	-- INSERT
+	INSERT INTO WRBHBChechkOutPaymentCheque(ChkOutHdrId,Payment,PayeeName,Address,
+	AmountPaid,ChequeNumber,BankName,DateIssued,DateIssueMonth,DateIssueYear,PaymentMode,
+	OutStanding,
+	CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId)
+
+	VALUES(@ChkOutHdrId,@Payment,@PayeeName,@Address,@AmountPaid,@ChequeNumber,@BankName,
+	@DateIssued,@DateIssueMonth,@DateIssueYear,@PaymentMode,@OutStanding,@CreatedBy,
+	GETDATE(),@CreatedBy,GETDATE(),1,0,NEWID())
+
+
+	SET @Id=@@IDENTITY;
+	SELECT  Id,RowId FROM WRBHBChechkOutPaymentCheque WHERE Id=@Id;
+END
+
 END
 GO
 

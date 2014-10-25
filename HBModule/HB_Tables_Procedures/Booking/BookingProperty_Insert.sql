@@ -60,7 +60,6 @@ BEGIN
  DECLARE @SingleRoomRate DECIMAL(27,2)=0,@SingleTaxes DECIMAL(27,2)=0;
  DECLARE @SingleRoomDiscount DECIMAL(27,2)=0,@DubRoomRate DECIMAL(27,2)=0;
  DECLARE @DubTaxes DECIMAL(27,2)=0,@DubRoomDiscount DECIMAL(27,2)=0;
- DECLARE @InsId BIGINT=0;
  --
  IF @APIHdrId != 0 AND @RatePlanCode != '' AND @RoomTypeCode != ''
   BEGIN
@@ -105,6 +104,17 @@ BEGIN
    SET @DubRoomRate=0;SET @DubTaxes=0;SET @DubRoomDiscount=0;
    SET @APIHdrId=0;
   END
+ DECLARE @TACPer DECIMAL(27,2) = 0;
+ IF @TAC = 1 AND @GetType = 'Property' AND @PropertyType = 'ExP'
+  BEGIN
+   SELECT TOP 1 @TACPer = ISNULL(TACPer,0) FROM WRBHBPropertyAgreements
+   WHERE IsActive = 1 AND IsDeleted = 0 AND PropertyId = @PropertyId
+   ORDER BY Id DESC;
+  END
+ ELSE
+  BEGIN
+   SET @TACPer = 0;
+  END
  INSERT INTO WRBHBBookingProperty(BookingId,PropertyName,PropertyId,
  GetType,PropertyType,RoomType,SingleTariff,DoubleTariff,TripleTariff,
  SingleandMarkup,DoubleandMarkup,TripleandMarkup,Markup,TAC,Inclusions,
@@ -112,7 +122,7 @@ BEGIN
  LocalityId,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,
  IsDeleted,RowId,MarkupId,SingleandMarkup1,DoubleandMarkup1,TripleandMarkup1,
  APIHdrId,RatePlanCode,RoomTypeCode,SingleRoomRate,SingleTaxes,
- SingleRoomDiscount,DubRoomRate,DubTaxes,DubRoomDiscount)
+ SingleRoomDiscount,DubRoomRate,DubTaxes,DubRoomDiscount,TACPer)
  VALUES(@BookingId,@PropertyName,@PropertyId,@GetType,@PropertyType,
  @RoomType,@SingleTariff,@DoubleTariff,@TripleTariff,@SingleandMarkup,
  @DoubleandMarkup,@TripleandMarkup,@Markup,@TAC,@Inclusions,
@@ -120,8 +130,7 @@ BEGIN
  @LocalityId,@UsrId,GETDATE(),@UsrId,GETDATE(),1,0,NEWID(),@MarkupId,
  @SingleandMarkup1,@DoubleandMarkup1,@TripleandMarkup1,@APIHdrId,
  @RatePlanCode,@RoomTypeCode,@SingleRoomRate,@SingleTaxes,@SingleRoomDiscount,
- @DubRoomRate,@DubTaxes,@DubRoomDiscount);
- --SET @InsId = @@IDENTITY;
+ @DubRoomRate,@DubTaxes,@DubRoomDiscount,@TACPer);
  SELECT Id,RowId FROM WRBHBBookingProperty WHERE Id=@@IDENTITY;
 END
 GO

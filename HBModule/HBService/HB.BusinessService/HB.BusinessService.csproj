@@ -95,6 +95,7 @@
     <Compile Include="BusinessService\IBusinessService.cs" />
     <Compile Include="BusinessService\ImportExcelService.cs" />
     <Compile Include="BusinessService\ImportGuestService.cs" />
+    <Compile Include="BusinessService\IntermediateCheckoutServiceHdrService.cs" />
     <Compile Include="BusinessService\InternalExpenseReportService.cs" />
     <Compile Include="BusinessService\KOTEntryService.cs" />
     <Compile Include="BusinessService\LaundrySService.cs" />

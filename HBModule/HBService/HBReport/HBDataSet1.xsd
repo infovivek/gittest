@@ -89,6 +89,9 @@
               <xs:element name="CessService" msprop:Generator_ColumnVarNameInTable="columnCessService" msprop:Generator_ColumnPropNameInRow="CessService" msprop:Generator_ColumnPropNameInTable="CessServiceColumn" msprop:Generator_UserColumnName="CessService" type="xs:string" minOccurs="0" />
               <xs:element name="CINNo" msprop:Generator_ColumnVarNameInTable="columnCINNo" msprop:Generator_ColumnPropNameInRow="CINNo" msprop:Generator_ColumnPropNameInTable="CINNoColumn" msprop:Generator_UserColumnName="CINNo" type="xs:string" minOccurs="0" />
               <xs:element name="InVoicedate" msprop:Generator_ColumnVarNameInTable="columnInVoicedate" msprop:Generator_ColumnPropNameInRow="InVoicedate" msprop:Generator_ColumnPropNameInTable="InVoicedateColumn" msprop:Generator_UserColumnName="InVoicedate" type="xs:string" minOccurs="0" />
+              <xs:element name="PIInvoice" msprop:Generator_ColumnVarNameInTable="columnPIInvoice" msprop:Generator_ColumnPropNameInRow="PIInvoice" msprop:Generator_ColumnPropNameInTable="PIInvoiceColumn" msprop:Generator_UserColumnName="PIInvoice" type="xs:string" minOccurs="0" />
+              <xs:element name="ChkinDT" msprop:Generator_ColumnVarNameInTable="columnChkinDT" msprop:Generator_ColumnPropNameInRow="ChkinDT" msprop:Generator_ColumnPropNameInTable="ChkinDTColumn" msprop:Generator_UserColumnName="ChkinDT" type="xs:string" minOccurs="0" />
+              <xs:element name="ChkoutDT" msprop:Generator_ColumnVarNameInTable="columnChkoutDT" msprop:Generator_ColumnPropNameInRow="ChkoutDT" msprop:Generator_ColumnPropNameInTable="ChkoutDTColumn" msprop:Generator_UserColumnName="ChkoutDT" type="xs:string" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>

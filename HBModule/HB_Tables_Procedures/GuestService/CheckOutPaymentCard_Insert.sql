@@ -34,19 +34,43 @@ CREATE PROCEDURE [dbo].[SP_CheckOutPaymentCard_Insert](
 AS
 BEGIN
 DECLARE @Id INT;
- -- INSERT
-INSERT INTO WRBHBChechkOutPaymentCard(ChkOutHdrId,Payment,PayeeName,Address,
-AmountPaid,PaymentMode,CardDetails,CCBrand,NameoftheCard,CreditCardNo,ExpiryOn,
-ROC,SOCBatchCloseNo,AmountSwipedFor,ExpiryMonth,ExpiryYear,OutStanding,CreatedBy,CreatedDate,ModifiedBy,
-ModifiedDate,IsActive,IsDeleted,RowId)
+DECLARE @IntermediateFlag NVARCHAR(100)
+SET @IntermediateFlag = (SELECT IntermediateFlag FROM WRBHBChechkOutHdr WHERE Id = @ChkOutHdrId)
+
+IF @IntermediateFlag = '1'
+BEGIN
+	-- INSERT
+	INSERT INTO WRBHBChechkOutPaymentCard(ChkOutHdrId,Payment,PayeeName,Address,
+	AmountPaid,PaymentMode,CardDetails,CCBrand,NameoftheCard,CreditCardNo,ExpiryOn,
+	ROC,SOCBatchCloseNo,AmountSwipedFor,ExpiryMonth,ExpiryYear,OutStanding,CreatedBy,CreatedDate,ModifiedBy,
+	ModifiedDate,IsActive,IsDeleted,RowId)
 
 
-VALUES(@ChkOutHdrId,@Payment,@PayeeName,@Address,@AmountPaid,@PaymentMode,
-@CardDetails,@CCBrand,@NameoftheCard,@CreditCardNo,@ExpiryOn,@ROC,
-@SOCBatchCloseNo,@AmountSwipedFor,@ExpiryMonth,@ExpiryYear,@OutStanding,@CreatedBy,
-GETDATE(),@CreatedBy,GETDATE(),1,0,NEWID())
+	VALUES(@ChkOutHdrId,@Payment,@PayeeName,@Address,@AmountPaid,@PaymentMode,
+	@CardDetails,@CCBrand,@NameoftheCard,@CreditCardNo,@ExpiryOn,@ROC,
+	@SOCBatchCloseNo,@AmountSwipedFor,@ExpiryMonth,@ExpiryYear,@OutStanding,@CreatedBy,
+	GETDATE(),@CreatedBy,GETDATE(),0,0,NEWID())
 
-SET @Id=@@IDENTITY;
-SELECT  Id,RowId FROM WRBHBChechkOutPaymentCard WHERE Id=@Id;
+	SET @Id=@@IDENTITY;
+	SELECT  Id,RowId FROM WRBHBChechkOutPaymentCard WHERE Id=@Id;
+END
+ELSE
+BEGIN
+-- INSERT
+	INSERT INTO WRBHBChechkOutPaymentCard(ChkOutHdrId,Payment,PayeeName,Address,
+	AmountPaid,PaymentMode,CardDetails,CCBrand,NameoftheCard,CreditCardNo,ExpiryOn,
+	ROC,SOCBatchCloseNo,AmountSwipedFor,ExpiryMonth,ExpiryYear,OutStanding,CreatedBy,CreatedDate,ModifiedBy,
+	ModifiedDate,IsActive,IsDeleted,RowId)
+
+
+	VALUES(@ChkOutHdrId,@Payment,@PayeeName,@Address,@AmountPaid,@PaymentMode,
+	@CardDetails,@CCBrand,@NameoftheCard,@CreditCardNo,@ExpiryOn,@ROC,
+	@SOCBatchCloseNo,@AmountSwipedFor,@ExpiryMonth,@ExpiryYear,@OutStanding,@CreatedBy,
+	GETDATE(),@CreatedBy,GETDATE(),1,0,NEWID())
+
+	SET @Id=@@IDENTITY;
+	SELECT  Id,RowId FROM WRBHBChechkOutPaymentCard WHERE Id=@Id;
+END
+
 END
 GO

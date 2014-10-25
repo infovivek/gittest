@@ -65,12 +65,17 @@
     <Content Include="GuestCheckOutService.aspx" />
     <Content Include="GuestCheckOutService1.aspx" />
     <Content Include="GuestCheckOutTariff.aspx" />
+    <Content Include="IntermediateCheckoutConsolidate.aspx" />
+    <Content Include="IntermediateCheckoutService.aspx" />
+    <Content Include="IntermediateCheckoutTariff.aspx" />
     <Content Include="NewSnackKOTEntry.aspx" />
     <Content Include="Styles\Site.css" />
     <Content Include="Global.asax" />
     <Content Include="Scripts\jquery-1.4.1-vsdoc.js" />
     <Content Include="Scripts\jquery-1.4.1.js" />
     <Content Include="Scripts\jquery-1.4.1.min.js" />
+    <Content Include="TAC Annexure.aspx" />
+    <Content Include="TACAnnuxpage1.aspx" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -188,6 +193,27 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>HBDataSet1.xsd</DependentUpon>
     </Compile>
+    <Compile Include="IntermediateCheckoutConsolidate.aspx.cs">
+      <DependentUpon>IntermediateCheckoutConsolidate.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="IntermediateCheckoutConsolidate.aspx.designer.cs">
+      <DependentUpon>IntermediateCheckoutConsolidate.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="IntermediateCheckoutService.aspx.cs">
+      <DependentUpon>IntermediateCheckoutService.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="IntermediateCheckoutService.aspx.designer.cs">
+      <DependentUpon>IntermediateCheckoutService.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="IntermediateCheckoutTariff.aspx.cs">
+      <DependentUpon>IntermediateCheckoutTariff.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="IntermediateCheckoutTariff.aspx.designer.cs">
+      <DependentUpon>IntermediateCheckoutTariff.aspx</DependentUpon>
+    </Compile>
     <Compile Include="NewSnackKOTEntry.aspx.cs">
       <DependentUpon>NewSnackKOTEntry.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -202,6 +228,20 @@
     </Compile>
     <Compile Include="Site.Master.designer.cs">
       <DependentUpon>Site.Master</DependentUpon>
+    </Compile>
+    <Compile Include="TAC Annexure.aspx.cs">
+      <DependentUpon>TAC Annexure.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="TAC Annexure.aspx.designer.cs">
+      <DependentUpon>TAC Annexure.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="TACAnnuxpage1.aspx.cs">
+      <DependentUpon>TACAnnuxpage1.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="TACAnnuxpage1.aspx.designer.cs">
+      <DependentUpon>TACAnnuxpage1.aspx</DependentUpon>
     </Compile>
     <Compile Include="WrbErpConnection1.cs" />
   </ItemGroup>
@@ -242,6 +282,11 @@
     <EmbeddedResource Include="GuestCheckOutConsolidate1.rdlc" />
     <EmbeddedResource Include="ContractBillDedicated.rdlc" />
     <EmbeddedResource Include="ExternalCheckoutTACMail.rdlc" />
+    <EmbeddedResource Include="IntermediateCheckoutTariff.rdlc" />
+    <EmbeddedResource Include="IntermediateCheckoutService.rdlc" />
+    <EmbeddedResource Include="IntermediateCheckoutConsolidate.rdlc" />
+    <EmbeddedResource Include="TAC Annexure.rdlc" />
+    <EmbeddedResource Include="TACAnnuxpage1.rdlc" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />

@@ -71,7 +71,7 @@ IF @Action='KOTDETAILS'
 	    BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg
 		FROM WRBHBKOTHdr KH
 		JOIN WRBHBKOTUser KD  ON KH.Id=KD.KOTEntryHdrId AND	KH.IsActive=1 AND KH.IsDeleted=0
-		WHERE KD.IsActive=1 AND KD.IsDeleted=0 
+		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KH.PropertyId=@PropertyId 
 		AND  CONVERT(date,KH.Date,103) BETWEEN CONVERT(date,@Str1,103) AND CONVERT(date,@Str3,103) 
 		order by CONVERT(date,KH.Date,103)
 		
@@ -101,7 +101,7 @@ IF @Action='KOTDETAILS'
 		AND  CONVERT(date,KH.Date,103) BETWEEN CONVERT(date,@Str1,103) AND CONVERT(date,@Str3,103) 
 		order by CONVERT(date,KH.Date,103)  
      END
-       SELECT  Date,ConsumerType,Name,BVeg,BNonVeg,LVeg,LNonVeg,DVeg,DNonVeg
+       SELECT  CONVERT(NVARCHAR(100),CONVERT(DATE,Date,103),110) AS Date,ConsumerType,Name,BVeg,BNonVeg,LVeg,LNonVeg,DVeg,DNonVeg
        FROM #Guest 
      
    END
@@ -134,7 +134,7 @@ IF @Action='KOTDETAILS'
 	    BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg
 		FROM WRBHBKOTHdr KH
 		JOIN WRBHBKOTUser KD  ON KH.Id=KD.KOTEntryHdrId AND	KH.IsActive=1 AND KH.IsDeleted=0
-		WHERE KD.IsActive=1 AND KD.IsDeleted=0 
+		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KH.PropertyId=@PropertyId 
 		AND  CONVERT(date,KH.Date,103) BETWEEN CONVERT(date,@Str1,103) AND CONVERT(date,@Str3,103) 
 		order by CONVERT(date,KH.Date,103)
 		
@@ -164,7 +164,7 @@ IF @Action='KOTDETAILS'
 		AND  CONVERT(date,KH.Date,103) BETWEEN CONVERT(date,@Str1,103) AND CONVERT(date,@Str3,103) 
 		order by CONVERT(date,KH.Date,103)  
      END
-       SELECT  Date,ConsumerType,Name,BVeg,BNonVeg,LVeg,LNonVeg,DVeg,DNonVeg
+       SELECT  CONVERT(NVARCHAR(100),CONVERT(DATE,Date,103),110) AS Date,ConsumerType,Name,BVeg,BNonVeg,LVeg,LNonVeg,DVeg,DNonVeg
        FROM #Guests 
      
    END

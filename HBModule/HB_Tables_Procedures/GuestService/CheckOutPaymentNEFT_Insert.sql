@@ -33,15 +33,36 @@ CREATE PROCEDURE [dbo].[SP_CheckOutPaymentNEFT_Insert](
 AS
 BEGIN
 DECLARE @Id INT;
- -- INSERT
-INSERT INTO WRBHBChechkOutPaymentNEFT(ChkOutHdrId,Payment,PayeeName,Address,
-AmountPaid,PaymentMode,ReferenceNumber,BankName,DateofNEFT,DateNEFTMonth,DateNEFTYear,OutStanding,
-CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId)
+DECLARE @IntermediateFlag NVARCHAR(100)
+SET @IntermediateFlag = (SELECT IntermediateFlag FROM WRBHBChechkOutHdr WHERE Id = @ChkOutHdrId)
 
-VALUES(@ChkOutHdrId,@Payment,@PayeeName,@Address,@AmountPaid,@PaymentMode,@ReferenceNumber,
-@BankName,@DateofNEFT,@DateNEFTMonth,@DateNEFTYear,@OutStanding,@CreatedBy,GETDATE(),@CreatedBy,GETDATE(),1,0,NEWID())
+IF @IntermediateFlag = '1'
+BEGIN
+	-- INSERT
+	INSERT INTO WRBHBChechkOutPaymentNEFT(ChkOutHdrId,Payment,PayeeName,Address,
+	AmountPaid,PaymentMode,ReferenceNumber,BankName,DateofNEFT,DateNEFTMonth,DateNEFTYear,OutStanding,
+	CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId)
 
-SET @Id=@@IDENTITY;
-SELECT  Id,RowId FROM WRBHBChechkOutPaymentNEFT WHERE Id=@Id;
+	VALUES(@ChkOutHdrId,@Payment,@PayeeName,@Address,@AmountPaid,@PaymentMode,@ReferenceNumber,
+	@BankName,@DateofNEFT,@DateNEFTMonth,@DateNEFTYear,@OutStanding,
+	@CreatedBy,GETDATE(),@CreatedBy,GETDATE(),0,0,NEWID())
+
+	SET @Id=@@IDENTITY;
+	SELECT  Id,RowId FROM WRBHBChechkOutPaymentNEFT WHERE Id=@Id;
+END
+ELSE
+BEGIN
+	-- INSERT
+	INSERT INTO WRBHBChechkOutPaymentNEFT(ChkOutHdrId,Payment,PayeeName,Address,
+	AmountPaid,PaymentMode,ReferenceNumber,BankName,DateofNEFT,DateNEFTMonth,DateNEFTYear,OutStanding,
+	CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId)
+
+	VALUES(@ChkOutHdrId,@Payment,@PayeeName,@Address,@AmountPaid,@PaymentMode,@ReferenceNumber,
+	@BankName,@DateofNEFT,@DateNEFTMonth,@DateNEFTYear,@OutStanding,@CreatedBy,GETDATE(),@CreatedBy,GETDATE(),1,0,NEWID())
+
+	SET @Id=@@IDENTITY;
+	SELECT  Id,RowId FROM WRBHBChechkOutPaymentNEFT WHERE Id=@Id;
+END
+ 
 END
 GO

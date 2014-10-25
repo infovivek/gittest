@@ -291,7 +291,8 @@ IF @Action = 'StayBased'
   SELECT PropertyId,PropertyName,PONo,PONoId,POQty,Used,Unused,
   RatePerDay,TotalTariff,TotalLuxuryTax,TotalServiceTax,TotalTax,TotalAmount,
   BookingCode,BookingId,StayDuration,PODate,BookingStatus,
-  ClientName,ClientId,RoomCaptured,ChkOutId,ChkInDt FROM #TABLEStay
+  ClientName,ClientId,RoomCaptured,ChkOutId,ChkInDt
+  FROM #TABLEStay
   GROUP BY PropertyId,PropertyName,PONo,PONoId,POQty,Used,Unused,
   RatePerDay,TotalTariff,TotalLuxuryTax,TotalServiceTax,TotalTax,TotalAmount,
   BookingCode,BookingId,StayDuration,PODate,BookingStatus,
@@ -326,7 +327,7 @@ IF @Action = 'StayBased'
   ISNULL(T1.BookingCode,0),ISNULL(T1.StayDuration,''),ISNULL(T1.PODate,''),
   ISNULL(T1.BookingStatus,''),ISNULL(T2.Guest,''),ISNULL(T1.ClientName,''),
   ISNULL(T1.ClientId,0),ISNULL(T2.RoomCaptured,0),ISNULL(T1.ChkOutId,0),
-  T1.ChkInDt 
+  CONVERT(NVARCHAR,CONVERT(DATE,T1.ChkInDt,103),110) AS ChkInDt
   FROM #TABLE1Stay T1
   LEFT OUTER JOIN #TABLE2Stay T2 ON T1.BookingId=T2.BookingId
   WHERE T1.BookingId=T2.BookingId AND T1.RoomCaptured=T2.RoomCaptured;

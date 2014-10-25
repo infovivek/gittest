@@ -65,6 +65,7 @@
 			public var Save_Flag:Boolean=true; 
 			public var uploadURL:URLRequest = new URLRequest();
 			public var Mode1:String="",PaymentStatus:String="";
+			public var Mode:String="";
 			public var ServiceChargeValue2Per:Number=0;
 			public var ServiceChargeValue12Per:Number=0;
 			public var ServiceChargeCess:Number=0;
@@ -116,8 +117,8 @@
 			protected function Help():void
 			{				
 	
-				useWeb("GuestCheckOut","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,Global_AC[0].UsrId,0]);
-	//			useWeb("GuestCheckOut","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,65,0]);
+	//			useWeb("GuestCheckOut","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,Global_AC[0].UsrId,0]);
+				useWeb("GuestCheckOut","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,65,0]);
 				Txt_ServiceBillAmt.editable=false;
 				Txt_ServiceVat.editable=false;
 				Txt_SerivceTax.editable=false;
@@ -267,12 +268,14 @@
 						ServiceChargeChk=Ds_Objects.result.Tables.Table3.Rows[0].ServiceChargeChk;	
 						if(ServiceChargeChk == 1)
 						{
-							chk_ServiceCharge.selected==true;
-							chk_ServiceCharge.enabled==false;
+							chk_ServiceCharge.selected=true;
+							chk_ServiceCharge.enabled=false;
 						}
 						else
 						{
-							chk_ServiceCharge.selected==false;
+							chk_ServiceCharge.selected=false;
+							chk_ServiceCharge.enabled=true;
+							
 						}
 						var RB:String=Ds_Objects.result.Tables.Table3.Rows[0].TariffPaymentMode;
 				//		var RB:String = "true";
@@ -2846,6 +2849,7 @@
 				{
 					useWeb("GuestCheckOut","ServiceEntry_CUSTOM",[GlobalXml,"ServiceEntry","",PrintChkOutId,0,0,Global_AC[0].UsrId,0]);
 					Btn_Settlement_clickHandler();
+					F2="";
 				}
 			}
 			public function FnSeviceUpdate(event:CloseEvent):void
@@ -3649,7 +3653,7 @@
 				Txt_ServiceEcess.text=String(Number(Food_ServiceEcess)+Number(Laundry_ServiceEcess));
 				Txt_serviceHECess.text=String(Number(Food_serviceHECess)+Number(Laundry_serviceHECess));
 				Txt_BST.text=Laundry_BST;
-				Txt_ServiceNetAmount.text=String(Number(Food_ServiceNetAmount)+Number(Laundry_ServiceNetAmount));
+				Txt_ServiceNetAmount.text=String(Number(Food_ServiceNetAmount.replace(",",""))+Number(Laundry_ServiceNetAmount.replace(",","")));
 				
 //				Grp_Service.visible=false;
 //				hlp_item.text="";
@@ -3925,68 +3929,18 @@
 				bdr_ConPay1.visible=true;
 			}
 // add tariff Payment save 	(Cash,Card,Cheque,Companyinvoice,NEFT)		
-			public 	var F4:String="";
-			public 	var F5:String="";
-			public 	var F6:String="";
-			public 	var F7:String="";
-			public 	var F8:String="";
-			public 	var Mode:String="";
+			public 	var F4:String="Cash";
+			public 	var F5:String="Card";
+			public 	var F6:String="Cheque";
+			public 	var F7:String="CompanyInvoice";
+			public 	var F8:String="NEFT";
+			
 		//	public 	var Mode:String="";
 			protected function AddTariffPayment():void
 			{
 				Mode="Tariff";
-				
-				var ErrStr:String="";var Flag:Boolean=true;
-				
-				if(Txt_TariffPayAmount.text=="")
+				if(Mode=="Tariff")
 				{
-					if(Flag==true)
-					{
-						Txt_TariffPayAmount.setFocus();Flag=false;
-					}
-					ErrStr=ErrStr+"*  Amount is Required.\n";					
-				}
-				if(Txt_TariffPayAmount.text=="0")
-				{
-					if(Flag==true)
-					{
-						Txt_TariffPayAmount.setFocus();Flag=false;
-					}
-					ErrStr=ErrStr+"*  Amount Should not be zero.\n";					
-				}
-				
-				if(Cash.selected==true)
-				{
-					PaymentMode='Cash'
-				}
-				else if(CreditCard.selected==true)
-				{
-					PaymentMode='Card'
-				}
-				else if (Cheque.selected==true)
-				{
-					PaymentMode='Cheque'
-				}
-				else if(CompanyInvoice.selected==true)
-				{
-					PaymentMode='CompanyInvoice'
-				}
-				else if(NEFT.selected==true)
-				{
-					PaymentMode='NEFT'
-				}
-				else
-				{   
-					ErrStr=ErrStr+"* Select Payment Mode Option.\n";
-				}		
-				if(ErrStr!="")
-				{
-					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
-					return;					
-				}
-				if(radiogroup1.selectedValue=="Cash")
-				{
-					F4="Cash";
 					var ErrStr:String="";var Flag:Boolean=true;
 					
 					if(Txt_TariffPayAmount.text=="")
@@ -4006,308 +3960,362 @@
 						ErrStr=ErrStr+"*  Amount Should not be zero.\n";					
 					}
 					
-					if(DT_TariffCashDate.text=="")
+					if(Cash.selected==true)
 					{
-						if(Flag==true)
-						{
-							DT_TariffCashDate.setFocus();Flag=false;
-						}
-						ErrStr=ErrStr+"*  Date is Required.\n";					
+						PaymentMode='Cash'
 					}
-					
+					else if(CreditCard.selected==true)
+					{
+						PaymentMode='Card'
+					}
+					else if (Cheque.selected==true)
+					{
+						PaymentMode='Cheque'
+					}
+					else if(CompanyInvoice.selected==true)
+					{
+						PaymentMode='CompanyInvoice'
+					}
+					else if(NEFT.selected==true)
+					{
+						PaymentMode='NEFT'
+					}
+					else
+					{   
+						ErrStr=ErrStr+"* Select Payment Mode Option.\n";
+					}		
 					if(ErrStr!="")
 					{
 						alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
 						return;					
 					}
-					
-					var TL:String=NF_Two.format(Txt_TariffLoad.text);
-					Txt_TariffLoad.text=TL.replace(",","");
-					var LL:String=NF_Two.format(Txt_TariffPayAmount.text+".00")
-					Txt_TariffPayAmount.text = LL.replace(",","");
-					if(Txt_TariffLoad.text == Txt_TariffPayAmount.text)
+					if(radiogroup1.selectedValue=="Cash")
 					{
-						useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
+						F4="Cash";
+						var ErrStr:String="";var Flag:Boolean=true;
+						
+						if(Txt_TariffPayAmount.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_TariffPayAmount.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*  Amount is Required.\n";					
+						}
+						if(Txt_TariffPayAmount.text=="0")
+						{
+							if(Flag==true)
+							{
+								Txt_TariffPayAmount.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*  Amount Should not be zero.\n";					
+						}
+						
+						if(DT_TariffCashDate.text=="")
+						{
+							if(Flag==true)
+							{
+								DT_TariffCashDate.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*  Date is Required.\n";					
+						}
+						
+						if(ErrStr!="")
+						{
+							alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
+							return;					
+						}
+						
+						var TL:String=NF_Two.format(Txt_TariffLoad.text);
+						Txt_TariffLoad.text=TL.replace(",","");
+						var LL:String=NF_Two.format(Txt_TariffPayAmount.text+".00")
+						Txt_TariffPayAmount.text = LL.replace(",","");
+						if(Txt_TariffLoad.text == Txt_TariffPayAmount.text)
+						{
+							useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
+						}
+						
+						var Ac_Hdr:ArrayCollection=new ArrayCollection
+							([{
+								Payment:"Tariff",PaymentMode:"Cash",ChkOutHdrId:PrintChkOutId,
+								PayeeName:Txt_Pname.text,
+								Address:Txt_address.text,
+								AmountPaid:Txt_TariffPayAmount.text,
+								CashReceivedOn:DT_TariffCashDate.text,
+								CashReceivedBy:ddl_CashReceivedby.selectedItem,
+								Id:Id,OutStanding:txt_TariffOutstanding.text}]);
+						var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"CashXml");
+						useWeb("CheckOutPaymentCash","Save_CUSTOM",[GlobalXml,HdrXml]);
 					}
 					
-					var Ac_Hdr:ArrayCollection=new ArrayCollection
-						([{
-							Payment:"Tariff",PaymentMode:"Cash",ChkOutHdrId:PrintChkOutId,
-							PayeeName:Txt_Pname.text,
-							Address:Txt_address.text,
-							AmountPaid:Txt_TariffPayAmount.text,
-							CashReceivedOn:DT_TariffCashDate.text,
-							CashReceivedBy:ddl_CashReceivedby.selectedItem,
-							Id:Id,OutStanding:txt_TariffOutstanding.text}]);
-					var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"CashXml");
-					useWeb("CheckOutPaymentCash","Save_CUSTOM",[GlobalXml,HdrXml]);
+					if(radiogroup1.selectedValue=="Card")
+					{
+						F5="Card";
+						var ErrStr:String="";var Flag:Boolean=true;
+						if(Txt_TariffPayAmount.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_TariffPayAmount.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*  Amount is Required.\n";					
+						}
+						if(Txt_TariffPayAmount.text=="0")
+						{
+							if(Flag==true)
+							{
+								Txt_TariffPayAmount.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*  Amount Should not be zero.\n";					
+						}
+						
+						
+						if(Txt_PaymentCardName.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_PaymentCardName.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*  Name of the Credit Card Required.\n";					
+						}
+						
+						if(Txt_PaymentCardNo.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_PaymentCardNo.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*   Card Number is Required.\n";					
+						}
+						
+						
+						if(Txt_PaymentAmountSwip.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_PaymentAmountSwip.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*   Amount Swiped is Required.\n";					
+						}
+						if(ErrStr!="")
+						{
+							alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
+							return;					
+						}
+						var TL:String=NF_Two.format(Txt_TariffLoad.text);
+						Txt_TariffLoad.text=TL.replace(",","");
+						var LL:String=NF_Two.format(Txt_TariffPayAmount.text+".00")
+						Txt_TariffPayAmount.text = LL.replace(",","");
+						if(Txt_TariffLoad.text == Txt_TariffPayAmount.text)
+						{
+							useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
+						}
+						var Ac_Hdr:ArrayCollection=new ArrayCollection
+							([{
+								Payment:"Tariff",PaymentMode:"Card",ChkOutHdrId:PrintChkOutId,
+								PayeeName:Txt_Pname.text,
+								Address:Txt_address.text,
+								AmountPaid:Txt_TariffPayAmount.text,
+								CardDetails:Txt_PaymentCardDtl.text,CCBrand:ddl_PaymentCCBrand.selectedItem,
+								NameoftheCard:Txt_PaymentCardName.text,CreditCardNo:Txt_PaymentCardNo.text,
+								ExpiryOn:dte_PaymentExpirydate.text,ROC:Txt_PaymentRoc.text,
+								SOCBatchCloseNo:Txt_PaymentSoc.text,AmountSwipedFor:Txt_PaymentAmountSwip.text,
+								ExpiryMonth:Txt_TarCardDateMonth.text,ExpiryYear:Txt_TarCardDateYear.text,Id:Id,
+								OutStanding:txt_TariffOutstanding.text
+							}]);
+						var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"CardXml");
+						useWeb("CheckOutPaymentCard","Save_CUSTOM",[GlobalXml,HdrXml]);
+					}
+					
+					
+					
+					
+					if(radiogroup1.selectedValue=="Cheque")
+					{
+						F6="Cheque";
+						var ErrStr:String="";var Flag:Boolean=true;
+						if(Txt_TariffPayAmount.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_TariffPayAmount.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*  Amount is Required.\n";					
+						}
+						if(Txt_TariffPayAmount.text=="0")
+						{
+							if(Flag==true)
+							{
+								Txt_TariffPayAmount.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*  Amount Should not be zero.\n";					
+						}
+						
+						
+						if(Txt_PaymentChecqNO.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_PaymentChecqNO.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*  Cheque Number is Required.\n";					
+						}
+						
+						if(Txt_CheqBankname.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_CheqBankname.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*  Bank Name is Required.\n";					
+						}
+						
+						
+						//					if(Txt_TarCheqDateMonth.text=="")
+						//					{
+						//						if(Flag==true)
+						//						{
+						//							Txt_TarCheqDateMonth.setFocus();Flag=false;
+						//						}
+						//						ErrStr=ErrStr+"* Month is Required.\n";					
+						//					}
+						//					
+						//					if(Txt_TarCheqDateYear.text=="")
+						//					{
+						//						if(Flag==true)
+						//						{
+						//							Txt_TarCheqDateYear.setFocus();Flag=false;
+						//						}
+						//						ErrStr=ErrStr+"* Year is Required.\n";					
+						//					}
+						if(ErrStr!="")
+						{
+							alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
+							return;					
+						}
+						
+						var TL:String=NF_Two.format(Txt_TariffLoad.text);
+						Txt_TariffLoad.text=TL.replace(",","");
+						var LL:String=NF_Two.format(Txt_TariffPayAmount.text+".00")
+						Txt_TariffPayAmount.text = LL.replace(",","");
+						if(Txt_TariffLoad.text == Txt_TariffPayAmount.text)
+						{
+							useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
+						}
+						
+						var Ac_Hdr:ArrayCollection=new ArrayCollection
+							([{
+								Payment:"Tariff",PaymentMode:"Cheque",ChkOutHdrId:PrintChkOutId,
+								PayeeName:Txt_Pname.text,
+								Address:Txt_address.text,
+								AmountPaid:Txt_TariffPayAmount.text,
+								ChequeNumber:Txt_PaymentChecqNO.text,BankName:Txt_CheqBankname.text,DateIssued:dte_CheqDate.text,
+								DateIssueMonth:0,DateIssueYear:0,Id:Id,
+								OutStanding:txt_TariffOutstanding.text
+							}]);
+						var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"CheqXml");
+						useWeb("CheckOutPaymentCheque","Save_CUSTOM",[GlobalXml,HdrXml]);
+					}
+					
+					if(radiogroup1.selectedValue=="CompanyInvoice")
+					{
+						F7="CompanyInvoice";
+						var ErrStr:String="";var Flag:Boolean=true;
+						
+						
+						
+						if(ErrStr!="")
+						{
+							alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
+							return;					
+						}
+						
+						var TL:String=NF_Two.format(Txt_TariffLoad.text);
+						Txt_TariffLoad.text=TL.replace(",","");
+						var LL:String=NF_Two.format(Txt_TariffPayAmount.text+".00")
+						Txt_TariffPayAmount.text = LL.replace(",","");
+						//					if(Txt_TariffLoad.text == Txt_TariffPayAmount.text)
+						//					{
+						//						useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0]);
+						//					}
+						
+						var Ac_Hdr:ArrayCollection=new ArrayCollection
+							([{
+								Payment:"Tariff",PaymentMode:"CompanyInvoice",ChkOutHdrId:PrintChkOutId,
+								PayeeName:Txt_Pname.text,
+								Address:Txt_address.text,
+								AmountPaid:Txt_TariffPayAmount.text,
+								Approver:Txt_CmpnyAppru.text,Requester:Txt_TariffCmpReq.text,
+								EmailId:Txt_TariffCmpEmail.text,PhoneNo:Txt_TariffCmpPhone.text,
+								Id:Id,FileLoad:FilePath.text,OutStanding:txt_TariffOutstanding.text
+								
+							}]);
+						var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"CmpInXml");
+						useWeb("CheckOutPaymentCompInvoice","Save_CUSTOM",[GlobalXml,HdrXml]);
+					}
+					if(radiogroup1.selectedValue=="NEFT")
+					{
+						F8="NEFT";
+						var ErrStr:String="";var Flag:Boolean=true;
+						if(Txt_TariffPayAmount.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_TariffPayAmount.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*  Amount is Required.\n";					
+						}
+						if(Txt_TariffPayAmount.text=="0")
+						{
+							if(Flag==true)
+							{
+								Txt_TariffPayAmount.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*  Amount Should not be zero.\n";					
+						}
+						
+						
+						if(Txt_TariffNEFTRef.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_TariffNEFTRef.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*  Reference Number is Required.\n";					
+						}
+						
+						
+						if(ErrStr!="")
+						{
+							alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
+							return;					
+						}
+						
+						var TL:String=NF_Two.format(Txt_TariffLoad.text);
+						Txt_TariffLoad.text=TL.replace(",","");
+						var LL:String=NF_Two.format(Txt_TariffPayAmount.text+".00")
+						Txt_TariffPayAmount.text = LL.replace(",","");
+						if(Txt_TariffLoad.text == Txt_TariffPayAmount.text)
+						{
+							useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
+						}
+						
+						var Ac_Hdr:ArrayCollection=new ArrayCollection
+							([{
+								Payment:"Tariff",PaymentMode:"NEFT",ChkOutHdrId:PrintChkOutId,
+								PayeeName:Txt_Pname.text,
+								Address:Txt_address.text,
+								AmountPaid:Txt_TariffPayAmount.text,
+								ReferenceNumber:Txt_TariffNEFTRef.text,DateofNEFT:dte_NEFTDdate.text,
+								BankName:Txt_TariffNEFTBankName.text,DateNEFTMonth:0,
+								DateNEFTYear:0,Id:Id,OutStanding:txt_TariffOutstanding.text
+							}])
+						var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"NEFTXml");
+						useWeb("CheckOutPaymentNEFT","Save_CUSTOM",[GlobalXml,HdrXml]);
+					}
 				}
 				
-				if(radiogroup1.selectedValue=="Card")
-				{
-					F5="Card";
-					var ErrStr:String="";var Flag:Boolean=true;
-					if(Txt_TariffPayAmount.text=="")
-					{
-						if(Flag==true)
-						{
-							Txt_TariffPayAmount.setFocus();Flag=false;
-						}
-						ErrStr=ErrStr+"*  Amount is Required.\n";					
-					}
-					if(Txt_TariffPayAmount.text=="0")
-					{
-						if(Flag==true)
-						{
-							Txt_TariffPayAmount.setFocus();Flag=false;
-						}
-						ErrStr=ErrStr+"*  Amount Should not be zero.\n";					
-					}
-					
-					
-					if(Txt_PaymentCardName.text=="")
-					{
-						if(Flag==true)
-						{
-							Txt_PaymentCardName.setFocus();Flag=false;
-						}
-						ErrStr=ErrStr+"*  Name of the Credit Card Required.\n";					
-					}
-					
-					if(Txt_PaymentCardNo.text=="")
-					{
-						if(Flag==true)
-						{
-							Txt_PaymentCardNo.setFocus();Flag=false;
-						}
-						ErrStr=ErrStr+"*   Card Number is Required.\n";					
-					}
-					
-					
-					if(Txt_PaymentAmountSwip.text=="")
-					{
-						if(Flag==true)
-						{
-							Txt_PaymentAmountSwip.setFocus();Flag=false;
-						}
-						ErrStr=ErrStr+"*   Amount Swiped is Required.\n";					
-					}
-					if(ErrStr!="")
-					{
-						alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
-						return;					
-					}
-					var TL:String=NF_Two.format(Txt_TariffLoad.text);
-					Txt_TariffLoad.text=TL.replace(",","");
-					var LL:String=NF_Two.format(Txt_TariffPayAmount.text+".00")
-					Txt_TariffPayAmount.text = LL.replace(",","");
-					if(Txt_TariffLoad.text == Txt_TariffPayAmount.text)
-					{
-						useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
-					}
-					var Ac_Hdr:ArrayCollection=new ArrayCollection
-						([{
-							Payment:"Tariff",PaymentMode:"Card",ChkOutHdrId:PrintChkOutId,
-							PayeeName:Txt_Pname.text,
-							Address:Txt_address.text,
-							AmountPaid:Txt_TariffPayAmount.text,
-							CardDetails:Txt_PaymentCardDtl.text,CCBrand:ddl_PaymentCCBrand.selectedItem,
-							NameoftheCard:Txt_PaymentCardName.text,CreditCardNo:Txt_PaymentCardNo.text,
-							ExpiryOn:dte_PaymentExpirydate.text,ROC:Txt_PaymentRoc.text,
-							SOCBatchCloseNo:Txt_PaymentSoc.text,AmountSwipedFor:Txt_PaymentAmountSwip.text,
-							ExpiryMonth:Txt_TarCardDateMonth.text,ExpiryYear:Txt_TarCardDateYear.text,Id:Id,
-							OutStanding:txt_TariffOutstanding.text
-						}]);
-					var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"CardXml");
-					useWeb("CheckOutPaymentCard","Save_CUSTOM",[GlobalXml,HdrXml]);
-				}
 				
-				
-				
-				
-				if(radiogroup1.selectedValue=="Cheque")
-				{
-					F6="Cheque";
-					var ErrStr:String="";var Flag:Boolean=true;
-					if(Txt_TariffPayAmount.text=="")
-					{
-						if(Flag==true)
-						{
-							Txt_TariffPayAmount.setFocus();Flag=false;
-						}
-						ErrStr=ErrStr+"*  Amount is Required.\n";					
-					}
-					if(Txt_TariffPayAmount.text=="0")
-					{
-						if(Flag==true)
-						{
-							Txt_TariffPayAmount.setFocus();Flag=false;
-						}
-						ErrStr=ErrStr+"*  Amount Should not be zero.\n";					
-					}
-					
-					
-					if(Txt_PaymentChecqNO.text=="")
-					{
-						if(Flag==true)
-						{
-							Txt_PaymentChecqNO.setFocus();Flag=false;
-						}
-						ErrStr=ErrStr+"*  Cheque Number is Required.\n";					
-					}
-					
-					if(Txt_CheqBankname.text=="")
-					{
-						if(Flag==true)
-						{
-							Txt_CheqBankname.setFocus();Flag=false;
-						}
-						ErrStr=ErrStr+"*  Bank Name is Required.\n";					
-					}
-					
-					
-//					if(Txt_TarCheqDateMonth.text=="")
-//					{
-//						if(Flag==true)
-//						{
-//							Txt_TarCheqDateMonth.setFocus();Flag=false;
-//						}
-//						ErrStr=ErrStr+"* Month is Required.\n";					
-//					}
-//					
-//					if(Txt_TarCheqDateYear.text=="")
-//					{
-//						if(Flag==true)
-//						{
-//							Txt_TarCheqDateYear.setFocus();Flag=false;
-//						}
-//						ErrStr=ErrStr+"* Year is Required.\n";					
-//					}
-					if(ErrStr!="")
-					{
-						alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
-						return;					
-					}
-					
-					var TL:String=NF_Two.format(Txt_TariffLoad.text);
-					Txt_TariffLoad.text=TL.replace(",","");
-					var LL:String=NF_Two.format(Txt_TariffPayAmount.text+".00")
-					Txt_TariffPayAmount.text = LL.replace(",","");
-					if(Txt_TariffLoad.text == Txt_TariffPayAmount.text)
-					{
-						useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
-					}
-					
-					var Ac_Hdr:ArrayCollection=new ArrayCollection
-						([{
-							Payment:"Tariff",PaymentMode:"Cheque",ChkOutHdrId:PrintChkOutId,
-							PayeeName:Txt_Pname.text,
-							Address:Txt_address.text,
-							AmountPaid:Txt_TariffPayAmount.text,
-							ChequeNumber:Txt_PaymentChecqNO.text,BankName:Txt_CheqBankname.text,DateIssued:dte_CheqDate.text,
-							DateIssueMonth:0,DateIssueYear:0,Id:Id,
-							OutStanding:txt_TariffOutstanding.text
-						}]);
-					var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"CheqXml");
-					useWeb("CheckOutPaymentCheque","Save_CUSTOM",[GlobalXml,HdrXml]);
-				}
-				
-				if(radiogroup1.selectedValue=="CompanyInvoice")
-				{
-					F7="CompanyInvoice";
-					var ErrStr:String="";var Flag:Boolean=true;
-					
-					
-					
-					if(ErrStr!="")
-					{
-						alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
-						return;					
-					}
-					
-					var TL:String=NF_Two.format(Txt_TariffLoad.text);
-					Txt_TariffLoad.text=TL.replace(",","");
-					var LL:String=NF_Two.format(Txt_TariffPayAmount.text+".00")
-					Txt_TariffPayAmount.text = LL.replace(",","");
-//					if(Txt_TariffLoad.text == Txt_TariffPayAmount.text)
-//					{
-//						useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0]);
-//					}
-					
-					var Ac_Hdr:ArrayCollection=new ArrayCollection
-						([{
-							Payment:"Tariff",PaymentMode:"CompanyInvoice",ChkOutHdrId:PrintChkOutId,
-							PayeeName:Txt_Pname.text,
-							Address:Txt_address.text,
-							AmountPaid:Txt_TariffPayAmount.text,
-							Approver:Txt_CmpnyAppru.text,Requester:Txt_TariffCmpReq.text,
-							EmailId:Txt_TariffCmpEmail.text,PhoneNo:Txt_TariffCmpPhone.text,
-							Id:Id,FileLoad:FilePath.text,OutStanding:txt_TariffOutstanding.text
-							
-						}]);
-					var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"CmpInXml");
-					useWeb("CheckOutPaymentCompInvoice","Save_CUSTOM",[GlobalXml,HdrXml]);
-				}
-				if(radiogroup1.selectedValue=="NEFT")
-				{
-					F8="NEFT";
-					var ErrStr:String="";var Flag:Boolean=true;
-					if(Txt_TariffPayAmount.text=="")
-					{
-						if(Flag==true)
-						{
-							Txt_TariffPayAmount.setFocus();Flag=false;
-						}
-						ErrStr=ErrStr+"*  Amount is Required.\n";					
-					}
-					if(Txt_TariffPayAmount.text=="0")
-					{
-						if(Flag==true)
-						{
-							Txt_TariffPayAmount.setFocus();Flag=false;
-						}
-						ErrStr=ErrStr+"*  Amount Should not be zero.\n";					
-					}
-					
-					
-					if(Txt_TariffNEFTRef.text=="")
-					{
-						if(Flag==true)
-						{
-							Txt_TariffNEFTRef.setFocus();Flag=false;
-						}
-						ErrStr=ErrStr+"*  Reference Number is Required.\n";					
-					}
-					
-					
-					if(ErrStr!="")
-					{
-						alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
-						return;					
-					}
-					
-					var TL:String=NF_Two.format(Txt_TariffLoad.text);
-					Txt_TariffLoad.text=TL.replace(",","");
-					var LL:String=NF_Two.format(Txt_TariffPayAmount.text+".00")
-					Txt_TariffPayAmount.text = LL.replace(",","");
-					if(Txt_TariffLoad.text == Txt_TariffPayAmount.text)
-					{
-						useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
-					}
-					
-					var Ac_Hdr:ArrayCollection=new ArrayCollection
-						([{
-							Payment:"Tariff",PaymentMode:"NEFT",ChkOutHdrId:PrintChkOutId,
-							PayeeName:Txt_Pname.text,
-							Address:Txt_address.text,
-							AmountPaid:Txt_TariffPayAmount.text,
-							ReferenceNumber:Txt_TariffNEFTRef.text,DateofNEFT:dte_NEFTDdate.text,
-							BankName:Txt_TariffNEFTBankName.text,DateNEFTMonth:0,
-							DateNEFTYear:0,Id:Id,OutStanding:txt_TariffOutstanding.text
-						}])
-					var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"NEFTXml");
-					useWeb("CheckOutPaymentNEFT","Save_CUSTOM",[GlobalXml,HdrXml]);
-				}
 			}
 			
 // add service payment save (Cash,Card,Cheque,Companyinvoice,NEFT)
@@ -4315,57 +4323,8 @@
 			protected function AddServicePayment():void
 			{
 				Mode="Service";
-				var ErrStr:String="";var Flag:Boolean=true;
-				if(Txt_ServicePayAmount.text=="")
+				if(Mode=="Service")
 				{
-					if(Flag==true)
-					{
-						Txt_ServicePayAmount.setFocus();Flag=false;
-					}
-					ErrStr=ErrStr+"*  Amount is Required.\n";					
-				}
-				if(Txt_ServicePayAmount.text=="0")
-				{
-					if(Flag==true)
-					{
-						Txt_ServicePayAmount.setFocus();Flag=false;
-					}
-					ErrStr=ErrStr+"*  Amount Should not be zero.\n";					
-				}
-				if(Cash1.selected==true)
-				{
-					PaymentMode='Cash'
-				}
-				else if(CreditCard1.selected==true)
-				{
-					PaymentMode='Card'
-				}
-				else if (Cheque1.selected==true)
-				{
-					PaymentMode='Cheque'
-				}
-				else if(CompanyInvoice1.selected==true)
-				{
-					PaymentMode='CompanyInvoice'
-				}
-				else if(NEFT1.selected==true)
-				{
-					PaymentMode='NEFT'
-				}
-				else
-				{   
-					ErrStr=ErrStr+"* Select Payment Mode Option.\n";
-				}
-				if(ErrStr!="")
-				{
-					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
-					return;					
-				}
-				// TODO Auto-generated method stub
-				if(radiogroup1.selectedValue=="Cash")
-				{
-					F4="Cash";
-					
 					var ErrStr:String="";var Flag:Boolean=true;
 					if(Txt_ServicePayAmount.text=="")
 					{
@@ -4383,330 +4342,334 @@
 						}
 						ErrStr=ErrStr+"*  Amount Should not be zero.\n";					
 					}
-					
-					if(Txt_ServicePayAmount.text=="0")
+					if(Cash1.selected==true)
 					{
-						if(Flag==true)
-						{
-							Txt_ServicePayAmount.setFocus();Flag=false;
-						}
-						ErrStr=ErrStr+"*  Amount Should not be zero.\n";					
+						PaymentMode='Cash'
 					}
-					
-					if(ErrStr!="")
+					else if(CreditCard1.selected==true)
 					{
-						alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
-						return;					
+						PaymentMode='Card'
 					}
-					
-					var TL:String=NF_Two.format(Txt_ServiceLoad.text);
-					Txt_ServiceLoad.text=TL.replace(",","");
-					var LL:String=NF_Two.format(Txt_ServicePayAmount.text+".00")
-					Txt_ServicePayAmount.text = LL.replace(",","");
-					if(Txt_ServiceLoad.text == Txt_ServicePayAmount.text)
+					else if (Cheque1.selected==true)
 					{
-						useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+						PaymentMode='Cheque'
 					}
-					
-					var Ac_Hdr:ArrayCollection=new ArrayCollection
-						([{
-							Payment:"Service",PaymentMode:"Cash",ChkOutHdrId:PrintChkOutId,
-							PayeeName:Txt_SName.text,
-							Address:Txt_SAddress.text,
-							AmountPaid:Txt_ServicePayAmount.text,
-							CashReceivedOn:DT_SerpayCashdate.text,
-							CashReceivedBy:ddl_ServiPayCashRecBy.selectedItem,
-							Id:Id,OutStanding:Txt_ServiceOutStanding.text}]);
-					var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"CashXml");
-					useWeb("CheckOutPaymentCash","Save_CUSTOM",[GlobalXml,HdrXml]);
-				}
-				
-				if(radiogroup1.selectedValue=="Card")
-				{
-					F5="Card";
-					var ErrStr:String="";var Flag:Boolean=true;
-					if(Txt_ServicePayAmount.text=="")
+					else if(CompanyInvoice1.selected==true)
 					{
-						if(Flag==true)
-						{
-							Txt_ServicePayAmount.setFocus();Flag=false;
-						}
-						ErrStr=ErrStr+"*  Amount is Required.\n";					
+						PaymentMode='CompanyInvoice'
 					}
-					
-					if(Txt_ServicePaymentCardName.text=="")
+					else if(NEFT1.selected==true)
 					{
-						if(Flag==true)
-						{
-							Txt_ServicePaymentCardName.setFocus();Flag=false;
-						}
-						ErrStr=ErrStr+"*  Name of the Credit Card Required.\n";					
+						PaymentMode='NEFT'
 					}
-					
-					if(Txt_ServicePaymentCardNo.text=="")
-					{
-						if(Flag==true)
-						{
-							Txt_ServicePaymentCardNo.setFocus();Flag=false;
-						}
-						ErrStr=ErrStr+"*   Card Number is Required.\n";					
-					}
-					
-					
-//					if(Txt_ServicePaymentRoc.text=="")
-//					{
-//						if(Flag==true)
-//						{
-//							Txt_ServicePaymentRoc.setFocus();Flag=false;
-//						}
-//						ErrStr=ErrStr+"*   ROC is Required.\n";					
-//					}
-					
-					if(Txt_ServicePaymentAmountSwip.text=="")
-					{
-						if(Flag==true)
-						{
-							Txt_ServicePaymentAmountSwip.setFocus();Flag=false;
-						}
-						ErrStr=ErrStr+"*   Amount Swiped is Required.\n";					
+					else
+					{   
+						ErrStr=ErrStr+"* Select Payment Mode Option.\n";
 					}
 					if(ErrStr!="")
 					{
 						alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
 						return;					
 					}
-					
-					var TL:String=NF_Two.format(Txt_ServiceLoad.text);
-					Txt_ServiceLoad.text=TL.replace(",","");
-					var LL:String=NF_Two.format(Txt_ServicePayAmount.text+".00")
-					Txt_ServicePayAmount.text = LL.replace(",","");
-					if(Txt_ServiceLoad.text == Txt_ServicePayAmount.text)
+					// TODO Auto-generated method stub
+					if(radiogroup1.selectedValue=="Cash")
 					{
-						useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
-					}
-					
-					var Ac_Hdr:ArrayCollection=new ArrayCollection
-						([{
-							Payment:"Service",PaymentMode:"Card",ChkOutHdrId:PrintChkOutId,
-							PayeeName:Txt_SName.text,
-							Address:Txt_SAddress.text,
-							AmountPaid:Txt_ServicePayAmount.text,
-							CardDetails:Txt_ServicePaymentCardDtl.text,CCBrand:ddl_ServicePaymentCCBrand.selectedItem,
-							NameoftheCard:Txt_ServicePaymentCardName.text,CreditCardNo:Txt_ServicePaymentCardNo.text,
-							ExpiryOn:dte_ServicePaymentExpirydate.text,ROC:Txt_ServicePaymentRoc.text,
-							SOCBatchCloseNo:Txt_ServicePaymentSoc.text,AmountSwipedFor:Txt_ServicePaymentAmountSwip.text,
-							ExpiryMonth:Txt_SerCardExpirymonth.text,ExpiryYear:Txt_SerCardExpiryYear.text,Id:Id,
-							OutStanding:Txt_ServiceOutStanding.text
-						}]);
-					var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"CardXml");
-					useWeb("CheckOutPaymentCard","Save_CUSTOM",[GlobalXml,HdrXml]);
-				}
-				
-				
-				
-				if(radiogroup1.selectedValue=="Cheque")
-				{
-					F6="Cheque";
-					var ErrStr:String="";var Flag:Boolean=true;
-					if(Txt_ServicePayAmount.text=="")
-					{
-						if(Flag==true)
+						F4="Cash";
+						
+						var ErrStr:String="";var Flag:Boolean=true;
+						if(Txt_ServicePayAmount.text=="")
 						{
-							Txt_ServicePayAmount.setFocus();Flag=false;
+							if(Flag==true)
+							{
+								Txt_ServicePayAmount.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*  Amount is Required.\n";					
 						}
-						ErrStr=ErrStr+"*  Amount is Required.\n";					
+						if(Txt_ServicePayAmount.text=="0")
+						{
+							if(Flag==true)
+							{
+								Txt_ServicePayAmount.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*  Amount Should not be zero.\n";					
+						}
+						
+						if(Txt_ServicePayAmount.text=="0")
+						{
+							if(Flag==true)
+							{
+								Txt_ServicePayAmount.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*  Amount Should not be zero.\n";					
+						}
+						
+						if(ErrStr!="")
+						{
+							alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
+							return;					
+						}
+						
+						var TL:String=NF_Two.format(Txt_ServiceLoad.text);
+						Txt_ServiceLoad.text=TL.replace(",","");
+						var LL:String=NF_Two.format(Txt_ServicePayAmount.text+".00")
+						Txt_ServicePayAmount.text = LL.replace(",","");
+						if(Txt_ServiceLoad.text == Txt_ServicePayAmount.text)
+						{
+							useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+						}
+						
+						var Ac_Hdr:ArrayCollection=new ArrayCollection
+							([{
+								Payment:"Service",PaymentMode:"Cash",ChkOutHdrId:PrintChkOutId,
+								PayeeName:Txt_SName.text,
+								Address:Txt_SAddress.text,
+								AmountPaid:Txt_ServicePayAmount.text,
+								CashReceivedOn:DT_SerpayCashdate.text,
+								CashReceivedBy:ddl_ServiPayCashRecBy.selectedItem,
+								Id:Id,OutStanding:Txt_ServiceOutStanding.text}]);
+						var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"CashXml");
+						useWeb("CheckOutPaymentCash","Save_CUSTOM",[GlobalXml,HdrXml]);
 					}
 					
-					
-//					if(Txt_ServicePaymentChecqNO.text=="")
-//					{
-//						if(Flag==true)
-//						{
-//							Txt_ServicePaymentChecqNO.setFocus();Flag=false;
-//						}
-//						ErrStr=ErrStr+"*  Cheque Number is Required.\n";					
-//					}
-//					
-//					if(Txt_ServicePayCheqBankname.text=="")
-//					{
-//						if(Flag==true)
-//						{
-//							Txt_ServicePayCheqBankname.setFocus();Flag=false;
-//						}
-//						ErrStr=ErrStr+"*  Bank Name is Required.\n";					
-//					}
-					
-					
-					if(ErrStr!="")
+					if(radiogroup1.selectedValue=="Card")
 					{
-						alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
-						return;					
+						F5="Card";
+						var ErrStr:String="";var Flag:Boolean=true;
+						if(Txt_ServicePayAmount.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_ServicePayAmount.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*  Amount is Required.\n";					
+						}
+						
+						if(Txt_ServicePaymentCardName.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_ServicePaymentCardName.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*  Name of the Credit Card Required.\n";					
+						}
+						
+						if(Txt_ServicePaymentCardNo.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_ServicePaymentCardNo.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*   Card Number is Required.\n";					
+						}
+						
+						
+						//					if(Txt_ServicePaymentRoc.text=="")
+						//					{
+						//						if(Flag==true)
+						//						{
+						//							Txt_ServicePaymentRoc.setFocus();Flag=false;
+						//						}
+						//						ErrStr=ErrStr+"*   ROC is Required.\n";					
+						//					}
+						
+						if(Txt_ServicePaymentAmountSwip.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_ServicePaymentAmountSwip.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*   Amount Swiped is Required.\n";					
+						}
+						if(ErrStr!="")
+						{
+							alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
+							return;					
+						}
+						
+						var TL:String=NF_Two.format(Txt_ServiceLoad.text);
+						Txt_ServiceLoad.text=TL.replace(",","");
+						var LL:String=NF_Two.format(Txt_ServicePayAmount.text+".00")
+						Txt_ServicePayAmount.text = LL.replace(",","");
+						if(Txt_ServiceLoad.text == Txt_ServicePayAmount.text)
+						{
+							useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+						}
+						
+						var Ac_Hdr:ArrayCollection=new ArrayCollection
+							([{
+								Payment:"Service",PaymentMode:"Card",ChkOutHdrId:PrintChkOutId,
+								PayeeName:Txt_SName.text,
+								Address:Txt_SAddress.text,
+								AmountPaid:Txt_ServicePayAmount.text,
+								CardDetails:Txt_ServicePaymentCardDtl.text,CCBrand:ddl_ServicePaymentCCBrand.selectedItem,
+								NameoftheCard:Txt_ServicePaymentCardName.text,CreditCardNo:Txt_ServicePaymentCardNo.text,
+								ExpiryOn:dte_ServicePaymentExpirydate.text,ROC:Txt_ServicePaymentRoc.text,
+								SOCBatchCloseNo:Txt_ServicePaymentSoc.text,AmountSwipedFor:Txt_ServicePaymentAmountSwip.text,
+								ExpiryMonth:Txt_SerCardExpirymonth.text,ExpiryYear:Txt_SerCardExpiryYear.text,Id:Id,
+								OutStanding:Txt_ServiceOutStanding.text
+							}]);
+						var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"CardXml");
+						useWeb("CheckOutPaymentCard","Save_CUSTOM",[GlobalXml,HdrXml]);
 					}
 					
-					var TL:String=NF_Two.format(Txt_ServiceLoad.text);
-					Txt_ServiceLoad.text=TL.replace(",","");
-					var LL:String=NF_Two.format(Txt_ServicePayAmount.text+".00")
-					Txt_ServicePayAmount.text = LL.replace(",","");
-					if(Txt_ServiceLoad.text == Txt_ServicePayAmount.text)
+					
+					
+					if(radiogroup1.selectedValue=="Cheque")
 					{
-						useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+						F6="Cheque";
+						var ErrStr:String="";var Flag:Boolean=true;
+						if(Txt_ServicePayAmount.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_ServicePayAmount.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*  Amount is Required.\n";					
+						}
+						
+						
+						//					if(Txt_ServicePaymentChecqNO.text=="")
+						//					{
+						//						if(Flag==true)
+						//						{
+						//							Txt_ServicePaymentChecqNO.setFocus();Flag=false;
+						//						}
+						//						ErrStr=ErrStr+"*  Cheque Number is Required.\n";					
+						//					}
+						//					
+						//					if(Txt_ServicePayCheqBankname.text=="")
+						//					{
+						//						if(Flag==true)
+						//						{
+						//							Txt_ServicePayCheqBankname.setFocus();Flag=false;
+						//						}
+						//						ErrStr=ErrStr+"*  Bank Name is Required.\n";					
+						//					}
+						
+						
+						if(ErrStr!="")
+						{
+							alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
+							return;					
+						}
+						
+						var TL:String=NF_Two.format(Txt_ServiceLoad.text);
+						Txt_ServiceLoad.text=TL.replace(",","");
+						var LL:String=NF_Two.format(Txt_ServicePayAmount.text+".00")
+						Txt_ServicePayAmount.text = LL.replace(",","");
+						if(Txt_ServiceLoad.text == Txt_ServicePayAmount.text)
+						{
+							useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+						}
+						
+						var Ac_Hdr:ArrayCollection=new ArrayCollection
+							([{
+								Payment:"Service",PaymentMode:"Cheque",ChkOutHdrId:PrintChkOutId,
+								PayeeName:Txt_SName.text,
+								Address:Txt_SAddress.text,
+								AmountPaid:Txt_ServicePayAmount.text,
+								ChequeNumber:Txt_ServicePaymentChecqNO.text,BankName:Txt_ServicePayCheqBankname.text,
+								DateIssued:dte_ServiceCheqDate.text,DateIssueMonth:0,
+								DateIssueYear:0,Id:Id,OutStanding:Txt_ServiceOutStanding.text
+							}]);
+						var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"CheqXml");
+						useWeb("CheckOutPaymentCheque","Save_CUSTOM",[GlobalXml,HdrXml]);
 					}
 					
-					var Ac_Hdr:ArrayCollection=new ArrayCollection
-						([{
-							Payment:"Service",PaymentMode:"Cheque",ChkOutHdrId:PrintChkOutId,
-							PayeeName:Txt_SName.text,
-							Address:Txt_SAddress.text,
-							AmountPaid:Txt_ServicePayAmount.text,
-							ChequeNumber:Txt_ServicePaymentChecqNO.text,BankName:Txt_ServicePayCheqBankname.text,
-							DateIssued:dte_ServiceCheqDate.text,DateIssueMonth:0,
-							DateIssueYear:0,Id:Id,OutStanding:Txt_ServiceOutStanding.text
-						}]);
-					var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"CheqXml");
-					useWeb("CheckOutPaymentCheque","Save_CUSTOM",[GlobalXml,HdrXml]);
+					if(radiogroup1.selectedValue=="CompanyInvoice")
+					{
+						F7="CompanyInvoice";
+						var ErrStr:String="";var Flag:Boolean=true;
+						
+						if(ErrStr!="")
+						{
+							alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
+							return;					
+						}
+						
+						var TL:String=NF_Two.format(Txt_ServiceLoad.text);
+						Txt_ServiceLoad.text=TL.replace(",","");
+						var LL:String=NF_Two.format(Txt_ServicePayAmount.text+".00")
+						Txt_ServicePayAmount.text = LL.replace(",","");
+						//					if(Txt_ServiceLoad.text == Txt_ServicePayAmount.text)
+						//					{
+						//						useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0]);
+						//					}
+						
+						var Ac_Hdr:ArrayCollection=new ArrayCollection
+							([{
+								Payment:"Service",PaymentMode:"CompanyInvoice",ChkOutHdrId:PrintChkOutId,
+								PayeeName:Txt_SName.text,
+								Address:Txt_SAddress.text,
+								AmountPaid:Txt_ServicePayAmount.text,
+								Approver:Txt_ServiceCmpnyAppru.text,Requester:Txt_servicePayCmpReq.text,
+								EmailId:Txt_ServicePayCmpEmail.text,PhoneNo:Txt_ServicePayCmpPhone.text,
+								Id:Id,FileLoad:FilePath1.text,OutStanding:Txt_ServiceOutStanding.text
+							}]);
+						var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"CmpInXml");
+						useWeb("CheckOutPaymentCompInvoice","Save_CUSTOM",[GlobalXml,HdrXml]);
+					}
+					if(radiogroup1.selectedValue=="NEFT")
+					{
+						F8="NEFT";
+						var ErrStr:String="";var Flag:Boolean=true;
+						if(Txt_ServicePayAmount.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_ServicePayAmount.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*  Amount is Required.\n";					
+						}
+						
+						
+						if(Txt_ServiceNEFTRef.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_ServiceNEFTRef.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*  Reference Number is Required.\n";					
+						}
+						
+						
+						if(ErrStr!="")
+						{
+							alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
+							return;					
+						}
+						
+						var TL:String=NF_Two.format(Txt_ServiceLoad.text);
+						Txt_ServiceLoad.text=TL.replace(",","");
+						var LL:String=NF_Two.format(Txt_ServicePayAmount.text+".00")
+						Txt_ServicePayAmount.text = LL.replace(",","");
+						if(Txt_ServiceLoad.text == Txt_ServicePayAmount.text)
+						{
+							useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+						}
+						
+						var Ac_Hdr:ArrayCollection=new ArrayCollection
+							([{
+								Payment:"Service",PaymentMode:"NEFT",ChkOutHdrId:PrintChkOutId,
+								PayeeName:Txt_SName.text,
+								Address:Txt_SAddress.text,
+								AmountPaid:Txt_ServicePayAmount.text,
+								ReferenceNumber:Txt_ServiceNEFTRef.text,DateofNEFT:dte_ServicePayNEFTDdate.text,
+								BankName:Txt_SrvicePayBankName.text,DateNEFTMonth:0,
+								DateNEFTYear:0,Id:Id,OutStanding:Txt_ServiceOutStanding.text
+							}]);
+						var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"NEFTXml");
+						useWeb("CheckOutPaymentNEFT","Save_CUSTOM",[GlobalXml,HdrXml]);
+					}
 				}
 				
-				if(radiogroup1.selectedValue=="CompanyInvoice")
-				{
-					F7="CompanyInvoice";
-					var ErrStr:String="";var Flag:Boolean=true;
-					
-					if(ErrStr!="")
-					{
-						alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
-						return;					
-					}
-					
-					var TL:String=NF_Two.format(Txt_ServiceLoad.text);
-					Txt_ServiceLoad.text=TL.replace(",","");
-					var LL:String=NF_Two.format(Txt_ServicePayAmount.text+".00")
-					Txt_ServicePayAmount.text = LL.replace(",","");
-//					if(Txt_ServiceLoad.text == Txt_ServicePayAmount.text)
-//					{
-//						useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0]);
-//					}
-					
-					var Ac_Hdr:ArrayCollection=new ArrayCollection
-						([{
-							Payment:"Service",PaymentMode:"CompanyInvoice",ChkOutHdrId:PrintChkOutId,
-							PayeeName:Txt_SName.text,
-							Address:Txt_SAddress.text,
-							AmountPaid:Txt_ServicePayAmount.text,
-							Approver:Txt_ServiceCmpnyAppru.text,Requester:Txt_servicePayCmpReq.text,
-							EmailId:Txt_ServicePayCmpEmail.text,PhoneNo:Txt_ServicePayCmpPhone.text,
-							Id:Id,FileLoad:FilePath1.text,OutStanding:Txt_ServiceOutStanding.text
-						}]);
-					var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"CmpInXml");
-					useWeb("CheckOutPaymentCompInvoice","Save_CUSTOM",[GlobalXml,HdrXml]);
-				}
-				if(radiogroup1.selectedValue=="NEFT")
-				{
-					F8="NEFT";
-					var ErrStr:String="";var Flag:Boolean=true;
-					if(Txt_ServicePayAmount.text=="")
-					{
-						if(Flag==true)
-						{
-							Txt_ServicePayAmount.setFocus();Flag=false;
-						}
-						ErrStr=ErrStr+"*  Amount is Required.\n";					
-					}
-					
-					
-					if(Txt_ServiceNEFTRef.text=="")
-					{
-						if(Flag==true)
-						{
-							Txt_ServiceNEFTRef.setFocus();Flag=false;
-						}
-						ErrStr=ErrStr+"*  Reference Number is Required.\n";					
-					}
-					
-					
-					if(ErrStr!="")
-					{
-						alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
-						return;					
-					}
-					
-					var TL:String=NF_Two.format(Txt_ServiceLoad.text);
-					Txt_ServiceLoad.text=TL.replace(",","");
-					var LL:String=NF_Two.format(Txt_ServicePayAmount.text+".00")
-					Txt_ServicePayAmount.text = LL.replace(",","");
-					if(Txt_ServiceLoad.text == Txt_ServicePayAmount.text)
-					{
-						useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
-					}
-					
-					var Ac_Hdr:ArrayCollection=new ArrayCollection
-						([{
-							Payment:"Service",PaymentMode:"NEFT",ChkOutHdrId:PrintChkOutId,
-							PayeeName:Txt_SName.text,
-							Address:Txt_SAddress.text,
-							AmountPaid:Txt_ServicePayAmount.text,
-							ReferenceNumber:Txt_ServiceNEFTRef.text,DateofNEFT:dte_ServicePayNEFTDdate.text,
-							BankName:Txt_SrvicePayBankName.text,DateNEFTMonth:0,
-							DateNEFTYear:0,Id:Id,OutStanding:Txt_ServiceOutStanding.text
-						}]);
-					var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"NEFTXml");
-					useWeb("CheckOutPaymentNEFT","Save_CUSTOM",[GlobalXml,HdrXml]);
-				}
 			}
 // add consolidate save (Cash,Card,Cheque,Companyinvoice,NEFT)
 			protected function AddConsolidatePayment():void
 			{
 				Mode="Consolidated"
-				var ErrStr:String="";var Flag:Boolean=true;
-				if(Txt_ConsolidatePayment.text=="")
+				if(Mode == "Consolidated")
 				{
-					if(Flag==true)
-					{
-						Txt_ConsolidatePayment.setFocus();Flag=false;
-					}
-					ErrStr=ErrStr+"*  Amount is Required.\n";					
-				}
-				if(Txt_ConsolidatePayment.text=="0")
-				{
-					if(Flag==true)
-					{
-						Txt_ConsolidatePayment.setFocus();Flag=false;
-					}
-					ErrStr=ErrStr+"*  Amount Should not be zero.\n";					
-				}
-				if(Cash2.selected==true)
-				{
-					PaymentMode='Cash'
-				}
-				else if(CreditCard2.selected==true)
-				{
-					PaymentMode='Card'
-				}
-				else if (Cheque2.selected==true)
-				{
-					PaymentMode='Cheque'
-				}
-				else if(CompanyInvoice2.selected==true)
-				{
-					PaymentMode='CompanyInvoice'
-				}
-				else if(NEFT2.selected==true)
-				{
-					PaymentMode='NEFT'
-				}
-				else
-				{   
-					ErrStr=ErrStr+"* Select Payment Mode Option.\n";
-				}
-				if(ErrStr!="")
-				{
-					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
-					return;					
-				}
-				
-				// TODO Auto-generated method stub
-				if(radiogroup1.selectedValue=="Cash")
-				{
-					F4="Cash";
 					var ErrStr:String="";var Flag:Boolean=true;
 					if(Txt_ConsolidatePayment.text=="")
 					{
@@ -4716,303 +4679,357 @@
 						}
 						ErrStr=ErrStr+"*  Amount is Required.\n";					
 					}
-					
-					if(DT_ConPayCashDate.text=="")
+					if(Txt_ConsolidatePayment.text=="0")
 					{
 						if(Flag==true)
 						{
-							DT_ConPayCashDate.setFocus();Flag=false;
+							Txt_ConsolidatePayment.setFocus();Flag=false;
 						}
-						ErrStr=ErrStr+"*  Date is Required.\n";					
+						ErrStr=ErrStr+"*  Amount Should not be zero.\n";					
 					}
-
-					
+					if(Cash2.selected==true)
+					{
+						PaymentMode='Cash'
+					}
+					else if(CreditCard2.selected==true)
+					{
+						PaymentMode='Card'
+					}
+					else if (Cheque2.selected==true)
+					{
+						PaymentMode='Cheque'
+					}
+					else if(CompanyInvoice2.selected==true)
+					{
+						PaymentMode='CompanyInvoice'
+					}
+					else if(NEFT2.selected==true)
+					{
+						PaymentMode='NEFT'
+					}
+					else
+					{   
+						ErrStr=ErrStr+"* Select Payment Mode Option.\n";
+					}
 					if(ErrStr!="")
 					{
 						alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
 						return;					
 					}
-					var TC:String=NF_Two.format(Txt_ConsolidateLoad.text);
-					Txt_ConsolidateLoad.text=TC.replace(",","");
-					var LC:String=NF_Two.format(Txt_ConsolidatePayment.text+".00")
-					Txt_ConsolidatePayment.text = LC.replace(",","");
-					if(Txt_ConsolidateLoad.text == Txt_ConsolidatePayment.text)
+					
+					// TODO Auto-generated method stub
+					if(radiogroup1.selectedValue=="Cash")
 					{
-						useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
-						useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+						F4="Cash";
+						var ErrStr:String="";var Flag:Boolean=true;
+						if(Txt_ConsolidatePayment.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_ConsolidatePayment.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*  Amount is Required.\n";					
+						}
 						
+						if(DT_ConPayCashDate.text=="")
+						{
+							if(Flag==true)
+							{
+								DT_ConPayCashDate.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*  Date is Required.\n";					
+						}
+						
+						
+						if(ErrStr!="")
+						{
+							alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
+							return;					
+						}
+						var TC:String=NF_Two.format(Txt_ConsolidateLoad.text);
+						Txt_ConsolidateLoad.text=TC.replace(",","");
+						var LC:String=NF_Two.format(Txt_ConsolidatePayment.text+".00")
+						Txt_ConsolidatePayment.text = LC.replace(",","");
+						if(Txt_ConsolidateLoad.text == Txt_ConsolidatePayment.text)
+						{
+							useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
+							useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+							
+						}
+						
+						var Ac_Hdr:ArrayCollection=new ArrayCollection
+							([{
+								Payment:"Consolidate",PaymentMode:"Cash",ChkOutHdrId:PrintChkOutId,
+								PayeeName:Txt_CName.text,
+								Address:Txt_CAddress.text,
+								AmountPaid:Txt_ConsolidatePayment.text,
+								CashReceivedOn:DT_ConPayCashDate.text,
+								CashReceivedBy:ddl_ConsoPayCashRecBy.selectedItem,
+								Id:Id,FileLoad:FilePath2.text,OutStanding:Txt_ConsolidateOutStanding.text}]);
+						var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"CashXml");
+						useWeb("CheckOutPaymentCash","Save_CUSTOM",[GlobalXml,HdrXml]);
 					}
 					
-					var Ac_Hdr:ArrayCollection=new ArrayCollection
-						([{
-							Payment:"Consolidate",PaymentMode:"Cash",ChkOutHdrId:PrintChkOutId,
-							PayeeName:Txt_CName.text,
-							Address:Txt_CAddress.text,
-							AmountPaid:Txt_ConsolidatePayment.text,
-							CashReceivedOn:DT_ConPayCashDate.text,
-							CashReceivedBy:ddl_ConsoPayCashRecBy.selectedItem,
-							Id:Id,FileLoad:FilePath2.text,OutStanding:Txt_ConsolidateOutStanding.text}]);
-					var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"CashXml");
-					useWeb("CheckOutPaymentCash","Save_CUSTOM",[GlobalXml,HdrXml]);
+					if(radiogroup1.selectedValue=="Card")
+					{
+						F5="Card";
+						var ErrStr:String="";var Flag:Boolean=true;
+						if(Txt_ConsolidatePayment.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_ConsolidatePayment.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*  Amount is Required.\n";					
+						}
+						
+						
+						if(Txt_ConPaymentCardName.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_ConPaymentCardName.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*  Name of the Credit Card Required.\n";					
+						}
+						
+						if(Txt_ConPaymentCardNo.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_ConPaymentCardNo.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*   Card Number is Required.\n";					
+						}
+						
+						
+						if(Txt_ConPaymentAmountSwip.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_ConPaymentAmountSwip.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*   Amount Swiped is Required.\n";					
+						}
+						if(ErrStr!="")
+						{
+							alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
+							return;					
+						}
+						var TC:String=NF_Two.format(Txt_ConsolidateLoad.text);
+						Txt_ConsolidateLoad.text=TC.replace(",","");
+						var LC:String=NF_Two.format(Txt_ConsolidatePayment.text+".00")
+						Txt_ConsolidatePayment.text = LC.replace(",","");
+						if(Txt_ConsolidateLoad.text == Txt_ConsolidatePayment.text)
+						{
+							useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
+							useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+						}
+						
+						var Ac_Hdr:ArrayCollection=new ArrayCollection
+							([{
+								Payment:"Consolidate",PaymentMode:"Card",ChkOutHdrId:PrintChkOutId,
+								PayeeName:Txt_CName.text,
+								Address:Txt_CAddress.text,
+								AmountPaid:Txt_ConsolidatePayment.text,
+								CardDetails:Txt_ConPaymentCardDtl.text,CCBrand:ddl_ConPaymentCCBrand.selectedItem,
+								NameoftheCard:Txt_ConPaymentCardName.text,CreditCardNo:Txt_ConPaymentCardNo.text,
+								ExpiryOn:dte_ConPaymentExpirydate.text,ROC:Txt_ConPaymentRoc.text,
+								SOCBatchCloseNo:Txt_ConPaymentSoc.text,AmountSwipedFor:Txt_ConPaymentAmountSwip.text,
+								ExpiryMonth:Txt_ConExpiryMonth.text,ExpiryYear:Txt_ConExpiryYear.text,Id:Id,
+								OutStanding:Txt_ConsolidateOutStanding.text
+							}]);
+						var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"CardXml");
+						useWeb("CheckOutPaymentCard","Save_CUSTOM",[GlobalXml,HdrXml]);
+					}
+					
+					
+					
+					if(radiogroup1.selectedValue=="Cheque")
+					{
+						F6="Cheque";
+						var ErrStr:String="";var Flag:Boolean=true;
+						if(Txt_ConsolidatePayment.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_ConsolidatePayment.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*  Amount is Required.\n";					
+						}
+						
+						
+						if(Txt_ConPaymentChecqNO.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_ConPaymentChecqNO.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*  Cheque Number is Required.\n";					
+						}
+						
+						if(Txt_ConPayCheqBankname.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_ConPayCheqBankname.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*  Bank Name is Required.\n";					
+						}
+						
+						
+						
+						if(ErrStr!="")
+						{
+							alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
+							return;					
+						}
+						var TC:String=NF_Two.format(Txt_ConsolidateLoad.text);
+						Txt_ConsolidateLoad.text=TC.replace(",","");
+						var LC:String=NF_Two.format(Txt_ConsolidatePayment.text+".00")
+						Txt_ConsolidatePayment.text = LC.replace(",","");
+						if(Txt_ConsolidateLoad.text == Txt_ConsolidatePayment.text)
+						{
+							useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
+							useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+						}
+						var Ac_Hdr:ArrayCollection=new ArrayCollection
+							([{
+								Payment:"Consolidate",PaymentMode:"Cheque",ChkOutHdrId:PrintChkOutId,
+								PayeeName:Txt_CName.text,
+								Address:Txt_CAddress.text,
+								AmountPaid:Txt_ConsolidatePayment.text,
+								ChequeNumber:Txt_ConPaymentChecqNO.text,BankName:Txt_ConPayCheqBankname.text,
+								DateIssued:dte_ConCheqDate.text,DateIssueMonth:0,
+								DateIssueYear:0,Id:Id,OutStanding:Txt_ConsolidateOutStanding.text
+							}]);
+						var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"CheqXml");
+						useWeb("CheckOutPaymentCheque","Save_CUSTOM",[GlobalXml,HdrXml]);
+					}
+					
+					if(radiogroup1.selectedValue=="CompanyInvoice")
+					{
+						F7="CompanyInvoice";
+						var ErrStr:String="";var Flag:Boolean=true;
+						//					if(Txt_ConsolidatePayment.text=="")
+						//					{
+						//						if(Flag==true)
+						//						{
+						//							Txt_ConsolidatePayment.setFocus();Flag=false;
+						//						}
+						//						ErrStr=ErrStr+"*  Amount is Required.\n";					
+						//					}
+						//					if(ErrStr!="")
+						//					{
+						//						alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
+						//						return;					
+						//					}
+						//					
+						//					if(Txt_ConCmpnyAppru.text=="")
+						//					{
+						//						if(Flag==true)
+						//						{
+						//							Txt_ConCmpnyAppru.setFocus();Flag=false;
+						//						}
+						//						ErrStr=ErrStr+"*  Approver is Required.\n";					
+						//					}
+						
+						if(ErrStr!="")
+						{
+							alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
+							return;					
+						}
+						var TC:String=NF_Two.format(Txt_ConsolidateLoad.text);
+						Txt_ConsolidateLoad.text=TC.replace(",","");
+						var LC:String=NF_Two.format(Txt_ConsolidatePayment.text+".00")
+						Txt_ConsolidatePayment.text = LC.replace(",","");
+						//					if(Txt_ConsolidateLoad.text == Txt_ConsolidatePayment.text)
+						//					{
+						//						useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0]);
+						//						useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0]);
+						//					}
+						var Ac_Hdr:ArrayCollection=new ArrayCollection
+							([{
+								Payment:"Consolidate",PaymentMode:"CompanyInvoice",ChkOutHdrId:PrintChkOutId,
+								PayeeName:Txt_CName.text,
+								Address:Txt_CAddress.text,
+								AmountPaid:Txt_ConsolidatePayment.text,
+								Approver:Txt_ConCmpnyAppru.text,Requester:Txt_ConPayCmpReq.text,
+								EmailId:Txt_ConPayCmpEmail.text,PhoneNo:Txt_ConPayCmpPhone.text,Id:Id,
+								OutStanding:Txt_ConsolidateOutStanding.text,FileLoad:FilePath2.text
+								
+							}]);
+						var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"CmpInXml");
+						useWeb("CheckOutPaymentCompInvoice","Save_CUSTOM",[GlobalXml,HdrXml]);
+					}
+					if(radiogroup1.selectedValue=="NEFT")
+					{
+						F8="NEFT";
+						var ErrStr:String="";var Flag:Boolean=true;
+						if(Txt_ConsolidatePayment.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_ConsolidatePayment.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*  Amount is Required.\n";					
+						}
+						
+						
+						if(Txt_ConNEFTRef.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_ConNEFTRef.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*  Reference Number is Required.\n";					
+						}
+						
+						//					if(dte_ConNEFTDdate.text=="")
+						//					{
+						//						if(Flag==true)
+						//						{
+						//							dte_ConNEFTDdate.setFocus();Flag=false;
+						//						}
+						//						ErrStr=ErrStr+"*  Date Of NEFT is Required.\n";					
+						//					}
+						
+						if(ErrStr!="")
+						{
+							alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
+							return;					
+						}
+						var TC:String=NF_Two.format(Txt_ConsolidateLoad.text);
+						Txt_ConsolidateLoad.text=TC.replace(",","");
+						var LC:String=NF_Two.format(Txt_ConsolidatePayment.text+".00")
+						Txt_ConsolidatePayment.text = LC.replace(",","");
+						if(Txt_ConsolidateLoad.text == Txt_ConsolidatePayment.text)
+						{
+							useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
+							useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+						}
+						var Ac_Hdr:ArrayCollection=new ArrayCollection
+							([{
+								Payment:"Consolidate",PaymentMode:"NEFT",ChkOutHdrId:PrintChkOutId,
+								PayeeName:Txt_CName.text,
+								Address:Txt_CAddress.text,
+								AmountPaid:Txt_ConsolidatePayment.text,
+								ReferenceNumber:Txt_ConNEFTRef.text,DateofNEFT:dte_ConNEFTDdate.text,
+								BankName:Txt_ConNEFTBankName.text,Id:Id,
+								DateNEFTMonth:0,DateNEFTYear:0,
+								OutStanding:Txt_ConsolidateOutStanding.text
+							}]);
+						var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"NEFTXml");
+						useWeb("CheckOutPaymentNEFT","Save_CUSTOM",[GlobalXml,HdrXml]);
+					}
 				}
 				
-				if(radiogroup1.selectedValue=="Card")
-				{
-					F5="Card";
-					var ErrStr:String="";var Flag:Boolean=true;
-					if(Txt_ConsolidatePayment.text=="")
-					{
-						if(Flag==true)
-						{
-							Txt_ConsolidatePayment.setFocus();Flag=false;
-						}
-						ErrStr=ErrStr+"*  Amount is Required.\n";					
-					}
-					
-					
-					if(Txt_ConPaymentCardName.text=="")
-					{
-						if(Flag==true)
-						{
-							Txt_ConPaymentCardName.setFocus();Flag=false;
-						}
-						ErrStr=ErrStr+"*  Name of the Credit Card Required.\n";					
-					}
-					
-					if(Txt_ConPaymentCardNo.text=="")
-					{
-						if(Flag==true)
-						{
-							Txt_ConPaymentCardNo.setFocus();Flag=false;
-						}
-						ErrStr=ErrStr+"*   Card Number is Required.\n";					
-					}
-					
-					
-					if(Txt_ConPaymentAmountSwip.text=="")
-					{
-						if(Flag==true)
-						{
-							Txt_ConPaymentAmountSwip.setFocus();Flag=false;
-						}
-						ErrStr=ErrStr+"*   Amount Swiped is Required.\n";					
-					}
-					if(ErrStr!="")
-					{
-						alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
-						return;					
-					}
-					var TC:String=NF_Two.format(Txt_ConsolidateLoad.text);
-					Txt_ConsolidateLoad.text=TC.replace(",","");
-					var LC:String=NF_Two.format(Txt_ConsolidatePayment.text+".00")
-					Txt_ConsolidatePayment.text = LC.replace(",","");
-					if(Txt_ConsolidateLoad.text == Txt_ConsolidatePayment.text)
-					{
-						useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
-						useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
-					}
-					
-					var Ac_Hdr:ArrayCollection=new ArrayCollection
-						([{
-							Payment:"Consolidate",PaymentMode:"Card",ChkOutHdrId:PrintChkOutId,
-							PayeeName:Txt_CName.text,
-							Address:Txt_CAddress.text,
-							AmountPaid:Txt_ConsolidatePayment.text,
-							CardDetails:Txt_ConPaymentCardDtl.text,CCBrand:ddl_ConPaymentCCBrand.selectedItem,
-							NameoftheCard:Txt_ConPaymentCardName.text,CreditCardNo:Txt_ConPaymentCardNo.text,
-							ExpiryOn:dte_ConPaymentExpirydate.text,ROC:Txt_ConPaymentRoc.text,
-							SOCBatchCloseNo:Txt_ConPaymentSoc.text,AmountSwipedFor:Txt_ConPaymentAmountSwip.text,
-							ExpiryMonth:Txt_ConExpiryMonth.text,ExpiryYear:Txt_ConExpiryYear.text,Id:Id,
-							OutStanding:Txt_ConsolidateOutStanding.text
-						}]);
-					var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"CardXml");
-					useWeb("CheckOutPaymentCard","Save_CUSTOM",[GlobalXml,HdrXml]);
-				}
-				
-				
-				
-				if(radiogroup1.selectedValue=="Cheque")
-				{
-					F6="Cheque";
-					var ErrStr:String="";var Flag:Boolean=true;
-					if(Txt_ConsolidatePayment.text=="")
-					{
-						if(Flag==true)
-						{
-							Txt_ConsolidatePayment.setFocus();Flag=false;
-						}
-						ErrStr=ErrStr+"*  Amount is Required.\n";					
-					}
-					
-					
-					if(Txt_ConPaymentChecqNO.text=="")
-					{
-						if(Flag==true)
-						{
-							Txt_ConPaymentChecqNO.setFocus();Flag=false;
-						}
-						ErrStr=ErrStr+"*  Cheque Number is Required.\n";					
-					}
-					
-					if(Txt_ConPayCheqBankname.text=="")
-					{
-						if(Flag==true)
-						{
-							Txt_ConPayCheqBankname.setFocus();Flag=false;
-						}
-						ErrStr=ErrStr+"*  Bank Name is Required.\n";					
-					}
-					
-
-					
-					if(ErrStr!="")
-					{
-						alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
-						return;					
-					}
-					var TC:String=NF_Two.format(Txt_ConsolidateLoad.text);
-					Txt_ConsolidateLoad.text=TC.replace(",","");
-					var LC:String=NF_Two.format(Txt_ConsolidatePayment.text+".00")
-					Txt_ConsolidatePayment.text = LC.replace(",","");
-					if(Txt_ConsolidateLoad.text == Txt_ConsolidatePayment.text)
-					{
-						useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
-						useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
-					}
-					var Ac_Hdr:ArrayCollection=new ArrayCollection
-						([{
-							Payment:"Consolidate",PaymentMode:"Cheque",ChkOutHdrId:PrintChkOutId,
-							PayeeName:Txt_CName.text,
-							Address:Txt_CAddress.text,
-							AmountPaid:Txt_ConsolidatePayment.text,
-							ChequeNumber:Txt_ConPaymentChecqNO.text,BankName:Txt_ConPayCheqBankname.text,
-							DateIssued:dte_ConCheqDate.text,DateIssueMonth:0,
-							DateIssueYear:0,Id:Id,OutStanding:Txt_ConsolidateOutStanding.text
-						}]);
-					var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"CheqXml");
-					useWeb("CheckOutPaymentCheque","Save_CUSTOM",[GlobalXml,HdrXml]);
-				}
-				
-				if(radiogroup1.selectedValue=="CompanyInvoice")
-				{
-					F7="CompanyInvoice";
-					var ErrStr:String="";var Flag:Boolean=true;
-//					if(Txt_ConsolidatePayment.text=="")
-//					{
-//						if(Flag==true)
-//						{
-//							Txt_ConsolidatePayment.setFocus();Flag=false;
-//						}
-//						ErrStr=ErrStr+"*  Amount is Required.\n";					
-//					}
-//					if(ErrStr!="")
-//					{
-//						alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
-//						return;					
-//					}
-//					
-//					if(Txt_ConCmpnyAppru.text=="")
-//					{
-//						if(Flag==true)
-//						{
-//							Txt_ConCmpnyAppru.setFocus();Flag=false;
-//						}
-//						ErrStr=ErrStr+"*  Approver is Required.\n";					
-//					}
-					
-					if(ErrStr!="")
-					{
-						alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
-						return;					
-					}
-					var TC:String=NF_Two.format(Txt_ConsolidateLoad.text);
-					Txt_ConsolidateLoad.text=TC.replace(",","");
-					var LC:String=NF_Two.format(Txt_ConsolidatePayment.text+".00")
-					Txt_ConsolidatePayment.text = LC.replace(",","");
-//					if(Txt_ConsolidateLoad.text == Txt_ConsolidatePayment.text)
-//					{
-//						useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0]);
-//						useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0]);
-//					}
-					var Ac_Hdr:ArrayCollection=new ArrayCollection
-						([{
-							Payment:"Consolidate",PaymentMode:"CompanyInvoice",ChkOutHdrId:PrintChkOutId,
-							PayeeName:Txt_CName.text,
-							Address:Txt_CAddress.text,
-							AmountPaid:Txt_ConsolidatePayment.text,
-							Approver:Txt_ConCmpnyAppru.text,Requester:Txt_ConPayCmpReq.text,
-							EmailId:Txt_ConPayCmpEmail.text,PhoneNo:Txt_ConPayCmpPhone.text,Id:Id,
-							OutStanding:Txt_ConsolidateOutStanding.text,FileLoad:FilePath2.text
-					
-						}]);
-					var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"CmpInXml");
-					useWeb("CheckOutPaymentCompInvoice","Save_CUSTOM",[GlobalXml,HdrXml]);
-				}
-				if(radiogroup1.selectedValue=="NEFT")
-				{
-					F8="NEFT";
-					var ErrStr:String="";var Flag:Boolean=true;
-					if(Txt_ConsolidatePayment.text=="")
-					{
-						if(Flag==true)
-						{
-							Txt_ConsolidatePayment.setFocus();Flag=false;
-						}
-						ErrStr=ErrStr+"*  Amount is Required.\n";					
-					}
-					
-					
-					if(Txt_ConNEFTRef.text=="")
-					{
-						if(Flag==true)
-						{
-							Txt_ConNEFTRef.setFocus();Flag=false;
-						}
-						ErrStr=ErrStr+"*  Reference Number is Required.\n";					
-					}
-					
-//					if(dte_ConNEFTDdate.text=="")
-//					{
-//						if(Flag==true)
-//						{
-//							dte_ConNEFTDdate.setFocus();Flag=false;
-//						}
-//						ErrStr=ErrStr+"*  Date Of NEFT is Required.\n";					
-//					}
-					
-					if(ErrStr!="")
-					{
-						alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
-						return;					
-					}
-					var TC:String=NF_Two.format(Txt_ConsolidateLoad.text);
-					Txt_ConsolidateLoad.text=TC.replace(",","");
-					var LC:String=NF_Two.format(Txt_ConsolidatePayment.text+".00")
-					Txt_ConsolidatePayment.text = LC.replace(",","");
-					if(Txt_ConsolidateLoad.text == Txt_ConsolidatePayment.text)
-					{
-						useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
-						useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
-					}
-					var Ac_Hdr:ArrayCollection=new ArrayCollection
-						([{
-							Payment:"Consolidate",PaymentMode:"NEFT",ChkOutHdrId:PrintChkOutId,
-							PayeeName:Txt_CName.text,
-							Address:Txt_CAddress.text,
-							AmountPaid:Txt_ConsolidatePayment.text,
-							ReferenceNumber:Txt_ConNEFTRef.text,DateofNEFT:dte_ConNEFTDdate.text,
-							BankName:Txt_ConNEFTBankName.text,Id:Id,
-							DateNEFTMonth:0,DateNEFTYear:0,
-							OutStanding:Txt_ConsolidateOutStanding.text
-						}]);
-					var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"NEFTXml");
-					useWeb("CheckOutPaymentNEFT","Save_CUSTOM",[GlobalXml,HdrXml]);
-				}
 			}
 			
 			protected function TariffCash_clickHandler(event:MouseEvent):void
 			{
 				// TODO Auto-generated method stub
+				Cash.selected=true;
 				CompanyInvoice.enabled=false;
 				bdr_TariffCash1.visible=true;
 				bdr_PaymentCredit.visible=false;
@@ -5029,6 +5046,7 @@
 			protected function TariffCreditCard_clickHandler(event:MouseEvent):void
 			{
 				// TODO Auto-generated method stub
+				CreditCard.selected=true;
 				CompanyInvoice.enabled=false;
 				bdr_PaymentCredit.visible=true;
 				bdr_TariffCash1.visible=false;
@@ -5042,6 +5060,7 @@
 			protected function TariffCheque_clickHandler(event:MouseEvent):void
 			{
 				// TODO Auto-generated method stub
+				Cheque.selected=true;
 				CompanyInvoice.enabled=false;
 				bdr__TariffCheq1.visible=true
 				bdr_PaymentCredit.visible=false;
@@ -5054,6 +5073,7 @@
 			protected function TariffCompanyInvoice_clickHandler(event:MouseEvent):void
 			{
 				// TODO Auto-generated method stub
+				CompanyInvoice.selected=true;
 				Cash.enabled=false;
 				CreditCard.enabled=false;
 				Cheque.enabled=false;
@@ -5069,6 +5089,7 @@
 			protected function TariffNEFT_clickHandler(event:MouseEvent):void
 			{
 				// TODO Auto-generated method stub
+				NEFT.selected=true;
 				CompanyInvoice.enabled=false;
 				bdr_TariffNEFT1.visible=true;
 				bdr_TariffCompinvoice1.visible=false;
@@ -5091,7 +5112,8 @@
 			
 			protected function ServicePayCash1_clickHandler(event:MouseEvent):void
 			{
-				// TODO Auto-generated method stub
+				// TODO Auto-generated method stubrue
+				Cash1.selected=true;
 				bdr_ServiceCash1.visible=true;
 				bdr_ServicePaymentCredit.visible=false;
 				bdr_ServiceCheque1.visible=false;
@@ -5104,6 +5126,7 @@
 			protected function ServicePayCreditCard1_clickHandler(event:MouseEvent):void
 			{
 				// TODO Auto-generated method stub
+				CreditCard1.selected=true;
 				bdr_ServicePaymentCredit.visible=true;
 				bdr_ServiceCash1.visible=false;
 				bdr_ServiceCheque1.visible=false;
@@ -5126,6 +5149,7 @@
 			protected function ServicePayCheque1_clickHandler(event:MouseEvent):void
 			{
 				// TODO Auto-generated method stub
+				Cheque1.selected=true;
 				bdr_ServiceCheque1.visible=true;
 				bdr_ServicePaymentCredit.visible=false;
 				bdr_ServiceCash1.visible=false;
@@ -5138,6 +5162,7 @@
 			protected function ServicePayCompanyInvoice1_clickHandler(event:MouseEvent):void
 			{
 				// TODO Auto-generated method stub
+				CompanyInvoice1.selected=true;
 				bdr_ServiceCompaInvoice1.visible=true;
 				bdr_ServiceCheque1.visible=false;
 				bdr_ServicePaymentCredit.visible=false;
@@ -5149,6 +5174,7 @@
 			protected function ServicePayNEFT1_clickHandler(event:MouseEvent):void
 			{
 				// TODO Auto-generated method stub
+				NEFT1.selected=true;
 				bdr_ServiceNEFT1.visible=true;
 				bdr_ServiceCash1.visible=false;
 				bdr_ServicePaymentCredit.visible=false;
@@ -5165,6 +5191,7 @@
 			protected function ConPayCash2_clickHandler(event:MouseEvent):void
 			{
 				// TODO Auto-generated method stub
+				Cash2.selected=true;
 				CompanyInvoice2.enabled=false;
 				ConsolidateCash1.visible=true;
 				bdr_ConPaymentCredit.visible=false;
@@ -5195,6 +5222,7 @@
 			protected function ConCreditCard2_clickHandler(event:MouseEvent):void
 			{
 				// TODO Auto-generated method stub
+				CreditCard2.selected=true;
 				CompanyInvoice2.enabled=false;
 				bdr_ConPaymentCredit.visible=true;
 				ConsolidateCash1.visible=false;
@@ -5207,6 +5235,7 @@
 			protected function ConCheque2_clickHandler(event:MouseEvent):void
 			{
 				// TODO Auto-generated method stub
+				Cheque2.selected=true;
 				CompanyInvoice2.enabled=false;
 				bdr_ConsolidateCheq1.visible=true;
 				bdr_ConPaymentCredit.visible=false;
@@ -5223,6 +5252,7 @@
 				CreditCard2.enabled=false;
 				Cheque2.enabled=false;
 				NEFT2.enabled=false;
+				CompanyInvoice2.selected=true;
 				bdr_ConsolidateCmpnyInvoice1.visible=true;
 				bdr_ConsolidateCheq1.visible=false;
 				bdr_ConPaymentCredit.visible=false;
@@ -5234,6 +5264,7 @@
 			protected function ConNEFT2_clickHandler(event:MouseEvent):void
 			{
 				// TODO Auto-generated method stub
+				NEFT2.selected=true;
 				CompanyInvoice2.enabled=false;
 				bdr_ConsolidateNEFT1.visible=true;
 				ConsolidateCash1.visible=false;
@@ -6783,7 +6814,7 @@
 				<s:TextInput x="96" y="482" id="Txt_CheckInDate" visible="false"/>
 				<s:TextInput x="204" y="471" id="Txt_ChkoutInvoice" editable="false" visible="false"/>
 				<WrbHelpComp:HelpText x="96" y="93" width="160" id="hlp_property" pxSetColumnsWidth="200,0"
-									  onselection="{OnSelectionProperty()}" depth="100" tabIndex="1">
+									  onselection="{OnSelectionProperty()}" depth="1500" tabIndex="1">
 				</WrbHelpComp:HelpText>
 				
 				

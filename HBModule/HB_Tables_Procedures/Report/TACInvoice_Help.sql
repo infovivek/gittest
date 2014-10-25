@@ -52,7 +52,9 @@ CREATE PROCEDURE Sp_TACInvoice_Help
 	JOIN WRBHBProperty P ON P.Id=CT.PropertyId and c.PropertyId=p.Id and p.IsActive=1 and p.IsDeleted=0
 	WHERE C.IsActive=1 and c.IsDeleted=0 AND p.Category!='Managed G H' 
 		
-	SELECT Id,BillNo,CreatedDate,InvoiceNo,Property,Amount,Tax,TotalAmount,Guests,Client,ChkInDate,
-	ChkOutDate,NOOfDays TotalDays,PerdayRate Perday FROM #TEMP	
+	SELECT Id,BillNo,CreatedDate,InvoiceNo,Property,Amount,Tax,TotalAmount,Guests,Client,
+	CONVERT(NVARCHAR,CONVERT(DATE,ChkInDate,103),110) AS CheckInDate,
+				CONVERT(NVARCHAR,CONVERT(DATE,ChkOutDate,103),110) AS CheckOutDate,
+				NOOfDays TotalDays,PerdayRate Perday FROM #TEMP	
  END
 END

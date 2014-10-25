@@ -45,9 +45,9 @@ CREATE PROCEDURE dbo.[SP_PCHistoryReport_Help]
     	--table gridload
 		SELECT  DISTINCT (U.FirstName+' '+U.LastName) AS Requestedby,P.PropertyName AS PCAccount,
 		PC.RequestedStatus AS RequestedStatus,PC.ProcessedStatus AS Status,PC.Comments AS Comments,
-		CONVERT(NVARCHAR(100),PC.RequestedOn,103) AS RequestedOn,0 AS Process,
+		CONVERT(NVARCHAR(100),CONVERT(DATE,PC.RequestedOn,103),110) AS RequestedOn,0 AS Process,
 		PC.RequestedAmount AS RequestedAmount,
-		CONVERT(NVARCHAR(100),PC.LastProcessedon,103) AS Processedon,(US.FirstName+' '+US.LastName) AS ProcessedBy,
+		CONVERT(NVARCHAR(100),CONVERT(DATE,PC.LastProcessedon,103),110) AS Processedon,(US.FirstName+' '+US.LastName) AS ProcessedBy,
 		PC.RequestedUserId AS RequestedUserId, PC.Id,
 		PC.PropertyId
 		From WRBHBPettyCashApprovalDtl PC
@@ -69,9 +69,9 @@ IF(@Action='GRIDLOAD')
 	BEGIN
 		SELECT  DISTINCT (U.FirstName+' '+U.LastName) AS Requestedby,P.PropertyName AS PCAccount,PC.RequestedStatus AS RequestedStatus,
 		PC.ProcessedStatus AS Status,PC.Comments AS Comments,
-		CONVERT(NVARCHAR(100),PC.RequestedOn,103) AS RequestedOn,0 AS Process,
+		CONVERT(NVARCHAR(100),CONVERT(DATE,PC.RequestedOn,103),110) AS RequestedOn,0 AS Process,
 		PC.RequestedAmount AS RequestedAmount,
-		CONVERT(NVARCHAR(100),PC.LastProcessedon,103) AS Processedon,(US.FirstName+' '+US.LastName) AS ProcessedBy,
+		CONVERT(NVARCHAR(100),CONVERT(DATE,PC.LastProcessedon,103),110) AS Processedon,(US.FirstName+' '+US.LastName) AS ProcessedBy,
 		PC.RequestedUserId AS RequestedUserId, PC.Id,
 		PC.PropertyId
 		From WRBHBPettyCashApprovalDtl PC

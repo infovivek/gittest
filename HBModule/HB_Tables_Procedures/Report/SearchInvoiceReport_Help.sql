@@ -173,7 +173,8 @@ IF @Action ='Pageload'
 		if(@Str1='')
 		begin
 		SELECT BookingCode,InVoiceNo InvoiceNumber,p.PropertyName+'-'+Location Property,ClientName ClientName, 
-		GuestName GuestName,CheckInDate CheckInDate,CheckOutDate CheckOutDate,Location,
+		GuestName GuestName,CONVERT(NVARCHAR,CheckInDate,103) AS CheckInDate,
+		 CONVERT(NVARCHAR,CheckOutDate,103) AS CheckOutDate,Location,
 		TotalAmount,TariffAmount Amount,BillAmount Amounts,BillType BillType,BillId ChkoutId,
 		0 as selectRadio ,'CheckOut'Status,'Internal Property' as PropertyCat
 		FROM #TempBillFinal1 f
@@ -186,7 +187,8 @@ IF @Action ='Pageload'
 			if(@FromDt!='')and(@ToDt!='')
 			Begin 
 				SELECT '0'BookingCode,InVoiceNo InvoiceNumber,p.PropertyName+'-'+cc.CityName Property,ClientName ClientName, 
-				GuestName GuestName,CheckInDate CheckInDate,CheckOutDate CheckOutDate,''Location,
+				GuestName GuestName,CONVERT(NVARCHAR,CheckInDate,103) AS CheckInDate,
+		 CONVERT(NVARCHAR,CheckOutDate,103) AS CheckOutDate,''Location,
 				''TotalAmount,ChkOutTariffTotal Amount,ChkOutTariffNetAmount Amounts,'Tariff' BillType,f.Id ChkoutId,
 				0 as selectRadio ,'CheckOut'Status,'External Property' as PropertyCat
 				FROM WRBHBChechkOutHdr f
@@ -200,7 +202,8 @@ IF @Action ='Pageload'
 			Else
 		   begin
 				SELECT '0'BookingCode,InVoiceNo InvoiceNumber,p.PropertyName+'-'+cc.CityName Property,ClientName ClientName, 
-				GuestName GuestName,CheckInDate CheckInDate,CheckOutDate CheckOutDate,''Location,
+				GuestName GuestName,CONVERT(NVARCHAR,CheckInDate,103) AS CheckInDate,
+		 CONVERT(NVARCHAR,CheckOutDate,103) AS CheckOutDate,''Location,
 				''TotalAmount,ChkOutTariffTotal Amount,ChkOutTariffNetAmount Amounts,'Tariff' BillType,f.Id ChkoutId,
 				0 as selectRadio ,'CheckOut'Status,'External Property' as PropertyCat
 				FROM WRBHBChechkOutHdr f
@@ -213,7 +216,8 @@ IF @Action ='Pageload'
        if(@Str1='Internal Property')
 		begin
 		SELECT BookingCode,InVoiceNo InvoiceNumber,p.PropertyName+'-'+Location Property,ClientName ClientName, 
-		GuestName GuestName,CheckInDate CheckInDate,CheckOutDate CheckOutDate,Location,
+		GuestName GuestName,CONVERT(NVARCHAR,CheckInDate,103) AS CheckInDate,
+		 CONVERT(NVARCHAR,CheckOutDate,103) AS CheckOutDate,Location,
 		TotalAmount,TariffAmount Amount,BillAmount Amounts,BillType BillType,BillId ChkoutId,
 		0 as selectRadio ,'CheckOut'Status,'Internal Property' as PropertyCat
 		FROM #TempBillFinal1 f
@@ -225,11 +229,12 @@ IF @Action ='Pageload'
 		begin 
 		if(@FromDt!='')and(@ToDt!='')
 	    Begin 
-			SELECT C.Id as ChkoutId,CT.TACInvoiceNo InvoiceNumber,P.PropertyName Property,
+			SELECT CT.Id as ChkoutId,CT.TACInvoiceNo InvoiceNumber,P.PropertyName Property,
 			--round(ct.ChkOutTariffHECess+ct.ChkOutTariffCess+CT.TotalBusinessSupportST+CT.TACAmount,0) as Amount ,
 			CT.MarkupAmount  as Amount,
 			CT.TACAmount Amounts,C.GuestName AS GuestName ,C.ClientName AS ClientName,
-			CT.CheckInDate as CheckInDate,CT.CheckOutDate AS CheckOutDate,--ct.NoOfDays,ct.Rate,
+			CONVERT(NVARCHAR,CT.CheckInDate,103) AS CheckInDate,
+			CONVERT(NVARCHAR,CT.CheckOutDate,103) AS CheckOutDate,--ct.NoOfDays,ct.Rate,
 			0 as selectRadio ,'CheckOut'Status,'TAC' as PropertyCat,'Tariff' BillType
 			FROM WRBHBChechkOutHdr C 
 			JOIN WRBHBExternalChechkOutTAC CT ON CT.ChkOutHdrId = C.Id and ct.IsActive=1 and ct.IsDeleted=0
@@ -241,11 +246,12 @@ IF @Action ='Pageload'
 			end
 			Else
 			begin
-				SELECT C.Id as ChkoutId,CT.TACInvoiceNo InvoiceNumber,P.PropertyName Property,
+				SELECT CT.Id as ChkoutId,CT.TACInvoiceNo InvoiceNumber,P.PropertyName Property,
 				--round(ct.ChkOutTariffHECess+ct.ChkOutTariffCess+CT.TotalBusinessSupportST,0) as Amount,
 				CT.MarkupAmount  as Amount,
 				CT.TACAmount Amounts,C.GuestName AS GuestName ,C.ClientName AS ClientName,
-				CT.CheckInDate as CheckInDate,CT.CheckOutDate AS CheckOutDate,--ct.NoOfDays,ct.Rate,
+				CONVERT(NVARCHAR,CT.CheckInDate,103) AS CheckInDate,
+				CONVERT(NVARCHAR,CT.CheckOutDate,103) AS CheckOutDate,--ct.NoOfDays,ct.Rate,
 				0 as selectRadio ,'CheckOut'Status,'TAC' as PropertyCat,'Tariff' BillType 
 				FROM WRBHBChechkOutHdr C 
 				JOIN WRBHBExternalChechkOutTAC CT ON CT.ChkOutHdrId = C.Id and ct.IsActive=1 and ct.IsDeleted=0

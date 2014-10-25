@@ -66,5 +66,8 @@ namespace HB.Entity
         public int ClientId { get; set; }
         public int CityId { get; set; }
         public int ServiceChargeChk { get; set; }
+        public string BillFromDate { get; set; }
+        public string BillEndDate { get; set; }
+        public string Intermediate { get; set; }
     }
 }

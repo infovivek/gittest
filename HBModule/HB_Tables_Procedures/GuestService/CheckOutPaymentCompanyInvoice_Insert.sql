@@ -33,15 +33,35 @@ CREATE PROCEDURE [dbo].[SP_CheckOutPaymentCompanyInvoice_Insert](
 AS
 BEGIN
 DECLARE @Id INT;
- -- INSERT
-INSERT INTO WRBHBChechkOutPaymentCompanyInvoice(ChkOutHdrId,Payment,PayeeName,Address,
-AmountPaid,PaymentMode,Approver,Requester,EmailId,PhoneNo,FileLoad,OutStanding,CreatedBy,CreatedDate,ModifiedBy,
-ModifiedDate,IsActive,IsDeleted,RowId)
+DECLARE @IntermediateFlag NVARCHAR(100)
+SET @IntermediateFlag = (SELECT IntermediateFlag FROM WRBHBChechkOutHdr WHERE Id = @ChkOutHdrId)
 
-VALUES(@ChkOutHdrId,@Payment,@PayeeName,@Address,@AmountPaid,@PaymentMode,
-@Approver,@Requester,@EmailId,@PhoneNo,@FileLoad,@OutStanding,@CreatedBy,GETDATE(),@CreatedBy,GETDATE(),1,0,NEWID())
+IF @IntermediateFlag = '1'
+BEGIN
+	-- INSERT
+	INSERT INTO WRBHBChechkOutPaymentCompanyInvoice(ChkOutHdrId,Payment,PayeeName,Address,
+	AmountPaid,PaymentMode,Approver,Requester,EmailId,PhoneNo,FileLoad,OutStanding,CreatedBy,CreatedDate,ModifiedBy,
+	ModifiedDate,IsActive,IsDeleted,RowId)
 
-SET @Id=@@IDENTITY;
-SELECT  Id,RowId FROM WRBHBChechkOutPaymentCompanyInvoice WHERE Id=@Id;
+	VALUES(@ChkOutHdrId,@Payment,@PayeeName,@Address,@AmountPaid,@PaymentMode,
+	@Approver,@Requester,@EmailId,@PhoneNo,@FileLoad,@OutStanding,@CreatedBy,GETDATE(),@CreatedBy,GETDATE(),0,0,NEWID())
+
+	SET @Id=@@IDENTITY;
+	SELECT  Id,RowId FROM WRBHBChechkOutPaymentCompanyInvoice WHERE Id=@Id;
+END
+ELSE
+BEGIN
+	-- INSERT
+	INSERT INTO WRBHBChechkOutPaymentCompanyInvoice(ChkOutHdrId,Payment,PayeeName,Address,
+	AmountPaid,PaymentMode,Approver,Requester,EmailId,PhoneNo,FileLoad,OutStanding,CreatedBy,CreatedDate,ModifiedBy,
+	ModifiedDate,IsActive,IsDeleted,RowId)
+
+	VALUES(@ChkOutHdrId,@Payment,@PayeeName,@Address,@AmountPaid,@PaymentMode,
+	@Approver,@Requester,@EmailId,@PhoneNo,@FileLoad,@OutStanding,@CreatedBy,GETDATE(),@CreatedBy,GETDATE(),1,0,NEWID())
+
+	SET @Id=@@IDENTITY;
+	SELECT  Id,RowId FROM WRBHBChechkOutPaymentCompanyInvoice WHERE Id=@Id;
+END
+ 
 END
 GO

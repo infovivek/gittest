@@ -359,13 +359,16 @@
 						Alert.OK, null, null, iconErrLarge, Alert.OK),10,"");
 				}
 				Grd_SpendHistory1.dataProvider=null;
-				PropertyId=0;
-				UserId=0;Txt_User.text="";
+				Grd_SpendHistory.dataProvider=null;
+				//PropertyId=0;
+				//UserId=0;
+				Txt_User.text="";
 				Txt_property.text="";
 				Txt_CloseBalance.text="";
 				Txt_OpenBalance.text="";
-				hlp_property.text="";
-				hlp_User.text="";
+				//hlp_property.text="";
+				//hlp_User.text="";
+				bdr_SpendHistory.visible=false;
 			}
 			
 			protected function FnValidation_BeforeSave():String

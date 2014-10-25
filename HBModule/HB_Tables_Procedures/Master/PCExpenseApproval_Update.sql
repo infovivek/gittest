@@ -115,7 +115,8 @@ BEGIN
 	 END
  ELSE
  BEGIN
-		UPDATE WRBHBPettyCashStatus SET Flag=0,Balance=@ApprovedAmount-@ExpenseAmount
+		UPDATE WRBHBPettyCashStatus SET Flag=0,Balance=@ApprovedAmount-@ExpenseAmount,
+		ModifiedDate=GETDATE()
 		,IsActive=0,IsDeleted=1
 		WHERE IsActive=1 AND IsDeleted=0 AND UserId=@RequestedUserId 
 		

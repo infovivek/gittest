@@ -163,8 +163,11 @@ BEGIN
 	LEFT OUTER JOIN #Service S ON T.COId=S.CID
 		
 	SELECT Id AS SNo,GetType AS BookingType,BookingId AS BookingCode,BillId,InVoiceNo,PropertyName,
-	ClientName,MasterClientName,Guest AS GuestName,CheckInDate,CheckOutDate,CityName AS Location,
-	BillStartDate,BillEndDate,ISNULL(TotalAmount,0) AS TotalAmount,Amount,FBAmount AS FoodAndBeverages,SAmount AS Service,
+	ClientName,MasterClientName,Guest AS GuestName,CONVERT(NVARCHAR(100),CONVERT(DATE,CheckInDate,103),110) AS CheckInDate,
+	CONVERT(NVARCHAR(100),CONVERT(DATE,CheckOutDate,103),110) AS CheckOutDate,CityName AS Location,
+	CONVERT(NVARCHAR(100),CONVERT(DATE,BillStartDate,103),110) AS BillStartDate,
+	CONVERT(NVARCHAR(100),CONVERT(DATE,BillEndDate,103),110) AS BillEndDate,
+	ISNULL(TotalAmount,0) AS TotalAmount,Amount,FBAmount AS FoodAndBeverages,SAmount AS Service,
 	LAmount AS Laundry,Mis AS Miscellaneous,OtherService AS OtherService,LT AS LuxuryTax,STT,STTC,
 	STC,SC AS ServiceCharge,VAT FROM #Final
 	group by Id  ,GetType ,BookingId  ,BillId,InVoiceNo,PropertyName,

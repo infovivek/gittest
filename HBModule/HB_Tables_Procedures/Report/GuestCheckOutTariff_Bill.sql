@@ -86,7 +86,8 @@ IF @Action='PageLoad'
 	 h.ClientName,h.CheckOutNo,h.InVoiceNo,  
 	 h.ChkOutTariffTotal as TotalTariff,h.ChkOutTariffLT as LuxuryTax,round(h.ChkOutTariffNetAmount,0) as NetAmount,  
 	 h.ChkOutTariffST1 as SerivceNet,h.ChkOutTariffST3 as SerivceTax,h.ChkOutTariffCess as Cess,h.NoOfDays,  
-	 h.ChkOutTariffHECess as HCess,h.ChkOutTariffSC as ServiceCharge,h.ChkOutTariffExtraAmount as ExtraMatress,convert(nvarchar(100),h.CheckInDate,103) as ArrivalDate,  
+	 h.ChkOutTariffHECess as HCess,h.ChkOutTariffSC as ServiceCharge,h.ChkOutTariffExtraAmount as ExtraMatress,
+	 convert(nvarchar(100),h.CheckInDate,103)as ArrivalDate,  
 	 d.Tariff,(p.PropertyName+','+p.Propertaddress) as Propertyaddress,(c.CityName+','+  
 	 s.StateName+','+p.Postal) as Propcity,c.CityName,s.StateName,p.Postal,  
 	 p.Phone,p.Email,@CompanyName as CompanyName,@LOGO AS logo,  

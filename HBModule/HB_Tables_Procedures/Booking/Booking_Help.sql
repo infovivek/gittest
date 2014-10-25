@@ -1684,7 +1684,7 @@ IF @Action = 'Property'
   --
   --SELECT COUNT(*) FROM #FINAL; 
   -- Recommended Property
-  CREATE TABLE #GuestId(Id INT,GuestId BIGINT);
+  /*CREATE TABLE #GuestId(Id INT,GuestId BIGINT);
   INSERT INTO #GuestId(Id,GuestId)
   SELECT * FROM dbo.Split(@Str2, ',');
   CREATE TABLE #GuestProperty(PropertyId BIGINT);
@@ -1694,8 +1694,32 @@ IF @Action = 'Property'
   G.GuestId=BP.GuestId
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id=BP.BookingPropertyId
   WHERE P.CityId=@CityId
-  GROUP BY BP.BookingPropertyId; 
-  --  
+  GROUP BY BP.BookingPropertyId;*/
+  --
+  CREATE TABLE #ZAXS(BookingId BIGINT, PropertyId BIGINT);
+  INSERT INTO #ZAXS(BookingId, PropertyId)
+  SELECT B.Id,BG.BookingPropertyId FROM WRBHBBooking B
+  LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
+  BG.BookingId = B.Id
+  WHERE B.IsActive = 1 AND B.IsDeleted = 0 AND BG.IsActive = 1 AND
+  BG.IsDeleted = 0 AND B.ClientId = @ClientId AND B.CityId = @CityId
+  GROUP BY B.Id,BG.BookingPropertyId;
+  --
+  CREATE TABLE #ZAXSQA(PropertyCnt BIGINT, PropertyId BIGINT);
+  INSERT INTO #ZAXSQA(PropertyCnt, PropertyId)
+  SELECT COUNT(PropertyId),PropertyId FROM #ZAXS GROUP BY PropertyId;
+  --SELECT * FROM #ZAXSQA;
+  --SELECT * FROM #FINAL WHERE PropertyId IN (SELECT PropertyId FROM #ZAXSQA);
+  SELECT F.PropertyName,CAST(Z.PropertyId AS NVARCHAR) AS PropertyId,
+  F.GetType,F.PropertyType,F.RoomType,F.SingleTariff,F.DoubleTariff,
+  F.TripleTariff,F.SingleandMarkup,F.DoubleandMarkup,F.TripleandMarkup,
+  F.TAC,F.Inclusions,F.DiscountModeRS,F.DiscountModePer,F.DiscountAllowed,
+  F.Phone,F.Email,F.Locality,F.LocalityId,F.MarkupId,F.SingleandMarkup1,
+  F.DoubleandMarkup1,F.TripleandMarkup1,F.StarRating,F.TaxAdded,0 AS Tick,
+  1 AS Chk,'' AS Markup,0 AS Id,F.RatePlanCode,F.RoomTypeCode,
+  @StateId AS APIHdrId,F.MealPlan  FROM #ZAXSQA Z
+  LEFT OUTER JOIN #FINAL F WITH(NOLOCK) ON Z.PropertyId = F.PropertyId
+  WHERE F.PropertyId = Z.PropertyId ORDER BY Z.PropertyCnt ASC;
   /*SELECT P.PropertyName,CAST(TP.Id AS NVARCHAR) AS PropertyId,
   TP.GetType,TP.PropertyType,
   TP.RoomType,TP.SingleTariff,TP.DoubleTariff,TP.TripleTariff,
@@ -1731,7 +1755,7 @@ IF @Action = 'Property'
   LEFT OUTER JOIN WRBHBLocality L WITH(NOLOCK)ON L.Id=P.LocalityId
   LEFT OUTER JOIN WRBHBPropertyType T WITH(NOLOCK)ON T.Id=P.PropertyType
   LEFT OUTER JOIN #GuestProperty G WITH(NOLOCK) ON G.PropertyId=TP.Id
-  WHERE TP.Id=G.PropertyId;*/
+  WHERE TP.Id=G.PropertyId;
   SELECT PropertyName,CAST(PropertyId AS NVARCHAR) AS PropertyId,
   GetType,PropertyType,RoomType,SingleTariff,
   DoubleTariff,TripleTariff,SingleandMarkup,DoubleandMarkup,TripleandMarkup,
@@ -1739,7 +1763,7 @@ IF @Action = 'Property'
   Locality,LocalityId,MarkupId,SingleandMarkup1,DoubleandMarkup1,
   TripleandMarkup1,StarRating,TaxAdded,0 AS Tick,1 AS Chk,'' AS Markup,0 AS Id,
   RatePlanCode,RoomTypeCode,@StateId AS APIHdrId,MealPlan 
-  FROM #FINAL WHERE PropertyId IN (SELECT PropertyId FROM #GuestProperty);
+  FROM #FINAL WHERE PropertyId IN (SELECT PropertyId FROM #GuestProperty);*/
  END
 IF @Action = 'BookingPropertyDtls'
  BEGIN

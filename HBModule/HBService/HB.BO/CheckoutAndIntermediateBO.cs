@@ -12,7 +12,7 @@ namespace HB.BO
     {
         public DataSet Save(string[] data, User User)
         {
-            return new GuestCheckOutDao().Save(data, User);
+            return new CheckoutAndIntermediateDao().Save(data, User);
         }
         public DataSet Search(string[] data, User user)
         {
@@ -20,7 +20,7 @@ namespace HB.BO
         }
         public DataSet HelpResult(string[] data, User user)
         {
-            return new GuestCheckOutDao().HelpResult(data, user);
+            return new CheckoutAndIntermediateDao().HelpResult(data, user);
         }
     }
 }

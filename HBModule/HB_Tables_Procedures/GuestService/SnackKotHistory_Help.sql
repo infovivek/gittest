@@ -41,14 +41,14 @@ CREATE PROCEDURE dbo.[SP_SnackKOTHistory_Help]
 		JOIN WRBHBProperty  P ON C.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
 		WHERE C.IsActive=1 AND C.IsDeleted=0 AND  P.Category IN('Internal Property','Managed G H')
 		
-		SELECT DISTINCT CH.BookingId,CONVERT(NVARCHAR,CH.ChkoutDate,103) AS ChkoutDate,'Guest' AS Type,
-		KH.GuestName,KH.RoomNo,
-	    SUM(CAST(ISNULL(KH.TotalAmount,0)as DECIMAL(27,2))) AS Amount,'Raised' as Status,
+		SELECT DISTINCT CH.BookingId,CH.ChkoutDate,'Guest' AS Type,KH.GuestName,CH.RoomNo,
+	    SUM(CAST(ISNULL(KD.Amount,0)as DECIMAL(27,2))) AS Amount,'Raised' as Status,
 	    KH.GuestId
 		FROM WRBHBNewKOTEntryHdr KH
+		JOIN WRBHBNewKOTEntryDtl KD ON KH.Id=KD.NewKOTEntryHdrId AND KD.IsActive=1 AND KD.IsDeleted=0
 		JOIN WRBHBCheckInHdr CH ON KH.GuestId=CH.GuestId AND CH.IsActive=1 AND CH.IsDeleted=0
 		group by CH.BookingId,
-		KH.GuestName,KH.RoomNo,KH.GuestId,CH.ChkoutDate
+		KH.GuestName,CH.RoomNo,KH.GuestId,CH.ChkoutDate
 		
 		
  END
@@ -60,21 +60,24 @@ CREATE PROCEDURE dbo.[SP_SnackKOTHistory_Help]
         
         INSERT INTO #Guest(BookingId,Date,Type,Name,Apartment,Amount,Status,GuestId)
 	    	         
-	    SELECT DISTINCT CH.BookingId,CH.ChkoutDate,'Guest' AS Type,KH.GuestName,KH.RoomNo,
-	    SUM(CAST(ISNULL(KH.TotalAmount,0)as DECIMAL(27,2))) AS Amount,'Raised' as Status,
+	    SELECT DISTINCT CH.BookingId,CH.ChkoutDate,'Guest' AS Type,KH.GuestName,CH.RoomNo,
+	    SUM(CAST(ISNULL(KD.Amount,0)as DECIMAL(27,2))) AS Amount,'Raised' as Status,
 	    KH.GuestId
 		FROM WRBHBNewKOTEntryHdr KH
+		JOIN WRBHBNewKOTEntryDtl KD ON KH.Id=KD.NewKOTEntryHdrId AND KD.IsActive=1 AND KD.IsDeleted=0
 		JOIN WRBHBCheckInHdr CH ON KH.GuestId=CH.GuestId AND CH.IsActive=1 AND CH.IsDeleted=0
 		WHERE KH.PropertyId=@PropertyId  AND KH.IsActive=1 And KH.IsDeleted=0
-		AND  CONVERT(NVARCHAR(100),KH.Date,103) BETWEEN @Str1 AND @Str2
-		group by CH.BookingId,
-		KH.GuestName,KH.RoomNo,KH.GuestId,CH.ChkoutDate
-		
-		
-  END	
-			
-       SELECT  Date,Type,BookingId,GuestId,Name,Apartment,Amount,Status
+		AND CH.ChkoutDate BETWEEN CONVERT(Date,@Str1 ,103)
+		AND CONVERT(Date,@Str2,103)
+		group by CH.BookingId,CH.ChkoutDate,KH.GuestName,CH.RoomNo,KH.GuestId
+		 
+		END	
+  	
+       SELECT  CONVERT(NVARCHAR(100),Date,103) AS Date,Type,
+       BookingId,GuestId,Name,Apartment,SUM(Amount) AS Amount,Status
        FROM #Guest 
+       Group by CONVERT(NVARCHAR(100),Date,103),Type,BookingId,GuestId,Name,Apartment,Status
+      
   END
  IF @Action='Guest'
 	BEGIN

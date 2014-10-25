@@ -149,29 +149,29 @@ BEGIN
 		order by H.Id desc
 --APARTMENT
       INSERT INTO #ExpChkin(BookedId,PropertyName,PropertyId,GuestName,BookingLevel,ExpDate,CityName,CityId,ClientName,ClientId,BookingCode)
-         select distinct H.Id, ABP.PropertyName PropertyName,ABP.PropertyId,ABPA.FirstName FirstName,H.BookingLevel,
+         select distinct H.Id, p.PropertyName PropertyName,p.Id,ABPA.FirstName FirstName,H.BookingLevel,
 		 convert(nvarchar(100),ABPA.ChkInDt,103) ExpDate ,p.City,p.CityId,H.ClientName,H.ClientId,BookingCode
 		  FROM WRBHBBooking H
-		 JOIN WRBHBApartmentBookingProperty ABP WITH(NOLOCK) ON H.Id = ABP.BookingId AND ABP.IsActive = 1 AND ABP.IsDeleted = 0
-		 JOIN WRBHBApartmentBookingPropertyAssingedGuest ABPA WITH(NOLOCK) ON ABPA.BookingId = ABP.BookingId AND ABPA.IsActive = 1 AND ABPA.IsDeleted = 0
-		 JOIN WRBHBProperty P WITH(NOLOCK) ON P.Id = ABP.PropertyId and P.IsActive = 1 and P.IsDeleted = 0
+		-- JOIN WRBHBApartmentBookingProperty ABP WITH(NOLOCK) ON H.Id = ABP.BookingId AND ABP.IsActive = 1 AND ABP.IsDeleted = 0
+		 JOIN WRBHBApartmentBookingPropertyAssingedGuest ABPA WITH(NOLOCK) ON H.Id = ABPA.BookingId AND ABPA.IsActive = 1 AND ABPA.IsDeleted = 0
+		 JOIN WRBHBProperty P WITH(NOLOCK) ON P.Id = ABPA.BookingPropertyId and P.IsActive = 1 and P.IsDeleted = 0
 		 JOIN WRBHBPropertyUsers PU WITH(NOLOCK) ON PU.PropertyId = P.Id and PU.IsActive = 1 and PU.IsDeleted = 0
 		 JOIN WRBHBUser U WITH(NOLOCK) ON   PU.UserId =U.Id and pu.IsActive = 1 and PU.IsDeleted = 0
          JOIN WRBHBUserRoles R WITH(NOLOCK) ON  U.Id =R.UserId  and R.IsActive = 1 and R.IsDeleted = 0 
 		 WHERE H.Status IN('Booked','Direct Booked')  and H.CancelStatus!='Canceled'  and ABPA.CurrentStatus='Booked'
 		 and CONVERT(date,ABPA.ChkInDt,103) <= CONVERT(date,GETDATE(),103)  
 		 and pu.UserId=@Pram1
-		group by H.Id, ABP.PropertyName,ABPA.FirstName,H.BookingLevel,ABPA.ChkInDt,ABP.PropertyId,
+		group by H.Id, p.PropertyName,ABPA.FirstName,H.BookingLevel,ABPA.ChkInDt,p.Id,
 		p.City,p.CityId,H.ClientName,H.ClientId,BookingCode  
 		order by H.Id desc 
 --APARTMENT   
  	 INSERT INTO #ExpChkin(BookedId,PropertyName,PropertyId,GuestName,BookingLevel,ExpDate,CityName,CityId,ClientName,ClientId,BookingCode)
- 	      SELECT DISTINCT H.Id, ABP.PropertyName PropertyName,ABP.PropertyId,ABPA.FirstName FirstName,H.BookingLevel,
+ 	      SELECT DISTINCT H.Id, p.PropertyName PropertyName,p.Id,ABPA.FirstName FirstName,H.BookingLevel,
 		  convert(nvarchar(100),ABPA.ChkInDt,103) ExpDate ,p.City,p.CityId,H.ClientName,H.ClientId,BookingCode
 		  FROM WRBHBBooking H
-		 JOIN WRBHBApartmentBookingProperty ABP WITH(NOLOCK) ON H.Id = ABP.BookingId AND ABP.IsActive = 1 AND ABP.IsDeleted = 0
-		 JOIN WRBHBApartmentBookingPropertyAssingedGuest ABPA WITH(NOLOCK) ON ABPA.BookingId = ABP.BookingId AND ABPA.IsActive = 1 AND ABPA.IsDeleted = 0
-		 JOIN WRBHBProperty P WITH(NOLOCK) ON P.Id = ABP.PropertyId and P.IsActive = 1 and P.IsDeleted = 0
+		-- JOIN WRBHBApartmentBookingProperty ABP WITH(NOLOCK) ON H.Id = ABP.BookingId AND ABP.IsActive = 1 AND ABP.IsDeleted = 0
+		 JOIN WRBHBApartmentBookingPropertyAssingedGuest ABPA WITH(NOLOCK) ON H.Id= ABPA.BookingId  AND ABPA.IsActive = 1 AND ABPA.IsDeleted = 0
+		 JOIN WRBHBProperty P WITH(NOLOCK) ON P.Id = ABPA.BookingPropertyId and P.IsActive = 1 and P.IsDeleted = 0
 		 JOIN WRBHBPropertyUsers PU WITH(NOLOCK) ON PU.PropertyId = P.Id and PU.IsActive = 1 and PU.IsDeleted = 0
 		 JOIN WRBHBUser U WITH(NOLOCK) ON   PU.UserId =U.Id and pu.IsActive = 1 and PU.IsDeleted = 0
 		 JOIN WRBHBUserRoles R WITH(NOLOCK) ON  U.Id =R.UserId  and R.IsActive = 1 and R.IsDeleted = 0 
@@ -180,37 +180,37 @@ BEGIN
 		 and ABPA.ChkInDt  BETWEEN CONVERT(date,GETDATE(),103) AND  
 		 CONVERT(NVARCHAR,DATEADD(DAY,7,CONVERT(DATE,GETDATE(),103))) 
 		 and pu.UserId=@Pram1
-		 group by H.Id, ABP.PropertyName,ABPA.FirstName,H.BookingLevel,ABPA.ChkInDt,
-		 ABP.PropertyId,p.City,p.CityId,H.ClientName,H.ClientId,BookingCode
+		 group by H.Id, P.PropertyName,ABPA.FirstName,H.BookingLevel,ABPA.ChkInDt,
+		 P.Id,p.City,p.CityId,H.ClientName,H.ClientId,BookingCode
 		 order by H.Id desc
 		
 -- Bed Level Booked and DirectBooked Property
   INSERT INTO #ExpChkin(BookedId,PropertyName,PropertyId,GuestName,BookingLevel,ExpDate,CityName,CityId,ClientName,ClientId,BookingCode)
-		 select distinct H.Id, ABP.PropertyName PropertyName,ABP.PropertyId,ABPA.FirstName FirstName,H.BookingLevel,
+		 select distinct H.Id, p.PropertyName PropertyName,p.Id,ABPA.FirstName FirstName,H.BookingLevel,
 		 convert(nvarchar(100),ABPA.ChkInDt,103) ExpDate ,p.City,p.CityId,H.ClientName,H.ClientId,BookingCode
 		 FROM WRBHBBooking H
-		 JOIN WRBHBApartmentBookingProperty ABP WITH(NOLOCK) ON H.Id = ABP.BookingId AND ABP.IsActive = 1 AND ABP.IsDeleted = 0
-		 JOIN WRBHBApartmentBookingPropertyAssingedGuest ABPA WITH(NOLOCK) ON ABPA.BookingId = ABP.BookingId AND ABPA.IsActive = 1 AND ABPA.IsDeleted = 0
-		 JOIN WRBHBProperty P WITH(NOLOCK) ON P.Id = ABP.PropertyId and P.IsActive = 1 and P.IsDeleted = 0
+		 --JOIN WRBHBApartmentBookingProperty ABP WITH(NOLOCK) ON H.Id = ABP.BookingId AND ABP.IsActive = 1 AND ABP.IsDeleted = 0
+		 JOIN WRBHBApartmentBookingPropertyAssingedGuest ABPA WITH(NOLOCK) ON H.Id= ABPA.BookingId  AND ABPA.IsActive = 1 AND ABPA.IsDeleted = 0
+		 JOIN WRBHBProperty P WITH(NOLOCK) ON P.Id = ABPA.BookingPropertyId and P.IsActive = 1 and P.IsDeleted = 0
 		 JOIN WRBHBPropertyUsers PU WITH(NOLOCK) ON PU.PropertyId = P.Id and PU.IsActive = 1 and PU.IsDeleted = 0
 		 JOIN WRBHBUser U WITH(NOLOCK) ON   PU.UserId =U.Id and pu.IsActive = 1 and PU.IsDeleted = 0
 		 JOIN WRBHBUserRoles R WITH(NOLOCK) ON  U.Id =R.UserId  and R.IsActive = 1 and R.IsDeleted = 0 
 		 WHERE  H.Status IN('Booked','Direct Booked')  and H.CancelStatus!='Canceled'  and ABPA.CurrentStatus='Booked'
 		 and  CONVERT(date,ABPA.ChkInDt,103) <= CONVERT(date,GETDATE(),103) 
 		 and pu.UserId=@Pram1
-		 group by H.Id, ABP.PropertyName,ABPA.FirstName,H.BookingLevel,ABPA.ChkInDt,
-		 ABP.PropertyId,p.City,p.CityId,H.ClientName,H.ClientId,BookingCode  
+		 group by H.Id, P.PropertyName,ABPA.FirstName,H.BookingLevel,ABPA.ChkInDt,
+		P.Id,p.City,p.CityId,H.ClientName,H.ClientId,BookingCode  
 		 order by H.Id desc
 		
 		
  -- Bed Level Booked and DirectBooked Property
   INSERT INTO #ExpChkin(BookedId,PropertyName,PropertyId,GuestName,BookingLevel,ExpDate,CityName,CityId,ClientName,ClientId,BookingCode)
-		 SELECT DISTINCT H.Id, ABP.PropertyName PropertyName,ABP.PropertyId,ABPA.FirstName FirstName,H.BookingLevel,
+		 SELECT DISTINCT H.Id, p.PropertyName PropertyName,P.Id,ABPA.FirstName FirstName,H.BookingLevel,
 		 convert(nvarchar(100),ABPA.ChkInDt,103) ExpDate ,p.City,p.CityId,H.ClientName,H.ClientId,BookingCode
 		 FROM WRBHBBooking H
-		 JOIN WRBHBBedBookingProperty ABP WITH(NOLOCK) ON H.Id = ABP.BookingId AND ABP.IsActive = 1 AND	 ABP.IsDeleted = 0
-		 JOIN WRBHBBedBookingPropertyAssingedGuest ABPA WITH(NOLOCK) ON ABPA.BookingId = ABP.BookingId AND ABPA.IsActive = 1 AND ABPA.IsDeleted = 0
-		 JOIN WRBHBProperty P WITH(NOLOCK) ON P.Id = ABP.PropertyId and P.IsActive = 1 and P.IsDeleted = 0
+		-- JOIN WRBHBBedBookingProperty ABP WITH(NOLOCK) ON H.Id = ABP.BookingId AND ABP.IsActive = 1 AND	 ABP.IsDeleted = 0
+		 JOIN WRBHBBedBookingPropertyAssingedGuest ABPA WITH(NOLOCK) ON H.ID=ABPA.BookingId  AND ABPA.IsActive = 1 AND ABPA.IsDeleted = 0
+		 JOIN WRBHBProperty P WITH(NOLOCK) ON P.Id = ABPA.BookingPropertyId and P.IsActive = 1 and P.IsDeleted = 0
 		 JOIN WRBHBPropertyUsers PU WITH(NOLOCK) ON PU.PropertyId = P.Id and PU.IsActive = 1 and PU.IsDeleted = 0
 		 JOIN WRBHBUser U WITH(NOLOCK) ON   PU.UserId =U.Id and pu.IsActive = 1 and PU.IsDeleted = 0 
 		 JOIN WRBHBUserRoles R WITH(NOLOCK) ON  U.Id =R.UserId  and R.IsActive = 1 and R.IsDeleted = 0 
@@ -219,8 +219,8 @@ BEGIN
 		 and  ABPA.ChkInDt  BETWEEN CONVERT(date,GETDATE(),103) AND  
 		 CONVERT(NVARCHAR,DATEADD(DAY,7,CONVERT(DATE,GETDATE(),103))) 
 		 and pu.UserId=@Pram1
-		 group by H.Id, ABP.PropertyName,ABPA.FirstName,H.BookingLevel,ABPA.ChkInDt,
-		 ABP.PropertyId,p.City,p.CityId,H.ClientName,H.ClientId,BookingCode
+		 group by H.Id, P.PropertyName,ABPA.FirstName,H.BookingLevel,ABPA.ChkInDt,
+		 P.Id,p.City,p.CityId,H.ClientName,H.ClientId,BookingCode
 		 order by H.Id desc 
     --#GRID VALUES 1 FOR TABLE0 
       select  BookedId,PropertyName,PropertyId,GuestName as FirstName,BookingLevel,

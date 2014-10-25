@@ -52,8 +52,9 @@ ChkoutDate,RoomNo,GuestName,ClientName,Property,MobileNo,
 EmailId,Designation,Nationality,IdProof,ChkinAdvance,Tariff,
 Direct,BTC,EmpCode,BookingCode,Image,CreatedBy,TimeType,Occupancy,RackTariffSingle,
 RackTariffDouble,ApartmentId,BedId,ApartmentType,BedType,Type,PropertyType,CheckStatus,
-GuestImage,SingleMarkupAmount,DoubleMarkupAmount,ClientId,CityId,ServiceCharge,ModifiedBy,
-CreatedDate,ModifiedDate,IsActive,IsDeleted,RowId)
+GuestImage,SingleMarkupAmount,DoubleMarkupAmount,ClientId,CityId,ServiceCharge,
+NewCheckInDate,NewCheckoutDate,
+ModifiedBy,CreatedDate,ModifiedDate,IsActive,IsDeleted,RowId)
 
 VALUES(@RoomId,@PropertyId,@BookingId,@StateId,@GuestId,@RefGuestId,@ChkInGuest,
 @CheckInNo,convert(date,@ArrivalDate,103),@ArrivalTime,
@@ -62,6 +63,7 @@ CONVERT(date,@ChkoutDate,103),@RoomNo,@GuestName,@ClientName,@Property,
 @Direct,@BTC,@EmpCode,@BookingCode,@Image,@CreatedBy,@TimeType,@Occupancy,@RackTariffSingle,
 @RackTariffDouble,@ApartmentId,@BedId,@ApartmentType,@BedType,@Type,@PropertyType ,@CheckStatus,
 @GuestImage,@SingleMarkupAmount,@DoubleMarkupAmount,@ClientId,@CityId,@ServiceCharge,
+CONVERT(date,@ArrivalDate,103),CONVERT(date,@ChkoutDate,103),
 @CreatedBy,GETDATE(),GETDATE(),1,0,NEWID());
 
 SET @InsId=@@IDENTITY;

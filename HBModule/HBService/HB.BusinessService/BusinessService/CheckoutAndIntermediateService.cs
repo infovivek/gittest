@@ -20,7 +20,7 @@ namespace HB.BusinessService.BusinessService
             {
                 string Hdrval;
                 Hdrval = data[1].ToString();
-                ds = new GuestCheckOutBO().Save(data, user);
+                ds = new CheckoutAndIntermediateBO().Save(data, user);
                 if (ds.Tables["DBERRORTBL"].Rows.Count > 0)
                 {
                     dTable.Rows.Add(ds.Tables["DBERRORTBL"].Rows[0][0].ToString());
@@ -55,7 +55,7 @@ namespace HB.BusinessService.BusinessService
 
         public DataSet HelpResult(string[] data, User user)
         {
-            return new GuestCheckOutBO().HelpResult(data, user);
+            return new CheckoutAndIntermediateBO().HelpResult(data, user);
 
         }
     }

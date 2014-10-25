@@ -237,7 +237,7 @@ IF @Action = 'RoomBookingConfirmed'
   --
   SET @MobileNo = (SELECT TOP 1 ISNULL(MobileNo,'') FROM #GST);
   --
-  DECLARE @Taxes NVARCHAR(100) = '';
+  DECLARE @Taxes NVARCHAR(100) = '',@TACPer DECIMAL(27,2) = 0;
   DECLARE @AgreedTariff NVARCHAR(1000) = '';
   IF EXISTS (SELECT NULL FROM WRBHBBookingProperty P
   LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest G WITH(NOLOCK)ON
@@ -246,7 +246,7 @@ IF @Action = 'RoomBookingConfirmed'
   P.PropertyType='ExP')
    BEGIN    
     SELECT TOP 1 @Taxes = (CASE WHEN ISNULL(R.Inclusive,0) = 1 THEN 'Net Tariff' 
-    ELSE 'Taxes as applicable' END)
+    ELSE 'Taxes as applicable' END),@TACPer = ISNULL(A.TACPer,0)
     FROM WRBHBProperty P
     LEFT OUTER JOIN WRBHBPropertyAgreements A WITH(NOLOCK)ON 
     A.PropertyId=P.Id
@@ -256,7 +256,7 @@ IF @Action = 'RoomBookingConfirmed'
     A.IsDeleted=0 AND R.IsActive=1 AND R.IsDeleted=0 AND
     P.Id = @BookingPropertyId AND 
     R.RoomType = (SELECT TOP 1 RoomType FROM WRBHBBookingPropertyAssingedGuest
-    WHERE BookingId=@Id);
+    WHERE BookingId=@Id);    
     --
     DECLARE @SingleCnt INT = 0;
     SELECT @SingleCnt = COUNT(*) FROM WRBHBBookingPropertyAssingedGuest
@@ -279,49 +279,88 @@ IF @Action = 'RoomBookingConfirmed'
     DECLARE @SingleMarkup DECIMAL(27,2) = 0;
     DECLARE @DoubleMarkup DECIMAL(27,2) = 0;
     DECLARE @TripleMarkup DECIMAL(27,2) = 0;
+    DECLARE @TACFlag BIT = 0;
     SELECT TOP 1 @SingleTariff = SingleTariff,@DoubleTariff = DoubleTariff,
-    @TripleTariff = TripleTariff,
+    @TripleTariff = TripleTariff,@TACFlag = ISNULL(TAC,0),
     @SingleMarkup = (SingleandMarkup1 - SingleTariff),
     @DoubleMarkup = (DoubleandMarkup1 - DoubleTariff),
     @TripleMarkup = (TripleandMarkup1 - TripleTariff)
     FROM WRBHBBookingProperty P    
     WHERE P.BookingId=@Id AND P.PropertyId = @BookingPropertyId;
     --
-    IF @SingleCnt != 0
+    IF @TACFlag = 0
      BEGIN
-      SET @AgreedTariff = 
-      'Single -> Tariff : ' + CAST(@SingleTariff AS VARCHAR) +
-      ', TAC : ' + CAST(@SingleMarkup AS VARCHAR) + '.<br>';
+      IF @SingleCnt != 0 
+       BEGIN 
+        SET @AgreedTariff = 
+        'Single - Tariff : ' + CAST(@SingleTariff AS VARCHAR) +
+        ', TAC : ' + CAST(@SingleMarkup AS VARCHAR) + '.<br>';
+       END
+      IF @DoubleCnt != 0
+       BEGIN
+        IF @AgreedTariff != ''
+         BEGIN
+          SET @AgreedTariff = 
+          @AgreedTariff + 'Double - Tariff : ' + CAST(@DoubleTariff AS VARCHAR) +
+          ', TAC : ' + CAST(@DoubleMarkup AS VARCHAR) + '.<br>';
+         END
+        ELSE
+         BEGIN
+          SET @AgreedTariff = 
+          'Double - Tariff : ' + CAST(@DoubleTariff AS VARCHAR) +
+          ', TAC : ' + CAST(@DoubleMarkup AS VARCHAR) + '.<br>';
+         END
+       END
+      IF @TripleCnt != 0
+       BEGIN
+        IF @AgreedTariff != ''
+         BEGIN
+          SET @AgreedTariff = 
+          @AgreedTariff + 'Triple - Tariff : ' + CAST(@TripleTariff AS VARCHAR) +
+          ', TAC : ' + CAST(@TripleMarkup AS VARCHAR) + '.<br>';
+         END
+        ELSE
+         BEGIN
+          SET @AgreedTariff = 
+          'Triple - Tariff : ' + CAST(@TripleTariff AS VARCHAR) +
+          ', TAC : ' + CAST(@TripleMarkup AS VARCHAR) + '.<br>';
+         END
+       END
      END
-    IF @DoubleCnt != 0
+    ELSE
      BEGIN
-      IF @AgreedTariff != ''
+      IF @SingleCnt != 0
        BEGIN
         SET @AgreedTariff = 
-        @AgreedTariff + 'Double -> Tariff : ' + CAST(@DoubleTariff AS VARCHAR) +
-        ', TAC : ' + CAST(@DoubleMarkup AS VARCHAR) + '.<br>';
+        'Tariff - Single : ' + CAST(@SingleTariff AS VARCHAR)+', ';
        END
-      ELSE
+      IF @DoubleCnt != 0
        BEGIN
-        SET @AgreedTariff = 
-        'Double -> Tariff : ' + CAST(@DoubleTariff AS VARCHAR) +
-        ', TAC : ' + CAST(@DoubleMarkup AS VARCHAR) + '.<br>';
+        IF @AgreedTariff != ''
+         BEGIN
+          SET @AgreedTariff = 
+          @AgreedTariff + 'Double : ' + CAST(@DoubleTariff AS VARCHAR)+ ', ';
+         END
+        ELSE
+         BEGIN
+          SET @AgreedTariff = 
+          'Double : ' + CAST(@DoubleTariff AS VARCHAR) + ', ';
+         END
        END
-     END
-    IF @TripleCnt != 0
-     BEGIN
-      IF @AgreedTariff != ''
+      IF @TripleCnt != 0
        BEGIN
-        SET @AgreedTariff = 
-        @AgreedTariff + 'Triple -> Tariff : ' + CAST(@TripleTariff AS VARCHAR) +
-        ', TAC : ' + CAST(@TripleMarkup AS VARCHAR) + '.<br>';
+        IF @AgreedTariff != ''
+         BEGIN
+          SET @AgreedTariff = 
+          @AgreedTariff + 'Triple : ' + CAST(@TripleTariff AS VARCHAR) + ', ';
+         END
+        ELSE
+         BEGIN
+          SET @AgreedTariff = 
+          'Triple : ' + CAST(@TripleTariff AS VARCHAR) + ', ';
+         END
        END
-      ELSE
-       BEGIN
-        SET @AgreedTariff = 
-        'Triple -> Tariff : ' + CAST(@TripleTariff AS VARCHAR) +
-        ', TAC : ' + CAST(@TripleMarkup AS VARCHAR) + '.<br>';
-       END
+      SET @AgreedTariff = @AgreedTariff + 'TAC : ' + CAST(@TACPer AS VARCHAR)+' %';
      END
    END
   ELSE

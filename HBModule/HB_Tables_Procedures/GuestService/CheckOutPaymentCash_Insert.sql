@@ -33,17 +33,40 @@ CREATE PROCEDURE [dbo].[SP_CheckOutPaymentCash_Insert](
 AS
 BEGIN
 DECLARE @Id INT;
- -- INSERT
-INSERT INTO WRBHBChechkOutPaymentCash(ChkOutHdrId,Payment,PayeeName,Address,PaymentMode,
-AmountPaid,CashReceivedOn,CashReceivedBy,OutStanding,
-CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId)
+DECLARE @IntermediateFlag NVARCHAR(100)
+SET @IntermediateFlag = (SELECT IntermediateFlag FROM WRBHBChechkOutHdr WHERE Id = @ChkOutHdrId)
 
-VALUES(@ChkOutHdrId,@Payment,@PayeeName,@Address,@PaymentMode,@AmountPaid,@CashReceivedOn,
-@CashReceivedBy,@OutStanding,@CreatedBy,GETDATE(),@CreatedBy,GETDATE(),1,0,NEWID())
+IF @IntermediateFlag = '1'
+BEGIN
+	-- INSERT
+	INSERT INTO WRBHBChechkOutPaymentCash(ChkOutHdrId,Payment,PayeeName,Address,PaymentMode,
+	AmountPaid,CashReceivedOn,CashReceivedBy,OutStanding,
+	CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId)
 
---UPDATE WRBHBChechkOutHdr SET AmountPaid=OutStanding
+	VALUES(@ChkOutHdrId,@Payment,@PayeeName,@Address,@PaymentMode,@AmountPaid,@CashReceivedOn,
+	@CashReceivedBy,@OutStanding,@CreatedBy,GETDATE(),@CreatedBy,GETDATE(),0,0,NEWID())
 
-SET @Id=@@IDENTITY;
-SELECT  Id,RowId FROM WRBHBChechkOutPaymentCash WHERE Id=@Id;
+	--UPDATE WRBHBChechkOutHdr SET AmountPaid=OutStanding
+
+	SET @Id=@@IDENTITY;
+	SELECT  Id,RowId FROM WRBHBChechkOutPaymentCash WHERE Id=@Id;
+END
+ELSE
+BEGIN
+	 -- INSERT
+	INSERT INTO WRBHBChechkOutPaymentCash(ChkOutHdrId,Payment,PayeeName,Address,PaymentMode,
+	AmountPaid,CashReceivedOn,CashReceivedBy,OutStanding,
+	CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId)
+
+	VALUES(@ChkOutHdrId,@Payment,@PayeeName,@Address,@PaymentMode,@AmountPaid,@CashReceivedOn,
+	@CashReceivedBy,@OutStanding,@CreatedBy,GETDATE(),@CreatedBy,GETDATE(),1,0,NEWID())
+
+	--UPDATE WRBHBChechkOutHdr SET AmountPaid=OutStanding
+
+	SET @Id=@@IDENTITY;
+	SELECT  Id,RowId FROM WRBHBChechkOutPaymentCash WHERE Id=@Id;
+
+END
+
 END
 GO

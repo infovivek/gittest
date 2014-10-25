@@ -85,14 +85,14 @@ namespace HB.Dao
                 string SecondRow =
                     " <table cellpadding=\"0\" cellspacing=\"0\" width=\"600\" border=\"0\" align=\"center\">" +
                     " <tr style=\"position:relative; background-color:#fff; font-size:11px;\">" +
-                    " <td width=\"400\" style=\" padding-bottom:1px;\">" +
+                    " <td width=\"300\" style=\" padding-bottom:1px;\">" +
                     " <p style=\"font-weight:bold; color:orange;\">Booking confirmation details" +
                     " <span style=\"color:#000; background-color:#ffcc00; padding:5px;\">Booking # : " + ds.Tables[2].Rows[0][0].ToString() + " </span></p>" + //Reservation
                     " <p style=\"margin:0px;\">Ref : <span>" + ds.Tables[2].Rows[0][8].ToString() + "</span></p><br>" +             //Ref                    
                     " <p style=\"margin:0px;\">Booked by : <span>" + ds.Tables[2].Rows[0][1].ToString() + "</span></p><br>" +             //Name                    
                     " <p style=\"margin:0px;\">Reservation Date : <span>" + ds.Tables[2].Rows[0][2].ToString() + "</span></p><br>" + //Date
                     " <p style=\"margin:0px;\">Company Name : <span>" + ds.Tables[2].Rows[0][3].ToString() + "</span></p><br>" + //company name
-                    " </td><td width=\"200\"><p style=\"margin:0px;\"></p>" +
+                    " </td><td width=\"300\"><p style=\"padding:25px 25px 25px 25px; font-size:13px; color:#000; font-weight:bold; background-color:#ffcc00;\">Please refer your name and reference number at the time of checkin</p>" +
                     " <p style=\"margin-top:0px;\"> <span style=\"color:orange; font-size:12px;\"></span></p>" +
                     " </td></tr><tr><td width=\"600\" style=\"margin-bottom:\">" +
                     " <p style=\"color:orange; font-weight:bold; font-size:14px;\"> Guest Details</p>" +

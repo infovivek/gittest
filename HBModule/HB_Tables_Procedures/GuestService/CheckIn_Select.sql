@@ -29,7 +29,7 @@ convert(nvarchar(100),ChkoutDate,103) as ChkoutDate,RoomNo,GuestName,ClientName,
 EmailId,Designation,Nationality,IdProof,ChkinAdvance,Tariff,
 Direct,BTC,EmpCode,BookingCode,Image,Id,TimeType,Occupancy,RackTariffSingle,RackTariffDouble,
 ApartmentId,BedId,ApartmentType,BedType,Type ,PropertyType,GuestImage,CheckStatus,SingleMarkupAmount,DoubleMarkupAmount,
-ClientId,CityId,ServiceCharge
+ClientId,CityId,ServiceCharge,NewCheckInDate,NewCheckoutDate
 FROM WRBHBCheckInHdr WHERE IsActive=1 AND IsDeleted=0 AND Id=@Id;
 END
 

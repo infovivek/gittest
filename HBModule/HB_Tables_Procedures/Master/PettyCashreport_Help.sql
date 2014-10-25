@@ -143,7 +143,7 @@ BEGIN
 		Bill NVARCHAR(100),ExpenseId INT)
 		
 		INSERT INTO #PettyCash(Date,ExpenseHead,Description,ApprovedAmount,PaidAmount,Bill,ExpenseId)
-		SELECT CONVERT(NVARCHAR,CAST(U.CreatedDate AS Date),103),
+		SELECT CONVERT(NVARCHAR,CAST(CONVERT(Date,U.CreatedDate,103) AS Date),110),
 		U.ExpenseHead,U.Description,U.Amount,U.Paid,'',U.Id
 		FROM WRBHBPettyCashStatus U 
 		JOIN WRBHBUser S ON U.UserId=S.Id AND S.IsActive=1 AND S.IsDeleted=0
@@ -190,7 +190,7 @@ BEGIN
 		WHERE UserId =@UserId AND PropertyId=@Id AND Date=CONVERT(Date,@Str,103) AND PC.IsActive=0 AND PC.IsDeleted=1
 			
 		INSERT INTO #PettyCash1(Date,ExpenseHead,Description,ApprovedAmount,PaidAmount,Bill)
-		SELECT CONVERT(NVARCHAR,CAST(U.CreatedDate AS Date),103),
+		SELECT CONVERT(NVARCHAR,CONVERT(DATE,CAST(U.CreatedDate AS Date),103),110),
 		U.ExpenseHead,U.Description,U.Amount,U.Paid,U.BillLogo
 		FROM WRBHBPettyCashStatus U 
 		JOIN WRBHBUser S ON U.UserId=S.Id AND S.IsActive=1 AND S.IsDeleted=0
@@ -257,10 +257,10 @@ BEGIN
 		INSERT INTO #PCNEW(Requestedby,RequestedOn,ExpenseHead,ExpenseItem,Description,Amount,
 		BillDate,BillStartDate,BillEndDate,Property)
 	
-		SELECT (U.FirstName+''+U.LastName) AS Requestedby,Convert(VARCHAR(100),PH.Date,103) 
+		SELECT (U.FirstName+''+U.LastName) AS Requestedby,Convert(VARCHAR(100),CONVERT(DATE,PH.Date,103),110) 
 		AS RequestedOn,EG.ExpenseHead,PC.ExpenseHead AS ExpenseItem,PC.Description,ApprovedAmount AS Amount,
-		CONVERT(NVARCHAR,PS.BillDate,103),@Str AS Startdate,
-		@Str1 AS EndDate,P.PropertyName 
+		CONVERT(NVARCHAR,CONVERT(DATE,PS.BillDate,103),110),CONVERT(NVARCHAR,CONVERT(Date,@Str,103),110) AS Startdate,
+		CONVERT(NVARCHAR,CONVERT(Date,@Str1,103),110) AS EndDate,P.PropertyName 
 		FROM WRBHBPettyCash PC  
 		JOIN WRBHBPettyCashHdr PH ON PC.PettyCashHdrId= PH.Id AND PH.IsActive=0 AND PH.IsDeleted=1
 		JOIN WRBHBPettyCashStatus PS ON PH.ClosingBalance=PS.Balance AND PS.IsActive=0 AND PS.IsDeleted=1

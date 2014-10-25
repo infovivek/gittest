@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
-			   xmlns:s="library://ns.adobe.com/flex/spark"   creationComplete="PageLoad()"
-			   xmlns:mx="library://ns.adobe.com/flex/mx"  width="100%" height="100%" xmlns:WrbComp="WrbComp.*"
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:WrbComp="WrbComp.*"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   width="100%" height="100%" creationComplete="PageLoad()"
 			   pageTitle="TodaysCheckinCheckout Report">
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
@@ -29,6 +32,7 @@
 			public var InvoiceNum:String="";public var Type:String="";
 			public var ErrorFlag:Boolean=true; 
 			private var xlsFile:ExcelFile;
+			public var ClientId:int=0;
 			protected function PageLoad():void
 			{
 				//Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>5</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
@@ -37,13 +41,27 @@
 				GlobalXml += "<ROOT>";
 				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
 				GlobalXml += "</ROOT>"; 
-				useWeb("PendingCkinReport","Reports_CUSTOM",[GlobalXml,"Pageload",FromDate,ToDate,'','',0,0,0]);
+				useWeb("TodaysCheckinCheckout","PageLoad_CUSTOM",[GlobalXml,'ClientDtls','','',0,0,0,0]);	
 			}
 			private function Custom_WebSer_Result (Ds_Objects:Object):void
 			{
 				Grd_ListClient1.dataProvider= null;
 				try
 				{
+					if (Ds_Objects.currentTarget.description.toString() == "PageLoad_CUSTOM")
+					{
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{
+							Hlp_ClientName.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						}
+						if(Ds_Objects.result.Tables.Table1.Rows.length > 0)
+						{
+							DT_To.text = Ds_Objects.result.Tables.Table1.Rows[0].TodayDate;
+							DT_From.text = Ds_Objects.result.Tables.Table1.Rows[0].TodayDate;
+							FromDate=DT_From.text;//Ds_Objects.result.Tables.Table1.Rows[0].TodayDate;
+						    ToDate= DT_To.text;//Ds_Objects.result.Tables.Table1.Rows[0].TodayDate;
+						}
+					}
 					if (Ds_Objects.currentTarget.description.toString() == "Reports_CUSTOM")
 					{
 						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
@@ -64,16 +82,13 @@
 				ErrorFlag=true;  
 				if(Modes.selectedValue==0)
 				{
-					Type="Internal Property"; 
+					Type="CheckIn"; 
 				}
 				else if(Modes.selectedValue==1)
 				{
-					Type="External Property"; 
+					Type="Checkout"; 
 				} 
-				else if(Modes.selectedValue==2)
-				{
-					Type=" Managed G H"; 
-				}
+				 
 				else
 				{
 					alignAlert(Alert.show("Select Category","Alert Message !",
@@ -89,6 +104,10 @@
 							Alert.OK,null,null,iconWarning,Alert.OK),10,"");
 						return;
 					}
+					else
+					{
+						FromDate=DT_From.text;
+					}
 				}
 				if(DT_To.text !='')
 				{
@@ -98,10 +117,14 @@
 							Alert.OK,null,null,iconWarning,Alert.OK),10,"");
 						return;
 					}
+					else
+					{
+						ToDate= DT_To.text;
+					}
 				}
 				if(ErrorFlag==true)
 				{	 	
-					useWeb("PendingCkinReport","Reports_CUSTOM",[GlobalXml,"Pageload",FromDate,ToDate,Type,'',0,0]);
+					useWeb("TodaysCheckinCheckout","Reports_CUSTOM",[GlobalXml,"Pageload",FromDate,ToDate,Type,'',ClientId,0]);
 				} 
 			}
 			public var FltPrpty:String="";
@@ -129,93 +152,106 @@
 			{
 				DT_From.text="";DT_To.text=""; txtBookingCode.text="";txtProperty.text="";
 				FromDate="";ToDate="";ChkoutId="";Status="";Type="";InvoiceNum="";
-				PageLoad();Internal.selected=false;External.selected=false;Managed.selected=false; 
+				Hlp_ClientName.text="";ClientId=0;
+				Grd_ListClient1.dataProvider= null;
+				Hlp_ClientName.dataProvider= null;
+				PageLoad(); 
 			}  
 			protected function CourierChange()
 			{
 				FromDate=DT_From.text;
 				ToDate=DT_To.text;
+				Hlp_ClientName.text="";
+				ClientId=0;
+				Grd_ListClient1.dataProvider= null;
 				if(Modes.selectedValue==0)
 				{
-					Type="Internal Property";
+					Type="CheckIn";
 				}
 				if(Modes.selectedValue==1)
 				{
-					Type="External Property";
+					Type="Checkout";
 				}
-				if(Modes.selectedValue==2)
-				{
-					Type="Managed G H";
-				}
+				 
 			}
 			protected function ExportExcel(event:MouseEvent):void
 			{
-				//				try
-				//				{
-				//					var arrExportResult:ArrayCollection = Grd_ListClient1.dataProvider as ArrayCollection;
-				//					if(arrExportResult.length!=0)
-				//					{					
-				//						xlsFile = new ExcelFile();
-				//						var sheet:Sheet = new Sheet();
-				//						
-				//						sheet.resize(arrExportResult.length+2,14);
-				//						
-				//						sheet.setCell(0,5,Type+" Report");
-				//						sheet.setCell(1,0,'Property Name');
-				//						sheet.setCell(1,1,'First Name');
-				//						sheet.setCell(1,2,'BookingLevel');
-				//						sheet.setCell(1,3,'ExpDate');
-				//						sheet.setCell(1,4,'City');
-				//						sheet.setCell(1,5,'ClientName');
-				//						sheet.setCell(1,6,'BookingCode');
-				//						//sheet.setCell(1,7,'');
-				//						//sheet.setCell(1,8,'');
-				//						
-				//						for(var i:int=0;i<arrExportResult.length;i++)
-				//						{
-				//							sheet.setCell(i+2, 0, arrExportResult[i].CityName);
-				//							sheet.setCell(i+2, 1, arrExportResult[i].PropertyName);
-				//							sheet.setCell(i+2, 2, arrExportResult[i].DD);
-				//							sheet.setCell(i+2, 3, arrExportResult[i].Direct);
-				//							sheet.setCell(i+2, 4, arrExportResult[i].BTC);
-				//							sheet.setCell(i+2, 5, arrExportResult[i].Online);
-				//							sheet.setCell(i+2, 6, arrExportResult[i].TOTAL);
-				//							sheet.setCell(i+2, 7, arrExportResult[i].GTV);
-				//							sheet.setCell(i+2, 8, arrExportResult[i].Category);
-				//							
-				//						}						
-				//						
-				//						
-				//						Grd_ListClient1.dataProvider = arrExportResult;
-				//						xlsFile.sheets.addItem(sheet);      
-				//						var bytes: ByteArray = xlsFile.saveToByteArray();
-				//						var fr:FileReference = new FileReference();
-				//						var FileName:String = ""; 
-				//					}
-				//					else
-				//					{
-				//						
-				//						alignAlert(Alert.show("* No Records Found.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
-				//						return;
-				//					}
-				//					//Grd_BCFC.visible=false;
-				//					//Grd_BCFC.dataProvider=null;
-				//					Clear();
-				//				}				
-				//				catch (myError:Error) 
-				//				{
-				//					alignAlert(Alert.show("* Excel File Already Opened.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
-				//					return
-				//				}catch (error:TypeError)
-				//				{
-				//					alignAlert(Alert.show("* Excel File Already Opened.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
-				//					return
-				//				}catch (error:IOErrorEvent)
-				//				{
-				//					alignAlert(Alert.show("* Excel File Already Opened.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
-				//					return
-				//				}
-				//				
+				try
+				{
+					var arrExportResult:ArrayCollection = Grd_ListClient1.dataProvider as ArrayCollection;
+					if(arrExportResult.length!=0)
+					{					
+						xlsFile = new ExcelFile();
+						var sheet:Sheet = new Sheet();
+						
+						sheet.resize(arrExportResult.length+2,9);
+						
+						//sheet.setCell(0,5,Type+" Report");
+						sheet.setCell(1,0,'S.NO');
+						sheet.setCell(1,1,'Company');
+						sheet.setCell(1,2,'Guest Name');
+						sheet.setCell(1,3,'BookingCode');
+						sheet.setCell(1,4,'City');
+						sheet.setCell(1,5,'Hotel / Property'); 
+						sheet.setCell(1,6,'CheckinDate');
+						sheet.setCell(1,7,'CheckOutDate'); 
+						sheet.setCell(1,8,'Mobile');
+						sheet.setCell(1,9,'Email Id');
+						
+						
+						
+						for(var i:int=0;i<arrExportResult.length;i++)
+						{
+							sheet.setCell(i+2, 0, arrExportResult[i].SNo);
+							sheet.setCell(i+2, 1, arrExportResult[i].ClientName);
+							sheet.setCell(i+2, 2, arrExportResult[i].FirstName);
+							sheet.setCell(i+2, 3, arrExportResult[i].BookingCode );
+							sheet.setCell(i+2, 4, arrExportResult[i].CityName);
+							sheet.setCell(i+2, 5, arrExportResult[i].PropertyName);
+							sheet.setCell(i+2, 6, arrExportResult[i].ChkinDate);
+							sheet.setCell(i+2, 7, arrExportResult[i].ChkoutDate);
+							sheet.setCell(i+2, 8, arrExportResult[i].MobileNo); 
+							sheet.setCell(i+2, 9, arrExportResult[i].EmailId); 
+						}		 
+						Grd_ListClient1.dataProvider = arrExportResult;
+						xlsFile.sheets.addItem(sheet);      
+						var bytes: ByteArray = xlsFile.saveToByteArray();
+						var fr:FileReference = new FileReference();
+						var FileName:String = ""; 
+						if(Type=="CheckIn")
+						{
+							fr.save(bytes,'CheckIn Details.xls');
+						}
+						if(Type=="Checkout")
+						{
+							fr.save(bytes,'CheckOut Details.xls');
+						}
+						
+					}
+					else
+					{
+						
+						alignAlert(Alert.show("* No Records Found.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+						return;
+					}
+					//Grd_BCFC.visible=false;
+					//Grd_BCFC.dataProvider=null;
+					Clear();
+				}				
+				catch (myError:Error) 
+				{
+					alignAlert(Alert.show("* Excel File Already Opened.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+					return
+				}catch (error:TypeError)
+				{
+					alignAlert(Alert.show("* Excel File Already Opened.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+					return
+				}catch (error:IOErrorEvent)
+				{
+					alignAlert(Alert.show("* Excel File Already Opened.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+					return
+				}
+								
 			}
 			public var FltNm:String="";
 			public var myArrayCollection:ArrayCollection=new ArrayCollection();
@@ -239,55 +275,72 @@
 				}				
 				return Itm;		
 			}
+			public function FnOnselection_Client():void
+			{
+				Hlp_ClientName.text="";
+				ClientId=0;
+				if(Hlp_ClientName.selected())
+				{
+					Hlp_ClientName.text=Hlp_ClientName.Select_Row.ClientName;
+					ClientId=Hlp_ClientName.Select_Row.Id;
+				}
+				else
+				{
+					Hlp_ClientName.fnClear();ClientId=0;					
+				} 
+			}
 		]]>
 	</fx:Script>
 	<s:BorderContainer x="0" y="30" width="100%" height="84" borderVisible="false" backgroundColor="#f4efef" depth="10">
 		<s:HGroup x="0" y="0" width="100%" height="90" horizontalAlign="center" verticalAlign="middle">
 			<s:Group x="132" y="5" width="100%" height="80">
-				<mx:DateField id="DT_From" x="148" y="6" width="90" formatString="DD/MM/YYYY"  tabIndex="1"  
-							  yearNavigationEnabled="true" selectableRange="{{rangeEnd: new Date()}}" visible="false" />
-				<mx:DateField id="DT_To" x="148" y="46" width="90" formatString="DD/MM/YYYY"
-							  tabIndex="2" yearNavigationEnabled="true"   visible="false"  />
+				<mx:DateField id="DT_From" x="198" y="6" width="90" formatString="DD/MM/YYYY"  tabIndex="1"  
+							  yearNavigationEnabled="true" selectableRange="{{rangeEnd: new Date()}}" />
+				<mx:DateField id="DT_To" x="198" y="46" width="90" formatString="DD/MM/YYYY"
+							  tabIndex="2" yearNavigationEnabled="true"  />
 				
-				<s:Image x="831" y="20" source="assets/a1.png" toolTip="Search" click="btn_Search_clickHandler()" tabIndex="5"/>
-				<s:Image x="900" y="20" click="Clear()" source="assets/dust_bin1.png" toolTip="Clear"/>
-				<WrbComp:Button_HB  x="1040" y="20" Lable_val="Export" id="btn_Excel"  click="ExportExcel(event)" visible="false" > 
+				<s:Image x="861" y="20" source="assets/a1.png" toolTip="Search" click="btn_Search_clickHandler()" tabIndex="5"/>
+				<s:Image x="930" y="20" click="Clear()" source="assets/dust_bin1.png" toolTip="Clear"/>
+				<WrbComp:Button_HB  x="1040" y="20" Lable_val="Export" id="btn_Excel"  click="ExportExcel(event)"> 
 				</WrbComp:Button_HB> 
 				<!--mx:Label id="Lbl_Vendor1" x="223" y="2" width="13" text="*" color="red" fontSize="16"/>
 				<mx:Label id="Lbl_Vendor0" x="222" y="42" width="13" text="*" color="red" fontSize="16"/-->
-				<mx:Label   x="342" y="2" width="13" text="*" color="red" fontSize="16"/>
-				<s:Label   x="293" y="14" text="Category"/>
-				<s:Label x="293" y="45" height="29" text="Filter by &#xd;Property"/>
-				<s:TextInput id="txtProperty" x="366" y="44" width="141" height="25"
-							 change="filterss('PropertyName')" prompt="Property Name"/>
-				<s:HGroup x="367" y="6" width="260" horizontalAlign="center" verticalAlign="middle" gap="17"  id="type">
-					<s:RadioButton label="Internal" groupName="Modes" value="0"
-								   id="Internal" buttonMode="true"  />
-					<s:RadioButton label="External" groupName="Modes"  value="1"
-								   id="External" buttonMode="true"  /> 
-					<s:RadioButton label="Managed GH" groupName="Modes"  value="2"
-								   id="Managed" buttonMode="true"  />
-				</s:HGroup>
-				<s:Label x="534" y="44" height="29" text="Filter by &#xd;BookingCode"/>
-				<s:TextInput id="txtBookingCode" x="646" y="44" width="109" height="25"
+				<s:TextInput id="txtProperty" x="666" y="41" width="141" height="25"
+							 change="filterss('PropertyName')" prompt="Property Name" visible="false"/>
+				<s:TextInput id="txtBookingCode" x="646" y="44" width="109" height="25" visible="false"
 							 change="filter('BookingCode')" prompt="BookingCode" restrict="0-9" maxChars="6"/>
+				<WrbHelpComp:HelpText id="Hlp_ClientName" x="465" y="41.5" width="200" height="23" depth="200"
+									  onselection="{FnOnselection_Client()}" pxSetColumnsWidth="198,0"/>
+				<mx:Label x="379" y="42.5" text="Client"/>
+				<mx:Label x="112" y="7" width="64" height="16" text="From Date" id="Lbl_FDT"/>
+				<mx:Label x="128" y="47" text="To Date" id="Lbl_TDT" />
+				<mx:Label   x="432" y="5" width="13" text="*" color="red" fontSize="16"/>
+				<mx:Label   x="380" y="14" text="Category"/>
+				<s:HGroup id="type" x="466" y="6" width="200" height="28" gap="17"
+						  horizontalAlign="center" verticalAlign="middle">
+					<s:RadioButton label="Checkin" groupName="Modes" value="0"
+								   id="Checkin" buttonMode="true"  />
+					<s:RadioButton label="Checkout" groupName="Modes"  value="1"
+								   id="Checkout" buttonMode="true"  /> 
+				</s:HGroup>
 			</s:Group>
 		</s:HGroup>
 	</s:BorderContainer>
 	
-	<s:BorderContainer x="0" y="130" width="100%" height="354" id="bdr_Scroll" visible="true" borderVisible="false">
+	<s:BorderContainer x="0" y="130" width="100%" height="502" id="bdr_Scroll" visible="true" borderVisible="false">
 		<s:HGroup  width="100%" height="100%">
-			<mx:DataGrid id="Grd_ListClient1" depth="100" x="10" y="48" width="100%" height="402" tabIndex="10"
-						 borderStyle="outset"> 
-				<mx:columns>		 	
-					<mx:DataGridColumn dataField="ClientName" width="200"  textAlign="left"/> 
-					<mx:DataGridColumn dataField="PropertyName" width="250"  textAlign="left"/> 
-					<mx:DataGridColumn dataField="CityName"   textAlign="left" visible="false"/> 
-					<mx:DataGridColumn dataField="FirstName" width="190"   headerText="Guest Name" textAlign="left"/>	
-					<mx:DataGridColumn dataField="BookingLevel" width="115"  headerText="BookingLevel"  textAlign="left" />
-					<mx:DataGridColumn dataField="ExpDate" width="91" headerText="Date"  textAlign="center"/>
-					<mx:DataGridColumn dataField="BookingCode" width="91" headerText="Booking Code"  textAlign="left"/>
-					
+		<mx:DataGrid id="Grd_ListClient1" depth="100" x="10" y="48" width="100%" height="502" tabIndex="10"	 borderStyle="outset"> 
+				<mx:columns>
+					<mx:DataGridColumn width="40" dataField="SNo"/>
+					<mx:DataGridColumn dataField="ClientName" width="200"  textAlign="left"/>
+					<mx:DataGridColumn dataField="FirstName" width="150"   headerText="Guest Name" textAlign="left"/> 
+					<mx:DataGridColumn dataField="BookingCode" width="110" textAlign="left"/>
+					<mx:DataGridColumn dataField="CityName" width="130" textAlign="left"/>
+					<mx:DataGridColumn dataField="PropertyName" width="230"  headerText="Hotel / Property" textAlign="left"/> 
+					<mx:DataGridColumn dataField="ChkinDate" width="91" headerText="Checkin Date"  textAlign="center"/>
+					<mx:DataGridColumn dataField="ChkoutDate" width="91" headerText="CheckOut Date"  textAlign="center"/>
+					<mx:DataGridColumn dataField="MobileNo" width="130" textAlign="left" />
+					<mx:DataGridColumn dataField="EmailId" headerText="Email" width="120" />
 				</mx:columns>
 			</mx:DataGrid> 
 			

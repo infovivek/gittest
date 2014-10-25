@@ -155,7 +155,7 @@ END
 		CONVERT(NVARCHAR(100),'',103),CONVERT(NVARCHAR(100),'',103)
 		
 		
-		SELECT BillDate,ExpenseHead,VendorName,Property,Type,PaymentMode,BillNo,RequestedAmount,
+		SELECT CONVERT(NVARCHAR(100),CONVERT(DATE,BillDate,103),110) AS BillDate,ExpenseHead,VendorName,Property,Type,PaymentMode,BillNo,RequestedAmount,
         UserId,PropertyId,Id FROM #Final		
 		
  END

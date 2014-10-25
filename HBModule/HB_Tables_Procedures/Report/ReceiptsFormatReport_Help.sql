@@ -220,9 +220,10 @@ BEGIN
 	JOIN #CheckOut C ON B.BillId=C.ChkId
 	
 	SELECT Id AS SNo,BookingType,BookingId AS BookingCode,BillId,InVoiceNo,PropertyName,ClientName,
-	MasterClientName,GuestName,CheckInDate,CheckOutDate,Location,NoOfDays,
-	TotalAmount,Type,PaymentMode,BillDate,BillStartDate,
-	BillEndDate,BillType  FROM #Final
+	MasterClientName,GuestName,CONVERT(NVARCHAR(100),CONVERT(DATE,CheckInDate,103),110) AS CheckInDate,
+	CONVERT(NVARCHAR(100),CONVERT(DATE,CheckOutDate,103),110) AS CheckOutDate,Location,NoOfDays,
+	TotalAmount,Type,PaymentMode,BillDate,CONVERT(NVARCHAR(100),CONVERT(DATE,BillStartDate,103),110) AS BillStartDate,
+	CONVERT(NVARCHAR(100),CONVERT(DATE,BillEndDate,103),110) AS BillEndDate,BillType  FROM #Final
 	
 
 END

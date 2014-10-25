@@ -46,7 +46,8 @@ Occupancy=@Occupancy ,RackTariffSingle=@RackTariffSingle,RackTariffDouble=@RackT
 ApartmentId = @ApartmentId,BedId =@BedId,ApartmentType = @ApartmentType,
 BedType = @BedType,Type=@Type,RefGuestId=@RefGuestId,PropertyType=@PropertyType,
 CheckStatus=@CheckStatus,GuestImage=@GuestImage,SingleMarkupAmount=@SingleMarkupAmount,
-DoubleMarkupAmount=@DoubleMarkupAmount,ClientId=@ClientId,CityId=@CityId,ServiceCharge=@ServiceCharge
+DoubleMarkupAmount=@DoubleMarkupAmount,ClientId=@ClientId,CityId=@CityId,ServiceCharge=@ServiceCharge,
+NewCheckInDate=CONVERT(Date,@ArrivalDate,103),NewCheckoutDate=CONVERT(Date,@ChkoutDate,103)
 WHERE Id=@Id;
 
 SELECT Id,RowId FROM WRBHBCheckInHdr WHERE Id=@Id;

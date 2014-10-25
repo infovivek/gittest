@@ -97,6 +97,8 @@
     <Compile Include="GuestCheckInBO.cs" />
     <Compile Include="GuestCheckOutBO.cs" />
     <Compile Include="ImportGuestBO.cs" />
+    <Compile Include="IntermediateCheckoutServiceDtlsBO.cs" />
+    <Compile Include="IntermediateCheckoutServiceHdrBO.cs" />
     <Compile Include="InternalExpenseReportBO.cs" />
     <Compile Include="KOTEntryDtlsBO.cs" />
     <Compile Include="KOTEntryHdrBO.cs" />

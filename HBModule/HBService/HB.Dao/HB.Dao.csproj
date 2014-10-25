@@ -120,6 +120,8 @@
     <Compile Include="ExternalCheckOutDao.cs" />
     <Compile Include="ExternalCheckOutMailDao.cs" />
     <Compile Include="ExternalExpenseReportDAO.cs" />
+    <Compile Include="IntermediateCheckoutServiceDtlsDAO.cs" />
+    <Compile Include="IntermediateCheckoutServiceHdrDAO.cs" />
     <Compile Include="InternalExpenseReportDAO.cs" />
     <Compile Include="ForgotDAO.cs" />
     <Compile Include="FormatReceiptsDAO.cs" />
