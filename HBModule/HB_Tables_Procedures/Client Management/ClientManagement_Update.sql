@@ -28,19 +28,43 @@ CREATE PROCEDURE [dbo].[SP_ClientManagement_Update](@MasterClientId BIGINT,@Mast
 @CreditPeriodNumber NVARCHAR(100),@Id BIGINT,@ServiceCharge BIT)
 AS
 BEGIN
- UPDATE WRBHBClientManagement SET MasterClientId=@MasterClientId,
- SalesExecutiveId=@SalesExecutiveId,KeyAccountPersonId=@KeyAccountPersonId,
- CRMId=@CRMId,ClientName=@ClientName,CAddress1=@CAddress1,
- CAddress2=@CAddress2,CCountry=@CCountry,InCCountry=@InCCountry,CState=@CState,CCity=@CCity,
- CLocality=@CLocality,CPincode=@CPincode,DirectPay=@DirectPay,BTC=@BTC,
- CreditLimit=@CreditLimit,CreditPeriod=@CreditPeriod,Status=@Status,
- BAddress1=@BAddress1,BAddress2=@BAddress2,BCountry=@BCountry,InBCountry=@InBCountry,BState=@BState,
- BCity=@BCity,BLocality=@BLocality,BPincode=@BPincode,DomainName=@DomainName,
- IndustryType=@IndustryType,CPhoneNo1=@CPhoneNo1,CPhoneNo2=@CPhoneNo2,
- CPhoneNo3=@CPhoneNo3,CPhoneNo4=@CPhoneNo4,CPhoneNo5=@CPhoneNo5,
- ModifiedBy=@UsrId,ModifiedDate=GETDATE(),
- CreditPeriodNumber=@CreditPeriodNumber,ContactNo=@ContactNo,ServiceCharge=@ServiceCharge WHERE Id=@Id;
- SELECT Id,RowId FROM WRBHBClientManagement WHERE Id=@Id;
+	DECLARE @TRURL NVARCHAR(100)
+	SET @TRURL=(SELECT TRClientURL FROM WRBHBClientManagement WHERE Id=@Id)
+	IF(@TRURL !='')
+		BEGIN
+			 UPDATE WRBHBClientManagement SET MasterClientId=@MasterClientId,
+			 SalesExecutiveId=@SalesExecutiveId,KeyAccountPersonId=@KeyAccountPersonId,
+			 CRMId=@CRMId,ClientName=@ClientName,CAddress1=@CAddress1,
+			 CAddress2=@CAddress2,CCountry=@CCountry,InCCountry=@InCCountry,CState=@CState,CCity=@CCity,
+			 CLocality=@CLocality,CPincode=@CPincode,DirectPay=@DirectPay,BTC=@BTC,
+			 CreditLimit=@CreditLimit,CreditPeriod=@CreditPeriod,Status=@Status,
+			 BAddress1=@BAddress1,BAddress2=@BAddress2,BCountry=@BCountry,InBCountry=@InBCountry,BState=@BState,
+			 BCity=@BCity,BLocality=@BLocality,BPincode=@BPincode,DomainName=@DomainName,
+			 IndustryType=@IndustryType,CPhoneNo1=@CPhoneNo1,CPhoneNo2=@CPhoneNo2,
+			 CPhoneNo3=@CPhoneNo3,CPhoneNo4=@CPhoneNo4,CPhoneNo5=@CPhoneNo5,
+			 ModifiedBy=@UsrId,ModifiedDate=GETDATE(),
+			 CreditPeriodNumber=@CreditPeriodNumber,ContactNo=@ContactNo,ServiceCharge=@ServiceCharge 
+			 WHERE Id=@Id;
+			 SELECT Id,RowId FROM WRBHBClientManagement WHERE Id=@Id;
+		 END
+ ELSE
+		 BEGIN
+			 UPDATE WRBHBClientManagement SET MasterClientId=@MasterClientId,
+			 SalesExecutiveId=@SalesExecutiveId,KeyAccountPersonId=@KeyAccountPersonId,
+			 CRMId=@CRMId,ClientName=@ClientName,CAddress1=@CAddress1,
+			 CAddress2=@CAddress2,CCountry=@CCountry,InCCountry=@InCCountry,CState=@CState,CCity=@CCity,
+			 CLocality=@CLocality,CPincode=@CPincode,DirectPay=@DirectPay,BTC=@BTC,
+			 CreditLimit=@CreditLimit,CreditPeriod=@CreditPeriod,Status=@Status,
+			 BAddress1=@BAddress1,BAddress2=@BAddress2,BCountry=@BCountry,InBCountry=@InBCountry,BState=@BState,
+			 BCity=@BCity,BLocality=@BLocality,BPincode=@BPincode,DomainName=@DomainName,
+			 IndustryType=@IndustryType,CPhoneNo1=@CPhoneNo1,CPhoneNo2=@CPhoneNo2,
+			 CPhoneNo3=@CPhoneNo3,CPhoneNo4=@CPhoneNo4,CPhoneNo5=@CPhoneNo5,
+			 ModifiedBy=@UsrId,ModifiedDate=GETDATE(),
+			 CreditPeriodNumber=@CreditPeriodNumber,ContactNo=@ContactNo,ServiceCharge=@ServiceCharge, 
+			 TRClientURL='http://tr.staysimplyfied.com/?'+''+REPLACE(CAST(RowId AS NVARCHAR(100)),'-','')
+			 WHERE Id=@Id;
+			 SELECT Id,RowId FROM WRBHBClientManagement WHERE Id=@Id;
+		 END
 END
 
 GO

@@ -65,6 +65,7 @@
     <application path="Master/DefineVendorCost.mxml"/>
     <application path="PropertyManagement/PropertyManagement.mxml"/>
     <application path="GuestService/NewSnackKOTHistory.mxml"/>
+    <application path="Sales/GenerateClient.mxml"/>
     <application path="Report/BookingCountReport.mxml"/>
     <application path="Master/HBUser.mxml"/>
     <application path="Master/PettyCashApproval.mxml"/>
@@ -114,6 +115,7 @@
     <application path="GuestService/SearchBookingGuest.mxml"/>
     <application path="GuestService/CheckOutNew.mxml"/>
     <application path="Master/ChangePassword.mxml"/>
+    <application path="Report/NewExternalInvoiceReport.mxml"/>
     <application path="Master/ExpenseHeads.mxml"/>
     <application path="Master/TravelDesk.mxml"/>
     <application path="Deleted Booking Screens/Booking.mxml"/>

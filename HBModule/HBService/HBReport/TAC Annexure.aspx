@@ -15,6 +15,7 @@
     
     </div>
     <div align ="center">
+
         <rsweb:ReportViewer ID="ReportViewer1" runat="server" Height="100%" 
             Width="100%" Font-Names="Verdana" Font-Size="8pt" 
             InteractiveDeviceInfos="(Collection)" WaitMessageFont-Names="Verdana" 

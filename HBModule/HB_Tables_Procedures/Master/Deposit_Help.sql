@@ -115,7 +115,7 @@ BEGIN			--DROP TABLE #TEMPCASH
 		SELECT BillType,InvoiceNo,Amount Total,ChkOutHdrId,ClientId,CM.ClientName,Tick 
 		From WRBHBDepositsDlts D
 		JOIN WRBHBClientManagement CM ON D.ClientId=CM.Id AND CM.IsActive=1 AND CM.IsDeleted=0
-		 WHERE DepHdrId=@Id
+		WHERE D.DepHdrId=@Id AND D.IsActive=1 AND D.IsDeleted=0
 		
 	END
 	IF @Action='BTCSearch'
@@ -126,7 +126,10 @@ BEGIN			--DROP TABLE #TEMPCASH
 		JOIN WRBHBClientManagement CM ON D.ClientId=CM.Id AND CM.IsActive=1 AND CM.IsDeleted=0
 		WHERE D.Id=@Id and D.IsActive=1 and D.IsDeleted=0 AND Mode='BTC'
 		
-		SELECT BillType,InvoiceNo,Amount Total,ChkOutHdrId,ClientId,Tick from WRBHBDepositsDlts WHERE DepHdrId=@Id
+		SELECT BillType,InvoiceNo,Amount Total,ChkOutHdrId,ClientId,Tick,CM.ClientName AS Client 
+		from WRBHBDepositsDlts D
+		JOIN WRBHBClientManagement CM ON D.ClientId=CM.Id AND CM.IsActive=1 AND CM.IsDeleted=0
+		WHERE D.DepHdrId=@Id
 	END
 	IF @Action='IMAGEUPLOAD'
 	BEGIN

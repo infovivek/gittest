@@ -14,7 +14,7 @@ namespace HB.Dao
     public class BookingPropertyDAO
     {
         string UserData;
-        public DataSet Save(string BookingProperty, User Usr, int BookingId)
+        public DataSet Save(string[] data, User Usr, int BookingId)
         {
             UserData = " UserId:" + Usr.Id + ", UsreName:" + Usr.LoginUserName + ", ScreenName:'" + Usr.ScreenName +
              "', SctId:" + Usr.SctId + ", Service:BookingPropertyDAO - Save" + ", ProcName:'" + StoredProcedures.BookingProperty_Insert; 
@@ -23,7 +23,7 @@ namespace HB.Dao
             dTable.Columns.Add("Exception");
             XmlDocument document = new XmlDocument();
             BookingProperty BookPty = new BookingProperty();
-            document.LoadXml(BookingProperty);
+            document.LoadXml(data[3].ToString());
             int n;
             n = (document).SelectNodes("//GridXml").Count;
             for (int i = 0; i < n; i++)
@@ -114,7 +114,14 @@ namespace HB.Dao
                     BookPty.TripleandMarkup1 = Convert.ToDecimal(document.SelectNodes("//GridXml")[i].Attributes["TripleandMarkup1"].Value);
                 }
                 BookPty.TAC = Convert.ToBoolean(document.SelectNodes("//GridXml")[i].Attributes["TAC"].Value);
-                BookPty.Inclusions = document.SelectNodes("//GridXml")[i].Attributes["Inclusions"].Value;
+                if ((BookPty.GetType == "API") & (BookPty.PropertyType == "MMT"))
+                {
+                    BookPty.Inclusions = document.SelectNodes("//GridXml")[i].Attributes["MealPlan"].Value;
+                }
+                else
+                {
+                    BookPty.Inclusions = document.SelectNodes("//GridXml")[i].Attributes["Inclusions"].Value;
+                }                
                 BookPty.DiscountModePer = Convert.ToBoolean(document.SelectNodes("//GridXml")[i].Attributes["DiscountModePer"].Value);
                 BookPty.DiscountModeRS = Convert.ToBoolean(document.SelectNodes("//GridXml")[i].Attributes["DiscountModeRS"].Value);
                 if (document.SelectNodes("//GridXml")[i].Attributes["DiscountAllowed"].Value == "")
@@ -135,6 +142,8 @@ namespace HB.Dao
                 BookPty.APIHdrId = Convert.ToInt32(document.SelectNodes("//GridXml")[i].Attributes["APIHdrId"].Value);
                 BookPty.RatePlanCode = document.SelectNodes("//GridXml")[i].Attributes["RatePlanCode"].Value;
                 BookPty.RoomTypeCode = document.SelectNodes("//GridXml")[i].Attributes["RoomTypeCode"].Value;
+                //
+                BookPty.TaxAdded = document.SelectNodes("//GridXml")[i].Attributes["TaxAdded"].Value;
                 SqlCommand command = new SqlCommand();
                 if (BookPty.Id != 0)
                 {
@@ -178,6 +187,7 @@ namespace HB.Dao
                 command.Parameters.Add("@RatePlanCode", SqlDbType.NVarChar).Value = BookPty.RatePlanCode;
                 command.Parameters.Add("@RoomTypeCode", SqlDbType.NVarChar).Value = BookPty.RoomTypeCode;
                 command.Parameters.Add("@PropertyCnt", SqlDbType.NVarChar).Value = n;
+                command.Parameters.Add("@TaxAdded", SqlDbType.NVarChar).Value = BookPty.TaxAdded;
                 ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
             }            
             if (n == 0)
@@ -187,17 +197,22 @@ namespace HB.Dao
             }
             if (n != 0)
             {
-                UserData = " UserId:" + Usr.Id + ", UsreName:" + Usr.LoginUserName + ", ScreenName:'" + Usr.ScreenName +
-                "', SctId:" + Usr.SctId + ", Service:BookingPropertyDAO - Help - Action Name - RecommendProperty" + ", ProcName:'" + StoredProcedures.BookingDtls_Help; 
-                SqlCommand command = new SqlCommand();
-                command.CommandText = StoredProcedures.BookingDtls_Help;
-                command.CommandType = CommandType.StoredProcedure;
-                command.Parameters.Add("@Action", SqlDbType.NVarChar).Value = "RecommendProperty";
-                command.Parameters.Add("@Str", SqlDbType.NVarChar).Value = "";
-                command.Parameters.Add("@Id", SqlDbType.BigInt).Value = BookingId;
-                DataSet DSBooking = new WrbErpConnection().ExecuteDataSet(command, UserData);
-                if (DSBooking.Tables[4].Rows[0][0].ToString() == "RmdPty")
+                XmlDocument xml = new XmlDocument();
+                xml.LoadXml(data[1].ToString());
+                string Status = xml.SelectSingleNode("HdrXml").Attributes["Status"].Value;
+                if (Status == "RmdPty")
                 {
+                    UserData = " UserId:" + Usr.Id + ", UsreName:" + Usr.LoginUserName + ", ScreenName:'" + Usr.ScreenName +
+                    "', SctId:" + Usr.SctId + ", Service:BookingPropertyDAO - Help - Action Name - RecommendProperty" + ", ProcName:'" + StoredProcedures.BookingDtls_Help;
+                    SqlCommand command = new SqlCommand();
+                    command.CommandText = StoredProcedures.BookingDtls_Help;
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.Add("@Action", SqlDbType.NVarChar).Value = "RecommendProperty";
+                    command.Parameters.Add("@Str", SqlDbType.NVarChar).Value = "";
+                    command.Parameters.Add("@Id", SqlDbType.BigInt).Value = BookingId;
+                    DataSet DSBooking = new WrbErpConnection().ExecuteDataSet(command, UserData);
+                    //if (DSBooking.Tables[4].Rows[0][0].ToString() == "RmdPty")
+                    //{
                     //SmtpMail Mail = new SmtpMail("TryIt");
                     System.Net.Mail.MailMessage message = new System.Net.Mail.MailMessage();
                     //DSBooking.Tables[1].Rows[0][4].ToString()
@@ -208,9 +223,9 @@ namespace HB.Dao
                     else
                     {
                         message.From = new System.Net.Mail.MailAddress("stay@staysimplyfied.com", "", System.Text.Encoding.UTF8);
-                    }                    
+                    }
                     //message.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
-                    //message.Subject = "Recommended Hotel List TID -" + DSBooking.Tables[1].Rows[0][2].ToString();
+                    //message.Subject = " Test Recommended Hotel List TID -" + DSBooking.Tables[1].Rows[0][2].ToString();
                     message.To.Add(new System.Net.Mail.MailAddress("booking_confirmation@staysimplyfied.com"));
                     if (DSBooking.Tables[2].Rows[0][0].ToString() == "0")
                     {
@@ -343,7 +358,7 @@ namespace HB.Dao
                         " <table cellpadding=\"0\" cellspacing=\"0\" width=\"600\" border=\"0\" align=\"center\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #cccdcf solid 1px\">" +
                         "<tr><td>" +
                         "<table cellpadding=\"0\" cellspacing=\"0\" width=\"600\" border=\"0\" align=\"center\">" +
-                        "<tr> "+
+                        "<tr> " +
                         "<th align=\"left\" width=\"50%\" style=\"padding: 10px 0px 10px 10px;\">" +
                         "<img src=" + Imagelocation + " width=\"200px\" height=\"52px\" alt=" + DSBooking.Tables[5].Rows[0][1].ToString() + ">" +              //Image Name Change
                         "</th><th width=\"50%\"></th></tr></table>";
@@ -366,11 +381,11 @@ namespace HB.Dao
                         " " +
                         " <span style=\"color:#f54d02; font-weight:bold\">City: </span> " + DSBooking.Tables[0].Rows[0][0].ToString()  + " " +
                         " "+
-                        " </table>";*/                   
+                        " </table>";*/
                     string GridBody =
                         " <table cellpadding=\"0\" cellspacing=\"0\" width=\"600\" border=\"0\" align=\"center\">" +
-                        " <tr style=\"font-size:11px; font-weight:normal;\">" +                        
-                        " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Property</p></th>" +
+                        " <tr style=\"font-size:11px; font-weight:normal;\">" +
+                        " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Property &darr;</p></th>" +
                         " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Location</p></th>" +
                         " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Room Type</p></th>" +
                         " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Single Tariff</p></th>" +
@@ -381,7 +396,7 @@ namespace HB.Dao
                     for (int j = 0; j < DSBooking.Tables[0].Rows.Count; j++)
                     {
                         GridBody +=
-                            " <tr style=\"font-size:11px; font-weight:normal;\">" +                            
+                            " <tr style=\"font-size:11px; font-weight:normal;\">" +
                             " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">" + DSBooking.Tables[0].Rows[j][1].ToString() + "</p></td>" +
                             " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">" + DSBooking.Tables[0].Rows[j][2].ToString() + "</p></td>" +
                             " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">" + DSBooking.Tables[0].Rows[j][3].ToString() + "</p></td>" +
@@ -393,20 +408,22 @@ namespace HB.Dao
                     }
                     GridBody += "</table>";
                     GridBody +=
+                        "<p style=\"margin-top:10px; margin-left:5px; font-size:11px;\">" +
+                        "<span style=\"color:#f54d02; font-weight:bold; font-size:11px;\">Tax </span><ul><li>  *  - Taxes as applicable</li><li> #  - Net Tariff</li></ul></p>" +
                         " <table cellpadding=\"0\" cellspacing=\"0\" width=\"600\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
                         " <tr style=\"font-size:11px; background-color:#eee;\">" +
                         " <td width=\"600\" style=\"padding:12px 5px;\">" +
+                        " <p style=\"margin-top:0px;\"><b>Conditions : </b> <ul><li>All rates quoted are subject to availability and duration of Stay.</li><li>All Tariff quoted are limited and subject to availability and has to be confirmed in 30 mins from the time when these tariff's are generated " + DSBooking.Tables[4].Rows[0][1].ToString() + ".</li><li>While every effort has been made to ensure the accuracy and availablity of all information.</li></ul></p>" +
                         " <p style=\"margin-top:0px;\"><b>Cancellation Policy : </b> <ul><li> Cancellation of booking to be confirmed through Email.</li> " +
                         "<li>Mail to be sent to stay@staysimplyfied.com and mention the booking ID no.</li>" +
                         "<li>100% refund will be made if cancellation request is sent 48 (forty eight) hours prior to the check-in date and NIL amount will be refunded if cancellation request sent beyond 48 (forty eight) hours to check-in date.</li> " +
                         "<li>1 day tariff will be charged for No-show without intimation.</li></ul>" +
-                        " <p style=\"margin-top:20px;\"><b>Note : </b>" + DSBooking.Tables[1].Rows[0][5].ToString() + "<br>" +
-                        " <p style=\"margin-top:20px;\"><b>Tax :</b> Taxes as applicable<br>" +
+                        " <p style=\"margin-top:20px;\"><b>Note : </b>" + DSBooking.Tables[1].Rows[0][5].ToString() + "<br>" +                        
                         " <p style=\"margin-top:20px;\">Kindly confirm the property at the earliest as rooms are subject to availability.<br>" +
                         " <br /> Thanking You,<br />" +
                         " </p><p style=\"margin-top:5px;\">" +
                         " <span style=\"color:#f54d02; font-weight:bold\">" + DSBooking.Tables[1].Rows[0][3].ToString() + "" + //username change
-                        " </p></td></tr></table><br><br>";                   
+                        " </p></td></tr></table><br><br>";
                     //string Disclaimer = "This message (including attachment if any)is confidential and may be privileged. Before opening attachments please check them for viruses and defects. HummingBird Travel & Stay Private Limited (HummingBird) will not be responsible for any viruses or defects or any forwarded attachments emanating either from within HummingBird or outside. If you have received this message by mistake please notify the sender by return e-mail and delete this message from your system. Any unauthorized use or dissemination of this message in whole or in part is strictly prohibited. Please note that e-mails are susceptible to change and HummingBird shall not be liable for any improper, untimely or incomplete transmission.";
                     /*GridBody +=
                          " <table cellpadding=\"0\" cellspacing=\"0\" width=\"600\" border=\"0\" align=\"center\" style=\"padding-top:30px;\">" +
@@ -428,9 +445,9 @@ namespace HB.Dao
                     // SMTP Email email:
                     System.Net.Mail.SmtpClient smtp = new System.Net.Mail.SmtpClient();
                     smtp.EnableSsl = true;
-                    smtp.Host = "email-smtp.us-west-2.amazonaws.com";
                     smtp.Port = 587;
-                    smtp.Credentials = new System.Net.NetworkCredential("AKIAIIVF5D5D3CJAX7SQ", "ApmuZkd+L8tissEga8kac3quhhwohEi5CB+dYD36KTq3");
+                    smtp.Host = "email-smtp.us-west-2.amazonaws.com"; smtp.Credentials = new System.Net.NetworkCredential("AKIAIIVF5D5D3CJAX7SQ", "ApmuZkd+L8tissEga8kac3quhhwohEi5CB+dYD36KTq3");
+                    //smtp.Host = "smtp.gmail.com"; smtp.Credentials = new System.Net.NetworkCredential("stay@staysimplyfied.com", "stay1234");
                     try
                     {
                         smtp.Send(message);

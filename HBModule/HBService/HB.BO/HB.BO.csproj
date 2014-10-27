@@ -61,6 +61,7 @@
     <Compile Include="BookingPropertyBO.cs" />
     <Compile Include="BTCSubmissionBO.cs" />
     <Compile Include="CheckInDtlsBo.cs" />
+    <Compile Include="CheckInForecastReportBO.cs" />
     <Compile Include="CheckoutAndIntermediateBO.cs" />
     <Compile Include="CheckOutPaymentBO.cs" />
     <Compile Include="CheckOutPaymentCardBO.cs" />
@@ -92,6 +93,7 @@
     <Compile Include="ExternalChechkOutTACBO.cs" />
     <Compile Include="ExternalCheckOutBO.cs" />
     <Compile Include="ExternalExpenseReportBO.cs" />
+    <Compile Include="ExternalIntermediateCheckOutBO.cs" />
     <Compile Include="ForgotBo.cs" />
     <Compile Include="FormatReceiptsBO.cs" />
     <Compile Include="GuestCheckInBO.cs" />

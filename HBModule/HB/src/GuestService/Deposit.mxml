@@ -133,7 +133,7 @@
 				{
 					if(Mode=="Cash")
 					{
-						Grd_Cash.dataProvider=null;
+						//Grd_Cash.dataProvider=null;
 						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
 						{
 							Grd_Cash.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
@@ -141,7 +141,7 @@
 					}
 					if(Mode=="Cheque")
 					{
-						Grd_Cheque.dataProvider=null;
+						//Grd_Cheque.dataProvider=null;
 						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
 						{
 							Grd_Cheque.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
@@ -149,7 +149,7 @@
 					}
 					if(Mode=="BTC")
 					{
-						Grd_BTC.dataProvider=null;
+						//Grd_BTC.dataProvider=null;
 						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
 						{
 							Grd_BTC.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
@@ -520,8 +520,7 @@
 			
 			protected function Search():void
 			{
-				if((dt_To.text!="") || (dt_To1.text!=""))
-				{
+				
 					SearchPopUp.Prc_name="BookingSearch"
 					var SearchParam:Array =new Array();
 					SearchPopUp.HlpIndex="SEARCH"
@@ -537,6 +536,11 @@
 						SearchParam[2]=dt_From1.text;
 						SearchParam[3]=dt_To1.text;
 					}
+					if(Mode=="BTC")
+					{
+						SearchParam[2]=dt_From2.text;
+						SearchParam[3]=dt_To2.text;
+					}
 					SearchParam[4]=Mode;
 					SearchPopUp.addEventListener("PopupEnter",funpopupEnter);
 					SearchPopUp.addEventListener("PopupClose",funpopupClose);
@@ -550,14 +554,13 @@
 					{
 						Load[2]=dt_From1.text;Load[3]=dt_To1.text;
 					}
+					if(Mode=="BTC")
+					{
+						Load[2]=dt_From2.text;Load[3]=dt_To2.text;
+					}
 					Load[4]=Mode;
 					useWeb("Deposit","Search_CUSTOM",Load);
-				}
-				else
-				{
-					alignAlert(Alert.show("Date Range","Required Fields !",Alert.OK,this,null,iconErrLarge),10,"");
-					return;
-				}
+				
 			}
 			private function funpopupClose(event:Event):void
 			{ 
@@ -1228,7 +1231,7 @@
 						  selectableRange="{{rangeEnd: new Date()}}" formatString="DD/MM/YYYY" styleName="DisabledDateField" 
 						  yearNavigationEnabled="true" change="dt_From_changeHandler(event)"/>
 			<mx:DateField id="dt_To" x="400" y="81" selectableRange="{{rangeEnd: new Date()}}" formatString="DD/MM/YYYY"
-						 enabled="false" />
+						/>
 			<s:Button x="543" y="83" height="28" label="Search" click="Search()"/>
 		</s:BorderContainer>
 	</s:HGroup>
@@ -1273,7 +1276,7 @@
 			<s:Button x="712" y="81" label="New Cheque Deposit" click="btn_Cheque_Click(event)"/>
 			<s:Label x="156" y="86" text="From"/>
 			<s:Label x="345" y="86" text="To"/>
-			<mx:DateField x="213" y="81" width="93" height="21" id="dt_From1" tabIndex="16"  enabled="false"
+			<mx:DateField x="213" y="81" width="93" height="21" id="dt_From1" tabIndex="16"  
 						  selectableRange="{{rangeEnd: new Date()}}" formatString="DD/MM/YYYY" styleName="DisabledDateField" 
 						  yearNavigationEnabled="true" change="dt_From1_changeHandler(event)"/>
 			<mx:DateField id="dt_To1" x="380" y="81" selectableRange="{{rangeEnd: new Date()}}" formatString="DD/MM/YYYY"
@@ -1299,7 +1302,7 @@
 				  click="CashCancel()"/>
 		<s:DropDownList id="Drp_CashAccount" x="644" y="119" width="225" prompt="Select Deposited Account" 
 						change="Drp_CashAccount_changeHandler()"></s:DropDownList>
-		<mx:DateField id="dt_CashDate" x="644" y="39" selectableRange="{{rangeEnd:new Date()}}"  enabled="false"
+		<mx:DateField id="dt_CashDate" x="644" y="39" selectableRange="{{rangeEnd:new Date()}}" 
 					  formatString="DD/MM/YYYY"/>
 		<s:BorderContainer x="644" y="145" width="297" height="128" id="Brd_imageUpload" visible="true" borderVisible="true"
 						   backgroundColor="#fbf9f9" cornerRadius="5">

@@ -228,6 +228,10 @@ IF @Action = 'Tab2_to_Tab3_Dtls'
  END
 IF @Action = 'RmdPty_GuestDtls'
  BEGIN
+  IF @Id2 = 123
+   BEGIN
+    DELETE FROM WRBHBBookingPropertyAssingedGuest WHERE BookingId=@Id1;
+   END
   -- tab 1 Guest Dlts
   SELECT GuestId,GradeId,EmpCode,Title,FirstName,LastName,Grade,Designation,
   EmailId,MobileNo,Nationality,Id FROM WRBHBBookingGuestDetails

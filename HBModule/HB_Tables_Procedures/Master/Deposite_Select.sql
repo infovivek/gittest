@@ -107,5 +107,39 @@ IF @Mode='Cash'
 			D.DepositedDate < CONVERT(DATETIME,@ToDate,103)
 		END	
 	END
+	IF @Mode='BTC'
+	BEGIN
+	IF @FromDate='' AND @ToDate=''
+		BEGIN
+			SELECT Convert(NVARCHAR(100),DepositedDate,103) AS Date,Amount,D.BTCTo,BTCMode,
+			Comments,ChallanImage,D.Id FROM WRBHBDeposits D 
+			JOIN WRBHBUser U ON U.Id=D.DepositedBy
+			where Mode='BTC' AND D.IsActive=1	AND D.IsDeleted=0  AND MONTH(D.DepositedDate) = MONTH(GETDATE())
+		END	
+	IF @FromDate!='' AND @ToDate=''
+		BEGIN
+			SELECT Convert(NVARCHAR(100),DepositedDate,103) AS Date,Amount,D.BTCTo,BTCMode,
+			Comments,ChallanImage,D.Id FROM WRBHBDeposits D 
+			JOIN WRBHBUser U ON U.Id=D.DepositedBy
+			where Mode='BTC' AND D.IsActive=1	AND D.IsDeleted=0  AND 
+			D.DepositedDate>=CONVERT(NVARCHAR(103),@FromDate,103)
+		END	
+	IF @FromDate!='' AND @ToDate!=''
+		BEGIN
+			SELECT Convert(NVARCHAR(100),DepositedDate,103) AS Date,Amount,D.BTCTo,BTCMode,
+			Comments,ChallanImage,D.Id FROM WRBHBDeposits D 
+			JOIN WRBHBUser U ON U.Id=D.DepositedBy
+			where Mode='BTC' AND D.IsActive=1	AND D.IsDeleted=0  AND 
+			D.DepositedDate BETWEEN CONVERT(DATETIME,@FromDate,103) AND CONVERT(DATETIME,@ToDate,103)
+		END
+	IF @FromDate='' AND @ToDate!=''
+		BEGIN
+			SELECT Convert(NVARCHAR(100),DepositedDate,103) AS Date,Amount,D.BTCTo,BTCMode,
+			Comments,ChallanImage,D.Id FROM WRBHBDeposits D 
+			JOIN WRBHBUser U ON U.Id=D.DepositedBy
+			where Mode='BTC' AND D.IsActive=1	AND D.IsDeleted=0  AND 
+			D.DepositedDate < CONVERT(DATETIME,@ToDate,103)
+		END	
 END		
+END
 

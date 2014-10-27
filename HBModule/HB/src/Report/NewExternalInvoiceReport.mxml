@@ -361,9 +361,30 @@
 				else
 				{
 					Ac[Index].Process=false;
-				} 
+				}
+				TotalBills()
 			}
-			
+			public function TotalBills():void
+			{
+				var SelBills:ArrayCollection= new ArrayCollection();
+				SelBills=Grd_FinalAdjustment.dataProvider as  ArrayCollection;
+				var ChkutIds:String = "";
+				var ChkutIds1:String = "";
+				for(var M:int=0;M<SelBills.length;M++)
+				{ 
+					if(SelBills[M].ClientName==ClientName)
+					{
+						if(SelBills[M].selectRadio==true)
+						{
+							ChkutIds+= SelBills[M].ChkoutId+',';  
+						}  
+					}
+					//ChkutIds1+=ChkutIds+',';  
+				}  
+				ChkoutId=ChkutIds;
+				//	ExternalInterface.call("changeDocumentTitle",Str_ChkOutTAC+ChkutIds);	 
+				//var Amttobe:Number =ChkoutId;
+			}
 		]]>
 	</fx:Script>
 	<s:BorderContainer x="0" y="0" width="100%" height="92" borderVisible="false" backgroundColor="#f4efef" depth="10">
@@ -396,6 +417,17 @@
 				<mx:DataGrid id="Grd_FinalAdjustment" width="2000" height="100%" depth="1" editable="true"
 							 tabIndex="93" verticalAlign="middle" >	
 					<mx:columns>
+						<mx:DataGridColumn dataField="Process" headerText="Select" width="60" editable="false">
+						<mx:itemRenderer >
+						<fx:Component>
+						<mx:HBox horizontalAlign="center" verticalAlign="middle">
+						<mx:CheckBox selected="{data.Process}"  
+						change="outerDocument.FnChkChange(event);" 
+						/>
+						</mx:HBox>	
+						</fx:Component>
+						</mx:itemRenderer>
+						</mx:DataGridColumn>
 						<mx:DataGridColumn dataField="BookingDate" headerText="Date Created" editable="false" width="100" textAlign="left" visible="true"/>	
 						<mx:DataGridColumn dataField="BillNumber" headerText="Bill No" textAlign="left" visible="true" width="120" editable="false"/>
 						<mx:DataGridColumn dataField="PropertyName" headerText="Property Name"  width="200" editable="false" textAlign="left" visible="true"/>

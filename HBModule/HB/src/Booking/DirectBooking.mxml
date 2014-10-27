@@ -99,11 +99,11 @@
 				//var num:Number= (end.getUTCFullYear() - start.getUTCFullYear()) * 12 +(end.getUTCMonth() - start.getUTCMonth());								
 				//useWeb("BOOKING","Tab2_to_Tab3_Dtls_CUSTOM",[GlobalXml,'Tab2_to_Tab3_Dtls','','','','',0,0,0,0,0,26,0]);				
 				var ss:String=Global_AC[0].UsrId;				
-				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Room',4466]);//
+				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Room',4815]);//
 				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Bed',1528]);
 				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Apartment',2027]);
-				//useWeb("BookingMail","RecommendMail_CUSTOM",[GlobalXml,'Recommend',1722]);
-				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'MMT',4]);				
+				//useWeb("BookingMail","RecommendMail_CUSTOM",[GlobalXml,'Recommend',5052]);
+				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'MMT',4781]);				
 				//var ChkInDt:String="2014-11-14 12:00:00 PM";
 				//var ChkOutDt:String="2014-11-15 12:00:00 PM";
 				//CityId=2905;
@@ -440,9 +440,16 @@
 						var Ac_Gst1:ArrayCollection=new ArrayCollection();
 						Ac_Gst1=Grd_Guest._getGridSrc as ArrayCollection;
 						// again pre load in MMT
-						useWeb("BOOKING","Tab3_to_Tab2_CUSTOM",[GlobalXml,'Property',GradeName,GuestIds,
-							ChkInDt,ChkOutDt,APIHdrId,CityId,ClientId,Ac_Gst1.length,GradeId,BookedId,123]);
-						//
+						if(Hlp_TrackingNo.text != "")
+						{
+							useWeb("BOOKING","RmdPty_GuestDtls_CUSTOM",[GlobalXml,'RmdPty_GuestDtls',
+								'','','','',0,0,0,0,0,BookedId,123]);
+						}
+						else
+						{
+							useWeb("BOOKING","Tab3_to_Tab2_CUSTOM",[GlobalXml,'Property',GradeName,GuestIds,
+								ChkInDt,ChkOutDt,APIHdrId,CityId,ClientId,Ac_Gst1.length,GradeId,BookedId,123]);
+						}
 						//alignAlert(Alert.show("No Rooms Avaliable.","Alert Message !",Alert.OK,null,null,iconWarning,Alert.OK),10,"");
 						alignAlert(Alert.show(Ds_Objects.result.Tables.Table.Rows[0].Strg,"Alert Message !",Alert.OK,
 							null,null,iconWarning,Alert.OK),10,"");
@@ -467,7 +474,7 @@
 						if(PropertyType == "MMT")
 						{
 							useWeb("API","MMT_CUSTOM",[GlobalXml,'MMTdata','','','','',BookedId,0,0,0]);
-							FnClear();
+							//FnClear();
 						}
 						else
 						{
@@ -1369,10 +1376,7 @@
 					if(Ac_Tmp[j].Tick == 1)
 					{
 						Cnt += 1;
-						if(Ac_Tmp[j].GetType == "API")
-						{
-							GetTypeCnt += 1;
-						}
+						//if(Ac_Tmp[j].GetType == "API"){GetTypeCnt += 1;}
 					}
 				}
 				if(Cnt == 0)
@@ -3129,14 +3133,15 @@
 			protected function Grd_Property_itemRollOverHandler(event:ListEvent):void
 			{
 				P = "";E = "";M = "";T = "";I = ""
+				P = DataGridItemRenderer(event.itemRenderer).data.Phone;
+				E = DataGridItemRenderer(event.itemRenderer).data.Email;
+				I = DataGridItemRenderer(event.itemRenderer).data.Inclusions;
+				M = DataGridItemRenderer(event.itemRenderer).data.MealPlan;
+				T = DataGridItemRenderer(event.itemRenderer).data.PropertyType;
+				//asdddddd.text = String(Number(event.itemRenderer.width));
+				//asdddddd0.text = String(Number(event.itemRenderer.measuredWidth));
 				if (event.itemRenderer.measuredWidth > 50)
 				{
-					P = DataGridItemRenderer(event.itemRenderer).data.Phone;
-					E = DataGridItemRenderer(event.itemRenderer).data.Email;
-					I = DataGridItemRenderer(event.itemRenderer).data.Inclusions;
-					M = DataGridItemRenderer(event.itemRenderer).data.MealPlan;
-					T = DataGridItemRenderer(event.itemRenderer).data.PropertyType;
-					//if(T == "ExP")
 					if(T != "MMT")
 					{
 						if (I == "")
@@ -3164,20 +3169,19 @@
 			
 			protected function Grd_Property_itemRollOutHandler(event:ListEvent):void
 			{
-				Grd_Property.toolTip=null;
+				Grd_Property.toolTip = null;
 			}
 			
 			protected function Grd_RecommendedProperty_itemRollOverHandler(event:ListEvent):void
 			{
 				P = "";E = "";M = "";T = "";I = ""
+				P = DataGridItemRenderer(event.itemRenderer).data.Phone;
+				E = DataGridItemRenderer(event.itemRenderer).data.Email;
+				I = DataGridItemRenderer(event.itemRenderer).data.Inclusions;
+				M = DataGridItemRenderer(event.itemRenderer).data.MealPlan;
+				T = DataGridItemRenderer(event.itemRenderer).data.PropertyType;				
 				if (event.itemRenderer.measuredWidth > 50)
 				{
-					P = DataGridItemRenderer(event.itemRenderer).data.Phone;
-					E = DataGridItemRenderer(event.itemRenderer).data.Email;
-					I = DataGridItemRenderer(event.itemRenderer).data.Inclusions;
-					M = DataGridItemRenderer(event.itemRenderer).data.MealPlan;
-					T = DataGridItemRenderer(event.itemRenderer).data.PropertyType;
-					//if(T == "ExP")
 					if(T != "MMT")
 					{
 						if (I == "")
@@ -3199,14 +3203,13 @@
 						{
 							Grd_RecommendedProperty.toolTip = "Phone: "+P+"\nEmail: "+E+"\nInclusions: "+M;
 						}
-					}
-					//Grd_RecommendedProperty.toolTip = "Phone: "+DataGridItemRenderer(event.itemRenderer).data.Phone +"\nEmail: "+DataGridItemRenderer(event.itemRenderer).data.Email;
-				}			
+					}										
+				}
 			}
 			
 			protected function Grd_RecommendedProperty_itemRollOutHandler(event:ListEvent):void
 			{
-				Grd_RecommendedProperty.toolTip=null;
+				Grd_RecommendedProperty.toolTip = null;
 			}						
 		]]>
 	</fx:Script>	

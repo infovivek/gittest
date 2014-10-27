@@ -58,26 +58,66 @@ IF @Action = 'ClientGuestLoad'
  IF @Action = 'RecommendProperty'
  BEGIN
   -- dataset table 0
+  CREATE TABLE #ASDS(CityName NVARCHAR(100),PropertyName NVARCHAR(100),
+  Locality NVARCHAR(100),RoomType NVARCHAR(100),SingleandMarkup1 NVARCHAR(100),
+  Inclusions NVARCHAR(100),Id BIGINT,DoubleandMarkup1 NVARCHAR(100),
+  CheckInType NVARCHAR(100));
+  INSERT INTO #ASDS(CityName,PropertyName,Locality,RoomType,SingleandMarkup1,
+  Inclusions,Id,DoubleandMarkup1,CheckInType)
+  SELECT C.CityName,BP.PropertyName,BP.Locality,BP.RoomType,
+  CASE WHEN BP.TaxAdded = 'N' THEN CAST(BP.SingleandMarkup1 AS VARCHAR) +' <SUP>#</SUP>'
+       WHEN BP.TaxAdded = 'T' THEN CAST(BP.SingleandMarkup1 AS VARCHAR) +' <SUP>*</SUP>'
+       WHEN BP.TaxAdded = '' THEN CAST(BP.SingleandMarkup1 AS VARCHAR) +' <SUP>*</SUP>'
+       ELSE CAST(BP.SingleandMarkup1 AS VARCHAR) +' <SUP>*</SUP>' END,
+  BP.Inclusions,BP.Id,
+  CASE WHEN BP.TaxAdded = 'N' THEN CAST(BP.DoubleandMarkup1 AS VARCHAR) +' <SUP>#</SUP>'
+       WHEN BP.TaxAdded = 'T' THEN CAST(BP.DoubleandMarkup1 AS VARCHAR) +' <SUP>*</SUP>'
+       WHEN BP.TaxAdded = '' THEN CAST(BP.DoubleandMarkup1 AS VARCHAR) +' <SUP>*</SUP>'
+       ELSE CAST(BP.DoubleandMarkup1 AS VARCHAR) +' <SUP>*</SUP>' END,
+  CAST(P.CheckIn AS VARCHAR)+' '+P.CheckInType
+  FROM WRBHBBookingProperty BP
+  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK) ON P.Id = BP.PropertyId
+  LEFT OUTER JOIN WRBHBLocality L WITH(NOLOCK) ON L.Id = BP.LocalityId
+  LEFT OUTER JOIN WRBHBCity C WITH(NOLOCK) ON L.CityId = C.Id
+  WHERE BP.BookingId = @Id AND 
+  BP.PropertyType IN ('ExP','CPP','InP','MGH','DdP');
+  --
+  INSERT INTO #ASDS(CityName,PropertyName,Locality,RoomType,SingleandMarkup1,
+  Inclusions,Id,DoubleandMarkup1,CheckInType)
+  SELECT B.CityName,BP.PropertyName,BP.Locality,BP.RoomType,
+  CAST(BP.SingleandMarkup1 AS VARCHAR)+' <SUP>#</SUP>',BP.Inclusions,BP.Id,
+  CAST(BP.DoubleandMarkup1 AS VARCHAR)+' <SUP>#</SUP>',SH.CheckInTime
+  FROM WRBHBBooking B
+  LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId = B.Id
+  LEFT OUTER JOIN WRBHBCity C WITH(NOLOCK) ON C.Id = B.CityId
+  LEFT OUTER JOIN WRBHBStaticHotels SH WITH(NOLOCK)ON 
+  SH.HotalId = BP.PropertyId AND SH.CityCode = C.CityCode  
+  WHERE BP.BookingId = @Id AND BP.PropertyType IN ('MMT');
+  --
+  SELECT CityName,PropertyName,Locality,RoomType,SingleandMarkup1,Inclusions,
+  Id,DoubleandMarkup1,CheckInType FROM #ASDS
+  ORDER BY PropertyName ASC;
+  /*-- dataset table 0
   SELECT C.CityName,BP.PropertyName,BP.Locality,RoomType,
   SingleandMarkup1 AS Tariff,Inclusions,BP.Id,DoubleandMarkup1,
   CAST(CheckIn AS VARCHAR)+' '+CheckInType     FROM WRBHBBookingProperty BP
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK) ON P.Id=BP.PropertyId
   LEFT OUTER JOIN WRBHBLocality L WITH(NOLOCK) ON L.Id=BP.LocalityId
   LEFT OUTER JOIN WRBHBCity C WITH(NOLOCK) ON L.CityId=C.Id
-  WHERE BP.BookingId=@Id;
+  WHERE BP.BookingId=@Id;*/
   -- dataset table 1
   SELECT ISNULL(ClientLogo,'') AS ClientLogo,B.ClientBookerEmail,
   B.TrackingNo,U.FirstName,U.Email,B.Note,C.ClientName FROM WRBHBBooking B
-  LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK) ON  C.Id=B.ClientId
-  LEFT OUTER JOIN WRBHBUser U  WITH(NOLOCK) ON  U.Id=B.CreatedBy
-  WHERE B.Id=@Id;
+  LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK) ON C.Id = B.ClientId
+  LEFT OUTER JOIN WRBHBUser U  WITH(NOLOCK) ON U.Id = B.CreatedBy
+  WHERE B.Id = @Id;
   -- dataset table 2
   SELECT CAST(EmailtoGuest AS INT) FROM WRBHBBooking 
   WHERE Id=@Id;
   -- dataset table 3
   SELECT EmailId FROM WRBHBBookingGuestDetails WHERE BookingId=@Id;
   -- dataset table 4
-  SELECT Status FROM WRBHBBooking WHERE Id=@Id;  
+  SELECT Status,CONVERT(VARCHAR(19),GETDATE()) FROM WRBHBBooking WHERE Id=@Id;  
   -- Dataset Table 5
   IF EXISTS (SELECT NULL FROM WRBHBClientwisePricingModel 
   WHERE IsActive=1 AND IsDeleted=0 AND 

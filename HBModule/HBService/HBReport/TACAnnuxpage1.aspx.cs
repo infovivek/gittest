@@ -48,6 +48,44 @@ namespace HBReport
                 ReportViewer1.LocalReport.EnableExternalImages = true;
 
 
+
+               // this.ContactTableAdapter.Fill(this.AdventureWorksDataSet.Contact);
+
+
+
+               // this.reportViewer1.LocalReport.SubreportProcessing +=
+
+               //new SubreportProcessingEventHandler(SubreportProcessingEventHandler);
+
+               // this.reportViewer1.RefreshReport();
+
+
+             //   switch (SwitchSubReport)
+             //   {
+             //       case 1:
+                  //      {
+
+
+                    // ReportViewer1.LocalReport.DataSources.Add(new ReportDataSource(sDataSourceName, ds.Tables[0]));
+
+                     //  rds.Fill(ds);
+                      //      SwitchSubReport = 2;
+                       //     break;
+             //           }
+                //    case 2:
+                //        {
+
+
+                //            BindingSource CheckListBS = new BindingSource(ds, "SubReportCheckList");
+
+
+                //            e.DataSources.Add(new ReportDataSource("ReportDataSet_SubReportCheckList", CheckListBS));
+
+
+                //            objAdapter.Fill(RD);
+                //            break;
+                //        }
+                //}
                 ReportParameter paramLogo = new ReportParameter();
 
                 paramLogo.Name = "Path";

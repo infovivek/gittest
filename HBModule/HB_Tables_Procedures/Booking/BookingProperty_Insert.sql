@@ -53,7 +53,8 @@ CREATE PROCEDURE [dbo].[SP_BookingProperty_Insert](
 @APIHdrId BIGINT,
 @RatePlanCode NVARCHAR(100),
 @RoomTypeCode NVARCHAR(100),
-@PropertyCnt INT) 
+@PropertyCnt INT,
+@TaxAdded NVARCHAR(100)) 
 AS
 BEGIN
  --
@@ -122,7 +123,7 @@ BEGIN
  LocalityId,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,
  IsDeleted,RowId,MarkupId,SingleandMarkup1,DoubleandMarkup1,TripleandMarkup1,
  APIHdrId,RatePlanCode,RoomTypeCode,SingleRoomRate,SingleTaxes,
- SingleRoomDiscount,DubRoomRate,DubTaxes,DubRoomDiscount,TACPer)
+ SingleRoomDiscount,DubRoomRate,DubTaxes,DubRoomDiscount,TACPer,TaxAdded)
  VALUES(@BookingId,@PropertyName,@PropertyId,@GetType,@PropertyType,
  @RoomType,@SingleTariff,@DoubleTariff,@TripleTariff,@SingleandMarkup,
  @DoubleandMarkup,@TripleandMarkup,@Markup,@TAC,@Inclusions,
@@ -130,7 +131,7 @@ BEGIN
  @LocalityId,@UsrId,GETDATE(),@UsrId,GETDATE(),1,0,NEWID(),@MarkupId,
  @SingleandMarkup1,@DoubleandMarkup1,@TripleandMarkup1,@APIHdrId,
  @RatePlanCode,@RoomTypeCode,@SingleRoomRate,@SingleTaxes,@SingleRoomDiscount,
- @DubRoomRate,@DubTaxes,@DubRoomDiscount,@TACPer);
+ @DubRoomRate,@DubTaxes,@DubRoomDiscount,@TACPer,@TaxAdded);
  SELECT Id,RowId FROM WRBHBBookingProperty WHERE Id=@@IDENTITY;
 END
 GO

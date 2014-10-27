@@ -37,7 +37,7 @@ CREATE PROCEDURE [dbo].[SP_ClientManagement_Insert](@MasterClientId BIGINT,@Mast
 @CreditPeriodNumber NVARCHAR(100),@ServiceCharge BIT)
 AS
 BEGIN
---DECLARE @MasterClientId INT
+DECLARE @NewId INT
 --IF NOT EXISTS(SELECT NULL FROM WRBHBMasterClientManagement WHERE   
 --   UPPER(MasterClient)=UPPER(@MasterClient))
 --   BEGIN
@@ -60,6 +60,16 @@ BEGIN
  @ClientLogo,@UsrId,GETDATE(),@UsrId,GETDATE(),1,0,NEWID(),
  @CreditPeriodNumber,@ContactNo,@ServiceCharge);
  
- SELECT Id,RowId FROM WRBHBClientManagement WHERE Id=@@IDENTITY;
+ SET @NewId=@@IDENTITY;
+ 
+ UPDATE WRBHBClientManagement SET  TRClientURL='http://tr.staysimplyfied.com/?'+''+REPLACE(CAST(RowId AS NVARCHAR(100)),'-','')
+ WHERE Id=@NewId
+  
+ SELECT Id,RowId FROM WRBHBClientManagement WHERE Id=@NewId;
 END
+
+
+
+
+
 

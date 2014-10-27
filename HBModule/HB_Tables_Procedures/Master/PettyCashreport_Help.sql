@@ -144,7 +144,7 @@ BEGIN
 		
 		INSERT INTO #PettyCash(Date,ExpenseHead,Description,ApprovedAmount,PaidAmount,Bill,ExpenseId)
 		SELECT CONVERT(NVARCHAR,CAST(CONVERT(Date,U.CreatedDate,103) AS Date),110),
-		U.ExpenseHead,U.Description,U.Amount,U.Paid,'',U.Id
+		U.ExpenseHead,U.Description,U.Amount,U.Paid,U.BillLogo,U.Id
 		FROM WRBHBPettyCashStatus U 
 		JOIN WRBHBUser S ON U.UserId=S.Id AND S.IsActive=1 AND S.IsDeleted=0
 		WHERE U.UserId =@UserId AND U.PropertyId=@Id AND U.IsActive=0 AND U.IsDeleted=1

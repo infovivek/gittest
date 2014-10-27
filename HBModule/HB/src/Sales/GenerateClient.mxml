@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx"  
+			   xmlns:WrbComp="WrbComp.*" xmlns:WrbHelpComp="WrbHelpComp.*"
+			   width="100%" height="100%" creationComplete="PageLoad()">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Style source = "..\\Common\\ApplicationCSS.css"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	
+	<fx:Script>
+		<![CDATA[
+			import WrbComp.frmsearchwindow;
+			
+			import mx.collections.ArrayCollection;
+			import mx.events.CloseEvent;
+			public var SearchPopUp:frmsearchwindow = new frmsearchwindow();
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "";
+			public var Id:int=0;
+			public var ErrStr:String="",Addmode:Boolean=true;
+			public var ClientId:int=0,RowId:String="";
+			public var ValueStarRatingFlag:Boolean=true; 
+			protected function PageLoad():void
+			{
+				Global_AC=funLoginInfo("<gScrId>1</gScrId><gUsrFk>1</gUsrFk>");
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";
+				Help();
+			}
+			private function Help():void
+			{
+				useWeb("ClientManagement","PAGELOAD_CUSTOM",[GlobalXml,"TRPageload","",0]);
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "PAGELOAD_CUSTOM")
+				{
+					if(Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						dd_Client.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Generate_CUSTOM")
+				{
+					if(Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Txt_Gen.text=Ds_Objects.result.Tables.Table.Rows[0].TrClientURL;
+					}
+				}
+				
+			}
+			private function ClientChange():void
+			{
+				if(dd_Client.selected())
+				{
+					Txt_Gen.text="";
+					ClientId=dd_Client.Select_Row.Id;
+					dd_Client.text=dd_Client.Select_Row.ClientName;
+					useWeb("ClientManagement","Generate_CUSTOM",[GlobalXml,"Client","",ClientId]);
+				}
+				else
+				{
+					ClientId=0;
+					dd_Client.text="";
+				}
+			 }
+			
+			
+		]]>
+	</fx:Script>
+	
+		
+	   
+	<s:BorderContainer x="204" y="172" width="582" height="219">
+		<mx:Label x="10" y="-21" text="TR Client URL"/>
+		
+		<mx:Label x="120" y="69" text="Client"/>
+		<mx:Label x="160" y="65" width="12" text="*" color="red"/>
+		<WrbHelpComp:HelpText  x="190" y="73" width="295" id="dd_Client" pxTabIndex="1" 
+							   pxSetColumnsWidth="295,0" onselection="{ClientChange()}" depth="10" >
+		</WrbHelpComp:HelpText>	
+		<mx:TextInput x="190" y="123" width="295" editable="false" id="Txt_Gen"/>
+	</s:BorderContainer>
+	
+	
+	
+</s:Application>

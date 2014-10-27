@@ -36,7 +36,7 @@ namespace HB.BusinessService.BusinessService
                     }
                     else
                     {
-                        DataSet ds_Property = new BookingPropertyBO().Save(data[3], user, BookingId);
+                        DataSet ds_Property = new BookingPropertyBO().Save(data, user, BookingId);
                         if (ds_Property.Tables["DBERRORTBL"].Rows.Count > 0)
                         {
                             dTable.Rows.Add(ds_Property.Tables["DBERRORTBL"].Rows[0][0].ToString());

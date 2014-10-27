@@ -734,13 +734,18 @@ namespace HB.Dao
         //CheckoutIntemediate
         public const string CheckoutIntermediate_Help = "Sp_CheckoutIntermediate_Help";
         public const string CheckoutIntermediate_Insert = "Sp_CheckoutIntermediate_Insert";
+        //External CheckoutIntemediate
+        public const string ExterInterCheckOutHdr_Insert = "SP_ExterInterCheckOutHdr_Insert";
+        public const string ExterInterCheckOutTAC_Insert = "SP_ExterInterCheckOutTAC_Insert";
+    //    public const string SP_IntermediateCheckOutConsolidate_Bill = "SP_IntermediateCheckOutConsolidate_Bill";
 
         //_TodaysCheckinChkout
         public const String TodaysCheckinChkout_Help = "Sp_TodaysCheckinChkout_Help";
 
-        //IntermediateReport
+        //Internal IntermediateReport
         public const string IntermediateCheckOutTariff_Bill = "SP_IntermediateCheckOutTariff_Bill";
         public const string IntermediateCheckOutService_Bill = "SP_IntermediateCheckOutService_Bill";
         public const string SP_IntermediateCheckOutConsolidate_Bill = "SP_IntermediateCheckOutConsolidate_Bill";
+       
     }
 }

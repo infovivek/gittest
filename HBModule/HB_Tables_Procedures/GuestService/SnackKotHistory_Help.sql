@@ -60,7 +60,7 @@ CREATE PROCEDURE dbo.[SP_SnackKOTHistory_Help]
         
         INSERT INTO #Guest(BookingId,Date,Type,Name,Apartment,Amount,Status,GuestId)
 	    	         
-	    SELECT DISTINCT CH.BookingId,CH.ChkoutDate,'Guest' AS Type,KH.GuestName,CH.RoomNo,
+	    SELECT DISTINCT CH.BookingId,CONVERT(NVARCHAR,CH.ChkoutDate,105) ,'Guest' AS Type,KH.GuestName,CH.RoomNo,
 	    SUM(CAST(ISNULL(KD.Amount,0)as DECIMAL(27,2))) AS Amount,'Raised' as Status,
 	    KH.GuestId
 		FROM WRBHBNewKOTEntryHdr KH

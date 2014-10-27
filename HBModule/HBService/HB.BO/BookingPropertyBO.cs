@@ -10,7 +10,7 @@ namespace HB.BO
 {
     public class BookingPropertyBO
     {
-        public DataSet Save(string Property, User user, int BookingId)
+        public DataSet Save(string[] Property, User user, int BookingId)
         {
             return new BookingPropertyDAO().Save(Property, user, BookingId);
         }

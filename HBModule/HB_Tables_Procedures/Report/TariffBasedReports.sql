@@ -108,7 +108,7 @@ PrintInvoice bit)
 					ChkOutTariffTotal,CheckOutDate,BookingId,ChkoutId,ChkInHdrId,CheckInDate,NoOfDays,
 					TotalAmt,PrintInvoice,BillDate,TariffpaymentMode)
 					
-					SELECT CheckOutNo,GuestName,h.GuestId,H.RoomId,Type,ClientName,Property,PropertyId,PropertyType,
+					SELECT DISTINCT CheckOutNo,GuestName,h.GuestId,H.RoomId,Type,ClientName,Property,PropertyId,PropertyType,
 					 g.Tariff,CONVERT(NVARCHAR,G.ChkOutDt,103) ,H.BookingId,H.Id as ChkoutId,ChkInHdrId,CONVERT(NVARCHAR,H.CheckInDate,103) ChkInDt,NoOfDays,
 					 g.Tariff   TotalAmt,PrintInvoice,BillDate,G.TariffPaymentMode 
 					FROM WRBHBChechkOutHdr  H
@@ -121,7 +121,7 @@ PrintInvoice bit)
 					ChkOutTariffTotal,CheckOutDate,BookingId,ChkoutId,ChkInHdrId,CheckInDate,NoOfDays,
 					TotalAmt,PrintInvoice,BillDate,TariffpaymentMode)
 					
-				    SELECT CheckOutNo,GuestName,h.GuestId,H.RoomId,Type,ClientName,Property,PropertyId,PropertyType,
+				    SELECT DISTINCT CheckOutNo,GuestName,h.GuestId,H.RoomId,Type,ClientName,Property,PropertyId,PropertyType,
 					 g.Tariff,CONVERT(NVARCHAR,G.ChkOutDt,103) ,H.BookingId,H.Id as ChkoutId,ChkInHdrId,CONVERT(NVARCHAR,H.CheckInDate,103) ChkInDt,NoOfDays,
 					 g.Tariff    TotalAmt,PrintInvoice,BillDate,G.TariffPaymentMode 
 					FROM WRBHBChechkOutHdr  H
@@ -134,7 +134,7 @@ PrintInvoice bit)
 					ChkOutTariffTotal,CheckOutDate,BookingId,ChkoutId,ChkInHdrId,CheckInDate,NoOfDays,
 					TotalAmt,PrintInvoice,BillDate,TariffpaymentMode)
 					
-					SELECT CheckOutNo,GuestName,h.GuestId,H.RoomId,Type,ClientName,Property,PropertyId,PropertyType,
+					SELECT DISTINCT CheckOutNo,GuestName,h.GuestId,H.RoomId,Type,ClientName,Property,PropertyId,PropertyType,
 					 g.Tariff,CONVERT(NVARCHAR,G.ChkOutDt,103) ChkInDt ,H.BookingId,H.Id as ChkoutId,ChkInHdrId,CONVERT(NVARCHAR,H.CheckInDate,103) ChkInDt,NoOfDays,
 					 g.Tariff   TotalAmt,PrintInvoice,BillDate ,G.TariffPaymentMode
 					FROM WRBHBChechkOutHdr  H

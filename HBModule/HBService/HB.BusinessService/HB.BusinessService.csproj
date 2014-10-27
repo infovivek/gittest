@@ -87,6 +87,7 @@
     <Compile Include="BusinessService\ExternalChechkOutTACSerivce.cs" />
     <Compile Include="BusinessService\ExternalCheckOutService.cs" />
     <Compile Include="BusinessService\ExternalExpenseReportService.cs" />
+    <Compile Include="BusinessService\ExternalIntermediateCheckOutService.cs" />
     <Compile Include="BusinessService\ForgotService.cs" />
     <Compile Include="BusinessService\FormatReceiptsService.cs" />
     <Compile Include="BusinessService\GuestCheckInService.cs" />

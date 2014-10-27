@@ -260,10 +260,10 @@ namespace HB.Dao
                 message.IsBodyHtml = true;
                 // SMTP Email email:
                 System.Net.Mail.SmtpClient smtp = new System.Net.Mail.SmtpClient();
-                smtp.EnableSsl = true;
-                smtp.Host = "email-smtp.us-west-2.amazonaws.com";
+                smtp.EnableSsl = true;                
                 smtp.Port = 587;
-                smtp.Credentials = new System.Net.NetworkCredential("AKIAIIVF5D5D3CJAX7SQ", "ApmuZkd+L8tissEga8kac3quhhwohEi5CB+dYD36KTq3");
+                smtp.Host = "email-smtp.us-west-2.amazonaws.com"; smtp.Credentials = new System.Net.NetworkCredential("AKIAIIVF5D5D3CJAX7SQ", "ApmuZkd+L8tissEga8kac3quhhwohEi5CB+dYD36KTq3");
+                //smtp.Host = "smtp.gmail.com"; smtp.Credentials = new System.Net.NetworkCredential("stay@staysimplyfied.com", "stay1234");
                 try
                 {
                     smtp.Send(message);

@@ -40,44 +40,28 @@
 				//			Str_ChkOut1="http://localhost:4171/ExternalCheckOutTariff.aspx?";
 				//			Str_Serv1="http://localhost:4171/GuestCheckOutService1.aspx?";
 				//			Str_Settle1="http://localhost:4171/GuestCheckOutConsolidate1.aspx?";
-				Str_ChkOutTAC="http://localhost:4171/ExternalCheckOutTAC.aspx?";
+				Str_ChkOutTAC="http://localhost:4171/TAC Annexure.aspx?";
 				Str_ChkOut1="http://sstage.in/HBReport/ExternalCheckOutTariff.aspx?";
 				Str_Serv1="http://sstage.in/HBReport/GuestCheckOutService1.aspx?";
 				Str_Settle1="http://sstage.in/HBReport/GuestCheckOutConsolidate1.aspx?";
 				
 				Str_ChkOut="http://sstage.in/HBReport/GuestCheckOutTariff.aspx?";
 				Str_Serv="http://sstage.in/HBReport/GuestCheckOutService.aspx?";
-				Str_Settle="http://sstage.in/HBReport/GuestCheckOutConsolidate.aspx?";
-				
-				
+				Str_Settle="http://sstage.in/HBReport/GuestCheckOutConsolidate.aspx?"; 
 				//	Str_ChkOutTAC="http://sstage.in/HBReport/ExternalCheckoutTAC.aspx?";
+				Modes.selectedValue=0
 			}
 			private function Custom_WebSer_Result (Ds_Objects:Object):void
 			{ 
-				Grd_SearchInvoice.dataProvider= null;
-				Grd_SearchInvoiceTAC.dataProvider= null;
+				Grd_SearchInvoice.dataProvider= null; 
 				try
 				{
 					if (Ds_Objects.currentTarget.description.toString() == "Report_CUSTOM")
-					{
-						if(Type=="TAC")
-						{
-							Grd_SearchInvoiceTAC.visible= true;
-							Grd_SearchInvoice.visible= false;
-							if (Ds_Objects.result.Tables.Table.Rows.length > 0)
-							{
-								Grd_SearchInvoiceTAC.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
-							}
-						}
-						else
-						{
-							Grd_SearchInvoiceTAC.visible= false;
-							Grd_SearchInvoice.visible= true;
+					{ 
 							if (Ds_Objects.result.Tables.Table.Rows.length > 0)
 							{
 								Grd_SearchInvoice.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
-							}
-						}
+							} 
 					} 
 				}//try end
 				catch(Exception)
@@ -92,8 +76,8 @@
 				DT_From.text="";DT_To.text="";txtInvoiceNumbr.text=""; 
 				//	Txt_TransID.text="";Txt_Date.text="";Txt_TransID.text="";
 				FromDate="";ToDate="";ChkoutId="";Status="";Type="";InvoiceNum="";
-				PageLoad();Internal.selected=false;External.selected=false;TAC.selected=false;
-				Change("Lbl_TDT");Changes("Lbl_FDT");
+				PageLoad();Internal.selected=true;External.selected=false;TAC.selected=false;
+				Change("Lbl_TDT");Changes("Lbl_FDT");//Modes.selectedValue=0;
 			}  
 			public var InvoiceNum:String="";
 			protected function btn_Search_clickHandler():void
@@ -147,12 +131,10 @@
 					{
 						Status='';
 					}
-					//useWeb("Reconcile","Report_CUSTOM",[GlobalXml,"Report",FromDate,ToDate,TransactionId,Status,0,0,'','']);	
 					useWeb("SearchInvoiceReport","Report_CUSTOM",[GlobalXml,"Pageload",FromDate,ToDate,Type,InvoiceNum,'',0,0,0]);
 				} 
 			}
-			public var Ac1:ArrayCollection=new ArrayCollection();
-			
+			public var Ac1:ArrayCollection=new ArrayCollection(); 
 			public function change()
 			{
 				Ac1=Grd_SearchInvoice.dataProvider as  ArrayCollection;				
@@ -179,7 +161,7 @@
 				}
 				if(Ac1[Index].selectRadio==0)
 				{
-					//	Ac[Index].Bankchecks=true;
+						Ac1[Index].selectRadio=true;
 				}
 			}
 			public function FnAction(Event):void
@@ -240,27 +222,20 @@
 			} 
 			public var Type:String="";
 			protected function CourierChange()
-			{
-				// TODO Auto-generated method stub
-				
+			{ 
 				FromDate=DT_From.text;
 				ToDate=DT_To.text;
 				if(Modes.selectedValue==0)
 				{
 					Type="Internal Property";
-					//		useWeb("SearchInvoiceReport","Report_CUSTOM",[GlobalXml,"Pageload",FromDate,ToDate,Type,'','',0,0,0]);
 				}
 				if(Modes.selectedValue==1)
 				{
 					Type="External Property";
-					//	useWeb("SearchInvoiceReport","Report_CUSTOM",[GlobalXml,"Pageload",FromDate,ToDate,Type,'','',0,0,0]);
 				}
 				if(Modes.selectedValue==2)
 				{
 					Type="TAC";
-					Grd_SearchInvoice.visible=false;
-					Grd_SearchInvoiceTAC.visible= true;
-					//	useWeb("SearchInvoiceReport","Report_CUSTOM",[GlobalXml,"Pageload",FromDate,ToDate,Type,'','',0,0,0]);
 				}
 			}
 			public var FltNm:String="";
@@ -268,8 +243,7 @@
 			private function filter(Filt:String):void
 			{				
 				FltNm=Filt;				
-				var tempAC:ArrayCollection=new ArrayCollection();	
-				//tempAC=myArrayCollection
+				var tempAC:ArrayCollection=new ArrayCollection(); 
 				tempAC=Grd_SearchInvoice.dataProvider as ArrayCollection;
 				tempAC.filterFunction = filterMyArrayCollections;
 				tempAC.refresh();				
@@ -289,8 +263,7 @@
 			public function filterss(Filts:String):void
 			{				
 				FltPrpty=Filts;				
-				var tempAC:ArrayCollection=new ArrayCollection();	
-				//tempAC=myArrayCollection
+				var tempAC:ArrayCollection=new ArrayCollection(); 
 				tempAC=Grd_SearchInvoice.dataProvider as ArrayCollection;
 				tempAC.filterFunction = filterMyArrayCollectionss;
 				tempAC.refresh();				
@@ -325,13 +298,7 @@
 					DT_To.selectableRange = {rangeStart:new Date(RangeStart)};
 					DT_To.selectedDate = new Date(RangeStart);
 					DT_To.setFocus();
-				}
-				
-				//				if(DT_To.selectedDate)
-				//				{ 
-				//				 	 DT_To.text=""; 
-				//					 DT_To.text=DT_To.text ;
-				//				}
+				} 
 			}
 			public function Changes(LabelName:String):void
 			{
@@ -345,25 +312,26 @@
 				}
 			}
 			public var Ac2:ArrayCollection=new ArrayCollection();
+			public var ClientName:String="";
 			public function TacSelect(Event):void
 			{ 
-				Ac2=Grd_SearchInvoiceTAC.dataProvider as  ArrayCollection;				
-				var Index:int=Grd_SearchInvoiceTAC.selectedIndex;
+				Ac2=Grd_SearchInvoice.dataProvider as  ArrayCollection;				
+				var Index:int=Grd_SearchInvoice.selectedIndex;
 				var Flag:Boolean=true;
 				
-				var Flag:Boolean=true;
-				var i:int=Ac2.length-1;
-				for( i ;i>=0;i--)
-				{
-					if(Ac2[i].selectRadio ==0)
-					{  
-						Ac2[i].selectRadio=false;
-					} 	
-					if(Ac2[i].selectRadio==true)
-					{
-						Ac2[i].selectRadio=false;
-					}
-				}	
+//				var Flag:Boolean=true;
+//				var i:int=Ac2.length-1;
+//				for( i ;i>=0;i--)
+//				{
+//					if(Ac2[i].selectRadio ==0)
+//					{  
+//						Ac2[i].selectRadio=false;
+//					} 	
+//					if(Ac2[i].selectRadio==true)
+//					{
+//						Ac2[i].selectRadio=false;
+//					}
+//				}	
 				if(Ac2[Index].selectRadio==1)
 				{
 					Ac2[Index].selectRadio=false;
@@ -371,27 +339,56 @@
 				else if(Ac2[Index].selectRadio==0)
 				{
 					Ac2[Index].selectRadio=true;
+					ClientName=Ac2[Index].ClientName;
 				} 
 				
 				TotalBills(); 
 			}
+		
 			public function TotalBills():void
 			{
 				var SelBills:ArrayCollection= new ArrayCollection();
-				SelBills=Grd_SearchInvoiceTAC.dataProvider as  ArrayCollection;
-				
+				SelBills=Grd_SearchInvoice.dataProvider as  ArrayCollection;
+				var ChkutIds:String = "";
+				var ChkutIds1:String = "";
 				for(var M:int=0;M<SelBills.length;M++)
 				{ 
-					if(SelBills[M].selectRadio==true)
+					if(SelBills[M].ClientName==ClientName)
 					{
-						ChkoutId = SelBills[M].ChkoutId;
-						//ExternalInterface.call("changeDocumentTitle",Str_ChkOutTAC+ChkoutId);
-					} 
-					
+						if(SelBills[M].selectRadio==true)
+						{
+							 ChkutIds+= SelBills[M].ChkoutId+',';  
+						}  
+					}
+					//ChkutIds1+=ChkutIds+',';  
 				}  
-				ChkoutId=ChkoutId;
-				ExternalInterface.call("changeDocumentTitle",Str_ChkOutTAC+ChkoutId);	 
+				ChkoutId=ChkutIds;
+			//	ExternalInterface.call("changeDocumentTitle",Str_ChkOutTAC+ChkutIds);	 
 				//var Amttobe:Number =ChkoutId;
+			}
+			protected function Print(event:MouseEvent):void
+			{
+				if(Modes.selectedValue==0)
+				{
+					Type="Internal";
+				}
+				if(Modes.selectedValue==1)
+				{
+					Type="External";
+				}
+				if(Modes.selectedValue==2)
+				{
+					Type="Tac";
+				}
+				if(Type=='')
+				{ 
+						Type="Internal"; 
+				}
+					
+				if(ChkoutId!='')
+				{
+				ExternalInterface.call("changeDocumentTitle",Str_ChkOutTAC+ChkoutId+'@'+Type);
+				}
 			}
 		]]>
 	</fx:Script>
@@ -426,6 +423,8 @@
 					<s:RadioButton label="TAC" groupName="Modes"  value="2"
 								   id="TAC" buttonMode="true"  />
 				</s:HGroup>
+				<WrbComp:Button_HB  x="660" y="7" Lable_val="Print" id="btn_Print"  click="Print(event)"> 
+				</WrbComp:Button_HB>
 			</s:Group>
 		</s:HGroup>
 	</s:BorderContainer>
@@ -438,21 +437,20 @@
 									   editable="false" visible="true">
 						<mx:itemRenderer >
 							<fx:Component>
-								<mx:HBox horizontalAlign="center" verticalAlign="middle">										
-									<s:RadioButton 
-										change="outerDocument.FnAction(event);" selected="{data.selectRadio}">  </s:RadioButton>
-								</mx:HBox>	
+								<mx:HBox horizontalAlign="center" verticalAlign="middle"> 
+									<mx:CheckBox selected="{data.selectRadio}" change="outerDocument.TacSelect(event);"/>
+								</mx:HBox> 	
 							</fx:Component>
 						</mx:itemRenderer>
 					</mx:DataGridColumn>
-					<mx:DataGridColumn dataField="CheckOutDate"   editable="false" width="100" textAlign="center"/>	
-					<mx:DataGridColumn dataField="CheckInDate"   editable="false" width="100" textAlign="center"/>	
-					<mx:DataGridColumn dataField="GuestName"   editable="false" width="100" textAlign="center"/>	
+					<mx:DataGridColumn dataField="CheckOutDate" headerText="ChkOutDt"    editable="false" width="100" textAlign="center"/>	
+					<mx:DataGridColumn dataField="CheckInDate" headerText="ChkInDt"  editable="false" width="100" textAlign="center"/>	
+					<mx:DataGridColumn dataField="GuestName"  editable="false" width="100" textAlign="center"/>	
 					<mx:DataGridColumn dataField="InvoiceNumber"  textAlign="center" visible="true" width="80" editable="false"/> 
-					<mx:DataGridColumn dataField="Property"  textAlign="center" visible="true" width="150" editable="false"/> 
+					<mx:DataGridColumn dataField="Property"  headerText="Property" textAlign="center" visible="true" width="150" editable="false"/> 
 					<mx:DataGridColumn dataField="ClientName"  textAlign="center" visible="true" width="120" editable="false"/>
 					
-					<mx:DataGridColumn dataField="Amount" headerText="Amount"  width="80" editable="false" textAlign="right" visible="true"/> 
+					<mx:DataGridColumn dataField="Amount"  width="80" editable="false" textAlign="right" visible="true"/> 
 					<mx:DataGridColumn dataField="BillType" editable="false" textAlign="center" visible="true" width="100"/>
 					<mx:DataGridColumn dataField="Amounts"  headerText="NetAmount" width="80" editable="false" textAlign="right" visible="true"/>
 					<mx:DataGridColumn dataField="Status"  editable="false" textAlign="center" visible="true" width="80"/> 
@@ -461,62 +459,6 @@
 				</mx:columns>
 			</mx:DataGrid>
 		</s:HGroup>
-		<s:HGroup  width="100%" height="100%">
-			<mx:DataGrid id="Grd_SearchInvoiceTAC" x="0" y="150" width="100%" height="100%"  editable="false" tabIndex="3" verticalAlign="middle">
-				<mx:columns>
-					<mx:DataGridColumn dataField="Select" headerText="Select" width="50" 
-									   editable="false" visible="true">
-						<mx:itemRenderer >
-							<fx:Component>
-								<mx:HBox horizontalAlign="center" verticalAlign="middle"> 
-									<mx:CheckBox selected="{data.selectRadio}" change="outerDocument.TacSelect(event);"/>
-								</mx:HBox> 
-								<!--s:RadioButton 
-								change="outerDocument.FnAction(event);" selected="{data.selectRadio}"-->  
-							</fx:Component>
-						</mx:itemRenderer>
-					</mx:DataGridColumn>
-					<mx:DataGridColumn dataField="CheckOutDate"   editable="false" width="100" textAlign="center"/>	
-					<mx:DataGridColumn dataField="CheckInDate"   editable="false" width="100" textAlign="center"/>	
-					<mx:DataGridColumn dataField="GuestName"   editable="false" width="100" textAlign="center"/>	
-					<mx:DataGridColumn dataField="InvoiceNumber"  textAlign="center" visible="true" width="80" editable="false"/> 
-					<mx:DataGridColumn dataField="Property"  textAlign="center" visible="true" width="150" editable="false"/> 
-					<mx:DataGridColumn dataField="ClientName"  textAlign="center" visible="true" width="120" editable="false"/>
-					
-					<mx:DataGridColumn dataField="Amount" headerText="Amount"  width="80" editable="false" textAlign="right" visible="true"/> 
-					<mx:DataGridColumn dataField="BillType" editable="false" textAlign="center" visible="true" width="100"/>
-					<mx:DataGridColumn dataField="Amounts"  headerText="NetAmount" width="80" editable="false" textAlign="right" visible="true"/>
-					<mx:DataGridColumn dataField="Status"  editable="false" textAlign="center" visible="true" width="80"/> 
-					<mx:DataGridColumn dataField="PropertyCat"  visible="false" /> 
-					<mx:DataGridColumn dataField="ChkoutId" visible="false"/> 
-				</mx:columns>
-			</mx:DataGrid>
-		</s:HGroup> 
+		 
 	</s:BorderContainer> 
-	<!--s:BorderContainer x="0" y="19" width="100%" height="474" id="brd_Popup_reset"
-	borderVisible="true" visible="false" depth="1500">
-	<mx:Label x="23" y="71" text="TransactionId"/>
-	<mx:Label x="354" y="71" text="Date"/>
-	<s:TextInput x="116" y="71" width="163" height="18"  id="Txt_TransID" editable="false"/>
-	<s:TextInput x="406" y="71" width="163" height="18" id="Txt_Date" editable="false"/>
-	<mx:Label x="633" y="71" text="Amount"/>
-	<s:TextInput x="696" y="71" width="163" height="18" id="Txt_Amount" editable="false"/>
-	<mx:DataGrid id="Grd_Popup" x="0" y="110" width="100%" height="100%"  editable="false" tabIndex="3" verticalAlign="middle">
-	<mx:columns> 
-	<mx:DataGridColumn dataField="Invoice"  width="100" textAlign="center" editable="false" visible="true"/>
-	<mx:DataGridColumn dataField="Billtype"  editable="false" textAlign="center" visible="true" width="100"/>						
-	<mx:DataGridColumn dataField="BillAmount"  textAlign="right" visible="true" editable="false" width="150" />
-	<mx:DataGridColumn dataField="ReconciledAmount"  textAlign="right" visible="true"  width="150" />
-	<mx:DataGridColumn dataField="ServiceCharge"  width="100" textAlign="right" editable="false" visible="true"/>
-	<mx:DataGridColumn dataField="TDSAmount"  editable="false" textAlign="right" visible="true" width="100"/>						
-	<mx:DataGridColumn dataField="TransId"  textAlign="right" visible="false"  width="150" />
-	</mx:columns>
-	</mx:DataGrid>
-	<s:BorderContainer x="0" y="0" width="100%" height="36" borderVisible="true"  backgroundColor="#c2c2c2">
-	<s:Image x="950" y="11" buttonMode="true" click="FnClosetariff_clickHandler(event)"
-	source="@Embed(source='../Assets/CrossSmall.png')" toolTip="Close"
-	horizontalAlign="right" verticalAlign="middle"/>
-	<mx:Label x="29" y="8" text="View Reconciled Data" color="red"/> 
-	</s:BorderContainer>
-	</s:BorderContainer-->
 </s:Application>

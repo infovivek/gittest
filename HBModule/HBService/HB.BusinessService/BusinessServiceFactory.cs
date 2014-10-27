@@ -356,6 +356,12 @@ namespace HB.BusinessService
                 case "IntermediateCheckoutService":
                     _businessService = new IntermediateCheckoutServiceHdrService();
                     break;
+                case "ExterIntermediateChkoutService":
+                    _businessService = new ExternalIntermediateCheckOutService();
+                    break;
+                case "CheckInForecastReport":
+                    _businessService = new ExternalIntermediateCheckOutService();
+                    break;
             }
             return _businessService;
         }

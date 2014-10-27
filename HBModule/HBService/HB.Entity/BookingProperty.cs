@@ -37,5 +37,7 @@ namespace HB.Entity
         public string RatePlanCode { get; set; }
         public string RoomTypeCode { get; set; }
         public int APIHdrId { get; set; }
+        //
+        public string TaxAdded { get; set; }
     }
 }

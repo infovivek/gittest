@@ -75,6 +75,7 @@
     <Compile Include="BedBookingPropertyDAO.cs" />
     <Compile Include="BedBookingResendMailDAO.cs" />
     <Compile Include="BookingCancelDAO.cs" />
+    <Compile Include="BookingCancelMMTDAO.cs" />
     <Compile Include="BookingCustomFieldsDetailsDAO.cs" />
     <Compile Include="BookingDtlsDAO.cs" />
     <Compile Include="BookingGuestDetailsDAO.cs" />
@@ -120,6 +121,7 @@
     <Compile Include="ExternalCheckOutDao.cs" />
     <Compile Include="ExternalCheckOutMailDao.cs" />
     <Compile Include="ExternalExpenseReportDAO.cs" />
+    <Compile Include="ExternalIntermediateCheckOutDao.cs" />
     <Compile Include="IntermediateCheckoutServiceDtlsDAO.cs" />
     <Compile Include="IntermediateCheckoutServiceHdrDAO.cs" />
     <Compile Include="InternalExpenseReportDAO.cs" />

@@ -52,7 +52,7 @@ IF @Action='KOTDETAILS'
 	 
 	    INSERT INTO #Guest(Date,ConsumerType,Name,BVeg,BNonVeg,LVeg,LNonVeg,DVeg,DNonVeg)
 	 
-	    SELECT CONVERT(NVARCHAR(100),KH.Date,103) AS Date,'Guest' AS ConsumerType,KD.GuestName,BreakfastVeg,
+	    SELECT CONVERT(NVARCHAR(100),KH.Date,105) AS Date,'Guest' AS ConsumerType,KD.GuestName,BreakfastVeg,
 	    BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg
 		FROM WRBHBKOTHdr KH
 		JOIN WRBHBKOTDtls KD  ON KH.Id=KD.KOTEntryHdrId AND
@@ -67,7 +67,7 @@ IF @Action='KOTDETAILS'
 		
 		INSERT INTO #Guest(Date,ConsumerType,Name,BVeg,BNonVeg,LVeg,LNonVeg,DVeg,DNonVeg)
 	    
-	    SELECT  CONVERT(NVARCHAR(100),KH.Date,103) AS Date,'Staff' AS ConsumerType,KD.UserName,BreakfastVeg,
+	    SELECT  CONVERT(NVARCHAR(100),KH.Date,105) AS Date,'Staff' AS ConsumerType,KD.UserName,BreakfastVeg,
 	    BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg
 		FROM WRBHBKOTHdr KH
 		JOIN WRBHBKOTUser KD  ON KH.Id=KD.KOTEntryHdrId AND	KH.IsActive=1 AND KH.IsDeleted=0
@@ -81,7 +81,7 @@ IF @Action='KOTDETAILS'
 		
 		INSERT INTO #Guest(Date,ConsumerType,Name,BVeg,BNonVeg,LVeg,LNonVeg,DVeg,DNonVeg)
 	    
-	    SELECT  CONVERT(NVARCHAR(100),KH.Date,103) AS Date,'Guest' AS ConsumerType,KD.GuestName,BreakfastVeg,
+	    SELECT  CONVERT(NVARCHAR(100),KH.Date,105) AS Date,'Guest' AS ConsumerType,KD.GuestName,BreakfastVeg,
 	    BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg
 		FROM WRBHBKOTHdr KH
 		JOIN WRBHBKOTDtls KD  ON KH.Id=KD.KOTEntryHdrId AND
@@ -92,7 +92,7 @@ IF @Action='KOTDETAILS'
 		
 		INSERT INTO #Guest(Date,ConsumerType,Name,BVeg,BNonVeg,LVeg,LNonVeg,DVeg,DNonVeg)
 	   
-	    SELECT   CONVERT(NVARCHAR(100),KH.Date,103) AS Date,'Staff' AS ConsumerType,KD.UserName,BreakfastVeg,
+	    SELECT   CONVERT(NVARCHAR(100),Date,105) AS Date,'Staff' AS ConsumerType,KD.UserName,BreakfastVeg,
 	    BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg
 		FROM WRBHBKOTHdr KH
 		JOIN WRBHBKOTUser KD  ON KH.Id=KD.KOTEntryHdrId AND
@@ -101,7 +101,7 @@ IF @Action='KOTDETAILS'
 		AND  CONVERT(date,KH.Date,103) BETWEEN CONVERT(date,@Str1,103) AND CONVERT(date,@Str3,103) 
 		order by CONVERT(date,KH.Date,103)  
      END
-       SELECT  CONVERT(NVARCHAR(100),CONVERT(DATE,Date,103),110) AS Date,ConsumerType,Name,BVeg,BNonVeg,LVeg,LNonVeg,DVeg,DNonVeg
+       SELECT  Date,ConsumerType,Name,BVeg,BNonVeg,LVeg,LNonVeg,DVeg,DNonVeg
        FROM #Guest 
      
    END
@@ -115,7 +115,7 @@ IF @Action='KOTDETAILS'
 	 
 	    INSERT INTO #Guests(Date,ConsumerType,Name,BVeg,BNonVeg,LVeg,LNonVeg,DVeg,DNonVeg)
 	 
-	    SELECT CONVERT(NVARCHAR(100),KH.Date,103) AS Date,'Guest' AS ConsumerType,KD.GuestName,BreakfastVeg,
+	    SELECT CONVERT(NVARCHAR(100),KH.Date,105) AS Date,'Guest' AS ConsumerType,KD.GuestName,BreakfastVeg,
 	    BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg
 		FROM WRBHBKOTHdr KH
 		JOIN WRBHBKOTDtls KD  ON KH.Id=KD.KOTEntryHdrId AND
@@ -130,7 +130,7 @@ IF @Action='KOTDETAILS'
 		
 		INSERT INTO #Guests(Date,ConsumerType,Name,BVeg,BNonVeg,LVeg,LNonVeg,DVeg,DNonVeg)
 	    
-	    SELECT  CONVERT(NVARCHAR(100),KH.Date,103) AS Date,'Staff' AS ConsumerType,KD.UserName,BreakfastVeg,
+	    SELECT  CONVERT(NVARCHAR(100),KH.Date,105) AS Date,'Staff' AS ConsumerType,KD.UserName,BreakfastVeg,
 	    BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg
 		FROM WRBHBKOTHdr KH
 		JOIN WRBHBKOTUser KD  ON KH.Id=KD.KOTEntryHdrId AND	KH.IsActive=1 AND KH.IsDeleted=0
@@ -144,7 +144,7 @@ IF @Action='KOTDETAILS'
 		
 		INSERT INTO #Guests(Date,ConsumerType,Name,BVeg,BNonVeg,LVeg,LNonVeg,DVeg,DNonVeg)
 	    
-	    SELECT  CONVERT(NVARCHAR(100),KH.Date,103) AS Date,'Guest' AS ConsumerType,KD.GuestName,BreakfastVeg,
+	    SELECT  CONVERT(NVARCHAR(100),KH.Date,105) AS Date,'Guest' AS ConsumerType,KD.GuestName,BreakfastVeg,
 	    BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg
 		FROM WRBHBKOTHdr KH
 		JOIN WRBHBKOTDtls KD  ON KH.Id=KD.KOTEntryHdrId AND
@@ -155,7 +155,7 @@ IF @Action='KOTDETAILS'
 		
 		INSERT INTO #Guests(Date,ConsumerType,Name,BVeg,BNonVeg,LVeg,LNonVeg,DVeg,DNonVeg)
 	   
-	    SELECT   CONVERT(NVARCHAR(100),KH.Date,103) AS Date,'Staff' AS ConsumerType,KD.UserName,BreakfastVeg,
+	    SELECT   CONVERT(NVARCHAR(100),KH.Date,105) AS Date,'Staff' AS ConsumerType,KD.UserName,BreakfastVeg,
 	    BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg
 		FROM WRBHBKOTHdr KH
 		JOIN WRBHBKOTUser KD  ON KH.Id=KD.KOTEntryHdrId AND
@@ -164,7 +164,7 @@ IF @Action='KOTDETAILS'
 		AND  CONVERT(date,KH.Date,103) BETWEEN CONVERT(date,@Str1,103) AND CONVERT(date,@Str3,103) 
 		order by CONVERT(date,KH.Date,103)  
      END
-       SELECT  CONVERT(NVARCHAR(100),CONVERT(DATE,Date,103),110) AS Date,ConsumerType,Name,BVeg,BNonVeg,LVeg,LNonVeg,DVeg,DNonVeg
+       SELECT  Date,ConsumerType,Name,BVeg,BNonVeg,LVeg,LNonVeg,DVeg,DNonVeg
        FROM #Guests 
      
    END

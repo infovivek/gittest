@@ -106,5 +106,15 @@ BEGIN
 		
 		
 	END
+	IF @Action='TRPageload'
+	BEGIN
+	 SELECT ClientName,Id FROM WRBHBClientManagement 
+	 WHERE  Status='Active' 
+	END
+	IF @Action='Client'
+	BEGIN
+	 SELECT TrClientURL FROM WRBHBClientManagement 
+	 WHERE  Id=@Id
+	END
 END
 
