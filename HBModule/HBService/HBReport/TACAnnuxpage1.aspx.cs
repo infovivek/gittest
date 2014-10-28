@@ -28,14 +28,14 @@ namespace HBReport
             {
                 string domainName = Request.Url.AbsoluteUri;
                 string[] Id = domainName.Split('?');
-                //var Id = asd[1].Split(',');
+                var Name = Id[1].Split('@');
                 command = new SqlCommand();
                 ds = new DataSet();
                 command.CommandText = "Sp_SearchInvoiceAnnexure_Help";
                 command.CommandType = CommandType.StoredProcedure;
                 command.Parameters.Add("@Action", SqlDbType.NVarChar).Value = "PAGELOAD";
-                command.Parameters.Add("@Str1", SqlDbType.NVarChar).Value = Id[1];
-                command.Parameters.Add("@Str2", SqlDbType.NVarChar).Value = "";
+                command.Parameters.Add("@Str1", SqlDbType.NVarChar).Value = Name[0];
+                command.Parameters.Add("@Str2", SqlDbType.NVarChar).Value = Name[1];
                 command.Parameters.Add("@Id1", SqlDbType.Int).Value = 0;// Convert.ToInt32(Id[1]);
                 command.Parameters.Add("@Id2", SqlDbType.Int).Value = 0;
                 ds = new WrbErpConnection1().ExecuteDataSet(command, "");
@@ -44,56 +44,17 @@ namespace HBReport
                 ReportViewer1.LocalReport.DataSources.Clear();
                 ReportViewer1.LocalReport.DataSources.Add(rds);
                 ReportViewer1.LocalReport.Refresh();
-                ReportViewer1.LocalReport.ReportPath = Server.MapPath("") + @"\TAC Annexure.rdlc";
+                ReportViewer1.LocalReport.ReportPath = Server.MapPath("") + @"\TACAnnuxpage1.rdlc";
                 ReportViewer1.LocalReport.EnableExternalImages = true;
 
-
-
-               // this.ContactTableAdapter.Fill(this.AdventureWorksDataSet.Contact);
-
-
-
-               // this.reportViewer1.LocalReport.SubreportProcessing +=
-
-               //new SubreportProcessingEventHandler(SubreportProcessingEventHandler);
-
-               // this.reportViewer1.RefreshReport();
-
-
-             //   switch (SwitchSubReport)
-             //   {
-             //       case 1:
-                  //      {
-
-
-                    // ReportViewer1.LocalReport.DataSources.Add(new ReportDataSource(sDataSourceName, ds.Tables[0]));
-
-                     //  rds.Fill(ds);
-                      //      SwitchSubReport = 2;
-                       //     break;
-             //           }
-                //    case 2:
-                //        {
-
-
-                //            BindingSource CheckListBS = new BindingSource(ds, "SubReportCheckList");
-
-
-                //            e.DataSources.Add(new ReportDataSource("ReportDataSet_SubReportCheckList", CheckListBS));
-
-
-                //            objAdapter.Fill(RD);
-                //            break;
-                //        }
-                //}
                 ReportParameter paramLogo = new ReportParameter();
 
                 paramLogo.Name = "Path";
 
                 //paramLogo.Values.Add(@"D:\Project\HR_Service\WrbHRPrint\Images\Logo.png");
                 // string var = ConfigurationManager.ConnectionStrings["Images"].ToString();
-                // paramLogo.Values.Add(@"http://sstage.in/Company_Images/HummingBird_Travel__0_0_HB_Logo.png_HB_Logo.png");
-                // ReportViewer1.LocalReport.SetParameters(paramLogo);
+                paramLogo.Values.Add(@"http://sstage.in/Company_Images/HummingBird_Travel__0_0_HB_Logo.png_HB_Logo.png");
+                ReportViewer1.LocalReport.SetParameters(paramLogo);
 
 
             }

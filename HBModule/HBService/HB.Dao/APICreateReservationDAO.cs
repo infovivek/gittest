@@ -366,7 +366,7 @@ namespace HB.Dao
             }
             else
             {
-                DataSet ds1 = new APIBookingMailDAO().Mail(api.BookingId);
+                DataSet ds1 = new APIBookingMailDAO().Mail(api.BookingId, user);
                 //dT.Rows.Add("Yes");ds.Tables.Add(dT);
                 command = new SqlCommand();
                 ds = new DataSet();

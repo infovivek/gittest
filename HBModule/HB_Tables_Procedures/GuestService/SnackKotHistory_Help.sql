@@ -60,23 +60,23 @@ CREATE PROCEDURE dbo.[SP_SnackKOTHistory_Help]
         
         INSERT INTO #Guest(BookingId,Date,Type,Name,Apartment,Amount,Status,GuestId)
 	    	         
-	    SELECT DISTINCT CH.BookingId,CONVERT(NVARCHAR,CH.ChkoutDate,105) ,'Guest' AS Type,KH.GuestName,CH.RoomNo,
+	    SELECT DISTINCT CH.BookingId,CONVERT(NVARCHAR,KH.Date,105) ,'Guest' AS Type,KH.GuestName,CH.RoomNo,
 	    SUM(CAST(ISNULL(KD.Amount,0)as DECIMAL(27,2))) AS Amount,'Raised' as Status,
 	    KH.GuestId
 		FROM WRBHBNewKOTEntryHdr KH
 		JOIN WRBHBNewKOTEntryDtl KD ON KH.Id=KD.NewKOTEntryHdrId AND KD.IsActive=1 AND KD.IsDeleted=0
 		JOIN WRBHBCheckInHdr CH ON KH.GuestId=CH.GuestId AND CH.IsActive=1 AND CH.IsDeleted=0
 		WHERE KH.PropertyId=@PropertyId  AND KH.IsActive=1 And KH.IsDeleted=0
-		AND CH.ChkoutDate BETWEEN CONVERT(Date,@Str1 ,103)
+		AND KH.Date BETWEEN CONVERT(Date,@Str1 ,103)
 		AND CONVERT(Date,@Str2,103)
-		group by CH.BookingId,CH.ChkoutDate,KH.GuestName,CH.RoomNo,KH.GuestId
+		group by CH.BookingId,KH.Date,KH.GuestName,CH.RoomNo,KH.GuestId
 		 
 		END	
   	
-       SELECT  CONVERT(NVARCHAR(100),Date,103) AS Date,Type,
+       SELECT  Date AS Date,Type,
        BookingId,GuestId,Name,Apartment,SUM(Amount) AS Amount,Status
        FROM #Guest 
-       Group by CONVERT(NVARCHAR(100),Date,103),Type,BookingId,GuestId,Name,Apartment,Status
+       Group by Date,Type,BookingId,GuestId,Name,Apartment,Status
       
   END
  IF @Action='Guest'

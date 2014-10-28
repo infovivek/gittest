@@ -45,9 +45,9 @@ CREATE PROCEDURE dbo.[SP_PCHistoryReport_Help]
     	--table gridload
 		SELECT  DISTINCT (U.FirstName+' '+U.LastName) AS Requestedby,P.PropertyName AS PCAccount,
 		PC.RequestedStatus AS RequestedStatus,PC.ProcessedStatus AS Status,PC.Comments AS Comments,
-		CONVERT(NVARCHAR(100),CONVERT(DATE,PC.RequestedOn,103),110) AS RequestedOn,0 AS Process,
+		CONVERT(NVARCHAR(100),PC.RequestedOn,105) AS RequestedOn,0 AS Process,
 		PC.RequestedAmount AS RequestedAmount,
-		CONVERT(NVARCHAR(100),CONVERT(DATE,PC.LastProcessedon,103),110) AS Processedon,(US.FirstName+' '+US.LastName) AS ProcessedBy,
+		CONVERT(NVARCHAR(100),PC.LastProcessedon,105) AS Processedon,(US.FirstName+' '+US.LastName) AS ProcessedBy,
 		PC.RequestedUserId AS RequestedUserId, PC.Id,
 		PC.PropertyId
 		From WRBHBPettyCashApprovalDtl PC
@@ -69,9 +69,9 @@ IF(@Action='GRIDLOAD')
 	BEGIN
 		SELECT  DISTINCT (U.FirstName+' '+U.LastName) AS Requestedby,P.PropertyName AS PCAccount,PC.RequestedStatus AS RequestedStatus,
 		PC.ProcessedStatus AS Status,PC.Comments AS Comments,
-		CONVERT(NVARCHAR(100),CONVERT(DATE,PC.RequestedOn,103),110) AS RequestedOn,0 AS Process,
+		CONVERT(NVARCHAR(100),PC.RequestedOn,105) AS RequestedOn,0 AS Process,
 		PC.RequestedAmount AS RequestedAmount,
-		CONVERT(NVARCHAR(100),CONVERT(DATE,PC.LastProcessedon,103),110) AS Processedon,(US.FirstName+' '+US.LastName) AS ProcessedBy,
+		CONVERT(NVARCHAR(100),PC.LastProcessedon,105) AS Processedon,(US.FirstName+' '+US.LastName) AS ProcessedBy,
 		PC.RequestedUserId AS RequestedUserId, PC.Id,
 		PC.PropertyId
 		From WRBHBPettyCashApprovalDtl PC
@@ -94,7 +94,7 @@ IF @Action='History'
 		JOIN WRBHBProperty P ON PH.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
 		JOIN WRBHBUser U ON  PH.UserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
 		WHERE PH.UserId=@UserId AND PH.PropertyId=@Id AND PC.IsActive=1 AND PC.IsDeleted=0
-		AND PH.Date=CONVERT(Date,@Str,103)
+		AND CONVERT(Date,PH.Date,105)=CONVERT(Date,@Str,105)
 		group by  U.FirstName,U.LastName,P.PropertyName,PC.Status,PH.Date,PH.UserId,PH.PropertyId
 		
 		--table2
@@ -110,7 +110,7 @@ IF @Action='History'
 		JOIN WRBHBPropertyUsers PU ON U.Id=PU.UserId AND PU.IsActive=1 AND PU.IsDeleted=0
 		WHERE PH.UserId=@UserId AND 
 		PH.PropertyId=@Id AND PC.IsActive=1 AND PC.IsDeleted=0 
-		AND PH.Date=CONVERT(Date,@Str,103) 
+		AND CONVERT(Date,PH.Date,105)=CONVERT(Date,@Str,105) 
 		
  END
  IF @Action='Action'

@@ -360,7 +360,7 @@ namespace HB.BusinessService
                     _businessService = new ExternalIntermediateCheckOutService();
                     break;
                 case "CheckInForecastReport":
-                    _businessService = new ExternalIntermediateCheckOutService();
+                    _businessService = new CheckInForecastReportServices();
                     break;
             }
             return _businessService;

@@ -45,18 +45,18 @@
 					{
 					 	Grd_Grid1.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
 						AC=Grd_Grid1.dataProvider as ArrayCollection; 
-						for(var i:int=0;i<AC.length;i++)
-						{
- 							if(AC[i].PropertyName=="Ratnalayam")
-							{
-								//(AC[i].PropertyName.setStyle('fontWeight', 'bold'))
-								AC[i].PropertyName= '0x00FF00';
-								//setStyle('PropertyName',0x32CD32);
-								//setStyle('color', 0xFF0000);
-							//	AC[i]('fontWeight', 'bold')
-								//return null;
-							}
-						}
+//						for(var i:int=0;i<AC.length;i++)
+//						{
+// 							if(AC[i].PropertyName=="Ratnalayam")
+//							{
+//								//(AC[i].PropertyName.setStyle('fontWeight', 'bold'))
+//							//	AC[i].PropertyName= '0x00FF00';
+//								//setStyle('PropertyName',0x32CD32);
+//								//setStyle('color', 0xFF0000);
+//							//	AC[i]('fontWeight', 'bold')
+//								//return null;
+//							}
+//						}
 						//if(Ds_Objects.result.Tables.Table.Columns[0]='PropertyName')
 					}	
 					if (Ds_Objects.result.Tables.Table1.Rows.length > 4)

@@ -89,6 +89,7 @@
     <Compile Include="BTCSPaymentDAO.cs" />
     <Compile Include="BTCSubmissionDAO.cs" />
     <Compile Include="CheckInDtlsDAO.cs" />
+    <Compile Include="CheckInForecastReportDAO.cs" />
     <Compile Include="CheckoutAndIntermediateDao.cs" />
     <Compile Include="CheckOutPaymentCardDao.cs" />
     <Compile Include="CheckOutPaymentCashDao.cs" />

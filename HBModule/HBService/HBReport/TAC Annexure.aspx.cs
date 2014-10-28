@@ -43,20 +43,16 @@ namespace HBReport
                 ReportViewer1.LocalReport.DataSources.Clear();
                 ReportViewer1.LocalReport.DataSources.Add(rds);
                 ReportViewer1.LocalReport.Refresh();
-                ReportViewer1.LocalReport.ReportPath = Server.MapPath("") + @"\TACAnnuxpage1.rdlc";
-                ReportViewer1.LocalReport.EnableExternalImages = true;
+                ReportViewer1.LocalReport.ReportPath = Server.MapPath("") + @"\TAC Annexure.rdlc";
+                ReportViewer1.LocalReport.EnableExternalImages = true; 
 
+                ReportParameter paramLogo = new ReportParameter(); 
+                paramLogo.Name = "path";
 
-                ReportParameter paramLogo = new ReportParameter();
-
-                paramLogo.Name = "Path";
-
-               paramLogo.Values.Add(@"D:\Project\HR_Service\WrbHRPrint\Images\Logo.png");
+                // paramLogo.Values.Add(@"D:\Project\HR_Service\WrbHRPrint\Images\Logo.png");
                 // string var = ConfigurationManager.ConnectionStrings["Images"].ToString();
-             //   paramLogo.Values.Add(@"http://sstage.in/Company_Images/HummingBird_Travel__0_0_HB_Logo.png_HB_Logo.png");
-                ReportViewer1.LocalReport.SetParameters(paramLogo);
-
-
+                paramLogo.Values.Add(@"http://sstage.in/Company_Images/HummingBird_Travel__0_0_HB_Logo.png_HB_Logo.png");
+                ReportViewer1.LocalReport.SetParameters(paramLogo); 
             }
         }
         protected void Button1_Click(object sender, EventArgs e)

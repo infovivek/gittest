@@ -113,8 +113,8 @@ namespace HB.Dao
                     string Imagebody =
                        " <table cellpadding=\"0\" cellspacing=\"0\" width=\"600\" border=\"0\" align=\"center\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #cccdcf solid 1px\">" +
                        " <tr><td><table cellpadding=\"0\" cellspacing=\"0\" width=\"600\" border=\"0\" align=\"center\">" +
-                       " <tr><td width=\"600\" align=\"left\" style=\"padding: 10px 0px 10px 10px;\"> " +
-                       " <img src=" + Imagelocation + " width=\"300px\" height=\"100px\" alt=\"Humming bird logo\">" +
+                       " <tr><td width=\"50%\" align=\"left\" style=\"padding: 10px 0px 10px 10px;\"> " +
+                       " <img src=" + Imagelocation + " width=\"200px\" height=\"52px\" alt=\"Humming bird logo\">" +
                        " </td></tr></table>";
 
 

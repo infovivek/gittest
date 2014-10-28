@@ -472,8 +472,8 @@ namespace HB.Dao
                                 }
                             }
                             message.Bcc.Add(new System.Net.Mail.MailAddress("vivek@warblerit.com"));
-                            message.Bcc.Add(new System.Net.Mail.MailAddress("prabathkar@admonk.in"));
-                            message.Bcc.Add(new System.Net.Mail.MailAddress("deepak@admonk.in"));
+                            //message.Bcc.Add(new System.Net.Mail.MailAddress("prabathkar@admonk.in"));
+                            //message.Bcc.Add(new System.Net.Mail.MailAddress("deepak@admonk.in"));
                             message.Bcc.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
                             message.Bcc.Add(new System.Net.Mail.MailAddress("arun@warblerit.com"));
                             //

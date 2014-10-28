@@ -33,22 +33,14 @@
 				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
 				GlobalXml += "</ROOT>";
 				useWeb("SearchInvoiceReport","Report_CUSTOM",[GlobalXml,"Pageload",FromDate,ToDate,'','','',0,0,0]);
-				//				Str_ChkOut="http://localhost:4171/GuestCheckOutTariff.aspx?";
-				//				Str_Serv="http://localhost:4171/GuestCheckOutService.aspx?";
-				//				Str_Settle="http://localhost:4171/GuestCheckOutConsolidate.aspx?";
-				//				
-				//			Str_ChkOut1="http://localhost:4171/ExternalCheckOutTariff.aspx?";
-				//			Str_Serv1="http://localhost:4171/GuestCheckOutService1.aspx?";
-				//			Str_Settle1="http://localhost:4171/GuestCheckOutConsolidate1.aspx?";
-				Str_ChkOutTAC="http://localhost:4171/TAC Annexure.aspx?";
-				Str_ChkOut1="http://sstage.in/HBReport/ExternalCheckOutTariff.aspx?";
-				Str_Serv1="http://sstage.in/HBReport/GuestCheckOutService1.aspx?";
-				Str_Settle1="http://sstage.in/HBReport/GuestCheckOutConsolidate1.aspx?";
+			 
+				Str_ChkOut1   = "http://localhost:4171/TAC Annexure.aspx?"; //For Tac 
+				Str_ChkOutTAC = "http://localhost:4171/TACAnnuxpage1.aspx?"; //For internel and Exterrnal
 				
-				Str_ChkOut="http://sstage.in/HBReport/GuestCheckOutTariff.aspx?";
-				Str_Serv="http://sstage.in/HBReport/GuestCheckOutService.aspx?";
-				Str_Settle="http://sstage.in/HBReport/GuestCheckOutConsolidate.aspx?"; 
-				//	Str_ChkOutTAC="http://sstage.in/HBReport/ExternalCheckoutTAC.aspx?";
+				//Str_ChkOutTAC="http://sstage.in/HBReport/TAC Annexure.aspx?";//For Tac 
+				//Str_ChkOut1="http://sstage.in/HBReport/TACAnnuxpage1.aspx?";  //For internel and Exterrnal
+			
+				
 				Modes.selectedValue=0
 			}
 			private function Custom_WebSer_Result (Ds_Objects:Object):void
@@ -340,28 +332,46 @@
 				{
 					Ac2[Index].selectRadio=true;
 					ClientName=Ac2[Index].ClientName;
+					Property=Ac2[Index].Property;
 				} 
 				
 				TotalBills(); 
 			}
-		
+		 public var Property:String='';
 			public function TotalBills():void
 			{
 				var SelBills:ArrayCollection= new ArrayCollection();
 				SelBills=Grd_SearchInvoice.dataProvider as  ArrayCollection;
 				var ChkutIds:String = "";
 				var ChkutIds1:String = "";
-				for(var M:int=0;M<SelBills.length;M++)
-				{ 
-					if(SelBills[M].ClientName==ClientName)
-					{
-						if(SelBills[M].selectRadio==true)
+				if(Modes.selectedValue==2)
+				{
+					for(var M:int=0;M<SelBills.length;M++)
+					{ 
+						if(SelBills[M].Property==Property)
 						{
-							 ChkutIds+= SelBills[M].ChkoutId+',';  
-						}  
+							if(SelBills[M].selectRadio==true)
+							{
+								 ChkutIds+= SelBills[M].ChkoutId+',';  
+							}  
+						}
+						//ChkutIds1+=ChkutIds+',';  
 					}
-					//ChkutIds1+=ChkutIds+',';  
 				}  
+				else
+				{
+					for(var M:int=0;M<SelBills.length;M++)
+					{ 
+						if(SelBills[M].ClientName==ClientName)
+						{
+							if(SelBills[M].selectRadio==true)
+							{
+								ChkutIds+= SelBills[M].ChkoutId+',';  
+							}  
+						}
+						//ChkutIds1+=ChkutIds+',';  
+					}
+				}
 				ChkoutId=ChkutIds;
 			//	ExternalInterface.call("changeDocumentTitle",Str_ChkOutTAC+ChkutIds);	 
 				//var Amttobe:Number =ChkoutId;
@@ -371,24 +381,39 @@
 				if(Modes.selectedValue==0)
 				{
 					Type="Internal";
+					if(ChkoutId!='')
+					{
+						ExternalInterface.call("changeDocumentTitle",Str_ChkOutTAC+ChkoutId+'@'+Type);
+					}
 				}
 				if(Modes.selectedValue==1)
 				{
 					Type="External";
+					if(ChkoutId!='')
+					{
+						ExternalInterface.call("changeDocumentTitle",Str_ChkOutTAC+ChkoutId+'@'+Type);
+					}
 				}
 				if(Modes.selectedValue==2)
 				{
 					Type="Tac";
+					
+					if(ChkoutId!='')
+					{
+						ExternalInterface.call("changeDocumentTitle",Str_ChkOut1+ChkoutId+'@'+Type);
+					}
 				}
 				if(Type=='')
 				{ 
-						Type="Internal"; 
+				  Type="Internal"; 
+						if(ChkoutId!='')
+						{
+							ExternalInterface.call("changeDocumentTitle",Str_ChkOutTAC+ChkoutId+'@'+Type);
+						}
 				}
 					
-				if(ChkoutId!='')
-				{
-				ExternalInterface.call("changeDocumentTitle",Str_ChkOutTAC+ChkoutId+'@'+Type);
-				}
+			
+				
 			}
 		]]>
 	</fx:Script>

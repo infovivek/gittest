@@ -207,10 +207,16 @@
 					b = a + 01;
 				}
 				var MFromDate:String = '01'+'/'+String(b)+'/'+String(c);
-				
-			    useWeb("Report","BookingForecast_CUSTOM", [GlobalXml, "BookingForecast",LocationId, PropertyId,
+				if(Drp_Reporttype.selectedItem=="Booking Forecasted Revenue")
+				{
+			    	useWeb("Report","BookingForecast_CUSTOM", [GlobalXml, "BookingForecast",LocationId, PropertyId,
 					MFromDate,"",Drp_Category.selectedItem]);
-					
+				}
+				else
+				{
+					useWeb("CheckInForecastReport","BookingForecast_CUSTOM", [GlobalXml, "CheckInForecast",LocationId, PropertyId,
+						MFromDate,"",Drp_Category.selectedItem]);
+				}
 				
 			}
 			protected function ExportExcel(event:MouseEvent):void

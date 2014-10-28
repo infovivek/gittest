@@ -746,6 +746,10 @@ namespace HB.Dao
         public const string IntermediateCheckOutTariff_Bill = "SP_IntermediateCheckOutTariff_Bill";
         public const string IntermediateCheckOutService_Bill = "SP_IntermediateCheckOutService_Bill";
         public const string SP_IntermediateCheckOutConsolidate_Bill = "SP_IntermediateCheckOutConsolidate_Bill";
+
+
+        //CheckInForecastReport
+        public const String CheckInForecastReport_Help = "Sp_CheckInForecastReport_Help";
        
     }
 }

@@ -18,9 +18,8 @@ namespace HB.Dao
         DataSet ds = new DataSet();
         string Err;
         String UserData;
-        public DataSet Mail(int BookingId)
+        public DataSet Mail(int BookingId, User user)
         {
-            User user = new Entity.User();
             UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
              "', SctId:" + user.SctId + ", Service : BedBookingMailDAO : Help, " + ", ProcName:'" + StoredProcedures.BookingDtls_Help; 
             DataTable dT = new DataTable("Table11");

@@ -370,18 +370,18 @@
 				SelBills=Grd_FinalAdjustment.dataProvider as  ArrayCollection;
 				var ChkutIds:String = "";
 				var ChkutIds1:String = "";
-				for(var M:int=0;M<SelBills.length;M++)
-				{ 
-					if(SelBills[M].ClientName==ClientName)
-					{
-						if(SelBills[M].selectRadio==true)
-						{
-							ChkutIds+= SelBills[M].ChkoutId+',';  
-						}  
-					}
-					//ChkutIds1+=ChkutIds+',';  
-				}  
-				ChkoutId=ChkutIds;
+//				for(var M:int=0;M<SelBills.length;M++)
+//				{ 
+//					if(SelBills[M].ClientName==ClientName)
+//					{
+//						if(SelBills[M].selectRadio==true)
+//						{
+//							ChkutIds+= SelBills[M].ChkoutId+',';  
+//						}  
+//					}
+//					//ChkutIds1+=ChkutIds+',';  
+//				}  
+//				ChkoutId=ChkutIds;
 				//	ExternalInterface.call("changeDocumentTitle",Str_ChkOutTAC+ChkutIds);	 
 				//var Amttobe:Number =ChkoutId;
 			}

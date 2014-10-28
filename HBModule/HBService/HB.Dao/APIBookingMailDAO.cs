@@ -14,9 +14,8 @@ namespace HB.Dao
         SqlCommand command = new SqlCommand();
         DataSet ds = new DataSet();
         string UserData;
-        public DataSet Mail(int BookingId)
+        public DataSet Mail(int BookingId, User user)
         {
-            User user = new User();
             UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + 
                        ", ScreenName:'" + user.ScreenName + "', SctId:" + user.SctId + 
                        ", Service : BookingRoomMailDAO : Help, " + ", ProcName:'" + StoredProcedures.BookingDtls_Help;            
@@ -151,8 +150,8 @@ namespace HB.Dao
                 else { SplReq = ds.Tables[2].Rows[0][5].ToString(); }
                 //
                 string AddressDtls =
-                    "<p style=\"margin-top:5px;\">" +
-                    " <span style=\"color:#f54d02; font-weight:bold\">Tax :</span> Net Tariff" +
+                    "<p style=\"margin-top:10px; margin-left:5px; font-size:11px;\">" +
+                    " <span style=\"color:#f54d02; font-weight:bold; font-size:11px;\">Tax :</span> Net Tariff" +
                     " </p>"+
                     " <table cellpadding=\"0\" cellspacing=\"0\" width=\"600\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
                     " <tr style=\"font-size:11px; background-color:#eee;\">" +

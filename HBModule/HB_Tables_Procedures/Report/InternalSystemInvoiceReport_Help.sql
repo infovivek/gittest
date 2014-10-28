@@ -161,6 +161,7 @@ BEGIN
 	FROM #Booking B
 	LEFT OUTER JOIN #Tariff T ON B.CHId=T.COId
 	LEFT OUTER JOIN #Service S ON T.COId=S.CID
+	ORDER BY CheckInDate ASC
 		
 	SELECT Id AS SNo,GetType AS BookingType,BookingId AS BookingCode,BillId,InVoiceNo,PropertyName,
 	ClientName,MasterClientName,Guest AS GuestName,CONVERT(NVARCHAR(100),CONVERT(DATE,CheckInDate,103),110) AS CheckInDate,
@@ -175,6 +176,7 @@ BEGIN
 	BillStartDate,BillEndDate,TotalAmount,Amount,FBAmount ,SAmount,
 	LAmount ,Mis ,OtherService ,LT ,STT,STTC,
 	STC,SC,VAT
+	
 	
 	
 	END

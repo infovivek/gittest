@@ -66,14 +66,14 @@ IF @Action = 'ClientGuestLoad'
   Inclusions,Id,DoubleandMarkup1,CheckInType)
   SELECT C.CityName,BP.PropertyName,BP.Locality,BP.RoomType,
   CASE WHEN BP.TaxAdded = 'N' THEN CAST(BP.SingleandMarkup1 AS VARCHAR) +' <SUP>#</SUP>'
-       WHEN BP.TaxAdded = 'T' THEN CAST(BP.SingleandMarkup1 AS VARCHAR) +' <SUP>*</SUP>'
-       WHEN BP.TaxAdded = '' THEN CAST(BP.SingleandMarkup1 AS VARCHAR) +' <SUP>*</SUP>'
-       ELSE CAST(BP.SingleandMarkup1 AS VARCHAR) +' <SUP>*</SUP>' END,
+       WHEN BP.TaxAdded = 'T' THEN CAST(BP.SingleandMarkup1 AS VARCHAR) +' <SUP>&#9733;</SUP>'
+       WHEN BP.TaxAdded = '' THEN CAST(BP.SingleandMarkup1 AS VARCHAR) +' <SUP>&#9733;</SUP>'
+       ELSE CAST(BP.SingleandMarkup1 AS VARCHAR) +' <SUP>&#9733;</SUP>' END,
   BP.Inclusions,BP.Id,
   CASE WHEN BP.TaxAdded = 'N' THEN CAST(BP.DoubleandMarkup1 AS VARCHAR) +' <SUP>#</SUP>'
-       WHEN BP.TaxAdded = 'T' THEN CAST(BP.DoubleandMarkup1 AS VARCHAR) +' <SUP>*</SUP>'
-       WHEN BP.TaxAdded = '' THEN CAST(BP.DoubleandMarkup1 AS VARCHAR) +' <SUP>*</SUP>'
-       ELSE CAST(BP.DoubleandMarkup1 AS VARCHAR) +' <SUP>*</SUP>' END,
+       WHEN BP.TaxAdded = 'T' THEN CAST(BP.DoubleandMarkup1 AS VARCHAR) +' <SUP>&#9733;</SUP>'
+       WHEN BP.TaxAdded = '' THEN CAST(BP.DoubleandMarkup1 AS VARCHAR) +' <SUP>&#9733;</SUP>'
+       ELSE CAST(BP.DoubleandMarkup1 AS VARCHAR) +' <SUP>&#9733;</SUP>' END,
   CAST(P.CheckIn AS VARCHAR)+' '+P.CheckInType
   FROM WRBHBBookingProperty BP
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK) ON P.Id = BP.PropertyId
