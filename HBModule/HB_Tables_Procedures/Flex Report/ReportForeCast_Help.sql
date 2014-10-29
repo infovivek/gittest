@@ -742,8 +742,8 @@ IF @Action ='PropertyAndCity'
 		 GROUP BY CO.BookingId,CO.ChkInHdrId,CO.ApartmentId,CO.Type,CO.GuestName,CO.CheckInDate,  
 		 B.ChkOutDt,B.Tariff,B.BookingPropertyId,B.TariffPaymentMode,CO.NoOfDays	
 		 
-		SELECT * FROM #CheckOutForecast
-		RETURN
+		--SELECT * FROM #CheckOutForecast
+	--	RETURN
 		 --GET DATA FROM CHECKIN TABLE 
 		 --ROOM 
 		 INSERT INTO #CheckInForecast(BookingId,CheckInId,RoomId,RoomName,GuestName,CheckInDt,CheckOutDt,  
@@ -2243,11 +2243,11 @@ IF @Action ='PropertyAndCity'
     END    
     END 
     
-   SELECT * FROM #RevanueCheckInForecast
-   where   MONTH(CONVERT(DATE,NoOfDays,103)) =9 
-   order by BookingId   
+   --SELECT * FROM #RevanueCheckInForecast
+   --where   MONTH(CONVERT(DATE,NoOfDays,103)) =9 
+   --order by BookingId   
      
-   Return
+   --Return
      --BOOKING REVANUE  
      SELECT @Count=COUNT(*) FROM #OccupancyFinalForecast  
      SELECT TOP 1 @Tariff=Tariff,@RoomId=RoomId,@BookingId=BookingId,  
@@ -3056,7 +3056,7 @@ IF @Action ='PropertyAndCity'
 			--SELECT BOOKING FORECAST REVENU
 			SELECT CityName,PropertyName,DD,Direct,BTC,Online,TOTAL,GTV,Category,OrderData
 			FROM #FINALBOOKINGREVEVANETOTAL
-			WHERE (DD+Direct+BTC+Online+GTV)!=0
+			WHERE (DD+Direct+BTC+Online+GTV)!=0 and TOTAL!=0
 			ORDER BY OrderData ASC
 			
 			INSERT INTO #FINALCHECKINREVEVANETOTAL(CityName,PropertyName,DD,Direct,BTC,Online,TOTAL,GTV,Category,OrderData)
@@ -3074,7 +3074,7 @@ IF @Action ='PropertyAndCity'
 			--CHECK IN FORECAST REVENU
 			SELECT CityName,PropertyName,DD,Direct,BTC,Online,TOTAL,GTV,Category,OrderData
 			FROM #FINALCHECKINREVEVANETOTAL 
-			WHERE (DD+Direct+BTC+Online+GTV)!=0
+			WHERE (DD+Direct+BTC+Online+GTV)!=0 and TOTAL!=0
 			ORDER BY OrderData ASC
 		
 		END

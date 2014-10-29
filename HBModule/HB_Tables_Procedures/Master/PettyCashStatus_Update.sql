@@ -2,9 +2,9 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-IF EXISTS (SELECT * FROM DBO.SYSOBJECTS WHERE ID = OBJECT_ID(N'[dbo].[Sp_PettyCashStatus_Insert]') AND OBJECTPROPERTY(ID, N'ISPROCEDURE') = 1)
+IF EXISTS (SELECT * FROM DBO.SYSOBJECTS WHERE ID = OBJECT_ID(N'[dbo].[Sp_PettyCashStatus_Update]') AND OBJECTPROPERTY(ID, N'ISPROCEDURE') = 1)
 
-DROP PROCEDURE Sp_PettyCashStatus_Insert
+DROP PROCEDURE Sp_PettyCashStatus_Update
 
 Go
 /* 
@@ -23,25 +23,30 @@ Reviewed By	: <Reviewed By (Leave it blank)>
 *******************************************************************************************************
 */
 
-CREATE PROCEDURE Sp_PettyCashStatus_Insert
+CREATE PROCEDURE Sp_PettyCashStatus_Update
 (
-@ExpenseHead NVARCHAR(100),
-@Status		 NVARCHAR(100),
-@Description		 NVARCHAR(100),
+@PettyCashStatusHdrId INT,
+@ExpenseHead    NVARCHAR(100),
+@Status		    NVARCHAR(100),
+@Description	NVARCHAR(100),
 @Amount         DECIMAL(27,2),
-@Paid		DECIMAL(27,2),
---@PropertyId BIGINT,
-@Id			 BIGINT,
-@UserId		 BIGINT
+@Paid		    DECIMAL(27,2),
+@PropertyId     BIGINT,
+@BillLogo       NVARCHAR(1000),
+@ExpenseId		BIGINT,
+@BillDate       NVARCHAR(1000),
+@UserId		    BIGINT,
+@Id				INT
 )
 AS
 
 BEGIN
 
-	UPDATE WRBHBPettyCashStatus SET ExpenseHead=@ExpenseHead,Status=@Status,
-	 Description=@Description,Amount=@Amount,Paid=@Paid,Modifiedby=@UserId,
-	 ModifiedDate=GETDATE()
-	 WHERE Id=@Id 
+	UPDATE WRBHBPettyCashStatus SET PettyCashStatusHdrId=@PettyCashStatusHdrId,
+	ExpenseHead=@ExpenseHead,Status=@Status,PropertyId=@PropertyId,UserId=@UserId,
+	Description=@Description,Amount=@Amount,Paid=@Paid,BillDate=@BillDate,BillLogo=@BillLogo,
+	Modifiedby=@UserId,ModifiedDate=GETDATE()
+	WHERE Id=@Id 
 	
 	
 SELECT Id,RowId FROM WRBHBPettyCashStatus WHERE Id=@Id;

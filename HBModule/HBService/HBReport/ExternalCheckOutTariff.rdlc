@@ -308,6 +308,18 @@
           <DataField>InVoicedate</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
+        <Field Name="PIInvoice">
+          <DataField>PIInvoice</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="ChkinDT">
+          <DataField>ChkinDT</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="ChkoutDT">
+          <DataField>ChkoutDT</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
       </Fields>
       <Query>
         <DataSourceName>HBDataSet1</DataSourceName>
@@ -343,7 +355,7 @@
         </Paragraphs>
         <rd:DefaultName>Textbox20</rd:DefaultName>
         <Top>0.05313in</Top>
-        <Left>3.24521in</Left>
+        <Left>3.25563in</Left>
         <Height>0.25in</Height>
         <Width>0.625in</Width>
         <Style>
@@ -375,7 +387,7 @@
         </Paragraphs>
         <rd:DefaultName>Textbox21</rd:DefaultName>
         <Top>0.04271in</Top>
-        <Left>3.90146in</Left>
+        <Left>3.91188in</Left>
         <Height>0.25in</Height>
         <Width>1in</Width>
         <ZIndex>1</ZIndex>
@@ -408,7 +420,7 @@
         </Paragraphs>
         <rd:DefaultName>Textbox22</rd:DefaultName>
         <Top>0.05313in</Top>
-        <Left>5.13063in</Left>
+        <Left>5.14105in</Left>
         <Height>0.25in</Height>
         <Width>0.73958in</Width>
         <ZIndex>2</ZIndex>
@@ -441,7 +453,7 @@
         </Paragraphs>
         <rd:DefaultName>Textbox23</rd:DefaultName>
         <Top>0.05313in</Top>
-        <Left>5.9223in</Left>
+        <Left>5.93272in</Left>
         <Height>0.25in</Height>
         <Width>1in</Width>
         <ZIndex>3</ZIndex>
@@ -474,7 +486,7 @@
         </Paragraphs>
         <rd:DefaultName>Textbox17</rd:DefaultName>
         <Top>0.05313in</Top>
-        <Left>1.05146in</Left>
+        <Left>1.06188in</Left>
         <Height>0.25in</Height>
         <Width>1.75in</Width>
         <ZIndex>4</ZIndex>
@@ -507,7 +519,7 @@
         </Paragraphs>
         <rd:DefaultName>Textbox14</rd:DefaultName>
         <Top>0.04271in</Top>
-        <Left>0.63659cm</Left>
+        <Left>0.66305cm</Left>
         <Height>0.25in</Height>
         <Width>0.77083in</Width>
         <ZIndex>5</ZIndex>
@@ -540,7 +552,7 @@
         </Paragraphs>
         <rd:DefaultName>Textbox15</rd:DefaultName>
         <Top>0.44896in</Top>
-        <Left>0.63659cm</Left>
+        <Left>0.66305cm</Left>
         <Height>0.25in</Height>
         <Width>0.77083in</Width>
         <ZIndex>6</ZIndex>
@@ -573,7 +585,7 @@
         </Paragraphs>
         <rd:DefaultName>Textbox18</rd:DefaultName>
         <Top>0.44896in</Top>
-        <Left>1.05146in</Left>
+        <Left>1.06188in</Left>
         <Height>0.25in</Height>
         <Width>1.75in</Width>
         <ZIndex>7</ZIndex>
@@ -604,7 +616,7 @@
         </Paragraphs>
         <rd:DefaultName>Textbox24</rd:DefaultName>
         <Top>0.44896in</Top>
-        <Left>3.06813in</Left>
+        <Left>3.07855in</Left>
         <Height>0.25in</Height>
         <Width>0.80208in</Width>
         <ZIndex>8</ZIndex>
@@ -625,7 +637,7 @@
           <Paragraph>
             <TextRuns>
               <TextRun>
-                <Value>=Fields!ArrivalDate.Value</Value>
+                <Value>=Fields!ChkinDT.Value</Value>
                 <Style />
               </TextRun>
             </TextRuns>
@@ -636,7 +648,7 @@
         </Paragraphs>
         <rd:DefaultName>Textbox25</rd:DefaultName>
         <Top>0.44896in</Top>
-        <Left>3.90146in</Left>
+        <Left>3.91188in</Left>
         <Height>0.25in</Height>
         <Width>1in</Width>
         <ZIndex>9</ZIndex>
@@ -669,7 +681,7 @@
         </Paragraphs>
         <rd:DefaultName>Textbox92</rd:DefaultName>
         <Top>0.44896in</Top>
-        <Left>5.13063in</Left>
+        <Left>5.14105in</Left>
         <Height>0.25in</Height>
         <Width>0.73958in</Width>
         <ZIndex>10</ZIndex>
@@ -691,7 +703,7 @@
           <Paragraph>
             <TextRuns>
               <TextRun>
-                <Value>=Fields!BillDate.Value</Value>
+                <Value>=Fields!ChkoutDT.Value</Value>
                 <Style />
               </TextRun>
             </TextRuns>
@@ -702,7 +714,7 @@
         </Paragraphs>
         <rd:DefaultName>Textbox93</rd:DefaultName>
         <Top>0.44896in</Top>
-        <Left>5.9223in</Left>
+        <Left>5.93272in</Left>
         <Height>0.25in</Height>
         <Width>1in</Width>
         <ZIndex>11</ZIndex>
@@ -735,7 +747,7 @@
         </Paragraphs>
         <rd:DefaultName>Textbox16</rd:DefaultName>
         <Top>0.83229in</Top>
-        <Left>0.63659cm</Left>
+        <Left>0.66305cm</Left>
         <Height>0.25in</Height>
         <Width>0.77083in</Width>
         <ZIndex>12</ZIndex>
@@ -768,7 +780,7 @@
         </Paragraphs>
         <rd:DefaultName>Textbox19</rd:DefaultName>
         <Top>0.83229in</Top>
-        <Left>1.05146in</Left>
+        <Left>1.06188in</Left>
         <Height>0.25in</Height>
         <Width>5.40626in</Width>
         <ZIndex>13</ZIndex>

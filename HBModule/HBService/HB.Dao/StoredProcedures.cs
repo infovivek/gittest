@@ -257,6 +257,9 @@ namespace HB.Dao
         public const string PettyCashStatus_Update = "Sp_PettyCashStatus_Update";
         public const string PettyCashStatus_Select = "Sp_PettyCashStatus_Select";
         public const string PettyCashStatus_Insert = "Sp_PettyCashStatus_Insert";
+        public const string PettyCashStatusHdr_Update = "Sp_PettyCashStatusHdr_Update";
+        public const string PettyCashStatusHdr_Insert = "Sp_PettyCashStatusHdr_Insert";
+
 
         //Import Guest Excel
         public const string ImportGuest_Insert = "Sp_ImportGuest_Insert";
@@ -737,7 +740,7 @@ namespace HB.Dao
         //External CheckoutIntemediate
         public const string ExterInterCheckOutHdr_Insert = "SP_ExterInterCheckOutHdr_Insert";
         public const string ExterInterCheckOutTAC_Insert = "SP_ExterInterCheckOutTAC_Insert";
-    //    public const string SP_IntermediateCheckOutConsolidate_Bill = "SP_IntermediateCheckOutConsolidate_Bill";
+        public const string ExternalChkoutIntermediate_Help = "Sp_ExternalChkoutIntermediate_Help";
 
         //_TodaysCheckinChkout
         public const String TodaysCheckinChkout_Help = "Sp_TodaysCheckinChkout_Help";

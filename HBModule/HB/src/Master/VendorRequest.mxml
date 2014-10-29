@@ -127,11 +127,11 @@
 				{
 					if (AddMode == true)
 					{
-						alignAlert(Alert.show("Vendor Requested Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+						alignAlert(Alert.show(" Vendor Payment Request Approved Successfully..","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
 					}
 					else
 					{
-						alignAlert(Alert.show("Vendor Requested Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+						alignAlert(Alert.show(" Vendor Payment Request Approved Successfully..","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
 					}
 					FnClear();
 				}
@@ -259,6 +259,13 @@
 					return;
 				} 
 				else
+				{
+					alignAlert(Alert.show("Do you want submit  the Vendor Payment Request?", "Warning",Alert.YES | Alert.NO, null,
+						FnSave1, iconWarning, Alert.NO),10,"");
+				}
+			}
+			protected function FnSave1():void
+			{
 				{
 					var arrcopy:ArrayCollection = new ArrayCollection
 						([{ 

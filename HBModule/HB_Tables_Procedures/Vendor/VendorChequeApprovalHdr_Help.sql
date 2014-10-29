@@ -35,14 +35,15 @@ CREATE PROCEDURE dbo.[SP_VendorChequeApprovalHdr_Help]
  IF @Action='PAGELOAD'
  BEGIN
 		CREATE TABLE #Request(Requestedby NVARCHAR(100),RequestedOn NVARCHAR(100),
-		RequestedAmount DECIMAL(27,2),Status NVARCHAR(100),Process BIT,
+		RequestedAmount DECIMAL(27,2),PropertyName NVARCHAR(100),Status NVARCHAR(100),Process BIT,
 		Processedby NVARCHAR(100),Processedon NVARCHAR(100),Id INT,RequestedUserId INT,PropertyId INT,UserId INT)
 		
 		INSERT INTO #Request(Requestedby,RequestedOn,
-		RequestedAmount,Status,Process,Processedby,Processedon,Id,RequestedUserId,PropertyId,UserId)
+		RequestedAmount,PropertyName,Status,Process,Processedby,Processedon,Id,RequestedUserId,PropertyId,UserId)
 		
 		SELECT  DISTINCT (U.FirstName+' '+U.LastName) AS Requestedby,
 		CONVERT(NVARCHAR(100),VC.RequestedOn,103) AS RequestedOn,VC.RequestedAmount AS RequestedAmount,
+		P.PropertyName,
 		VC.Status AS Status,0 AS Process,(US.FirstName+' '+US.LastName) AS Processedby,
 		CONVERT(NVARCHAR(100),VC.Processedon,103) AS Processedon, VC.Id,VC.RequestedUserId AS RequestedUserId,
 		VC.PropertyId,VC.UserId
@@ -58,11 +59,11 @@ CREATE PROCEDURE dbo.[SP_VendorChequeApprovalHdr_Help]
 		AND PU.UserType IN('Resident Managers','Assistant Resident Managers','Operations Managers',
 		'Ops Head','Finance')	
 		
-		INSERT INTO #Request(Requestedby,RequestedOn,RequestedAmount,Status,Process,Processedon,
+		INSERT INTO #Request(Requestedby,RequestedOn,RequestedAmount,PropertyName,Status,Process,Processedon,
 		Processedby,Id,RequestedUserId,PropertyId,UserId)
 		
 		SELECT (U.FirstName+' '+U.LastName) AS Requestedby,CONVERT(NVARCHAR(100),VC.Date,103) AS RequestedOn,
-		SUM(VC.Amount) AS RequestAmount,'Waiting For Operation Manager Approval' AS Status,0 AS Process,
+		SUM(VC.Amount) AS RequestAmount,P.PropertyName,'Waiting For Operation Manager Approval' AS Status,0 AS Process,
 		CONVERT(NVARCHAR(100),GETDATE(),103) AS Processedon,'Process' AS Processedby,
 		0 AS Id,VC.UserId AS RequestedUserId,VC.PropertyId,0 AS UserId
 		FROM WRBHBVendorRequest VC
@@ -74,13 +75,13 @@ CREATE PROCEDURE dbo.[SP_VendorChequeApprovalHdr_Help]
 		AND P.Category IN('Internal Property','Managed G H')
 		AND PU.UserType IN('Resident Managers','Assistant Resident Managers','Operations Managers',
 		'Ops Head','Finance')
-		GROUP BY U.FirstName,U.LastName,VC.Date,VC.UserId,VC.PropertyId
+		GROUP BY U.FirstName,U.LastName,P.PropertyName,VC.Date,VC.UserId,VC.PropertyId
 		
 				
-		SELECT  Requestedby,RequestedOn,sum(RequestedAmount) AS RequestedAmount,Status,
+		SELECT  Requestedby,RequestedOn,sum(RequestedAmount) AS RequestedAmount,PropertyName AS Property,Status,
 		Process,Processedon,Processedby,Id,RequestedUserId,PropertyId 
 		FROM #Request
-		group by  Requestedby,RequestedOn,Status,
+		group by  Requestedby,RequestedOn,PropertyName,Status,
 		Process,Processedon,Processedby,Id,RequestedUserId,PropertyId 
 		
 END
@@ -89,14 +90,14 @@ END
         --table1
         SELECT CONVERT(NVARCHAR(100),GETDATE(),103) AS BillDate,
 		VR.Service AS ExpenseHead,VR.VendorName AS VendorName,
-		P.PropertyName AS Property,VR.Type,'Cheque' AS PaymentMode,VR.BillNo,SUM(VR.Amount) AS RequestedAmount,VR.UserId,
+		P.PropertyName AS Property,VR.Duedate AS DueDate,VR.Type,'Cheque' AS PaymentMode,VR.BillNo,SUM(VR.Amount) AS RequestedAmount,VR.UserId,
 		VR.PropertyId,VR.Id
 		FROM WRBHBVendorRequest VR
 		JOIN WRBHBProperty P ON VR.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
 		WHERE VR.UserId=@UserId AND VR.PropertyId=@CreatedById AND 
 		VR.IsActive=1 AND VR.IsDeleted=0 AND VR.Partial=0
 		AND VR.Date=CONVERT(Date,@Str,103)
-		group by VR.Service,VR.VendorName,P.PropertyName,VR.Type,VR.BillNo,VR.UserId,VR.PropertyId,VR.Id
+		group by VR.Service,VR.VendorName,P.PropertyName,VR.Duedate ,VR.Type,VR.BillNo,VR.UserId,VR.PropertyId,VR.Id
 		
 		
 			
@@ -108,54 +109,59 @@ END
        
        
         CREATE TABLE #Final(BillDate NVARCHAR(100),ExpenseHead NVARCHAR(100),VendorName NVARCHAR(100),
-        Property NVARCHAR(100),Type NVARCHAR(100),PaymentMode NVARCHAR(100),BillNo NVARCHAR(100),
+        Property NVARCHAR(100),Duedate NVARCHAR(100),Type NVARCHAR(100),PaymentMode NVARCHAR(100),BillNo NVARCHAR(100),
         RequestedAmount NVARCHAR(100),UserId NVARCHAR(100),PropertyId NVARCHAR(100),Id NVARCHAR(100))
         
-        INSERT INTO #Final(BillDate,ExpenseHead,VendorName,Property,Type,PaymentMode,BillNo,RequestedAmount,
+        INSERT INTO #Final(BillDate,ExpenseHead,VendorName,Property,Duedate,Type,PaymentMode,BillNo,RequestedAmount,
         UserId,PropertyId,Id)
         
         SELECT CONVERT(NVARCHAR(100),GETDATE(),103) AS BillDate,
 		VR.Service AS ExpenseHead,VR.VendorName AS VendorName,
-		P.PropertyName AS Property,VR.Type,'Cheque' AS PaymentMode,VR.BillNo,SUM(VR.Amount) AS RequestedAmount,VR.UserId,
+		P.PropertyName AS Property,VR.Duedate,VR.Type,'Cheque' AS PaymentMode,VR.BillNo,SUM(VR.Amount) AS RequestedAmount,VR.UserId,
 		VR.PropertyId,VR.Id
 		FROM WRBHBVendorRequest VR
 		JOIN WRBHBProperty P ON VR.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
 		WHERE VR.UserId=@UserId AND VR.PropertyId=@CreatedById AND 
 		VR.IsActive=1 AND VR.IsDeleted=0 AND VR.Partial=0
 		AND VR.Date=CONVERT(Date,@Str,103)
-		group by VR.Service,VR.VendorName,P.PropertyName,VR.Type,VR.BillNo,VR.UserId,VR.PropertyId,VR.Id
+		group by VR.Service,VR.VendorName,P.PropertyName,VR.Duedate,VR.Type,VR.BillNo,VR.UserId,VR.PropertyId,VR.Id
 		
-		INSERT INTO #Final(BillDate,ExpenseHead,VendorName,Property,Type,PaymentMode,BillNo,RequestedAmount,
+		INSERT INTO #Final(BillDate,ExpenseHead,VendorName,Property,Duedate,Type,PaymentMode,BillNo,RequestedAmount,
         UserId,PropertyId,Id)
         
         SELECT '' AS BillDate,
-		'' AS ExpenseHead,'' AS VendorName,'' AS Property,'','' AS PaymentMode,'',
+		'' AS ExpenseHead,'' AS VendorName,'' AS Property,'','','' AS PaymentMode,'',
 		CONVERT(NVARCHAR(100),'',103) AS RequestedAmount,CONVERT(NVARCHAR(100),'',103),
 		CONVERT(NVARCHAR(100),'',103),CONVERT(NVARCHAR(100),'',103)
 		
-		INSERT INTO #Final(BillDate,ExpenseHead,VendorName,Property,Type,PaymentMode,BillNo,RequestedAmount,
+		INSERT INTO #Final(BillDate,ExpenseHead,VendorName,Property,Duedate,Type,PaymentMode,BillNo,RequestedAmount,
         UserId,PropertyId,Id)
         
         SELECT '' AS BillDate,
-		'' AS ExpenseHead,'' AS VendorName,'' AS Property,'','' AS PaymentMode,'',CONVERT(NVARCHAR(100),'',103) AS RequestedAmount,CONVERT(NVARCHAR(100),'',103),
+		'' AS ExpenseHead,'' AS VendorName,'' AS Property,'','','' AS PaymentMode,'',CONVERT(NVARCHAR(100),'',103) AS RequestedAmount,CONVERT(NVARCHAR(100),'',103),
 		CONVERT(NVARCHAR(100),'',103),CONVERT(NVARCHAR(100),'',103)
 		
-		INSERT INTO #Final(BillDate,ExpenseHead,VendorName,Property,Type,PaymentMode,BillNo,RequestedAmount,
+		INSERT INTO #Final(BillDate,ExpenseHead,VendorName,Property,Duedate,Type,PaymentMode,BillNo,RequestedAmount,
         UserId,PropertyId,Id)
 		
 		SELECT '' AS BillDate,
-		'' AS ExpenseHead,'' AS VendorName,'' AS Property,'','' AS PaymentMode,'',CONVERT(NVARCHAR(100),'',103) AS RequestedAmount,CONVERT(NVARCHAR(100),'',103),
+		'' AS ExpenseHead,'' AS VendorName,'' AS Property,'','','' AS PaymentMode,'',CONVERT(NVARCHAR(100),'',103) AS RequestedAmount,CONVERT(NVARCHAR(100),'',103),
 		CONVERT(NVARCHAR(100),'',103),CONVERT(NVARCHAR(100),'',103)
 		
-		INSERT INTO #Final(BillDate,ExpenseHead,VendorName,Property,Type,PaymentMode,BillNo,RequestedAmount,
+		INSERT INTO #Final(BillDate,ExpenseHead,VendorName,Property,Duedate,Type,PaymentMode,BillNo,RequestedAmount,
         UserId,PropertyId,Id)
         SELECT 'Resident Manager' AS BillDate,
-		'Operations Manager' AS ExpenseHead,'Head Operations' AS VendorName,'Account Manager' AS Property,'',''
-		 AS PaymentMode,'',CONVERT(NVARCHAR(100),'',103) AS RequestedAmount,CONVERT(NVARCHAR(100),'',103),
-		CONVERT(NVARCHAR(100),'',103),CONVERT(NVARCHAR(100),'',103)
+		'Operations Manager' AS ExpenseHead,'Head Operations' AS VendorName,'Account Manager' AS Property,'',
+		'Total' AS Type,SUM(Amount) AS PaymentMode,'',CONVERT(NVARCHAR(100),'',103) AS RequestedAmount,CONVERT(NVARCHAR(100),'',103),
+		CONVERT(NVARCHAR(100),'',103),CONVERT(NVARCHAR(100),'',103) 
+		FROM WRBHBVendorRequest WHERE UserId=@UserId AND PropertyId=@CreatedById AND 
+		IsActive=1 AND IsDeleted=0 AND Partial=0
+		AND Date=CONVERT(Date,@Str,103)
 		
 		
-		SELECT CONVERT(NVARCHAR(100),CONVERT(DATE,BillDate,103),110) AS BillDate,ExpenseHead,VendorName,Property,Type,PaymentMode,BillNo,RequestedAmount,
+		
+		SELECT CONVERT(NVARCHAR(100),BillDate,105) AS BillDate,ExpenseHead,
+		VendorName,Property,Duedate AS DueDate,Type,PaymentMode,BillNo,RequestedAmount,
         UserId,PropertyId,Id FROM #Final		
 		
  END

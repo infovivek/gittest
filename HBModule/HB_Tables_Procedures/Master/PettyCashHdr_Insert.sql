@@ -37,7 +37,7 @@ SET @ER=(SELECT DISTINCT UserId FROM WRBHBPettyCashHdr WHERE UserId=@UserId AND 
 		 AND IsActive=1 AND IsDeleted=0 AND ExpenseReport=0)
 IF ISNULL(@ER,0) != 0
 BEGIN
-	  SET @ErrMsg = 'Your Previous Request Is Not Completed';
+	  SET @ErrMsg = 'PC Can be requested after submitting the Expense Report for the Previous Request.';
 	  SELECT @ErrMsg;
 END
 ELSE

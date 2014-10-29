@@ -329,40 +329,40 @@
         <TablixBody>
           <TablixColumns>
             <TablixColumn>
-              <Width>0.52327in</Width>
+              <Width>0.75079in</Width>
             </TablixColumn>
             <TablixColumn>
               <Width>0.67398in</Width>
             </TablixColumn>
             <TablixColumn>
-              <Width>0.93842in</Width>
+              <Width>0.87854in</Width>
             </TablixColumn>
             <TablixColumn>
-              <Width>0.42343in</Width>
+              <Width>0.64218in</Width>
             </TablixColumn>
             <TablixColumn>
-              <Width>0.87743in</Width>
+              <Width>0.69381in</Width>
             </TablixColumn>
             <TablixColumn>
-              <Width>0.71077in</Width>
+              <Width>0.85733in</Width>
             </TablixColumn>
             <TablixColumn>
-              <Width>0.62155in</Width>
+              <Width>0.78305in</Width>
             </TablixColumn>
             <TablixColumn>
               <Width>0.54082in</Width>
             </TablixColumn>
             <TablixColumn>
-              <Width>0.52326in</Width>
+              <Width>0.50875in</Width>
             </TablixColumn>
             <TablixColumn>
-              <Width>0.64488in</Width>
+              <Width>0.76407in</Width>
             </TablixColumn>
             <TablixColumn>
-              <Width>0.82535in</Width>
+              <Width>0.71693in</Width>
             </TablixColumn>
             <TablixColumn>
-              <Width>0.68993in</Width>
+              <Width>0.98103in</Width>
             </TablixColumn>
           </TablixColumns>
           <TablixRows>
@@ -511,18 +511,16 @@
                 </TablixCell>
                 <TablixCell>
                   <CellContents>
-                    <Textbox Name="Textbox100">
+                    <Textbox Name="Textbox1">
                       <CanGrow>true</CanGrow>
                       <KeepTogether>true</KeepTogether>
                       <Paragraphs>
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>GuestName</Value>
+                              <Value>Guest Name</Value>
                               <Style>
                                 <FontWeight>Bold</FontWeight>
-                                <TextDecoration>None</TextDecoration>
-                                <Color>#000000</Color>
                               </Style>
                             </TextRun>
                           </TextRuns>
@@ -531,7 +529,7 @@
                           </Style>
                         </Paragraph>
                       </Paragraphs>
-                      <rd:DefaultName>Textbox100</rd:DefaultName>
+                      <rd:DefaultName>Textbox1</rd:DefaultName>
                       <Style>
                         <Border>
                           <Color>LightGrey</Color>
@@ -673,7 +671,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>Rate</Value>
+                              <Value>Cess</Value>
                               <Style>
                                 <FontWeight>Bold</FontWeight>
                               </Style>
@@ -743,7 +741,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>Service Tax</Value>
+                              <Value>Tax</Value>
                               <Style>
                                 <FontWeight>Bold</FontWeight>
                               </Style>
@@ -1111,21 +1109,21 @@
                 </TablixCell>
                 <TablixCell>
                   <CellContents>
-                    <Textbox Name="SServiceTax">
+                    <Textbox Name="TaxNo">
                       <CanGrow>true</CanGrow>
                       <KeepTogether>true</KeepTogether>
                       <Paragraphs>
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Fields!SServiceTax.Value</Value>
+                              <Value>=Fields!TaxNo.Value</Value>
                               <Style />
                             </TextRun>
                           </TextRuns>
                           <Style />
                         </Paragraph>
                       </Paragraphs>
-                      <rd:DefaultName>SServiceTax</rd:DefaultName>
+                      <rd:DefaultName>TaxNo</rd:DefaultName>
                       <Style>
                         <Border>
                           <Color>LightGrey</Color>
@@ -1296,7 +1294,7 @@
                 </TablixCell>
                 <TablixCell>
                   <CellContents>
-                    <Textbox Name="Textbox121">
+                    <Textbox Name="Textbox3">
                       <CanGrow>true</CanGrow>
                       <KeepTogether>true</KeepTogether>
                       <Paragraphs>
@@ -1310,7 +1308,7 @@
                           <Style />
                         </Paragraph>
                       </Paragraphs>
-                      <rd:DefaultName>Textbox121</rd:DefaultName>
+                      <rd:DefaultName>Textbox3</rd:DefaultName>
                       <Style>
                         <Border>
                           <Color>LightGrey</Color>
@@ -1573,9 +1571,9 @@
           </TablixMembers>
         </TablixRowHierarchy>
         <DataSetName>DataSet1</DataSetName>
-        <Top>9.22583in</Top>
+        <Top>8.85083in</Top>
         <Height>0.88542in</Height>
-        <Width>7.9931in</Width>
+        <Width>8.79128in</Width>
         <Style>
           <Border>
             <Style>None</Style>
@@ -1609,7 +1607,7 @@
         <Top>8.46709in</Top>
         <Left>0.00001in</Left>
         <Height>0.25in</Height>
-        <Width>7.99309in</Width>
+        <Width>8.77878in</Width>
         <ZIndex>1</ZIndex>
         <Style>
           <Border>
@@ -1650,7 +1648,7 @@
         <Top>6.25571in</Top>
         <Left>0.0125in</Left>
         <Height>0.25in</Height>
-        <Width>7.9806in</Width>
+        <Width>8.77878in</Width>
         <ZIndex>2</ZIndex>
         <Style>
           <Border>
@@ -1678,8 +1676,8 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox51</rd:DefaultName>
-        <Top>6.22721in</Top>
-        <Left>2.66535cm</Left>
+        <Top>6.2314in</Top>
+        <Left>2.98285cm</Left>
         <Height>0.01042in</Height>
         <Width>6.77958in</Width>
         <ZIndex>3</ZIndex>
@@ -1716,7 +1714,7 @@
         <Top>8.20695in</Top>
         <Left>0.0125in</Left>
         <Height>0.25in</Height>
-        <Width>7.9806in</Width>
+        <Width>8.77878in</Width>
         <ZIndex>4</ZIndex>
         <Style>
           <Border>
@@ -1733,7 +1731,7 @@
         <TablixBody>
           <TablixColumns>
             <TablixColumn>
-              <Width>2.98493in</Width>
+              <Width>2.85993in</Width>
             </TablixColumn>
           </TablixColumns>
           <TablixRows>
@@ -1870,9 +1868,9 @@
           </TablixMembers>
         </TablixRowHierarchy>
         <Top>4.47138in</Top>
-        <Left>4.6981in</Left>
+        <Left>5.8981in</Left>
         <Height>1.10183in</Height>
-        <Width>2.98493in</Width>
+        <Width>2.85993in</Width>
         <ZIndex>5</ZIndex>
         <Style>
           <Border>
@@ -1900,7 +1898,7 @@
         <Top>4.16096in</Top>
         <Left>0.04594in</Left>
         <Height>0.25in</Height>
-        <Width>4.86422in</Width>
+        <Width>5.7933in</Width>
         <ZIndex>6</ZIndex>
         <Style>
           <Border>
@@ -1917,10 +1915,10 @@
         <TablixBody>
           <TablixColumns>
             <TablixColumn>
-              <Width>2.53617in</Width>
+              <Width>3.332in</Width>
             </TablixColumn>
             <TablixColumn>
-              <Width>5.29276in</Width>
+              <Width>5.45927in</Width>
             </TablixColumn>
           </TablixColumns>
           <TablixRows>
@@ -2149,7 +2147,7 @@
         <DataSetName>DataSet1</DataSetName>
         <Top>0.05191in</Top>
         <Height>0.88035in</Height>
-        <Width>7.82893in</Width>
+        <Width>8.79128in</Width>
         <ZIndex>7</ZIndex>
         <Style>
           <Border>
@@ -2161,13 +2159,13 @@
         <TablixBody>
           <TablixColumns>
             <TablixColumn>
-              <Width>4.91015in</Width>
+              <Width>4.92804in</Width>
             </TablixColumn>
             <TablixColumn>
-              <Width>1.38341in</Width>
+              <Width>1.85563in</Width>
             </TablixColumn>
             <TablixColumn>
-              <Width>1.53537in</Width>
+              <Width>2.00759in</Width>
             </TablixColumn>
           </TablixColumns>
           <TablixRows>
@@ -3042,7 +3040,7 @@
         <Top>1.08563in</Top>
         <Left>0.00001in</Left>
         <Height>2.69624in</Height>
-        <Width>7.82893in</Width>
+        <Width>8.79127in</Width>
         <ZIndex>8</ZIndex>
         <Style>
           <Border>
@@ -3054,13 +3052,13 @@
         <TablixBody>
           <TablixColumns>
             <TablixColumn>
-              <Width>0.99786in</Width>
+              <Width>1.38892in</Width>
             </TablixColumn>
             <TablixColumn>
-              <Width>3.45797in</Width>
+              <Width>3.56359in</Width>
             </TablixColumn>
             <TablixColumn>
-              <Width>3.53727in</Width>
+              <Width>3.83877in</Width>
             </TablixColumn>
           </TablixColumns>
           <TablixRows>
@@ -3094,40 +3092,10 @@
                         <PaddingBottom>2pt</PaddingBottom>
                       </Style>
                     </Textbox>
+                    <ColSpan>2</ColSpan>
                   </CellContents>
                 </TablixCell>
-                <TablixCell>
-                  <CellContents>
-                    <Textbox Name="LTPer1">
-                      <CanGrow>true</CanGrow>
-                      <KeepTogether>true</KeepTogether>
-                      <Paragraphs>
-                        <Paragraph>
-                          <TextRuns>
-                            <TextRun>
-                              <Value>=Fields!LTPer.Value</Value>
-                              <Style />
-                            </TextRun>
-                          </TextRuns>
-                          <Style />
-                        </Paragraph>
-                      </Paragraphs>
-                      <rd:DefaultName>LTPer1</rd:DefaultName>
-                      <Style>
-                        <Border>
-                          <Style>None</Style>
-                        </Border>
-                        <BottomBorder>
-                          <Style>Solid</Style>
-                        </BottomBorder>
-                        <PaddingLeft>2pt</PaddingLeft>
-                        <PaddingRight>2pt</PaddingRight>
-                        <PaddingTop>2pt</PaddingTop>
-                        <PaddingBottom>2pt</PaddingBottom>
-                      </Style>
-                    </Textbox>
-                  </CellContents>
-                </TablixCell>
+                <TablixCell />
                 <TablixCell>
                   <CellContents>
                     <Textbox Name="Textbox141">
@@ -3218,6 +3186,9 @@
                         <Border>
                           <Style>None</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>Solid</Style>
+                        </TopBorder>
                         <PaddingLeft>2pt</PaddingLeft>
                         <PaddingRight>2pt</PaddingRight>
                         <PaddingTop>2pt</PaddingTop>
@@ -3499,7 +3470,7 @@
         <DataSetName>DataSet1</DataSetName>
         <Top>6.68063in</Top>
         <Height>1.43333in</Height>
-        <Width>7.9931in</Width>
+        <Width>8.79128in</Width>
         <ZIndex>9</ZIndex>
         <Style>
           <Border>
@@ -3508,7 +3479,7 @@
         </Style>
       </Tablix>
     </ReportItems>
-    <Height>10.2675in</Height>
+    <Height>9.73625in</Height>
     <Style />
   </Body>
   <ReportParameters>
@@ -3517,7 +3488,7 @@
       <Prompt>ReportParameter1</Prompt>
     </ReportParameter>
   </ReportParameters>
-  <Width>7.9931in</Width>
+  <Width>8.79128in</Width>
   <Page>
     <PageHeader>
       <Height>1.21992in</Height>
@@ -3528,10 +3499,10 @@
           <Source>External</Source>
           <Value>=Parameters!path.Value</Value>
           <Sizing>FitProportional</Sizing>
-          <Top>0.30663in</Top>
-          <Left>0.44262in</Left>
-          <Height>0.5in</Height>
-          <Width>2.24167in</Width>
+          <Top>0.18163in</Top>
+          <Left>0.06762in</Left>
+          <Height>0.63542in</Height>
+          <Width>3.13542in</Width>
           <Style>
             <Border>
               <Style>None</Style>
@@ -3559,7 +3530,7 @@
           </Paragraphs>
           <rd:DefaultName>Textbox13</rd:DefaultName>
           <Top>0.99561in</Top>
-          <Left>5.19345cm</Left>
+          <Left>6.78095cm</Left>
           <Height>0.22431in</Height>
           <Width>3.2833in</Width>
           <ZIndex>1</ZIndex>
@@ -3595,7 +3566,7 @@
           </Paragraphs>
           <rd:DefaultName>Textbox219</rd:DefaultName>
           <Top>0.99561in</Top>
-          <Left>5.91686in</Left>
+          <Left>6.79186in</Left>
           <Height>0.22431in</Height>
           <Width>1in</Width>
           <ZIndex>2</ZIndex>
@@ -3631,7 +3602,7 @@
           </Paragraphs>
           <rd:DefaultName>Textbox220</rd:DefaultName>
           <Top>0.99561in</Top>
-          <Left>6.91686in</Left>
+          <Left>7.79186in</Left>
           <Height>0.22431in</Height>
           <Width>0.85573in</Width>
           <ZIndex>3</ZIndex>
@@ -3662,7 +3633,7 @@
           </Paragraphs>
           <rd:DefaultName>Textbox218</rd:DefaultName>
           <Top>0.71874in</Top>
-          <Left>5.27259in</Left>
+          <Left>6.23509in</Left>
           <Height>0.22237in</Height>
           <Width>2.5in</Width>
           <ZIndex>4</ZIndex>
@@ -3695,7 +3666,7 @@
           </Paragraphs>
           <rd:DefaultName>Textbox217</rd:DefaultName>
           <Top>0.47847in</Top>
-          <Left>5.27259in</Left>
+          <Left>6.23509in</Left>
           <Height>0.22237in</Height>
           <Width>2.5in</Width>
           <ZIndex>5</ZIndex>
@@ -3726,7 +3697,7 @@
           </Paragraphs>
           <rd:DefaultName>Textbox216</rd:DefaultName>
           <Top>0.23958in</Top>
-          <Left>5.27259in</Left>
+          <Left>6.23509in</Left>
           <Height>0.22237in</Height>
           <Width>2.5in</Width>
           <ZIndex>6</ZIndex>
@@ -3757,7 +3728,7 @@
             </Paragraph>
           </Paragraphs>
           <rd:DefaultName>Textbox133</rd:DefaultName>
-          <Left>5.27259in</Left>
+          <Left>6.23509in</Left>
           <Height>0.22237in</Height>
           <Width>2.5in</Width>
           <ZIndex>7</ZIndex>
@@ -3778,10 +3749,12 @@
         </Border>
       </Style>
     </PageHeader>
-    <LeftMargin>1in</LeftMargin>
-    <RightMargin>1in</RightMargin>
-    <TopMargin>1in</TopMargin>
-    <BottomMargin>1in</BottomMargin>
+    <PageHeight>10.69in</PageHeight>
+    <PageWidth>9.8in</PageWidth>
+    <LeftMargin>0.5in</LeftMargin>
+    <RightMargin>0.5in</RightMargin>
+    <TopMargin>0.3in</TopMargin>
+    <BottomMargin>0.3in</BottomMargin>
     <Style />
   </Page>
   <rd:ReportID>e07b5b02-681d-496f-8dfa-946bd0c3ff6f</rd:ReportID>

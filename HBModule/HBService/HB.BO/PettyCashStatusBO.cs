@@ -10,14 +10,9 @@ namespace HB.BO
 {
     public class PettyCashStatusBO
     {
-
-        public DataSet Save(string[] data, Entity.User user)
+        public DataSet Save(string PettyCashStatusHdr, User user, int PettyCashStatusHdrId)
         {
-            return new PettyCashStatusDAO().Save(data, user);
+            return new PettyCashStatusDAO().Save(PettyCashStatusHdr, user, PettyCashStatusHdrId);
         }
-        public DataSet HelpResult(string[] data, Entity.User user)
-        {
-            return new PettyCashStatusDAO().HelpResult(data, user);
-        }
-    }
+     }
 }

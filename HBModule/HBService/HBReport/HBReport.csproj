@@ -60,6 +60,10 @@
     <Content Include="ExternalCheckOutTAC.aspx" />
     <Content Include="ExternalCheckoutTACMail.aspx" />
     <Content Include="ExternalCheckOutTariff.aspx" />
+    <Content Include="ExternalIntermediateCheckoutConsolidate.aspx" />
+    <Content Include="ExternalIntermediateCheckoutService.aspx" />
+    <Content Include="ExternalIntermediateCheckOutTariff.aspx" />
+    <Content Include="ExternalIntermediateTAC.aspx" />
     <Content Include="GuestCheckOutConsolidate.aspx" />
     <Content Include="GuestCheckOutConsolidate1.aspx" />
     <Content Include="GuestCheckOutService.aspx" />
@@ -149,6 +153,34 @@
     </Compile>
     <Compile Include="ExternalCheckOutTariff.aspx.designer.cs">
       <DependentUpon>ExternalCheckOutTariff.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="ExternalIntermediateCheckoutConsolidate.aspx.cs">
+      <DependentUpon>ExternalIntermediateCheckoutConsolidate.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ExternalIntermediateCheckoutConsolidate.aspx.designer.cs">
+      <DependentUpon>ExternalIntermediateCheckoutConsolidate.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="ExternalIntermediateCheckoutService.aspx.cs">
+      <DependentUpon>ExternalIntermediateCheckoutService.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ExternalIntermediateCheckoutService.aspx.designer.cs">
+      <DependentUpon>ExternalIntermediateCheckoutService.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="ExternalIntermediateCheckOutTariff.aspx.cs">
+      <DependentUpon>ExternalIntermediateCheckOutTariff.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ExternalIntermediateCheckOutTariff.aspx.designer.cs">
+      <DependentUpon>ExternalIntermediateCheckOutTariff.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="ExternalIntermediateTAC.aspx.cs">
+      <DependentUpon>ExternalIntermediateTAC.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ExternalIntermediateTAC.aspx.designer.cs">
+      <DependentUpon>ExternalIntermediateTAC.aspx</DependentUpon>
     </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -285,6 +317,10 @@
     <EmbeddedResource Include="IntermediateCheckoutTariff.rdlc" />
     <EmbeddedResource Include="IntermediateCheckoutService.rdlc" />
     <EmbeddedResource Include="IntermediateCheckoutConsolidate.rdlc" />
+    <EmbeddedResource Include="ExternalIntermediateCheckOutTariff.rdlc" />
+    <EmbeddedResource Include="ExternalIntermediateCheckoutService.rdlc" />
+    <EmbeddedResource Include="ExternalIntermediateCheckoutConsolidate.rdlc" />
+    <EmbeddedResource Include="ExternalIntermediateTAC.rdlc" />
     <EmbeddedResource Include="TAC Annexure.rdlc" />
     <EmbeddedResource Include="TACAnnuxpage1.rdlc" />
   </ItemGroup>

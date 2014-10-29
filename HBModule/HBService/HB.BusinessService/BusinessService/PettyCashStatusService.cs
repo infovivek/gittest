@@ -16,31 +16,7 @@ namespace HB.BusinessService.BusinessService
 
         public DataSet Save(string[] data, User user)
         {
-            DataSet ds = new DataSet();
-            DataTable dTable = new DataTable("ERRORTBL");
-            dTable.Columns.Add("Exception");
-            try
-            {
-                string Hdrval = (data[1].ToString());
-                DataSet ds1 = new PettyCashStatusBO().Save(data, user);
-                if (ds1.Tables["DBERRORTBL"].Rows.Count > 0)
-                {
-                    dTable.Rows.Add(ds1.Tables["DBERRORTBL"].Rows[0][0].ToString());
-                }
-            }
-            catch (Exception Ex)
-            {
-                CreateLogFilesService Err = new CreateLogFilesService();
-                Err.ErrorLog(Ex.Message);
-                dTable.Rows.Add("Error - " + Ex.Message + " | " + Ex.InnerException);
-            }
-            finally
-            {
-                ds.Tables.Add(dTable);
-                dTable.Dispose();
-                dTable = null;
-            }
-            return ds;
+            throw new NotImplementedException();
         }
 
         public DataSet Delete(string[] data, Entity.User user)
@@ -55,7 +31,7 @@ namespace HB.BusinessService.BusinessService
 
         public DataSet HelpResult(string[] data, Entity.User user)
         {
-            return new PettyCashStatusBO().HelpResult(data, user);
+            throw new NotImplementedException();
         }
     }
 }

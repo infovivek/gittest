@@ -115,16 +115,9 @@ BEGIN
 	 END
  ELSE
  BEGIN
-		UPDATE WRBHBPettyCashStatus SET Flag=0,Balance=@ApprovedAmount-@ExpenseAmount,
-		ModifiedDate=GETDATE()
-		,IsActive=0,IsDeleted=1
+		UPDATE WRBHBPettyCashStatusHdr SET Flag=0,IsActive=0,IsDeleted=1
 		WHERE IsActive=1 AND IsDeleted=0 AND UserId=@RequestedUserId 
-		
-		UPDATE WRBHBPettyCashHdr SET ExpenseReport=1,ClosingBalance=@ApprovedAmount-@ExpenseAmount
-		,IsActive=0,IsDeleted=1
-		WHERE IsActive=1 AND IsDeleted=0 AND UserId=@RequestedUserId 
-		
-		 			
+			 			
 		INSERT INTO	WRBHBNewPCExpenseApproval (RequestedOn,Requestedby,
 		PCAccount,ApprovedAmount,ExpenseAmount,ProcessedStatus,LastProcessedon,Comments,
 		RequestedUserId,PropertyId,UserId,Process,IsActive,IsDeleted,CreatedBy,

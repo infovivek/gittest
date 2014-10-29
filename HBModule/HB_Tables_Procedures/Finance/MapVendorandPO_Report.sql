@@ -114,7 +114,7 @@ BEGIN
 	
 	SELECT AdvanceAmount,Id,0 AdjusmentAmount FROM #AdvanceAmount
 	
-	SELECT SUM(AdvanceAmount) AdvanceAmount FROM #AdvanceAmount
+	SELECT SUM(ISNULL(AdvanceAmount,0)) AdvanceAmount FROM #AdvanceAmount
 	
 END
 IF @Action ='Property'

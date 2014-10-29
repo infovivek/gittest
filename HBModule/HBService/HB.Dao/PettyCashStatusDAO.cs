@@ -13,7 +13,7 @@ namespace HB.Dao
     public class PettyCashStatusDAO
     {
         string UserData;
-        public DataSet Save(string[] data, Entity.User user)
+        public DataSet Save(string PettyCashStatusHdr, User user, int PettyCashStatusHdrId)
         {
             DataSet ds = new DataSet();
             DataTable dTable = new DataTable("ERRORTBL");
@@ -22,14 +22,8 @@ namespace HB.Dao
             PettyCashStatusEntity PettySt = new PettyCashStatusEntity();
             XmlDocument doc = new XmlDocument();
 
-            int PropertyId,UserId;
-            doc.LoadXml(data[2].ToString());
-
-            PropertyId = Convert.ToInt32(doc.SelectSingleNode("//Property").Attributes["PropertyId"].Value);
-            UserId = Convert.ToInt32(doc.SelectSingleNode("//Property").Attributes["UserId"].Value);
-
             XmlDocument document = new XmlDocument();
-            document.LoadXml(data[1].ToString());
+            document.LoadXml(PettyCashStatusHdr);
 
             int n;
             n = (document).SelectNodes("//HdrXml").Count;
@@ -104,7 +98,7 @@ namespace HB.Dao
                     command.CommandText = StoredProcedures.PettyCashStatus_Insert;
                 }
                 command.CommandType = CommandType.StoredProcedure;
-                command.Parameters.Add("@PropertyId", SqlDbType.BigInt).Value = PropertyId;
+                command.Parameters.Add("@PettyCashStatusHdrId", SqlDbType.BigInt).Value = PettyCashStatusHdrId;
                 command.Parameters.Add("@ExpenseHead", SqlDbType.NVarChar).Value = PettySt.ExpenseHead;
                 command.Parameters.Add("@Status", SqlDbType.NVarChar).Value = PettySt.Status;
                 command.Parameters.Add("@Description", SqlDbType.NVarChar).Value = PettySt.Description;
@@ -113,43 +107,12 @@ namespace HB.Dao
                 command.Parameters.Add("@BillLogo", SqlDbType.NVarChar).Value = PettySt.FilePath;
                 command.Parameters.Add("@BillDate", SqlDbType.NVarChar).Value = PettySt.BillDate;
                 command.Parameters.Add("@ExpenseId", SqlDbType.BigInt).Value = PettySt.ExpenseId;
-                command.Parameters.Add("@UserId", SqlDbType.BigInt).Value = UserId;
+                command.Parameters.Add("@UserId", SqlDbType.BigInt).Value = user.Id;
                 ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
             }
             return ds;
         }
 
-        public DataSet Search(string[] data, Entity.User user)
-        {
-            UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
-                "', SctId:" + user.SctId + ", Service:PettyCashStatusDAO Select" + ", ProcName:'" + StoredProcedures.PettyCashStatus_Select; 
-
-            PettyCashStatusEntity PettySt = new PettyCashStatusEntity();
-            XmlDocument document = new XmlDocument();
-            SqlCommand command = new SqlCommand();
-            //command.CommandText = StoredProcedures.PettyCashStatus_Select;
-            //command.CommandType = CommandType.StoredProcedure;
-            //command.Parameters.Add("@Id", SqlDbType.Int).Value = Convert.ToInt32(data[1].ToString());
-            //command.Parameters.Add("@FromDate", SqlDbType.NVarChar).Value = data[3].ToString();
-            //command.Parameters.Add("@ToDate", SqlDbType.NVarChar).Value = data[4].ToString();
-            //command.Parameters.Add("@PropertyId", SqlDbType.Int).Value = Convert.ToInt32(data[5].ToString());
-            //command.Parameters.Add("@UserId", SqlDbType.Int).Value = Convert.ToInt32(data[6].ToString());//Convert.ToInt32(user.Id);
-            return new WrbErpConnection().ExecuteDataSet(command, UserData);
-        }
-        public DataSet HelpResult(string[] data, Entity.User user)
-        {
-            UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
-                "', SctId:" + user.SctId + ", Service:PettyCashStatusDAO Help" + ", ProcName:'" + StoredProcedures.PettyCashStatus_Help; 
-
-            SqlCommand command = new SqlCommand();
-            command.CommandText = StoredProcedures.PettyCashStatus_Help;
-            command.CommandType = CommandType.StoredProcedure;
-            command.Parameters.Add("@Action", SqlDbType.NVarChar).Value = data[1].ToString();
-            command.Parameters.Add("@Str", SqlDbType.NVarChar).Value = data[2].ToString();
-            command.Parameters.Add("@Id", SqlDbType.Int).Value = Convert.ToInt32(data[3].ToString());
-            command.Parameters.Add("@UserId", SqlDbType.Int).Value = Convert.ToInt32(data[4].ToString());
-            command.Parameters.Add("@ExpenseId", SqlDbType.Int).Value = Convert.ToInt32(data[5].ToString());
-            return new WrbErpConnection().ExecuteDataSet(command, UserData);
-        }
+           
     }
 }

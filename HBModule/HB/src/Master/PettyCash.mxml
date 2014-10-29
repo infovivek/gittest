@@ -86,11 +86,11 @@
 				{
 					if (AddMode == true)
 					{
-						alignAlert(Alert.show("PettyCash Submitted Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+						alignAlert(Alert.show("PC Request Submitted Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
 					}
 					else
 					{
-						alignAlert(Alert.show("PettyCash Submitted Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+						alignAlert(Alert.show("PC Request Submitted Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
 					}
 					FnClear();
 				}
@@ -147,7 +147,7 @@
 				} 
 				else
 				{
-					alignAlert(Alert.show("Do you want To Request ?", "Warning",Alert.YES | Alert.NO, null,
+					alignAlert(Alert.show(" Do you want submit the PC request?", "Warning",Alert.YES | Alert.NO, null,
 					FnSave1, iconWarning, Alert.NO),10,"");
 				}
 			}

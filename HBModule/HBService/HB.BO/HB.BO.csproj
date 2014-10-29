@@ -130,6 +130,7 @@
     <Compile Include="PettyCashHdrBO.cs" />
     <Compile Include="PettyCashReportBO.cs" />
     <Compile Include="PettyCashStatusBO.cs" />
+    <Compile Include="PettyCashStatusHdrBO.cs" />
     <Compile Include="PropertyOwnerOtherContactsBO.cs" />
     <Compile Include="PropertyReportBO.cs" />
     <Compile Include="ReassignClientBO.cs" />

@@ -25,31 +25,43 @@ Reviewed By	: <Reviewed By (Leave it blank)>
 
 CREATE PROCEDURE Sp_PettyCashStatus_Insert
 (
+@PettyCashStatusHdrId INT,
 @ExpenseHead    NVARCHAR(100),
 @Status		    NVARCHAR(100),
 @Description	NVARCHAR(100),
 @Amount         DECIMAL(27,2),
 @Paid		    DECIMAL(27,2),
-@PropertyId     BIGINT,
 @BillLogo       NVARCHAR(1000),
 @ExpenseId		BIGINT,
 @BillDate       NVARCHAR(1000),
 @UserId		    BIGINT
 )
 AS
-DECLARE @Identity int
+DECLARE @Identity int;
 BEGIN
-	UPDATE WRBHBPettyCashApprovalDtl SET Process=0 
-	WHERE UserId=@UserId AND PropertyId=@PropertyId
 	
-	UPDATE WRBHBNewPettyCashApprovalDtl SET Process=0,IsActive=0,IsDeleted=1
-	WHERE UserId=@UserId AND PropertyId=@PropertyId
-	
-	INSERT INTO WRBHBPettyCashStatus(PropertyId,ExpenseHead,Status,Description,Amount,
+	INSERT INTO WRBHBPettyCashStatus(PettyCashStatusHdrId,ExpenseHead,Status,Description,Amount,
 	Paid,UserId,IsActive,IsDeleted,Createdby,Createddate,Modifiedby,Modifieddate,
-	RowId,Flag,BillLogo,ExpenseId,BillDate)
-	VALUES(@PropertyId,@ExpenseHead,@Status,@Description,@Amount,@Paid,@UserId,1,0,@UserId,
-	GETDATE(),@UserId,GETDATE(),NEWID(),1,@BillLogo,@ExpenseId,@BillDate)
+	RowId,Flag,BillLogo,ExpenseId,BillDate,Balance)
+	VALUES(@PettyCashStatusHdrId,@ExpenseHead,@Status,@Description,@Amount,@Paid,@UserId,1,0,@UserId,
+	GETDATE(),@UserId,GETDATE(),NEWID(),1,@BillLogo,@ExpenseId,@BillDate,@Amount-@Paid)
+	
+	DECLARE @Pr INT
+	SET @Pr=(SELECT PropertyId FROM WRBHBPettyCashStatusHdr
+	WHERE Id=@PettyCashStatusHdrId)
+	UPDATE WRBHBPettyCashStatus SET PropertyId=@Pr
+	WHERE PettyCashStatusHdrId=@PettyCashStatusHdrId
+	
+	DECLARE @Bal DECIMAL(27,2)
+	SET @Bal=(SELECT SUM(Balance)
+	FROM WRBHBPettyCashStatus 
+	WHERE PettyCashStatusHdrId=@PettyCashStatusHdrId AND IsActive=1 AND IsDeleted=0)
+	UPDATE WRBHBPettyCashStatusHdr SET Balance=@Bal
+	WHERE Id=@PettyCashStatusHdrId
+	
+	UPDATE WRBHBPettyCashHdr SET ClosingBalance=@Bal,ExpenseReport=1
+	WHERE UserId=@UserId AND PropertyId=@Pr AND
+	Convert(NVARCHAR(100),Date,103)=@Status
 	
 	SET  @Identity=@@IDENTITY
 	SELECT Id,RowId FROM WRBHBPettyCashStatus WHERE Id=@Identity;

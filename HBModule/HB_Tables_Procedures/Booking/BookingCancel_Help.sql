@@ -147,42 +147,87 @@ IF @Action = 'BookingCode'
 	  ORDER BY Id ASC
  END
  IF @Action = 'BookingCodeCancel'
- BEGIN
-	  CREATE TABLE #BookingCode1(BookingCode NVARCHAR(100),Id BIGINT,GuestName NVARCHAR(100),
-	  PropertyName NVARCHAR(100),ClientNameId NVARCHAR(100),BookingLevelId NVARCHAR(100))	
-	  
-	  INSERT INTO #BookingCode1(BookingCode,Id,GuestName,PropertyName,ClientNameId,BookingLevelId)
-	  SELECT BookingCode,B.Id,FirstName +' '+LastName,P.PropertyName,ClientName,BookingLevel 
-	  FROM WRBHBBooking B
-	  JOIN WRBHBBookingPropertyAssingedGuest A ON A.BookingId=B.Id AND  A.IsActive=1 AND A.IsDeleted=0 
-	  AND A.CurrentStatus ='Booked'
-	  JOIN WRBHBProperty P ON A.BookingPropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
-	  WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled' AND B.Status IN ('Direct Booked','Booked') 
-	  AND BookingCode !=0  
-	  
-	  INSERT INTO #BookingCode1(BookingCode,Id,GuestName,PropertyName,ClientNameId,BookingLevelId)
-	  SELECT BookingCode,B.Id,FirstName +' '+LastName,P.PropertyName,ClientName ,BookingLevel
-	  FROM WRBHBBooking B
-	  JOIN WRBHBBedBookingPropertyAssingedGuest A ON A.BookingId=B.Id AND  A.IsActive=1 AND A.IsDeleted=0 
-	  AND A.CurrentStatus ='Booked'
-	  
-	  JOIN WRBHBProperty P ON A.BookingPropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
-	  WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled' AND B.Status IN ('Direct Booked','Booked') 
-	  AND BookingCode !=0 
-	  
-	  INSERT INTO #BookingCode1(BookingCode,Id,GuestName,PropertyName,ClientNameId,BookingLevelId)
-	  SELECT BookingCode,B.Id,FirstName +' '+LastName,P.PropertyName,ClientName,BookingLevel 
-	  FROM WRBHBBooking B
-	  JOIN WRBHBApartmentBookingPropertyAssingedGuest A ON A.BookingId=B.Id AND  A.IsActive=1 AND A.IsDeleted=0 
-	  AND A.CurrentStatus ='Booked'
-	  JOIN WRBHBProperty P ON A.BookingPropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
-	  WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled' AND B.Status IN ('Direct Booked','Booked') 
-	  AND BookingCode !=0 
-	  
-	  SELECT BookingCode,Id,GuestName,PropertyName,ClientNameId as ZClientNameId,
-	  BookingLevelId as ZBookingLevelId FROM #BookingCode1
-	  ORDER BY Id ASC
-	  END
+  BEGIN
+   CREATE TABLE #BookingCode1(BookingCode NVARCHAR(100),Id BIGINT,
+   GuestName NVARCHAR(100),PropertyName NVARCHAR(100),ClientNameId NVARCHAR(100),
+   BookingLevelId NVARCHAR(100),PropertyType NVARCHAR(100));
+   -- ROOM LEVEL
+   INSERT INTO #BookingCode1(BookingCode,Id,GuestName,PropertyName,ClientNameId,
+   BookingLevelId,PropertyType)
+   SELECT BookingCode,B.Id,FirstName +' '+LastName,P.PropertyName,ClientName,
+   BookingLevel,'' FROM WRBHBBooking B
+   JOIN WRBHBBookingPropertyAssingedGuest A WITH(NOLOCK) ON A.BookingId = B.Id 
+   AND A.IsActive = 1 AND A.IsDeleted = 0 AND A.CurrentStatus ='Booked'
+   JOIN WRBHBProperty P ON A.BookingPropertyId = P.Id AND P.IsActive = 1 AND 
+   P.IsDeleted = 0
+   WHERE B.IsActive = 1 AND B.IsDeleted = 0 AND BookingCode != 0 AND
+   ISNULL(B.CancelStatus,'') != 'Canceled' AND B.BookingLevel = 'Room' AND
+   B.Status IN ('Direct Booked','Booked');
+   -- ROOM LEVEL MMT
+   INSERT INTO #BookingCode1(BookingCode,Id,GuestName,PropertyName,ClientNameId,
+   BookingLevelId,PropertyType)
+   SELECT B.BookingCode,B.Id,BG.FirstName +' '+BG.LastName,P.HotalName,
+   B.ClientName,B.BookingLevel,BP.PropertyType FROM WRBHBBooking B
+   LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId = B.Id
+   LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
+   BG.BookingId = B.Id AND BG.BookingPropertyTableId = BP.Id AND
+   BG.BookingPropertyId = BP.PropertyId
+   LEFT OUTER JOIN WRBHBStaticHotels P WITH(NOLOCK)ON 
+   P.HotalId = BG.BookingPropertyId
+   WHERE B.IsActive = 1 AND B.IsDeleted = 0 AND BP.IsActive = 1 AND
+   BP.IsDeleted = 0 AND BG.IsActive = 1 AND BG.IsDeleted = 0 AND
+   P.IsActive = 1 AND P.IsDeleted = 0 AND B.BookingLevel = 'Room' AND
+   B.BookingCode != 0 AND BG.CurrentStatus = 'Booked' AND
+   ISNULL(B.CancelStatus,'') = '' AND 
+   BP.PropertyType = 'MMT' AND BP.GetType = 'API' AND
+   B.Status IN ('Direct Booked','Booked');
+   -- BED LEVEL
+   INSERT INTO #BookingCode1(BookingCode,Id,GuestName,PropertyName,ClientNameId,
+   BookingLevelId,PropertyType)
+   SELECT BookingCode,B.Id,FirstName +' '+LastName,P.PropertyName,ClientName,
+   BookingLevel,'' FROM WRBHBBooking B
+   JOIN WRBHBBedBookingPropertyAssingedGuest A WITH(NOLOCK)ON A.BookingId = B.Id 
+   AND A.IsActive = 1 AND A.IsDeleted = 0 AND A.CurrentStatus = 'Booked'
+   JOIN WRBHBProperty P WITH(NOLOCK)ON A.BookingPropertyId = P.Id AND 
+   P.IsActive = 1 AND P.IsDeleted = 0
+   WHERE B.IsActive = 1 AND B.IsDeleted = 0 AND BookingCode != 0 AND
+   ISNULL(B.CancelStatus,'') != 'Canceled' AND B.BookingLevel = 'Bed' AND
+   B.Status IN ('Direct Booked','Booked');
+   -- APARTMENT LEVEL
+   INSERT INTO #BookingCode1(BookingCode,Id,GuestName,PropertyName,ClientNameId,
+   BookingLevelId,PropertyType)
+   SELECT BookingCode,B.Id,FirstName +' '+LastName,P.PropertyName,ClientName,
+   BookingLevel,'' FROM WRBHBBooking B
+   JOIN WRBHBApartmentBookingPropertyAssingedGuest A WITH(NOLOCK)ON 
+   A.BookingId = B.Id AND A.IsActive = 1 AND A.IsDeleted = 0 AND 
+   A.CurrentStatus = 'Booked'
+   JOIN WRBHBProperty P WITH(NOLOCK)ON A.BookingPropertyId = P.Id AND 
+   P.IsActive = 1 AND P.IsDeleted = 0
+   WHERE B.IsActive = 1 AND B.IsDeleted = 0 AND BookingCode != 0 AND
+   ISNULL(B.CancelStatus,'') != 'Canceled' AND B.BookingLevel = 'Apartment' AND 
+   B.Status IN ('Direct Booked','Booked');
+   --
+   SELECT BookingCode,Id,GuestName,PropertyName,ClientNameId as ZClientNameId,
+   BookingLevelId as ZBookingLevelId,PropertyType AS ZPropertyTypeId 
+   FROM #BookingCode1 ORDER BY Id ASC
+  END
+ IF @Action = 'BookingGuestMMT'
+  BEGIN
+   -- Table 0
+   SELECT BP.PropertyName,'' AS CheckIn FROM WRBHBBookingProperty BP
+   LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
+   BG.BookingId = BP.BookingId AND BG.BookingPropertyTableId = BP.Id AND
+   BG.BookingPropertyId = BP.PropertyId
+   WHERE BP.BookingId = @Id;
+   -- Table 1
+   SELECT FirstName,LastName,Occupancy,RoomType,Tariff,
+   CONVERT(NVARCHAR(100),ChkInDt,103) AS ChkInDt ,
+   CONVERT(NVARCHAR(100),ChkOutDt,103) AS ChkOutDt,TariffPaymentMode,
+   ServicePaymentMode,GuestId,RoomId,0 AS BookingPrTariffPaymentModeopertyId,
+   0 AS Id,0 AS DateDiffs,0 AS Tick
+   FROM WRBHBBookingPropertyAssingedGuest
+   WHERE IsActive = 1 AND IsDeleted = 0 AND BookingId = @Id;
+  END  
  IF @Action = 'BookingGuest'
  BEGIN
 		
@@ -712,5 +757,86 @@ BEGIN
 		AND P.IsActive=1 AND P.IsDeleted=0
 		WHERE B.Id=@BookingId)
 END
+ IF @Action = 'BookingCancelMMT'
+  BEGIN
+   SELECT BookHotelReservationIdvalue FROM WRBHBBookingProperty 
+   WHERE BookingId = @Id AND Id IN (SELECT BookingPropertyTableId FROM 
+   WRBHBBookingPropertyAssingedGuest WHERE BookingId = @Id);
+  END
+ IF @Action = 'MMTBookingCancelDataUpdate'
+  BEGIN
+   UPDATE WRBHBBookingProperty SET TotalCancelAmount = @Str1,
+   CancellationMarkup = @Remarks,Errorcode = '',Description1 = '' 
+   WHERE BookingId = @Id AND 
+   Id IN (SELECT BookingPropertyTableId FROM 
+   WRBHBBookingPropertyAssingedGuest WHERE BookingId = @Id);
+  END
+ IF @Action = 'MMTBookingCancelDataUpdateError'
+  BEGIN
+   UPDATE WRBHBBookingProperty SET Errorcode = @Str1,
+   Description1 = @Remarks WHERE BookingId = @Id AND 
+   Id IN (SELECT BookingPropertyTableId FROM 
+   WRBHBBookingPropertyAssingedGuest WHERE BookingId = @Id);
+  END
+ IF @Action = 'MMTBookingCancelUpdate'
+  BEGIN
+   UPDATE WRBHBBooking SET CancelStatus = 'Canceled',
+   CancelRemarks = @Remarks,ModifiedBy = @UserId,ModifiedDate = GETDATE()
+   WHERE Id = @Id;
+   --
+   UPDATE WRBHBBookingPropertyAssingedGuest SET IsActive = 0,IsDeleted = 1,
+   ModifiedBy = @UserId,ModifiedDate = GETDATE(),CurrentStatus = 'Canceled' 
+   WHERE BookingId = @Id;
+   -- Mail data's
+   SET @PROPERTYID = (SELECT TOP 1 BookingPropertyId 
+   FROM WRBHBBookingPropertyAssingedGuest WHERE BookingId = @Id);
+   -- TABLE 0
+   SELECT CAST(EmailtoGuest AS INT),ClientBookerEmail,BookingCode,
+   CONVERT(VARCHAR(100),BookedDt,103),ClientName,BookingLevel
+   FROM WRBHBBooking WHERE Id = @Id;
+   -- TABLE 1
+   SELECT EmailId FROM WRBHBBookingGuestDetails WHERE BookingId = @Id AND
+   EmailId != '';
+   -- TABLE 2
+   SELECT Email FROM WRBHBUser WHERE Id = @UserId;
+   -- TABLE 3
+   SELECT Logo FROM WRBHBCompanyMaster WHERE IsActive = 1 AND IsDeleted = 0
+   ORDER BY Id DESC;
+   -- TABLE 4
+   SELECT PropertyName FROM WRBHBBookingProperty WHERE Id IN 
+   (SELECT BookingPropertyTableId FROM WRBHBBookingPropertyAssingedGuest 
+   WHERE BookingId = @Id);
+   -- TABLE 5
+   CREATE TABLE #MAILGUESTDATA(Name NVARCHAR(1000),ChkInDt DATE,ChkOutDt DATE);
+   INSERT INTO #MAILGUESTDATA(Name,ChkInDt,ChkOutDt)
+   SELECT STUFF((SELECT ', '+BA.Title+'. '+BA.FirstName+'  '+BA.LastName
+   FROM WRBHBBookingPropertyAssingedGuest BA 
+   WHERE BA.BookingId = @Id AND BA.RoomCaptured=B.RoomCaptured
+   FOR XML PATH('')),1,1,'') AS Name,B.ChkInDt,B.ChkOutDt
+   FROM WRBHBBookingPropertyAssingedGuest AS B
+   WHERE B.BookingId = @Id;
+   --
+   SELECT Name,CONVERT(VARCHAR(100),ChkInDt,103),
+   CONVERT(VARCHAR(100),ChkOutDt,103),
+   DATEDIFF(DAY,ChkInDt,ChkOutDt) FROM #MAILGUESTDATA;  
+  END
+ IF @Action = 'MMTCancelSuccess'
+  BEGIN
+   IF @Str1 = 'true'
+    BEGIN
+     SELECT 'Yes' AS Success,'' AS Msg;
+    END
+   IF @Str1 = 'false' AND @Id = 0
+    BEGIN
+     SELECT 'No' AS Success,'Booking is not Canceled. URL is Error.' AS Msg;
+    END
+   IF @Str1 = 'false' AND @Id != 0
+    BEGIN
+     SELECT 'No' AS Success,Description1 AS Msg FROM WRBHBBookingProperty 
+     WHERE BookingId = @Id AND
+     Id IN (SELECT BookingPropertyTableId FROM WRBHBBookingPropertyAssingedGuest 
+     WHERE BookingId = @Id);
+    END
+  END
 END
 	 

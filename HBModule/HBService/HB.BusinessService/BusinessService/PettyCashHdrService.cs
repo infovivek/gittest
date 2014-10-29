@@ -26,9 +26,9 @@ namespace HB.BusinessService.BusinessService
                 {
                     dTable.Rows.Add(ds.Tables["DBERRORTBL"].Rows[0][0].ToString());
                 }
-                if (ds.Tables[0].Rows[0][0].ToString() == "Your Previous Request Is Not Completed")
+                if (ds.Tables[0].Rows[0][0].ToString() == "PC Can be requested after submitting the Expense Report for the Previous Request.")
                 {
-                    dTable.Rows.Add("Your Previous Request Is Not Completed");
+                    dTable.Rows.Add("PC Can be requested after submitting the Expense Report for the Previous Request.");
                 }
                 else
                 {

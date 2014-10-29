@@ -34,15 +34,15 @@ namespace HB.BusinessService.BusinessService
             DataSet ds = new DataSet();
             if (data[1].ToString() == "Room")
             {
-                ds = new BookingRoomMailDAO().Mail(BookingId);
+                ds = new BookingRoomMailDAO().Mail(BookingId, user);
             }
             if (data[1].ToString() == "Bed")
             {
-                ds = new BedBookingMailDAO().Mail(BookingId);
+                ds = new BedBookingMailDAO().Mail(BookingId, user);
             }
             if (data[1].ToString() == "Apartment")
             {
-                ds = new ApartmentBookingMailDAO().Mail(BookingId);
+                ds = new ApartmentBookingMailDAO().Mail(BookingId, user);
             }
             if (data[1].ToString() == "Recommend")
             {
@@ -50,7 +50,11 @@ namespace HB.BusinessService.BusinessService
             }
             if (data[1].ToString() == "MMT")
             {
-                ds = new APIBookingMailDAO().Mail(BookingId);
+                ds = new APIBookingMailDAO().Mail(BookingId, user);
+            }
+            if (data[1].ToString() == "BookingCancelMMT")
+            {
+                ds = new BookingCancelMMTDAO().FnCancel(data, user);
             }
             return ds;
         }

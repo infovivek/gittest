@@ -96,11 +96,11 @@
 				{
 					if (AddMode == true)
 					{
-						alignAlert(Alert.show("Request Approved Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+						alignAlert(Alert.show("PC Request Approved Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
 					}
 					else
 					{
-						alignAlert(Alert.show("Request Approved Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+						alignAlert(Alert.show("PC Request Approved Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
 					}
 					FnClear();
 					
@@ -109,7 +109,7 @@
 				{
 					if (AddMode == true)
 					{
-						alignAlert(Alert.show("Amount Approved Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+						alignAlert(Alert.show("PC Request Amount Approved Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
 					}
 					else
 					{
@@ -166,7 +166,7 @@
 				} 
 				else
 				{
-					alignAlert(Alert.show("Do you want To Approve ?", "Warning",Alert.YES | Alert.NO, null,
+					alignAlert(Alert.show(" Do you want to Submit the PC Expense Report?", "Warning",Alert.YES | Alert.NO, null,
 						FnSave1, iconWarning, Alert.NO),10,"");
 				}
 			}

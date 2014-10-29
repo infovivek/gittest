@@ -160,6 +160,7 @@
     <Compile Include="PettyCashReportDAO.cs" />
     <Compile Include="PettyCashRequiredStatusDAO.cs" />
     <Compile Include="PettyCashStatusDAO.cs" />
+    <Compile Include="PettyCashStatusHdrDAO.cs" />
     <Compile Include="PropertyOwnerOtherContactsDAO.cs" />
     <Compile Include="PropertyReportDAO.cs" />
     <Compile Include="ReassignClientDAO.cs" />

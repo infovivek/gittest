@@ -433,7 +433,7 @@
           <Paragraph>
             <TextRuns>
               <TextRun>
-                <Value>=Fields!ChkinDT.Value</Value>
+                <Value>=Fields!ArrivalDate.Value</Value>
                 <Style />
               </TextRun>
             </TextRuns>
@@ -499,7 +499,7 @@
           <Paragraph>
             <TextRuns>
               <TextRun>
-                <Value>=Fields!ChkoutDT.Value</Value>
+                <Value>=Fields!BillDate.Value</Value>
                 <Style />
               </TextRun>
             </TextRuns>
@@ -532,7 +532,7 @@
           <Paragraph>
             <TextRuns>
               <TextRun>
-                <Value>=Fields!BillDate.Value</Value>
+                <Value>=Fields!ChkoutDT.Value</Value>
                 <Style />
               </TextRun>
             </TextRuns>
@@ -598,7 +598,7 @@
           <Paragraph>
             <TextRuns>
               <TextRun>
-                <Value>=Fields!ArrivalDate.Value</Value>
+                <Value>=Fields!ChkinDT.Value</Value>
                 <Style />
               </TextRun>
             </TextRuns>

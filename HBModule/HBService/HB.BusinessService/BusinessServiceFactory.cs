@@ -101,7 +101,7 @@ namespace HB.BusinessService
                 //    _businessService = new PettyCashService();
                 //    break;
                 case "PettyCashStatus":
-                    _businessService = new PettyCashStatusService();
+                    _businessService = new PettyCashStatusHdrService();
                     break;
                 case "ImportGuest":
                     _businessService = new ImportGuestService();

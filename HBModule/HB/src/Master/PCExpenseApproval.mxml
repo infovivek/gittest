@@ -109,11 +109,11 @@
 				{
 					if (AddMode == true)
 					{
-						alignAlert(Alert.show("Request Approved Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+						alignAlert(Alert.show("Expense Report Approved Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
 					}
 					else
 					{
-						alignAlert(Alert.show("Request Approved Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+						alignAlert(Alert.show("Expense Report Approved Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
 					}
 					FnClear();
 					
@@ -166,7 +166,7 @@
 				} 
 				else
 				{
-					alignAlert(Alert.show("Do you want To Approve ?", "Warning",Alert.YES | Alert.NO, null,
+					alignAlert(Alert.show("Do you want Submit the Vendor Payment Request?", "Warning",Alert.YES | Alert.NO, null,
 						FnSave1, iconWarning, Alert.NO),10,"");
 				}
 			}
@@ -255,7 +255,13 @@
 					Ac[Index].Process=false;
 				} 
 			}
-			
+			public var ImagePath:String=""
+			public function Billview(Event):void
+			{ 
+				ImagePath=Grd_History.selectedItem.Bill;
+				ExternalInterface.call("changeDocumentTitle",ImagePath);
+				ImagePath="";	
+			}
 			
 		]]>
 	</fx:Script>
@@ -293,8 +299,18 @@
 				<mx:DataGridColumn dataField="RequestedOn" headerText="Requested Date" width="100" editable="false"/>
 				<mx:DataGridColumn dataField="ApprovedAmount" headerText="ApprovedAmount" width="100" editable="false"/>
 				<mx:DataGridColumn dataField="ExpenseAmount" headerText="ExpenseAmount" width="100" editable="false"/>
-				<mx:DataGridColumn dataField="ExpenseHead" headerText="Expense-Head" width="200" editable="false"/>
-				<mx:DataGridColumn dataField="Description" headerText="Description" width="250" editable="false"/>
+				<mx:DataGridColumn dataField="ExpenseHead" headerText="Expense-Head" width="190" editable="false"/>
+				<mx:DataGridColumn dataField="Description" headerText="Description" width="200" editable="false"/>
+				<mx:DataGridColumn dataField="Bill" headerText="Bill" width="50" editable="false">
+					<mx:itemRenderer >
+						<fx:Component>
+							<mx:HBox horizontalAlign="center" verticalAlign="middle">										
+								<mx:Image source="@Embed(source='../Assets/Comment.png')" buttonMode="true"
+										  click="outerDocument.Billview(event)"/>
+							</mx:HBox>	
+						</fx:Component>
+					</mx:itemRenderer>
+				</mx:DataGridColumn>
 				<mx:DataGridColumn dataField="Id" headerText="Id" width="10" editable="false" visible="false"/>
 			</mx:columns>
 		</mx:DataGrid> 

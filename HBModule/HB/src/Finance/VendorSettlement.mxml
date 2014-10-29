@@ -87,19 +87,13 @@
 					if (Ds_Objects.result.Tables.Table2.Rows.length > 0)
 					{
 						Advance_AC=Ds_Objects.result.Tables.Table2.Rows as ArrayCollection;
-					}
-					else
-					{
-						Advance_AC=new ArrayCollection();
-					}
-					if (Ds_Objects.result.Tables.Table3.Rows.length > 0)
-					{
 						AdvanceTotal=Ds_Objects.result.Tables.Table3.Rows[0].AdvanceAmount;
 					}
 					else
 					{
+						Advance_AC=new ArrayCollection();
 						AdvanceTotal=0;
-					}
+					}					
 					
 					
 					Clear()					
@@ -313,18 +307,18 @@
 					ErrorFlag=false;
 					return;
 				}
-				var Temp_Ac1:ArrayCollection=new ArrayCollection();
-				Temp_Ac1=Grd_TAC.dataProvider as ArrayCollection;
-				if(Temp_Ac1.length==0)
-				{
-					lbl_Error.visible=true;
-					lbl_Error.text="This Is An Invalid Process";
-					fader.target=lbl_Error;				
-					fader.play();
-					lbl_Error.setStyle("color","red");
-					ErrorFlag=false;
-					return;
-				}
+//				var Temp_Ac1:ArrayCollection=new ArrayCollection();
+//				Temp_Ac1=Grd_TAC.dataProvider as ArrayCollection;
+//				if(Temp_Ac1.length==0)
+//				{
+//					lbl_Error.visible=true;
+//					lbl_Error.text="This Is An Invalid Process";
+//					fader.target=lbl_Error;				
+//					fader.play();
+//					lbl_Error.setStyle("color","red");
+//					ErrorFlag=false;
+//					return;
+//				}
 				if(InoviceAmount==0)
 				{
 					lbl_Error.visible=true;
@@ -335,16 +329,16 @@
 					ErrorFlag=false;
 					return;
 				}
-				if(Total_AmountTAC==0)
-				{
-					lbl_Error.visible=true;
-					lbl_Error.text="Please Select TAC Invoice Amount";
-					fader.target=lbl_Error;				
-					fader.play();
-					lbl_Error.setStyle("color","red");
-					ErrorFlag=false;
-					return;
-				}
+//				if(Total_AmountTAC==0)
+//				{
+//					lbl_Error.visible=true;
+//					lbl_Error.text="Please Select TAC Invoice Amount";
+//					fader.target=lbl_Error;				
+//					fader.play();
+//					lbl_Error.setStyle("color","red");
+//					ErrorFlag=false;
+//					return;
+//				}
 				if(InoviceAmount<=Total_AmountTAC)
 				{
 					lbl_Error.visible=true;

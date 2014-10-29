@@ -122,6 +122,7 @@
     <Compile Include="BusinessService\PettyCashReportService.cs" />
     <Compile Include="BusinessService\PettyCashRequiedStatus.cs" />
     <Compile Include="BusinessService\PettyCashService.cs" />
+    <Compile Include="BusinessService\PettyCashStatusHdrService.cs" />
     <Compile Include="BusinessService\PettyCashStatusService.cs" />
     <Compile Include="BusinessService\PropertyAgreementService.cs" />
     <Compile Include="BusinessService\PropertyImageService.cs" />

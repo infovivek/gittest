@@ -73,7 +73,7 @@ CREATE PROCEDURE dbo.[SP_PCExpenseApproval_Help]
 		'Waiting For Operation Manager Approval' AS ProcessedStatus,'Processing' AS Comments,
 		CONVERT(NVARCHAR,CAST(PC.CreatedDate AS Date),103) AS RequestedOn,0 AS Process,
 		(PC.Amount) AS ApprovedAmount,(PC.Paid) AS ExpenseAmount,PH.OPeningBalance,
-		CONVERT(NVARCHAR(100),GETDATE(),103) AS Processedon, 'Process' AS Processedby,
+		CONVERT(NVARCHAR(100),GETDATE(),103) AS Processedon,(U.FirstName+' '+U.LastName) AS Processedby,
 		PC.UserId AS RequestedUserId, 0 AS Id,PC.PropertyId,PC.Id AS PCId
 		From WRBHBPettyCashStatus PC
 		JOIN WRBHBPettyCashHdr PH ON PC.PropertyId=PH.PropertyId AND PH.IsActive=1 AND PH.IsDeleted=0
@@ -81,9 +81,10 @@ CREATE PROCEDURE dbo.[SP_PCExpenseApproval_Help]
 		JOIN WRBHBPropertyUsers PU ON P.Id=PU.PropertyId AND PU.IsActive=1 AND PU.IsDeleted=0
 		JOIN WRBHBUser U ON  PC.UserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
 		WHERE PC.IsActive=1 AND PC.IsDeleted=0 AND PC.Flag=1 
-		AND PU.UserId=@UserId AND P.Category IN('Internal Property','Managed G H')
+		AND PU.UserId=@UserId 
+		AND P.Category IN('Internal Property','Managed G H')
 		AND PU.UserType IN('Resident Managers','Assistant Resident Managers','Operations Managers',
-		'Ops Head','Finance')
+		'Ops Head')
 		END
 		
 		SELECT Requestedby,PCAccount,ProcessedStatus,Comments,
@@ -111,7 +112,7 @@ END
 		--table2
 		Select  DISTINCT 
 		CONVERT(NVARCHAR(100),PC.CreatedDate,103) AS RequestedOn,
-		PC.Amount AS ApprovedAmount,PC.Paid AS ExpenseAmount,ExpenseHead,Description,PC.Id AS Id
+		PC.Amount AS ApprovedAmount,PC.Paid AS ExpenseAmount,ExpenseHead,Description,PC.BillLogo As Bill,PC.Id AS Id
 		From WRBHBPettyCashStatus PC
 		JOIN WRBHBProperty P ON PC.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
 		JOIN WRBHBUser U ON  PC.UserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0

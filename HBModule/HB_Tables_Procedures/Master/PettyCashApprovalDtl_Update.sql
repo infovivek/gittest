@@ -145,20 +145,20 @@ END
 IF(@ProcessedStatus ='Transferred')
 BEGIN
  SET @Id1=(SELECT UserId FROM WRBHBPettyCashApprovalDtl WITH (NOLOCK) 
- WHERE UPPER(RequestedUserId) = UPPER(@RequestedUserId) AND IsActive=1 AND IsDeleted=0 AND Id=@Id)
- IF(@Id1 =0)
+ WHERE UPPER(RequestedUserId) = UPPER(@UserId) AND IsActive=1 AND IsDeleted=0 AND Id=@Id)
+ IF (ISNULL(@Id1,0) =0)
  BEGIN
       SET @ErrMsg = 'Need Resident Manager Approval';
 	  SELECT @ErrMsg;
  END
-  --   SET @Str=(SELECT UserType FROM WRBHBPropertyUsers WITH (NOLOCK) 
-	 --WHERE UPPER(UserId) = UPPER(@UserId) AND IsActive=1 AND IsDeleted=0 AND PropertyId=@PropertyId
-	 --AND UserType='Resident Managers')
-	 --IF(ISNULL(@Str,'') !='Resident Managers')
-	 --BEGIN
-		--	SET @ErrMsg = 'Need Resident Managers Approval';
-		--	SELECT @ErrMsg;
-	 --END
+     SET @Str=(SELECT UserType FROM WRBHBPropertyUsers WITH (NOLOCK) 
+	 WHERE UPPER(UserId) = UPPER(@UserId) AND IsActive=1 AND IsDeleted=0 AND PropertyId=@PropertyId
+	 AND UserType IN ('Resident Managers','Assistant Resident Managers'))
+	 IF(ISNULL(@Str,'') !='')
+	 BEGIN
+			SET @ErrMsg = 'Need Resident Managers Approval';
+			SELECT @ErrMsg;
+	 END
  ELSE
  BEGIN
  
