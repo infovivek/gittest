@@ -65,9 +65,7 @@ BEGIN
 	 END
  ELSE
  BEGIN
-		UPDATE WRBHBPettyCashStatus SET Flag=0
-		WHERE IsActive=1 AND IsDeleted=0 AND UserId=@RequestedUserId 
- 
+		
 		INSERT INTO	WRBHBNewPCExpenseApproval (RequestedOn,Requestedby,
 		PCAccount,ApprovedAmount,ExpenseAmount,ProcessedStatus,LastProcessedon,Comments,
 		RequestedUserId,UserId,PropertyId,Process,IsActive,IsDeleted,CreatedBy,

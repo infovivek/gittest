@@ -3,8 +3,8 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-IF EXISTS (SELECT * FROM dbo.SYSOBJECTS WHERE id = OBJECT_ID(N'[dbo].[SP_GuestCheckOutConsolidate_Bill]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
-DROP PROCEDURE [dbo].[SP_GuestCheckOutConsolidate_Bill]
+IF EXISTS (SELECT * FROM dbo.SYSOBJECTS WHERE id = OBJECT_ID(N'[dbo].[SP_IntermediateCheckOutConsolidate_Bill]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+DROP PROCEDURE [dbo].[SP_IntermediateCheckOutConsolidate_Bill]
 GO
 /*=============================================
 Author Name  : shameem
@@ -18,7 +18,7 @@ Name			Date			Signature			Description of Changes
 ********************************************************************************************************	
 *******************************************************************************************************
 -- =============================================*/
-CREATE PROCEDURE [dbo].[SP_GuestCheckOutConsolidate_Bill]
+CREATE PROCEDURE [dbo].[SP_IntermediateCheckOutConsolidate_Bill]
 (@Action NVARCHAR(100)=NULL,
 @Str1 NVARCHAR(100)=NULL,
 @Str2 INT=NULL,
@@ -72,7 +72,8 @@ DECLARE @CompanyName VARCHAR(100),@Address NVARCHAR(100),@PanCardNo VARCHAR(100)
     
 	
     select h.GuestName as GuestName,h.Name,h.Stay,h.Type,h.BookingLevel,
-    convert(nvarchar(100),h.BillDate,103) as BillDate,h.InVoiceNo,h.NoOfDays,
+    convert(nvarchar(100),h.CheckOutDate,103) as BillDate,h.InVoiceNo,h.PIInvoice,
+    convert(nvarchar(100),d.ArrivalDate,103) as ArrivalDate,
 	h.ClientName,isnull(h.ChkOutTariffNetAmount,0) as ChkOutTariffNetAmount,
 	h.ChkOutTariffTotal as TotalTariff,sum(cs.ChkOutServiceAmtl) as ServiceAmount,
 	h.ChkOutTariffLT as LuxuryTax,
@@ -82,14 +83,16 @@ DECLARE @CompanyName VARCHAR(100),@Address NVARCHAR(100),@PanCardNo VARCHAR(100)
 	sum(cs.ChkOutServiceVat) as Vat,h.ChkOutTariffST3 as SerivceTax,
 	(h.ChkOutTariffCess+sum(cs.Cess)) as Cess,
 	(h.ChkOutTariffHECess+sum(cs.HECess)) as HCess,--CSDD.BillAmount,
-	convert(nvarchar(100),h.CheckInDate,103) as ArrivalDate,
-	ROUND (d.Tariff,0) Tariff,(p.PropertyName+','+p.Propertaddress) as Propertyaddress,(c.CityName+','+
+	convert(nvarchar(100),h.BillEndDate,103) as BillDate,  
+	CONVERT(nvarchar(100),h.BillFromDate,103) ChkinDT,CONVERT(nvarchar(100),h.BillEndDate,103) as ChkoutDT,
+	d.Tariff,(p.PropertyName+','+p.Propertaddress) as Propertyaddress,(c.CityName+','+
 	s.StateName+','+p.Postal) as Propcity,c.CityName,s.StateName,p.Postal,
 	p.Phone,p.Email,
 	sum(cs.ChkOutServiceLT) ChkOutServiceLT,sum(cs.ChkOutServiceST) as ServiceTax,
 	sum(Cs.ChkOutServiceNetAmount) ChkOutServiceNetAmount,sum(cs.ChkOutServiceAmtl) as Amount,	
-	sum(CS.ChkOutServiceNetAmount) as ServiceNetAmt,sum(cs.ChkOutServiceVat) as Vat,
+	sum(CS.ChkOutServiceNetAmount) as ServiceNetAmt,
 	@CompanyName as CompanyName,'PAN NO :'+@PanCardNo AS PanCardNo,@LOGO AS logo,
+	sum(cs.ChkOutServiceVat) as Vat,
 	'Regd Office : No. 122, Amarjyothi Layout, Domlur, Bangalore - 560071'+'.'+'www.hummingbirdindia.com' as CompanyAddress,
 	'INVOICE : For any invoice clarification revert within 7 days from the date of receipt' as Invoice,
 	'All cheque or demand drafts in payment of bills should be drawn in favor of Hummingbird Travel and stay pvt.ltd.
@@ -104,7 +107,7 @@ DECLARE @CompanyName VARCHAR(100),@Address NVARCHAR(100),@PanCardNo VARCHAR(100)
 	round(isnull(@Laundry,0),0)+round(isnull(@Service,0),0)+round(isnull(@Miscellaneous,0),0)+round(isnull(h.ChkOutTariffLT,0),0)+
 	round(isnull(h.ChkOutTariffST1,0),0)+round(isnull(h.ChkOutTariffSC,0),0)+round(sum(CS.ChkOutServiceST),0)+round(sum(CS.OtherService),0)+
 	(round (isnull(h.ChkOutTariffST3,0),0)+round(isnull(h.ChkOutTariffCess,0),0)+round(sum(cs.Cess),0))+
-	(round(isnull(h.ChkOutTariffHECess,0),0)+round(sum(cs.HECess),0)+round(sum(cs.ChkOutServiceVat),0))) as 	BillAmount,
+	(round(isnull(h.ChkOutTariffHECess,0),0)+round(sum(cs.HECess),0)+round(sum(cs.ChkOutServiceVat),0))) as BillAmount,
 	@ClientAddress as Address,'Service Tax Regn. No : AABCH5874RST001' as ServiceTaxNo,
 	'Luxury Tax @ '+CAST(H.LuxuryTaxPer AS NVARCHAR)+'%' LTPer,
 	 'Service Tax @ '+CAST(H.ServiceTaxPer AS NVARCHAR)+'%' STPer,
@@ -121,7 +124,7 @@ DECLARE @CompanyName VARCHAR(100),@Address NVARCHAR(100),@PanCardNo VARCHAR(100)
 	
 	
 	from WRBHBChechkOutHdr h 
-	join  WRBHBCheckInHdr d on h.ChkInHdrId = d.Id and d.IsActive = 1 and d.IsDeleted = 0
+	join  WRBHBCheckInHdr d on h.ChkInHdrId = d.Id --and d.IsActive = 1 and d.IsDeleted = 0
 	
 	
 	--join WRBHBCheckOutServiceDtls CSD on cs.Id = csd.CheckOutServceHdrId
@@ -132,10 +135,10 @@ DECLARE @CompanyName VARCHAR(100),@Address NVARCHAR(100),@PanCardNo VARCHAR(100)
 	 join WRBHBState s on s.Id=p.StateId
 	 join WRBHBCity c on c.Id=p.CityId 
 	--join WRBHBBooking b on b.Id = d.BookingId
-	left outer join WRBHBCheckOutServiceHdr CS on h.Id = cs.CheckOutHdrId and CS.IsActive = 1 and cs.IsDeleted = 0
-	where h.IsActive = 1 and h.IsDeleted = 0
+	left outer join WRBHBCheckOutServiceHdr CS on h.Id = cs.CheckOutHdrId --and CS.IsActive = 1 and cs.IsDeleted = 0
+	where --h.IsActive = 1 and h.IsDeleted = 0 and
 	--and CSDD.BillType ='Consolidated'
-	 and h.Id = @Id1
+	 h.Id = @Id1
 	group by h.GuestName ,h.Name,h.Stay,h.Type,h.BookingLevel,
 	BillDate,h.ClientName,h.Id,	h.ChkOutTariffTotal ,h.ChkOutTariffLT ,h.ChkOutTariffNetAmount,
 	h.ChkOutTariffST2 ,h.ChkOutTariffST3 ,h.ChkOutTariffCess ,
@@ -143,7 +146,7 @@ DECLARE @CompanyName VARCHAR(100),@Address NVARCHAR(100),@PanCardNo VARCHAR(100)
 	c.CityName,s.StateName,p.Postal,p.Phone,p.Email,	
     H.VATPer,h.RestaurantSTPer ,
     h.BusinessSupportST,h.ChkOutTariffST1 ,H.LuxuryTaxPer,H.ServiceTaxPer,h.ChkOutTariffExtraAmount,
-    h.InVoiceNo,h.NoOfDays
+    h.InVoiceNo,h.PIInvoice,h.BillFromDate,h.BillEndDate,d.ArrivalDate,h.CheckOutDate
     
     
     

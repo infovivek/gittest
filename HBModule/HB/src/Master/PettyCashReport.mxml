@@ -70,29 +70,20 @@
 				GlobalXml += "<ROOT>";
 				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
 				GlobalXml += "</ROOT>";
-				Help();	
-				hlp_property.setFocus();
+				//Help();	
+				
 			}
 			public function Help():void
 			{
-				useWeb("PettyCashReport","PAGELOAD_CUSTOM",[GlobalXml,'PAGELOAD',0,Global_AC[0].UsrId,'','']);//32]);
+				useWeb("PettyCashReport","PAGELOAD_CUSTOM",[GlobalXml,'PAGELOAD',0,0,'','']);//32]);
 			}
 			private function Custom_WebSer_Result (Ds_Objects:Object):void
 			{
 				if (Ds_Objects.currentTarget.description.toString() == "PAGELOAD_CUSTOM")
 				{
-					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
-					{
-						hlp_property.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;		
-					}
+					
 				}
-				if (Ds_Objects.currentTarget.description.toString() == "USERLOAD_CUSTOM")
-				{
-					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
-					{
-						hlp_User.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;		
-					}
-				}
+				
 				if (Ds_Objects.currentTarget.description.toString() == "Gridload_CUSTOM")
 				{
 					Grd_Details.dataProvider=null;
@@ -163,6 +154,8 @@
 			public function Details(Event):void
 			{ 
 				var Date:String=Grd_Details.selectedItem.ProcessedOn;
+				PropertyId=Grd_Details.selectedItem.PropertyId;
+				UserId=Grd_Details.selectedItem.UserId;
 				useWeb("PettyCashReport","HistoryLoad_CUSTOM",[GlobalXml,"Action",PropertyId,UserId,Date,'']);
 				bdr_History.visible=true;
 				Grd_Details.visible=false;
@@ -171,47 +164,15 @@
 			public function Spend(Event):void
 			{ 
 				var Date1:String=Grd_Details.selectedItem.ProcessedOn;
+				PropertyId=Grd_Details.selectedItem.PropertyId;
+				UserId=Grd_Details.selectedItem.UserId;
 				useWeb("PettyCashReport","SpendHistoryLoad_CUSTOM",[GlobalXml,"SpendReport",PropertyId,UserId,Date1,'']);
 				bdr_SpendHistory.visible=true;
 				bdr_History.visible=false;
 				//Grd_History.visible=false;
 								
 			}
-			protected function PropertyLoad():void
-			{
-				if(hlp_property.selected())
-				{
-					hlp_User.text="";
-					UserId=0;
-					Grd_Details.dataProvider=null;
-					PropertyId=hlp_property.Select_Row.Id;
-					PropertyName=hlp_property.Select_Row.Property;
-					hlp_property.text=PropertyName;
-					useWeb("PettyCashReport","USERLOAD_CUSTOM",[GlobalXml,"USERLOAD",PropertyId,0,'','']);
-					hlp_User.setFocus();
-					
-				}
-				else
-				{
-					hlp_property.text="";
-				}
-			}
-			protected function GuestNameLoad():void
-			{
-				if(hlp_User.selected())
-				{
-					UserId=hlp_User.Select_Row.Id;
-					UserName=hlp_User.Select_Row.UserName;
-					hlp_User.text=UserName;
-					Rbtn_First.setFocus();
-					//useWeb("PettyCashReport","Gridload_CUSTOM",[GlobalXml,"GRIDLOAD",PropertyId,UserId]);
-					
-				}
-				else
-				{
-					hlp_User.text="";
-				}
-			}
+			
 			public function FnClosetariff_clickHandler(event):void
 			{
 				bdr_History.visible=false;
@@ -370,29 +331,12 @@
 				//hlp_User.text="";
 				bdr_SpendHistory.visible=false;
 			}
-			
-			protected function FnValidation_BeforeSave():String
-			{
-				ErrStr="";
-				
-				var TxtFlag:Boolean=true;
-				if(hlp_property.text =="")
-				{
-					ErrStr=ErrStr+"* PropertyName Required.\n";
-				}
-				if(hlp_User.text =="")
-				{
-					ErrStr=ErrStr+"* UserName Required.\n";
-				}
-				return ErrStr;
-			
-			}
-			
+						
 			protected function search():void
 			{
 				ErrStr="";
 				ErrMsg = ""; Flag = true; 
-				var Str:String=FnValidation_BeforeSave();
+				//var Str:String=FnValidation_BeforeSave();
 				if(ErrStr !="")
 				{
 					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10,"");
@@ -416,15 +360,15 @@
 				var MFromDate:String = '01'+'/'+String(b)+'/'+String(c);
 				if(Rbtn_First.selected==true)
 				{
-					useWeb("PettyCashReport","Gridload_CUSTOM",[GlobalXml,"GRIDLOAD",PropertyId,UserId,"First",MFromDate]);
+					useWeb("PettyCashReport","Gridload_CUSTOM",[GlobalXml,"GRIDLOAD",0,0,"First",MFromDate]);
 				}
 				else if(Rbtn_Second.selected==true)
 				{
-					useWeb("PettyCashReport","Gridload_CUSTOM",[GlobalXml,"GRIDLOAD",PropertyId,UserId,"Second",MFromDate]);
+					useWeb("PettyCashReport","Gridload_CUSTOM",[GlobalXml,"GRIDLOAD",0,0,"Second",MFromDate]);
 				}
 				else if(Rbtn_All.selected==true)
 				{
-					useWeb("PettyCashReport","Gridload_CUSTOM",[GlobalXml,"GRIDLOAD",PropertyId,UserId,"All",MFromDate]);
+					useWeb("PettyCashReport","Gridload_CUSTOM",[GlobalXml,"GRIDLOAD",0,0,"All",MFromDate]);
 				}
 				Grd_Details.visible=true;
 			}
@@ -493,31 +437,20 @@
 		<s:BorderContainer x="12" y="19" width="100%" height="500" backgroundColor="#fbf9f9"
 						   borderVisible="false">
 			
-			<WrbHelpComp:HelpText id="hlp_property" x="153" y="35" width="155" height="27" depth="100"
-								  onselection="{PropertyLoad()}" pxSetColumnsWidth="0,200"
-								  pxSetHeight="183" tabIndex="1">
-			</WrbHelpComp:HelpText>
-			<WrbHelpComp:HelpText id="hlp_User" x="153" y="75" width="155" height="27" depth="10" tabIndex="2"
-								  onselection="{GuestNameLoad()}" pxSetColumnsWidth="0,200">
-			</WrbHelpComp:HelpText>
-			
-			<mx:DateChooser id="dt_Date1" visible="true" x="333" y="73" height="31"
+			<mx:DateChooser id="dt_Date1" visible="true" x="203" y="63" height="31"
 							focusEnabled="false" selectedDate="{new Date()}" 
 							yearNavigationEnabled="true" selectableRange="{{rangeEnd: new Date()}}" />
-			<s:BorderContainer x="334" y="104" width="183" height="21" backgroundColor="#fbf9f9"
+			<s:BorderContainer x="204" y="107" width="183" height="21" backgroundColor="#fbf9f9"
 							   borderVisible="false" depth="4">
 				</s:BorderContainer>
 				
 			
-			<s:BorderContainer id="brd_Rbtn_Deposite" x="529" y="76" width="269" height="34" 
+			<s:BorderContainer id="brd_Rbtn_Deposite" x="410" y="66" width="269" height="34" 
 							   borderVisible="false" visible="true">
 				<s:RadioButton id="Rbtn_All" x="4" y="0" label="All" selected="true"/>
 				<s:RadioButton id="Rbtn_First" x="44" y="0" label="First Fortnight" />
 				<s:RadioButton id="Rbtn_Second" x="145" y="0" label="Second Fortnight"/>
 			</s:BorderContainer>
-			
-			<mx:Label x="83" y="40" text="Property"/>
-			<mx:Label x="84" y="80" text="UserName"/>
 			<mx:Label x="83" y="9" text="Petty Cash Expense Report" color="red"/>
 			<mx:DataGrid x="83" y="129"  verticalAlign="middle" editable="true" visible="true"
 						 width="850" height="344" tabIndex="4" id="Grd_Details" >
@@ -539,6 +472,8 @@
 					<mx:DataGridColumn dataField="ProcessedOn" headerText="ProcessedOn" width="100" editable="false"/>
 					<mx:DataGridColumn dataField="TransferredAmount" headerText="TransferredAmount" width="200" 
 									   textAlign="center" editable="false"/>
+					<mx:DataGridColumn dataField="PropertyId" headerText="PropertyId" width="100" editable="false" visible="false"/>
+					<mx:DataGridColumn dataField="UserId" headerText="UserId" width="100" editable="false"/>
 					<mx:DataGridColumn dataField="DetailView" headerText="DetailView" width="75" editable="false"
 									   visible="true">
 						<mx:itemRenderer >
@@ -663,7 +598,7 @@
 				<mx:TextInput x="653" y="361" id="Txt_CloseBalance" editable="false"/>
 			</s:BorderContainer>
 			<!--s:Button x="525" y="480" width="58" label="Print" click="doPrint()" visible="false"/-->
-			<WrbComp:Button_BB x="815" y="76" height="23" click="search()" Lable_val="Filter">
+			<WrbComp:Button_BB x="705" y="68" height="23" click="search()" Lable_val="Filter">
 			</WrbComp:Button_BB>
 		</s:BorderContainer>
 		

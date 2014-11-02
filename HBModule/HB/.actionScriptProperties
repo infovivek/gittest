@@ -76,6 +76,7 @@
     <application path="Booking/ApartmentBooking.mxml"/>
     <application path="GuestService/SnackKOTHistory.mxml"/>
     <application path="Master/Import.mxml"/>
+    <application path="Report/PendingUnsettled.mxml"/>
     <application path="GuestService/ExternalCheckOut.mxml"/>
     <application path="Sales/ContractProductMaster.mxml"/>
     <application path="GuestService/Deposit.mxml"/>
@@ -112,6 +113,7 @@
     <application path="Report/ReconciliationReport.mxml"/>
     <application path="GuestService/Intermediatebill.mxml"/>
     <application path="Master/ImportGuest.mxml"/>
+    <application path="GuestService/ExternalIntermediateCheckout.mxml"/>
     <application path="GuestService/SearchBookingGuest.mxml"/>
     <application path="GuestService/CheckOutNew.mxml"/>
     <application path="Master/ChangePassword.mxml"/>

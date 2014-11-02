@@ -67,7 +67,7 @@ namespace HBReport
                "PDF", null, out mimeType, out encoding,
                 out extension,
                out streamids, out warnings);
-            filename = string.Format("{0}.{1}", "ExternalCheckoutTAC", "pdf");
+            filename = string.Format("{0}.{1}", "TACInvoice-Annexure", "pdf");
             Response.ClearHeaders();
             Response.Clear();
             Response.AddHeader("Content-Disposition", "attachment;filename=" + filename);

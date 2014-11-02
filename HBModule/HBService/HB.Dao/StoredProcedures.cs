@@ -670,7 +670,7 @@ namespace HB.Dao
         public const string PCExpenseApproval_Update = "SP_PCExpenseApproval_Update";
 
         //Client Column
-        public const string ClientColumn_Help = "Sp_ClientCloumn_Help";
+        public const string ClientColumn_Help = "Sp_ClientColumn_Help";
         public const string ClientColumn_Insert = "Sp_ClientColumn_Insert";
         public const string ClientColumn_Update = "Sp_ClientColumn_update";    
 

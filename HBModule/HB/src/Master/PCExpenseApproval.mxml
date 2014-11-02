@@ -42,6 +42,7 @@
 			public static var GlobalXml:String = "",TypeServiceId:int=0,ApprovalId:int=0,ErrStr:String="";
 			public var Id:int=0,ErrMsg:String="",Roles:String="",PropertyId:int=0,PropertyName:String="",UserId:int=0;
 			public var AddMode:Boolean=true,Flag:Boolean=true;
+			public var PId:int=0,UId:int=0;
 			
 			
 			
@@ -85,6 +86,12 @@
 						Txt_Requestedamount.text=Ds_Objects.result.Tables.Table.Rows[0].Amount;
 						Txt_Requestedstatus.text=Ds_Objects.result.Tables.Table.Rows[0].Status;
 						Txt_Openingbalance.text=Ds_Objects.result.Tables.Table.Rows[0].OpeningBalance;
+						PId=Ds_Objects.result.Tables.Table.Rows[0].PropertyId;
+						UId=Ds_Objects.result.Tables.Table.Rows[0].UserId;
+					}
+					if (Ds_Objects.currentTarget.description.toString() == "Rejected_CUSTOM")
+					{
+						
 					}
 					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
 					{
@@ -206,6 +213,17 @@
 				bdr_Scroll.visible=false;
 				Scr_Grid.visible=false;
 			}
+			protected function FnReject():void
+			{
+				var ReqOn=Txt_RequestedOn.text
+				useWeb("PCExpenseApproval","Rejected_CUSTOM",[GlobalXml,"Reject",PId,UId,0,ReqOn]);
+				bdr_History.visible=false;
+				Grd_History.dataProvider=null;
+				Grd_Details.visible=true;
+				bdr_Scroll.visible=true;
+				Scr_Grid.visible=true;
+				Help();
+			}
 			public var Id1:int=0;
 			public function FnAction(Event):void
 			{ 
@@ -276,7 +294,7 @@
 	</WrbComp:Button_BB>
 	
 	
-	<s:BorderContainer x="46" y="33" width="851" height="435" id="bdr_History"
+	<s:BorderContainer x="46" y="33" width="851" height="473" id="bdr_History"
 					   borderVisible="true" visible="false" depth="1500">
 		<mx:Label x="82" y="58" text="Expensed by"/>
 		<mx:Label x="454" y="58" text="Expensed on"/>
@@ -286,9 +304,11 @@
 		<s:TextInput x="215" y="50" width="199" height="29"  id="Txt_Requestedby" editable="false"/>
 		<s:TextInput x="576" y="50" width="199" height="29" id="Txt_RequestedOn" editable="false"/>
 		<s:TextInput x="215" y="135" width="199" height="29" id="Txt_RequestedProperty" editable="false"/>
+		<s:TextInput x="256" y="433" width="98" height="29" id="Txt_PropertyId" visible="false" editable="false"/>
+		<s:TextInput x="395" y="435" width="95" height="29" id="Txt_UserID" visible="false" editable="false"/>
 		<mx:Label x="3" y="401" text="Approved and OpeningBalance"/>
 		<s:TextInput x="178" y="396" width="81" height="29" id="Txt_AOAmount" editable="false"/>
-		<s:TextInput x="270" y="396" width="81" height="29" id="Txt_ExpAmount" editable="false"/>
+		<s:TextInput x="273" y="396" width="81" height="29" id="Txt_ExpAmount" editable="false"/>
 		<s:TextInput x="576" y="93" width="199" height="29" id="Txt_Requestedamount" editable="false"/>
 		<mx:Label x="454" y="143" text="Opening Balance"/>
 		<s:TextInput x="576" y="133" width="199" height="29" id="Txt_Openingbalance" editable="false"/>
@@ -301,6 +321,8 @@
 				<mx:DataGridColumn dataField="ExpenseAmount" headerText="ExpenseAmount" width="100" editable="false"/>
 				<mx:DataGridColumn dataField="ExpenseHead" headerText="Expense-Head" width="190" editable="false"/>
 				<mx:DataGridColumn dataField="Description" headerText="Description" width="200" editable="false"/>
+				<mx:DataGridColumn dataField="PropertyId" headerText="PropertyId" width="10" visible="false" editable="false"/>
+				<mx:DataGridColumn dataField="UserId" headerText="UserId" width="10" visible="false" editable="false"/>
 				<mx:DataGridColumn dataField="Bill" headerText="Bill" width="50" editable="false">
 					<mx:itemRenderer >
 						<fx:Component>
@@ -317,8 +339,11 @@
 		<s:BorderContainer x="0" y="0" width="849" height="42" borderVisible="true"  backgroundColor="#c2c2c2">
 			<s:Image x="826" y="14" source="@Embed(source='../Assets/CrossSmall.png')" 
 					 buttonMode="true" toolTip="Close" click="FnClosetariff_clickHandler(event)"/>
-			<mx:Label x="32" y="13" text="Petty Cash Request Details" color="red"/>
+			<mx:Label x="23" y="13" text="Petty Cash Request Details" color="red"/>
 		</s:BorderContainer>
+		<WrbComp:Button_BB id="Sctrl_Reject" x="415" y="398" width="94" height="30"
+						   click="FnReject()" Lable_val="Reject">
+		</WrbComp:Button_BB>
 	</s:BorderContainer>
 	<s:BorderContainer x="232" y="43" width="538" height="409" id="bdr_Action" visible="false" depth="500">
 		<s:BorderContainer x="0" y="0" width="536" height="42" borderVisible="true"  backgroundColor="#c2c2c2">

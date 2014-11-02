@@ -229,6 +229,11 @@ namespace HB.Dao
             {
                 ExChkOut.BusinessSupportST = Convert.ToDecimal(doc.SelectSingleNode("HdrXml").Attributes["BusinessSupportST"].Value);
             }
+            ExChkOut.ClientId = Convert.ToInt32(doc.SelectSingleNode("HdrXml").Attributes["ClientId"].Value);
+            ExChkOut.CityId = Convert.ToInt32(doc.SelectSingleNode("HdrXml").Attributes["CityId"].Value);
+            ExChkOut.BillFromDate = doc.SelectSingleNode("HdrXml").Attributes["BillFromDate"].Value;
+            ExChkOut.BillEndDate = doc.SelectSingleNode("HdrXml").Attributes["BillEndDate"].Value;
+   //         ExChkOut.Intermediate = doc.SelectSingleNode("HdrXml").Attributes["Intermediate"].Value;
             //if (doc.SelectSingleNode("HdrXml").Attributes["PrintInvoice"].Value == "")
             //{
             //    ExChkOut.PrintInvoice = 0;
@@ -311,6 +316,10 @@ namespace HB.Dao
             Cmd.Parameters.Add("@RestaurantSTPer", SqlDbType.Decimal).Value = ExChkOut.RestaurantSTPer;
             Cmd.Parameters.Add("@BusinessSupportST", SqlDbType.Decimal).Value = ExChkOut.BusinessSupportST;
             Cmd.Parameters.Add("@PrintInvoice", SqlDbType.Bit).Value = ExChkOut.PrintInvoice;
+            Cmd.Parameters.Add("@ClientId", SqlDbType.Int).Value = ExChkOut.ClientId;
+            Cmd.Parameters.Add("@CityId", SqlDbType.Int).Value = ExChkOut.CityId;
+            Cmd.Parameters.Add("@BillFromDate", SqlDbType.NVarChar).Value = ExChkOut.BillFromDate;
+            Cmd.Parameters.Add("@BillEndDate", SqlDbType.NVarChar).Value = ExChkOut.BillEndDate;
             Cmd.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = user.Id;
             ds = new WrbErpConnection().ExecuteDataSet(Cmd, UserData);
             //  document.LoadXml(data[2].ToString());
@@ -447,6 +456,8 @@ namespace HB.Dao
                                 {
                                     ExChkOut.TACAmount = Convert.ToDecimal(document.SelectSingleNode("GrdXml").Attributes["TACAmount"].Value);
                                 }
+                                ExChkOut.BillFromDate1 = doc.SelectSingleNode("HdrXml").Attributes["BillFromDate"].Value;
+                                ExChkOut.BillEndDate1 = doc.SelectSingleNode("HdrXml").Attributes["BillEndDate"].Value;
                                 Cmd = new SqlCommand();
                                 if (ExChkOut.Id != 0)
                                 {
@@ -503,6 +514,8 @@ namespace HB.Dao
                                 Cmd.Parameters.Add("@Rate", SqlDbType.Decimal).Value = ExChkOut.Rate1;
                                 Cmd.Parameters.Add("@TotalBusinessSupportST", SqlDbType.Decimal).Value = ExChkOut.TotalBusinessSupportST;
                                 Cmd.Parameters.Add("@TACAmount", SqlDbType.Decimal).Value = ExChkOut.TACAmount;
+                                Cmd.Parameters.Add("@BillFromDate", SqlDbType.NVarChar).Value = ExChkOut.BillFromDate1;
+                                Cmd.Parameters.Add("@BillEndDate", SqlDbType.NVarChar).Value = ExChkOut.BillEndDate1;
                                 Cmd.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = user.Id;
                                 ds = new WrbErpConnection().ExecuteDataSet(Cmd, UserData);
 
@@ -664,10 +677,12 @@ namespace HB.Dao
             Cmd.CommandType = CommandType.StoredProcedure;
             Cmd.Parameters.Add("@Action", SqlDbType.NVarChar).Value = data[1].ToString();
             Cmd.Parameters.Add("@Str1", SqlDbType.NVarChar).Value = data[2].ToString();
-            Cmd.Parameters.Add("@CheckInHdrId", SqlDbType.Int).Value = Convert.ToInt32(data[3].ToString());
-            Cmd.Parameters.Add("@StateId", SqlDbType.Int).Value = Convert.ToInt32(data[4].ToString());
-            Cmd.Parameters.Add("@PropertyId", SqlDbType.Int).Value = Convert.ToInt32(data[5].ToString());
-            Cmd.Parameters.Add("@UserId", SqlDbType.Int).Value = Convert.ToInt32(data[6].ToString());
+            Cmd.Parameters.Add("@BillFrom", SqlDbType.NVarChar).Value = data[3].ToString();
+            Cmd.Parameters.Add("@BillTo", SqlDbType.NVarChar).Value = data[4].ToString();
+            Cmd.Parameters.Add("@CheckInHdrId", SqlDbType.Int).Value = Convert.ToInt32(data[5].ToString());
+            Cmd.Parameters.Add("@StateId", SqlDbType.Int).Value = Convert.ToInt32(data[6].ToString());
+            Cmd.Parameters.Add("@PropertyId", SqlDbType.Int).Value = Convert.ToInt32(data[7].ToString());
+            Cmd.Parameters.Add("@UserId", SqlDbType.Int).Value = Convert.ToInt32(data[8].ToString());
             return new WrbErpConnection().ExecuteDataSet(Cmd, UserData);
         }
     }

@@ -33,8 +33,8 @@ CREATE PROCEDURE [dbo].[SP_ExterCheckOutTAC_Insert](@ChkOutHdrId int,
 @PropertyId int,@GuestId int,@BookingId int,@StateId int,@Direct nvarchar(100),
 @PropertyType nvarchar(100),@Status nvarchar(100),@CheckOutDate nvarchar(100),
 @CheckInDate nvarchar(100),@MarkUpAmount decimal(27,2),@BusinessSupportST decimal(27,2),
-@Rate decimal(27,2),@TotalBusinessSupportST decimal(27,2),@TACAmount decimal(27,2)
-)
+@Rate decimal(27,2),@TotalBusinessSupportST decimal(27,2),@TACAmount decimal(27,2),
+@BillFromDate NVARCHAR(100),@BillEndDate NVARCHAR(100))
 AS
 BEGIN
 	DECLARE @InsId INT,@Cnt INT,@Cnt1 INT,@SCode INT;--,@TACInvoiceNo nvarchar(100);
@@ -73,14 +73,14 @@ ChkOutTariffHECess,ChkOutTariffNetAmount,ChkInHdrId,
 CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId,NoOfDays,
 RoomId,PropertyId,GuestId,BookingId,StateId,Direct ,
 PropertyType,Status ,CheckInDate,CheckOutDate ,MarkUpAmount,BusinessSupportST,Rate,
-TotalBusinessSupportST,TACAmount,PaymentStatus,Flag)
+TotalBusinessSupportST,TACAmount,PaymentStatus,Flag,BillFromDate,BillEndDate,Intermediate,IntermediateFlag)
 values(@ChkOutHdrId,@TACInvoiceNo,@TACInvoiceFile,@GuestName,@BillDate,@ClientName,
 @Property,@ChkOutTariffTotal,@ChkOutTariffCess,
 @ChkOutTariffHECess,@ChkOutTariffNetAmount,@ChkInHdrId,@CreatedBy,GETDATE(),@CreatedBy,
 GETDATE(),1,0,NEWID(),@NoOfDays,
 @RoomId,@PropertyId,@GuestId,@BookingId,@StateId,@Direct ,
 @PropertyType,@Status,@CheckInDate,@CheckOutDate,@MarkUpAmount,@BusinessSupportST,@Rate,
-@TotalBusinessSupportST,@TACAmount,'Paid','1')
+@TotalBusinessSupportST,@TACAmount,'Paid','1',@BillFromDate,@BillEndDate,'',0)
 
 SET @InsId=@@IDENTITY;
 SELECT  Id ,RowId ,DATENAME(WEEKDAY, GETDATE())+','+CONVERT(VARCHAR(12), GETDATE(), 107),

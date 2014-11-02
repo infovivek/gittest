@@ -37,7 +37,8 @@ CREATE PROCEDURE [dbo].[SP_ExterCheckOutHdr_Insert](
 @BTC nvarchar(100),@PropertyType nvarchar(100),@STAgreedAmount decimal(27,2),@LTAgreedAmount decimal(27,2),
 @STRackAmount decimal(27,2),@LTRackAmount decimal(27,2),@Status nvarchar(100),@CheckOutDate nvarchar(100),
 @CheckInDate nvarchar(100),@PrintInvoice bit,@InVoiceNo nvarchar(100),@LTTaxPer DECIMAL(27,2),@STTaxPer DECIMAL(27,2),
-@VATPer decimal(27,2),@RestaurantSTPer decimal(27,2),@BusinessSupportST decimal(27,2))
+@VATPer decimal(27,2),@RestaurantSTPer decimal(27,2),@BusinessSupportST decimal(27,2),@ClientId int,@CityId int,
+@BillFromDate NVARCHAR(100),@BillEndDate NVARCHAR(100))
 AS
 BEGIN
 DECLARE @InsId INT,@Cnt INT,@Cnt1 INT,@SCode INT;
@@ -144,7 +145,7 @@ RoomId,CheckInType,ApartmentNo,BedNo,BedId,ApartmentId,PropertyId,GuestId,
 BookingId,StateId,Direct ,
 BTC,PropertyType,STAgreedAmount,LTAgreedAmount,STRackAmount,LTRackAmount,Status ,
 CheckInDate,CheckOutDate ,InVoiceNo,Flag,PrintInvoice ,PaymentStatus,ServiceTaxPer,LuxuryTaxPer,ServiceEntryFlag,VATPer,
-RestaurantSTPer,BusinessSupportST)
+RestaurantSTPer,BusinessSupportST,ClientId,CityId,BillFromDate,BillEndDate,Intermediate,IntermediateFlag,PIInvoice)
 
 VALUES
 (@CheckOutNo,@GuestName,@Stay,@Type,@BookingLevel,@BillDate,
@@ -160,7 +161,7 @@ GETDATE(),1,0,NEWID(),@Name,@NoOfDays,
 @PropertyId,@GuestId,@BookingId,@StateId,@Direct ,
 @BTC,@PropertyType,@STAgreedAmount,@LTAgreedAmount,@STRackAmount,@LTRackAmount,@Status,
 @CheckInDate,@CheckOutDate,@InVoiceNo,0,@PrintInvoice,'UnPaid',@STTaxPer,@LTTaxPer,0,
-@VATPer,@RestaurantSTPer,@BusinessSupportST)
+@VATPer,@RestaurantSTPer,@BusinessSupportST,@ClientId,@CityId,@BillFromDate,@BillEndDate,'',0,0)
 
 SET @InsId=@@IDENTITY;
 SELECT  Id ,RowId FROM WRBHBChechkOutHdr WHERE Id=@InsId;

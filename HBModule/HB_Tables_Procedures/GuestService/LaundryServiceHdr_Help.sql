@@ -38,9 +38,9 @@ If @Action ='Property'
 			H.BookingId,H.Id 
 			FROM WRBHBCheckInHdr H
 			join WRBHBProperty p on p.Id = h.PropertyId AND P.IsActive=1 AND P.IsDeleted=0
-			WHERE H.PropertyId = @Id AND -- GETDATE() BETWEEN  H.ArrivalDate AND H.ChkoutDate AND 
-			H.IsActive=1 AND H.IsDeleted=0 AND
-			p.Category = 'Internal Property' AND  H.Id NOT IN(SELECT ChkInHdrId FROM WRBHBChechkOutHdr)
+			JOIN WRBHBBookingPropertyAssingedGuest B ON H.BookingId=B.BookingId AND B.IsActive=1 AND B.IsDeleted=0
+			WHERE H.PropertyId = @Id AND H.IsActive=1 AND H.IsDeleted=0 AND B.CurrentStatus='CheckIn'
+			AND p.Category = 'Internal Property' AND  H.Id NOT IN(SELECT ChkInHdrId FROM WRBHBChechkOutHdr)
 					
     --KOTDate 
 		SELECT CONVERT(varchar(103),GETDATE(),103) as KOTDate

@@ -26,13 +26,15 @@ namespace HB.Dao
 
             PettyStHdr.PropertyId = Convert.ToInt32(doc.SelectSingleNode("//Property").Attributes["PropertyId"].Value);
             PettyStHdr.UserId = Convert.ToInt32(doc.SelectSingleNode("//Property").Attributes["UserId"].Value);
+            PettyStHdr.Balance = Convert.ToDecimal(doc.SelectSingleNode("//Property").Attributes["Balance"].Value);
+            PettyStHdr.Id = Convert.ToInt32(doc.SelectSingleNode("//Property").Attributes["Id"].Value);
             command = new SqlCommand();
             if (PettyStHdr.Id != 0)
                 {
                     UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
-                        "', SctId:" + user.SctId + ", Service:PettyCashStatusHdr_Insert" + ", ProcName:'" + StoredProcedures.PettyCashStatusHdr_Insert;
+                        "', SctId:" + user.SctId + ", Service:PettyCashStatusHdr_Update" + ", ProcName:'" + StoredProcedures.PettyCashStatusHdr_Update;
 
-                    command.CommandText = StoredProcedures.PettyCashStatusHdr_Insert;
+                    command.CommandText = StoredProcedures.PettyCashStatusHdr_Update;
                     command.Parameters.Add("@Id", SqlDbType.BigInt).Value = PettyStHdr.Id;
                 }
                 else
@@ -45,6 +47,7 @@ namespace HB.Dao
                 command.CommandType = CommandType.StoredProcedure;
                 command.Parameters.Add("@PropertyId", SqlDbType.BigInt).Value = PettyStHdr.PropertyId;
                 command.Parameters.Add("@UserId", SqlDbType.BigInt).Value = PettyStHdr.UserId;
+                command.Parameters.Add("@Balance", SqlDbType.Decimal).Value = PettyStHdr.Balance;
                 command.Parameters.Add("@CreatedBy", SqlDbType.BigInt).Value = PettyStHdr.UserId;
                 ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
                 return ds;

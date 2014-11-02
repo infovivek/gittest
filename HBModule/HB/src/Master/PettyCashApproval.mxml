@@ -16,6 +16,9 @@
 		<![CDATA[
 			import WrbComp.frmsearchwindow;
 			
+			import com.as3xls.xls.Cell;
+			import com.as3xls.xls.ExcelFile;
+			import com.as3xls.xls.Sheet;
 			import com.as3xls.xls.Type;
 			
 			import mx.collections.ArrayCollection;
@@ -42,6 +45,15 @@
 			public static var GlobalXml:String = "",TypeServiceId:int=0,ApprovalId:int=0,ErrStr:String="";
 			public var Id:int=0,ErrMsg:String="",Roles:String="",PropertyId:int=0,PropertyName:String="",UserId:int=0;
 			public var AddMode:Boolean=true,Flag:Boolean=true;
+			private var fileRef:FileReference = new FileReference();
+			private var urlReq:URLRequest;
+			private var arrColl:ArrayCollection;
+			private var FILE_URL:String = "";
+			private var xlsFile:ExcelFile;
+			public var uploadURL:URLRequest = new URLRequest();
+			
+			private var imageTypes:FileFilter = new FileFilter("Images (*.jpg; *.jpeg; *.gif; *.png)" ,"*.jpg; *.jpeg; *.gif; *.png");
+			private var documentTypes:FileFilter = new FileFilter("Documents (*.pdf), (*.doc), (*.rtf), (*.txt)",("*.pdf; *.doc; *.rtf, *.txt"));
 			
 
 			
@@ -323,6 +335,52 @@
 					Txt_Approvedamount.text=TotalAmt.replace(",","");
 			   }
 			}
+			public var bytes:ByteArray = new ByteArray();
+			public function roExport_export_Result(event:MouseEvent):void
+			{
+				if(Grd_Details.dataProvider !=null)
+				{
+					var arrExportResult:ArrayCollection = Grd_Details.dataProvider as ArrayCollection;
+					xlsFile = new ExcelFile();
+					var sheet:Sheet = new Sheet();
+					
+					sheet.resize(arrExportResult.length+1,9);
+					
+					sheet.setCell(0,0,'RequestedOn');
+					sheet.setCell(0,1,'Requestedby');
+					sheet.setCell(0,2,'PCAccount');
+					sheet.setCell(0,3,'RequestedAmount');
+					sheet.setCell(0,4,'RequestedStatus');
+					sheet.setCell(0,5,'ProcessedStatus');
+					sheet.setCell(0,6,'Processedon');
+					sheet.setCell(0,7,'Processedby');
+					sheet.setCell(0,8,'Comments');
+										
+					for(var i:int=0;i<arrExportResult.length;i++)
+					{
+						sheet.setCell(i+1, 0, arrExportResult[i].RequestedOn);
+						sheet.setCell(i+1, 1, arrExportResult[i].Requestedby);
+						sheet.setCell(i+1, 2, arrExportResult[i].PCAccount);
+						sheet.setCell(i+1, 3, arrExportResult[i].RequestedAmount);
+						sheet.setCell(i+1, 4, arrExportResult[i].RequestedStatus);
+						sheet.setCell(i+1, 5, arrExportResult[i].ProcessedStatus);
+						sheet.setCell(i+1, 6, arrExportResult[i].Processedon);
+						sheet.setCell(i+1, 7, arrExportResult[i].Processedby);
+						sheet.setCell(i+1, 8, arrExportResult[i].Comments);
+					}
+					Grd_Details.dataProvider = arrExportResult;
+					xlsFile.sheets.addItem(sheet);      
+					var bytes: ByteArray = xlsFile.saveToByteArray();
+					var fr:FileReference = new FileReference();
+					fr.save(bytes,"Export.xls");
+				}
+				else
+				{
+					alignAlert(Alert.show("PettyCash Approval Details Required.","Message !",
+						Alert.OK, null, null, iconErrLarge, Alert.OK),10,"");
+				}
+				
+			}
 		]]>
 	</fx:Script>
 	
@@ -335,7 +393,8 @@
 					   click="FnClear()" Lable_val="Clear">
 	</WrbComp:Button_BB>
 	
-	
+	<WrbComp:Button_BB x="625" y="476" Lable_val="Export" click="roExport_export_Result(event)">
+	</WrbComp:Button_BB>
 	<s:BorderContainer x="110" y="43" width="775" height="462" id="bdr_History"
 					   borderVisible="true" visible="false" depth="1500">
 		<mx:Label x="33" y="58" text="Requested by"/>

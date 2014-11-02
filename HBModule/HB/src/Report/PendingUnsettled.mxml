@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark"   creationComplete="PageLoad()"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"  width="100%" height="100%" xmlns:WrbComp="WrbComp.*"
+			   pageTitle="PendingCheckin Report">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<s:RadioButtonGroup id="Modes"  change="CourierChange()"/> 
+	</fx:Declarations>
+	<fx:Style source="..\\Common\\ApplicationCSS.css" />
+	<fx:Script source="..\\Common\\CommonScript.as" />
+	<fx:Script source="..\\Common\\Functions.as"/>
+	<fx:Script>
+		<![CDATA[
+			import com.as3xls.xls.Cell;
+			import com.as3xls.xls.ExcelFile;
+			import com.as3xls.xls.Sheet;
+			import com.as3xls.xls.Type;
+			
+			import flash.globalization.LocaleID;
+			
+			import WrbComp.frmsearchwindow;			
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;			
+			import spark.events.IndexChangeEvent;
+			public static var GlobalXml:String="";								
+			public static var Global_AC:ArrayCollection=new ArrayCollection(); 
+			public var Mode :String="";  
+			public var InvoiceNum:String="";public var Type:String="";
+			public var ErrorFlag:Boolean=true; 
+			private var xlsFile:ExcelFile;
+			protected function PageLoad():void
+			{
+				//Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>5</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				Global_AC = funLoginInfo("<gScrId>1</gScrId><gUsrFk>65</gUsrFk>");	
+				GlobalXml = "";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>"; 
+				useWeb("PendingCkinReport","Reports_CUSTOM",[GlobalXml,"Pageload",FromDate,ToDate,'','',0,0,0]);
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				Grd_ListClient1.dataProvider= null;
+				try
+				{
+					if (Ds_Objects.currentTarget.description.toString() == "Reports_CUSTOM")
+					{
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{
+							Grd_ListClient1.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						} 
+					} 
+				}//try end
+				catch(Exception)
+				{
+					
+				}
+			}
+			public var 	FromDate:String="",ToDate:String="",ChkoutId:String="",Status:String="";
+			protected function btn_Search_clickHandler():void
+			{
+				// TODO Auto-generated method stub
+				ErrorFlag=true;  
+				if(Modes.selectedValue==0)
+				{
+					Type="Internal Property"; 
+				}
+				else if(Modes.selectedValue==1)
+				{
+					Type="External Property"; 
+				} 
+				else if(Modes.selectedValue==2)
+				{
+					Type=" Managed G H"; 
+				}
+				else
+				{
+					alignAlert(Alert.show("Select Category","Alert Message !",
+						Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+					return;
+				}
+				
+				if(DT_From.text !='')
+				{
+					if(DT_To.text =='')
+					{
+						alignAlert(Alert.show("Select Valid From and ToDate","Alert Message !",
+							Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+						return;
+					}
+				}
+				if(DT_To.text !='')
+				{
+					if(DT_From.text =='')
+					{
+						alignAlert(Alert.show("Select Valid From and ToDate","Alert Message !",
+							Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+						return;
+					}
+				}
+				if(ErrorFlag==true)
+				{	 	
+					useWeb("PendingCkinReport","Reports_CUSTOM",[GlobalXml,"Pageload",FromDate,ToDate,Type,'',0,0]);
+				} 
+			}
+			public var FltPrpty:String="";
+			public function filterss(Filts:String):void
+			{				
+				FltPrpty=Filts;				
+				var tempAC:ArrayCollection=new ArrayCollection();	
+				//tempAC=myArrayCollection
+				tempAC=Grd_ListClient1.dataProvider as ArrayCollection;
+				tempAC.filterFunction = filterMyArrayCollectionss;
+				tempAC.refresh();				
+			}	
+			private function filterMyArrayCollectionss(item:Object):Boolean 
+			{
+				var Itm:Boolean=true;				
+				if(txtProperty.text!="")
+				{
+					var searchString:String = txtProperty.text.toLowerCase();
+					var itemName:String = (item.PropertyName as String).toLowerCase();
+					Itm=itemName.indexOf(searchString) > -1;
+				}				
+				return Itm;		
+			}
+			public function Clear():void
+			{
+				DT_From.text="";DT_To.text=""; txtBookingCode.text="";txtProperty.text="";
+				FromDate="";ToDate="";ChkoutId="";Status="";Type="";InvoiceNum="";
+				PageLoad();Internal.selected=false;External.selected=false;Managed.selected=false; 
+			}  
+			protected function CourierChange()
+			{
+				FromDate=DT_From.text;
+				ToDate=DT_To.text;
+				if(Modes.selectedValue==0)
+				{
+					Type="Internal Property";
+				}
+				if(Modes.selectedValue==1)
+				{
+					Type="External Property";
+				}
+				if(Modes.selectedValue==2)
+				{
+					Type="Managed G H";
+				}
+			}
+			protected function ExportExcel(event:MouseEvent):void
+			{
+				try
+				{
+					var arrExportResult:ArrayCollection = Grd_ListClient1.dataProvider as ArrayCollection;
+					if(arrExportResult.length!=0)
+					{					
+						xlsFile = new ExcelFile();
+						var sheet:Sheet = new Sheet();
+						
+						sheet.resize(arrExportResult.length+2,14);
+						//BookedId,PropertyName,PropertyId,FirstName,BookingLevel,
+						//ExpDate,C.CityName,CityId,,ClientId,BookingCode,Category
+						sheet.setCell(0,3,Type+"PendingCheckin Report");
+						sheet.setCell(1,0,'Property Name');
+						sheet.setCell(1,1,'ClientName');
+						sheet.setCell(1,2,'BookingLevel');
+						sheet.setCell(1,3,'ExpDate');
+						sheet.setCell(1,4,'CityName'); 
+						sheet.setCell(1,5,'BookingCode');
+						//sheet.setCell(1,6,'');
+						//sheet.setCell(1,7,'');
+						
+						for(var i:int=0;i<arrExportResult.length;i++)
+						{
+							sheet.setCell(i+2, 0, arrExportResult[i].ClientName);
+							sheet.setCell(i+2, 1, arrExportResult[i].PropertyName);
+							sheet.setCell(i+2, 2, arrExportResult[i].BookingLevel);
+							sheet.setCell(i+2, 3, arrExportResult[i].ExpDate);
+							sheet.setCell(i+2, 4, arrExportResult[i].CityName);
+							sheet.setCell(i+2, 5, arrExportResult[i].BookingCode);
+							//sheet.setCell(i+2, 7, arrExportResult[i].);
+							//sheet.setCell(i+2, 8, arrExportResult[i].); 
+						}			 
+						
+						Grd_ListClient1.dataProvider = arrExportResult;
+						xlsFile.sheets.addItem(sheet);      
+						var bytes: ByteArray = xlsFile.saveToByteArray();
+						var fr:FileReference = new FileReference(); 
+						var str:String="PendingCheckin.xls";
+						fr.save(bytes,"PendingCheckin.xls");
+					}
+					else
+					{
+						
+						alignAlert(Alert.show("* No Records Found.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+						return;
+					}
+					//Grd_BCFC.visible=false;
+					//Grd_BCFC.dataProvider=null;
+					Clear();
+				}				
+				catch (myError:Error) 
+				{
+					alignAlert(Alert.show("* Excel File Already Opened.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+					return
+				}catch (error:TypeError)
+				{
+					alignAlert(Alert.show("* Excel File Already Opened.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+					return
+				}catch (error:IOErrorEvent)
+				{
+					alignAlert(Alert.show("* Excel File Already Opened.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+					return
+				}
+				
+			}
+			public var FltNm:String="";
+			public var myArrayCollection:ArrayCollection=new ArrayCollection();
+			private function filter(Filt:String):void
+			{				
+				FltNm=Filt;				
+				var tempAC:ArrayCollection=new ArrayCollection();	
+				//tempAC=myArrayCollection
+				tempAC=Grd_ListClient1.dataProvider as ArrayCollection;
+				tempAC.filterFunction = filterMyArrayCollections;
+				tempAC.refresh();				
+			}	
+			private function filterMyArrayCollections(items:Object):Boolean 
+			{
+				var Itm:Boolean=true;				
+				if(txtBookingCode.text!="")
+				{
+					var searchString:String = txtBookingCode.text;
+					var itemName:String = (items.BookingCode);
+					Itm=itemName.indexOf(searchString) > -1;
+				}				
+				return Itm;		
+			}
+		]]>
+	</fx:Script>
+	<s:BorderContainer x="0" y="30" width="100%" height="84" borderVisible="false" backgroundColor="#f4efef" depth="10">
+		<s:HGroup x="0" y="0" width="100%" height="90" horizontalAlign="center" verticalAlign="middle">
+			<s:Group x="132" y="5" width="100%" height="80">
+				<mx:DateField id="DT_From" x="148" y="6" width="90" formatString="DD/MM/YYYY"  tabIndex="1"  
+							  yearNavigationEnabled="true" selectableRange="{{rangeEnd: new Date()}}" visible="false" />
+				<mx:DateField id="DT_To" x="148" y="46" width="90" formatString="DD/MM/YYYY"
+							  tabIndex="2" yearNavigationEnabled="true"   visible="false"  />
+				
+				<s:Image x="831" y="20" source="assets/a1.png" toolTip="Search" click="btn_Search_clickHandler()" tabIndex="5"/>
+				<s:Image x="900" y="20" click="Clear()" source="assets/dust_bin1.png" toolTip="Clear"/>
+				<WrbComp:Button_HB  x="1040" y="20" Lable_val="Export" id="btn_Excel"  click="ExportExcel(event)"> 
+				</WrbComp:Button_HB> 
+				<!--mx:Label id="Lbl_Vendor1" x="223" y="2" width="13" text="*" color="red" fontSize="16"/>
+				<mx:Label id="Lbl_Vendor0" x="222" y="42" width="13" text="*" color="red" fontSize="16"/-->
+				<mx:Label   x="342" y="2" width="13" text="*" color="red" fontSize="16"/>
+				<s:Label   x="293" y="14" text="Category"/>
+				<s:Label x="293" y="45" height="29" text="Filter by &#xd;Property"/>
+				<s:TextInput id="txtProperty" x="366" y="44" width="141" height="25"
+							 change="filterss('PropertyName')" prompt="Property Name"/>
+				<s:HGroup x="367" y="6" width="260" horizontalAlign="center" verticalAlign="middle" gap="17"  id="type">
+					<s:RadioButton label="Internal" groupName="Modes" value="0"
+								   id="Internal" buttonMode="true"  />
+					<s:RadioButton label="External" groupName="Modes"  value="1"
+								   id="External" buttonMode="true"  /> 
+					<s:RadioButton label="Managed GH" groupName="Modes"  value="2"
+								   id="Managed" buttonMode="true"  />
+				</s:HGroup>
+				<s:Label x="534" y="44" height="29" text="Filter by &#xd;BookingCode"/>
+				<s:TextInput id="txtBookingCode" x="646" y="44" width="109" height="25"
+							 change="filter('BookingCode')" prompt="BookingCode" restrict="0-9" maxChars="6"/>
+			</s:Group>
+		</s:HGroup>
+	</s:BorderContainer>
+	
+	<s:BorderContainer x="0" y="130" width="100%" height="354" id="bdr_Scroll" visible="true" borderVisible="false">
+		<s:HGroup  width="100%" height="100%">
+			<mx:DataGrid id="Grd_ListClient1" depth="100" x="10" y="48" width="100%" height="402" tabIndex="10"
+						 borderStyle="outset"> 
+				<mx:columns>		 				
+					<mx:DataGridColumn dataField="Property" width="150"  headerText="Property Name" editable="False" textAlign="left"/>
+					<mx:DataGridColumn dataField="ClientName" width="150" />
+					<mx:DataGridColumn dataField="ChkOutTariffNetAmount" width="150" />	
+					<mx:DataGridColumn dataField="ChkOutDate" width="150" /> 
+					<mx:DataGridColumn dataField="CityName"   textAlign="left" visible="false"/> 
+					<mx:DataGridColumn dataField="FirstName" width="190"   headerText="Guest Name" textAlign="left"/>	
+					<mx:DataGridColumn dataField="BookingLevel" width="115"  headerText="BookingLevel"  textAlign="left" />
+					<mx:DataGridColumn dataField="ExpDate" width="91" headerText="Date"  textAlign="center"/>
+					<mx:DataGridColumn dataField="BookingCode" width="91" headerText="Booking No"  textAlign="left"/>
+					
+				</mx:columns>
+			</mx:DataGrid> 
+			
+		</s:HGroup> 
+	</s:BorderContainer> 
+</s:Application>
+

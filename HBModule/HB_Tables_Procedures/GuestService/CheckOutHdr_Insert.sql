@@ -38,7 +38,7 @@ CREATE PROCEDURE [dbo].[SP_CheckOutHdr_Insert](
 @LTAgreedAmount decimal(27,2),@STRackAmount decimal(27,2),@LTRackAmount decimal(27,2),@CheckOutDate nvarchar(100),
 @CheckInDate nvarchar(100),@InVoiceNo nvarchar(100),@LTTaxPer DECIMAL(27,2),@STTaxPer DECIMAL(27,2),
 @VATPer decimal(27,2),@RestaurantSTPer decimal(27,2),@BusinessSupportST decimal(27,2),@ClientId int,@CityId int,
-@ServiceChargeChk int)
+@ServiceChargeChk int,@BillFromDate NVARCHAR(100),@BillEndDate NVARCHAR(100))
 
 AS
 BEGIN
@@ -95,7 +95,7 @@ BookingId,StateId,Direct ,
 BTC,PropertyType,Status,STAgreedAmount,LTAgreedAmount,STRackAmount,LTRackAmount,CheckInDate,CheckOutDate,
 InVoiceNo,Flag,PrintInvoice ,PaymentStatus,ServiceTaxPer,LuxuryTaxPer,ServiceEntryFlag,VATPer,
 RestaurantSTPer,BusinessSupportST,ClientId,CityId,
-ServiceChargeChk)
+ServiceChargeChk,BillFromDate,BillEndDate,Intermediate,IntermediateFlag,PIInvoice)
 
 VALUES
 (@CheckOutNo,@GuestName,@Stay,@Type,@BookingLevel,@BillDate,
@@ -112,7 +112,7 @@ GETDATE(),1,0,NEWID(),@Name,@NoOfDays,
 @BTC,@PropertyType ,@Status,@STAgreedAmount,@LTAgreedAmount,@STRackAmount,@LTRackAmount,
 @CheckInDate,@CheckOutDate,@InVoiceNo,0,0,'UnPaid',@STTaxPer,@LTTaxPer,0,
 @VATPer,@RestaurantSTPer,@BusinessSupportST,@ClientId,@CityId,
-@ServiceChargeChk)
+@ServiceChargeChk,@BillFromDate,@BillEndDate,'',0,0)
 
 SET @InsId=@@IDENTITY;
 SELECT  Id,RowId FROM WRBHBChechkOutHdr WHERE Id=@InsId;

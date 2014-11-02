@@ -17,6 +17,8 @@ GO
 CREATE PROCEDURE [dbo].[Sp_ExternalCheckout_Help]
 (@Action NVARCHAR(100)=NULL,
 @Str1 NVARCHAR(100)=NULL,
+@BillFrom NVARCHAR(100),
+@BillTo NVARCHAR(100),
 @CheckInHdrId INT=NULL,
 --@Tariff DECIMAL(27,2)=NULL,
 @StateId INT=NULL,
@@ -103,40 +105,114 @@ BEGIN
 	--	AND Id  IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where isnull(Flag,0) = 0 and  
 	--	IsActive = 1 and IsDeleted = 0 )
 		CREATE TABLE #GUEST(GuestName NVARCHAR(100),GuestId INT,StateId INT,CheckInHdrId INT,  
-		PropertyId INT,RoomId INT,ApartmentId INT,BookingId INT,BedId INT,Type NVARCHAR(100),Flag int)  
+		PropertyId INT,RoomId INT,ApartmentId INT,BookingId INT,BedId INT,Type NVARCHAR(100),Flag int,
+		BookingCode nvarchar(100),ChkInDT nvarchar(100),ChkOutDT nvarchar(100))  
+		
+		INSERT INTO #GUEST(GuestName,GuestId,StateId,CheckInHdrId,PropertyId,RoomId,ApartmentId,  
+		BookingId,BedId,Type,Flag,BookingCode,ChkInDT,ChkOutDT)  
+
+		SELECT  h.ChkInGuest,h.GuestId,h.StateId,h.Id AS CheckInHdrId,h.PropertyId,h.RoomId,h.ApartmentId,  
+		h.BookingId,h.BedId,h.Type as Level,0 as Flag,h.BookingCode,h.NewCheckInDate,d.ChkOutDt 
+		From WRBHBCheckInHdr  h
+		join WRBHBBookingPropertyAssingedGuest d on h.Id = d.CheckInHdrId and
+		h.BookingId = d.BookingId and h.GuestId = d.GuestId and
+		d.IsActive=1 and d.IsDeleted=0
+		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
+		h.PropertyType in ('External Property' , 'Managed G H') and  
+		h.PropertyId = 590 and  
+		-- CONVERT(nvarchar(100),ChkoutDate,103) = CONVERT(nvarchar(100),GETDATE(),103) and  
+		h.Id  IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where IsActive = 1 and IsDeleted = 0 
+		and ISNULL(IntermediateFlag,0)=1 and ISNULL(Flag,0)=1  )  and
+		h.Id   in (Select ChkInHdrId FRom WRBHBExternalChechkOutTAC where IsActive = 1 and IsDeleted = 0 
+		and ISNULL(IntermediateFlag,0)=1 and ISNULL(Flag,0)=1)
+		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
+		h.BookingId,h.BedId,h.Type,h.BookingCode ,h.ChkInGuest,h.NewCheckInDate,d.ChkOutDt
+		
+		INSERT INTO #GUEST(GuestName,GuestId,StateId,CheckInHdrId,PropertyId,RoomId,ApartmentId,  
+		BookingId,BedId,Type,Flag,BookingCode,ChkInDT,ChkOutDT)  
+
+		SELECT  h.ChkInGuest,h.GuestId,h.StateId,h.Id AS CheckInHdrId,h.PropertyId,h.RoomId,h.ApartmentId,  
+		h.BookingId,h.BedId,h.Type as Level,0 as Flag,h.BookingCode,h.NewCheckInDate,d.ChkOutDt 
+		From WRBHBCheckInHdr  h
+		join WRBHBBookingPropertyAssingedGuest d on h.Id = d.CheckInHdrId and
+		h.BookingId = d.BookingId and h.GuestId = d.GuestId and
+		d.IsActive=1 and d.IsDeleted=0
+		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
+		h.PropertyType in ('External Property' , 'Managed G H') and  
+		h.PropertyId = @PropertyId and  
+		-- CONVERT(nvarchar(100),ChkoutDate,103) = CONVERT(nvarchar(100),GETDATE(),103) and  
+		h.Id NOT IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where IsActive = 1 and IsDeleted = 0  )  and
+		h.Id not in (Select ChkInHdrId FRom WRBHBExternalChechkOutTAC where IsActive = 1 and IsDeleted = 0)
+		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
+		h.BookingId,h.BedId,h.Type,h.BookingCode ,h.ChkInGuest,h.NewCheckInDate,d.ChkOutDt
 
 		INSERT INTO #GUEST(GuestName,GuestId,StateId,CheckInHdrId,PropertyId,RoomId,ApartmentId,  
-		BookingId,BedId,Type,Flag)  
+		BookingId,BedId,Type,Flag,BookingCode,ChkInDT,ChkOutDT)  
 
-		SELECT  GuestName,GuestId,StateId,Id AS CheckInHdrId,PropertyId,RoomId,ApartmentId,  
-		BookingId,BedId,Type as Level,0 as Flag  
-		From WRBHBCheckInHdr  
-		WHERE IsActive=1 AND IsDeleted=0 AND   
-		PropertyType in ('External Property' , 'Managed G H','Client Prefered') and  
-		PropertyId = @PropertyId and  
+		SELECT  h.ChkInGuest,h.GuestId,h.StateId,h.Id AS CheckInHdrId,h.PropertyId,h.RoomId,h.ApartmentId,  
+		h.BookingId,h.BedId,h.Type as Level,0 as Flag,h.BookingCode,h.NewCheckInDate,d.ChkOutDt 
+		From WRBHBCheckInHdr  h
+		join WRBHBBookingPropertyAssingedGuest d on h.Id = d.CheckInHdrId and
+		h.BookingId = d.BookingId and h.GuestId = d.GuestId and
+		d.IsActive=1 and d.IsDeleted=0
+		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
+		h.PropertyType in ('External Property','Managed G H') and  
+		h.PropertyId = @PropertyId and  
 		-- CONVERT(nvarchar(100),ChkoutDate,103) = CONVERT(nvarchar(100),GETDATE(),103) and  
-		Id NOT IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where IsActive = 1 and IsDeleted = 0  )  and
-		Id not in (Select ChkInHdrId FRom WRBHBExternalChechkOutTAC where IsActive = 1 and IsDeleted = 0)
-
-		INSERT INTO #GUEST(GuestName,GuestId,StateId,CheckInHdrId,PropertyId,RoomId,ApartmentId,  
-		BookingId,BedId,Type,Flag)  
-
-		SELECT  GuestName,GuestId,StateId,Id AS CheckInHdrId,PropertyId,RoomId,ApartmentId,  
-		BookingId,BedId,Type as Level,0 as Flag  
-		From WRBHBCheckInHdr  
-		WHERE IsActive=1 AND IsDeleted=0 AND   
-		PropertyType in ('External Property','Managed G H','Client Prefered') and  
-		PropertyId = @PropertyId and  
-		-- CONVERT(nvarchar(100),ChkoutDate,103) = CONVERT(nvarchar(100),GETDATE(),103) and  
-		Id  IN (Select ChkInHdrId FROM WRBHBChechkOutHdr where isnull(Flag,0) = 0 and  
+		h.Id  IN (Select ChkInHdrId FROM WRBHBChechkOutHdr where isnull(Flag,0) = 0 and  
 		IsActive = 1 and IsDeleted = 0 ) 
 		
-		and Id  not IN (Select ChkInHdrId FRom WRBHBExternalChechkOutTAC where isnull(Flag,0) = 1 and  
+		and h.Id  not IN (Select ChkInHdrId FRom WRBHBExternalChechkOutTAC where isnull(Flag,0) = 1 and  
 		IsActive = 1 and IsDeleted = 0 ) 
+		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
+		h.BookingId,h.BedId,h.Type,h.BookingCode ,h.ChkInGuest,h.NewCheckInDate,d.ChkOutDt
+		
+		INSERT INTO #GUEST(GuestName,GuestId,StateId,CheckInHdrId,PropertyId,RoomId,ApartmentId,  
+		BookingId,BedId,Type,Flag,BookingCode,ChkInDT,ChkOutDT)  
 
+		SELECT  h.ChkInGuest,h.GuestId,h.StateId,h.Id AS CheckInHdrId,h.PropertyId,h.RoomId,h.ApartmentId,  
+		h.BookingId,h.BedId,h.Type as Level,0 as Flag,h.BookingCode,h.NewCheckInDate,d.ChkOutDt 
+		From WRBHBCheckInHdr  h
+		join WRBHBBookingPropertyAssingedGuest d on h.Id = d.CheckInHdrId and
+		h.BookingId = d.BookingId and h.GuestId = d.GuestId and
+		d.IsActive=1 and d.IsDeleted=0
+		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
+		h.PropertyType in ('External Property','Managed G H') and  
+		h.PropertyId = @PropertyId and  
+		-- CONVERT(nvarchar(100),ChkoutDate,103) = CONVERT(nvarchar(100),GETDATE(),103) and  
+		h.Id  IN (Select Id FROM WRBHBChechkOutHdr where isnull(IntermediateFlag,0) = 1 and  
+		IsActive = 0 and IsDeleted = 0 ) 
+		
+		and h.Id  not IN (Select Id FRom WRBHBExternalChechkOutTAC where isnull(IntermediateFlag,0) = 1 and  
+		IsActive = 0 and IsDeleted = 0 ) 
+		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
+		h.BookingId,h.BedId,h.Type,h.BookingCode ,h.ChkInGuest,h.NewCheckInDate,d.ChkOutDt
+
+		INSERT INTO #GUEST(GuestName,GuestId,StateId,CheckInHdrId,PropertyId,RoomId,ApartmentId,  
+		BookingId,BedId,Type,Flag,BookingCode,ChkInDT,ChkOutDT)  
+
+		SELECT  h.ChkInGuest,h.GuestId,h.StateId,h.Id AS CheckInHdrId,h.PropertyId,h.RoomId,h.ApartmentId,  
+		h.BookingId,h.BedId,h.Type as Level,0 as Flag,h.BookingCode,h.NewCheckInDate,d.ChkOutDt 
+		From WRBHBCheckInHdr  h
+		join WRBHBBookingPropertyAssingedGuest d on h.Id = d.CheckInHdrId and
+		h.BookingId = d.BookingId and h.GuestId = d.GuestId and
+		d.IsActive=1 and d.IsDeleted=0
+		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
+		h.PropertyType in ('External Property' , 'Managed G H') and  
+		h.PropertyId = 590 and  
+		-- CONVERT(nvarchar(100),ChkoutDate,103) = CONVERT(nvarchar(100),GETDATE(),103) and  
+		h.Id  IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where IsActive = 1 and IsDeleted = 0
+		and ISNULL(IntermediateFlag,0)=1  )  and
+		h.Id not in (Select ChkInHdrId FRom WRBHBExternalChechkOutTAC where IsActive = 1 and IsDeleted = 0
+		and ISNULL(IntermediateFlag,0)=1)
+		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
+		h.BookingId,h.BedId,h.Type,h.BookingCode ,h.ChkInGuest,h.NewCheckInDate,d.ChkOutDt
+		
 		SELECT  GuestName,GuestId,StateId, CheckInHdrId,PropertyId,RoomId,ApartmentId,  
-		BookingId,BedId,Type as Level  
+		BookingId,BedId,Type as Level,BookingCode ,ChkInDT as CheckInDate,ChkOutDT as CheckOutDate 
 		FROM #GUEST 
+		group by GuestName,GuestId,StateId, CheckInHdrId,PropertyId,RoomId,ApartmentId,  
+		BookingId,BedId,Type ,BookingCode ,ChkInDT,ChkOutDT
 		 
 		SELECT DISTINCT U.FirstName AS label,U.Id AS Data FROM WRBHBUser U
 		JOIN WRBHBPropertyUsers P ON U.Id=P.UserId AND P.IsActive=1 AND P.IsDeleted=0
@@ -183,10 +259,14 @@ BEGIN
 			SET @TariffPaymentMode =(SELECT TariffPaymentMode FROM #LEVEL)
 			SET @ServicePaymentMode =(SELECT ServicePaymentMode FROM #LEVEL)
 			SET @TAC=(SELECT TAC from #LEVEL)
-		 
+			
+			declare @NewCheckInDate nvarchar(100);
+			set  @NewCheckInDate=(select convert(nvarchar(100),Cast(NewCheckInDate as DATE),103)	FROM WRBHBCheckInHdr  
+			WHERE IsActive = 1 and IsDeleted = 0 and Id =@CheckInHdrId)
+		
 			SELECT Property,
 			CONVERT(nvarchar(100),@ChkInDate,103)+' To '+CONVERT(nvarchar(100),@ChkOutDate,103) as Stay,Tariff,
-			CONVERT(nvarchar(100),@ChkOutDate,103) as ChkoutDate,CONVERT(nvarchar(100),@ChkInDate,103) as CheckInDate
+			CONVERT(nvarchar(100),@ChkOutDate,103) as ChkoutDate,CONVERT(nvarchar(100),@NewCheckInDate,103) as CheckInDate
 			FROM WRBHBCheckInHdr
 			WHERE IsActive = 1 and IsDeleted = 0 and Id =@CheckInHdrId;
 		
@@ -322,9 +402,9 @@ BEGIN
 			IF @HR='12'		
 			BEGIN
 			-- To Check Time
-			SET @MIN=(SELECT DATEDIFF(MINUTE,CAST(YEAR(CONVERT(DATE,@ChkInDate,103)) AS VARCHAR)+'-'+
-			CAST(MONTH(CONVERT(DATE,@ChkInDate,103)) AS VARCHAR)+'-'+
-			CAST(DAY(CONVERT(DATE,@ChkInDate,103)) AS VARCHAR)+' '+'12:00:00',CAST(YEAR(CONVERT(DATE,@ChkOutDate,103)) AS VARCHAR)+'-'+
+			SET @MIN=(SELECT DATEDIFF(MINUTE,CAST(YEAR(CONVERT(DATE,@NewCheckInDate,103)) AS VARCHAR)+'-'+
+			CAST(MONTH(CONVERT(DATE,@NewCheckInDate,103)) AS VARCHAR)+'-'+
+			CAST(DAY(CONVERT(DATE,@NewCheckInDate,103)) AS VARCHAR)+' '+'12:00:00',CAST(YEAR(CONVERT(DATE,@ChkOutDate,103)) AS VARCHAR)+'-'+
 			CAST(MONTH(CONVERT(DATE,@ChkOutDate,103)) AS VARCHAR)+'-'+
 			CAST(DAY(CONVERT(DATE,@ChkOutDate,103)) AS VARCHAR)+' '+@chkouttime) AS M
 			);
@@ -396,9 +476,9 @@ BEGIN
 			 ELSE 
 			 BEGIN
 		 --Get Date Differance
-					SET @MIN=(SELECT DATEDIFF(MINUTE,CAST(YEAR(CONVERT(DATE,@ChkInDate,103)) AS VARCHAR)+'-'+
-					CAST(MONTH(CONVERT(DATE,@ChkInDate,103)) AS VARCHAR)+'-'+
-					CAST(DAY(CONVERT(DATE,@ChkInDate,103)) AS VARCHAR)+' '+@chktime,CAST(YEAR(CONVERT(DATE,@ChkOutDate,103)) AS VARCHAR)+'-'+
+					SET @MIN=(SELECT DATEDIFF(MINUTE,CAST(YEAR(CONVERT(DATE,@NewCheckInDate,103)) AS VARCHAR)+'-'+
+					CAST(MONTH(CONVERT(DATE,@NewCheckInDate,103)) AS VARCHAR)+'-'+
+					CAST(DAY(CONVERT(DATE,@NewCheckInDate,103)) AS VARCHAR)+' '+@chktime,CAST(YEAR(CONVERT(DATE,@ChkOutDate,103)) AS VARCHAR)+'-'+
 					CAST(MONTH(CONVERT(DATE,@ChkOutDate,103)) AS VARCHAR)+'-'+
 					CAST(DAY(CONVERT(DATE,@ChkOutDate,103)) AS VARCHAR)+' '+@chkouttime) AS M
 					);
@@ -407,34 +487,35 @@ BEGIN
 					--this is 24 hour  for mat
 					Select @i=0,@DateDiff=@MIN/1440,@OutPutHour=(@MIN % 1440)/60,@OutPutSEC=(@MIN % 60) 
 			-- this is 12 hour Format	
-			--Select @MIN/720 as NoDays,(@MIN % 720)/60 as NoHours,(@MIN % 60) as NoMinutes  		
-		    
+			--Select @MIN/720 as NoDays,(@MIN % 720)/60 as NoHours,(@MIN % 60) as NoMinutes  
+					
+	-- below this if condition to hide for extra 1 day		    
 		   --ABOVE 1 HR IT WILL WORK
 		   --select @OutPutHour;
-			IF(@OutPutHour>1)
-			BEGIN
-			IF (@NoOfDays = 1)
-				BEGIN
-					SELECT @NoOfDays=@NoOfDays 
-					INSERT INTO #ExTariff(Tariff,RackTariffSingle,RackTariffDouble,STAgreed,LTAgreed,STRack,LTRack,Occupancy,Date,
-					SingleMarkupAmount,DoubleMarkupAmount)
-					SELECT @Tariff,@RackTariffSingle,@RackTariffDouble,@STAgreed,@LTAgreed,@STRack,@LTRack,@Occupancy,
-					CONVERT(NVARCHAR,DATEADD(DAY,@DateDiff,CONVERT(DATE,@ChkInDate,103)),103),@SingleMarkupAmount,
-					@DoubleMarkupAmount
-				END
-				ELSE
-				BEGIN
-					SELECT @NoOfDays=@NoOfDays + 1
-					INSERT INTO #ExTariff(Tariff,RackTariffSingle,RackTariffDouble,STAgreed,LTAgreed,STRack,LTRack,Occupancy,Date,
-					SingleMarkupAmount,DoubleMarkupAmount)
-					SELECT @Tariff,@RackTariffSingle,@RackTariffDouble,@STAgreed,@LTAgreed,@STRack,@LTRack,@Occupancy,
-					CONVERT(NVARCHAR,DATEADD(DAY,@DateDiff,CONVERT(DATE,@ChkInDate,103)),103),@SingleMarkupAmount,
-					@DoubleMarkupAmount
+	--		IF(@OutPutHour>1)
+	--		BEGIN
+	--		IF (@NoOfDays = 1)
+	--			BEGIN
+	--				SELECT @NoOfDays=@NoOfDays 
+	--				INSERT INTO #ExTariff(Tariff,RackTariffSingle,RackTariffDouble,STAgreed,LTAgreed,STRack,LTRack,Occupancy,Date,
+	--				SingleMarkupAmount,DoubleMarkupAmount)
+	--				SELECT @Tariff,@RackTariffSingle,@RackTariffDouble,@STAgreed,@LTAgreed,@STRack,@LTRack,@Occupancy,
+	--				CONVERT(NVARCHAR,DATEADD(DAY,@DateDiff,CONVERT(DATE,@ChkInDate,103)),103),@SingleMarkupAmount,
+	--				@DoubleMarkupAmount
+	--			END
+	--			ELSE
+	--			BEGIN
+	--				SELECT @NoOfDays=@NoOfDays + 1
+	--				INSERT INTO #ExTariff(Tariff,RackTariffSingle,RackTariffDouble,STAgreed,LTAgreed,STRack,LTRack,Occupancy,Date,
+	--				SingleMarkupAmount,DoubleMarkupAmount)
+	--				SELECT @Tariff,@RackTariffSingle,@RackTariffDouble,@STAgreed,@LTAgreed,@STRack,@LTRack,@Occupancy,
+	--				CONVERT(NVARCHAR,DATEADD(DAY,@DateDiff,CONVERT(DATE,@ChkInDate,103)),103),@SingleMarkupAmount,
+	--				@DoubleMarkupAmount
 				
-				END
+	--			END
 				
-	--			SELECT @Tariff,@RackTariff,CONVERT(NVARCHAR,DATEADD(DAY,@DateDiff,CONVERT(DATE,@ChkInDate,103)),103)
-		    END
+	----			SELECT @Tariff,@RackTariff,CONVERT(NVARCHAR,DATEADD(DAY,@DateDiff,CONVERT(DATE,@ChkInDate,103)),103)
+	--	    END
 		    
 		    --DAYS TARIFF ADD
 		  --  select @NoOfDays,@DateDiff
@@ -642,16 +723,19 @@ BEGIN
 	--END
 	
 		SELECT COUNT(Id) AS Id1 from WRBHBChechkOutHdr where ChkInHdrId = @CheckInHdrId   
+		 and IsActive = 1 and IsDeleted = 0 and ISNULL(Flag,0)= 0 
 		 
 		SELECT COUNT(d.CheckOutHdrId) AS Id2 FROM WRBHBChechkOutHdr h  
 		JOIN WRBHBCheckOutServiceHdr d ON h.Id = d.CheckOutHdrId  
 		--join WRBHBCheckOutServiceDtls cs on d.Id= cs.CheckOutServceHdrId  
-		WHERE h.ChkInHdrId= @CheckInHdrId  
+		WHERE h.ChkInHdrId= @CheckInHdrId  and h.IsActive = 1 and h.IsDeleted = 0
+		and ISNULL(h.Flag,0)= 0  
 		 
 		 
 		 
 		SELECT Id  
 		FROM WRBHBChechkOutHdr WHERE ChkInHdrId = @CheckInHdrId  
+		and IsActive = 1 and IsDeleted = 0 and ISNULL(Flag,0)= 0 
 		 
 		SELECT COUNT(Tariff) AS Tariff FROM #FINAL  
 		
@@ -666,7 +750,7 @@ BEGIN
 		left outer join WRBHBChechkOutPaymentCash d on h.Id = d.ChkOutHdrId and  
 		h.IsActive = 1 and h.IsDeleted = 0  
 		WHERE h.ChkInHdrId=@CheckInHdrId AND d.IsActive=1 AND d.IsDeleted=0 and  
-		d.Payment='Tariff'  
+		d.Payment='Tariff'   and ISNULL(h.Flag,0)= 0 
 
 		INSERT INTO #TariffSet(BillNo,BillType,Amount,NetAmount,OutStanding,PaymentStatus)  
 		SELECT h.CheckOutNo,d.Payment,(round(h.ChkOutTariffNetAmount,0)) as ChkOutTariffNetAmount,  
@@ -675,7 +759,7 @@ BEGIN
 		left outer join WRBHBChechkOutPaymentCard d on h.Id = d.ChkOutHdrId and  
 		h.IsActive = 1 and h.IsDeleted = 0  
 		WHERE h.ChkInHdrId=@CheckInHdrId AND d.IsActive=1 AND d.IsDeleted=0  
-		and d.Payment='Tariff'  
+		and d.Payment='Tariff'   and ISNULL(h.Flag,0)= 0 
 
 		INSERT INTO #TariffSet(BillNo,BillType,Amount,NetAmount,OutStanding,PaymentStatus)  
 		SELECT h.CheckOutNo,d.Payment,(round(h.ChkOutTariffNetAmount,0)) as ChkOutTariffNetAmount,  
@@ -684,7 +768,7 @@ BEGIN
 		left outer join WRBHBChechkOutPaymentCheque d on h.Id = d.ChkOutHdrId and  
 		h.IsActive = 1 and h.IsDeleted = 0  
 		WHERE h.ChkInHdrId=@CheckInHdrId AND d.IsActive=1 AND d.IsDeleted=0  
-		and d.Payment='Tariff'  
+		and d.Payment='Tariff'   and ISNULL(h.Flag,0)= 0 
 
 		INSERT INTO #TariffSet(BillNo,BillType,Amount,NetAmount,OutStanding,PaymentStatus)  
 		SELECT h.CheckOutNo,d.Payment,(round(h.ChkOutTariffNetAmount,0)) as ChkOutTariffNetAmount,  
@@ -693,7 +777,7 @@ BEGIN
 		left outer join WRBHBChechkOutPaymentCompanyInvoice d on h.Id = d.ChkOutHdrId and  
 		h.IsActive = 1 and h.IsDeleted = 0  
 		WHERE h.ChkInHdrId=@CheckInHdrId AND d.IsActive=1 AND d.IsDeleted=0   
-		and d.Payment='Tariff'  
+		and d.Payment='Tariff'   and ISNULL(h.Flag,0)= 0 
 
 		INSERT INTO #TariffSet(BillNo,BillType,Amount,NetAmount,OutStanding,PaymentStatus)  
 		SELECT h.CheckOutNo,d.Payment,(round(h.ChkOutTariffNetAmount,0)) as ChkOutTariffNetAmount,  
@@ -702,7 +786,7 @@ BEGIN
 		left outer join WRBHBChechkOutPaymentNEFT d on h.Id = d.ChkOutHdrId and  
 		h.IsActive = 1 and h.IsDeleted = 0  
 		WHERE h.ChkInHdrId=@CheckInHdrId AND d.IsActive=1 AND d.IsDeleted=0  
-		and d.Payment='Tariff'  
+		and d.Payment='Tariff'   and ISNULL(h.Flag,0)= 0 
 
 		-- Service  
 		INSERT INTO #TariffSet(BillNo,BillType,Amount,NetAmount,OutStanding,PaymentStatus)  
@@ -712,7 +796,7 @@ BEGIN
 		join WRBHBCheckOutServiceHdr h on h.CheckOutHdrId = ch.Id  
 		join WRBHBChechkOutPaymentCash d on d.ChkOutHdrId = h.CheckOutHdrId  
 		where ch.ChkInHdrId=@CheckInHdrId AND d.IsActive=1 AND d.IsDeleted=0 and  
-		d.Payment='Service'  
+		d.Payment='Service'  and ISNULL(ch.Flag,0)= 0 
 
 
 		INSERT INTO #TariffSet(BillNo,BillType,Amount,NetAmount,OutStanding,PaymentStatus)  
@@ -722,7 +806,7 @@ BEGIN
 		join WRBHBCheckOutServiceHdr h on h.CheckOutHdrId = ch.Id  
 		join WRBHBChechkOutPaymentCard d on d.ChkOutHdrId = h.CheckOutHdrId  
 		where ch.ChkInHdrId=@CheckInHdrId AND d.IsActive=1 AND d.IsDeleted=0 and  
-		d.Payment='Service'  
+		d.Payment='Service'  and ISNULL(ch.Flag,0)= 0 
 
 		INSERT INTO #TariffSet(BillNo,BillType,Amount,NetAmount,OutStanding,PaymentStatus)  
 		SELECT CH.CheckOutNo,d.Payment,(round(h.ChkOutServiceNetAmount,0)) as ChkOutTariffNetAmount,  
@@ -731,7 +815,7 @@ BEGIN
 		join WRBHBCheckOutServiceHdr h on h.CheckOutHdrId = ch.Id  
 		join WRBHBChechkOutPaymentCheque d on d.ChkOutHdrId = h.CheckOutHdrId  
 		where ch.ChkInHdrId=@CheckInHdrId AND d.IsActive=1 AND d.IsDeleted=0 and   
-		d.Payment='Service'  
+		d.Payment='Service'  and ISNULL(ch.Flag,0)= 0 
 
 
 		INSERT INTO #TariffSet(BillNo,BillType,Amount,NetAmount,OutStanding,PaymentStatus)  
@@ -741,7 +825,7 @@ BEGIN
 		join WRBHBCheckOutServiceHdr h on h.CheckOutHdrId = ch.Id  
 		join WRBHBChechkOutPaymentCompanyInvoice d on d.ChkOutHdrId = h.CheckOutHdrId  
 		where ch.ChkInHdrId=@CheckInHdrId AND d.IsActive=1 AND d.IsDeleted=0  
-		and d.Payment='Service'  
+		and d.Payment='Service'  and ISNULL(ch.Flag,0)= 0 
 		 
 		 
 		 INSERT INTO #TariffSet(BillNo,BillType,Amount,NetAmount,OutStanding,PaymentStatus)  
@@ -751,7 +835,7 @@ BEGIN
 		join WRBHBCheckOutServiceHdr h on h.CheckOutHdrId = ch.Id  
 		join WRBHBChechkOutPaymentNEFT d on d.ChkOutHdrId = h.CheckOutHdrId  
 		where ch.ChkInHdrId=@CheckInHdrId AND d.IsActive=1 AND d.IsDeleted=0 and d.Payment='Service'  
-		 
+		 and ISNULL(ch.Flag,0)= 0 
 		 
 		INSERT INTO #TariffSet(BillNo,BillType,Amount,NetAmount,OutStanding,PaymentStatus)  
 		SELECT CH.CheckOutNo,d.Payment,(round(ch.ChkOutTariffNetAmount,0)+ISNULL(h.ChkOutServiceNetAmount,0)) ,  
@@ -762,7 +846,7 @@ BEGIN
 		join WRBHBCheckOutServiceHdr h on h.CheckOutHdrId = ch.Id  
 		join WRBHBChechkOutPaymentCash d on d.ChkOutHdrId = h.CheckOutHdrId  
 		where ch.ChkInHdrId=@CheckInHdrId AND d.IsActive=1 AND d.IsDeleted=0 and  
-		d.Payment='Consolidated'  
+		d.Payment='Consolidated'   and ISNULL(ch.Flag,0)= 0 
 		group by ch.CheckOutNo,d.Payment,h. PaymentStatus,ch.ChkOutTariffNetAmount,h.ChkOutServiceNetAmount,
 		ch. PaymentStatus  
 		 
@@ -778,7 +862,7 @@ BEGIN
 		join WRBHBCheckOutServiceHdr h on h.CheckOutHdrId = ch.Id  
 		join WRBHBChechkOutPaymentCard d on d.ChkOutHdrId = h.CheckOutHdrId  
 		where ch.ChkInHdrId=@CheckInHdrId AND d.IsActive=1 AND d.IsDeleted=0 and  
-		d.Payment='Consolidated' 
+		d.Payment='Consolidated'  and ISNULL(ch.Flag,0)= 0 
 		group by ch.CheckOutNo,d.Payment,h. PaymentStatus,ch.ChkOutTariffNetAmount,h.ChkOutServiceNetAmount,
 		ch. PaymentStatus   
 
@@ -791,7 +875,7 @@ BEGIN
 		join WRBHBCheckOutServiceHdr h on h.CheckOutHdrId = ch.Id  
 		join WRBHBChechkOutPaymentCheque d on d.ChkOutHdrId = h.CheckOutHdrId  
 		where ch.ChkInHdrId=@CheckInHdrId AND d.IsActive=1 AND d.IsDeleted=0 and   
-		d.Payment='Consolidated'  
+		d.Payment='Consolidated'   and ISNULL(ch.Flag,0)= 0 
 		group by ch.CheckOutNo,d.Payment,h. PaymentStatus,ch.ChkOutTariffNetAmount,h.ChkOutServiceNetAmount,
 		ch. PaymentStatus  
 
@@ -805,7 +889,7 @@ BEGIN
 		join WRBHBCheckOutServiceHdr h on h.CheckOutHdrId = ch.Id  
 		join WRBHBChechkOutPaymentCompanyInvoice d on d.ChkOutHdrId = h.CheckOutHdrId  
 		where ch.ChkInHdrId=@CheckInHdrId AND d.IsActive=1 AND d.IsDeleted=0  
-		and d.Payment='Consolidated'  
+		and d.Payment='Consolidated'  and ISNULL(ch.Flag,0)= 0  
 		group by ch.CheckOutNo,d.Payment,h. PaymentStatus,ch.ChkOutTariffNetAmount,h.ChkOutServiceNetAmount,
 		ch. PaymentStatus  
 
@@ -820,7 +904,7 @@ BEGIN
 		join WRBHBCheckOutServiceHdr h on h.CheckOutHdrId = ch.Id  
 		join WRBHBChechkOutPaymentNEFT d on d.ChkOutHdrId = ch.Id  
 		where ch.ChkInHdrId=@CheckInHdrId AND d.IsActive=1 AND d.IsDeleted=0   
-		and d.Payment='Consolidated' 
+		and d.Payment='Consolidated'  and ISNULL(ch.Flag,0)= 0 
 		group by ch.CheckOutNo,d.Payment,h. PaymentStatus,ch.ChkOutTariffNetAmount,h.ChkOutServiceNetAmount,
 		ch. PaymentStatus   
      
@@ -843,25 +927,26 @@ BEGIN
 		--Name  
 		  SELECT DISTINCT Name FROM WRBHBChechkOutHdr  
 		  WHERE ChkInHdrId=@CheckInHdrId AND IsActive=1 AND IsDeleted=0   
-	        
+	        and ISNULL(Flag,0)= 0 
 	        
 		  -- TARIFF FOR ADD PAYMENTS  
 		  SELECT round(H.ChkOutTariffNetAmount,0) as ChkOutTariffNetAmount,D.ChkinAdvance as Advance,H.ChkInHdrId  
 		  FROM WRBHBChechkOutHdr H  
 		  JOIN WRBHBCheckInHdr D ON H.ChkInHdrId = D.Id AND D.IsActive = 1 AND D.IsDeleted = 0  
 		  WHERE H.IsActive = 1 AND D.IsDeleted = 0   
-		  AND H.ChkInHdrId = @CheckInHdrId  
+		  AND H.ChkInHdrId = @CheckInHdrId  and ISNULL(h.Flag,0)= 0 
 		  -- SERVICE FOR ADD PAYMENTS  
 		  SELECT round(H.ChkOutServiceNetAmount,0) as ChkOutServiceNetAmount  
 		  FROM WRBHBCheckOutServiceHdr H  
 		  JOIN WRBHBChechkOutHdr D ON H.CheckOutHdrId = D.Id AND D.IsActive = 1 AND D.IsDeleted = 0  
 		  WHERE H.IsActive=1 AND H.IsDeleted=0 AND D.ChkInHdrId=@CheckInHdrId  
+		  and ISNULL(d.Flag,0)= 0 
 		  -- CONSOLIDATE FOR ADD PAYMENTS  
 		  SELECT round((H.ChkOutTariffNetAmount+D.ChkOutServiceNetAmount),0) AS ConsolidateAmount  
 		  FROM WRBHBChechkOutHdr H  
 		  JOIN WRBHBCheckOutServiceHdr D ON H.Id = D.CheckOutHdrId AND D.IsActive = 1 AND D.IsDeleted = 0  
 		  WHERE H.IsActive = 1 AND H.IsDeleted = 0 AND  
-		  H.ChkInHdrId = @CheckInHdrId  
+		  H.ChkInHdrId = @CheckInHdrId  and ISNULL(h.Flag,0)= 0 
 	        
 	        
 		  SELECT COUNT(*) AS UnPaid FROM  #TariffSet  WHERE PaymentStatus = 'UnPaid'  

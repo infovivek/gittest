@@ -392,11 +392,11 @@
 	</s:Group>
 	</s:VGroup>
 	<s:VGroup x="0" y="0" width="100%" height="147" verticalAlign="middle" horizontalAlign="center" depth="50">
-		<s:Group x="95" y="10" width="744" height="165">
-			<mx:Label x="359" y="65" text="Property"/>
+		<s:Group x="95" y="10" width="744" height="161">
+			<mx:Label x="359" y="65" text="Property" visible="false"/>
 			<WrbComp:Button_HB x="428" y="102.5" _Label="Genarate" click="button_hb1_clickHandler(event)">
 			</WrbComp:Button_HB>
-			<WrbHelpComp:HelpText x="428" y="65.5" depth="50" pxTabIndex="4"  width="303" id="hlp_Property" onselection="{fnGetProperty()}" pxSetColumnsWidth="300,150,150">
+			<WrbHelpComp:HelpText x="428" y="65.5" depth="50" visible="false" pxTabIndex="4"  width="303" id="hlp_Property" onselection="{fnGetProperty()}" pxSetColumnsWidth="300,150,150">
 			</WrbHelpComp:HelpText>
 			<mx:Label x="7" y="65" text="Property Category" id="lbl_PricingModel" />
 			<mx:Label x="359" y="25" text="Location" id="lbl_PricingModel0" />
@@ -425,7 +425,7 @@
 			<mx:DateChooser id="dt_Date1" visible="true" x="129" y="103" height="31"
 							focusEnabled="false" selectedDate="{new Date()}" 
 							yearNavigationEnabled="true" selectableRange="{{rangeEnd: new Date()}}" />
-			<s:BorderContainer x="130" y="134" width="183" height="21" backgroundColor="#fbf9f9"
+			<s:BorderContainer x="130" y="134" width="183" height="28" backgroundColor="#fbf9f9"
 							   borderVisible="false" depth="4">
 				
 				
@@ -437,7 +437,7 @@
 			
 		</s:Group>
 	</s:VGroup>
-	<mx:Label x="44" y="154" text="Filter"/>
-	<s:TextInput id="FiltFirstName" x="80" y="153" width="253" change="filter('PropertyName')"
+	<mx:Label x="44" y="154" text="PropertyName Filter"/>
+	<s:TextInput id="FiltFirstName" x="180" y="153" width="253" change="filter('PropertyName')"
 				 depth="8" prompt="Property Name"/>
 </s:Application>

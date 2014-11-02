@@ -59,9 +59,10 @@ DECLARE @Identity int,@ErrMsg NVARCHAR(MAX),@Str NVARCHAR(100);
 	 END
  ELSE
  BEGIN
-		UPDATE WRBHBPettyCashStatus SET Flag=0
-		WHERE IsActive=1 AND IsDeleted=0 AND UserId=@RequestedUserId 
-		
+		UPDATE WRBHBPettyCashStatusHdr SET NewEntry=1
+		WHERE UserId=@RequestedUserId AND PropertyId=@PropertyId AND 
+		CONVERT(NVARCHAR,CAST(CreatedDate AS Date),103)=CONVERT(NVARCHAR,@RequestedOn,103)
+			
 		INSERT INTO	WRBHBPCExpenseApproval (RequestedOn,Requestedby,
 		PCAccount,ApprovedAmount,ExpenseAmount,ProcessedStatus,LastProcessedon,Comments,
 		RequestedUserId,UserId,PropertyId,Process,IsActive,IsDeleted,CreatedBy,

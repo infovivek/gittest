@@ -58,7 +58,8 @@ CREATE PROCEDURE dbo.[SP_PCExpenseApproval_Help]
 		JOIN WRBHBPropertyUsers PU ON P.Id=PU.PropertyId AND PU.IsActive=1 AND PU.IsDeleted=0
 		JOIN WRBHBUser U ON  PC.RequestedUserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
 		JOIN WRBHBUser US ON PC.UserId=US.Id AND US.IsActive=1 AND US.IsDeleted=0
-		WHERE PC.IsActive=1 AND PC.IsDeleted=0 AND PU.UserId=@UserId AND PC.Process=1 AND
+		WHERE PC.IsActive=1 AND PC.IsDeleted=0 AND PU.UserId=@UserId AND 
+		PC.Process=1 AND
 		ProcessedStatus !='Accounted and Closed by Finance Manager ' AND 
 		P.Category IN('Internal Property','Managed G H')
 		AND PU.UserType IN('Resident Managers','Assistant Resident Managers','Operations Managers',
@@ -76,11 +77,12 @@ CREATE PROCEDURE dbo.[SP_PCExpenseApproval_Help]
 		CONVERT(NVARCHAR(100),GETDATE(),103) AS Processedon,(U.FirstName+' '+U.LastName) AS Processedby,
 		PC.UserId AS RequestedUserId, 0 AS Id,PC.PropertyId,PC.Id AS PCId
 		From WRBHBPettyCashStatus PC
+		JOIN WRBHBPettyCashStatusHdr H ON PC.PettyCashStatusHdrId=H.Id AND H.IsActive=1 AND H.IsDeleted=0
 		JOIN WRBHBPettyCashHdr PH ON PC.PropertyId=PH.PropertyId AND PH.IsActive=1 AND PH.IsDeleted=0
 		JOIN WRBHBProperty P ON PC.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
 		JOIN WRBHBPropertyUsers PU ON P.Id=PU.PropertyId AND PU.IsActive=1 AND PU.IsDeleted=0
 		JOIN WRBHBUser U ON  PC.UserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
-		WHERE PC.IsActive=1 AND PC.IsDeleted=0 AND PC.Flag=1 
+		WHERE PC.IsActive=1 AND PC.IsDeleted=0 AND PC.Flag=1 AND H.NewEntry=0
 		AND PU.UserId=@UserId 
 		AND P.Category IN('Internal Property','Managed G H')
 		AND PU.UserType IN('Resident Managers','Assistant Resident Managers','Operations Managers',
@@ -101,8 +103,10 @@ END
         --table1
         SELECT DISTINCT (U.FirstName+' '+U.LastName) AS Requestedby,P.PropertyName AS PCAccount,
 		CONVERT(NVARCHAR,CAST(PC.CreatedDate AS Date),103) AS RequestedOn,'Submitted' AS Status,
-		SUM(PC.Amount) AS Amount,PH.OpeningBalance From WRBHBPettyCashStatus PC
-		JOIN WRBHBPettyCashHdr PH ON PC.PropertyId=PH.PropertyId AND PC.UserId=PH.UserId AND PH.IsActive=1 AND PC.IsDeleted=0
+		SUM(PC.Amount) AS Amount,PH.OpeningBalance,PC.PropertyId,PC.UserId
+		From WRBHBPettyCashStatus PC
+		JOIN WRBHBPettyCashHdr PH ON PC.PropertyId=PH.PropertyId AND 
+		PC.Status=CONVERT(NVARCHAR,PH.Date,103) AND PC.UserId=PH.UserId AND PH.IsActive=1 AND PC.IsDeleted=0
 		JOIN WRBHBProperty P ON PC.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
 		JOIN WRBHBUser U ON  PC.UserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
 		WHERE PC.UserId=@UserId AND PC.PropertyId=@PropertyId AND PC.IsActive=1 AND PC.IsDeleted=0
@@ -112,7 +116,8 @@ END
 		--table2
 		Select  DISTINCT 
 		CONVERT(NVARCHAR(100),PC.CreatedDate,103) AS RequestedOn,
-		PC.Amount AS ApprovedAmount,PC.Paid AS ExpenseAmount,ExpenseHead,Description,PC.BillLogo As Bill,PC.Id AS Id
+		PC.Amount AS ApprovedAmount,PC.Paid AS ExpenseAmount,ExpenseHead,Description,PC.BillLogo As Bill,
+		PC.Id AS Id
 		From WRBHBPettyCashStatus PC
 		JOIN WRBHBProperty P ON PC.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
 		JOIN WRBHBUser U ON  PC.UserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
@@ -120,6 +125,9 @@ END
 		WHERE PC.UserId=@UserId AND PC.PropertyId=@PropertyId AND PC.IsActive=1 AND PC.IsDeleted=0 
 		AND CONVERT(NVARCHAR,CAST(PC.CreatedDate AS Date),103)=CONVERT(NVARCHAR,@Str,103) 
 		 END
+		 
+		
+		 
  IF @Action='Action'
  BEGIN
 		CREATE TABLE #User (UserName NVARCHAR(100),Status NVARCHAR(100),Comments NVARCHAR(100),Processedon NVARCHAR(100))
@@ -143,6 +151,26 @@ END
 		AND CONVERT(NVARCHAR,CAST(P.CreatedDate AS Date),103)=CONVERT(NVARCHAR,@Str,103)
 		
 		SELECT UserName,Status,Comments,Processedon FROM #User ORDER BY Processedon DESC
+	END
+	IF @Action='Reject'
+	BEGIN
+		 UPDATE WRBHBPettyCashStatus SET Flag=0 
+		 WHERE UserId=@UserId AND PropertyId=@PropertyId AND 
+		 CONVERT(NVARCHAR,CAST(CreatedDate AS Date),103)=CONVERT(NVARCHAR,@Str,103)
+	
+		
+		 UPDATE WRBHBPettyCashStatusHdr SET Flag=0
+		 WHERE UserId=@UserId AND PropertyId=@PropertyId AND 
+		 CONVERT(NVARCHAR,CAST(CreatedDate AS Date),103)=CONVERT(NVARCHAR,@Str,103)
+		 
+		 DECLARE @Bt NVARCHAR(100)
+		 SET @Bt=(SELECT DISTINCT CONVERT(NVARCHAR(100),Date,103) FROM WRBHBPettyCashHdr  P
+		 JOIN WRBHBPettyCashStatus S ON P.PropertyId=S.PropertyId AND P.UserId=S.UserId AND
+		 CONVERT(NVARCHAR(100),Date,103)=S.Status AND S.IsActive=1 AND S.IsDeleted=0
+		 WHERE S.UserId=@UserId AND S.PropertyId=@PropertyId AND 
+		 CONVERT(NVARCHAR,CAST(S.CreatedDate AS Date),103)=CONVERT(NVARCHAR,@Str,103))
+		 
+		 
 	END
 	
  END

@@ -47,67 +47,76 @@ END
 IF(@Action='GRIDLOAD')
 BEGIN
 		CREATE TABLE #Final(UserName NVARCHAR(100),ProcessedOn NVARCHAR(100),
-		TransferredAmount DECIMAL(27,2),Fortnight NVARCHAR(100))
+		TransferredAmount DECIMAL(27,2),Fortnight NVARCHAR(100),PropertyId INT,UserId INT)
 		
 		IF(@Str ='First')
 		BEGIN
-		INSERT INTO #Final(UserName,ProcessedOn,TransferredAmount,Fortnight)
+		
+			INSERT INTO #Final(UserName,ProcessedOn,TransferredAmount,Fortnight,PropertyId,UserId)
 			SELECT (S.FirstName+''+S.LastName) AS UserName,
-			CONVERT(NVARCHAR,CAST(U.CreatedDate AS Date),103) AS ProcessedOn,U.Amount,1 
+			CONVERT(NVARCHAR,CAST(U.CreatedDate AS Date),103) AS ProcessedOn,U.Amount,1, 
+			U.PropertyId,U.UserId
 			FROM WRBHBPettyCashStatus U 
 			JOIN WRBHBUser S ON U.UserId=S.Id AND S.IsActive=1 AND S.IsDeleted=0
-			WHERE U.UserId=@UserId AND U.PropertyId=@Id AND U.IsActive=0 AND U.IsDeleted=1
+			WHERE  U.IsActive=0 AND U.IsDeleted=1
 			AND  CONVERT(date,CAST(DATEADD(mm, DATEDIFF(mm, 0, U.CreatedDate), 0) AS Date),103)=
 			Convert(date,@Str1,103)
-			group by S.FirstName,S.LastName,U.CreatedDate,U.Amount
+			group by S.FirstName,S.LastName,U.CreatedDate,U.Amount,U.PropertyId,U.UserId
+			
+			
+					
 		END
 		ELSE IF(@Str ='Second')
 		BEGIN
-		INSERT INTO #Final(UserName,ProcessedOn,TransferredAmount,Fortnight)
+		INSERT INTO #Final(UserName,ProcessedOn,TransferredAmount,Fortnight,PropertyId,UserId)
 			SELECT (S.FirstName+''+S.LastName) AS UserName,
-			CONVERT(NVARCHAR,CAST(U.CreatedDate AS Date),103) AS ProcessedOn,U.Amount,2 
+			CONVERT(NVARCHAR,CAST(U.CreatedDate AS Date),103) AS ProcessedOn,U.Amount,2, 
+			U.PropertyId,U.UserId 
 			FROM WRBHBPettyCashStatus U 
 			JOIN WRBHBUser S ON U.UserId=S.Id AND S.IsActive=1 AND S.IsDeleted=0
-			WHERE U.UserId=@UserId AND U.PropertyId=@Id AND U.IsActive=0 AND U.IsDeleted=1
+			WHERE  U.IsActive=0 AND U.IsDeleted=1
 			AND CONVERT(date,CAST(DATEADD(mm, DATEDIFF(mm, 0, U.CreatedDate), 0) AS Date),103)=
 			Convert(date,@Str1,103)
-			group by S.FirstName,S.LastName,U.CreatedDate,U.Amount
+			group by S.FirstName,S.LastName,U.CreatedDate,U.Amount,U.PropertyId,U.UserId
 		END
 		ELSE IF(@Str ='All')
 		BEGIN
-		INSERT INTO #Final(UserName,ProcessedOn,TransferredAmount,Fortnight)
+		INSERT INTO #Final(UserName,ProcessedOn,TransferredAmount,Fortnight,PropertyId,UserId)
 			SELECT (S.FirstName+''+S.LastName) AS UserName,
-			CONVERT(NVARCHAR,CAST(U.CreatedDate AS Date),103) AS ProcessedOn,U.Amount,3 
+			CONVERT(NVARCHAR,CAST(U.CreatedDate AS Date),103) AS ProcessedOn,U.Amount,3, 
+			U.PropertyId,U.UserId 
 			FROM WRBHBPettyCashStatus U 
 			JOIN WRBHBUser S ON U.UserId=S.Id AND S.IsActive=1 AND S.IsDeleted=0
-			WHERE U.UserId=@UserId AND U.PropertyId=@Id AND U.IsActive=0 AND U.IsDeleted=1
+			WHERE  U.IsActive=0 AND U.IsDeleted=1
 			AND MONTH(CONVERT (date,U.CreatedDate,103))=MONTH(Convert(date,@Str1,103))
-			group by S.FirstName,S.LastName,U.CreatedDate,U.Amount
+			group by S.FirstName,S.LastName,U.CreatedDate,U.Amount,U.PropertyId,U.UserId
 		END
 		
 		CREATE TABLE #FinalReport(UserName NVARCHAR(100),ProcessedOn NVARCHAR(100),
-		TransferredAmount DECIMAL(27,2))
+		TransferredAmount DECIMAL(27,2),PropertyId INT,UserId INT)
 		
-		INSERT #FinalReport(UserName,ProcessedOn,TransferredAmount)
-		SELECT UserName,ProcessedOn,SUM(TransferredAmount)AS TransferredAmount
+		INSERT #FinalReport(UserName,ProcessedOn,TransferredAmount,PropertyId,UserId)
+		SELECT UserName,ProcessedOn,SUM(TransferredAmount)AS TransferredAmount, 
+		PropertyId,UserId
 		FROM #Final
 		WHERE (day(Convert(datetime,ProcessedOn)-1) / 15) + 1=1 AND Fortnight=1
-		GROUP BY UserName,ProcessedOn
-		
-		
-		INSERT #FinalReport(UserName,ProcessedOn,TransferredAmount)
-		SELECT UserName,ProcessedOn,SUM(TransferredAmount)AS TransferredAmount
+		GROUP BY UserName,ProcessedOn,PropertyId,UserId
+						
+		INSERT #FinalReport(UserName,ProcessedOn,TransferredAmount,PropertyId,UserId)
+		SELECT UserName,ProcessedOn,SUM(TransferredAmount)AS TransferredAmount, 
+		PropertyId,UserId
 		FROM #Final
 		WHERE (day(Convert(datetime,ProcessedOn)-1) / 15) + 1=2 AND Fortnight=2
-		GROUP BY UserName,ProcessedOn
+		GROUP BY UserName,ProcessedOn,PropertyId,UserId
 		
-		INSERT #FinalReport(UserName,ProcessedOn,TransferredAmount)
-		SELECT UserName,ProcessedOn,SUM(TransferredAmount)AS TransferredAmount
+		INSERT #FinalReport(UserName,ProcessedOn,TransferredAmount,PropertyId,UserId)
+		SELECT UserName,ProcessedOn,SUM(TransferredAmount)AS TransferredAmount, 
+		PropertyId,UserId
 		FROM #Final
 		WHERE  Fortnight=3
-		GROUP BY UserName,ProcessedOn
+		GROUP BY UserName,ProcessedOn,PropertyId,UserId
 		
-		SELECT UserName,ProcessedOn,TransferredAmount FROM #FinalReport
+		SELECT UserName,ProcessedOn,TransferredAmount,PropertyId,UserId FROM #FinalReport
 END
 IF @Action='Action'
  BEGIN
@@ -257,10 +266,10 @@ BEGIN
 		INSERT INTO #PCNEW(Requestedby,RequestedOn,ExpenseHead,ExpenseItem,Description,Amount,
 		BillDate,BillStartDate,BillEndDate,Property)
 	
-		SELECT (U.FirstName+''+U.LastName) AS Requestedby,Convert(VARCHAR(100),CONVERT(DATE,PH.Date,103),110) 
+		SELECT (U.FirstName+''+U.LastName) AS Requestedby,Convert(VARCHAR(100),PH.Date,105) 
 		AS RequestedOn,EG.ExpenseHead,PC.ExpenseHead AS ExpenseItem,PC.Description,ApprovedAmount AS Amount,
-		CONVERT(NVARCHAR,CONVERT(DATE,PS.BillDate,103),110),CONVERT(NVARCHAR,CONVERT(Date,@Str,103),110) AS Startdate,
-		CONVERT(NVARCHAR,CONVERT(Date,@Str1,103),110) AS EndDate,P.PropertyName 
+		CONVERT(NVARCHAR,PS.BillDate,105),CONVERT(NVARCHAR,@Str,105) AS Startdate,
+		CONVERT(NVARCHAR,@Str1,105) AS EndDate,P.PropertyName 
 		FROM WRBHBPettyCash PC  
 		JOIN WRBHBPettyCashHdr PH ON PC.PettyCashHdrId= PH.Id AND PH.IsActive=0 AND PH.IsDeleted=1
 		JOIN WRBHBPettyCashStatus PS ON PH.ClosingBalance=PS.Balance AND PS.IsActive=0 AND PS.IsDeleted=1
@@ -273,7 +282,7 @@ BEGIN
 		GROUP BY U.FirstName,U.LastName,PH.Date,EG.ExpenseHead,PC.ExpenseHead,PC.Description,
 		ApprovedAmount,PS.BillDate,P.PropertyName
 		ORDER BY PH.Date
-		
+						
 		SELECT Id as SNo,Requestedby,RequestedOn,ExpenseHead,ExpenseItem,Description,Amount,
 		BillDate,BillStartDate,BillEndDate,Property	FROM #PCNEW 
 			

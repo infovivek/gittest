@@ -117,8 +117,9 @@
 			protected function Help():void
 			{				
 	
-	//			useWeb("GuestCheckOut","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,Global_AC[0].UsrId,0]);
-				useWeb("GuestCheckOut","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,65,0]);
+				useWeb("GuestCheckOut","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId,0]);
+	//			useWeb("GuestCheckOut","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65,0]);
+	//			useWeb("GuestCheckOut","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65,0]);
 				Txt_ServiceBillAmt.editable=false;
 				Txt_ServiceVat.editable=false;
 				Txt_SerivceTax.editable=false;
@@ -180,7 +181,7 @@
 						hlp_property.text=Ds_Objects.result.Tables.Table2.Rows[0].PropertyName; 
 						PropertyId=Ds_Objects.result.Tables.Table2.Rows[0].ZId;
 						hlp_GuestName.enabled=true;
-						useWeb("GuestCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','',0,0,PropertyId,0,0]);
+						useWeb("GuestCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','','','',0,0,PropertyId,0,0]);
 					}
 					if(Ds_Objects.result.Tables.Table1.Rows.length > 1)
 					{
@@ -225,6 +226,8 @@
 						lbl_Nettariff.text=Ds_Objects.result.Tables.Table.Rows[0].Tariff;
 						DT_CheckOutDate.text=Ds_Objects.result.Tables.Table.Rows[0].ChkoutDate;
 						Txt_CheckInDate.text=Ds_Objects.result.Tables.Table.Rows[0].CheckInDate;
+						DT_BillFromDate.text=Ds_Objects.result.Tables.Table.Rows[0].CheckInDate;
+						DT_BillTo.text=Ds_Objects.result.Tables.Table.Rows[0].ChkoutDate;
 						//lbl_tariff.text=Ds_Objects.result.Tables.Table1.Rows[0].Tariff;
 						dt_ServiceDate.text=Ds_Objects.result.Tables.Table.Rows[0].CheckInDate;
 						Txt_AdditionalCharge.text=Ds_Objects.result.Tables.Table.Rows[0].Tariff;
@@ -1063,7 +1066,7 @@
 					{
 						if(F4=="Cash")
 						{
-							useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+							useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
 							
 //							
 							
@@ -1098,7 +1101,7 @@
 						}
 						if(F5=="Card")
 						{
-							useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+							useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
 //							
 						
 							if (ChkOutHdrId == 0)
@@ -1128,7 +1131,7 @@
 						}
 						if(F6=="Cheque")
 						{
-							useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+							useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
 //							
 						
 							if (ChkOutHdrId == 0)
@@ -1158,7 +1161,7 @@
 						}
 						if(F7=="CompanyInvoice")
 						{
-							useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+							useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
 							
 							BTCSId=Ds_Objects.result.Tables.Table.Rows[0].Id;
 							
@@ -1195,7 +1198,7 @@
 						}
 						if(F8=="NEFT")
 						{
-							useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+							useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
 							
 //							
 							if (ChkOutHdrId == 0)
@@ -1229,7 +1232,7 @@
 					{
 						if(F4=="Cash")
 						{
-							useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+							useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
 							
 //							
 							
@@ -1260,7 +1263,7 @@
 						}
 						if(F5=="Card")
 						{
-							useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+							useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
 							
 //							
 							
@@ -1292,7 +1295,7 @@
 						}
 						if(F6=="Cheque")
 						{
-							useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+							useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
 							
 //							
 							if (ChkOutHdrId == 0)
@@ -1322,7 +1325,7 @@
 						}
 						if(F7=="CompanyInvoice")
 						{
-							useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+							useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
 							
      						BTCSId=Ds_Objects.result.Tables.Table.Rows[0].Id;
 							
@@ -1359,7 +1362,7 @@
 						}
 						if(F8=="NEFT")
 						{
-							useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+							useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
 //							
 							if (ChkOutHdrId == 0)
 							{
@@ -1392,7 +1395,7 @@
 					{
 						if(F4=="Cash")
 						{
-							useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+							useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
 //							
 							
 							if (ChkOutHdrId == 0)
@@ -1422,7 +1425,7 @@
 						}
 						if(F5=="Card")
 						{
-							useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+							useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
 							
 //							
 							
@@ -1453,7 +1456,7 @@
 						}
 						if(F6=="Cheque")
 						{
-							useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+							useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
 							
 //							
 							if (ChkOutHdrId == 0)
@@ -1482,7 +1485,7 @@
 						}
 						if(F7=="CompanyInvoice")
 						{
-							useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+							useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
 							
 							BTCSId=Ds_Objects.result.Tables.Table.Rows[0].Id;
 							
@@ -1520,7 +1523,7 @@
 						}
 						if(F8=="NEFT")
 						{
-							useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+							useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
 							
 //							
 							if (ChkOutHdrId == 0)
@@ -2429,7 +2432,8 @@
 								Status:"UnSettled",CheckOutDate:DT_CheckOutDate.text,CheckInDate:Txt_CheckInDate.text,
 								InVoiceNo:Txt_ChkoutInvoice.text,LT:lbl_tarffLT.text,ST:lbl_TariffST.text,
 								VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
-								ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk
+								ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk,
+								BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text
 								//Flag:Flag1
 							}]);
 						var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
@@ -2462,7 +2466,8 @@
 								Status:"UnSettled",CheckOutDate:DT_CheckOutDate.text,CheckInDate:Txt_CheckInDate.text,
 								InVoiceNo:Txt_ChkoutInvoice.text,LT:lbl_tarffLT.text,ST:lbl_TariffST.text,
 								VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
-								ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk
+								ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk,
+								BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text
 								//Flag:Flag1
 							}]);
 						var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
@@ -2496,7 +2501,8 @@
 								Status:"UnSettled",CheckOutDate:DT_CheckOutDate.text,CheckInDate:Txt_CheckInDate.text,
 								InVoiceNo:Txt_ChkoutInvoice.text,LT:lbl_tarffLT.text,ST:lbl_TariffST.text,
 								VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
-								ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk
+								ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk,
+								BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text
 								//Flag:Flag1
 							}]);
 						var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
@@ -2522,7 +2528,7 @@
 					hlp_property.text = hlp_property.Select_Row.PropertyName;
 					PropertyId=hlp_property.Select_Row.ZId;
 					hlp_GuestName.enabled=true;
-					useWeb("GuestCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','',0,0,PropertyId,0,0]);
+					useWeb("GuestCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','','','',0,0,PropertyId,0,0]);
 					
 				}
 				else
@@ -2553,7 +2559,7 @@
 					ExtraMaters=0;
 				
 											
-					useWeb("GuestCheckOut","Guest_CUSTOM",[GlobalXml,"CHKINROOMDETAILS","",CheckInHdrId,StateId,0,0,ExtraMaters]);
+					useWeb("GuestCheckOut","Guest_CUSTOM",[GlobalXml,"CHKINROOMDETAILS","","","",CheckInHdrId,StateId,0,0,ExtraMaters]);
 			//		useWeb("CheckOutServiceHdr","TariffLoad_CUSTOM",[GlobalXml,"ProductLoad",CheckInHdrId,GuestId,StateId,0,0,0]);
 					
 					bdr_Tariff.visible=true;
@@ -2847,7 +2853,7 @@
 			{	
 				if (event.detail == Alert.YES) 
 				{
-					useWeb("GuestCheckOut","ServiceEntry_CUSTOM",[GlobalXml,"ServiceEntry","",PrintChkOutId,0,0,Global_AC[0].UsrId,0]);
+					useWeb("GuestCheckOut","ServiceEntry_CUSTOM",[GlobalXml,"ServiceEntry","","","",PrintChkOutId,0,0,Global_AC[0].UsrId,0]);
 					Btn_Settlement_clickHandler();
 					F2="";
 				}
@@ -3108,8 +3114,8 @@
 				//var luxury:Number=(Number(lbl_tarffLT.text));
 				//luxury=Number(ExtraMatress*luxury/100)
 				//Txt_Luxury.text=NF_Two.format(luxury);
-				ExtraMaters=Number(ExtraPerDay);
-				useWeb("GuestCheckOut","Guest_CUSTOM",[GlobalXml,"CHKINROOMDETAILS","",CheckInHdrId,StateId,0,0,ExtraMaters]);
+				ExtraMaters=Number(Extra);
+				useWeb("GuestCheckOut","Guest_CUSTOM",[GlobalXml,"CHKINROOMDETAILS","","","",CheckInHdrId,StateId,0,0,ExtraMaters]);
 //				var service:Number=(Number(lbl_TariffST.text));
 //				service=Number(ExtraMatress*service/100)
 //				Txt_ServiceTax12.text=NF_Two.format(service);
@@ -3263,7 +3269,7 @@
 				bdr_Service.visible=false;
 				bdr_Settle.visible=true;
 ////				
-				useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+				useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
 				//useWeb("GuestCheckOut","Guest_CUSTOM",[GlobalXml,"CHKINROOMDETAILS","",CheckInHdrId,StateId,0,0,0]);
 							
 			}
@@ -3400,7 +3406,8 @@
 				ClientId=0;
 				CityId=0;
 				ServiceChargeChk=0;
-			
+				DT_BillFromDate.text="";
+				DT_BillTo.text="";
 				
 			}
 			protected function AllClear():void
@@ -3475,6 +3482,8 @@
 				bdr_ConsolidateCmpnyInvoice1.visible=false;
 				bdr_ConsolidateNEFT1.visible=false;
 				PageLoad();
+				DT_BillFromDate.text="";
+				DT_BillTo.text="";
 			}
 			
 			protected function Chk_Select_clickHandler(event:MouseEvent):void
@@ -4032,7 +4041,8 @@
 						Txt_TariffPayAmount.text = LL.replace(",","");
 						if(Txt_TariffLoad.text == Txt_TariffPayAmount.text)
 						{
-							useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
+							useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","","",CheckInHdrId,0,0,0,0]);
+							
 						}
 						
 						var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -4108,7 +4118,7 @@
 						Txt_TariffPayAmount.text = LL.replace(",","");
 						if(Txt_TariffLoad.text == Txt_TariffPayAmount.text)
 						{
-							useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
+							useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","","",CheckInHdrId,0,0,0,0]);
 						}
 						var Ac_Hdr:ArrayCollection=new ArrayCollection
 							([{
@@ -4200,7 +4210,7 @@
 						Txt_TariffPayAmount.text = LL.replace(",","");
 						if(Txt_TariffLoad.text == Txt_TariffPayAmount.text)
 						{
-							useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
+							useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","","",CheckInHdrId,0,0,0,0]);
 						}
 						
 						var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -4297,7 +4307,7 @@
 						Txt_TariffPayAmount.text = LL.replace(",","");
 						if(Txt_TariffLoad.text == Txt_TariffPayAmount.text)
 						{
-							useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
+							useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","","",CheckInHdrId,0,0,0,0]);
 						}
 						
 						var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -4415,7 +4425,7 @@
 						Txt_ServicePayAmount.text = LL.replace(",","");
 						if(Txt_ServiceLoad.text == Txt_ServicePayAmount.text)
 						{
-							useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+							useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","","",CheckInHdrId,0,0,0,0]);
 						}
 						
 						var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -4492,7 +4502,7 @@
 						Txt_ServicePayAmount.text = LL.replace(",","");
 						if(Txt_ServiceLoad.text == Txt_ServicePayAmount.text)
 						{
-							useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+							useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","","",CheckInHdrId,0,0,0,0]);
 						}
 						
 						var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -4559,7 +4569,7 @@
 						Txt_ServicePayAmount.text = LL.replace(",","");
 						if(Txt_ServiceLoad.text == Txt_ServicePayAmount.text)
 						{
-							useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+							useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","","",CheckInHdrId,0,0,0,0]);
 						}
 						
 						var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -4645,7 +4655,7 @@
 						Txt_ServicePayAmount.text = LL.replace(",","");
 						if(Txt_ServiceLoad.text == Txt_ServicePayAmount.text)
 						{
-							useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+							useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","","",CheckInHdrId,0,0,0,0]);
 						}
 						
 						var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -4752,8 +4762,8 @@
 						Txt_ConsolidatePayment.text = LC.replace(",","");
 						if(Txt_ConsolidateLoad.text == Txt_ConsolidatePayment.text)
 						{
-							useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
-							useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+							useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","","",CheckInHdrId,0,0,0,0]);
+							useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","","",CheckInHdrId,0,0,0,0]);
 							
 						}
 						
@@ -4822,8 +4832,8 @@
 						Txt_ConsolidatePayment.text = LC.replace(",","");
 						if(Txt_ConsolidateLoad.text == Txt_ConsolidatePayment.text)
 						{
-							useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
-							useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+							useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","","",CheckInHdrId,0,0,0,0]);
+							useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","","",CheckInHdrId,0,0,0,0]);
 						}
 						
 						var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -4890,8 +4900,8 @@
 						Txt_ConsolidatePayment.text = LC.replace(",","");
 						if(Txt_ConsolidateLoad.text == Txt_ConsolidatePayment.text)
 						{
-							useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
-							useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+							useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","","",CheckInHdrId,0,0,0,0]);
+							useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","","",CheckInHdrId,0,0,0,0]);
 						}
 						var Ac_Hdr:ArrayCollection=new ArrayCollection
 							([{
@@ -5005,8 +5015,8 @@
 						Txt_ConsolidatePayment.text = LC.replace(",","");
 						if(Txt_ConsolidateLoad.text == Txt_ConsolidatePayment.text)
 						{
-							useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
-							useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+							useWeb("GuestCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","","",CheckInHdrId,0,0,0,0]);
+							useWeb("GuestCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","","",CheckInHdrId,0,0,0,0]);
 						}
 						var Ac_Hdr:ArrayCollection=new ArrayCollection
 							([{
@@ -5623,11 +5633,11 @@
 				// TODO Auto-generated method stub
 				if(ddl_CashReceivedby.selectedItem.label=="Resident Managers")
 				{  
-					useWeb("GuestCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','',0,0,PropertyId,0,0]);
+					useWeb("GuestCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','','','',0,0,PropertyId,0,0]);
 				}
 				if(ddl_CashReceivedby.selectedItem.label=="Assistant Resident Managers")
 				{  
-					useWeb("GuestCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','',0,0,PropertyId,0,0]);
+					useWeb("GuestCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','','','',0,0,PropertyId,0,0]);
 				}
 			}
 //dropdown for service cash
@@ -5636,11 +5646,11 @@
 				// TODO Auto-generated method stub
 				if(ddl_ServiPayCashRecBy.selectedItem.label=="Resident Managers")
 				{  
-					useWeb("GuestCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','',0,0,PropertyId,0,0]);
+					useWeb("GuestCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','','','',0,0,PropertyId,0,0]);
 				}
 				if(ddl_ServiPayCashRecBy.selectedItem.label=="Assistant Resident Managers")
 				{  
-					useWeb("GuestCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','',0,0,PropertyId,0,0]);
+					useWeb("GuestCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','','','',0,0,PropertyId,0,0]);
 				}
 			}
 //drop down for Consolidate cash
@@ -5649,11 +5659,11 @@
 				// TODO Auto-generated method stub
 				if(ddl_ConsoPayCashRecBy.selectedItem.label=="Resident Managers")
 				{  
-					useWeb("GuestCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','',0,0,PropertyId,0,0]);
+					useWeb("GuestCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','','','',0,0,PropertyId,0,0]);
 				}
 				if(ddl_ConsoPayCashRecBy.selectedItem.label=="Assistant Resident Managers")
 				{  
-					useWeb("GuestCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','',0,0,PropertyId,0,0]);
+					useWeb("GuestCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','','','',0,0,PropertyId,0,0]);
 				}
 			}
 //to settlemnt grid check box select print option
@@ -5762,7 +5772,7 @@
 				}				
 				if(ImageFlage==true)
 				{					
-					useWeb("GuestCheckOut","ImageUpload_CUSTOM",[GlobalXml,'IMAGEUPLOAD',"http://sstage.in/BTC/"+resultsTxtField.text,BTCSId,0,0,0,0,0]);
+					useWeb("GuestCheckOut","ImageUpload_CUSTOM",[GlobalXml,'IMAGEUPLOAD',"http://sstage.in/BTC/"+resultsTxtField.text,"","",BTCSId,0,0,0,0,0]);
 				}
 			}
 			
@@ -6816,6 +6826,12 @@
 				<WrbHelpComp:HelpText x="96" y="93" width="160" id="hlp_property" pxSetColumnsWidth="200,0"
 									  onselection="{OnSelectionProperty()}" depth="1500" tabIndex="1">
 				</WrbHelpComp:HelpText>
+				<mx:Label x="5" y="375" text="Bill From" id="lbl_Billfrom"/>
+				<mx:DateField id="DT_BillFromDate" x="96" y="375" width="122" height="23"
+							  formatString="DD/MM/YYYY" selectableRange="{{rangeEnd: new Date()}}" enabled="false"/>
+				<mx:Label x="5" y="408" text="Bill To" id="lbl_Billto"/>
+				<mx:DateField x="96" y="408" width="122" height="23" id="DT_BillTo" 
+							  formatString="DD/MM/YYYY" selectableRange="{{rangeEnd: new Date()}}" enabled="false"/>
 				
 				
 			</s:Group>

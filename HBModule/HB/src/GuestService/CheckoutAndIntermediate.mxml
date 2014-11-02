@@ -151,8 +151,8 @@
 			protected function Help():void
 			{				
 				
-				useWeb("GuestCheckOut","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,Global_AC[0].UsrId,0]);
-			//	useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65,0]);
+				useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId,0]);
+			// 	useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65,0]);
 				Txt_ServiceBillAmt.editable=false;
 				Txt_ServiceVat.editable=false;
 				Txt_SerivceTax.editable=false;
@@ -214,7 +214,7 @@
 						hlp_property.text=Ds_Objects.result.Tables.Table2.Rows[0].PropertyName; 
 						PropertyId=Ds_Objects.result.Tables.Table2.Rows[0].ZId;
 						hlp_GuestName.enabled=true;
-						useWeb("GuestCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','','','',0,0,PropertyId,0,0]);
+						useWeb("CheckoutAndIntermediate","GuestLoad_CUSTOM",[GlobalXml,'GuestName','','','',0,0,PropertyId,0,0]);
 					}
 					if(Ds_Objects.result.Tables.Table1.Rows.length > 1)
 					{
@@ -404,7 +404,7 @@
 					}
 					if(Ds_Objects.result.Tables.Table4.Rows.length > 0)
 					{
-						if(Ds_Objects.result.Tables.Table4.Rows[0].Days > 5 )
+						if(Ds_Objects.result.Tables.Table4.Rows[0].Days > 1 )
 						{
 							if(Checkout.selected=true)
 							{
@@ -2298,7 +2298,7 @@
 					{
 						btn_Settle.enabled= false;
 						btn_Service.enabled=false;
-						useWeb("CheckoutAndIntermediate","Paid_CUSTOM",[GlobalXml,"TariffIntermediate","","","",CheckInHdrId,0,0,0,0]);
+						useWeb("CheckoutAndIntermediate","PaidInt_CUSTOM",[GlobalXml,"TariffIntermediate","","","",CheckInHdrId,0,0,0,0]);
 				//		FnSelect();
 					}
 					else
@@ -2325,7 +2325,7 @@
 					{
 						btn_Settle.enabled= false;
 						btn_Service.enabled=false;
-						useWeb("CheckoutAndIntermediate","Paid_CUSTOM",[GlobalXml,"TariffIntermediate","","","",CheckInHdrId,0,0,0,0]);
+						useWeb("CheckoutAndIntermediate","PaidInt_CUSTOM",[GlobalXml,"TariffIntermediate","","","",CheckInHdrId,0,0,0,0]);
 					//	FnSelect();
 					}
 					else
@@ -3330,7 +3330,7 @@
 			{	
 				if (event.detail == Alert.YES) 
 				{
-					useWeb("GuestCheckOut","ServiceEntry_CUSTOM",[GlobalXml,"ServiceEntry","",PrintChkOutId,0,0,Global_AC[0].UsrId,0]);
+					useWeb("CheckoutAndIntermediate","ServiceEntry_CUSTOM",[GlobalXml,"ServiceEntry","","","",PrintChkOutId,0,0,Global_AC[0].UsrId,0]);
 					Btn_Settlement_clickHandler();
 				}
 			}
@@ -3590,7 +3590,7 @@
 				//var luxury:Number=(Number(lbl_tarffLT.text));
 				//luxury=Number(ExtraMatress*luxury/100)
 				//Txt_Luxury.text=NF_Two.format(luxury);
-				ExtraMaters=Number(ExtraPerDay);
+				ExtraMaters=Number(Extra);
 				useWeb("CheckoutAndIntermediate","Guest_CUSTOM",[GlobalXml,"CHKINROOMDETAILS","","","",CheckInHdrId,StateId,0,0,ExtraMaters]);
 				//				var service:Number=(Number(lbl_TariffST.text));
 				//				service=Number(ExtraMatress*service/100)
@@ -7334,7 +7334,7 @@
 				}				
 				if(ImageFlage==true)
 				{					
-					useWeb("GuestCheckOut","ImageUpload_CUSTOM",[GlobalXml,'IMAGEUPLOAD',"http://sstage.in/BTC/"+resultsTxtField.text,BTCSId,0,0,0,0,0]);
+					useWeb("CheckoutAndIntermediate","ImageUpload_CUSTOM",[GlobalXml,'IMAGEUPLOAD',"http://sstage.in/BTC/"+resultsTxtField.text,"","",BTCSId,0,0,0,0,0]);
 				}
 			}
 			

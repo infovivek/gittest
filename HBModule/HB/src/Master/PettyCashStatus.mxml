@@ -60,6 +60,7 @@
 			private var urlReq:URLRequest;
 			public var date:String="";
 			public var uploadURL:URLRequest = new URLRequest();
+			public var HId:int=0;
 			protected function PageLoad():void
 			{
 				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
@@ -126,6 +127,10 @@
 					}
 					var TA:String=NF_Two.format(Total+OB);
 					lbl_Total.text=TA.replace(",","");
+					if (Ds_Objects.result.Tables.Table3.Rows.length > 0)
+					{
+						HId=Ds_Objects.result.Tables.Table3.Rows[0].HId;
+					}
 							
 				}
 				if (Ds_Objects.currentTarget.description.toString() == "ActionUpload_CUSTOM")
@@ -227,12 +232,28 @@
 			{
 				if ((event.detail==Alert.YES)) 
 				{
+					var TotalPaidAmount:Number=Math.round(Number(lbl_PaidTotal.text))
+					var total:Number=Math.round(Number(lbl_Total.text))
+					if(HId==0)
+					{
 					var arrcopy:ArrayCollection = new ArrayCollection
 						([{ 
 							PropertyId:PropertyId,
-							UserId:Global_AC[0].UsrId
+							UserId:Global_AC[0].UsrId,
+							Balance:total-TotalPaidAmount,
+							Id:Id
 						}])
-						
+					}
+					else
+					{
+						var arrcopy:ArrayCollection = new ArrayCollection
+							([{ 
+								PropertyId:PropertyId,
+								UserId:Global_AC[0].UsrId,
+								Balance:total-TotalPaidAmount,
+								Id:HId
+							}])
+					}
 					var StatusGrid:ArrayCollection=new ArrayCollection();
 					StatusGrid=Grd_User.dataProvider as ArrayCollection
 					var HdrXml:String="";
@@ -267,7 +288,7 @@
 				Txt_des.text="";
 				Txt_amt.text="";
 				lbl_PaidTotal.text="";
-				lbl_Total.text="";
+				lbl_Total.text="";HId=0;
 			}
 			public function FnAction(Event):void
 			{ 

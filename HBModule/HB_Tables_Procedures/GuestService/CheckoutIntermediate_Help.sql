@@ -387,7 +387,7 @@ If @BookingLevel = 'Apartment'
 	END
 	 
 		SELECT Property,  
-		CONVERT(NVARCHAR(100),@NewCheckInDate,103)+' To '+CONVERT(NVARCHAR(100),@ChkOutDate,103) AS Stay,Tariff,  
+		CONVERT(NVARCHAR(100),ArrivalDate,103)+' To '+CONVERT(NVARCHAR(100),@ChkOutDate,103) AS Stay,Tariff,  
 		CONVERT(NVARCHAR(100),@ChkOutDate,103) as ChkoutDate,CONVERT(NVARCHAR(100),@NewCheckInDate,103) AS CheckInDate  
 		FROM WRBHBCheckInHdr  
 		WHERE IsActive = 1 and IsDeleted = 0 and Id =@CheckInHdrId;  
@@ -1821,7 +1821,7 @@ BEGIN
   --  SET @Consolidated = 
     
    
-	UPDATE WRBHBCheckInHdr SET NewCheckInDate = @IntemediateChkoutDt 
+	UPDATE WRBHBCheckInHdr SET NewCheckInDate = @IntemediateChkoutDt ,ArrivalTime = '12:00:00',TimeType = 'PM'
 	WHERE Id = @CheckInHdrId  
 	
 	UPDATE WRBHBChechkOutHdr SET PaymentStatus = 'Paid' ,Flag = 1,Status='CheckOut' ,IsActive = 1 
@@ -1845,7 +1845,58 @@ BEGIN
 	UPDATE WRBHBChechkOutPaymentNEFT SET IsActive = 1 
 	WHERE ChkOutHdrId = @CheckOutId2
 	
-	
+	-- Settlement table insert 
+	CREATE TABLE #TEMPCHKHDR(ChkOutHdrId INT,PayeeName NVARCHAR(100),AddressS NVARCHAR(4000),
+	Consolidated BIT,CreatedBy BIGINT,ModifiedBy BIGINT,Payment nvarchar(100),AmountPaid decimal(27,2),StatusId Bigint)
+
+	INSERT INTO #TEMPCHKHDR(ChkOutHdrId,PayeeName,AddressS,Consolidated,CreatedBy,ModifiedBy,Payment,AmountPaid,StatusId)
+
+	SELECT ChkOutHdrId,PayeeName,Address,0 Consoli,CreatedBy,ModifiedBy,Payment,AmountPaid,Id
+	FROM WRBHBChechkOutPaymentCash
+	WHERE IsActive=1 AND IsDeleted=0 AND ISNULL(OutStanding,0)=0 AND ChkOutHdrId=@CheckOutId2
+
+	INSERT INTO #TEMPCHKHDR(ChkOutHdrId,PayeeName,AddressS,Consolidated,CreatedBy,ModifiedBy,Payment,AmountPaid,StatusId)
+	SELECT ChkOutHdrId,PayeeName,Address,0 Consoli,CreatedBy,ModifiedBy,Payment,AmountPaid,Id
+	FROM WRBHBChechkOutPaymentCard
+	WHERE IsActive=1 AND IsDeleted=0 AND ISNULL(OutStanding,0)=0 AND ChkOutHdrId=@CheckOutId2
+
+	INSERT INTO #TEMPCHKHDR(ChkOutHdrId,PayeeName,AddressS,Consolidated,CreatedBy,ModifiedBy,Payment,AmountPaid,StatusId)
+	SELECT ChkOutHdrId,PayeeName,Address,0 Consoli,CreatedBy,ModifiedBy,Payment,AmountPaid,Id
+	FROM WRBHBChechkOutPaymentCheque
+	WHERE IsActive=1 AND IsDeleted=0 AND ISNULL(OutStanding,0)=0 AND ChkOutHdrId=@CheckOutId2
+
+	INSERT INTO #TEMPCHKHDR(ChkOutHdrId,PayeeName,AddressS,Consolidated,CreatedBy,ModifiedBy,Payment,AmountPaid,StatusId)
+	SELECT ChkOutHdrId,PayeeName,Address,0 Consoli,CreatedBy,ModifiedBy,Payment,AmountPaid,Id
+	FROM WRBHBChechkOutPaymentCompanyInvoice
+	WHERE IsActive=1 AND IsDeleted=0 AND ISNULL(OutStanding,0)=0 AND ChkOutHdrId=@CheckOutId2
+
+	INSERT INTO #TEMPCHKHDR(ChkOutHdrId,PayeeName,AddressS,Consolidated,CreatedBy,ModifiedBy,Payment,AmountPaid,StatusId)
+	SELECT ChkOutHdrId,PayeeName,Address,0 Consoli,CreatedBy,ModifiedBy,Payment,AmountPaid,Id
+	FROM WRBHBChechkOutPaymentNEFT
+	WHERE IsActive=1 AND IsDeleted=0 AND ISNULL(OutStanding,0)=0 AND ChkOutHdrId=@CheckOutId2
+	--Insert into main table
+	INSERT INTO WRBHBCheckOutSettleHdr(ChkOutHdrId,PayeeName,Address,Consolidated,
+	CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId)
+
+	Select Distinct ChkOutHdrId,PayeeName,AddressS,0,CreatedBy,GETDATE(),ModifiedBy,GETDATE(),1,0,NEWID()
+	from #TEMPCHKHDR
+
+	DEclare @CkstlHdrid Bigint;
+	SET @CkstlHdrid=@@IDENTITY;
+
+	--SELECT Id FROM WRBHBCheckOutSettleHdr WHERE Id=@CkstlHdrid;
+
+
+	INSERT INTO WRBHBCheckOutSettleDtl(CheckOutSettleHdrId,PropertyId,GuestId,BillNo,BillType,
+	BillAmount,NetAmount,OutStanding,PaymentStatus,
+	CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId)
+
+	Select @CkstlHdrid,0 as prptyId,0 as GuestId,0 as BillNO, Payment Billtype,
+	AmountPaid,AmountPaid,0 as Outstand,'Paid' Status,
+	CreatedBy,GETDATE(),CreatedBy,GETDATE(),1,0,NEWID()
+	from #TEMPCHKHDR
+	group by Payment,AmountPaid,CreatedBy
+
 	
 	
 END
@@ -1909,5 +1960,7 @@ END
 			
 			
 			
+
+
 
 

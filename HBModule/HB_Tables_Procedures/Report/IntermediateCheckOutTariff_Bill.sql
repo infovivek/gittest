@@ -3,8 +3,8 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-IF EXISTS (SELECT * FROM dbo.SYSOBJECTS WHERE id = OBJECT_ID(N'[dbo].[SP_GuestCheckOutTariff_Bill]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
-DROP PROCEDURE [dbo].[SP_GuestCheckOutTariff_Bill]
+IF EXISTS (SELECT * FROM dbo.SYSOBJECTS WHERE id = OBJECT_ID(N'[dbo].[SP_IntermediateCheckOutTariff_Bill]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+DROP PROCEDURE [dbo].[SP_IntermediateCheckOutTariff_Bill]
 GO
 /*=============================================
 Author Name  : shameem
@@ -18,7 +18,7 @@ Name			Date			Signature			Description of Changes
 ********************************************************************************************************	
 *******************************************************************************************************
 -- =============================================*/
-CREATE PROCEDURE [dbo].[SP_GuestCheckOutTariff_Bill]
+CREATE PROCEDURE [dbo].[SP_IntermediateCheckOutTariff_Bill]
 (@Action NVARCHAR(100)=NULL,
 @Str1 NVARCHAR(100)=NULL,
 @Str2 INT=NULL,
@@ -83,15 +83,15 @@ IF @Action='PageLoad'
 	WHERE H.Id=@ClientId
     
 	 select h.GuestName as GuestName,h.Name,h.Stay,h.Type,d.Type as BookingLevel,convert(nvarchar(100),h.CheckOutDate,103) as BillDate,  
-	 h.ClientName,h.CheckOutNo,h.InVoiceNo,  
+	 h.ClientName,h.CheckOutNo,h.InVoiceNo,  h.PIInvoice,
 	 h.ChkOutTariffTotal as TotalTariff,h.ChkOutTariffLT as LuxuryTax,round(h.ChkOutTariffNetAmount,0) as NetAmount,  
 	 h.ChkOutTariffST1 as SerivceNet,h.ChkOutTariffST3 as SerivceTax,h.ChkOutTariffCess as Cess,h.NoOfDays,  
 	 h.ChkOutTariffHECess as HCess,h.ChkOutTariffSC as ServiceCharge,h.ChkOutTariffExtraAmount as ExtraMatress,
-	 convert(nvarchar(100),d.ArrivalDate,103)as ArrivalDate,  
-	 round(d.Tariff,0) Tariff,(p.PropertyName+','+p.Propertaddress) as Propertyaddress,(c.CityName+','+  
-	 s.StateName+','+p.Postal) as Propcity,c.CityName,s.StateName,p.Postal,  
-	 p.Phone,p.Email,@CompanyName as CompanyName,@LOGO AS logo,  
+	 convert(nvarchar(100),d.ArrivalDate,103) as ArrivalDate,  
+	 d.Tariff,(p.PropertyName+','+p.Propertaddress) as Propertyaddress,(c.CityName+','+  
+	 s.StateName+','+p.Postal) as Propcity,c.CityName,s.StateName,p.Postal, 
 	 CONVERT(nvarchar(100),h.BillFromDate,103) ChkinDT,CONVERT(nvarchar(100),h.BillEndDate,103) as ChkoutDT,
+	 p.Phone,p.Email,@CompanyName as CompanyName,@LOGO AS logo,  
 	 'Regd Office : No. 122, Amarjyothi Layout, Domlur, Bangalore - 560071'+'.'+'www.hummingbirdindia.com'  AS CompanyAddress,
 	 @ClientAddress as Address,  
 	 'INVOICE : For any invoice clarification revert within 7 days from the date of receipt' as Invoice,  
@@ -110,9 +110,8 @@ IF @Action='PageLoad'
 	 join WRBHBState s on s.Id=p.StateId
 	 join WRBHBCity c on c.Id=p.CityId 
 	 join WRBHBBooking b on b.Id = d.BookingId 	   
-	 where h.IsActive = 1 and h.IsDeleted = 0 
-	 and   
-	 h.Id = @Id1  
+	 where h.Id = @Id1   
+	-- and h.IsActive = 1 and h.IsDeleted = 0 
 END
 END
 

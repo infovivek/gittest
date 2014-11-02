@@ -72,6 +72,14 @@ namespace HB.Dao
                 {
                     PettySt.FilePath = document.SelectNodes("//HdrXml")[i].Attributes["FilePath"].Value;
                 }
+                if (document.SelectNodes("//HdrXml")[i].Attributes["BillNo"].Value == "")
+                {
+                    PettySt.BillNo = "";
+                }
+                else
+                {
+                    PettySt.BillNo = document.SelectNodes("//HdrXml")[i].Attributes["BillNo"].Value;
+                }
                 if (document.SelectNodes("//HdrXml")[i].Attributes["BillDate"].Value == "")
                 {
                     PettySt.BillDate = "";
@@ -106,6 +114,7 @@ namespace HB.Dao
                 command.Parameters.Add("@Paid", SqlDbType.Decimal).Value = PettySt.Paid;
                 command.Parameters.Add("@BillLogo", SqlDbType.NVarChar).Value = PettySt.FilePath;
                 command.Parameters.Add("@BillDate", SqlDbType.NVarChar).Value = PettySt.BillDate;
+                command.Parameters.Add("@BillNo", SqlDbType.NVarChar).Value = PettySt.BillNo;
                 command.Parameters.Add("@ExpenseId", SqlDbType.BigInt).Value = PettySt.ExpenseId;
                 command.Parameters.Add("@UserId", SqlDbType.BigInt).Value = user.Id;
                 ds = new WrbErpConnection().ExecuteDataSet(command, UserData);

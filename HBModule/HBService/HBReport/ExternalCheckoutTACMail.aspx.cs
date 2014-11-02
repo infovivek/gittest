@@ -75,7 +75,7 @@ namespace HBReport
                 //DateTime now = DateTime.Now;
                 //string date = (now.ToString("yyyyMMddThhmmss"));
 
-                using (FileStream fs = File.Create(@"D:\admonk\Backend\flex_bin\TACInVoice\" + ds.Tables[0].Rows[0][0].ToString() + ".pdf"))
+                using (FileStream fs = File.Create(@"D:\Backend\flex_bin\TACInVoice\" + ds.Tables[0].Rows[0][0].ToString() + ".pdf"))
                 {
                     fs.Write(mybytes, 0, mybytes.Length);
                 }
@@ -83,7 +83,7 @@ namespace HBReport
                 {
                     string Valid = ""; string Err = "";
                     string Email = "shiv@hummingbirdindia.com";
-             //       string Email = "shameem@warblerit.com";
+               //     string Email = "shameem@warblerit.com";
                     Valid = EmailValidate(Email);
 
                     if ((ds.Tables[0].Rows[0][0].ToString() != "UserName or EmailId Already Exist"))

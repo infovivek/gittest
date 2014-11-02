@@ -1748,6 +1748,87 @@ IF @Action ='PropertyAndCity'
 		        
 			
 		   ---------------External start 
+		   	    -- (MMT)   EXTERNAL DATE CHECK IN DATE WISE  
+	INSERT INTO #ExternalForecast(BookingId,PropertyAssGustId,RoomName,GuestName,CheckInDt,CheckOutDt,Type,Occupancy,  
+	BookingLevel,Tariff,Category,ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,  
+	PropertyId,TAC,TACPer,RoomType)  
+	  
+		Select Distinct AG.BookingId,Isnull(Ag.RoomId,0),Ag.RoomType,ag.FirstName,convert(nvarchar(100),Ag.ChkInDt,103) CheckinDate,
+		convert(nvarchar(100),Ag.ChkOutDt,103),'Booking' CurrentStatus,AG.Occupancy,'MMT',Tariff,'External Property'Category,
+		--Ag.RoomId, C.clientname,S.HotalName,S.HotalId,'External Property',
+		ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,Ag.BookingPropertyId Id,
+		ISNULL(PA.TAC,0),ISNULL(PA.TACPer,0),'MMT'
+		from wrbhbbooking C
+		join  WRBHBBookingPropertyAssingedGuest AG WITH(NOLOCK) ON C.Id= AG.BookingId AND AG.IsActive=1 and AG.IsDeleted=0
+		 AND CONVERT(DATE,ChkInDt,103) BETWEEN DATEADD(d,0,DATEADD(dd,-(DAY(CONVERT(DATE,@Pram3,103))-1),CONVERT(DATE,@Pram3,103)))  
+		 AND DATEADD(d,0,DATEADD(dd,-(DAY(DATEADD(mm,1,CONVERT(DATE,@Pram3,103)))),DATEADD(mm,1,CONVERT(DATE,@Pram3,103))))  
+		join WRBHBStaticHotels S WITH(NOLOCK) ON Ag.BookingPropertyId=S.HotalId and s.IsActive=1 and s.IsDeleted=0
+		JOIN dbo.WRBHBBookingProperty BP WITH(NOLOCK)ON C.Id=BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0  
+		and  PropertyType='MMT' 
+		LEFT OUTER JOIN WRBHBPropertyAgreements PA WITH(NOLOCK) ON PA.IsActive=1 AND PA.PropertyId=bp.PropertyId AND PA.IsDeleted=0  
+		  where --Convert(date,Ag.ChkInDt,103)>= CONVERT(date,'01/09/2014',103) and
+		   C.IsActive=1 AND C.IsDeleted=0 AND ISNULL(C.CancelStatus,'')!='Canceled'
+		-- AND C.Id NOT IN(SELECT BookingId FROM #ExternalForecast) 
+		 group by  AG.BookingId,Ag.RoomId,Ag.RoomType,ag.FirstName,Ag.ChkInDt,
+		Ag.ChkOutDt,CurrentStatus,AG.Occupancy,Tariff,ServicePaymentMode,
+		TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,Ag.BookingPropertyId,
+		ISNULL(PA.TAC,0),ISNULL(PA.TACPer,0)
+
+    -- (MMT)   EXTERNAL DATE CHECK IN DATE WISE     	       
+	INSERT INTO #ExternalForecast(BookingId,PropertyAssGustId,RoomName,GuestName,CheckInDt,CheckOutDt,Type,Occupancy,  
+	BookingLevel,Tariff,Category,ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,  
+	PropertyId,TAC,TACPer,RoomType)  
+	  
+		Select Distinct AG.BookingId,Isnull(Ag.RoomId,0),Ag.RoomType,ag.FirstName,convert(nvarchar(100),Ag.ChkInDt,103) CheckinDate,
+		convert(nvarchar(100),Ag.ChkOutDt,103),'Booking' CurrentStatus,AG.Occupancy,'MMT',Tariff,'External Property'Category,
+		--Ag.RoomId, C.clientname,S.HotalName,S.HotalId,'External Property',
+		ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,Ag.BookingPropertyId Id,
+		ISNULL(PA.TAC,0),ISNULL(PA.TACPer,0),'MMT'
+		from wrbhbbooking C
+		join  WRBHBBookingPropertyAssingedGuest AG WITH(NOLOCK) ON C.Id= AG.BookingId AND AG.IsActive=1 and AG.IsDeleted=0
+		 AND CONVERT(DATE,ChkOutDt,103) BETWEEN DATEADD(d,0,DATEADD(dd,-(DAY(CONVERT(DATE,@Pram3,103))-1),CONVERT(DATE,@Pram3,103)))  
+		 AND DATEADD(d,0,DATEADD(dd,-(DAY(DATEADD(mm,1,CONVERT(DATE,@Pram3,103)))),DATEADD(mm,1,CONVERT(DATE,@Pram3,103))))  
+		join WRBHBStaticHotels S WITH(NOLOCK) ON Ag.BookingPropertyId=S.HotalId and s.IsActive=1 and s.IsDeleted=0
+		JOIN dbo.WRBHBBookingProperty BP WITH(NOLOCK)ON C.Id=BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0  
+		and  PropertyType='MMT' 
+		LEFT OUTER JOIN WRBHBPropertyAgreements PA WITH(NOLOCK) ON PA.IsActive=1 AND PA.PropertyId=bp.PropertyId AND PA.IsDeleted=0  
+	   where Convert(date,Ag.ChkInDt,103)>= CONVERT(date,'01/09/2014',103)
+		 and  C.IsActive=1 AND C.IsDeleted=0 AND ISNULL(C.CancelStatus,'')!='Canceled'
+		 AND C.Id NOT IN(SELECT BookingId FROM #ExternalForecast)
+		 group by  AG.BookingId,Ag.RoomId,Ag.RoomType,ag.FirstName,Ag.ChkInDt,
+		Ag.ChkOutDt,CurrentStatus,AG.Occupancy,Tariff,ServicePaymentMode,
+		TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,Ag.BookingPropertyId,
+		ISNULL(PA.TAC,0),ISNULL(PA.TACPer,0) 
+ 
+    -- (MMT)   EXTERNAL DATE CHECK IN DATE WISE     	       
+	INSERT INTO #ExternalForecast(BookingId,PropertyAssGustId,RoomName,GuestName,CheckInDt,CheckOutDt,Type,Occupancy,  
+	BookingLevel,Tariff,Category,ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,  
+	PropertyId,TAC,TACPer,RoomType)  
+	  
+		Select Distinct AG.BookingId,Isnull(Ag.RoomId,0),Ag.RoomType,ag.FirstName,convert(nvarchar(100),Ag.ChkInDt,103) CheckinDate,
+		convert(nvarchar(100),Ag.ChkOutDt,103),'Booking' CurrentStatus,AG.Occupancy,'MMT',Tariff,'External Property'Category,
+		--Ag.RoomId, C.clientname,S.HotalName,S.HotalId,'External Property',
+		ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,Ag.BookingPropertyId Id,
+		ISNULL(PA.TAC,0),ISNULL(PA.TACPer,0),'MMT'
+		from wrbhbbooking C
+		join  WRBHBBookingPropertyAssingedGuest AG WITH(NOLOCK) ON C.Id= AG.BookingId AND AG.IsActive=1 and AG.IsDeleted=0
+		 AND CONVERT(DATE,ChkInDt,103) < DATEADD(d,0,DATEADD(dd,-(DAY(CONVERT(DATE,@Pram3,103))-1),CONVERT(DATE,@Pram3,103)))  
+		 AND CONVERT(DATE,ChkOutDt,103) > DATEADD(dd,-(DAY(DATEADD(mm,1,CONVERT(DATE,@Pram3,103)))),DATEADD(mm,1,CONVERT(DATE,@Pram3,103)))   
+		join WRBHBStaticHotels S WITH(NOLOCK) ON Ag.BookingPropertyId=S.HotalId and s.IsActive=1 and s.IsDeleted=0
+		JOIN dbo.WRBHBBookingProperty BP WITH(NOLOCK)ON C.Id=BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0  
+		and  PropertyType='MMT' 
+		LEFT OUTER JOIN WRBHBPropertyAgreements PA WITH(NOLOCK) ON PA.IsActive=1 AND PA.PropertyId=bp.PropertyId AND PA.IsDeleted=0  
+		 where Convert(date,Ag.ChkInDt,103)>= CONVERT(date,'01/09/2014',103)
+		 and  C.IsActive=1 AND C.IsDeleted=0 AND ISNULL(C.CancelStatus,'')!='Canceled'
+		 AND C.Id NOT IN(SELECT BookingId FROM #ExternalForecast) 
+		 group by  AG.BookingId,Ag.RoomId,Ag.RoomType,ag.FirstName,Ag.ChkInDt,
+		Ag.ChkOutDt,CurrentStatus,AG.Occupancy,Tariff,ServicePaymentMode,
+		TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,Ag.BookingPropertyId,
+		ISNULL(PA.TAC,0),ISNULL(PA.TACPer,0)
+		
+     --Select * from #ExternalForecast
+	--	Return;
+		
 		 --EXTERNAL DATE CHECK IN DATE WISE  
 		 INSERT INTO #ExternalForecast(BookingId,PropertyAssGustId,RoomName,GuestName,CheckInDt,CheckOutDt,Type,Occupancy,  
 		 BookingLevel,Tariff,Category,ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,  
@@ -2421,7 +2502,8 @@ IF @Action ='PropertyAndCity'
 	BookingLevel,Tariff,Category,ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,  
 	PropertyId,TAC,TACPer
 		 
-	
+	--Select * from #ExternalForecastNew where BookingLevel='MMT'
+	---Return
 		 
     
     --NofDays   
@@ -2797,6 +2879,19 @@ IF @Action ='PropertyAndCity'
        WHERE Category='External Property'  
        AND P.IsActive=1 AND P.IsDeleted=0  
        ORDER BY LTRIM(p.PropertyName),LTRIM(C.CityName) ASC  
+      --MMT Checked 
+      INSERT INTO #FinalBookingForeCast(CityName,PropertyName,NDDRevenue,DDRevenue,TOTAL,OutStanding,
+      Category,GTV,ActualTariff) 
+
+      SELECT S.city,S.HotalName , ISNULL(DR.Tariff,0) DDRevenue,0,  
+      (ISNULL(DR.Tariff,0)) TOTAL,ISNULL(O.Tariff,0) OutStanding,'External Property',ISNULL(DR.GTV,0), 
+      ISNULL(DR.ActualTariff,0)-- ,DR.PropertyId    
+      from #RevanueDDExternal DR --WITH(NOLOCK) ON P.Id=DR.PropertyId 
+      join  WRBHBBookingPropertyAssingedGuest AG WITH(NOLOCK) ON DR.PropertyId= AG.BookingPropertyId AND AG.IsActive = 1 and AG.IsDeleted = 0
+      join WRBHBStaticHotels S   WITH(NOLOCK) ON DR.PropertyId= S.HotalId and s.IsActive=1 and s.IsDeleted=0 
+      LEFT OUTER JOIN #OutStanding O WITH(NOLOCK) ON  DR.PropertyId=O.PropertyId  
+      group by S.city,S.HotalName,Dr.PropertyId, DR.Tariff,  
+       O.Tariff,DR.GTV,DR.ActualTariff,DR.PropertyId 
      END  
      ELSE  
      BEGIN  
@@ -2855,6 +2950,20 @@ IF @Action ='PropertyAndCity'
        WHERE Category='External Property'  
        AND P.IsActive=1 AND P.IsDeleted=0  
        ORDER BY LTRIM(p.PropertyName),LTRIM(C.CityName) ASC   
+     --MMT Checked 
+      INSERT INTO #FinalBookingForeCast(CityName,PropertyName,NDDRevenue,DDRevenue,TOTAL,OutStanding,
+      Category,GTV,ActualTariff) 
+      SELECT S.city,S.HotalName , ISNULL(DR.Tariff,0) DDRevenue,0,  
+      (ISNULL(DR.Tariff,0)) TOTAL,ISNULL(O.Tariff,0) OutStanding,'External Property',ISNULL(DR.GTV,0), 
+      ISNULL(DR.ActualTariff,0)-- ,DR.PropertyId    
+      from #RevanueDDExternal DR --WITH(NOLOCK) ON P.Id=DR.PropertyId 
+      join  WRBHBBookingPropertyAssingedGuest AG WITH(NOLOCK) ON DR.PropertyId= AG.BookingPropertyId AND AG.IsActive = 1 and AG.IsDeleted = 0
+      join WRBHBStaticHotels S   WITH(NOLOCK) ON DR.PropertyId= S.HotalId and s.IsActive=1 and s.IsDeleted=0
+      join WRBHBBooking B On B.id=Ag.BookingId --and  AG.BookingPropertyId=B.p 
+      LEFT OUTER JOIN #OutStanding O WITH(NOLOCK) ON  DR.PropertyId=O.PropertyId 
+      where B.CityId=@Pram1 and B.IsActive=1 and B.IsDeleted=0 
+      group by S.city,S.HotalName,Dr.PropertyId, DR.Tariff,  
+       O.Tariff,DR.GTV,DR.ActualTariff,DR.PropertyId 
        
      END    
     END  

@@ -479,26 +479,26 @@
 					else if(Modual_AC[i].ModuleName== "KOT Report")
 					{
 						Grp_Type="Grp_Report";
-						_x=430;
+						_x=400;
 						NewControl = new mx.controls.Label;
 						NewControl.id = "lbl1" + i;
 						NewControl.text= Modual_AC[i].ModuleName;
 						//NewControl.visible=visble;
 						NewControl.setStyle("color","#F90808");
-						NewControl.x =420;
+						NewControl.x =390;
 						NewControl.y=17;	
 						Grp_Report.addElement(NewControl as mx.controls.Label)
 					}//Grp_Commercial
 					else if(Modual_AC[i].ModuleName== "PC Report")
 					{
 						Grp_Type="Grp_Report";
-						_x=250;
+						_x=640;
 						NewControl = new mx.controls.Label;
 						NewControl.id = "lbl1" + i;
 						NewControl.text= Modual_AC[i].ModuleName;
 						//NewControl.visible=visble;
 						NewControl.setStyle("color","#F90808");
-						NewControl.x =240;
+						NewControl.x =615;
 						NewControl.y=17;	
 						Grp_Report.addElement(NewControl as mx.controls.Label)
 					}

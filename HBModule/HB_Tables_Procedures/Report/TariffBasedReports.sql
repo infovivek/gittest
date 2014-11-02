@@ -555,7 +555,28 @@ INSERT INTO #TEST( RoomId,CheckOutNo,GuestName,GuestId,Typess,ClientName,Propert
 		 GROUP BY G.BookingId,RoomId,G.RoomType,FirstName,ChkInDt,ChkOutDt,G.Occupancy,Tariff,Category,  
 		 ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,P.Id,PA.TAC,PA.TACPer,G.CurrentStatus   
 	       
-	   
+	     INSERT INTO #ExternalForecasts(BookingId,PropertyAssGustId,RoomName,GuestName,CheckInDt,CheckOutDt,Type,Occupancy,  
+		 BookingLevel,Tariff,Category,ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,  
+		 PropertyId,TAC,TACPer,NofDays) 
+Select Distinct C.id,Ag.guestid,Ag.RoomType,ag.FirstName,convert(nvarchar(100),Ag.ChkInDt,103) CheckinDate,
+convert(nvarchar(100),Ag.ChkOutDt,103),'CheckIn' CurrentStatus,AG.Occupancy,'Room',Tariff,'External Property'Category,
+--Ag.RoomId, C.clientname,S.HotalName,S.HotalId,'External Property',
+ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,0 Id ,
+ISNULL(PA.TAC,0),ISNULL(PA.TACPer,0),DateDiff(day,Ag.ChkInDt,Ag.ChkOutDt) as nodays
+--,DateDiff(day,Ag.ChkInDt,Ag.ChkOutDt)*AG.Tariff,
+--0,convert(nvarchar(100),Ag.ChkInDt,103) ChkInDt,Ag.TariffPaymentMode
+ --,AG.RackDouble,ag.RackSingle,Ag.BookingPropertyId ,S.HotalId,C.Id
+from wrbhbbooking C
+join  WRBHBBookingPropertyAssingedGuest AG WITH(NOLOCK) ON C.Id= AG.BookingId AND AG.IsActive = 1 and AG.IsDeleted = 0
+join WRBHBStaticHotels S   WITH(NOLOCK) ON Ag.BookingPropertyId = S.HotalId and s.IsActive=1 and s.IsDeleted=0
+JOIN dbo.WRBHBBookingProperty BP WITH(NOLOCK)ON C.Id=BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0  
+		and  PropertyType='MMT' 
+LEFT OUTER JOIN WRBHBPropertyAgreements PA WITH(NOLOCK) ON PA.IsActive=1 AND PA.PropertyId=bp.PropertyId AND PA.IsDeleted=0  
+ where Convert(date,Ag.ChkInDt,103)>= CONVERT(date,'01/09/2014',103)
+ 
+-- Select * from WRBHBBookingProperty where PropertyType='MMT'
+
+ 
 		UPDATE #ExternalForecasts SET NofDays=NoOfDays FROM #ExternalForecasts S
 		JOIN dbo.WRBHBChechkOutHdr A WITH(NOLOCK) ON S.BookingId=A.BookingId AND
 		S.Type='CheckOut';
@@ -585,8 +606,8 @@ INSERT INTO #TEST( RoomId,CheckOutNo,GuestName,GuestId,Typess,ClientName,Propert
 	BookingLevel,Tariff,Category,ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,  
 	PropertyId,TAC,TACPer,NofDays
 	
-	-- Select * from #ExternalForecastNew  WHERE PropertyId=793  
-	  --   order by BookingId;return;
+	-- Select * from #ExternalForecastNew   
+	--     order by BookingId;return;
 	    --where PropertyId=456
 		-- Delete from #TFFINAL where PropertyType='External Property'; 
      --truncate table #TFFINAL;
@@ -629,9 +650,9 @@ INSERT INTO #TEST( RoomId,CheckOutNo,GuestName,GuestId,Typess,ClientName,Propert
  --return
 ----All for looop data compltee here
 ----separat by monthwise			  
-   --  Select * from #TFFINAL where PropertyType='External Property'-- and PropertyId=793
-   --and MONTH(CONVERT(DATE,CheckOutDate,103))= 8
-   --order by BookingId
+  --Select * from #TFFINAL where PropertyType='Internal Property'-- and PropertyId=793
+  -- and MONTH(CONVERT(DATE,CheckOutDate,103))= 8
+  -- order by BookingId
    -- return;
 
  --Jan		 
@@ -1032,8 +1053,26 @@ INSERT INTO #TEST( RoomId,CheckOutNo,GuestName,GuestId,Typess,ClientName,Propert
 		 GROUP BY G.BookingId,RoomId,G.RoomType,FirstName,ChkInDt,ChkOutDt,G.Occupancy,Tariff,Category,  
 		 ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,P.Id,PA.TAC,PA.TACPer,
 		 G.CurrentStatus
-		 
-		  
+	--	 Truncate table  #ExternalForecast ;
+		INSERT INTO #ExternalForecast(BookingId,PropertyAssGustId,RoomName,GuestName,CheckInDt,CheckOutDt,Type,Occupancy,  
+		 BookingLevel,Tariff,Category,ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,  
+		 PropertyId,TAC,TACPer,NofDays) 
+Select Distinct C.id,Ag.guestid,Ag.RoomType,ag.FirstName,convert(nvarchar(100),Ag.ChkInDt,103) CheckinDate,
+convert(nvarchar(100),Ag.ChkOutDt,103),'CheckIn' CurrentStatus,AG.Occupancy,'Room',Tariff,'External Property'Category,
+--Ag.RoomId, C.clientname,S.HotalName,S.HotalId,'External Property',
+ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,0 Id ,
+ISNULL(PA.TAC,0),ISNULL(PA.TACPer,0),DateDiff(day,Ag.ChkInDt,Ag.ChkOutDt) as nodays
+--,DateDiff(day,Ag.ChkInDt,Ag.ChkOutDt)*AG.Tariff,
+--0,convert(nvarchar(100),Ag.ChkInDt,103) ChkInDt,Ag.TariffPaymentMode
+ --,AG.RackDouble,ag.RackSingle,Ag.BookingPropertyId ,S.HotalId,C.Id
+from wrbhbbooking C
+join  WRBHBBookingPropertyAssingedGuest AG WITH(NOLOCK) ON C.Id= AG.BookingId AND AG.IsActive = 1 and AG.IsDeleted = 0
+join WRBHBStaticHotels S   WITH(NOLOCK) ON Ag.BookingPropertyId = S.HotalId and s.IsActive=1 and s.IsDeleted=0
+JOIN dbo.WRBHBBookingProperty BP WITH(NOLOCK)ON C.Id=BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0  
+		and  PropertyType='MMT' 
+LEFT OUTER JOIN WRBHBPropertyAgreements PA WITH(NOLOCK) ON PA.IsActive=1 AND PA.PropertyId=bp.PropertyId AND PA.IsDeleted=0  
+ where Convert(date,Ag.ChkInDt,103)>= CONVERT(date,'01/09/2014',103)
+   
 		UPDATE #ExternalForecast SET NofDays=NoOfDays FROM #ExternalForecast S
 		JOIN dbo.WRBHBChechkOutHdr A WITH(NOLOCK) ON S.BookingId=A.BookingId AND
 		S.Type='CheckOut'
@@ -1041,7 +1080,8 @@ INSERT INTO #TEST( RoomId,CheckOutNo,GuestName,GuestId,Typess,ClientName,Propert
 		-- Delete from #TFFINAL where PropertyType='External Property'; 
      truncate table #TFFINAL;
   --   return;
-     
+   --  Select SingleTariff,SingleandMarkup,Markup,  
+		 --PropertyId,TAC,TACPer,NofDays from #ExternalForecast
     SELECT TOP 1 @Tariff=Tariff,@GuestId=PropertyAssGustId,@BookingId=BookingId,
     @NoOfDays= NofDays,@Typess=Type,@GuestName=BookingLevel,
     @CheckInDate=CheckInDt,@CheckOutDate=CheckOutDt,@PropertyId=PropertyId,@TAC=TACPer,
@@ -1110,9 +1150,9 @@ INSERT INTO #TEST( RoomId,CheckOutNo,GuestName,GuestId,Typess,ClientName,Propert
 		END   
          
     END  
-    --Select * from #TFFINAL where
+   --  Select * from #TFFINAL  
     --MONTH(CONVERT(DATE,CheckOutDate,103))= 8;--where TariffPaymentMode='Direct'
-    --return;
+   --  return;
 --INSERT INTO #ExternalNet(GuestId,BookingId,PropertyId,ChkInHdrId,MarkUpAmount,CheckInDate ,CheckOutDate)
 --SELECT H.GuestId,H.BookingId,H.PropertyId,H.ChkInHdrId,T.MarkUpAmount,T.CheckInDate,T.CheckOutDate
 --FROM  WRBHBChechkOutHdr H

@@ -154,7 +154,7 @@ BEGIN
      SET @Str=(SELECT UserType FROM WRBHBPropertyUsers WITH (NOLOCK) 
 	 WHERE UPPER(UserId) = UPPER(@UserId) AND IsActive=1 AND IsDeleted=0 AND PropertyId=@PropertyId
 	 AND UserType IN ('Resident Managers','Assistant Resident Managers'))
-	 IF(ISNULL(@Str,'') !='')
+	 IF(ISNULL(@Str,'') ='')
 	 BEGIN
 			SET @ErrMsg = 'Need Resident Managers Approval';
 			SELECT @ErrMsg;

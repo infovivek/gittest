@@ -87,7 +87,7 @@
 				//	Txt_TransID.text="";Txt_Date.text="";Txt_TransID.text="";
 				FromDate="";ToDate="";ChkoutId="";Status="";Type="";InvoiceNum="";
 				PageLoad();Internal.selected=false;External.selected=false;TAC.selected=false;
-				Change("Lbl_TDT");Changes("Lbl_FDT");
+				Change("Lbl_TDT");Changes("Lbl_FDT");txtGuestName.text="";
 			}  
 			public var InvoiceNum:String="";
 			protected function btn_Search_clickHandler():void
@@ -281,6 +281,8 @@
 			}	
 			private function filterMyArrayCollections(item:Object):Boolean 
 			{
+				txtGuestName.text="";
+				txtProperty.text="";
 				var Itm:Boolean=true;				
 				if(txtInvoiceNumbr.text!="")
 				{
@@ -302,6 +304,8 @@
 			}	
 			private function filterMyArrayCollectionss(item:Object):Boolean 
 			{
+				txtGuestName.text="";
+				txtInvoiceNumbr.text="";
 				var Itm:Boolean=true;				
 				if(txtProperty.text!="")
 				{
@@ -349,32 +353,61 @@
 					DT_To.text=="";
 				}
 			}
+			
+			
+			public var FltNmg:String="";
+		//	public var filterMyArrayCollectionsg:ArrayCollection=new ArrayCollection();
+			private function filterg(Filtg:String):void
+			{				
+				FltNmg=Filtg;				
+				var tempAC:ArrayCollection=new ArrayCollection();	
+				//tempAC=myArrayCollection
+				tempAC=Grd_SearchInvoice.dataProvider as ArrayCollection;
+				tempAC.filterFunction = filterMyArrayCollectionsg;
+				tempAC.refresh();				
+			}	
+			private function filterMyArrayCollectionsg(item:Object):Boolean 
+			{
+				txtInvoiceNumbr.text="";
+				txtProperty.text="";
+				var Itm:Boolean=true;				
+				if(txtGuestName.text!="")
+				{
+					var searchString:String = txtGuestName.text.toLowerCase();
+					var itemName:String = (item.GuestName as String).toLowerCase();
+					Itm=itemName.indexOf(searchString) > -1;
+				}				
+				return Itm;		
+			}
 		]]>
 	</fx:Script>
 	<s:BorderContainer x="0" y="30" width="100%" height="84" borderVisible="false" backgroundColor="#f4efef" depth="10">
 		<s:HGroup x="0" y="0" width="100%" height="90" horizontalAlign="center" verticalAlign="middle">
 			<s:Group x="132" y="5" width="100%" height="80">
-				<mx:Label x="62" y="7" width="64" height="16" text="From Date" id="Lbl_FDT"/>
-				<mx:Label x="78" y="47" text="To Date" id="Lbl_TDT"/>
+				<mx:Label x="42" y="7" width="64" height="16" text="From Date" id="Lbl_FDT"/>
+				<mx:Label x="58" y="47" text="To Date" id="Lbl_TDT"/>
 				
-				<mx:DateField id="DT_From" x="148" y="6" width="90" formatString="DD/MM/YYYY"  tabIndex="1"  
+				<mx:DateField id="DT_From" x="128" y="6" width="90" formatString="DD/MM/YYYY"  tabIndex="1"  
 							  yearNavigationEnabled="true" selectableRange="{{rangeEnd: new Date()}}" change="Change('Lbl_FDT')" />
-				<mx:DateField id="DT_To" x="148" y="46" width="90" formatString="DD/MM/YYYY"
+				<mx:DateField id="DT_To" x="128" y="46" width="90" formatString="DD/MM/YYYY"
 							  tabIndex="2" yearNavigationEnabled="true"   change="Changes('Lbl_TDT')" />
 				
 				<s:Image x="831" y="20" source="assets/a1.png" toolTip="Search" click="btn_Search_clickHandler()" tabIndex="5"/>
 				<s:Image x="930" y="20" click="Clear()" source="assets/dust_bin1.png" toolTip="Clear"/>
 				<!--mx:Label id="Lbl_Vendor1" x="223" y="2" width="13" text="*" color="red" fontSize="16"/>
 				<mx:Label id="Lbl_Vendor0" x="222" y="42" width="13" text="*" color="red" fontSize="16"/-->
-				<mx:Label   x="327" y="2" width="13" text="*" color="red" fontSize="16"/>
-				<s:Label x="293" y="45" height="29" text="Filter by &#xd;InvoiceNumber"/>
-				<s:Label   x="293" y="14" text="Status"/>
-				<s:TextInput id="txtInvoiceNumbr" x="396" y="44" width="109" height="25"
+				<mx:Label   x="304" y="2" width="13" text="*" color="red" fontSize="16"/>
+				<s:Label x="270" y="45" height="29" text="Filter by &#xd;InvoiceNumber"/>
+				<s:Label x="582" y="8" width="84" height="28" text="Filter by Guest Name"/>
+				<s:TextInput id="txtGuestName" x="688" y="2" width="109" height="25" tabIndex="5"
+							 change="filterg('GuestName')" prompt="GuestName"/>
+				<s:Label   x="270" y="14" text="Status"/>
+				<s:TextInput id="txtInvoiceNumbr" x="373" y="44" width="109" height="25" tabIndex="4"
 							 change="filter('InvoiceNumber')" prompt="InvoiceNumber"/>
-				<s:Label x="543" y="45" height="29" text="Filter by &#xd;Property"/>
-				<s:TextInput id="txtProperty" x="646" y="44" width="109" height="25"
+				<s:Label x="582" y="45" height="29" text="Filter by &#xd;Property"/>
+				<s:TextInput id="txtProperty" x="688" y="44" width="109" height="25" tabIndex="6"
 							 change="filterss('Property')" prompt="Property Name"/>
-				<s:HGroup x="367" y="6" width="199" horizontalAlign="center" verticalAlign="middle" gap="17"  id="type">
+				<s:HGroup x="344" y="6" width="199" horizontalAlign="center" verticalAlign="middle" tabIndex="3" gap="17"  id="type">
 					<s:RadioButton label="Internal" groupName="Modes" value="0"
 								   id="Internal" buttonMode="true"  />
 					<s:RadioButton label="External" groupName="Modes"  value="1"

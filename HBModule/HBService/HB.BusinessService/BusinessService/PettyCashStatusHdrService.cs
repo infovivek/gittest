@@ -26,6 +26,10 @@ namespace HB.BusinessService.BusinessService
                 {
                     dTable.Rows.Add(ds.Tables["DBERRORTBL"].Rows[0][0].ToString());
                 }
+                if (ds.Tables[0].Rows[0][0].ToString() == "PC Expense Report Can be submit after the Previous Expense Report Approval.")
+                {
+                    dTable.Rows.Add("PC Expense Report Can be submit after the Previous Expense Report Approval.");
+                }
                  else
                 {
                     Int32  PettyCashStatusHdrId = Convert.ToInt32(ds.Tables[0].Rows[0][0].ToString());

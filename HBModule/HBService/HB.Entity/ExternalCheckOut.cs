@@ -66,6 +66,10 @@ namespace HB.Entity
         public decimal VATPer { get; set; }
         public decimal RestaurantSTPer { get; set; }
         public decimal BusinessSupportST { get; set; }
+        public int ClientId { get; set; }
+        public int CityId { get; set; }
+        public string BillFromDate { get; set; }
+        public string BillEndDate { get; set; }
 
         // Details
         public int Id1 { get; set; }
@@ -102,5 +106,7 @@ namespace HB.Entity
         public decimal Rate1 { get; set; }
         public decimal TotalBusinessSupportST { get; set; }
         public decimal TACAmount { get; set; }
+        public string BillFromDate1 { get; set; }
+        public string BillEndDate1 { get; set; }
     }
 }

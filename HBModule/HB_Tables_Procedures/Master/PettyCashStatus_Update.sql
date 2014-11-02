@@ -31,10 +31,10 @@ CREATE PROCEDURE Sp_PettyCashStatus_Update
 @Description	NVARCHAR(100),
 @Amount         DECIMAL(27,2),
 @Paid		    DECIMAL(27,2),
-@PropertyId     BIGINT,
 @BillLogo       NVARCHAR(1000),
 @ExpenseId		BIGINT,
 @BillDate       NVARCHAR(1000),
+@BillNo			NVARCHAR(1000),
 @UserId		    BIGINT,
 @Id				INT
 )
@@ -43,11 +43,40 @@ AS
 BEGIN
 
 	UPDATE WRBHBPettyCashStatus SET PettyCashStatusHdrId=@PettyCashStatusHdrId,
-	ExpenseHead=@ExpenseHead,Status=@Status,PropertyId=@PropertyId,UserId=@UserId,
-	Description=@Description,Amount=@Amount,Paid=@Paid,BillDate=@BillDate,BillLogo=@BillLogo,
-	Modifiedby=@UserId,ModifiedDate=GETDATE()
+	ExpenseHead=@ExpenseHead,Status=@Status,UserId=@UserId,
+	Description=@Description,Amount=@Amount,Paid=@Paid,BillDate=@BillDate,
+	Balance=@Amount-@Paid,BillLogo=@BillLogo,Flag=1,
+	BillNo=@Billno,Modifiedby=@UserId,ModifiedDate=GETDATE()
 	WHERE Id=@Id 
 	
+	DECLARE @Pr INT
+	SET @Pr=(SELECT PropertyId FROM WRBHBPettyCashStatusHdr
+	WHERE Id=@PettyCashStatusHdrId)
+	UPDATE WRBHBPettyCashStatus SET PropertyId=@Pr
+	WHERE PettyCashStatusHdrId=@PettyCashStatusHdrId
+	
+	DECLARE @Bal DECIMAL(27,2)
+	SET @Bal=(SELECT SUM(Balance)
+	FROM WRBHBPettyCashStatus 
+	WHERE PettyCashStatusHdrId=@PettyCashStatusHdrId AND IsActive=1 AND IsDeleted=0)
+	UPDATE WRBHBPettyCashStatusHdr SET Balance=@Bal
+	WHERE Id=@PettyCashStatusHdrId
+	
+	UPDATE WRBHBPettyCashHdr SET ClosingBalance=@Bal,ExpenseReport=1
+	WHERE UserId=@UserId AND PropertyId=@Pr AND
+	Convert(NVARCHAR(100),Date,103)=@Status
+	
+	UPDATE WRBHBPettyCashApprovalDtl SET Process=0
+	WHERE RequestedUserId=@UserId AND PropertyId=@Pr AND 
+	CONVERT(NVARCHAR,RequestedOn,103)=CONVERT(NVARCHAR,@Status,103)
+		
+	UPDATE WRBHBNewPettyCashApprovalDtl SET Process=0,IsActive=0,IsDeleted=1
+	WHERE RequestedUserId=@UserId AND PropertyId=@Pr AND 
+	CONVERT(NVARCHAR,RequestedOn,103)=CONVERT(NVARCHAR,@Status,103)
 	
 SELECT Id,RowId FROM WRBHBPettyCashStatus WHERE Id=@Id;
 END
+
+
+
+  

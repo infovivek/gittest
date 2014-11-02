@@ -592,18 +592,20 @@ CREATE TABLE #PROPWSE(PropertyName NVARCHAR(200),Code NVARCHAR(200),Category NVA
         SELECT  Property,H.ClientName ClientName,ChkOutTariffNetAmount,B.BookingCode as BookingNo,
         Convert(NVARCHAR(100),BillDate,103)  ChkOutDate
         FROM WRBHBChechkOutHdr H 
-        join WRBHBBooking B on h.BookingId= B.Id 
+        join WRBHBBooking B on h.BookingId= B.Id and b.IsActive=1 and b.IsDeleted=0
         JOIN WRBHBProperty P ON H.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
 		JOIN WRBHBPropertyUsers PU ON P.Id=PU.PropertyId AND PU.IsActive=1 AND PU.IsDeleted=0
 		JOIN WRBHBUser U ON   U.Id=pu.UserId AND U.IsActive=1 AND U.IsDeleted=0
 		WHERE H.IsActive=1 AND H.IsDeleted=0 and PaymentStatus='UnPaid' and pu.UserId=@Pram1 
-		Group by Property,H.ClientName,ChkOutTariffNetAmount,B.BookingCode,BillDate,H.Id
+		AND PU.UserType IN('Resident Managers','Operations Managers','Ops Head','Finance','Super Admin')
+		Group by Property,H.ClientName,ChkOutTariffNetAmount,B.BookingCode,BillDate,H.Id,B.Id
 		ORDER BY  Convert(NVARCHAR(100),BillDate,103)  
 		
 		
 		
 		
 		Select Property,ClientName,ChkOutTariffNetAmount,BookingNo,ChkOutDate from #FinalChkout
+		where Convert(date,ChkOutDate,103)>= CONVERT(date,'01/09/2014',103) 
 		Group by Property,ClientName,ChkOutTariffNetAmount,BookingNo,ChkOutDate
 		
 END
