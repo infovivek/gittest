@@ -264,9 +264,10 @@
 						FnSave1, iconWarning, Alert.NO),10,"");
 				}
 			}
-			protected function FnSave1():void
+			protected function FnSave1(event:CloseEvent):void
 			{
-				{
+			 if ((event.detail==Alert.YES)) 
+			  {
 					var arrcopy:ArrayCollection = new ArrayCollection
 						([{ 
 							PropertyId:PropertyId,Property:hlp_Property.text,CategoryId:CategoryId,

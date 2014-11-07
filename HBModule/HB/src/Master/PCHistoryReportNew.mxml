@@ -273,16 +273,15 @@
 				Grd_Details.dataProvider=null;
 				ErrStr="";
 				ErrMsg = ""; Flag = true; 
-				var Str:String=FnValidation_BeforeSave();
+				//var Str:String=FnValidation_BeforeSave();
 				if(ErrStr !="")
 				{
 					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10,"");
 					return;
 				} 
 				else
-				FromDate=dt_DateFrom.text;
-				ToDate=dt_DateTo.text;
-				useWeb("PCHistory","Gridload_CUSTOM",[GlobalXml,"GRIDLOAD",NewPropertyId,UserId,FromDate,ToDate]);
+				var Str:String=drp_status.selectedItem;
+				useWeb("PCHistory","Gridload_CUSTOM",[GlobalXml,"GRIDLOAD",NewPropertyId,UserId,Str,'']);
 				Grd_Details.visible=true;
 				
 			}
@@ -476,7 +475,7 @@
 					</mx:columns>
 				</mx:DataGrid>
 				
-	<WrbComp:Button_BB x="862" y="56" Lable_val="Filter" click="search(event)">
+	<WrbComp:Button_BB x="852" y="56" Lable_val="Filter" click="search(event)">
 	</WrbComp:Button_BB>
 	<s:BorderContainer x="78" y="43" width="825" height="479" id="bdr_History"
 					   borderVisible="true" visible="false" depth="1500">
@@ -542,16 +541,16 @@
 	<s:Label x="48" y="65" text="Select Property"/>
 	<s:Label x="316" y="65" text="UserName"/>
 	
-	<mx:Label x="545" y="60" text="From"/>
+	<mx:Label x="545" y="60" text="From" visible="false"/>
 	<mx:DateField id="dt_DateFrom" x="583" y="59" width="100" height="23" enabled="true"
 				  formatString="DD/MM/YYYY" selectableRange="{{rangeEnd:new Date()}}"
-				  styleName="DisabledDateField" tabIndex="3"
-				  yearNavigationEnabled="false"/>
-	<s:Label x="701" y="65" text="To"/>
+				  styleName="DisabledDateField" 
+				  yearNavigationEnabled="false" visible="false"/>
+	<s:Label x="701" y="65" text="To" visible="false"/>
 	<mx:DateField id="dt_DateTo" x="723" y="59" width="100" height="23" enabled="true"
 				  formatString="DD/MM/YYYY" selectableRange="{{rangeEnd:new Date()}}"
-				  styleName="DisabledDateField" tabIndex="4"
-				  yearNavigationEnabled="false"/>
+				  styleName="DisabledDateField"
+				  yearNavigationEnabled="false" visible="false"/>
 	<WrbHelpComp:HelpText x="137" y="59" width="171" height="24" id="hlp_Property" onselection="{PropertyLoad()}" 
 						  pxSetColumnsWidth="160,0" pxSetHeight="183" depth="10" tabIndex="1">
 	</WrbHelpComp:HelpText>
@@ -562,5 +561,15 @@
 	</WrbComp:Button_BB>
 	<WrbComp:Button_BB x="475" y="470" Lable_val="Print" visible="false">
 	</WrbComp:Button_BB>
+	<s:DropDownList x="557" y="59" width="277" height="24" id="drp_status"
+					selectedItem="Waiting For Operation Manager Approval">
+		<s:ArrayList>
+			<fx:String>Waiting For Operation Manager Approval</fx:String>
+			<fx:String>Approved by reporting authority</fx:String>
+			<fx:String>Approved and waiting for transfer</fx:String>
+			<fx:String>Transferred</fx:String>
+			<fx:String>Acknowledged</fx:String>
+		</s:ArrayList>
+	</s:DropDownList>
 	<!--s:Label x="419" y="86" width="10" height="12" text="*" color="Red"/-->
 </s:Application>

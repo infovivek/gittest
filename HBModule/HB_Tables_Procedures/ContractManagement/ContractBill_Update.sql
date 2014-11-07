@@ -71,8 +71,8 @@ BEGIN
 	ELSE
 	BEGIN
 		SET @InVoiceNo = 
-		SUBSTRING(@Tempinvoiceno,0,6)+
-		CAST(CAST(SUBSTRING(@Tempinvoiceno,6,LEN(@Tempinvoiceno)) AS VARCHAR) + 1 AS VARCHAR); 
+		SUBSTRING(@Tempinvoiceno,0,5)+
+		CAST(CAST(SUBSTRING(@Tempinvoiceno,5,LEN(@Tempinvoiceno)) AS VARCHAR) + 1 AS VARCHAR); 
 	END
 	
 	

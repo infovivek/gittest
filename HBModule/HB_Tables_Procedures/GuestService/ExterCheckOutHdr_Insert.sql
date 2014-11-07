@@ -68,40 +68,41 @@ IF ISNULL(@PrintInvoice,0) = '1'
 				CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
 				WHERE PropertyType ='External Property' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND InvoiceNo!='' and PrintInvoice = 1
-				ORDER BY InvoiceNo DESC;
+				YEAR(CreatedDate)=YEAR(GETDATE()) AND InvoiceNo!='' and PrintInvoice = 1 and InvoiceNo!='0'
+				ORDER BY Id DESC;
 			END
 			ELSE
 				BEGIN
 				SELECT @InVoiceNo='HBE/1';
 			END
 	END
-	ELSE
-	BEGIN
-		set @InVoiceNo='0';
-	END
+	--ELSE
+	----BEGIN
+	--	set @InVoiceNo='0';
+	--END
 	IF @BTC = 'Bill to Company (BTC)'  OR @PrintInvoice = 1 
 	BEGIN
-		IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
+		IF EXISTS (SELECT  NULL FROM WRBHBChechkOutHdr
 		WHERE PropertyType ='External Property' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
 		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(InVoiceNo,'') != '')
 			BEGIN
-				SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
+				set  @InVoiceNo=(Select Top 1 SUBSTRING(InVoiceNo,0,5)+
 				CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
 				WHERE PropertyType ='External Property' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND InvoiceNo!=''
-				ORDER BY InvoiceNo DESC;
+				YEAR(CreatedDate)=YEAR(GETDATE()) AND InvoiceNo!=''and InvoiceNo!='0'
+				ORDER BY Id DESC);
 			END
 			ELSE
 				BEGIN
+				select 'r'
 				SELECT @InVoiceNo='HBE/1';
 			END
 	END
-	ELSE
-	BEGIN
-		set @InVoiceNo='0';
-	END
+	--ELSE
+	--BEGIN
+	--	set @InVoiceNo='0';
+	--END
 	IF @BTC = 'Bill to Client' OR @PrintInvoice = 1 
 	BEGIN
 		IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
@@ -112,18 +113,18 @@ IF ISNULL(@PrintInvoice,0) = '1'
 				CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
 				WHERE PropertyType ='External Property' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND InvoiceNo!=''
-				ORDER BY InvoiceNo DESC;
+				YEAR(CreatedDate)=YEAR(GETDATE()) AND InvoiceNo!=''and InvoiceNo!='0'
+				ORDER BY Id DESC;
 			END
 			ELSE
 				BEGIN
 				SELECT @InVoiceNo='HBE/1';
 			END
 	END
-	ELSE
-	BEGIN
-		set @InVoiceNo='0';
-	END
+	--ELSE
+	--BEGIN
+	--	set @InVoiceNo='0';
+	--END
 END
 
  
@@ -131,7 +132,7 @@ END
 --declare @InVoiceNo nvarchar(100)
 
 
---select @InVoiceNo
+select @InVoiceNo
  
  -- INSERT
 INSERT INTO WRBHBChechkOutHdr(CheckOutNo,GuestName,Stay,Type,BookingLevel,

@@ -78,11 +78,12 @@
 //				Str_ChkOut="http://localhost:4171/ExternalCheckOutTariff.aspx?";
 //				Str_Serv="http://localhost:4171/GuestCheckOutService1.aspx?";
 //				Str_Settle="http://localhost:4171/GuestCheckOutConsolidate1.aspx?";
-//				Str_ChkOutEXT ="http://localhost:4171/ExternalCheckoutTACMail.aspx?";
+				Str_ChkOutEXT ="http://localhost:4171/ExternalCheckoutTACMail.aspx?";
+				
 				Str_ChkOut="http://sstage.in/HBReport/ExternalCheckOutTariff.aspx?";
 				Str_Serv="http://sstage.in/HBReport/GuestCheckOutService1.aspx?";
 				Str_Settle="http://sstage.in/HBReport/GuestCheckOutConsolidate1.aspx?";
-				Str_ChkOutEXT ="http://sstage.in/HBReport/ExternalCheckoutTACMail.aspx?";
+//				Str_ChkOutEXT ="http://sstage.in/HBReport/ExternalCheckoutTACMail.aspx?";
 				btn_Service.enabled=false;
 				Btn_Settlement.enabled=false;
 				btn_Sctrl.setButtonRights("Delete",true);
@@ -97,8 +98,8 @@
 			
 			protected function Help():void
 			{				
-				useWeb("ExternalCheckOut","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId]);
-		//		useWeb("ExternalCheckOut","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65]);
+		//		useWeb("ExternalCheckOut","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId]);
+				useWeb("ExternalCheckOut","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65]);
 				//			useWeb("GuestCheckOut","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,0]);
 				Txt_ServiceBillAmt.editable=false;
 				Txt_ServiceVat.editable=false;
@@ -1008,7 +1009,7 @@
 						{
 							if(F4=="Cash")
 							{
-								useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+								useWeb("ExternalCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0]);
 								
 								
 //								var arr:ArrayCollection= new ArrayCollection();
@@ -1080,7 +1081,7 @@
 							}
 							if(F5=="Card")
 							{
-								useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+								useWeb("ExternalCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0]);
 								
 //								var arr:ArrayCollection= new ArrayCollection();
 //								arr=Grid_Settle.dataProvider as ArrayCollection;
@@ -1151,7 +1152,7 @@
 							}
 							if(F6=="Cheque")
 							{
-								useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+								useWeb("ExternalCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0]);
 								
 //								var arr:ArrayCollection= new ArrayCollection();
 //								arr=Grid_Settle.dataProvider as ArrayCollection;
@@ -1220,7 +1221,7 @@
 							}
 							if(F7=="CompanyInvoice")
 							{
-								useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+								useWeb("ExternalCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0]);
 								
 								
 //								var arr:ArrayCollection= new ArrayCollection();
@@ -1298,7 +1299,7 @@
 							}
 							if(F8=="NEFT")
 							{
-								useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+								useWeb("ExternalCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0]);
 								
 								
 								
@@ -1373,7 +1374,7 @@
 						{
 							if(F4=="Cash")
 							{
-								useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+								useWeb("ExternalCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0]);
 								
 //								var arr:ArrayCollection= new ArrayCollection();
 //								arr=Grid_Settle.dataProvider as ArrayCollection;
@@ -1442,7 +1443,7 @@
 							}
 							if(F5=="Card")
 							{
-								useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+								useWeb("ExternalCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0]);
 								
 //								var arr:ArrayCollection= new ArrayCollection();
 //								arr=Grid_Settle.dataProvider as ArrayCollection;
@@ -1513,7 +1514,7 @@
 							if(F6=="Cheque")
 							{
 								
-								useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+								useWeb("ExternalCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0]);
 								
 								
 //								var arr:ArrayCollection= new ArrayCollection();
@@ -1584,7 +1585,7 @@
 							if(F7=="CompanyInvoice")
 							{
 								
-								useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+								useWeb("ExternalCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0]);
 								
 								
 //								var arr:ArrayCollection= new ArrayCollection();
@@ -1661,7 +1662,7 @@
 							}
 							if(F8=="NEFT")
 							{
-								useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+								useWeb("ExternalCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0]);
 								
 //								var arr:ArrayCollection= new ArrayCollection();
 //								arr=Grid_Settle.dataProvider as ArrayCollection;
@@ -1734,7 +1735,7 @@
 						{
 							if(F4=="Cash")
 							{
-								useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+								useWeb("ExternalCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0]);
 								
 								
 //								var arr:ArrayCollection= new ArrayCollection();
@@ -1805,7 +1806,7 @@
 							if(F5=="Card")
 							{
 								
-								useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+								useWeb("ExternalCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0]);
 								
 //								var arr:ArrayCollection= new ArrayCollection();
 //								arr=Grid_Settle.dataProvider as ArrayCollection;
@@ -1874,7 +1875,7 @@
 							}
 							if(F6=="Cheque")
 							{
-								useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+								useWeb("ExternalCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0]);
 								
 								
 //								var arr:ArrayCollection= new ArrayCollection();
@@ -1943,7 +1944,7 @@
 							}
 							if(F7=="CompanyInvoice")
 							{
-								useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+								useWeb("ExternalCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0]);
 								
 //								var arr:ArrayCollection= new ArrayCollection();
 //								arr=Grid_Settle.dataProvider as ArrayCollection;
@@ -2021,7 +2022,7 @@
 							}
 							if(F8=="NEFT")
 							{
-								useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+								useWeb("ExternalCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0]);
 								
 //								var arr:ArrayCollection= new ArrayCollection();
 //								arr=Grid_Settle.dataProvider as ArrayCollection;
@@ -2177,7 +2178,7 @@
 						{
 							if(F4=="Cash")
 							{
-								useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+								useWeb("ExternalCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0]);
 								
 								
 								
@@ -2242,7 +2243,7 @@
 							}
 							if(F6=="Cheque")
 							{
-								useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+								useWeb("ExternalCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0]);
 								
 								
 								
@@ -2313,7 +2314,7 @@
 							}
 							if(F8=="NEFT")
 							{
-								useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+								useWeb("ExternalCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0]);
 								
 								
 								
@@ -2350,7 +2351,7 @@
 						{
 							if(F4=="Cash")
 							{
-								useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+								useWeb("ExternalCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0]);
 								
 								
 								
@@ -2381,7 +2382,7 @@
 							}
 							if(F5=="Card")
 							{
-								useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+								useWeb("ExternalCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0]);
 								
 								
 								
@@ -2414,7 +2415,7 @@
 							if(F6=="Cheque")
 							{
 								
-								useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+								useWeb("ExternalCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0]);
 								
 								
 								
@@ -2447,7 +2448,7 @@
 							if(F7=="CompanyInvoice")
 							{
 								
-								useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+								useWeb("ExternalCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0]);
 								
 								
 								
@@ -2486,7 +2487,7 @@
 							}
 							if(F8=="NEFT")
 							{
-								useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+								useWeb("ExternalCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0]);
 								
 								
 								
@@ -2521,7 +2522,7 @@
 						{
 							if(F4=="Cash")
 							{
-								useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+								useWeb("ExternalCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0]);
 								
 								
 								
@@ -2585,7 +2586,7 @@
 							}
 							if(F6=="Cheque")
 							{
-								useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+								useWeb("ExternalCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0]);
 								
 								
 								
@@ -2615,7 +2616,7 @@
 							}
 							if(F7=="CompanyInvoice")
 							{
-								useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+								useWeb("ExternalCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0]);
 								
 								
 								
@@ -2655,7 +2656,7 @@
 							}
 							if(F8=="NEFT")
 							{
-								useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+								useWeb("ExternalCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0]);
 								
 								if (ChkOutHdrId == 0)
 								{
@@ -4139,7 +4140,7 @@
 				
 				
 				//useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
-				useWeb("ExternalCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+				useWeb("ExternalCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0]);
 			//	useWeb("ExternalCheckOut","Guest_CUSTOM",[GlobalXml,"CHKINROOMDETAILS","",CheckInHdrId,StateId,0,0,0]);
 				
 			}
@@ -4765,7 +4766,7 @@
 							Txt_TariffPayAmount.text = LL.replace(",","");
 							if(Txt_TariffLoad.text == Txt_TariffPayAmount.text)
 							{
-								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","",CheckInHdrId,0,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -4843,7 +4844,7 @@
 							Txt_TariffPayAmount.text = LL.replace(",","");
 							if(Txt_TariffLoad.text == Txt_TariffPayAmount.text)
 							{
-								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","",CheckInHdrId,0,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -4915,7 +4916,7 @@
 							Txt_TariffPayAmount.text = LL.replace(",","");
 							if(Txt_TariffLoad.text == Txt_TariffPayAmount.text)
 							{
-								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","",CheckInHdrId,0,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -5007,7 +5008,7 @@
 							Txt_TariffPayAmount.text = LL.replace(",","");
 							if(Txt_TariffLoad.text == Txt_TariffPayAmount.text)
 							{
-								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","",CheckInHdrId,0,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -5120,7 +5121,7 @@
 							Txt_TariffPayAmount.text = LL.replace(",","");
 							if(Txt_TariffLoad.text == Txt_TariffPayAmount.text)
 							{
-								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","",CheckInHdrId,0,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -5198,7 +5199,7 @@
 							Txt_TariffPayAmount.text = LL.replace(",","");
 							if(Txt_TariffLoad.text == Txt_TariffPayAmount.text)
 							{
-								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","",CheckInHdrId,0,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -5271,7 +5272,7 @@
 							Txt_TariffPayAmount.text = LL.replace(",","");
 							if(Txt_TariffLoad.text == Txt_TariffPayAmount.text)
 							{
-								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","",CheckInHdrId,0,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -5364,7 +5365,7 @@
 							Txt_TariffPayAmount.text = LL.replace(",","");
 							if(Txt_TariffLoad.text == Txt_TariffPayAmount.text)
 							{
-								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","",CheckInHdrId,0,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -5481,7 +5482,7 @@
 							Txt_ServicePayAmount.text = LL.replace(",","");
 							if(Txt_ServiceLoad.text == Txt_ServicePayAmount.text)
 							{
-								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","",CheckInHdrId,0,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -5558,7 +5559,7 @@
 							Txt_ServicePayAmount.text = LL.replace(",","");
 							if(Txt_ServiceLoad.text == Txt_ServicePayAmount.text)
 							{
-								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","",CheckInHdrId,0,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -5625,7 +5626,7 @@
 							Txt_ServicePayAmount.text = LL.replace(",","");
 							if(Txt_ServiceLoad.text == Txt_ServicePayAmount.text)
 							{
-								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","",CheckInHdrId,0,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -5711,7 +5712,7 @@
 							Txt_ServicePayAmount.text = LL.replace(",","");
 							if(Txt_ServiceLoad.text == Txt_ServicePayAmount.text)
 							{
-								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","",CheckInHdrId,0,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -5823,7 +5824,7 @@
 							Txt_ServicePayAmount.text = LL.replace(",","");
 							if(Txt_ServiceLoad.text == Txt_ServicePayAmount.text)
 							{
-								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","",CheckInHdrId,0,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -5900,7 +5901,7 @@
 							Txt_ServicePayAmount.text = LL.replace(",","");
 							if(Txt_ServiceLoad.text == Txt_ServicePayAmount.text)
 							{
-								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","",CheckInHdrId,0,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -5967,7 +5968,7 @@
 							Txt_ServicePayAmount.text = LL.replace(",","");
 							if(Txt_ServiceLoad.text == Txt_ServicePayAmount.text)
 							{
-								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","",CheckInHdrId,0,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -6053,7 +6054,7 @@
 							Txt_ServicePayAmount.text = LL.replace(",","");
 							if(Txt_ServiceLoad.text == Txt_ServicePayAmount.text)
 							{
-								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","",CheckInHdrId,0,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -6161,8 +6162,8 @@
 							Txt_ConsolidatePayment.text = LC.replace(",","");
 							if(Txt_ConsolidateLoad.text == Txt_ConsolidatePayment.text)
 							{
-								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
-								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","",CheckInHdrId,0,0,0,0]);
 								
 							}
 							
@@ -6231,8 +6232,8 @@
 							Txt_ConsolidatePayment.text = LC.replace(",","");
 							if(Txt_ConsolidateLoad.text == Txt_ConsolidatePayment.text)
 							{
-								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
-								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","",CheckInHdrId,0,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -6299,8 +6300,8 @@
 							Txt_ConsolidatePayment.text = LC.replace(",","");
 							if(Txt_ConsolidateLoad.text == Txt_ConsolidatePayment.text)
 							{
-								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
-								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","",CheckInHdrId,0,0,0,0]);
 							}
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
 								([{
@@ -6414,8 +6415,8 @@
 							Txt_ConsolidatePayment.text = LC.replace(",","");
 							if(Txt_ConsolidateLoad.text == Txt_ConsolidatePayment.text)
 							{
-								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
-								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","",CheckInHdrId,0,0,0,0]);
 							}
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
 								([{
@@ -6518,8 +6519,8 @@
 							Txt_ConsolidatePayment.text = LC.replace(",","");
 							if(Txt_ConsolidateLoad.text == Txt_ConsolidatePayment.text)
 							{
-								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
-								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","",CheckInHdrId,0,0,0,0]);
 								
 							}
 							
@@ -6588,8 +6589,8 @@
 							Txt_ConsolidatePayment.text = LC.replace(",","");
 							if(Txt_ConsolidateLoad.text == Txt_ConsolidatePayment.text)
 							{
-								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
-								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","",CheckInHdrId,0,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -6656,8 +6657,8 @@
 							Txt_ConsolidatePayment.text = LC.replace(",","");
 							if(Txt_ConsolidateLoad.text == Txt_ConsolidatePayment.text)
 							{
-								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
-								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","",CheckInHdrId,0,0,0,0]);
 							}
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
 								([{
@@ -6771,8 +6772,8 @@
 							Txt_ConsolidatePayment.text = LC.replace(",","");
 							if(Txt_ConsolidateLoad.text == Txt_ConsolidatePayment.text)
 							{
-								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
-								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","",CheckInHdrId,0,0,0,0]);
 							}
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
 								([{
@@ -7335,11 +7336,11 @@
 				// TODO Auto-generated method stub
 				if(ddl_CashReceivedby.selectedItem.label=="Resident Managers")
 				{  
-					useWeb("ExternalCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','',0,0,PropertyId,0]);
+					useWeb("ExternalCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','','',0,0,PropertyId,0,0]);
 				}
 				if(ddl_CashReceivedby.selectedItem.label=="Assistant Resident Managers")
 				{  
-					useWeb("ExternalCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','',0,0,PropertyId,0]);
+					useWeb("ExternalCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','','',0,0,PropertyId,0,0]);
 				}
 			}
 			
@@ -7348,11 +7349,11 @@
 				// TODO Auto-generated method stub
 				if(ddl_ServiPayCashRecBy.selectedItem.label=="Resident Managers")
 				{  
-					useWeb("ExternalCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','',0,0,PropertyId,0]);
+					useWeb("ExternalCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','','',0,0,PropertyId,0,0]);
 				}
 				if(ddl_ServiPayCashRecBy.selectedItem.label=="Assistant Resident Managers")
 				{  
-					useWeb("ExternalCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','',0,0,PropertyId,0]);
+					useWeb("ExternalCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','','',0,0,PropertyId,0,0]);
 				}
 			}
 			
@@ -7361,11 +7362,11 @@
 				// TODO Auto-generated method stub
 				if(ddl_ConsoPayCashRecBy.selectedItem.label=="Resident Managers")
 				{  
-					useWeb("ExternalCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','',0,0,PropertyId,0]);
+					useWeb("ExternalCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','','',0,0,PropertyId,0,0]);
 				}
 				if(ddl_ConsoPayCashRecBy.selectedItem.label=="Assistant Resident Managers")
 				{  
-					useWeb("ExternalCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','',0,0,PropertyId,0]);
+					useWeb("ExternalCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','','',0,0,PropertyId,0,0]);
 				}
 			}
 			
@@ -7470,7 +7471,7 @@
 				}				
 				if(ImageFlage==true)
 				{					
-					useWeb("GuestCheckOut","ImageUpload_CUSTOM",[GlobalXml,'IMAGEUPLOAD',"http://sstage.in/BTC/"+resultsTxtField.text,"","",BTCSId,0,0,0,0,0]);
+					useWeb("ExternalCheckOut","ImageUpload_CUSTOM",[GlobalXml,'IMAGEUPLOAD',"http://sstage.in/BTC/"+resultsTxtField.text,"","",BTCSId,0,0,0]);
 				}
 			}
 			

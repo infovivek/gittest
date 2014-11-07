@@ -100,11 +100,11 @@ BEGIN
 			
 			SELECT  FirstName label,hd.Id UserId,0 as Id,rl.Roles UserType FROM dbo.WRBHBUser hd
 			  join WRBHBUserRoles rl on hd.Id=rl.UserId and rl.IsActive=1 and rl.IsDeleted=0
-			WHERE  hd.IsActive=1 AND hd.IsDeleted=0 AND  rl.Roles='Other Roles';
+			WHERE  hd.IsActive=1 AND hd.IsDeleted=0 AND  rl.Roles='Ops Head';
 			
 			SELECT  FirstName label,hd.Id UserId,0 as Id,rl.Roles UserType FROM dbo.WRBHBUser hd
 			  join WRBHBUserRoles rl on hd.Id=rl.UserId and rl.IsActive=1 and rl.IsDeleted=0 
-			WHERE   hd.IsActive=1 AND hd.IsDeleted=0 AND  rl.Roles='Sales';
+			WHERE   hd.IsActive=1 AND hd.IsDeleted=0 AND  rl.Roles='Finance';
 END 
 IF @PAction ='UserDelete'
 BEGIN
@@ -278,12 +278,12 @@ DECLARE @StateId BIGINT,@CityId BIGINT;
 		 SELECT U.FirstName label,P.UserId,P.UserType,0 Id FROM WRBHBPropertyUsers P
 		 LEFT OUTER JOIN WRBHBUser U WITH(NOLOCK)ON U.Id=P.UserId   
 		 WHERE P.IsDeleted=0 AND U.IsActive=1 AND U.IsDeleted=0 AND  
-		 P.PropertyId =@PropertyId AND P.UserType='Other Roles'  
+		 P.PropertyId =@PropertyId AND P.UserType='Ops Head'; 
 		   
 		 SELECT U.FirstName label,P.UserId,P.UserType,0 Id FROM WRBHBPropertyUsers P
 		 LEFT OUTER JOIN WRBHBUser U WITH(NOLOCK)ON U.Id=P.UserId   
 		 WHERE P.IsDeleted=0 AND U.IsActive=1 AND U.IsDeleted=0 AND  
-		 P.PropertyId =@PropertyId AND P.UserType='Sales'  
+		 P.PropertyId =@PropertyId AND P.UserType='Finance'  
 		   
 		 SELECT BlockDescription Description,BlockName Block,0 Id FROM dbo.WRBHBPropertyBlocks  
 		 WHERE PropertyId=@PropertyId AND IsDeleted=0  

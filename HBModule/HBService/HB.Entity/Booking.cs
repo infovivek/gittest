@@ -30,5 +30,6 @@ namespace HB.Entity
         public string Status { get; set; }
         public string AMPM { get; set; }
         public string BookingLevel { get; set; }
+        public string ExtraCCEmail { get; set; }
     }
 }

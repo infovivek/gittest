@@ -76,6 +76,7 @@ namespace HBReport
                 //string date = (now.ToString("yyyyMMddThhmmss"));
 
                 using (FileStream fs = File.Create(@"D:\Backend\flex_bin\TACInVoice\" + ds.Tables[0].Rows[0][0].ToString() + ".pdf"))
+            //    using (FileStream fs = File.Create(@"E:\Project\HBModule\HB\flex_bin\TACInVoice\" + ds.Tables[0].Rows[0][0].ToString() + ".pdf"))
                 {
                     fs.Write(mybytes, 0, mybytes.Length);
                 }
@@ -134,9 +135,8 @@ namespace HBReport
                                    " <p style=\"margin-top:10px;\">" +
                                    "<span>Hello, </span> " + " <br>" +
                                    " </p>" +
-                                   "<span>Please find attached the TAC Invoice " +"<B>"+ ds.Tables[0].Rows[0][8].ToString() +"</B>" +" with respect to our Guest Stay from  " + 
-                                   "<B>"+ ds.Tables[0].Rows[0][16].ToString()  +"</B>" + "  To  " +
-                                   "<B>"+ ds.Tables[0].Rows[0][5].ToString()+ "</B>"+"</span> " + " <br>" +
+                                   "<span>Kindly find attached Commission Invoice for the booking given to your property, for which payment is collected by you. " + 
+                                    " <br>" +
                                    " </p>" +
                                    "<br>"+
                                    //" <span style=\"color:#f54d02; font-weight:bold\">Invoice No                 : </span> " + ds.Tables[0].Rows[0][8].ToString() + "  <br>" +
@@ -180,7 +180,8 @@ namespace HBReport
 
 
                         //  message.Subject = "TAC InVoice ";
-                        message.Attachments.Add(new Attachment(@"D:\admonk\Backend\flex_bin\TACInVoice\" + ds.Tables[0].Rows[0][0].ToString() + ".pdf"));
+                        message.Attachments.Add(new Attachment(@"D:\Backend\flex_bin\TACInVoice\" + ds.Tables[0].Rows[0][0].ToString() + ".pdf"));
+                   //     message.Attachments.Add(new Attachment(@"E:\Project\HBModule\HB\flex_bin\TACInVoice\" + ds.Tables[0].Rows[0][0].ToString() + ".pdf"));
                         //string[] files = new string[20];
                         //System.Net.Mail.Attachment attachment;
                         //MailMessage mail = new MailMessage();
@@ -194,9 +195,12 @@ namespace HBReport
 
                         System.Net.Mail.SmtpClient smtp = new System.Net.Mail.SmtpClient();
                         smtp.EnableSsl = true;
-                        smtp.Host = "email-smtp.us-west-2.amazonaws.com";
+                      smtp.Host = "email-smtp.us-west-2.amazonaws.com"; 
+     //Local test       smtp.Host = "smtp.gmail.com"; 
+
                         smtp.Port = 587;
                         smtp.Credentials = new System.Net.NetworkCredential("AKIAIIVF5D5D3CJAX7SQ", "ApmuZkd+L8tissEga8kac3quhhwohEi5CB+dYD36KTq3");
+            //            smtp.Credentials = new System.Net.NetworkCredential("stay@staysimplyfied.com", "stay1234");
                         try
                         {
                             smtp.Send(message);

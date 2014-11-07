@@ -10,10 +10,6 @@ namespace HB.BO
 {
     public class ClientColumnBO
     {
-        //public DataSet Save(string Hdrval, User user)
-        //{
-        //    return new ClientColumnDAO().Save(Hdrval, user);
-        //}
         public DataSet Help(string[] data, User user)
         {
             return new ClientColumnDAO().Help(data, user);

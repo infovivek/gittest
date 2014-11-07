@@ -1,18 +1,17 @@
 
+GO
+/****** Object:  StoredProcedure [dbo].[Sp_CheckoutIntermediate_Help]    Script Date: 11/07/2014 10:44:15 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-IF EXISTS (SELECT * FROM DBO.SYSOBJECTS WHERE ID = OBJECT_ID(N'[dbo].[Sp_CheckoutIntermediate_Help]') AND OBJECTPROPERTY(ID, N'ISPROCEDURE') = 1)
-DROP PROCEDURE [dbo].[Sp_CheckoutIntermediate_Help]
-GO 
 -- ===============================================================================
 -- Author: Anbu
 -- Create date:08-05-2014
 -- ModifiedBy :          , ModifiedDate: 
 -- Description:	Check Out
 -- =================================================================================
-CREATE PROCEDURE [dbo].[Sp_CheckoutIntermediate_Help]
+ALTER PROCEDURE [dbo].[Sp_CheckoutIntermediate_Help]
 (@Action NVARCHAR(100)=NULL,
 @Str1 NVARCHAR(100)=NULL,
 @BillFrom NVARCHAR(100),
@@ -123,9 +122,9 @@ BEGIN
 		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
 		PropertyType = 'Internal Property' and  
 		PropertyId = @PropertyId and  
-		isnull(d.RoomShiftingFlag,0)=0 and
-		CONVERT(date,d.ChkOutDt,103) between CONVERT(date,d.ChkInDt,103) AND 
-		CONVERT(date,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) and
+		isnull(d.RoomShiftingFlag,0)=0 and d.CurrentStatus = 'CheckIn' and
+		--CONVERT(date,d.ChkOutDt,103) between CONVERT(date,d.ChkInDt,103) AND 
+		--CONVERT(date,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) and
 		h.Id NOT IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where IsActive = 1 and IsDeleted = 0 
 		and ISNULL(IntermediateFlag,0)=0)
 		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
@@ -142,9 +141,9 @@ BEGIN
 		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
 		PropertyType = 'Internal Property' and  
 		PropertyId = @PropertyId and  
-		
-		CONVERT(date,d.ChkOutDt,103) between CONVERT(date,d.ChkInDt,103) AND 
-		CONVERT(date,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) and
+		 d.CurrentStatus = 'CheckIn' and
+		--CONVERT(date,d.ChkOutDt,103) between CONVERT(date,d.ChkInDt,103) AND 
+		--CONVERT(date,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) and
 		h.Id NOT IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where IsActive = 1 and IsDeleted = 0)
 		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
 		h.BookingId,h.BedId,h.Type,h.BookingCode ,h.ChkInGuest,h.NewCheckInDate,d.ChkOutDt
@@ -160,9 +159,9 @@ BEGIN
 		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
 		PropertyType = 'Internal Property' and  
 		PropertyId = @PropertyId and  
-		
-		CONVERT(date,d.ChkOutDt,103) between CONVERT(date,d.ChkInDt,103) AND 
-		CONVERT(date,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) and
+		d.CurrentStatus = 'CheckIn' and
+		--CONVERT(date,d.ChkOutDt,103) between CONVERT(date,d.ChkInDt,103) AND 
+		--CONVERT(date,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) and
 		h.Id NOT IN (Select ChkInHdrId FROM WRBHBChechkOutHdr where IsActive = 1 and IsDeleted = 0)
 		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
 		h.BookingId,h.BedId,h.Type,h.BookingCode ,h.ChkInGuest,h.NewCheckInDate,d.ChkOutDt
@@ -180,11 +179,11 @@ BEGIN
 		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
 		PropertyType = 'Internal Property' and  
 		PropertyId = @PropertyId and  
-		isnull(d.RoomShiftingFlag,0)=0 and
-		CONVERT(date,d.ChkOutDt,103) between CONVERT(date,d.ChkInDt,103) AND 
-		CONVERT(date,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) and   
+		isnull(d.RoomShiftingFlag,0)=0 and --d.CurrentStatus = 'CheckIn' and
+		--CONVERT(date,d.ChkOutDt,103) between CONVERT(date,d.ChkInDt,103) AND 
+		--CONVERT(date,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) and   
 		h.Id  IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where isnull(Flag,0) = 0 and  
-		IsActive = 1 and IsDeleted = 0 )
+		IsActive = 1 and IsDeleted = 0 and Status = 'UnSettled')
 		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
 		h.BookingId,h.BedId,h.Type,h.BookingCode ,h.ChkInGuest,h.NewCheckInDate,d.ChkOutDt
 		
@@ -202,11 +201,11 @@ BEGIN
 		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
 		PropertyType = 'Internal Property' and  
 		PropertyId = @PropertyId and  
-		
-		CONVERT(date,d.ChkOutDt,103) between CONVERT(date,d.ChkInDt,103) AND 
-		CONVERT(date,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) and   
+		--d.CurrentStatus = 'CheckIn' and
+		--CONVERT(date,d.ChkOutDt,103) between CONVERT(date,d.ChkInDt,103) AND 
+		--CONVERT(date,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) and   
 		h.Id  IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where isnull(Flag,0) = 0 and  
-		IsActive = 1 and IsDeleted = 0 )
+		IsActive = 1 and IsDeleted = 0 and Status = 'UnSettled' )
 		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
 		h.BookingId,h.BedId,h.Type,h.BookingCode ,h.ChkInGuest,h.NewCheckInDate,d.ChkOutDt
 		
@@ -222,11 +221,11 @@ BEGIN
 		h.GuestId = d.GuestId and d.IsActive=1 and d.IsDeleted=0
 		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
 		PropertyType = 'Internal Property' and  
-		PropertyId = @PropertyId and  
-		CONVERT(date,d.ChkOutDt,103) between CONVERT(date,d.ChkInDt,103) AND 
-		CONVERT(date,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) and   
+		PropertyId = @PropertyId and -- d.CurrentStatus = 'CheckIn' and
+		--CONVERT(date,d.ChkOutDt,103) between CONVERT(date,d.ChkInDt,103) AND 
+		--CONVERT(date,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) and   
 		h.Id  IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where isnull(Flag,0) = 0 and  
-		IsActive = 1 and IsDeleted = 0 )
+		IsActive = 1 and IsDeleted = 0 and Status = 'UnSettled')
 		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
 		h.BookingId,h.BedId,h.Type,h.BookingCode,h.ChkInGuest,h.NewCheckInDate,d.ChkOutDt
 		
@@ -243,10 +242,10 @@ BEGIN
 		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
 		PropertyType = 'Internal Property' and  
 		PropertyId = @PropertyId and  
-		isnull(d.RoomShiftingFlag,0)=0 and
-		CONVERT(date,d.ChkOutDt,103) between CONVERT(date,d.ChkInDt,103) AND 
-		CONVERT(date,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) and   
-		h.Id  IN (Select Id FRom WRBHBChechkOutHdr where isnull(IntermediateFlag,0) = 1 and  
+		isnull(d.RoomShiftingFlag,0)=0 and --d.CurrentStatus = 'CheckIn' and
+		--CONVERT(date,d.ChkOutDt,103) between CONVERT(date,d.ChkInDt,103) AND 
+		--CONVERT(date,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) and   
+		h.Id  IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where isnull(IntermediateFlag,0) = 1 and  
 		IsActive = 0 and IsDeleted = 0 )
 		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
 		h.BookingId,h.BedId,h.Type,h.BookingCode ,h.ChkInGuest	,h.NewCheckInDate,d.ChkOutDt
@@ -265,10 +264,10 @@ BEGIN
 		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
 		PropertyType = 'Internal Property' and  
 		PropertyId = @PropertyId and  
-		
-		CONVERT(date,d.ChkOutDt,103) between CONVERT(date,d.ChkInDt,103) AND 
-		CONVERT(date,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) and   
-		h.Id  IN (Select Id FRom WRBHBChechkOutHdr where isnull(IntermediateFlag,0) = 1 and  
+		--d.CurrentStatus = 'CheckIn' and
+		--CONVERT(date,d.ChkOutDt,103) between CONVERT(date,d.ChkInDt,103) AND 
+		--CONVERT(date,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) and   
+		h.Id  IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where isnull(IntermediateFlag,0) = 1 and  
 		IsActive = 0 and IsDeleted = 0 )
 		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
 		h.BookingId,h.BedId,h.Type,h.BookingCode ,h.ChkInGuest	,h.NewCheckInDate,d.ChkOutDt
@@ -285,10 +284,10 @@ BEGIN
 		h.GuestId = d.GuestId and d.IsActive=1 and d.IsDeleted=0
 		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
 		PropertyType = 'Internal Property' and  
-		PropertyId = @PropertyId and  
-		CONVERT(date,d.ChkOutDt,103) between CONVERT(date,d.ChkInDt,103) AND 
-		CONVERT(date,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) and   
-		h.Id  IN (Select Id FRom WRBHBChechkOutHdr where isnull(IntermediateFlag,0) = 1 and  
+		PropertyId = @PropertyId and -- d.CurrentStatus = 'CheckIn' and
+		--CONVERT(date,d.ChkOutDt,103) between CONVERT(date,d.ChkInDt,103) AND 
+		--CONVERT(date,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) and   
+		h.Id  IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where isnull(IntermediateFlag,0) = 1 and  
 		IsActive = 0 and IsDeleted = 0 )
 		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
 		h.BookingId,h.BedId,h.Type,h.BookingCode,h.ChkInGuest,h.NewCheckInDate,d.ChkOutDt
@@ -331,31 +330,45 @@ BEGIN
 If @BookingLevel = 'Room'   
 	BEGIN  
 		INSERT INTO #LEVEL(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode)  
-		select CONVERT(nvarchar(100),min(ChkInDt),103),CONVERT(nvarchar(100),max(ChkOutDt),103) , 
+		--select top 1 CONVERT(nvarchar(100),min(ChkInDt),103),CONVERT(nvarchar(100),max(ChkOutDt),103) , 
+		--TariffPaymentMode,ServicePaymentMode  
+		--from WRBHBBookingPropertyAssingedGuest  
+		--where GuestId = 29544 and BookingId = 4976 
+		--group by TariffPaymentMode,ServicePaymentMode  
+		--and IsDeleted=0 and IsActive=1 
+		select top 1 CONVERT(nvarchar(100),(ChkInDt),103),CONVERT(nvarchar(100),(ChkOutDt),103) , 
 		TariffPaymentMode,ServicePaymentMode  
 		from WRBHBBookingPropertyAssingedGuest  
 		where GuestId = @GuestId and BookingId = @BookingId 
-		group by TariffPaymentMode,ServicePaymentMode  
+		--group by TariffPaymentMode,ServicePaymentMode  ,ChkInDt,ChkOutDt
+		order by Id desc
 		--and IsDeleted=0 and IsActive=1 
+		
 	END  
 If @BookingLevel = 'Bed'  
 	BEGIN  
 		INSERT INTO #LEVEL(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode )  
-		select CONVERT(nvarchar(100),min(ChkInDt),103),CONVERT(nvarchar(100),max(ChkOutDt),103),
+		--select CONVERT(nvarchar(100),min(ChkInDt),103),CONVERT(nvarchar(100),max(ChkOutDt),103),
+		--TariffPaymentMode,ServicePaymentMode     
+		--from WRBHBBedBookingPropertyAssingedGuest  
+		--where GuestId = @GuestId and BookingId = @BookingId  
+		--group by TariffPaymentMode,ServicePaymentMode  
+		--and IsDeleted=0 and IsActive=1 
+		select CONVERT(nvarchar(100),(ChkInDt),103),CONVERT(nvarchar(100),(ChkOutDt),103),
 		TariffPaymentMode,ServicePaymentMode     
 		from WRBHBBedBookingPropertyAssingedGuest  
 		where GuestId = @GuestId and BookingId = @BookingId  
-		group by TariffPaymentMode,ServicePaymentMode  
-		--and IsDeleted=0 and IsActive=1 
+		order by Id desc
 	END   
 If @BookingLevel = 'Apartment'  
 	BEGIN  
 		INSERT INTO #LEVEL(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode  )  
-		select CONVERT(nvarchar(100),min(ChkInDt),103),CONVERT(nvarchar(100),max(ChkOutDt),103)  ,
+		select CONVERT(nvarchar(100),(ChkInDt),103),CONVERT(nvarchar(100),(ChkOutDt),103)  ,
 		TariffPaymentMode,ServicePaymentMode   
 		from WRBHBApartmentBookingPropertyAssingedGuest  
 		where GuestId = @GuestId and BookingId = @BookingId 
-		group by TariffPaymentMode,ServicePaymentMode  
+		order by Id desc
+		--group by TariffPaymentMode,ServicePaymentMode  
 		--and IsDeleted=0 and IsActive=1  
 	END   
 		DECLARE @ChkInDate nvarchar(100),@ChkOutDate nvarchar(100);  
@@ -922,7 +935,7 @@ If @BookingLevel = 'Apartment'
 		AND RackTariffFlag=0  
 
 		INSERT INTO #FINAL(TARIFF,LuxuryTax,ServiceTax,LT,ST)  
-		SELECT SUM(TARIFF),(SUM(TARIFF)+@ExtraMatters)*LT/100,SUM((TARIFF*ST)/100),LT,ST FROM   
+		SELECT SUM(TARIFF),(SUM(TARIFF)+@ExtraMatters)*LT/100,(SUM(TARIFF)+@ExtraMatters)*ST/100,LT,ST FROM   
 		#FINALLuxury  
 		GROUP BY TARIFF,LuxuryTax,ServiceTax,LT,ST  
 		  

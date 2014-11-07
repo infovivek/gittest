@@ -108,6 +108,8 @@ BEGIN
 		PropertyId INT,RoomId INT,ApartmentId INT,BookingId INT,BedId INT,Type NVARCHAR(100),Flag int,
 		BookingCode nvarchar(100),ChkInDT nvarchar(100),ChkOutDT nvarchar(100))  
 		
+		
+		
 		INSERT INTO #GUEST(GuestName,GuestId,StateId,CheckInHdrId,PropertyId,RoomId,ApartmentId,  
 		BookingId,BedId,Type,Flag,BookingCode,ChkInDT,ChkOutDT)  
 
@@ -119,10 +121,10 @@ BEGIN
 		d.IsActive=1 and d.IsDeleted=0
 		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
 		h.PropertyType in ('External Property' , 'Managed G H') and  
-		h.PropertyId = 590 and  
+		h.PropertyId = @PropertyId and   d.CurrentStatus = 'CheckIn' and 
 		-- CONVERT(nvarchar(100),ChkoutDate,103) = CONVERT(nvarchar(100),GETDATE(),103) and  
 		h.Id  IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where IsActive = 1 and IsDeleted = 0 
-		and ISNULL(IntermediateFlag,0)=1 and ISNULL(Flag,0)=1  )  and
+		and ISNULL(IntermediateFlag,0)=1 and ISNULL(Flag,0)=1  )  OR
 		h.Id   in (Select ChkInHdrId FRom WRBHBExternalChechkOutTAC where IsActive = 1 and IsDeleted = 0 
 		and ISNULL(IntermediateFlag,0)=1 and ISNULL(Flag,0)=1)
 		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
@@ -139,7 +141,7 @@ BEGIN
 		d.IsActive=1 and d.IsDeleted=0
 		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
 		h.PropertyType in ('External Property' , 'Managed G H') and  
-		h.PropertyId = @PropertyId and  
+		h.PropertyId = @PropertyId and   d.CurrentStatus = 'CheckIn' and 
 		-- CONVERT(nvarchar(100),ChkoutDate,103) = CONVERT(nvarchar(100),GETDATE(),103) and  
 		h.Id NOT IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where IsActive = 1 and IsDeleted = 0  )  and
 		h.Id not in (Select ChkInHdrId FRom WRBHBExternalChechkOutTAC where IsActive = 1 and IsDeleted = 0)
@@ -157,7 +159,7 @@ BEGIN
 		d.IsActive=1 and d.IsDeleted=0
 		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
 		h.PropertyType in ('External Property','Managed G H') and  
-		h.PropertyId = @PropertyId and  
+		h.PropertyId = @PropertyId and   d.CurrentStatus = 'CheckIn' and 
 		-- CONVERT(nvarchar(100),ChkoutDate,103) = CONVERT(nvarchar(100),GETDATE(),103) and  
 		h.Id  IN (Select ChkInHdrId FROM WRBHBChechkOutHdr where isnull(Flag,0) = 0 and  
 		IsActive = 1 and IsDeleted = 0 ) 
@@ -178,35 +180,34 @@ BEGIN
 		d.IsActive=1 and d.IsDeleted=0
 		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
 		h.PropertyType in ('External Property','Managed G H') and  
-		h.PropertyId = @PropertyId and  
+		h.PropertyId = @PropertyId and   d.CurrentStatus = 'CheckIn' and 
 		-- CONVERT(nvarchar(100),ChkoutDate,103) = CONVERT(nvarchar(100),GETDATE(),103) and  
-		h.Id  IN (Select Id FROM WRBHBChechkOutHdr where isnull(IntermediateFlag,0) = 1 and  
-		IsActive = 0 and IsDeleted = 0 ) 
-		
-		and h.Id  not IN (Select Id FRom WRBHBExternalChechkOutTAC where isnull(IntermediateFlag,0) = 1 and  
-		IsActive = 0 and IsDeleted = 0 ) 
+		h.Id  IN (Select ChkInHdrId FROM WRBHBChechkOutHdr where isnull(IntermediateFlag,0) = 1 and  
+		IsActive = 1 and IsDeleted = 0 and Isnull(Flag,0)=0 ) 
+		and h.Id  not IN (Select ChkInHdrId FRom WRBHBExternalChechkOutTAC where isnull(IntermediateFlag,0) = 1 and  
+		IsActive = 1 and IsDeleted = 0 and Isnull(Flag,0)=0 ) 
 		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
 		h.BookingId,h.BedId,h.Type,h.BookingCode ,h.ChkInGuest,h.NewCheckInDate,d.ChkOutDt
 
-		INSERT INTO #GUEST(GuestName,GuestId,StateId,CheckInHdrId,PropertyId,RoomId,ApartmentId,  
-		BookingId,BedId,Type,Flag,BookingCode,ChkInDT,ChkOutDT)  
+		--INSERT INTO #GUEST(GuestName,GuestId,StateId,CheckInHdrId,PropertyId,RoomId,ApartmentId,  
+		--BookingId,BedId,Type,Flag,BookingCode,ChkInDT,ChkOutDT)  
 
-		SELECT  h.ChkInGuest,h.GuestId,h.StateId,h.Id AS CheckInHdrId,h.PropertyId,h.RoomId,h.ApartmentId,  
-		h.BookingId,h.BedId,h.Type as Level,0 as Flag,h.BookingCode,h.NewCheckInDate,d.ChkOutDt 
-		From WRBHBCheckInHdr  h
-		join WRBHBBookingPropertyAssingedGuest d on h.Id = d.CheckInHdrId and
-		h.BookingId = d.BookingId and h.GuestId = d.GuestId and
-		d.IsActive=1 and d.IsDeleted=0
-		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
-		h.PropertyType in ('External Property' , 'Managed G H') and  
-		h.PropertyId = 590 and  
-		-- CONVERT(nvarchar(100),ChkoutDate,103) = CONVERT(nvarchar(100),GETDATE(),103) and  
-		h.Id  IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where IsActive = 1 and IsDeleted = 0
-		and ISNULL(IntermediateFlag,0)=1  )  and
-		h.Id not in (Select ChkInHdrId FRom WRBHBExternalChechkOutTAC where IsActive = 1 and IsDeleted = 0
-		and ISNULL(IntermediateFlag,0)=1)
-		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
-		h.BookingId,h.BedId,h.Type,h.BookingCode ,h.ChkInGuest,h.NewCheckInDate,d.ChkOutDt
+		--SELECT  h.ChkInGuest,h.GuestId,h.StateId,h.Id AS CheckInHdrId,h.PropertyId,h.RoomId,h.ApartmentId,  
+		--h.BookingId,h.BedId,h.Type as Level,0 as Flag,h.BookingCode,h.NewCheckInDate,d.ChkOutDt 
+		--From WRBHBCheckInHdr  h
+		--join WRBHBBookingPropertyAssingedGuest d on h.Id = d.CheckInHdrId and
+		--h.BookingId = d.BookingId and h.GuestId = d.GuestId and
+		--d.IsActive=1 and d.IsDeleted=0
+		--WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
+		--h.PropertyType in ('External Property' , 'Managed G H') and  
+		--h.PropertyId = 1334 and  
+		---- CONVERT(nvarchar(100),ChkoutDate,103) = CONVERT(nvarchar(100),GETDATE(),103) and  
+		--h.Id  IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where IsActive = 1 and IsDeleted = 0
+		--and ISNULL(IntermediateFlag,0)=1  )  and
+		--h.Id not in (Select ChkInHdrId FRom WRBHBExternalChechkOutTAC where IsActive = 1 and IsDeleted = 0
+		--and ISNULL(IntermediateFlag,0)=1)
+		--group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
+		--h.BookingId,h.BedId,h.Type,h.BookingCode ,h.ChkInGuest,h.NewCheckInDate,d.ChkOutDt
 		
 		SELECT  GuestName,GuestId,StateId, CheckInHdrId,PropertyId,RoomId,ApartmentId,  
 		BookingId,BedId,Type as Level,BookingCode ,ChkInDT as CheckInDate,ChkOutDT as CheckOutDate 
@@ -1497,6 +1498,10 @@ IF @Action='ConUpdate'
 	   WHERE CheckOutHdrId = (SELECT Id  FROM WRBHBChechkOutHdr WHERE ChkInHdrId=@CheckInHdrId)  
   END 
 		
-
+IF @Action='IMAGEUPLOAD'  
+  BEGIN 
+		UPDATE WRBHBChechkOutPaymentCompanyInvoice SET FileLoad=@Str1 
+		WHERE Id=@CheckInHdrId ---CompanyInvoice Id IS IN @CheckInHdrId
+  END 
 
 

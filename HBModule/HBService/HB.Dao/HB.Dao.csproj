@@ -153,6 +153,7 @@
     <Compile Include="PCExpenseApprovalDAO.cs" />
     <Compile Include="PCHistroryDAO.cs" />
     <Compile Include="PendingCkinReportDao.cs" />
+    <Compile Include="PendingUnsettledDao.cs" />
     <Compile Include="PettyCashApprovalDtlDAO.cs" />
     <Compile Include="PettyCashDAO.cs" />
     <Compile Include="PettyCashApprovalHdrDAO.cs" />

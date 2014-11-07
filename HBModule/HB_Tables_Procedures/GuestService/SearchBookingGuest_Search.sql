@@ -75,8 +75,9 @@ SET ANSI_WARNINGS OFF
 			PAG.TariffPaymentMode,PAG.Tariff,DATEDIFF(DAY,PAG.ChkInDt,PAG.ChkOutDt),B.BookingLevel,
 			BP.PropertyType
 			FROM WRBHBBooking B			
-			JOIN WRBHBBookingPropertyAssingedGuest PAG ON B.Id = PAG.BookingId
+			JOIN WRBHBBookingPropertyAssingedGuest PAG ON B.Id = PAG.BookingId AND PAG.IsActive=1 AND PAG.IsDeleted=0 
 			JOIN WRBHBBookingProperty BP ON B.Id=BP.BookingId	AND PAG.BookingPropertyTableId=BP.Id	
+			AND BP.IsActive=1 AND BP.IsDeleted=0
 			LEFT OUTER JOIN WRBHBProperty P ON PAG.BookingPropertyId=P.Id			
 			WHERE   B.IsActive=1 AND B.IsDeleted=0			
 			GROUP BY B.BookingCode,PAG.Occupancy,

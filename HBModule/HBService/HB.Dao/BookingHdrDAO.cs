@@ -49,18 +49,18 @@ namespace HB.Dao
             Book.Status = document.SelectSingleNode("HdrXml").Attributes["Status"].Value;
             Book.AMPM = document.SelectSingleNode("HdrXml").Attributes["AMPM"].Value;
             Book.BookingLevel = document.SelectSingleNode("HdrXml").Attributes["BookingLevel"].Value;
+            Book.ExtraCCEmail = document.SelectSingleNode("HdrXml").Attributes["ExtraCCEmail"].Value;
             if (Book.Id != 0)
             {
                 command.CommandText = StoredProcedures.Booking_Update;
                 command.Parameters.Add("@Id", SqlDbType.BigInt).Value = Book.Id;
-
+                command.Parameters.Add("@ExtraCCEmail", SqlDbType.NVarChar).Value = Book.ExtraCCEmail;
                 UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
              "', SctId:" + user.SctId + ", Service : BookingHdrDAO : Update, " + ", ProcName:'" + StoredProcedures.Booking_Update; 
             }
             else
             {
                 command.CommandText = StoredProcedures.Booking_Insert;
-
                 UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
              "', SctId:" + user.SctId + ", Service : BookingHdrDAO : Insert, " + ", ProcName:'" + StoredProcedures.Booking_Insert; 
             }

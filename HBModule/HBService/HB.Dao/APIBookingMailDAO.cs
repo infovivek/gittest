@@ -42,7 +42,7 @@ namespace HB.Dao
                 //message.To.Add(new System.Net.Mail.MailAddress("vivek@warblerit.com"));
                 //message.Subject = "MMT Testing Booking Confirmation - " + ds.Tables[2].Rows[0][0].ToString();
                 message.To.Add(new System.Net.Mail.MailAddress("booking_confirmation@staysimplyfied.com"));
-                if (ds.Tables[2].Rows[0][6].ToString() == "0")
+                /*if (ds.Tables[2].Rows[0][6].ToString() == "0")
                 {
                     if (ds.Tables[2].Rows[0][7].ToString() != "")
                     {
@@ -50,7 +50,7 @@ namespace HB.Dao
                     }
                 }
                 else
-                {
+                {*/
                     for (int i = 0; i < ds.Tables[3].Rows.Count; i++)
                     {
                         if (ds.Tables[3].Rows[i][0].ToString() != "")
@@ -62,7 +62,21 @@ namespace HB.Dao
                     {
                         message.CC.Add(new System.Net.Mail.MailAddress(ds.Tables[2].Rows[0][7].ToString()));
                     }
-                }
+                //}
+                    // Extra CC email from Front end
+                    if (ds.Tables[2].Rows[0][9].ToString() != "")
+                    {
+                        string ExtraCC = ds.Tables[2].Rows[0][9].ToString();
+                        var ExtraCCEmail = ExtraCC.Split(',');
+                        int cnt = ExtraCCEmail.Length;
+                        for (int i = 0; i < cnt; i++)
+                        {
+                            if (ExtraCCEmail[i].ToString() != "")
+                            {
+                                message.CC.Add(new System.Net.Mail.MailAddress(ExtraCCEmail[i].ToString()));
+                            }
+                        }
+                    }
                 if (ds.Tables[2].Rows[0][4].ToString() != "")
                 {
                     message.Bcc.Add(new System.Net.Mail.MailAddress(ds.Tables[2].Rows[0][4].ToString()));

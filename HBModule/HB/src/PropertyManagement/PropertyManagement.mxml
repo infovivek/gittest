@@ -4591,7 +4591,7 @@
 					  click="Btn_Lst1Single_clickHandler('Lst_SCSAL','Lst_DSSAL')"/>
 			<s:Button id="Btn_delAllSAL" x="285" y="453.5" width="50" height="21" label="&lt;&lt;"
 					  click="Btn_Lst1All_clickHandler('Lst_SCSAL','Lst_DSSAL')"/>
-			<mx:Label x="5" y="405.5" width="127" height="35" text="Sales"/>
+			<mx:Label x="5" y="405.5" width="127" height="35" text="Finance"/>
 			<s:Button id="Btn_addOR" x="285" y="206.5" width="50" height="21" label=">"
 					  click="Btn_LstSingle_clickHandler('Lst_SCOR','Lst_DSOR')"/>
 			<s:Button id="Btn_addAllOR" x="285" y="237.5" width="50" height="21" label=">>"
@@ -4600,7 +4600,7 @@
 					  click="Btn_Lst1Single_clickHandler('Lst_SCOR','Lst_DSOR')"/>
 			<s:Button id="Btn_delAllOR" x="285" y="299.5" width="50" height="21" label="&lt;&lt;"
 					  click="Btn_Lst1All_clickHandler('Lst_SCOR','Lst_DSOR')"/>
-			<mx:Label x="5" y="255.5" width="127" height="35" text="Other Roles"/>
+			<mx:Label x="5" y="255.5" width="127" height="35" text="OPS Head"/>
 			<s:Button id="Btn_addPM" x="285" y="49.5" width="50" height="21" label=">"
 					  click="Btn_LstSingle_clickHandler('Lst_SCPM','Lst_DSPM')"/>
 			<s:Button id="Btn_addAllPM" x="285" y="79.5" width="50" height="21" label=">>"

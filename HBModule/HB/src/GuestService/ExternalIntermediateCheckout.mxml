@@ -4881,7 +4881,7 @@
 				
 				
 				//useWeb("GuestCheckOut","SettleLoad_CUSTOM",[GlobalXml,"Print","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
-				useWeb("ExterIntermediateChkoutService","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0,0]);
+				useWeb("ExterIntermediateChkoutService","SettleLoad_CUSTOM",[GlobalXml,"Print","","","",PrintChkOutId,StateId,CheckInHdrId,0]);
 				//	useWeb("ExternalCheckOut","Guest_CUSTOM",[GlobalXml,"CHKINROOMDETAILS","",CheckInHdrId,StateId,0,0,0]);
 				
 			}
@@ -5510,7 +5510,7 @@
 							Txt_TariffPayAmount.text = LL.replace(",","");
 							if(Txt_TariffLoad.text == Txt_TariffPayAmount.text)
 							{
-								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExterIntermediateChkoutService","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","","",CheckInHdrId,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -5588,7 +5588,7 @@
 							Txt_TariffPayAmount.text = LL.replace(",","");
 							if(Txt_TariffLoad.text == Txt_TariffPayAmount.text)
 							{
-								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExterIntermediateChkoutService","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","","",CheckInHdrId,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -5660,7 +5660,7 @@
 							Txt_TariffPayAmount.text = LL.replace(",","");
 							if(Txt_TariffLoad.text == Txt_TariffPayAmount.text)
 							{
-								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExterIntermediateChkoutService","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","","",CheckInHdrId,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -5752,7 +5752,7 @@
 							Txt_TariffPayAmount.text = LL.replace(",","");
 							if(Txt_TariffLoad.text == Txt_TariffPayAmount.text)
 							{
-								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExterIntermediateChkoutService","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","","",CheckInHdrId,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -5865,7 +5865,7 @@
 							Txt_TariffPayAmount.text = LL.replace(",","");
 							if(Txt_TariffLoad.text == Txt_TariffPayAmount.text)
 							{
-								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExterIntermediateChkoutService","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","","",CheckInHdrId,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -5943,7 +5943,7 @@
 							Txt_TariffPayAmount.text = LL.replace(",","");
 							if(Txt_TariffLoad.text == Txt_TariffPayAmount.text)
 							{
-								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExterIntermediateChkoutService","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","","",CheckInHdrId,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -6016,7 +6016,7 @@
 							Txt_TariffPayAmount.text = LL.replace(",","");
 							if(Txt_TariffLoad.text == Txt_TariffPayAmount.text)
 							{
-								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExterIntermediateChkoutService","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","","",CheckInHdrId,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -6109,7 +6109,7 @@
 							Txt_TariffPayAmount.text = LL.replace(",","");
 							if(Txt_TariffLoad.text == Txt_TariffPayAmount.text)
 							{
-								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExterIntermediateChkoutService","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","","",CheckInHdrId,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -6226,7 +6226,7 @@
 							Txt_ServicePayAmount.text = LL.replace(",","");
 							if(Txt_ServiceLoad.text == Txt_ServicePayAmount.text)
 							{
-								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExterIntermediateChkoutService","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","","",CheckInHdrId,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -6303,7 +6303,7 @@
 							Txt_ServicePayAmount.text = LL.replace(",","");
 							if(Txt_ServiceLoad.text == Txt_ServicePayAmount.text)
 							{
-								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExterIntermediateChkoutService","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","","",CheckInHdrId,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -6370,7 +6370,7 @@
 							Txt_ServicePayAmount.text = LL.replace(",","");
 							if(Txt_ServiceLoad.text == Txt_ServicePayAmount.text)
 							{
-								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExterIntermediateChkoutService","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","","",CheckInHdrId,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -6456,7 +6456,7 @@
 							Txt_ServicePayAmount.text = LL.replace(",","");
 							if(Txt_ServiceLoad.text == Txt_ServicePayAmount.text)
 							{
-								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExterIntermediateChkoutService","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","","",CheckInHdrId,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -6568,7 +6568,7 @@
 							Txt_ServicePayAmount.text = LL.replace(",","");
 							if(Txt_ServiceLoad.text == Txt_ServicePayAmount.text)
 							{
-								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExterIntermediateChkoutService","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","","",CheckInHdrId,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -6645,7 +6645,7 @@
 							Txt_ServicePayAmount.text = LL.replace(",","");
 							if(Txt_ServiceLoad.text == Txt_ServicePayAmount.text)
 							{
-								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExterIntermediateChkoutService","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","","",CheckInHdrId,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -6712,7 +6712,7 @@
 							Txt_ServicePayAmount.text = LL.replace(",","");
 							if(Txt_ServiceLoad.text == Txt_ServicePayAmount.text)
 							{
-								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExterIntermediateChkoutService","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","","",CheckInHdrId,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -6798,7 +6798,7 @@
 							Txt_ServicePayAmount.text = LL.replace(",","");
 							if(Txt_ServiceLoad.text == Txt_ServicePayAmount.text)
 							{
-								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExterIntermediateChkoutService","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","","",CheckInHdrId,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -6906,8 +6906,8 @@
 							Txt_ConsolidatePayment.text = LC.replace(",","");
 							if(Txt_ConsolidateLoad.text == Txt_ConsolidatePayment.text)
 							{
-								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
-								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExterIntermediateChkoutService","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","","",CheckInHdrId,0,0,0]);
+								useWeb("ExterIntermediateChkoutService","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","","",CheckInHdrId,0,0,0]);
 								
 							}
 							
@@ -6976,8 +6976,8 @@
 							Txt_ConsolidatePayment.text = LC.replace(",","");
 							if(Txt_ConsolidateLoad.text == Txt_ConsolidatePayment.text)
 							{
-								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
-								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExterIntermediateChkoutService","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","","",CheckInHdrId,0,0,0]);
+								useWeb("ExterIntermediateChkoutService","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","","",CheckInHdrId,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -7044,8 +7044,8 @@
 							Txt_ConsolidatePayment.text = LC.replace(",","");
 							if(Txt_ConsolidateLoad.text == Txt_ConsolidatePayment.text)
 							{
-								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
-								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExterIntermediateChkoutService","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","","",CheckInHdrId,0,0,0]);
+								useWeb("ExterIntermediateChkoutService","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","","",CheckInHdrId,0,0,0]);
 							}
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
 								([{
@@ -7159,8 +7159,8 @@
 							Txt_ConsolidatePayment.text = LC.replace(",","");
 							if(Txt_ConsolidateLoad.text == Txt_ConsolidatePayment.text)
 							{
-								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
-								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExterIntermediateChkoutService","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","","",CheckInHdrId,0,0,0]);
+								useWeb("ExterIntermediateChkoutService","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","","",CheckInHdrId,0,0,0]);
 							}
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
 								([{
@@ -7263,8 +7263,8 @@
 							Txt_ConsolidatePayment.text = LC.replace(",","");
 							if(Txt_ConsolidateLoad.text == Txt_ConsolidatePayment.text)
 							{
-								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
-								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExterIntermediateChkoutService","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","","",CheckInHdrId,0,0,0]);
+								useWeb("ExterIntermediateChkoutService","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","","",CheckInHdrId,0,0,0]);
 								
 							}
 							
@@ -7333,8 +7333,8 @@
 							Txt_ConsolidatePayment.text = LC.replace(",","");
 							if(Txt_ConsolidateLoad.text == Txt_ConsolidatePayment.text)
 							{
-								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
-								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExterIntermediateChkoutService","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","","",CheckInHdrId,0,0,0]);
+								useWeb("ExterIntermediateChkoutService","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","","",CheckInHdrId,0,0,0]);
 							}
 							
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -7401,8 +7401,8 @@
 							Txt_ConsolidatePayment.text = LC.replace(",","");
 							if(Txt_ConsolidateLoad.text == Txt_ConsolidatePayment.text)
 							{
-								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
-								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExterIntermediateChkoutService","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","","",CheckInHdrId,0,0,0]);
+								useWeb("ExterIntermediateChkoutService","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","","",CheckInHdrId,0,0,0]);
 							}
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
 								([{
@@ -7516,8 +7516,8 @@
 							Txt_ConsolidatePayment.text = LC.replace(",","");
 							if(Txt_ConsolidateLoad.text == Txt_ConsolidatePayment.text)
 							{
-								useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
-								useWeb("ExternalCheckOut","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","",CheckInHdrId,0,0,0,0]);
+								useWeb("ExterIntermediateChkoutService","Paid_CUSTOM",[GlobalXml,"PaidUpdate","","","",CheckInHdrId,0,0,0]);
+								useWeb("ExterIntermediateChkoutService","PaidSer_CUSTOM",[GlobalXml,"ServiceUpdate","","","",CheckInHdrId,0,0,0]);
 							}
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
 								([{
@@ -8080,11 +8080,11 @@
 				// TODO Auto-generated method stub
 				if(ddl_CashReceivedby.selectedItem.label=="Resident Managers")
 				{  
-					useWeb("ExternalCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','',0,0,PropertyId,0]);
+					useWeb("ExterIntermediateChkoutService","GuestLoad_CUSTOM",[GlobalXml,'GuestName','','','',0,0,PropertyId,0]);
 				}
 				if(ddl_CashReceivedby.selectedItem.label=="Assistant Resident Managers")
 				{  
-					useWeb("ExternalCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','',0,0,PropertyId,0]);
+					useWeb("ExterIntermediateChkoutService","GuestLoad_CUSTOM",[GlobalXml,'GuestName','','','',0,0,PropertyId,0]);
 				}
 			}
 			
@@ -8093,11 +8093,11 @@
 				// TODO Auto-generated method stub
 				if(ddl_ServiPayCashRecBy.selectedItem.label=="Resident Managers")
 				{  
-					useWeb("ExternalCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','',0,0,PropertyId,0]);
+					useWeb("ExterIntermediateChkoutService","GuestLoad_CUSTOM",[GlobalXml,'GuestName','','','',0,0,PropertyId,0]);
 				}
 				if(ddl_ServiPayCashRecBy.selectedItem.label=="Assistant Resident Managers")
 				{  
-					useWeb("ExternalCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','',0,0,PropertyId,0]);
+					useWeb("ExterIntermediateChkoutService","GuestLoad_CUSTOM",[GlobalXml,'GuestName','','','',0,0,PropertyId,0]);
 				}
 			}
 			
@@ -8106,11 +8106,11 @@
 				// TODO Auto-generated method stub
 				if(ddl_ConsoPayCashRecBy.selectedItem.label=="Resident Managers")
 				{  
-					useWeb("ExternalCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','',0,0,PropertyId,0]);
+					useWeb("ExterIntermediateChkoutService","GuestLoad_CUSTOM",[GlobalXml,'GuestName','','','',0,0,PropertyId,0]);
 				}
 				if(ddl_ConsoPayCashRecBy.selectedItem.label=="Assistant Resident Managers")
 				{  
-					useWeb("ExternalCheckOut","GuestLoad_CUSTOM",[GlobalXml,'GuestName','',0,0,PropertyId,0]);
+					useWeb("ExterIntermediateChkoutService","GuestLoad_CUSTOM",[GlobalXml,'GuestName','','','',0,0,PropertyId,0]);
 				}
 			}
 			
@@ -8241,7 +8241,7 @@
 				}				
 				if(ImageFlage==true)
 				{					
-					useWeb("ExterIntermediateChkoutService","ImageUpload_CUSTOM",[GlobalXml,'IMAGEUPLOAD',"http://sstage.in/BTC/"+resultsTxtField.text,"","",BTCSId,0,0,0,0,0]);
+					useWeb("ExterIntermediateChkoutService","ImageUpload_CUSTOM",[GlobalXml,'IMAGEUPLOAD',"http://sstage.in/BTC/"+resultsTxtField.text,"","",BTCSId,0,0,0,0]);
 				}
 			}
 			
@@ -8715,7 +8715,7 @@
 							
 							
 							var GrdXml:String = ObjToXmlStr_Comm(Ac_Hdr1,"GrdXml");	
-							useWeb("ExternalCheckOut","Save_CUSTOM",[GlobalXml,HdrXml,GrdXml]);
+							useWeb("ExterIntermediateChkoutService","Save_CUSTOM",[GlobalXml,HdrXml,GrdXml]);
 							//		useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
 							btn_Service.visible=false;
 							bdr_SerPay1.visible=false;
@@ -8788,7 +8788,7 @@
 							
 							
 							var GrdXml:String = ObjToXmlStr_Comm(Ac_Hdr1,"GrdXml");	
-							useWeb("ExternalCheckOut","Save_CUSTOM",[GlobalXml,HdrXml,GrdXml]);
+							useWeb("ExterIntermediateChkoutService","Save_CUSTOM",[GlobalXml,HdrXml,GrdXml]);
 							//		useWeb("ExternalCheckOut","Paid_CUSTOM",[GlobalXml,"PaidUpdate","",CheckInHdrId,0,0,0,0]);
 							btn_Service.visible=false;
 							bdr_SerPay1.visible=false;

@@ -19,5 +19,15 @@ namespace HB.Entity
         public string Column9 { get; set; }
         public string Column10 { get; set; }
         public int Id { get; set; }
+        public bool Column1Mandatory { get; set; }
+        public bool Column2Mandatory { get; set; }
+        public bool Column3Mandatory { get; set; }
+        public bool Column4Mandatory { get; set; }
+        public bool Column5Mandatory { get; set; }
+        public bool Column6Mandatory { get; set; }
+        public bool Column7Mandatory { get; set; }
+        public bool Column8Mandatory { get; set; }
+        public bool Column9Mandatory { get; set; }
+        public bool Column10Mandatory { get; set; }
     }
 }

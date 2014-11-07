@@ -100,7 +100,7 @@ IF @Action='PageLoad'
 	
 	select distinct  h.GuestName as GuestName,h.Name,h.Stay,h.Type,h.BookingLevel,
 	convert(nvarchar(100),h.CheckOutDate,103) as BillDate,
-	h.ClientName,h.Id,h.InVoiceNo,h.PIInvoice,
+	h.ClientName,h.Id,h.InVoiceNo,h.PIInvoice,h.NoOfDays, 
 	h.ChkOutTariffTotal as TotalTariff,h.ChkOutTariffLT as LuxuryTax,h.ChkOutTariffNetAmount as NetAmount,
 	h.ChkOutTariffST2 as SerivceNet,h.ChkOutTariffST3 as SerivceTax,h.ChkOutTariffCess as Cess,
 	h.ChkOutTariffHECess as HCess,h.ChkOutTariffSC as ServiceCharge,convert(nvarchar(100),h.CheckInDate,103) as ArrivalDate,
@@ -147,7 +147,7 @@ IF @Action='PageLoad'
 	c.CityName,s.StateName,p.Postal,p.Phone,p.Email,	
     H.VATPer,h.RestaurantSTPer ,
     h.BusinessSupportST ,h.InVoiceNo,d.ArrivalDate,h.PIInvoice,h.CheckOutDate,h.BillFromDate,
-    h.BillEndDate
+    h.BillEndDate,h.NoOfDays
    
 	
 	END

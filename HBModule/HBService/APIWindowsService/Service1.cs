@@ -17,8 +17,8 @@ namespace APIWindowsService
         {
             string[] St = { "", "" };
             //OnStart(St);
-            //new StaticData().staticDateFun();
-            new DynamicData().DynamicDateFun();
+            new StaticData().staticDateFun();
+            //new DynamicData().DynamicDateFun();
         }
 
         protected override void OnStart(string[] args)

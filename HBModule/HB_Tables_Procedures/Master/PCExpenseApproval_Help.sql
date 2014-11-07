@@ -132,23 +132,23 @@ END
  BEGIN
 		CREATE TABLE #User (UserName NVARCHAR(100),Status NVARCHAR(100),Comments NVARCHAR(100),Processedon NVARCHAR(100))
 				
+						
 		INSERT INTO #User(UserName,Status,Comments,Processedon)
-		
-		SELECT DISTINCT (U.FirstName+' '+U.LastName) AS UserName,PC.ProcessedStatus AS Status,PC.Comments AS Comments,
-		CONVERT(NVARCHAR(100),PC.LastProcessedon,103) AS Processedon		
-		From WRBHBNewPCExpenseApproval PC
-		JOIN WRBHBUser U ON  PC.UserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
-		WHERE PC.RequestedUserId=@UserId AND PC.PropertyId=@PropertyId AND PC.IsActive=1 AND PC.IsDeleted=0
-		AND PC.RequestedOn=CONVERT(NVARCHAR,@Str,103);
-				
-		INSERT INTO #User(UserName,Status,Comments,Processedon)
-		
-		SELECT DISTINCT	(U.FirstName+' '+U.LastName) AS UserName,'Submitted' AS Status,'' AS Comments,
+		SELECT DISTINCT(U.FirstName+' '+U.LastName) AS UserName,'Submitted' AS Status,'' AS Comments,
 		CONVERT(NVARCHAR,CAST(P.CreatedDate AS Date),103) AS Processedon
 	    FROM WRBHBPettyCashStatus P
 		JOIN WRBHBUser U ON  P.UserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
 		WHERE P.UserId=@UserId AND P.PropertyId=@PropertyId AND P.IsActive=1 AND P.IsDeleted=0
 		AND CONVERT(NVARCHAR,CAST(P.CreatedDate AS Date),103)=CONVERT(NVARCHAR,@Str,103)
+		
+		INSERT INTO #User(UserName,Status,Comments,Processedon)
+		SELECT (U.FirstName+' '+U.LastName) AS UserName,PC.ProcessedStatus AS Status,PC.Comments AS Comments,
+		CONVERT(NVARCHAR(100),PC.LastProcessedon,103) AS Processedon		
+		From WRBHBNewPCExpenseApproval PC
+		JOIN WRBHBUser U ON  PC.UserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
+		WHERE PC.RequestedUserId=@UserId AND PC.PropertyId=@PropertyId AND PC.IsActive=1 AND PC.IsDeleted=0
+		AND PC.RequestedOn=CONVERT(NVARCHAR,@Str,103)
+		ORDER BY PC.CreatedDate		
 		
 		SELECT UserName,Status,Comments,Processedon FROM #User ORDER BY Processedon DESC
 	END

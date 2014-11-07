@@ -49,11 +49,14 @@ IF @Action = 'HotelAvailability'
  END
 IF @Action = 'ClientGuestLoad'
  BEGIN
-  SELECT EmpCode,FirstName,LastName,Grade,Designation,
-  EmailId AS Email,GMobileNo AS MobileNo,Id,GradeId,
-  Nationality AS NationalityId,Title AS TitleId
+  SELECT ISNULL(EmpCode,'') AS EmpCode,ISNULL(FirstName,'') AS FirstName,
+  ISNULL(LastName,'') AS LastName,ISNULL(Grade,'') AS Grade,
+  ISNULL(Designation,'') AS Designation,ISNULL(EmailId,'') AS Email,
+  ISNULL(GMobileNo,'') AS MobileNo,Id,ISNULL(GradeId,0) AS GradeId,
+  ISNULL(Nationality,'') AS NationalityId,ISNULL(Title,'') AS TitleId
   FROM WRBHBClientManagementAddClientGuest 
-  WHERE IsDeleted=0 AND IsActive=1 AND CltmgntId=@Id;
+  WHERE IsDeleted = 0 AND IsActive = 1 AND CltmgntId = @Id
+  ORDER BY FirstName ASC;
  END
  IF @Action = 'RecommendProperty'
  BEGIN
@@ -213,7 +216,7 @@ IF @Action = 'RoomBookingConfirmed'
   SELECT ISNULL(ClientLogo,'') AS ClientLogo,B.ClientName,
   B.BookingCode,U.FirstName,U.Email,ISNULL(U.PhoneNumber,''),B.ClientBookerName,
   REPLACE(CONVERT(VARCHAR(11), B.CreatedDate, 106), ' ', '-'),
-  B.SpecialRequirements,B.ClientBookerEmail
+  B.SpecialRequirements,B.ClientBookerEmail,B.ExtraCCEmail
   FROM WRBHBBooking B
   LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK) ON  C.Id=B.ClientId
   LEFT OUTER JOIN WRBHBUser U  WITH(NOLOCK) ON  U.Id=B.CreatedBy
@@ -435,12 +438,13 @@ IF @Action = 'RoomBookingConfirmed'
   CltmgntId=(SELECT ClientId FROM WRBHBBooking B WHERE B.Id=@Id);
   -- Dataset Table 8
   --SELECT ClientBookerEmail FROM WRBHBBooking WHERE Id=@Id;
-  SELECT B.ClientBookerEmail,BP.PropertyType FROM WRBHBBooking B
+  SELECT B.ClientBookerEmail,BP.PropertyType,B.ExtraCCEmail FROM WRBHBBooking B
   LEFT OUTER JOIN WRBHBBookingProperty BP 
   WITH(NOLOCK)ON BP.BookingId=B.Id
   LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG
   WITH(NOLOCK)ON BG.BookingPropertyTableId=BP.Id 
-  WHERE BG.BookingId=@Id GROUP BY B.ClientBookerEmail,BP.PropertyType;
+  WHERE BG.BookingId=@Id 
+  GROUP BY B.ClientBookerEmail,BP.PropertyType,B.ExtraCCEmail;
   -- Dataset Table 9 Email Address Begin
   CREATE TABLE #Mail(Id INT,Email NVARCHAR(100));
   -- Guest Email
@@ -492,7 +496,8 @@ IF @Action = 'RoomBookingConfirmed'
   MasterClientId=(SELECT MasterClientId FROM WRBHBClientManagement
   WHERE IsActive=1 AND IsDeleted=0 AND
   Id=(SELECT ClientId FROM WRBHBBooking WHERE Id=@Id));
-  -- Dataset Table 10 End  
+  -- Dataset Table 10 End
+  DECLARE @BelowTACcontent NVARCHAR(MAX) = 'Kindly arrange to pay the above TAC amount to HummingBird by CHEQUE or through Bank Transfer (NEFT).<br><b>CHEQUE</b> : Kindly issue the cheque in Favour of "Humming Bird Travel & Stay Pvt Ltd".<br><b>Bank Transfer (NEFT)</b> : <br>Payee Name : Humming Bird Travel & Stay Pvt. Ltd.<br>Bank Name : HDFC Bank<br>Account No. : 17552560000226<br>IFSC : HDFC0001755';
   -- Dataset Table 11 bEGIN
   CREATE TABLE #PropertyMailBTCChecking(Name NVARCHAR(100),
   ChkInDt NVARCHAR(100),ChkOutDt NVARCHAR(100),Tariff NVARCHAR(100),
@@ -525,12 +530,14 @@ IF @Action = 'RoomBookingConfirmed'
          WHEN Occupancy = 'Double' THEN @Double
          WHEN Occupancy = 'Triple' THEN @Triple
          ELSE Tariff END,Occupancy,TariffPaymentMode,
-    ServicePaymentMode,'BTC',@AgreedTariff FROM #PropertyMailBTCChecking;
+    ServicePaymentMode,'BTC',@AgreedTariff,@BelowTACcontent 
+    FROM #PropertyMailBTCChecking;
    END
   ELSE
    BEGIN
     SELECT Name,ChkInDt,ChkOutDt,Tariff,Occupancy,TariffPaymentMode,
-    ServicePaymentMode,'NOTBTC',@AgreedTariff FROM #PropertyMailBTCChecking;
+    ServicePaymentMode,'NOTBTC',@AgreedTariff,@BelowTACcontent 
+    FROM #PropertyMailBTCChecking;
    END
   -- Dataset Table 11 eND 
  END
@@ -628,7 +635,7 @@ IF @Action = 'BedBookingConfirmed'
   WHERE IsActive=1 AND IsDeleted=0 AND ContactType='Extra C C' AND
   CltmgntId=(SELECT ClientId FROM WRBHBBooking B WHERE B.Id=@Id);
   -- Dataset Table 8
-  SELECT ClientBookerEmail FROM WRBHBBooking WHERE Id=@Id;
+  SELECT ClientBookerEmail,ExtraCCEmail  FROM WRBHBBooking WHERE Id=@Id;
   -- Dataset Table 9 Email Address Begin
   CREATE TABLE #BedMail(Id INT,Email NVARCHAR(100));
   -- Guest Email
@@ -717,7 +724,7 @@ IF @Action = 'ApartmentBookingConfirmed'
   SELECT ISNULL(ClientLogo,'') AS ClientLogo,B.ClientName,
   B.BookingCode,U.FirstName,U.Email,U.PhoneNumber,B.ClientBookerName,
   REPLACE(CONVERT(VARCHAR(11), B.CreatedDate, 106), ' ', '-'),
-  B.SpecialRequirements,B.ClientBookerEmail FROM WRBHBBooking B
+  B.SpecialRequirements,B.ClientBookerEmail,B.ExtraCCEmail FROM WRBHBBooking B
   LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK) ON  C.Id=B.ClientId
   LEFT OUTER JOIN WRBHBUser U  WITH(NOLOCK) ON  U.Id=B.CreatedBy
   WHERE B.Id=@Id;
@@ -774,7 +781,7 @@ IF @Action = 'ApartmentBookingConfirmed'
   WHERE IsActive=1 AND IsDeleted=0 AND ContactType='Extra C C' AND
   CltmgntId=(SELECT ClientId FROM WRBHBBooking B WHERE B.Id=@Id);
   -- Dataset Table 8
-  SELECT ClientBookerEmail FROM WRBHBBooking WHERE Id=@Id;
+  SELECT ClientBookerEmail,ExtraCCEmail FROM WRBHBBooking WHERE Id=@Id;
   -- Dataset Table 9 Email Address Begin
   CREATE TABLE #AMail(Id INT,Email NVARCHAR(100));
   -- Guest Email
@@ -891,7 +898,7 @@ IF @Action = 'MMTBookingConfirmed'
   REPLACE(CONVERT(VARCHAR(11), B.CreatedDate, 106), ' ', '-') AS ReservationDt,
   C.ClientName,U.Email,B.SpecialRequirements,
   CAST(B.EmailtoGuest AS INT),B.ClientBookerEmail,
-  BP.BookHotelReservationIdvalue
+  BP.BookHotelReservationIdvalue,B.ExtraCCEmail
   FROM WRBHBBooking B
   LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id
   LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK) ON  C.Id=B.ClientId

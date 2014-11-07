@@ -42,8 +42,8 @@ IF @Action = 'BookingLoad'
   B.BookingLevel='Room' AND --BP.PropertyType NOT IN ('MMT','CPP') AND
   BP.PropertyType IN ('InP','MGH','DdP','ExP') AND 
   --BG.RoomId != 0 AND 
-  ISNULL(RoomShiftingFlag,0) = 0 AND 
-  CONVERT(DATE,BG.ChkOutDt,103) >= CONVERT(DATE,GETDATE(),103);
+  ISNULL(RoomShiftingFlag,0) = 0;-- AND 
+  --CONVERT(DATE,BG.ChkOutDt,103) >= CONVERT(DATE,GETDATE(),103);
   -- Guest Joined in RoomId
   CREATE TABLE #TMP1(Guest NVARCHAR(100),BookingCode INT,BookingId INT,
   RoomId INT,RoomCapturedId INT,BookingLevelId NVARCHAR(100),
@@ -93,6 +93,16 @@ IF @Action = 'BookingLoad'
  END
 IF @Action = 'DateLoad'
  BEGIN
+  DECLARE @CurrentStatus NVARCHAR(100) = '',@PtyType NVARCHAR(100) = '';
+  SELECT TOP 1 @PtyType = BP.PropertyType,@CurrentStatus = BG.CurrentStatus 
+  FROM WRBHBBookingProperty BP
+  LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
+  BG.BookingId=BP.BookingId AND BG.BookingPropertyTableId=BP.Id AND
+  BG.BookingPropertyId=BP.PropertyId
+  WHERE BG.IsActive = 1 AND BG.IsDeleted = 0 AND BP.IsActive = 1 AND
+  BP.IsDeleted = 0 AND BP.BookingId = @BookingId AND 
+  BG.RoomCaptured = @Id1 ORDER BY BG.Id DESC;
+  --
   DECLARE @DtCnt INT=0,@FromDt DATE,@ToDt DATE,@Dtt DATE;
   SET @DtCnt=(SELECT COUNT(*) FROM WRBHBBookingPropertyAssingedGuest
   WHERE IsActive=1 AND IsDeleted=0 AND BookingId=@BookingId AND
@@ -114,14 +124,32 @@ IF @Action = 'DateLoad'
     WHERE IsActive=1 AND IsDeleted=0 AND BookingId=@BookingId AND
     RoomId=@RoomId AND ISNULL(RoomShiftingFlag,0)=0 AND RoomCaptured=@Id1;
    END
-  SELECT CAST(YEAR(@FromDt) AS VARCHAR)+'/'+CAST(MONTH(@FromDt) AS VARCHAR)
-  +'/'+CAST(DAY(@FromDt) AS VARCHAR) AS ChkInRangeStart,
-  CAST(YEAR(@ToDt) AS VARCHAR)+'/'+CAST(MONTH(@ToDt) AS VARCHAR)+'/'+
-  CAST(DAY(@ToDt) AS VARCHAR) AS ChkInRangeEnd,
-  CAST(YEAR(@FromDt) AS VARCHAR)+'/'+CAST(MONTH(@FromDt) AS VARCHAR)
-  +'/'+CAST(DAY(@FromDt)+1 AS VARCHAR) AS ChkOutRangeStart,
-  CAST(YEAR(@Dtt) AS VARCHAR)+'/'+CAST(MONTH(@Dtt) AS VARCHAR)
-  +'/'+CAST(DAY(@Dtt) AS VARCHAR) AS ChkInRangeStart1;
+  IF @PtyType NOT IN ('InP','MGH','DdP') AND @CurrentStatus NOT IN ('CheckIn')
+   BEGIN
+    SELECT CAST(YEAR(@FromDt) AS VARCHAR)+'/'+CAST(MONTH(@FromDt) AS VARCHAR)
+    +'/'+CAST(DAY(@FromDt) AS VARCHAR) AS ChkInRangeStart,
+    CAST(YEAR(@ToDt) AS VARCHAR)+'/'+CAST(MONTH(@ToDt) AS VARCHAR)+'/'+
+    CAST(DAY(@ToDt) AS VARCHAR) AS ChkInRangeEnd,
+    CAST(YEAR(@FromDt) AS VARCHAR)+'/'+CAST(MONTH(@FromDt) AS VARCHAR)
+    +'/'+CAST(DAY(@FromDt)+1 AS VARCHAR) AS ChkOutRangeStart,
+    CAST(YEAR(@Dtt) AS VARCHAR)+'/'+CAST(MONTH(@Dtt) AS VARCHAR)
+    +'/'+CAST(DAY(@Dtt) AS VARCHAR) AS ChkInRangeStart1;
+   END
+  ELSE
+   BEGIN
+    SELECT CAST(YEAR(DATEADD(DAY,-1,@FromDt)) AS VARCHAR)+'/'+
+    CAST(MONTH(DATEADD(DAY,-1,@FromDt)) AS VARCHAR)+'/'+
+    CAST(DAY(DATEADD(DAY,-1,@FromDt)) AS VARCHAR) AS ChkInRangeStart,
+    CAST(YEAR(@ToDt) AS VARCHAR)+'/'+
+    CAST(MONTH(@ToDt) AS VARCHAR)+'/'+
+    CAST(DAY(@ToDt) AS VARCHAR) AS ChkInRangeEnd,
+    CAST(YEAR(@FromDt) AS VARCHAR)+'/'+
+    CAST(MONTH(@FromDt) AS VARCHAR)+'/'+
+    CAST(DAY(@FromDt) AS VARCHAR) AS ChkOutRangeStart,
+    CAST(YEAR(@Dtt) AS VARCHAR)+'/'+
+    CAST(MONTH(@Dtt) AS VARCHAR)+'/'+
+    CAST(DAY(@Dtt) AS VARCHAR) AS ChkInRangeStart1;
+   END
   --
   SELECT TOP 1 BP.PropertyType,BG.TariffPaymentMode,
   BG.ServicePaymentMode FROM WRBHBBookingProperty BP

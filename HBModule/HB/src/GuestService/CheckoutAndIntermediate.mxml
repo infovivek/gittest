@@ -151,8 +151,8 @@
 			protected function Help():void
 			{				
 				
-				useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId,0]);
-			// 	useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65,0]);
+			//	useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId,0]);
+			 	useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65,0]);
 				Txt_ServiceBillAmt.editable=false;
 				Txt_ServiceVat.editable=false;
 				Txt_SerivceTax.editable=false;
@@ -7576,6 +7576,7 @@
 				BillFrom=DT_BillFromDate.text;
 				BillTo=DT_BillTo.text;
 				useWeb("CheckoutAndIntermediate","Guest_CUSTOM",[GlobalXml,"CHKINROOMDETAILS","",BillFrom,BillTo,CheckInHdrId,StateId,0,0,ExtraMaters]);
+		//		useWeb("CheckOutServiceHdr","TariffLoad_CUSTOM",[GlobalXml,"ProductLoad",BillFrom,,CheckInHdrId,GuestId,StateId,0,0,0]);
 			}
 			
 			protected function Checkout_clickHandler(event:MouseEvent):void

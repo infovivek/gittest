@@ -79,20 +79,20 @@ namespace HB.Dao
             else
             {
                 message.From = new System.Net.Mail.MailAddress("stay@staysimplyfied.com", "", System.Text.Encoding.UTF8);
-            }            
+            }
             //message.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
             //message.To.Add(new System.Net.Mail.MailAddress("vivek@warblerit.com"));
             //message.Subject = "Test Booking - " + ds.Tables[2].Rows[0][2].ToString();
             message.To.Add(new System.Net.Mail.MailAddress("booking_confirmation@staysimplyfied.com"));
-            if (ds.Tables[4].Rows[0][0].ToString() == "0")
-            {
-                if (ds.Tables[8].Rows[0][0].ToString() != "")
-                {
-                    message.To.Add(new System.Net.Mail.MailAddress(ds.Tables[8].Rows[0][0].ToString()));
-                }
-            }
-            else
-            {
+            //if (ds.Tables[4].Rows[0][0].ToString() == "0")
+            //{
+            //    if (ds.Tables[8].Rows[0][0].ToString() != "")
+            //    {
+            //        message.To.Add(new System.Net.Mail.MailAddress(ds.Tables[8].Rows[0][0].ToString()));
+            //    }
+            //}
+            //else
+            //{
                 for (int i = 0; i < ds.Tables[5].Rows.Count; i++)
                 {
                     if (ds.Tables[5].Rows[i][0].ToString() != "")
@@ -104,13 +104,27 @@ namespace HB.Dao
                 {
                     message.CC.Add(new System.Net.Mail.MailAddress(ds.Tables[8].Rows[0][0].ToString()));
                 }
-            }
+            //}
             //Extra CC
             for (int i = 0; i < ds.Tables[7].Rows.Count; i++)
             {
                 if (ds.Tables[7].Rows[i][0].ToString() != "")
                 {
                     message.CC.Add(new System.Net.Mail.MailAddress(ds.Tables[7].Rows[i][0].ToString()));
+                }
+            }
+            // Extra CC email from Front end
+            if (ds.Tables[8].Rows[0][2].ToString() != "")
+            {
+                string ExtraCC = ds.Tables[8].Rows[0][2].ToString();
+                var ExtraCCEmail = ExtraCC.Split(',');
+                int cnt = ExtraCCEmail.Length;
+                for (int i = 0; i < cnt; i++)
+                {
+                    if (ExtraCCEmail[i].ToString() != "")
+                    {
+                        message.CC.Add(new System.Net.Mail.MailAddress(ExtraCCEmail[i].ToString()));
+                    }
                 }
             }
             if (ds.Tables[2].Rows[0][4].ToString() != "")
@@ -639,6 +653,7 @@ namespace HB.Dao
                         MobileNo = " - NA - ";
                     }
                     string Stng = ds.Tables[11].Rows[0][8].ToString();
+                    string BelowTACcontent = ds.Tables[11].Rows[0][9].ToString();
                     string AddressDtls1 = "";
                     if (ds.Tables[11].Rows[0][7].ToString() == "NOTBTC")
                     //if (ds.Tables[11].Rows[0][7].ToString() == "BTC")
@@ -651,6 +666,8 @@ namespace HB.Dao
                                 " <td width=\"600\" style=\"padding:12px 5px;\">" +
                                 " <p style=\"color:orange; font-weight:bold; margin:0px; font-size:14px;\"> Agreed Tariff & TAC :</p>" +
                                 " <p style=\"margin-top:5px; margin-left:25px\">" + Stng + "</p>" +
+                                " <p style=\"color:orange; font-weight:bold; margin:0px; font-size:0px;\"> Agreed Tariff & TAC :</p>" +
+                                " <p style=\"margin-top:5px; margin-left:25px\">" + BelowTACcontent + "</p>" +
                                 " <p style=\"color:orange; font-weight:bold; margin:0px; font-size:14px;\"> Guest Contact Details :</p>" +
                                 " <p style=\"margin-top:5px; margin-left:25px\">" + MobileNo + "</p>" +
                                 " <p style=\"color:orange; font-weight:bold; margin:0px; font-size:14px;\"> Special Request :</p>" +

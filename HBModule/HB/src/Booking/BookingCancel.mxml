@@ -16,9 +16,7 @@
 			import mx.events.CloseEvent;
 			public static var Global_AC:ArrayCollection = new ArrayCollection();
 			public static var GlobalXml:String = "";
-			public var DtlsId:int=0;
-			public var BookingId:int=0;
-			public var Status:String="";
+			public var DtlsId:int = 0,BookingId:int = 0,Status:String = "",PropertyType:String = "";
 			private function Page_Load():void
 			{
 				Global_AC = funLoginInfo("<gScrId>1</gScrId><gUsrFk>1</gUsrFk>");				
@@ -32,6 +30,8 @@
 				SCtrl.setButtonRights("Search",true);
 				hlp_BookingCode._setFocus();
 				help();
+				//Chk_Mail.selected = true;
+				//useWeb("BookingMail","MMTBookingCancel_CUSTOM",[GlobalXml,"BookingCancelMMT",4661,"Test Cancelation",Chk_Mail.selected]);
 			}
 			private function help():void
 			{				
@@ -86,8 +86,20 @@
 					alignAlert(Alert.show("Booking Canceled Successfully.","Message !",Alert.OK,null,null,iconTickLarge, Alert.OK),10,"");
 					Clear();
 				}
-				
-				
+				if (Ds_Objects.currentTarget.description.toString() == "MMTBookingCancel_CUSTOM")
+				{
+					if(Ds_Objects.result.Tables.Table.Rows[0].Success == "No")
+					{
+						alignAlert(Alert.show(Ds_Objects.result.Tables.Table.Rows[0].Msg,"Alert Message !",
+							Alert.OK,null,null,iconWarning, Alert.OK),10,"");
+					}
+					if(Ds_Objects.result.Tables.Table.Rows[0].Success == "Yes")
+					{
+						alignAlert(Alert.show("Booking Canceled Successfully.","Message !",
+							Alert.OK,null,null,iconTickLarge, Alert.OK),10,"");
+						Clear();
+					}					
+				}			
 			}
 			public function Clear():void
 			{
@@ -106,43 +118,52 @@
 			public var selectedindex:int=0;
 			public function DeleteGrid1():void
 			{
-							
-				Ac_Guest=Grd_Property.dataProvider as ArrayCollection;
-				for(var i:int=0;i<Ac_Guest.length;i++)
+				if(PropertyType == "")
 				{
-					var sDate1:Date=DateField.stringToDate(Ac_Guest[i].ChkInDt,"DD/MM/YYYY");
-					var sDate2:Date=DateField.stringToDate(Ac_Guest[i].ChkOutDt,"DD/MM/YYYY");					
-					//Date Differance
-					var MS_PER_DAY:uint = 1000 * 60 * 60 * 24;
-					var tempDate:Date = new Date(sDate2.time - sDate1.time);
-					var difference:Number = 
-						Math.abs(Math.round((tempDate.time / MS_PER_DAY)));
-					
-					Ac_Guest[i].DateDiffs=difference;
-					if(Ac_Guest[i].Tick=="1")
+					Ac_Guest=Grd_Property.dataProvider as ArrayCollection;
+					for(var i:int=0;i<Ac_Guest.length;i++)
 					{
-						GuestFlag=true;
+						var sDate1:Date=DateField.stringToDate(Ac_Guest[i].ChkInDt,"DD/MM/YYYY");
+						var sDate2:Date=DateField.stringToDate(Ac_Guest[i].ChkOutDt,"DD/MM/YYYY");					
+						//Date Differance
+						var MS_PER_DAY:uint = 1000 * 60 * 60 * 24;
+						var tempDate:Date = new Date(sDate2.time - sDate1.time);
+						var difference:Number = 
+							Math.abs(Math.round((tempDate.time / MS_PER_DAY)));
+						
+						Ac_Guest[i].DateDiffs=difference;
+						if(Ac_Guest[i].Tick=="1")
+						{
+							GuestFlag=true;
+						}
 					}
-				}
-				//var selectedindex:int=Grd_Property.selectedIndex;
-				//DtlsId=Ac_Guest[selectedindex].Id;
-				if(GuestFlag==false)
-				{
-					alignAlert(Alert.show("This is an Invalid Process.Select Any Guest to Delete.","Error !",Alert.OK, 
-						null, null, iconCrossSmall, Alert.OK),10,"");
-					return;
-				}
-				if(txt_Remarks.text=="")
-				{
-					alignAlert(Alert.show("* Remarks is Required.","Error !",Alert.OK, 
-						null, null, iconCrossSmall, Alert.OK),10,"");
-					return;
+					//var selectedindex:int=Grd_Property.selectedIndex;
+					//DtlsId=Ac_Guest[selectedindex].Id;
+					if(GuestFlag==false)
+					{
+						alignAlert(Alert.show("This is an Invalid Process.Select Any Guest to Delete.","Error !",Alert.OK, 
+							null, null, iconCrossSmall, Alert.OK),10,"");
+						return;
+					}
+					if(txt_Remarks.text=="")
+					{
+						alignAlert(Alert.show("* Remarks is Required.","Error !",Alert.OK, 
+							null, null, iconCrossSmall, Alert.OK),10,"");
+						return;
+					}
+					else
+					{
+						alignAlert(Alert.show("Do you want to delete this Guest?", "Warning",Alert.YES | Alert.NO, null,
+							removeDgridItem1, iconWarning, Alert.NO),10,"");
+					}
 				}
 				else
 				{
-					alignAlert(Alert.show("Do you want to delete this Guest?", "Warning",Alert.YES | Alert.NO, null,
-						removeDgridItem1, iconWarning, Alert.NO),10,"");
+					alignAlert(Alert.show("* Guest Cancelation is not allowed in MMT.","Alert Message !",
+						Alert.OK,null, null, iconWarning, Alert.OK),10,"");
+					return;
 				}
+				
 					
 			}
 			protected function Grd_POS_keyDownHandler(event:KeyboardEvent):void
@@ -189,38 +210,46 @@
 			{
 				if(hlp_BookingCode.selected())
 				{
-					hlp_BookingCode.text=hlp_BookingCode.Select_Row.BookingCode;
-					BookingId=hlp_BookingCode.Select_Row.Id;
-					txt_Client.text=hlp_BookingCode.Select_Row.ZClientNameId;					
-					txt_BookingLevel.text=hlp_BookingCode.Select_Row.ZBookingLevelId;
-					useWeb("BookingCancel","BookingGuest_CUSTOM", [GlobalXml, "BookingGuest",txt_BookingLevel.text, BookingId, Global_AC[0].UsrId]);
+					hlp_BookingCode.text = hlp_BookingCode.Select_Row.BookingCode;
+					BookingId = hlp_BookingCode.Select_Row.Id;
+					txt_Client.text = hlp_BookingCode.Select_Row.ZClientNameId;					
+					txt_BookingLevel.text = hlp_BookingCode.Select_Row.ZBookingLevelId;
+					PropertyType = hlp_BookingCode.Select_Row.ZPropertyTypeId;
+					if(PropertyType == "MMT")
+					{
+						useWeb("BookingCancel","BookingGuest_CUSTOM",
+							[GlobalXml,"BookingGuestMMT","",BookingId,0]);
+					}
+					else
+					{
+						useWeb("BookingCancel","BookingGuest_CUSTOM", [GlobalXml,"BookingGuest",
+							txt_BookingLevel.text,BookingId,Global_AC[0].UsrId]);
+					}					
 				}
 				else
 				{
-					hlp_BookingCode.text="";
-					BookingId=0;
-					txt_Client.text="";
+					hlp_BookingCode.text = ""; hlp_BookingCode.fnClear(); BookingId = 0;
+					txt_Client.text = ""; txt_BookingLevel.text = ""; PropertyType = "";
 				}
 			}
 			
 			protected function button_hb1_clickHandler(event:MouseEvent):void
 			{
-				if(BookingId==0)
+				if(BookingId == 0)
 				{
 					alignAlert(Alert.show("This is an Invalid Process","Error !",Alert.OK, 
 						null, null, iconCrossSmall, Alert.OK),10,"");
 				}
 				else
 				{
-					if(txt_Remarks.text=="")
+					if(txt_Remarks.text == "")
 					{
 						alignAlert(Alert.show("* Remarks is Required.","Error !",Alert.OK, 
 							null, null, iconCrossSmall, Alert.OK),10,"");
 						
 					}
 					else
-					{				
-					
+					{
 						alignAlert(Alert.show("Do you want to Cancel this Booking?", "Warning",Alert.YES | Alert.NO, null,
 						removeDgridItem2, iconWarning, Alert.NO),10,"");
 					}					
@@ -231,35 +260,40 @@
 			{	
 				if (event.detail == Alert.YES) 
 				{
-					if(BookingId!=0)
+					if(BookingId != 0)
 					{
-						Ac_Guest=new ArrayCollection();
-						Ac_Guest=Grd_Property.dataProvider as ArrayCollection;
-						for(var i:int=0;i<Ac_Guest.length;i++)
+						if(PropertyType == "")
 						{
-							var sDate1:Date=DateField.stringToDate(Ac_Guest[i].ChkInDt,"DD/MM/YYYY");
-							var sDate2:Date=DateField.stringToDate(Ac_Guest[i].ChkOutDt,"DD/MM/YYYY");					
-							//Date Differance
-							var MS_PER_DAY:uint = 1000 * 60 * 60 * 24;
-							var tempDate:Date = new Date(sDate2.time - sDate1.time);
-							var difference:Number = 
-								Math.abs(Math.round((tempDate.time / MS_PER_DAY)));
-							
-							Ac_Guest[i].DateDiffs=difference;							
+							Ac_Guest=new ArrayCollection();
+							Ac_Guest=Grd_Property.dataProvider as ArrayCollection;
+							for(var i:int=0;i<Ac_Guest.length;i++)
+							{
+								var sDate1:Date=DateField.stringToDate(Ac_Guest[i].ChkInDt,"DD/MM/YYYY");
+								var sDate2:Date=DateField.stringToDate(Ac_Guest[i].ChkOutDt,"DD/MM/YYYY");					
+								//Date Differance
+								var MS_PER_DAY:uint = 1000 * 60 * 60 * 24;
+								var tempDate:Date = new Date(sDate2.time - sDate1.time);
+								var difference:Number = 
+									Math.abs(Math.round((tempDate.time / MS_PER_DAY)));
+								
+								Ac_Guest[i].DateDiffs=difference;							
+							}
+							var HdrXml:String = "";
+							HdrXml += "<ROOT>";
+							HdrXml += ObjToXmlStr_Comm(Grd_Property.dataProvider as ArrayCollection,"HdrXml")
+							HdrXml += "</ROOT>";
+							useWeb("BookingCancel","BookingDelete_CUSTOM", [GlobalXml, "BookingDelete",HdrXml,BookingId, txt_Remarks.text,Chk_Mail.selected]);
 						}
-						var HdrXml:String = "";
-						HdrXml += "<ROOT>";
-						HdrXml += ObjToXmlStr_Comm(Grd_Property.dataProvider as ArrayCollection,"HdrXml")
-						HdrXml += "</ROOT>";
-						useWeb("BookingCancel","BookingDelete_CUSTOM", [GlobalXml, "BookingDelete",HdrXml,BookingId, txt_Remarks.text,Chk_Mail.selected]);
-						
-						
+						else
+						{
+							useWeb("BookingMail","MMTBookingCancel_CUSTOM",
+								[GlobalXml,"BookingCancelMMT",BookingId,txt_Remarks.text,Chk_Mail.selected]);
+						}				
 					}
 					else
 					{
 						alignAlert(Alert.show("This is an Invalid Process","Error !",Alert.OK, 
-							null, null, iconCrossSmall, Alert.OK),10,"");
-						
+							null, null, iconCrossSmall, Alert.OK),10,"");						
 					}
 				}
 				
@@ -310,7 +344,8 @@
 	<mx:Label x="85" y="346" text="Remarks"/>
 	<mx:Label x="581" y="36" text="Property"/>
 	<mx:Label x="818" y="66" text="Payment Mode"/>
-	<WrbHelpComp:HelpText x="110" y="36.5" width="135" depth="2" id="hlp_BookingCode" tabIndex="1" onselection="{fnGetBooking()}" pxSetColumnsWidth="100,200,0,300">
+	<WrbHelpComp:HelpText x="110" y="36.5" width="135" depth="2" id="hlp_BookingCode" tabIndex="1" 
+						  onselection="{fnGetBooking()}" pxSetColumnsWidth="100,200,0,300">
 	</WrbHelpComp:HelpText>
 	<s:TextInput x="339" y="36.5" width="221" id="txt_Client"/>
 	<s:TextInput x="644" y="36.5" width="262" id="txt_Property"/>
@@ -345,7 +380,7 @@
 	</mx:DataGrid>
 	<mx:HRule x="0" y="417" width="100%" strokeColor="#eb1c24"/>
 	<s:HGroup x="0" y="422" width="100%" height="30" horizontalAlign="center" verticalAlign="top">
-		<WrbComp:SaveControl id="SCtrl" docRefresh="help()">
+		<WrbComp:SaveControl id="SCtrl" docRefresh="Clear()">
 		</WrbComp:SaveControl>
 		<WrbComp:Button_HB width="130" _Label="Cancel Guest" click="DeleteGrid1()" id="Btn_Cancel">
 		</WrbComp:Button_HB>

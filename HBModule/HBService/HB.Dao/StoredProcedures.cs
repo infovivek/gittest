@@ -753,6 +753,8 @@ namespace HB.Dao
 
         //CheckInForecastReport
         public const String CheckInForecastReport_Help = "Sp_CheckInForecastReport_Help";
+
+        public const String PendingUnsettled_Help = "Sp_PendingUnsettled_Help";
        
     }
 }

@@ -39,10 +39,22 @@ CREATE PROCEDURE [dbo].[SP_BookingPropertyAssingedGuest_Update](
 AS
 BEGIN
  ---
- DECLARE @BookingLevel NVARCHAR(100),@PROPERTYID BIGINT,@RoomId BIGINT,@Count BIGINT;
+ DECLARE @BookingLevel NVARCHAR(100),@PROPERTYID BIGINT,@RoomId BIGINT,@Count BIGINT,@ClientId BIGINT;
  
- SELECT @BookingLevel=BookingLevel FROM WRBHBBooking WHERE Id=@BookingId
+ SELECT @BookingLevel=BookingLevel,@ClientId=ClientId FROM WRBHBBooking WHERE Id=@BookingId
  
+ IF @GuestId=0
+ BEGIN
+		INSERT INTO  dbo.WRBHBClientManagementAddClientGuest
+		(CltmgntId,FirstName,LastName,Grade,GMobileNo,EmailId,
+		RangeMin,RangeMax,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,
+		IsDeleted,RowId,Designation,GradeId,Nationality,Title,Column1,Column2,Column3,
+		Column4,Column5,Column6,Column7,Column8,Column9,Column10,EmpCode)
+		VALUES(@ClientId,@FirstName,@LastName,0,'','',0,0,@UserId,GETDATE(),@UserId,GETDATE(),
+		1,0,NEWID(),'',0,'','','','','','','','','','','','','')
+
+		SELECT @GuestId= @@IDENTITY
+ END
  
  IF @BookingLevel='Room'
  BEGIN

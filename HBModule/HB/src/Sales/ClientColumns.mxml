@@ -6,7 +6,8 @@
 			   xmlns:WrbHelpComp="WrbHelpComp.*"
 			   xmlns:WrbComp="WrbComp.*"
 			   xmlns:flexlib="http://code.google.com/p/flexlib/"
-			   width="100%" height="100%" creationComplete="PageLoad()" pageTitle="Client Column">
+			   width="100%" height="100%" creationComplete="PageLoad()" 
+			   pageTitle="Client Custom Fields">
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
@@ -15,9 +16,7 @@
 	<fx:Script source = "..\\Common\\Functions.as"/>
 	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
 	<fx:Script>
-		<![CDATA[
-			import WrbComp.frmsearchwindow;
-			
+		<![CDATA[			
 			import WrbHelpComp.HlpGridHdr;
 			
 			import flashx.textLayout.formats.Float;
@@ -32,11 +31,9 @@
 			
 			import spark.events.IndexChangeEvent;
 			import spark.events.TextOperationEvent;
-			private var SearchPopUp:frmsearchwindow = new frmsearchwindow();
 			public static var Global_AC:ArrayCollection = new ArrayCollection();
-			public static var GlobalXml:String = "",TypeServiceId:int=0,ErrStr:String="";
-			public var ClientId:Number=0,ClientName:String="";
-			public var Id:int=0,ErrMsg:String="",Flag:Boolean=true,AddMode:Boolean=true;
+			public static var GlobalXml:String = "";
+			public var ClientId:int = 0,Id:int = 0;
 			
 			protected function PageLoad():void
 			{
@@ -44,29 +41,31 @@
 				GlobalXml="";
 				GlobalXml += "<ROOT>";
 				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
-				GlobalXml += "</ROOT>";
+				GlobalXml += "</ROOT>";				
+				//Save_Columns.setButtonRights("Delete",true);
+				//Save_Columns.setButtonRights("Refresh",true);
+				//Save_Columns.setButtonRights("Search",true);
 				Help();
-				Save_Columns.setButtonRights("Delete",true);
-				Save_Columns.setButtonRights("Refresh",true);
-				Save_Columns.setButtonRights("Search",true);
-				hlp_Client.setFocus();
 			}
 			public function Help():void
 			{
-				useWeb("ClientColumn","PAGELOAD_CUSTOM",[GlobalXml,'PAGELOAD',0,0]);
+				useWeb("ClientColumn","PAGELOAD_CUSTOM",[GlobalXml,'PAGELOAD',0]);
 			}
 			private function Custom_WebSer_Result (Ds_Objects:Object):void				
 			{
 				if (Ds_Objects.currentTarget.description.toString() == "PAGELOAD_CUSTOM")
 				{
+					Hlp_Client.dataProvider = null;
+					Hlp_Client.fnClear();
 					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
-					{
-						hlp_Client.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					{						
+						Hlp_Client.dataProvider = Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
 					}
+					Hlp_Client._setFocus();
 				}
 				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
 				{
-					if(AddMode==true)
+					if(Id == 0)
 					{
 						alignAlert(Alert.show("Saved Successfully.","Message !",Alert.OK, null, null, 
 						iconTickLarge, Alert.OK),10,"");
@@ -77,156 +76,269 @@
 							iconTickLarge, Alert.OK),10,"");
 					}
 					FnClear();
-					//hlp_Client.setFocus();
 				}
 				if (Ds_Objects.currentTarget.description.toString() == "LASTDATA_CUSTOM")
 				{
 					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
 					{
-						txt_Col1.text=Ds_Objects.result.Tables.Table.Rows[0].Column1;
-						txt_COl2.text=Ds_Objects.result.Tables.Table.Rows[0].Column2;
-						txt_COl3.text=Ds_Objects.result.Tables.Table.Rows[0].Column3;
-						txt_COl4.text=Ds_Objects.result.Tables.Table.Rows[0].Column4;
-						txt_COl5.text=Ds_Objects.result.Tables.Table.Rows[0].Column5;
-						txt_COl6.text=Ds_Objects.result.Tables.Table.Rows[0].Column6;
-						txt_COl7.text=Ds_Objects.result.Tables.Table.Rows[0].Column7;
-						txt_COl8.text=Ds_Objects.result.Tables.Table.Rows[0].Column8;
-						txt_COl9.text=Ds_Objects.result.Tables.Table.Rows[0].Column9;
-						txt_COl10.text=Ds_Objects.result.Tables.Table.Rows[0].Column10;
-						ClientId=Ds_Objects.result.Tables.Table.Rows[0].ClientId;
-						Id=Ds_Objects.result.Tables.Table.Rows[0].Id;
-						AddMode=false;
+						Txt_Col1.text = Ds_Objects.result.Tables.Table.Rows[0].Column1;
+						Txt_COl2.text = Ds_Objects.result.Tables.Table.Rows[0].Column2;
+						Txt_COl3.text = Ds_Objects.result.Tables.Table.Rows[0].Column3;
+						Txt_COl4.text = Ds_Objects.result.Tables.Table.Rows[0].Column4;
+						Txt_COl5.text = Ds_Objects.result.Tables.Table.Rows[0].Column5;
+						Txt_COl6.text = Ds_Objects.result.Tables.Table.Rows[0].Column6;
+						Txt_COl7.text = Ds_Objects.result.Tables.Table.Rows[0].Column7;
+						Txt_COl8.text = Ds_Objects.result.Tables.Table.Rows[0].Column8;
+						Txt_COl9.text = Ds_Objects.result.Tables.Table.Rows[0].Column9;
+						Txt_COl10.text = Ds_Objects.result.Tables.Table.Rows[0].Column10;						
+						Id = Ds_Objects.result.Tables.Table.Rows[0].Id;
+						Chk_Col1.selected = Ds_Objects.result.Tables.Table.Rows[0].Column1Mandatory;
+						Chk_Col2.selected = Ds_Objects.result.Tables.Table.Rows[0].Column2Mandatory;
+						Chk_Col3.selected = Ds_Objects.result.Tables.Table.Rows[0].Column3Mandatory;
+						Chk_Col4.selected = Ds_Objects.result.Tables.Table.Rows[0].Column4Mandatory;
+						Chk_Col5.selected = Ds_Objects.result.Tables.Table.Rows[0].Column5Mandatory;
+						Chk_Col6.selected = Ds_Objects.result.Tables.Table.Rows[0].Column6Mandatory;
+						Chk_Col7.selected = Ds_Objects.result.Tables.Table.Rows[0].Column7Mandatory;
+						Chk_Col8.selected = Ds_Objects.result.Tables.Table.Rows[0].Column8Mandatory;
+						Chk_Col9.selected = Ds_Objects.result.Tables.Table.Rows[0].Column9Mandatory;
+						Chk_Col10.selected = Ds_Objects.result.Tables.Table.Rows[0].Column10Mandatory;
+					}
+					else
+					{
+						Txt_Col1.text = "";Txt_COl2.text = "";Txt_COl3.text = "";
+						Txt_COl4.text = "";Txt_COl5.text = "";Txt_COl6.text = "";Txt_COl7.text = "";
+						Txt_COl8.text = "";Txt_COl9.text = "";Txt_COl10.text = "";Id = 0;
+						Chk_Col1.selected = false;Chk_Col2.selected = false;Chk_Col3.selected = false;
+						Chk_Col4.selected = false;Chk_Col5.selected = false;Chk_Col6.selected = false;
+						Chk_Col7.selected = false;Chk_Col8.selected = false;Chk_Col9.selected = false;
+						Chk_Col10.selected = false;
 					}
 				}
 			}
-			protected function FnValidation_BeforeSave():String
+			
+			public function FnSave_Validation():String
 			{
-				var TxtFlag:Boolean=true;ErrStr="";
-				var Flag:Boolean=true;
-				if(ClientId==0)
+				var Str:String = "";
+				var TxtFlag:Boolean = true;
+				if(ClientId == 0)
 				{
-					if(TxtFlag=true)
+					if(TxtFlag == true)
 					{
-						hlp_Client.setFocus();
+						Hlp_Client.setFocus();
 						TxtFlag=false;
 					}
-					ErrStr=ErrStr+" *   Client is Required \n";
+					Str += "*   Client is Required.\n";
 				}
-				if(txt_Col1.text=="")
+				if((Txt_Col1.text == "") && (Txt_COl2.text == "") && (Txt_COl3.text == "") &&
+					(Txt_COl4.text == "") && (Txt_COl5.text == "") && (Txt_COl6.text == "") &&
+					(Txt_COl7.text == "") && (Txt_COl8.text == "") && (Txt_COl9.text == "") &&
+					(Txt_COl10.text == "") && (Chk_Col1.selected == false) && (Chk_Col2.selected == false) &&
+					(Chk_Col3.selected == false) && (Chk_Col4.selected == false) &&
+					(Chk_Col5.selected == false) && (Chk_Col6.selected == false) &&
+					(Chk_Col7.selected == false) && (Chk_Col8.selected == false) &&
+					(Chk_Col9.selected == false) && (Chk_Col10.selected == false))
 				{
-					if(TxtFlag=true)
+					if(TxtFlag == true)
 					{
-						txt_Col1.setFocus();
-						TxtFlag=false;
+						Txt_Col1.setFocus();
+						TxtFlag = false;
 					}
-					ErrStr=ErrStr+" *   Column1 is Required \n";
+					Str += "*  Field Name is Required.\n";
 				}
-				return ErrStr;
+				if((Chk_Col1.selected == true) && (Txt_Col1.text == ""))
+				{
+					if(TxtFlag == true)
+					{
+						Txt_Col1.setFocus();
+						TxtFlag = false;
+					}
+					Str += "*  Field Name 1 is Required.\n";
+				}
+				if((Chk_Col2.selected == true) && (Txt_COl2.text == ""))
+				{
+					if(TxtFlag == true)
+					{
+						Txt_COl2.setFocus();
+						TxtFlag = false;
+					}
+					Str += "*  Field Name 2 is Required.\n";
+				}
+				if((Chk_Col3.selected == true) && (Txt_COl3.text == ""))
+				{
+					if(TxtFlag == true)
+					{
+						Txt_COl3.setFocus();
+						TxtFlag = false;
+					}
+					Str += "*  Field Name 3 is Required.\n";
+				}
+				if((Chk_Col4.selected == true) && (Txt_COl4.text == ""))
+				{
+					if(TxtFlag == true)
+					{
+						Txt_COl4.setFocus();
+						TxtFlag = false;
+					}
+					Str += "*  Field Name 4 is Required.\n";
+				}
+				if((Chk_Col5.selected == true) && (Txt_COl5.text == ""))
+				{
+					if(TxtFlag == true)
+					{
+						Txt_COl5.setFocus();
+						TxtFlag = false;
+					}
+					Str += "*  Field Name 5 is Required.\n";
+				}
+				if((Chk_Col6.selected == true) && (Txt_COl6.text == ""))
+				{
+					if(TxtFlag == true)
+					{
+						Txt_COl6.setFocus();
+						TxtFlag = false;
+					}
+					Str += "*  Field Name 6 is Required.\n";
+				}
+				if((Chk_Col7.selected == true) && (Txt_COl7.text == ""))
+				{
+					if(TxtFlag == true)
+					{
+						Txt_COl7.setFocus();
+						TxtFlag = false;
+					}
+					Str += "*  Field Name 7 is Required.\n";
+				}
+				if((Chk_Col8.selected == true) && (Txt_COl8.text == ""))
+				{
+					if(TxtFlag == true)
+					{
+						Txt_COl8.setFocus();
+						TxtFlag = false;
+					}
+					Str += "*  Field Name 8 is Required.\n";
+				}
+				if((Chk_Col9.selected == true) && (Txt_COl9.text == ""))
+				{
+					if(TxtFlag == true)
+					{
+						Txt_COl9.setFocus();
+						TxtFlag = false;
+					}
+					Str += "*  Field Name 9 is Required.\n";
+				}
+				if((Chk_Col10.selected == true) && (Txt_COl10.text == ""))
+				{
+					if(TxtFlag == true)
+					{
+						Txt_COl10.setFocus();
+						TxtFlag = false;
+					}
+					Str += "*  Field Name 10 is Required.\n";
+				}
+				return Str;
 			}
+			
 			protected function FnSave():void
 			{
-				ErrStr="";
-				ErrMsg = ""; Flag = true; 
-				var Str:String=FnValidation_BeforeSave();
-				if(ErrStr !="")
+				var Str:String = FnSave_Validation();				
+				if(Str != "")
 				{
-					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10,"");
+					alignAlert(Alert.show(Str,"Required Fields !",Alert.OK,this,null,iconErrLarge),10,"");
 					return;
-				} 
+				}
 				else
 				{
-					var arrcopy:ArrayCollection = new ArrayCollection
-						([{ 
-							ClientId:ClientId,
-							Column1:txt_Col1.text,
-							Column2:txt_COl2.text,
-							Column3:txt_COl3.text,
-							Column4:txt_COl4.text,
-							Column5:txt_COl5.text,
-							Column6:txt_COl6.text,
-							Column7:txt_COl7.text,
-							Column8:txt_COl8.text,
-							Column9:txt_COl9.text,
-							Column10:txt_COl10.text,
-							Id:Id
-						}])
-					
-					var HdrXml:String=""
-					HdrXml += "<ROOT>";	
-					HdrXml += ObjToXmlStr_Comm(arrcopy,"HdrXml") 
-					HdrXml += "</ROOT>";
-					
+					var Ac_Hdr:ArrayCollection = new ArrayCollection
+						([{ClientId:ClientId,Column1:Txt_Col1.text,Column2:Txt_COl2.text,
+						   Column3:Txt_COl3.text,Column4:Txt_COl4.text,Column5:Txt_COl5.text,
+						   Column6:Txt_COl6.text,Column7:Txt_COl7.text,Column8:Txt_COl8.text,
+						   Column9:Txt_COl9.text,Column10:Txt_COl10.text,Id:Id,
+						   Column1Mandatory:Chk_Col1.selected,Column2Mandatory:Chk_Col2.selected,
+						   Column3Mandatory:Chk_Col3.selected,Column4Mandatory:Chk_Col4.selected,
+						   Column5Mandatory:Chk_Col5.selected,Column6Mandatory:Chk_Col6.selected,
+						   Column7Mandatory:Chk_Col7.selected,Column8Mandatory:Chk_Col8.selected,
+						   Column9Mandatory:Chk_Col9.selected,Column10Mandatory:Chk_Col10.selected
+						}]);
+					var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
 					useWeb("ClientColumn","Save_CUSTOM",[GlobalXml,HdrXml]);
 				}
 			}
+			
 			protected function FnClear():void
 			{
-			//	hlp_Client.setFocus();
-				ClientId=0;
-				hlp_Client.text="";
-				ClientName="";
-				txt_Col1.text="";
-				txt_COl2.text="";
-				txt_COl3.text="";
-				txt_COl4.text="";
-				txt_COl5.text="";
-				txt_COl6.text="";
-				txt_COl7.text="";
-				txt_COl8.text="";
-				txt_COl9.text="";
-				txt_COl10.text="";
-				Help();
+				ClientId = 0;Hlp_Client.fnClear();Txt_Col1.text = "";Txt_COl2.text = "";Txt_COl3.text = "";
+				Txt_COl4.text = "";Txt_COl5.text = "";Txt_COl6.text = "";Txt_COl7.text = "";
+				Txt_COl8.text = "";Txt_COl9.text = "";Txt_COl10.text = "";Id = 0;
+				Chk_Col1.selected = false;Chk_Col2.selected = false;Chk_Col3.selected = false;
+				Chk_Col4.selected = false;Chk_Col5.selected = false;Chk_Col6.selected = false;
+				Chk_Col7.selected = false;Chk_Col8.selected = false;Chk_Col9.selected = false;
+				Chk_Col10.selected = false;Help();
 			}
 			public function fnGetClient():void
 			{
-				if(hlp_Client.selected())
+				if(Hlp_Client.selected())
 				{
-					ClientName=hlp_Client.Select_Row.ClientName
-					hlp_Client.text=ClientName;	
-					ClientId=hlp_Client.Select_Row.ZId
-					txt_Col1.setFocus();
-					useWeb("ClientColumn","LASTDATA_CUSTOM",[GlobalXml,'LASTDATA',ClientId,Global_AC[0].UsrId]);
+					Hlp_Client.text = Hlp_Client.Select_Row.ClientName;	
+					ClientId = Hlp_Client.Select_Row.ZId
+					Txt_Col1.setFocus();
+					useWeb("ClientColumn","LASTDATA_CUSTOM",[GlobalXml,'LASTDATA',ClientId]);
 				}
 				else
 				{
-					hlp_Client.text="";
+					Hlp_Client.fnClear();
 					ClientId=0;
 				}
 			}
 		]]>
 	</fx:Script>
 	<s:HGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
-		<s:BorderContainer x="0" y="-2" width="100%" height="100%" id="Brd_Cash" backgroundColor="#fbf9f9" 
-						   visible="true" borderVisible="false">
-			<s:Label x="272" y="69" text="Client"/>
-			<WrbHelpComp:HelpText x="372" y="61.5" width="200" pxTabIndex="1" depth="10" pxSetPrompt="Select Client"
-								  id="hlp_Client" pxSetColumnsWidth="200,0" onselection="{fnGetClient()}">
+		<s:BorderContainer x="0" y="0" width="900" height="515" backgroundColor="#ffffff"
+						   borderVisible="false">
+			<s:Label x="274" y="26.5" text="Client"/>
+			<s:Label x="321" y="30.5" text="*" color="Red"/>
+			<WrbHelpComp:HelpText x="339" y="22.5" width="300" pxTabIndex="1" depth="10" 
+								  pxSetPrompt="Select Client" id="Hlp_Client" 
+								  pxSetColumnsWidth="298,0" onselection="{fnGetClient()}">
 			</WrbHelpComp:HelpText>
-			<s:Label x="115" y="159" text="Column1"/>
-			<s:Label x="115" y="201" text="Column2"/>
-			<s:Label x="115" y="242" text="Column3"/>
-			<s:Label x="115" y="282" text="Column4"/>
-			<s:Label x="115" y="320" text="Column5"/>
-			<s:Label x="555" y="159" text="Column6"/>
-			<s:Label x="555" y="201" text="Column7"/>
-			<s:Label x="555" y="242" text="Column8"/>
-			<s:Label x="555" y="282" text="Column9"/>
-			<s:Label x="555" y="320" text="Column10"/>
-			<s:TextInput id="txt_Col1" x="215" y="151" maxChars="100" tabIndex="2"/>
-			<s:TextInput id="txt_COl2" x="215" y="193" maxChars="100" tabIndex="3"/>
-			<s:TextInput id="txt_COl3" x="215" y="234" maxChars="100" tabIndex="4"/>
-			<s:TextInput id="txt_COl4" x="215" y="274" maxChars="100" tabIndex="5"/>
-			<s:TextInput id="txt_COl5" x="215" y="312" maxChars="100" tabIndex="6"/>
-			<s:TextInput id="txt_COl6" x="655" y="151" maxChars="100" tabIndex="7"/>
-			<s:TextInput id="txt_COl7" x="655" y="193" maxChars="100" tabIndex="8"/>
-			<s:TextInput id="txt_COl8" x="655" y="234" maxChars="100" tabIndex="9"/>
-			<s:TextInput id="txt_COl9" x="655" y="274" maxChars="100" tabIndex="10"/>
-			<s:TextInput id="txt_COl10" x="655" y="312" maxChars="100" tabIndex="11"/>
-			<s:Label x="34" y="23" text="Client Columns" color="red"/>
-			<s:HGroup x="0" y="439" width="100%" height="50" horizontalAlign="center" verticalAlign="middle">
-				<WrbComp:SaveControl id="Save_Columns" x="196" y="451" docSave="FnSave()" docClear="FnClear()">
-				</WrbComp:SaveControl>
+			<s:Label x="409" y="67" text="Field Name"/>
+			<s:Label x="582" y="67" text="Mandatory"/>
+			<s:TextInput id="Txt_Col1" x="339" y="93" width="205" height="20" maxChars="25"
+						 tabIndex="2" prompt="Field Name 1"/>
+			<s:TextInput id="Txt_COl2" x="339" y="130" width="205" height="20" maxChars="25"
+						 tabIndex="4" prompt="Field Name 2"/>
+			<s:TextInput id="Txt_COl3" x="339" y="167" width="205" height="20" maxChars="25"
+						 tabIndex="6" prompt="Field Name 3"/>
+			<s:TextInput id="Txt_COl4" x="339" y="203" width="205" height="20" maxChars="25"
+						 tabIndex="8" prompt="Field Name 4"/>
+			<s:TextInput id="Txt_COl5" x="339" y="240" width="205" height="20" maxChars="25"
+						 tabIndex="10" prompt="Field Name 5"/>
+			<s:TextInput id="Txt_COl6" x="339" y="277" width="205" height="20" maxChars="25"
+						 tabIndex="12" prompt="Field Name 6"/>
+			<s:TextInput id="Txt_COl7" x="339" y="314" width="205" height="20" maxChars="25"
+						 tabIndex="14" prompt="Field Name 7"/>
+			<s:TextInput id="Txt_COl8" x="339" y="351" width="205" height="20" maxChars="25"
+						 tabIndex="16" prompt="Field Name 8"/>
+			<s:TextInput id="Txt_COl9" x="339" y="388" width="205" height="20" maxChars="25"
+						 tabIndex="18" prompt="Field Name 9"/>
+			<s:TextInput id="Txt_COl10" x="339" y="424" width="205" height="20" maxChars="25"
+						 tabIndex="20" prompt="Field Name 10"/>
+			<s:HGroup x="339" y="470" width="300" height="32" horizontalAlign="center" verticalAlign="middle"
+					  gap="25">
+				<WrbComp:Button_HB _Label="Save" click="FnSave()">
+				</WrbComp:Button_HB>
+				<WrbComp:Button_HB _Label="Clear" click="FnClear()">
+				</WrbComp:Button_HB>
 			</s:HGroup>
+			<s:CheckBox x="601.5" y="94" id="Chk_Col1" tabIndex="3"/>
+			<s:CheckBox x="601.5" y="131" id="Chk_Col2" tabIndex="5"/>
+			<s:CheckBox x="601.5" y="168" id="Chk_Col3" tabIndex="7"/>
+			<s:CheckBox x="601.5" y="204" id="Chk_Col4" tabIndex="9"/>
+			<s:CheckBox x="601.5" y="241" id="Chk_Col5" tabIndex="11"/>
+			<s:CheckBox x="601.5" y="278" id="Chk_Col6" tabIndex="13"/>
+			<s:CheckBox x="601.5" y="315" id="Chk_Col7" tabIndex="15"/>
+			<s:CheckBox x="601.5" y="352" id="Chk_Col8" tabIndex="17"/>
+			<s:CheckBox x="601.5" y="389" id="Chk_Col9" tabIndex="19"/>
+			<s:CheckBox x="601.5" y="425" id="Chk_Col10" tabIndex="21"/>
 		</s:BorderContainer>
 	</s:HGroup>
 </s:Application>

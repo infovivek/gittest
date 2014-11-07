@@ -52,7 +52,7 @@ CREATE PROCEDURE dbo.[SP_VendorChequeApprovalHdr_Help]
 		JOIN WRBHBPropertyUsers PU ON P.Id=PU.PropertyId AND PU.IsActive=1 AND PU.IsDeleted=0
 		JOIN WRBHBUser U ON  VC.RequestedUserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
 		JOIN WRBHBUser US ON VC.UserId=US.Id AND US.IsActive=1 AND US.IsDeleted=0
-		WHERE VC.IsActive=1 AND VC.IsDeleted=0 --AND PU.UserId=@UserId 
+		WHERE VC.IsActive=1 AND VC.IsDeleted=0 AND PU.UserId=@UserId 
 		AND VC.Process=1 AND
 		VC.Status !='Acknowledged' AND
 		P.Category IN('Internal Property','Managed G H')
@@ -71,7 +71,7 @@ CREATE PROCEDURE dbo.[SP_VendorChequeApprovalHdr_Help]
 		JOIN WRBHBPropertyUsers PU ON P.Id=PU.PropertyId AND PU.IsActive=1 AND PU.IsDeleted=0
 		JOIN WRBHBUser U ON VC.UserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
 		WHERE VC.IsActive=1 AND VC.IsDeleted=0 AND VC.Flag=1 AND VC.Partial=0
-		--AND PU.UserId=@UserId AND VC.Partial=0
+		AND PU.UserId=@UserId AND VC.Partial=0
 		AND P.Category IN('Internal Property','Managed G H')
 		AND PU.UserType IN('Resident Managers','Assistant Resident Managers','Operations Managers',
 		'Ops Head','Finance')
@@ -84,7 +84,75 @@ CREATE PROCEDURE dbo.[SP_VendorChequeApprovalHdr_Help]
 		group by  Requestedby,RequestedOn,PropertyName,Status,
 		Process,Processedon,Processedby,Id,RequestedUserId,PropertyId 
 		
+		SELECT DISTINCT P.PropertyName Property,P.Id Id	
+		FROM WRBHBPropertyUsers  PU 
+		JOIN WRBHBProperty P ON PU.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
+		WHERE PU.UserId=@UserId AND 
+		P.Category IN('Internal Property','Managed G H') AND PU.IsActive=1 AND PU.IsDeleted=0 
+		
 END
+ IF @Action='UserLoad'
+ BEGIN
+		SELECT DISTINCT PU.UserName,PU.UserId AS Id	
+		FROM WRBHBPropertyUsers  PU 
+		JOIN WRBHBProperty P ON PU.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
+		WHERE PU.PropertyId=@CreatedById AND 
+		P.Category IN('Internal Property','Managed G H') AND PU.IsActive=1 AND PU.IsDeleted=0 
+		AND PU.UserType IN('Resident Managers' ,'Assistant Resident Managers')
+ END
+ IF @Action='PropertyLoad'
+ BEGIN
+		CREATE TABLE #Request1(Requestedby NVARCHAR(100),RequestedOn NVARCHAR(100),
+		RequestedAmount DECIMAL(27,2),PropertyName NVARCHAR(100),Status NVARCHAR(100),Process BIT,
+		Processedby NVARCHAR(100),Processedon NVARCHAR(100),Id INT,RequestedUserId INT,PropertyId INT,UserId INT)
+		
+		IF(@Str ='All')
+		BEGIN
+		INSERT INTO #Request1(Requestedby,RequestedOn,
+		RequestedAmount,PropertyName,Status,Process,Processedby,Processedon,Id,RequestedUserId,PropertyId,UserId)
+		SELECT  DISTINCT (U.FirstName+' '+U.LastName) AS Requestedby,
+		CONVERT(NVARCHAR(100),VC.RequestedOn,103) AS RequestedOn,VC.RequestedAmount AS RequestedAmount,
+		P.PropertyName,
+		VC.Status AS Status,0 AS Process,(US.FirstName+' '+US.LastName) AS Processedby,
+		CONVERT(NVARCHAR(100),VC.Processedon,103) AS Processedon, VC.Id,VC.RequestedUserId AS RequestedUserId,
+		VC.PropertyId,VC.UserId
+		From WRBHBVendorChequeApprovalDtl VC
+		JOIN WRBHBProperty P ON VC.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
+		JOIN WRBHBPropertyUsers PU ON P.Id=PU.PropertyId AND PU.IsActive=1 AND PU.IsDeleted=0
+		JOIN WRBHBUser U ON  VC.RequestedUserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
+		JOIN WRBHBUser US ON VC.UserId=US.Id AND US.IsActive=1 AND US.IsDeleted=0
+		WHERE VC.IsActive=1 AND VC.IsDeleted=0 AND PU.UserId=@UserId AND VC.PropertyId=@CreatedById
+		AND VC.Process=1 AND
+		VC.Status !='Acknowledged' AND
+		P.Category IN('Internal Property','Managed G H')
+		AND PU.UserType IN('Resident Managers','Assistant Resident Managers','Operations Managers',
+		'Ops Head','Finance')	
+		
+		INSERT INTO #Request1(Requestedby,RequestedOn,RequestedAmount,PropertyName,Status,Process,Processedon,
+		Processedby,Id,RequestedUserId,PropertyId,UserId)
+		
+		SELECT (U.FirstName+' '+U.LastName) AS Requestedby,CONVERT(NVARCHAR(100),VC.Date,103) AS RequestedOn,
+		SUM(VC.Amount) AS RequestAmount,P.PropertyName,'Waiting For Operation Manager Approval' AS Status,0 AS Process,
+		CONVERT(NVARCHAR(100),GETDATE(),103) AS Processedon,'Process' AS Processedby,
+		0 AS Id,VC.UserId AS RequestedUserId,VC.PropertyId,0 AS UserId
+		FROM WRBHBVendorRequest VC
+		JOIN WRBHBProperty P ON VC.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
+		JOIN WRBHBPropertyUsers PU ON P.Id=PU.PropertyId AND PU.IsActive=1 AND PU.IsDeleted=0
+		JOIN WRBHBUser U ON VC.UserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
+		WHERE VC.IsActive=1 AND VC.IsDeleted=0 AND VC.Flag=1 AND VC.Partial=0
+		AND PU.UserId=@UserId AND VC.Partial=0 AND VC.PropertyId=@CreatedById
+		AND P.Category IN('Internal Property','Managed G H')
+		AND PU.UserType IN('Resident Managers','Assistant Resident Managers','Operations Managers',
+		'Ops Head','Finance')
+		GROUP BY U.FirstName,U.LastName,P.PropertyName,VC.Date,VC.UserId,VC.PropertyId
+		END
+						
+		SELECT  Requestedby,RequestedOn,sum(RequestedAmount) AS RequestedAmount,PropertyName AS Property,Status,
+		Process,Processedon,Processedby,Id,RequestedUserId,PropertyId 
+		FROM #Request1
+		group by  Requestedby,RequestedOn,PropertyName,Status,
+		Process,Processedon,Processedby,Id,RequestedUserId,PropertyId
+ END
  IF @Action='History'
  BEGIN
         --table1
@@ -175,22 +243,21 @@ END
 		CREATE TABLE #User (UserName NVARCHAR(100),Status NVARCHAR(100),Processedon NVARCHAR(100))
 			
 		INSERT INTO #User(UserName,Status,Processedon)
-		
-		SELECT DISTINCT (US.FirstName+' '+US.LastName) AS UserName, VC.Status,
-		CONVERT(NVARCHAR(100),VC.Processedon,103) AS Processedon		
-		From WRBHBVendorChequeApprovalNewDtl VC
-		JOIN WRBHBUser US ON  VC.UserId=US.Id AND US.IsActive=1 AND US.IsDeleted=0
-		WHERE VC.RequestedUserId=@UserId AND VC.PropertyId=@CreatedById AND  VC.IsActive=1 AND VC.IsDeleted=0
-		AND VC.RequestedOn=CONVERT(NVARCHAR,@Str,103)
-				
-		INSERT INTO #User(UserName,Status,Processedon)
-		
 		SELECT DISTINCT(U.FirstName+' '+U.LastName) AS UserName,
 		'Waiting' AS Status,CONVERT(NVARCHAR(100),VR.Date,103) AS Processedon
 		FROM WRBHBVendorRequest VR
 		JOIN WRBHBUser U ON VR.UserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
 		WHERE VR.UserId=@UserId AND VR.PropertyId=@CreatedById AND VR.IsActive=1 AND VR.IsDeleted=0 
 		AND VR.Date=CONVERT(Date,@Str,103)
+		
+		INSERT INTO #User(UserName,Status,Processedon)
+		SELECT (US.FirstName+' '+US.LastName) AS UserName, VC.Status,
+		CONVERT(NVARCHAR(100),VC.Processedon,103) AS Processedon		
+		From WRBHBVendorChequeApprovalNewDtl VC
+		JOIN WRBHBUser US ON  VC.UserId=US.Id AND US.IsActive=1 AND US.IsDeleted=0
+		WHERE VC.RequestedUserId=@UserId AND VC.PropertyId=@CreatedById AND  VC.IsActive=1 AND VC.IsDeleted=0
+		AND VC.RequestedOn=CONVERT(NVARCHAR,@Str,103)
+		ORDER BY VC.CreatedDate
 		
 		SELECT UserName,Status,Processedon 
 		FROM #User ORDER BY Processedon ASC

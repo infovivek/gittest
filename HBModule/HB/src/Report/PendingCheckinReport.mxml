@@ -150,72 +150,70 @@
 			}
 			protected function ExportExcel(event:MouseEvent):void
 			{
-//				try
-//				{
-//					var arrExportResult:ArrayCollection = Grd_ListClient1.dataProvider as ArrayCollection;
-//					if(arrExportResult.length!=0)
-//					{					
-//						xlsFile = new ExcelFile();
-//						var sheet:Sheet = new Sheet();
-//						
-//						sheet.resize(arrExportResult.length+2,14);
-//						
-//						sheet.setCell(0,5,Type+" Report");
-//						sheet.setCell(1,0,'Property Name');
-//						sheet.setCell(1,1,'First Name');
-//						sheet.setCell(1,2,'BookingLevel');
-//						sheet.setCell(1,3,'ExpDate');
-//						sheet.setCell(1,4,'City');
-//						sheet.setCell(1,5,'ClientName');
-//						sheet.setCell(1,6,'BookingCode');
-//						//sheet.setCell(1,7,'');
-//						//sheet.setCell(1,8,'');
-//						
-//						for(var i:int=0;i<arrExportResult.length;i++)
-//						{
-//							sheet.setCell(i+2, 0, arrExportResult[i].CityName);
-//							sheet.setCell(i+2, 1, arrExportResult[i].PropertyName);
-//							sheet.setCell(i+2, 2, arrExportResult[i].DD);
-//							sheet.setCell(i+2, 3, arrExportResult[i].Direct);
-//							sheet.setCell(i+2, 4, arrExportResult[i].BTC);
-//							sheet.setCell(i+2, 5, arrExportResult[i].Online);
-//							sheet.setCell(i+2, 6, arrExportResult[i].TOTAL);
-//							sheet.setCell(i+2, 7, arrExportResult[i].GTV);
-//							sheet.setCell(i+2, 8, arrExportResult[i].Category);
-//							
-//						}						
-//						
-//						
-//						Grd_ListClient1.dataProvider = arrExportResult;
-//						xlsFile.sheets.addItem(sheet);      
-//						var bytes: ByteArray = xlsFile.saveToByteArray();
-//						var fr:FileReference = new FileReference();
-//						var FileName:String = ""; 
-//					}
-//					else
-//					{
-//						
-//						alignAlert(Alert.show("* No Records Found.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
-//						return;
-//					}
-//					//Grd_BCFC.visible=false;
-//					//Grd_BCFC.dataProvider=null;
-//					Clear();
-//				}				
-//				catch (myError:Error) 
-//				{
-//					alignAlert(Alert.show("* Excel File Already Opened.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
-//					return
-//				}catch (error:TypeError)
-//				{
-//					alignAlert(Alert.show("* Excel File Already Opened.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
-//					return
-//				}catch (error:IOErrorEvent)
-//				{
-//					alignAlert(Alert.show("* Excel File Already Opened.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
-//					return
-//				}
-//				
+				try
+				{
+					var arrExportResult:ArrayCollection = Grd_ListClient1.dataProvider as ArrayCollection;
+					if(arrExportResult.length!=0)
+					{					
+						xlsFile = new ExcelFile();
+						var sheet:Sheet = new Sheet();
+						
+						sheet.resize(arrExportResult.length+2,14);
+						//BookedId,PropertyName,PropertyId,FirstName,BookingLevel,
+						//ExpDate,C.CityName,CityId,,ClientId,BookingCode,Category
+						sheet.setCell(0,3,Type+"PendingCheckin Report");
+						sheet.setCell(1,0,'Property Name');
+						sheet.setCell(1,1,'ClientName');
+						sheet.setCell(1,2,'BookingLevel');
+						sheet.setCell(1,3,'CheckinDate');
+						sheet.setCell(1,4,'CityName'); 
+						sheet.setCell(1,5,'BookingCode');
+						//sheet.setCell(1,6,'');
+						//sheet.setCell(1,7,'');
+						
+						for(var i:int=0;i<arrExportResult.length;i++)
+						{
+							sheet.setCell(i+2, 0, arrExportResult[i].ClientName);
+							sheet.setCell(i+2, 1, arrExportResult[i].PropertyName);
+							sheet.setCell(i+2, 2, arrExportResult[i].BookingLevel);
+							sheet.setCell(i+2, 3, arrExportResult[i].ExpDate);
+							sheet.setCell(i+2, 4, arrExportResult[i].CityName);
+							sheet.setCell(i+2, 5, arrExportResult[i].BookingCode);
+							//sheet.setCell(i+2, 7, arrExportResult[i].);
+							//sheet.setCell(i+2, 8, arrExportResult[i].); 
+						}			 
+						
+						Grd_ListClient1.dataProvider = arrExportResult;
+						xlsFile.sheets.addItem(sheet);      
+						var bytes: ByteArray = xlsFile.saveToByteArray();
+						var fr:FileReference = new FileReference(); 
+						var str:String="PendingCheckin.xls";
+						fr.save(bytes,"PendingCheckin.xls");
+					}
+					else
+					{
+						
+						alignAlert(Alert.show("* No Records Found.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+						return;
+					}
+					//Grd_BCFC.visible=false;
+					//Grd_BCFC.dataProvider=null;
+					Clear();
+				}				
+				catch (myError:Error) 
+				{
+					alignAlert(Alert.show("* Excel File Already Opened.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+					return
+				}catch (error:TypeError)
+				{
+					alignAlert(Alert.show("* Excel File Already Opened.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+					return
+				}catch (error:IOErrorEvent)
+				{
+					alignAlert(Alert.show("* Excel File Already Opened.","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+					return
+				}
+				
 			}
 			public var FltNm:String="";
 			public var myArrayCollection:ArrayCollection=new ArrayCollection();
@@ -251,7 +249,7 @@
 				
 				<s:Image x="831" y="20" source="assets/a1.png" toolTip="Search" click="btn_Search_clickHandler()" tabIndex="5"/>
 				<s:Image x="900" y="20" click="Clear()" source="assets/dust_bin1.png" toolTip="Clear"/>
-				<WrbComp:Button_HB  x="1040" y="20" Lable_val="Export" id="btn_Excel"  click="ExportExcel(event)" visible="false" > 
+				<WrbComp:Button_HB  x="1040" y="20" Lable_val="Export" id="btn_Excel"  click="ExportExcel(event)"> 
 				</WrbComp:Button_HB> 
 				<!--mx:Label id="Lbl_Vendor1" x="223" y="2" width="13" text="*" color="red" fontSize="16"/>
 				<mx:Label id="Lbl_Vendor0" x="222" y="42" width="13" text="*" color="red" fontSize="16"/-->
@@ -285,7 +283,7 @@
 					<mx:DataGridColumn dataField="CityName"   textAlign="left" visible="false"/> 
 					<mx:DataGridColumn dataField="FirstName" width="190"   headerText="Guest Name" textAlign="left"/>	
 					<mx:DataGridColumn dataField="BookingLevel" width="115"  headerText="BookingLevel"  textAlign="left" />
-					<mx:DataGridColumn dataField="ExpDate" width="91" headerText="Date"  textAlign="center"/>
+					<mx:DataGridColumn dataField="ExpDate" width="91" headerText="CheckinDate"  textAlign="center"/>
 					<mx:DataGridColumn dataField="BookingCode" width="91" headerText="Booking Code"  textAlign="left"/>
 					
 				</mx:columns>

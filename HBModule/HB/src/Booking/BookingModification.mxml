@@ -22,6 +22,7 @@
 			public var DtlsId:int=0;
 			public var BookingId:int=0;
 			public var Status:String="";
+			public var GradeId:String="";
 			private function Page_Load():void
 			{
 				Global_AC = funLoginInfo("<gScrId>1</gScrId><gUsrFk>1</gUsrFk>");				
@@ -110,7 +111,7 @@
 					if (Ds_Objects.result.Tables.Table4.Rows.length > 0)
 					{
 						var ClientId:String= Ds_Objects.result.Tables.Table4.Rows[0].ClientId;
-						var GradeId:String= Ds_Objects.result.Tables.Table4.Rows[0].GradeId;
+						GradeId= Ds_Objects.result.Tables.Table4.Rows[0].GradeId;
 						
 						var Tmp:ArrayCollection=new ArrayCollection
 							([{Action:GlobalXml,Param1:"PaymentMode",Param2:BookingLevel,Param3:BookingId,prcName:"BookingCancel",
@@ -159,6 +160,7 @@
 				GuestFlag=false;
 				txt_BookingLevel.text="";
 				hlp_BookingCode._setFocus();
+				GradeId="";
 				help();
 			}
 			public var Ac_Guest:ArrayCollection=new ArrayCollection();	
@@ -299,6 +301,21 @@
 				{
 					arrObj.Tick="1";
 				}
+				if(GradeId=="0")
+				{
+					if((arrObj.FirstName!=arrObj.OldFirstname)||(arrObj.GuestId==arrObj.OldGuestId))
+					{
+						arrObj.GuestId=0;
+					}
+				}
+				else
+				{
+					if((arrObj.FirstName!=arrObj.OldFirstname)||(arrObj.GuestId==arrObj.OldGuestId))
+					{
+						Err=Err+"It is an Invalid Process.Please Select Guest Name and Enter It.\n";
+					}
+				}
+				
 				if(arrObj.DateDiffs=="0")
 				{
 					Err=Err+"CheckIn And CheckOut Date Are Same.\n";

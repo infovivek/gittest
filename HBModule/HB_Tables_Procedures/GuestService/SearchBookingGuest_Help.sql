@@ -57,96 +57,96 @@ BEGIN						--DROP TABLE #TEMP2
 		SELECT DISTINCT (FirstName+ ' '+ LastName) AS Guest,GuestId as ZId
 		FROM WRBHBBookingGuestDetails ORDER BY Guest
 		
-		CREATE TABLE #TEMP1(BookingCode BIGINT,OccupancyLevel NVARCHAR(100),Guests NVARCHAR(1024),GuestId BIGINT,
-		ClientName NVARCHAR(100),ClientId BIGINT,PropertyName NVARCHAR(100),Category NVARCHAR(100),
-		PropertyId BIGINT,BookingDate NVARCHAR(100),CheckInDate NVARCHAR(100),CheckOutDate NVARCHAR(100),
-		Status NVARCHAR(100),CancelStatus NVARCHAR(100),ChkInStatus NVARCHAR(100),PaymentMode NVARCHAR(100),
-		Tariff DECIMAL(27,2),Days BIGINT,BookingLevel NVARCHAR(100),BookingId BIGINT,PropertyType NVARCHAR(100))
+--		CREATE TABLE #TEMP1(BookingCode BIGINT,OccupancyLevel NVARCHAR(100),Guests NVARCHAR(1024),GuestId BIGINT,
+--		ClientName NVARCHAR(100),ClientId BIGINT,PropertyName NVARCHAR(100),Category NVARCHAR(100),
+--		PropertyId BIGINT,BookingDate NVARCHAR(100),CheckInDate NVARCHAR(100),CheckOutDate NVARCHAR(100),
+--		Status NVARCHAR(100),CancelStatus NVARCHAR(100),ChkInStatus NVARCHAR(100),PaymentMode NVARCHAR(100),
+--		Tariff DECIMAL(27,2),Days BIGINT,BookingLevel NVARCHAR(100),BookingId BIGINT,PropertyType NVARCHAR(100))
 				
-		CREATE TABLE #TEMP2(BookingCode BIGINT,OccupancyLevel NVARCHAR(100),Guests NVARCHAR(1024),GuestId BIGINT,
-		ClientName NVARCHAR(100),ClientId BIGINT,PropertyName NVARCHAR(100),Category NVARCHAR(100),
-		PropertyId BIGINT,BookingDate NVARCHAR(100),CheckInDate NVARCHAR(100),CheckOutDate NVARCHAR(100),
-		Status NVARCHAR(100),CancelStatus NVARCHAR(100),ChkInStatus NVARCHAR(100),PaymentMode NVARCHAR(100),
-		Tariff DECIMAL(27,2),Days BIGINT,BookingLevel NVARCHAR(100))
+--		CREATE TABLE #TEMP2(BookingCode BIGINT,OccupancyLevel NVARCHAR(100),Guests NVARCHAR(1024),GuestId BIGINT,
+--		ClientName NVARCHAR(100),ClientId BIGINT,PropertyName NVARCHAR(100),Category NVARCHAR(100),
+--		PropertyId BIGINT,BookingDate NVARCHAR(100),CheckInDate NVARCHAR(100),CheckOutDate NVARCHAR(100),
+--		Status NVARCHAR(100),CancelStatus NVARCHAR(100),ChkInStatus NVARCHAR(100),PaymentMode NVARCHAR(100),
+--		Tariff DECIMAL(27,2),Days BIGINT,BookingLevel NVARCHAR(100))
 	
-		CREATE TABLE #TEMPFINAL(BookingCode BIGINT,OccupancyLevel NVARCHAR(100),Guests NVARCHAR(2500),
-		GuestId NVARCHAR(2500),ClientName NVARCHAR(100),ClientId BIGINT,PropertyName NVARCHAR(100),
-		Category NVARCHAR(100),PropertyId BIGINT,BookingDate NVARCHAR(100),CheckInDate NVARCHAR(100),
-		CheckOutDate NVARCHAR(100),Status NVARCHAR(100),CancelStatus NVARCHAR(100),ChkInStatus NVARCHAR(100),
-		PaymentMode NVARCHAR(100),Tariff DECIMAL(27,2),Days BIGINT,BookingLevel NVARCHAR(100))
+--		CREATE TABLE #TEMPFINAL(BookingCode BIGINT,OccupancyLevel NVARCHAR(100),Guests NVARCHAR(2500),
+--		GuestId NVARCHAR(2500),ClientName NVARCHAR(100),ClientId BIGINT,PropertyName NVARCHAR(100),
+--		Category NVARCHAR(100),PropertyId BIGINT,BookingDate NVARCHAR(100),CheckInDate NVARCHAR(100),
+--		CheckOutDate NVARCHAR(100),Status NVARCHAR(100),CancelStatus NVARCHAR(100),ChkInStatus NVARCHAR(100),
+--		PaymentMode NVARCHAR(100),Tariff DECIMAL(27,2),Days BIGINT,BookingLevel NVARCHAR(100))
 
 	 
 		
---BOOKING AND CANCELED
---Room Level		
-		INSERT INTO #TEMP1(BookingCode,OccupancyLevel,Guests,GuestId,ClientName,ClientId,PropertyName,Category,PropertyId,BookingDate,CheckInDate,
-		CheckOutDate,Status,CancelStatus,ChkInStatus,PaymentMode,Tariff,Days,BookingLevel,PropertyType)
+----BOOKING AND CANCELED
+----Room Level		
+--		INSERT INTO #TEMP1(BookingCode,OccupancyLevel,Guests,GuestId,ClientName,ClientId,PropertyName,Category,PropertyId,BookingDate,CheckInDate,
+--		CheckOutDate,Status,CancelStatus,ChkInStatus,PaymentMode,Tariff,Days,BookingLevel,PropertyType)
 		
-		SELECT DISTINCT B.BookingCode,PAG.Occupancy,
-		(PAG.FirstName+ ' '+ PAG.LastName) AS Guests,PAG.GuestId as GuestId,
-		B.ClientName Client,B.ClientId,ISNULL(P.PropertyName,'') Property,P.Category,PAG.BookingPropertyId,CONVERT(NVARCHAR(100),
-		PAG.CreatedDate,103) AS BookingDate,CONVERT(NVARCHAR(100),B.CheckInDate,103) AS CheckInDate,
-		CONVERT(NVARCHAR(100),B.CheckOutDate,103) AS CheckOutDate,PAG.CurrentStatus Status,B.CancelStatus,PAG.CurrentStatus,
-		PAG.TariffPaymentMode,PAG.Tariff,DATEDIFF(DAY,PAG.ChkInDt,PAG.ChkOutDt),B.BookingLevel,BP.PropertyType
-		FROM WRBHBBooking B		
-		JOIN WRBHBBookingPropertyAssingedGuest PAG ON B.Id = PAG.BookingId
-		JOIN WRBHBBookingProperty BP ON B.Id=BP.BookingId	AND PAG.BookingPropertyTableId=BP.Id	
-		LEFT OUTER JOIN WRBHBProperty P ON PAG.BookingPropertyId=P.Id		
-		WHERE  CONVERT(DATETIME,B.CreatedDate,103) between CONVERT(DATETIME,GETDATE()-30,103) and
-		CONVERT(DATETIME,GETDATE(),103)
-		GROUP BY B.BookingCode,PAG.Occupancy,
-		B.ClientName,B.ClientId,PAG.GuestId,
-		P.PropertyName,P.Category,PAG.BookingPropertyId,PAG.FirstName,PAG.LastName,PAG.CreatedDate,
-		B.CheckInDate,B.CheckOutDate,B.Status,B.CancelStatus,PAG.CurrentStatus,PAG.TariffPaymentMode,PAG.Tariff,
-		PAG.ChkInDt,PAG.ChkOutDt,B.BookingLevel,BP.PropertyType ORDER BY BookingCode
+--		SELECT DISTINCT B.BookingCode,PAG.Occupancy,
+--		(PAG.FirstName+ ' '+ PAG.LastName) AS Guests,PAG.GuestId as GuestId,
+--		B.ClientName Client,B.ClientId,ISNULL(P.PropertyName,'') Property,P.Category,PAG.BookingPropertyId,CONVERT(NVARCHAR(100),
+--		PAG.CreatedDate,103) AS BookingDate,CONVERT(NVARCHAR(100),B.CheckInDate,103) AS CheckInDate,
+--		CONVERT(NVARCHAR(100),B.CheckOutDate,103) AS CheckOutDate,PAG.CurrentStatus Status,B.CancelStatus,PAG.CurrentStatus,
+--		PAG.TariffPaymentMode,PAG.Tariff,DATEDIFF(DAY,PAG.ChkInDt,PAG.ChkOutDt),B.BookingLevel,BP.PropertyType
+--		FROM WRBHBBooking B		
+--		JOIN WRBHBBookingPropertyAssingedGuest PAG ON B.Id = PAG.BookingId
+--		JOIN WRBHBBookingProperty BP ON B.Id=BP.BookingId	AND PAG.BookingPropertyTableId=BP.Id	
+--		LEFT OUTER JOIN WRBHBProperty P ON PAG.BookingPropertyId=P.Id		
+--		WHERE  CONVERT(DATETIME,B.CreatedDate,103) between CONVERT(DATETIME,GETDATE()-30,103) and
+--		CONVERT(DATETIME,GETDATE(),103)
+--		GROUP BY B.BookingCode,PAG.Occupancy,
+--		B.ClientName,B.ClientId,PAG.GuestId,
+--		P.PropertyName,P.Category,PAG.BookingPropertyId,PAG.FirstName,PAG.LastName,PAG.CreatedDate,
+--		B.CheckInDate,B.CheckOutDate,B.Status,B.CancelStatus,PAG.CurrentStatus,PAG.TariffPaymentMode,PAG.Tariff,
+--		PAG.ChkInDt,PAG.ChkOutDt,B.BookingLevel,BP.PropertyType ORDER BY BookingCode
 
 
---Appartment Level		
-		INSERT INTO #TEMP1(BookingCode,OccupancyLevel,Guests,GuestId,ClientName,ClientId,PropertyName,Category,PropertyId,
-		BookingDate,CheckInDate,CheckOutDate,Status,CancelStatus,ChkInStatus,PaymentMode,Tariff,Days,BookingLevel,
-		PropertyType)
+----Appartment Level		
+--		INSERT INTO #TEMP1(BookingCode,OccupancyLevel,Guests,GuestId,ClientName,ClientId,PropertyName,Category,PropertyId,
+--		BookingDate,CheckInDate,CheckOutDate,Status,CancelStatus,ChkInStatus,PaymentMode,Tariff,Days,BookingLevel,
+--		PropertyType)
 
-		SELECT DISTINCT B.BookingCode,'' as OccupancyLevel,(PAG.FirstName+ ' '+ PAG.LastName) AS Guests,
-		PAG.GuestId as GuestId,B.ClientName Client,B.ClientId,ISNULL(P.PropertyName,'') Property,P.Category,PAG.BookingPropertyId,
-		CONVERT(NVARCHAR(100),PAG.CreatedDate,103) AS BookingDate,
-		CONVERT(NVARCHAR(100),B.CheckInDate,103) AS CheckInDate,
-		CONVERT(NVARCHAR(100),B.CheckOutDate,103) AS CheckOutDate,PAG.CurrentStatus Status,B.CancelStatus,PAG.CurrentStatus,
-		PAG.TariffPaymentMode,PAG.Tariff,DATEDIFF(DAY,PAG.ChkInDt,PAG.ChkOutDt) as Days,B.BookingLevel,
-		BP.PropertyType
-		FROM WRBHBBooking B 			
-		JOIN WRBHBApartmentBookingPropertyAssingedGuest PAG WITH(NOLOCK) ON PAG.BookingId=B.Id AND PAG.IsActive=1 
-		AND PAG.IsDeleted=0					
-		JOIN WRBHBApartmentBookingProperty BP ON B.Id =BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0
-		AND PAG.BookingPropertyTableId=BP.Id
-		LEFT OUTER JOIN WRBHBProperty P on  P.Id = PAG.BookingPropertyId and P.IsActive=1 and P.IsDeleted = 0
-		WHERE   B.IsActive=1 AND B.IsDeleted=0 AND CONVERT(DATETIME,B.CreatedDate,103) between CONVERT(DATETIME,GETDATE()-30,103) and
-		CONVERT(DATETIME,GETDATE(),103) 
+--		SELECT DISTINCT B.BookingCode,'' as OccupancyLevel,(PAG.FirstName+ ' '+ PAG.LastName) AS Guests,
+--		PAG.GuestId as GuestId,B.ClientName Client,B.ClientId,ISNULL(P.PropertyName,'') Property,P.Category,PAG.BookingPropertyId,
+--		CONVERT(NVARCHAR(100),PAG.CreatedDate,103) AS BookingDate,
+--		CONVERT(NVARCHAR(100),B.CheckInDate,103) AS CheckInDate,
+--		CONVERT(NVARCHAR(100),B.CheckOutDate,103) AS CheckOutDate,PAG.CurrentStatus Status,B.CancelStatus,PAG.CurrentStatus,
+--		PAG.TariffPaymentMode,PAG.Tariff,DATEDIFF(DAY,PAG.ChkInDt,PAG.ChkOutDt) as Days,B.BookingLevel,
+--		BP.PropertyType
+--		FROM WRBHBBooking B 			
+--		JOIN WRBHBApartmentBookingPropertyAssingedGuest PAG WITH(NOLOCK) ON PAG.BookingId=B.Id AND PAG.IsActive=1 
+--		AND PAG.IsDeleted=0					
+--		JOIN WRBHBApartmentBookingProperty BP ON B.Id =BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0
+--		AND PAG.BookingPropertyTableId=BP.Id
+--		LEFT OUTER JOIN WRBHBProperty P on  P.Id = PAG.BookingPropertyId and P.IsActive=1 and P.IsDeleted = 0
+--		WHERE   B.IsActive=1 AND B.IsDeleted=0 AND CONVERT(DATETIME,B.CreatedDate,103) between CONVERT(DATETIME,GETDATE()-30,103) and
+--		CONVERT(DATETIME,GETDATE(),103) 
 
---Bed Level	
-		INSERT INTO #TEMP1(BookingCode,OccupancyLevel,Guests,GuestId,ClientName,ClientId,PropertyName,Category,PropertyId,
-		BookingDate,CheckInDate,CheckOutDate,Status,CancelStatus,ChkInStatus,PaymentMode,Tariff,Days,
-		BookingLevel,PropertyType)
+----Bed Level	
+--		INSERT INTO #TEMP1(BookingCode,OccupancyLevel,Guests,GuestId,ClientName,ClientId,PropertyName,Category,PropertyId,
+--		BookingDate,CheckInDate,CheckOutDate,Status,CancelStatus,ChkInStatus,PaymentMode,Tariff,Days,
+--		BookingLevel,PropertyType)
 
-		SELECT DISTINCT B.BookingCode,'' as OccupancyLevel,(PAG.FirstName+ ' '+ PAG.LastName) AS Guests,
-		PAG.GuestId as GuestId,B.ClientName Client,B.ClientId,ISNULL(P.PropertyName,'') Property,P.Category,PAG.BookingPropertyId,
-		CONVERT(NVARCHAR(100),PAG.CreatedDate,103) AS BookingDate,
-		CONVERT(NVARCHAR(100),B.CheckInDate,103) AS CheckInDate,
-		CONVERT(NVARCHAR(100),B.CheckOutDate,103) AS CheckOutDate,PAG.CurrentStatus Status,B.CancelStatus,PAG.CurrentStatus,
-		PAG.TariffPaymentMode,PAG.Tariff,DATEDIFF(DAY,PAG.ChkInDt,PAG.ChkOutDt) as Days,B.BookingLevel,BP.PropertyType
-		FROM WRBHBBooking B 				
-		JOIN WRBHBBedBookingPropertyAssingedGuest PAG WITH(NOLOCK) ON PAG.BookingId=B.Id AND PAG.IsActive=1 
-		AND PAG.IsDeleted=0 					
-		JOIN WRBHBBedBookingProperty BP ON B.Id =BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0
-		AND PAG.BookingPropertyTableId=BP.Id
-		LEFT OUTER JOIN WRBHBProperty P on  P.Id = PAG.BookingPropertyId and P.IsActive=1 and P.IsDeleted = 0
-		WHERE B.IsActive=1 AND B.IsDeleted=0
-		AND CONVERT(DATETIME,B.CreatedDate,103) between CONVERT(DATETIME,GETDATE()-30,103) and
-		CONVERT(DATETIME,GETDATE(),103) 
+--		SELECT DISTINCT B.BookingCode,'' as OccupancyLevel,(PAG.FirstName+ ' '+ PAG.LastName) AS Guests,
+--		PAG.GuestId as GuestId,B.ClientName Client,B.ClientId,ISNULL(P.PropertyName,'') Property,P.Category,PAG.BookingPropertyId,
+--		CONVERT(NVARCHAR(100),PAG.CreatedDate,103) AS BookingDate,
+--		CONVERT(NVARCHAR(100),B.CheckInDate,103) AS CheckInDate,
+--		CONVERT(NVARCHAR(100),B.CheckOutDate,103) AS CheckOutDate,PAG.CurrentStatus Status,B.CancelStatus,PAG.CurrentStatus,
+--		PAG.TariffPaymentMode,PAG.Tariff,DATEDIFF(DAY,PAG.ChkInDt,PAG.ChkOutDt) as Days,B.BookingLevel,BP.PropertyType
+--		FROM WRBHBBooking B 				
+--		JOIN WRBHBBedBookingPropertyAssingedGuest PAG WITH(NOLOCK) ON PAG.BookingId=B.Id AND PAG.IsActive=1 
+--		AND PAG.IsDeleted=0 					
+--		JOIN WRBHBBedBookingProperty BP ON B.Id =BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0
+--		AND PAG.BookingPropertyTableId=BP.Id
+--		LEFT OUTER JOIN WRBHBProperty P on  P.Id = PAG.BookingPropertyId and P.IsActive=1 and P.IsDeleted = 0
+--		WHERE B.IsActive=1 AND B.IsDeleted=0
+--		AND CONVERT(DATETIME,B.CreatedDate,103) between CONVERT(DATETIME,GETDATE()-30,103) and
+--		CONVERT(DATETIME,GETDATE(),103) 
 		
----UPDATE MMT PROPERTY NAME
-	UPDATE #TEMP1 SET PropertyName=S.HotalName,Category='MMT' FROM #TEMP1 A
-	JOIN dbo.WRBHBStaticHotels S ON A.PropertyId=S.HotalId
-	WHERE PropertyType='MMT'
+-----UPDATE MMT PROPERTY NAME
+--	UPDATE #TEMP1 SET PropertyName=S.HotalName,Category='MMT' FROM #TEMP1 A
+--	JOIN dbo.WRBHBStaticHotels S ON A.PropertyId=S.HotalId
+--	WHERE PropertyType='MMT'
 	
 	
 		
@@ -305,11 +305,11 @@ BEGIN						--DROP TABLE #TEMP2
 --		UPDATE #TEMPFINAL SET Status='CheckOut' WHERE ChkInStatus='CheckOut'
 --		--SELECT BookingCode,Guests,ClientName Client,PropertyName Property,BookingDate,Status FROM #TEMP1
 		
-		SELECT DISTINCT BookingCode,OccupancyLevel,Guests,ClientName Client,PropertyName Property,Category,BookingDate,CheckInDate,
-		CheckOutDate,Status,PaymentMode,Tariff as TotalTariff,Days FROM #TEMP1
-		GROUP BY BookingCode,OccupancyLevel,Guests,ClientName ,PropertyName ,Category,
-		BookingDate,CheckInDate,
-		CheckOutDate,Status,PaymentMode,Tariff ,Days
-		ORDER BY BookingCode desc
+		--SELECT DISTINCT BookingCode,OccupancyLevel,Guests,ClientName Client,PropertyName Property,Category,BookingDate,CheckInDate,
+		--CheckOutDate,Status,PaymentMode,Tariff as TotalTariff,Days FROM #TEMP1
+		--GROUP BY BookingCode,OccupancyLevel,Guests,ClientName ,PropertyName ,Category,
+		--BookingDate,CheckInDate,
+		--CheckOutDate,Status,PaymentMode,Tariff ,Days
+		--ORDER BY BookingCode desc
 	END
 END

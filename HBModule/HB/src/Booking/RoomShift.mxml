@@ -141,12 +141,28 @@
 						}
 						if(CurrentStatus == "CheckIn")
 						{
+							/*Dt_Dumy.selectedDate = new Date(ChkInRangeStart);
+							var sstr:String = Dt_Dumy.text;											
+							var sFY:String = String(Number(sstr.substr(6,10)) - 1);
+							var sFM:String = sstr.substr(3,2);
+							var sFD:String = sstr.substr(0,2);
+							var sstr1:String = sFY+'/'+sFM+'/'+sFD;
+							Dt_Dumy.selectedDate = new Date(ChkOutRangeStart);
+							var str:String = Dt_Dumy.text;
+							var FY:String = String(Number(str.substr(6,10)) - 1);
+							var FM:String = str.substr(3,2);
+							var FD:String = str.substr(0,2);
+							var str1:String = FY+'/'+FM+'/'+FD;
+							Dt_ChkInDt.selectableRange = {rangeStart:new Date(sstr1),
+								rangeEnd:new Date(ChkInRangeEnd)};
+							Dt_ChkInDt.selectedDate = new Date(sstr1);
+							Dt_ChkOutDt.selectableRange = {rangeStart:new Date(str1)};
+							Dt_ChkOutDt.selectedDate = new Date(str1);*/
 							Dt_ChkInDt.selectableRange = {rangeStart:new Date(ChkInRangeStart),
 								rangeEnd:new Date(ChkInRangeEnd)};
 							Dt_ChkInDt.selectedDate = new Date(ChkInRangeStart);
 							Dt_ChkOutDt.selectableRange = {rangeStart:new Date(ChkOutRangeStart)};
-							//Dt_ChkOutDt.selectedDate = new Date(ChkOutRangeStart);
-							Dt_ChkOutDt.selectedDate = new Date(ChkInRangeEnd);							
+							Dt_ChkOutDt.selectedDate = new Date(ChkOutRangeStart);							
 						}
 					}
 				}
@@ -328,7 +344,7 @@
 					var ToDtr:String = Y1r+'/'+M1r+'/'+D1r;
 					//Dt_ToDt.selectableRange = {rangeStart:new Date(RangeStart),rangeEnd:new Date(RangeEnd)};
 					//Dt_ChkOutDt.selectableRange = {rangeStart:new Date(RangeStart)};
-					if(new Date(RangeStartr) > new Date(ToDtr))
+					if(new Date(RangeStartr) >= new Date(ToDtr))
 					{
 						Dt_ChkOutDt.selectedDate = new Date(RangeStart1r);
 					}

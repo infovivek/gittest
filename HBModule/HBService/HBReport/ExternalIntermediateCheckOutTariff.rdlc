@@ -2769,7 +2769,7 @@
             <Paragraph>
               <TextRuns>
                 <TextRun>
-                  <Value>Performa Invoice</Value>
+                  <Value>Proforma Invoice</Value>
                   <Style>
                     <FontSize>12pt</FontSize>
                     <FontWeight>Bold</FontWeight>

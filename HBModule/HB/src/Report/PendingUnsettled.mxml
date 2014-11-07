@@ -2,7 +2,7 @@
 <s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
 			   xmlns:s="library://ns.adobe.com/flex/spark"   creationComplete="PageLoad()"
 			   xmlns:mx="library://ns.adobe.com/flex/mx"  width="100%" height="100%" xmlns:WrbComp="WrbComp.*"
-			   pageTitle="PendingCheckin Report">
+			   pageTitle="PendingUnSettled Report">
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 		<s:RadioButtonGroup id="Modes"  change="CourierChange()"/> 
@@ -31,13 +31,15 @@
 			private var xlsFile:ExcelFile;
 			protected function PageLoad():void
 			{
-				//Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>5</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><UsrId>65</UsrId><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
 				Global_AC = funLoginInfo("<gScrId>1</gScrId><gUsrFk>65</gUsrFk>");	
 				GlobalXml = "";
 				GlobalXml += "<ROOT>";
 				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
 				GlobalXml += "</ROOT>"; 
-				useWeb("PendingCkinReport","Reports_CUSTOM",[GlobalXml,"Pageload",FromDate,ToDate,'','',0,0,0]);
+				Type="Internal Property";
+				Internal.selected=true;
+				useWeb("PendingUnsettledServiceReport","Reports_CUSTOM",[GlobalXml,"Pageload",FromDate,ToDate,Type,'',0,0,0]);
 			}
 			private function Custom_WebSer_Result (Ds_Objects:Object):void
 			{
@@ -46,10 +48,10 @@
 				{
 					if (Ds_Objects.currentTarget.description.toString() == "Reports_CUSTOM")
 					{
-						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						if(Ds_Objects.result.Tables.Table.Rows.length > 0)
 						{
-							Grd_ListClient1.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
-						} 
+							Grd_ListClient1.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection
+						}
 					} 
 				}//try end
 				catch(Exception)
@@ -101,7 +103,7 @@
 				}
 				if(ErrorFlag==true)
 				{	 	
-					useWeb("PendingCkinReport","Reports_CUSTOM",[GlobalXml,"Pageload",FromDate,ToDate,Type,'',0,0]);
+					useWeb("PendingUnsettledServiceReport","Reports_CUSTOM",[GlobalXml,"Pageload",FromDate,ToDate,Type,'',0,0]);
 				} 
 			}
 			public var FltPrpty:String="";
@@ -127,9 +129,9 @@
 			}
 			public function Clear():void
 			{
-				DT_From.text="";DT_To.text=""; txtBookingCode.text="";txtProperty.text="";
+				DT_From.text="";DT_To.text=""; txtCheckOutNo.text="";txtProperty.text="";
 				FromDate="";ToDate="";ChkoutId="";Status="";Type="";InvoiceNum="";
-				PageLoad();Internal.selected=false;External.selected=false;Managed.selected=false; 
+				PageLoad();Internal.selected=true;External.selected=false;Managed.selected=false; 
 			}  
 			protected function CourierChange()
 			{
@@ -161,25 +163,25 @@
 						sheet.resize(arrExportResult.length+2,14);
 						//BookedId,PropertyName,PropertyId,FirstName,BookingLevel,
 						//ExpDate,C.CityName,CityId,,ClientId,BookingCode,Category
-						sheet.setCell(0,3,Type+"PendingCheckin Report");
+						sheet.setCell(0,3,Type+"PendingUnsettled Report");
 						sheet.setCell(1,0,'Property Name');
-						sheet.setCell(1,1,'ClientName');
-						sheet.setCell(1,2,'BookingLevel');
+						sheet.setCell(1,1,'Client Name');
+						sheet.setCell(1,2,'FirstName');
 						sheet.setCell(1,3,'ExpDate');
 						sheet.setCell(1,4,'CityName'); 
-						sheet.setCell(1,5,'BookingCode');
-						//sheet.setCell(1,6,'');
+						sheet.setCell(1,5,'CheckOutNo');
+						sheet.setCell(1,6,'ChkOutTariffNetAmount');
 						//sheet.setCell(1,7,'');
 						
 						for(var i:int=0;i<arrExportResult.length;i++)
 						{
 							sheet.setCell(i+2, 0, arrExportResult[i].ClientName);
 							sheet.setCell(i+2, 1, arrExportResult[i].PropertyName);
-							sheet.setCell(i+2, 2, arrExportResult[i].BookingLevel);
-							sheet.setCell(i+2, 3, arrExportResult[i].ExpDate);
+							sheet.setCell(i+2, 2, arrExportResult[i].FirstName);
+							sheet.setCell(i+2, 3, arrExportResult[i].ChkOutDate);
 							sheet.setCell(i+2, 4, arrExportResult[i].CityName);
-							sheet.setCell(i+2, 5, arrExportResult[i].BookingCode);
-							//sheet.setCell(i+2, 7, arrExportResult[i].);
+							sheet.setCell(i+2, 5, arrExportResult[i].CheckOutNo);
+							sheet.setCell(i+2, 6, arrExportResult[i].ChkOutTariffNetAmount);
 							//sheet.setCell(i+2, 8, arrExportResult[i].); 
 						}			 
 						
@@ -187,8 +189,8 @@
 						xlsFile.sheets.addItem(sheet);      
 						var bytes: ByteArray = xlsFile.saveToByteArray();
 						var fr:FileReference = new FileReference(); 
-						var str:String="PendingCheckin.xls";
-						fr.save(bytes,"PendingCheckin.xls");
+						var str:String="PendingUnSettled.xls";
+						fr.save(bytes,"PendingUnSettled.xls");
 					}
 					else
 					{
@@ -229,10 +231,10 @@
 			private function filterMyArrayCollections(items:Object):Boolean 
 			{
 				var Itm:Boolean=true;				
-				if(txtBookingCode.text!="")
+				if(txtCheckOutNo.text!="")
 				{
-					var searchString:String = txtBookingCode.text;
-					var itemName:String = (items.BookingCode);
+					var searchString:String = txtCheckOutNo.text;
+					var itemName:String = (items.CheckOutNo);
 					Itm=itemName.indexOf(searchString) > -1;
 				}				
 				return Itm;		
@@ -247,18 +249,18 @@
 				<mx:DateField id="DT_To" x="148" y="46" width="90" formatString="DD/MM/YYYY"
 							  tabIndex="2" yearNavigationEnabled="true"   visible="false"  />
 				
-				<s:Image x="831" y="20" source="assets/a1.png" toolTip="Search" click="btn_Search_clickHandler()" tabIndex="5"/>
-				<s:Image x="900" y="20" click="Clear()" source="assets/dust_bin1.png" toolTip="Clear"/>
-				<WrbComp:Button_HB  x="1040" y="20" Lable_val="Export" id="btn_Excel"  click="ExportExcel(event)"> 
+				<s:Image x="751" y="20" source="assets/a1.png" toolTip="Search" click="btn_Search_clickHandler()" tabIndex="5"/>
+				<s:Image x="820" y="20" click="Clear()" source="assets/dust_bin1.png" toolTip="Clear"/>
+				<WrbComp:Button_HB  x="930" y="29" Lable_val="Export" id="btn_Excel"  click="ExportExcel(event)"> 
 				</WrbComp:Button_HB> 
 				<!--mx:Label id="Lbl_Vendor1" x="223" y="2" width="13" text="*" color="red" fontSize="16"/>
 				<mx:Label id="Lbl_Vendor0" x="222" y="42" width="13" text="*" color="red" fontSize="16"/-->
-				<mx:Label   x="342" y="2" width="13" text="*" color="red" fontSize="16"/>
-				<s:Label   x="293" y="14" text="Category"/>
-				<s:Label x="293" y="45" height="29" text="Filter by &#xd;Property"/>
-				<s:TextInput id="txtProperty" x="366" y="44" width="141" height="25"
+				<mx:Label   x="262" y="2" width="13" text="*" color="red" fontSize="16"/>
+				<s:Label   x="213" y="14" text="Category"/>
+				<s:Label x="173" y="45" height="29" text="Filter by &#xd;Property"/>
+				<s:TextInput id="txtProperty" x="246" y="44" width="141" height="25"
 							 change="filterss('PropertyName')" prompt="Property Name"/>
-				<s:HGroup x="367" y="6" width="260" horizontalAlign="center" verticalAlign="middle" gap="17"  id="type">
+				<s:HGroup x="287" y="6" width="260" horizontalAlign="center" verticalAlign="middle" gap="17"  id="type">
 					<s:RadioButton label="Internal" groupName="Modes" value="0"
 								   id="Internal" buttonMode="true"  />
 					<s:RadioButton label="External" groupName="Modes"  value="1"
@@ -266,28 +268,26 @@
 					<s:RadioButton label="Managed GH" groupName="Modes"  value="2"
 								   id="Managed" buttonMode="true"  />
 				</s:HGroup>
-				<s:Label x="534" y="44" height="29" text="Filter by &#xd;BookingCode"/>
-				<s:TextInput id="txtBookingCode" x="646" y="44" width="109" height="25"
-							 change="filter('BookingCode')" prompt="BookingCode" restrict="0-9" maxChars="6"/>
+				<s:Label x="414" y="44" height="29" text="Filter by &#xd;CheckOutNo"/>
+				<s:TextInput id="txtCheckOutNo" x="526" y="44" width="109" height="25"
+							 change="filter('CheckOutNo')" prompt="CheckOutNo" restrict="0-9" maxChars="6"/>
 			</s:Group>
 		</s:HGroup>
 	</s:BorderContainer>
 	
 	<s:BorderContainer x="0" y="130" width="100%" height="354" id="bdr_Scroll" visible="true" borderVisible="false">
 		<s:HGroup  width="100%" height="100%">
-			<mx:DataGrid id="Grd_ListClient1" depth="100" x="10" y="48" width="100%" height="402" tabIndex="10"
-						 borderStyle="outset"> 
+			<mx:DataGrid id="Grd_ListClient1" width="100%" height="402" borderStyle="outset"
+						 depth="100" tabIndex="10"> 
 				<mx:columns>		 				
-					<mx:DataGridColumn dataField="Property" width="150"  headerText="Property Name" editable="False" textAlign="left"/>
 					<mx:DataGridColumn dataField="ClientName" width="150" />
-					<mx:DataGridColumn dataField="ChkOutTariffNetAmount" width="150" />	
+					<mx:DataGridColumn dataField="PropertyName" width="150"  headerText="Property Name" editable="False" textAlign="left"/>
+					<mx:DataGridColumn dataField="CityName" width="100" textAlign="left" /> 
+					<mx:DataGridColumn dataField="FirstName" width="190"   headerText="Guest Name" textAlign="left"/> 
 					<mx:DataGridColumn dataField="ChkOutDate" width="150" /> 
-					<mx:DataGridColumn dataField="CityName"   textAlign="left" visible="false"/> 
-					<mx:DataGridColumn dataField="FirstName" width="190"   headerText="Guest Name" textAlign="left"/>	
-					<mx:DataGridColumn dataField="BookingLevel" width="115"  headerText="BookingLevel"  textAlign="left" />
-					<mx:DataGridColumn dataField="ExpDate" width="91" headerText="Date"  textAlign="center"/>
-					<mx:DataGridColumn dataField="BookingCode" width="91" headerText="Booking No"  textAlign="left"/>
-					
+					<mx:DataGridColumn dataField="ChkOutTariffNetAmount" width="150" /> 
+					<mx:DataGridColumn dataField="CheckOutNo" width="91" headerText="CheckOut No" textAlign="left"/> 
+					<mx:DataGridColumn dataField="Propertytype" width="100" headerText="Propertytype" textAlign="center"/> 
 				</mx:columns>
 			</mx:DataGrid> 
 			

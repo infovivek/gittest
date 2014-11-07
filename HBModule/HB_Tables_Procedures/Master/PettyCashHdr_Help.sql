@@ -33,7 +33,8 @@ CREATE PROCEDURE [dbo].[Sp_PettyCashHdr_Help]
  BEGIN
  IF @Action='PAGELOAD'
  BEGIN
- 	SELECT Id,HeaderName as ExpenseHead FROM WRBHBExpenseHeads WHERE ExpenseGroupId=@Id AND Status='Active'
+ 	SELECT Id,HeaderName as ExpenseHead FROM WRBHBExpenseHeads 
+ 	WHERE Status='Active'
  
  --PROPERTY
 	SELECT DISTINCT P.PropertyName Property,P.Id Id	

@@ -80,7 +80,7 @@ CREATE PROCEDURE dbo.[SP_PettyCashApprovalHdr_Help]
 		AND PC.Remark=0 AND PU.UserId=@UserId 
 		AND P.Category IN('Internal Property','Managed G H')
 		AND PU.UserType IN('Resident Managers','Assistant Resident Managers','Operations Managers',
-		'Ops Head')
+		'Ops Head','Finance')
 		group by  U.FirstName,U.LastName,P.PropertyName,PC.Status,PH.Date,PH.UserId,PH.PropertyId
 		
 		END
@@ -125,23 +125,24 @@ END
 		CREATE TABLE #User (UserName NVARCHAR(100),Status NVARCHAR(100),Comments NVARCHAR(100),Processedon NVARCHAR(100))
 				
 		INSERT INTO #User(UserName,Status,Comments,Processedon)
-		
-		SELECT DISTINCT (U.FirstName+' '+U.LastName) AS UserName,PC.ProcessedStatus AS Status,PC.Comments AS Comments,
-		CONVERT(NVARCHAR(100),PC.LastProcessedon,103) AS Processedon		
-		From WRBHBNewPettyCashApprovalDtl PC
-		JOIN WRBHBNewPettyCashApprovalHdr PCH ON PC.PettyCashApprovalHdrId=PCH.Id AND PCH.IsActive=1 AND PCH.IsDeleted=0
-		JOIN WRBHBUser U ON  PC.UserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
-		WHERE PC.RequestedUserId=@UserId AND PC.PropertyId=@PropertyId AND PC.IsActive=1 AND PC.IsDeleted=0
-		AND PC.RequestedOn=CONVERT(NVARCHAR,@Str,103);
-				
-		INSERT INTO #User(UserName,Status,Comments,Processedon)
-		SELECT DISTINCT	(U.FirstName+' '+U.LastName) AS UserName,P.Status AS Status,'' AS Comments,
+		SELECT DISTINCT (U.FirstName+' '+U.LastName) AS UserName,P.Status AS Status,'' AS Comments,
 		CONVERT(NVARCHAR(100),PC.Date,103) AS Processedon
 	    FROM WRBHBPettyCash P
 	    JOIN WRBHBPettyCashHdr PC ON P.PettyCashHdrId=PC.Id AND PC.IsActive=1  AND PC.IsDeleted=0
 		JOIN WRBHBUser U ON  PC.UserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
 		WHERE PC.UserId=@UserId AND PC.PropertyId=@PropertyId AND P.IsActive=1 AND P.IsDeleted=0
 		AND PC.Date=CONVERT(Date,@Str,103)
+		
+		
+		INSERT INTO #User(UserName,Status,Comments,Processedon)
+		SELECT (U.FirstName+' '+U.LastName) AS UserName,PC.ProcessedStatus AS Status,PC.Comments AS Comments,
+		CONVERT(NVARCHAR(100),PC.LastProcessedon,103) AS Processedon	
+		From WRBHBNewPettyCashApprovalDtl PC
+		JOIN WRBHBNewPettyCashApprovalHdr PCH ON PC.PettyCashApprovalHdrId=PCH.Id AND PCH.IsActive=1 AND PCH.IsDeleted=0
+		JOIN WRBHBUser U ON  PC.UserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
+		WHERE PC.RequestedUserId=@UserId AND PC.PropertyId=@PropertyId AND PC.IsActive=1 AND PC.IsDeleted=0
+		AND PC.RequestedOn=CONVERT(NVARCHAR,@Str,103)
+		ORDER BY PC.CreatedDate
 		
 		SELECT UserName,Status,Comments,Processedon FROM #User ORDER BY CONVERT(date,Processedon,103) ASC
 	END

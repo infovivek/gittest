@@ -117,6 +117,7 @@
     <Compile Include="BusinessService\PCExpenseApprovalService.cs" />
     <Compile Include="BusinessService\PCHistoryService.cs" />
     <Compile Include="BusinessService\PendingCkinReportService.cs" />
+    <Compile Include="BusinessService\PendingUnsettledServiceReport.cs" />
     <Compile Include="BusinessService\PettyCashApprovalService.cs" />
     <Compile Include="BusinessService\PettyCashHdrService.cs" />
     <Compile Include="BusinessService\PettyCashReportService.cs" />

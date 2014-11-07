@@ -85,11 +85,11 @@
 						Grd_Details.dataProvider=null;
 						hlp_Guest.dataProvider=Ds_Objects.result.Tables.Table3.Rows as ArrayCollection;		
 					}
-					if (Ds_Objects.result.Tables.Table4.Rows.length > 0)
-					{
-						Grd_Details.dataProvider=null;
-						Grd_Details.dataProvider=Ds_Objects.result.Tables.Table4.Rows as ArrayCollection;		
-					}
+//					if (Ds_Objects.result.Tables.Table4.Rows.length > 0)
+//					{
+//						Grd_Details.dataProvider=null;
+//						Grd_Details.dataProvider=Ds_Objects.result.Tables.Table4.Rows as ArrayCollection;		
+//					}
 				}
 				if (Ds_Objects.currentTarget.description.toString() == "Search_CUSTOM")
 				{
@@ -270,7 +270,7 @@
 					xlsFile.sheets.addItem(sheet);      
 					var bytes: ByteArray = xlsFile.saveToByteArray();
 					var fr:FileReference = new FileReference();
-					fr.save(bytes,"Search_Booking_guest.xlsx");
+					fr.save(bytes,"Search_Booking_guest.xls");
 				}
 				else
 				{
@@ -282,7 +282,7 @@
 			protected function Grd_Details_doubleClickHandler(event:MouseEvent):void
 			{
 				// TODO Auto-generated method stub
-				bdr_Intermidiate.visible=true;
+				bdr_Intermidiate.visible=false;
 				
 				
 				
@@ -304,7 +304,7 @@
 							   borderVisible="false">
 				<mx:DataGrid x="0" y="183"  verticalAlign="middle" editable="true" visible="true"
 							 width="100%" height="100%" tabIndex="4" id="Grd_Details" 
-							 doubleClickEnabled="true" doubleClick="Grd_Details_doubleClickHandler(event)">
+							 doubleClickEnabled="true" doubleClick="">
 					<mx:columns>
 						<mx:DataGridColumn width="40" dataField="BookingCode" headerText="B.Code"  textAlign="left" editable="false"/>
 						<mx:DataGridColumn width="50" dataField="OccupancyLevel" headerText="Occupancy Level" textAlign="left" editable="false"/>
@@ -397,8 +397,8 @@
 										  onselection="{Ddl_Guest_changeHandler()}"  pxTabIndex="1" depth="10"
 										  pxSetPrompt="Select Guest" >
 					</WrbHelpComp:HelpText>
-					<s:RadioButton id="rbtn_Booking" x="669" y="75" label="Booking" selected="true" />
-					<s:RadioButton id="rbtn_CheckIn" x="753" y="75" label="CheckIn" />
+					<s:RadioButton id="rbtn_Booking" x="409" y="115" label="Booking" selected="true" />
+					<s:RadioButton id="rbtn_CheckIn" x="493" y="115" label="CheckIn" />
 					<WrbComp:Button_HB x="588" y="108" _Label="Search" click="Search()">
 					</WrbComp:Button_HB>
 					<WrbComp:Button_HB x="680" y="108" _Label="Clear" click="FnClear()">

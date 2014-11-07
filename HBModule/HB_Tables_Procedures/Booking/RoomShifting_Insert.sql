@@ -160,6 +160,16 @@ IF @BookingLevel = 'Room'
         WHERE Id IN (SELECT Id FROM WRBHBBookingPropertyAssingedGuest
         WHERE IsActive=1 AND IsDeleted=0 AND RoomCaptured=@RoomCaptured AND 
         BookingId=@BookingId AND ChkInDt=ChkOutDt);
+        --
+        CREATE TABLE #TMPPP(Id BIGINT, DayCnt INT);
+        INSERT INTO #TMPPP(Id, DayCnt)
+        SELECT Id,DATEDIFF(DAY,ChkInDt,ChkOutDt) 
+        FROM WRBHBBookingPropertyAssingedGuest
+        WHERE IsActive=1 AND IsDeleted=0 AND RoomCaptured=@RoomCaptured AND 
+        BookingId=@BookingId;
+        --
+        UPDATE WRBHBBookingPropertyAssingedGuest SET IsActive=0,IsDeleted=1
+        WHERE Id IN (SELECT Id FROM #TMPPP WHERE DayCnt < 0)
        END
      END
    END

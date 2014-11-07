@@ -544,7 +544,7 @@ IF @Action = 'BedLevel_Tab2_to_Tab3_Dtls'
   SELECT label FROM #PAYMENT1; 
   -- Payment Mode End
  END
-/*IF @Action = 'BeforeSave_Validation'
+IF @Action = 'BeforeSaveBedValidation'
  BEGIN  
   -- Room Booked Begin
   CREATE TABLE #BookedRoom(RoomId BIGINT);
@@ -679,12 +679,51 @@ IF @Action = 'BedLevel_Tab2_to_Tab3_Dtls'
   A.SellableApartmentType != 'HUB' AND A.Status='Active' AND 
   R.IsActive=1 AND R.IsDeleted=0 AND R.RoomStatus='Active' AND
   B.IsActive=1 AND B.IsDeleted=0 AND P.Category='Internal Property' AND   
-  P.Id=@PropertyId AND
+  P.Id=@PropertyId AND B.Id != 0 AND
   R.Id NOT IN (SELECT RoomId FROM #BookedRoom) AND
   B.Id NOT IN (SELECT BedId FROM #BookedBed) AND
   A.Id NOT IN (SELECT ApartmentId FROM #BookedApartment)
   GROUP BY B.Id;
+  -- Save Bed Id
+  CREATE TABLE #SaveBed(Id INT,BedId BIGINT);
+  INSERT INTO #SaveBed(Id,BedId)
+  SELECT * FROM dbo.Split(@Str1, ',');
   --
-  SELECT * FROM #AvaliableBed;
- END*/
+  DECLARE @SaveBedCnt INT = (SELECT COUNT(BedId) FROM #SaveBed
+  WHERE BedId != 0);
+  DECLARE @AvaliableBedCnt INT = (SELECT COUNT(BedId) FROM #AvaliableBed
+  WHERE BedId IN (SELECT BedId FROM #SaveBed));
+  --
+  --SELECT BedId FROM #SaveBed WHERE BedId NOT IN (SELECT BedId FROM #AvaliableBed);
+  --SELECT @SaveBedCnt,@AvaliableBedCnt;
+  IF @SaveBedCnt != @AvaliableBedCnt
+   BEGIN
+    SELECT PB.BlockName+' - '+A.ApartmentNo+' - '+R.RoomNo+' - '+
+    CAST(B.BedNO AS VARCHAR) AS Bed FROM WRBHBProperty P
+    LEFT OUTER JOIN WRBHBPropertyBlocks PB WITH(NOLOCK)ON PB.PropertyId=P.Id
+    LEFT OUTER JOIN WRBHBPropertyApartment A WITH(NOLOCK)ON
+    A.PropertyId=P.Id AND A.BlockId=PB.Id
+    LEFT OUTER JOIN WRBHBPropertyRooms R WITH(NOLOCK)ON 
+    R.PropertyId=P.Id AND R.ApartmentId=A.Id
+    LEFT OUTER JOIN WRBHBPropertyRoomBeds B WITH(NOLOCK)ON 
+    B.RoomId=R.Id
+    WHERE P.IsActive=1 AND P.IsDeleted=0 AND PB.IsActive=1 AND 
+    PB.IsDeleted=0 AND A.IsActive=1 AND A.IsDeleted=0 AND 
+    A.SellableApartmentType != 'HUB' AND A.Status='Active' AND 
+    R.IsActive=1 AND R.IsDeleted=0 AND R.RoomStatus='Active' AND
+    B.IsActive=1 AND B.IsDeleted=0 AND P.Category='Internal Property' AND   
+    P.Id=@PropertyId AND B.Id != 0 AND
+    --R.Id NOT IN (SELECT RoomId FROM #BookedRoom) AND
+    --B.Id NOT IN (SELECT BedId FROM #BookedBed) AND
+    --A.Id NOT IN (SELECT ApartmentId FROM #BookedApartment) AND
+    B.Id IN (SELECT BedId FROM #SaveBed
+    WHERE BedId NOT IN (SELECT BedId FROM #AvaliableBed))
+    GROUP BY PB.BlockName,A.ApartmentNo,R.RoomNo,B.BedNO;
+   END
+  ELSE
+   BEGIN
+    CREATE TABLE #AvaliableBed123(A INT);
+    SELECT * FROM #AvaliableBed123;
+   END
+ END
 END

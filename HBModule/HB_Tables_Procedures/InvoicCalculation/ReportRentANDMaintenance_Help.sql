@@ -65,6 +65,7 @@ BEGIN
 		JOIN WRBHBPropertyBlocks B WITH(NOLOCK) ON B.PropertyId=R.PropertyId AND B.IsActive=1 AND B.IsDeleted=0
 		JOIN WRBHBPropertyApartment A	WITH(NOLOCK) ON A.PropertyId=R.PropertyId AND B.Id=A.BlockId
 		AND A.IsActive=1 AND A.IsDeleted=0 and R.ApartmentId=A.Id
+		JOIN dbo.WRBHBPropertyOwners PO WITH(NOLOCK) ON PO.Id=R.OwnerId
 		WHERE RentMonthGeneratedRentId=@Pram1 AND RentelAmount!=CAST(0 AS DECIMAL)
 		
 		INSERT INTO  #RentAndMaintenance(OwnerName,PropertyName,ApartmentNo,RentelAmount,TDSAMOUNT,RentType,

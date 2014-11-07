@@ -42,7 +42,7 @@
 			private var SearchPopUp:frmsearchwindow = new frmsearchwindow();
 			public static var Global_AC:ArrayCollection = new ArrayCollection();
 			public static var GlobalXml:String = "",TypeServiceId:int=0,ApprovalId:int=0,ErrStr:String="";
-			public var Id:int=0,ErrMsg:String="",Roles:String="",PropertyId:int=0,UserName:String="",UserId:int=0;
+			public var Id:int=0,ErrMsg:String="",Roles:String="",PropertyId:int=0,PropertyName:String="",UserName:String="",UserId:int=0;
 			public var AddMode:Boolean=true,Flag:Boolean=true;
 			private var xlsFile:ExcelFile;
 			private var fileRef:FileReference = new FileReference();
@@ -68,6 +68,25 @@
 			private function Custom_WebSer_Result (Ds_Objects:Object):void
 			{
 				if (Ds_Objects.currentTarget.description.toString() == "PAGELOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_Details.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						hlp_Property.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+					
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "USERLOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						hlp_User.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "PropertyLoad_CUSTOM")
 				{
 					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
 					{
@@ -195,8 +214,10 @@
 						FnSave1, iconWarning, Alert.NO),10,"");
 				}
 			}
-			protected function FnSave1():void
+			protected function FnSave1(event:CloseEvent):void
 			{
+				if ((event.detail==Alert.YES)) 
+				{
 					var Ac_Hdr:ArrayCollection = new ArrayCollection
 						([{ 
 							UserName:UserName,
@@ -212,7 +233,7 @@
 					ServiceXml += "</ROOT>";
 					var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
 					useWeb("VendorChequeApproval","Save_CUSTOM",[GlobalXml,HdrXml,ServiceXml]);
-				
+				}
 			}
 			
 			protected function FnClear():void
@@ -223,7 +244,48 @@
 				Grd_Details.visible=true;
 				//Grd_Details.dataProvider=null;
 				//bdr_Scroll.visible=false;
+				hlp_Property.dataProvider=null;
+				hlp_Property.text="";
+				hlp_User.dataProvider=null;
+				hlp_User.text="";
 				
+			}
+			public function Ddl_Property_changeHandler():void
+			{
+				if(hlp_Property.selected())
+				{
+					PropertyName=hlp_Property.Select_Row.Property;
+					PropertyId=hlp_Property.Select_Row.Id;
+					hlp_Property.text=PropertyName;
+					useWeb("VendorChequeApproval","USERLOAD_CUSTOM",[GlobalXml,'UserLoad',0,PropertyId,'']);
+				}
+				else
+				{
+					hlp_Property.text="";
+				}
+			}
+			public function Ddl_User_changeHandler():void
+			{
+				if(hlp_User.selected())
+				{
+					UserName=hlp_User.Select_Row.UserName;
+					UserId=hlp_User.Select_Row.Id;
+					hlp_User.text=UserName;
+					//useWeb("PettyCash","GRID_CUSTOM",[GlobalXml,'PETTYLOAD',PropertyId,Global_AC[0].UsrId]);
+				}
+				else
+				{
+					hlp_User.text="";
+				}
+			}
+			protected function Search():void
+			{
+				var Str:String="";
+				if((hlp_Property.text !="")||(hlp_User.text !=""))
+					{
+						Str="All";
+						useWeb("VendorChequeApproval","PropertyLoad_CUSTOM",[GlobalXml,'PropertyLoad',UserId,PropertyId,Str]);
+					}
 			}
 			public function FnHistory(Event):void
 			{ 
@@ -449,8 +511,17 @@
 	<WrbComp:Button_BB id="Sctrl_Clear" x="523" y="476" width="94" height="30"
 					   click="FnClear()" Lable_val="Clear">
 	</WrbComp:Button_BB>
-	
-	
+	<s:Label x="183" y="69" text="Property"/>
+	<s:Label x="493" y="69" text="User"/>
+	<WrbHelpComp:HelpText id="hlp_User" x="546" y="63" width="238" height="22" pxSetColumnsWidth="0,275" 
+						  onselection="{Ddl_User_changeHandler()}"  pxTabIndex="2" depth="10">
+	</WrbHelpComp:HelpText>
+	<WrbHelpComp:HelpText id="hlp_Property" x="236" y="63" width="238" height="22" pxSetColumnsWidth="0,275" 
+						  onselection="{Ddl_Property_changeHandler()}"  pxTabIndex="1" depth="10">
+	</WrbHelpComp:HelpText>
+	<WrbComp:Button_BB id="Sctrl_Search" x="807" y="58" width="94" height="30" click="Search()"
+					   Lable_val="Search">
+	</WrbComp:Button_BB>
 	<s:BorderContainer x="57" y="33" width="856" height="415" id="bdr_History"
 					   borderVisible="true" visible="false" >
 		<mx:Label x="19" y="62" text="Requestedby" />

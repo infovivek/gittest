@@ -86,5 +86,7 @@ namespace APIWindowsService
         public string Phone { get; set; }
 
         public int HotelCount { get; set; }
+
+        public int CityId { get; set; }
     }
 }

@@ -959,11 +959,13 @@ BEGIN
 		   SELECT CA.ApartmentId,CA.PropertyId,0,Tariff,ContractType,CA.Property,C.ClientId,C.BookingLevel,C.Id,C.RateInterval 
 		   FROM dbo.WRBHBContractManagementAppartment CA       
 		   JOIN dbo.WRBHBContractManagement C ON C.Id=CA.ContractId AND LTRIM(ContractType)IN(LTRIM(' Dedicated Contracts '),LTRIM(' Managed Contracts '))   
-		   AND C.IsActive=1 AND C.IsDeleted=0
+		   AND C.IsActive=1 AND C.IsDeleted=0 AND 
+		   CONVERT(DATE,C.StartDate,103)<CONVERT(DATE,GETDATE(),103) AND
+		   CONVERT(DATE,C.EndDate,103)>CONVERT(DATE,GETDATE(),103)  		   
 		   JOIN WRBHBProperty P ON P.Id=CA.PropertyId AND P.IsActive=1 AND P.IsDeleted=0  
 		   JOIN WRBHBPropertyBlocks B ON P.Id=B.PropertyId AND B.IsActive=1 AND B.IsDeleted=0
 		   JOIN WRBHBPropertyApartment A ON P.Id=A.PropertyId AND A.IsActive=1 AND A.IsDeleted=0 
-		   AND B.Id=A.BlockId AND CA.ApartmentId=A.Id
+		   AND B.Id=A.BlockId AND CA.ApartmentId=A.Id 
 		   WHERE CA.IsActive=1 AND CA.IsDeleted=0 AND CA.ApartmentId!=0 AND CA.PropertyId!=0  
 		      
 		   INSERT INTO #NDDCountForecast(RoomId,PropertyId,ApartmentId,Tariff,PropertyType,PropertyName,ClientId,ContractLevel,ContractId,ContractType)     
@@ -971,7 +973,9 @@ BEGIN
 		   FROM dbo.WRBHBContractManagementTariffAppartment CR  
 		   JOIN dbo.WRBHBContractManagement C ON C.Id=CR.ContractId   
 		   AND LTRIM(ContractType)IN(LTRIM(' Dedicated Contracts '))   
-		   AND C.IsActive=1 AND C.IsDeleted=0 
+		   AND C.IsActive=1 AND C.IsDeleted=0 AND 
+		   CONVERT(DATE,C.StartDate,103)<CONVERT(DATE,GETDATE(),103) AND
+		   CONVERT(DATE,C.EndDate,103)>CONVERT(DATE,GETDATE(),103) 		   
 		   JOIN WRBHBProperty P ON P.Id=CR.PropertyId AND P.IsActive=1 AND P.IsDeleted=0  
 		   JOIN WRBHBPropertyBlocks B ON P.Id=B.PropertyId AND B.IsActive=1 AND B.IsDeleted=0
 		   JOIN WRBHBPropertyApartment A ON P.Id=A.PropertyId AND A.IsActive=1 AND A.IsDeleted=0 
@@ -987,7 +991,9 @@ BEGIN
 		   FROM dbo.WRBHBContractManagementTariffAppartment CR  
 		   JOIN dbo.WRBHBContractManagement C ON C.Id=CR.ContractId AND   
 		   LTRIM(ContractType)IN(LTRIM(' Managed Contracts '))   
-		   AND C.IsActive=1 AND C.IsDeleted=0 
+		   AND C.IsActive=1 AND C.IsDeleted=0 AND 
+		   CONVERT(DATE,C.StartDate,103)<CONVERT(DATE,GETDATE(),103) AND
+		   CONVERT(DATE,C.EndDate,103)>CONVERT(DATE,GETDATE(),103) 
 		   JOIN WRBHBProperty P ON P.Id=CR.PropertyId AND P.IsActive=1 AND P.IsDeleted=0   
 		   WHERE  CR.IsActive=1 AND CR.IsDeleted=0 AND CR.PropertyId!=0 
 		   

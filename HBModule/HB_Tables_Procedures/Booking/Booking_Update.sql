@@ -45,14 +45,16 @@ CREATE PROCEDURE [dbo].[Sp_Booking_Update](
 @Note NVARCHAR(1000),
 @Status NVARCHAR(100),
 @AMPM NVARCHAR(100),
-@BookingLevel NVARCHAR(100))
+@BookingLevel NVARCHAR(100),
+@ExtraCCEmail NVARCHAR(1000))
 AS
 BEGIN   
- UPDATE WRBHBBooking SET CheckInDate=CONVERT(DATE,@CheckInDate,103),
- CheckOutDate=CONVERT(DATE,@CheckOutDate,103),
- ExpectedChkInTime=@ExpectedChkInTime,--BookingCode=@BookingCode,
- SpecialRequirements=@SpecialRequirements,Status=@Status,AMPM=@AMPM,
- EmailtoGuest=@EmailtoGuest,BookedDt=GETDATE(),BookedUsrId=@UsrId
+ UPDATE WRBHBBooking SET CheckInDate = CONVERT(DATE,@CheckInDate,103),
+ CheckOutDate = CONVERT(DATE,@CheckOutDate,103),
+ ExpectedChkInTime = @ExpectedChkInTime,--BookingCode=@BookingCode,
+ SpecialRequirements = @SpecialRequirements,Status = @Status,AMPM = @AMPM,
+ EmailtoGuest = @EmailtoGuest,BookedDt = GETDATE(),BookedUsrId = @UsrId,
+ ExtraCCEmail = @ExtraCCEmail
  WHERE Id=@Id;
  SELECT Id,RowId,BookingCode FROM WRBHBBooking WHERE Id=@Id;
  --select * from wrbhbbooking where Id=@Id;

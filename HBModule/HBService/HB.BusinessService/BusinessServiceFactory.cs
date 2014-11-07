@@ -362,6 +362,9 @@ namespace HB.BusinessService
                 case "CheckInForecastReport":
                     _businessService = new CheckInForecastReportServices();
                     break;
+                case "PendingUnsettledServiceReport":
+                    _businessService = new PendingUnsettledServiceReport();
+                    break;
             }
             return _businessService;
         }

@@ -2301,4 +2301,129 @@ IF @Action = 'BookingPropertyDtls'
   --
   SELECT 'Direct' AS label;
  END
+IF @Action = 'CustomFields'
+ BEGIN
+  -- Field Name
+  CREATE TABLE #Column(FieldName NVARCHAR(100),Mandatory BIT,Id INT);
+  INSERT INTO #Column(FieldName,Mandatory,Id)
+  SELECT Column1,Column1Mandatory,1 FROM WRBHBClientColumns
+  WHERE IsActive = 1 AND IsDeleted = 0 AND ClientId = @ClientId;
+  INSERT INTO #Column(FieldName,Mandatory,Id)
+  SELECT Column2,Column2Mandatory,2 FROM WRBHBClientColumns
+  WHERE IsActive = 1 AND IsDeleted = 0 AND ClientId = @ClientId;
+  INSERT INTO #Column(FieldName,Mandatory,Id)
+  SELECT Column3,Column3Mandatory,3 FROM WRBHBClientColumns
+  WHERE IsActive = 1 AND IsDeleted = 0 AND ClientId = @ClientId;
+  INSERT INTO #Column(FieldName,Mandatory,Id)
+  SELECT Column4,Column4Mandatory,4 FROM WRBHBClientColumns
+  WHERE IsActive = 1 AND IsDeleted = 0 AND ClientId = @ClientId;
+  INSERT INTO #Column(FieldName,Mandatory,Id)
+  SELECT Column5,Column5Mandatory,5 FROM WRBHBClientColumns
+  WHERE IsActive = 1 AND IsDeleted = 0 AND ClientId = @ClientId;
+  INSERT INTO #Column(FieldName,Mandatory,Id)
+  SELECT Column6,Column6Mandatory,6 FROM WRBHBClientColumns
+  WHERE IsActive = 1 AND IsDeleted = 0 AND ClientId = @ClientId;
+  INSERT INTO #Column(FieldName,Mandatory,Id)
+  SELECT Column7,Column7Mandatory,7 FROM WRBHBClientColumns
+  WHERE IsActive = 1 AND IsDeleted = 0 AND ClientId = @ClientId;
+  INSERT INTO #Column(FieldName,Mandatory,Id)
+  SELECT Column8,Column8Mandatory,8 FROM WRBHBClientColumns
+  WHERE IsActive = 1 AND IsDeleted = 0 AND ClientId = @ClientId;
+  INSERT INTO #Column(FieldName,Mandatory,Id)
+  SELECT Column9,Column9Mandatory,9 FROM WRBHBClientColumns
+  WHERE IsActive = 1 AND IsDeleted = 0 AND ClientId = @ClientId;
+  INSERT INTO #Column(FieldName,Mandatory,Id)
+  SELECT Column10,Column10Mandatory,10 FROM WRBHBClientColumns
+  WHERE IsActive = 1 AND IsDeleted = 0 AND ClientId = @ClientId;
+  --
+  SELECT FieldName,Mandatory,Id FROM #Column;
+  -- Column 1 Field ValueS
+  CREATE TABLE #Column1Values(label NVARCHAR(100));
+  INSERT INTO #Column1Values(label)
+  SELECT DISTINCT Column1 FROM WRBHBClientManagementAddClientGuest
+  WHERE IsActive = 1 AND IsDeleted = 0 AND CltmgntId = @ClientId AND
+  ISNULL(Column1,'') != '';
+  --
+  SELECT label FROM #Column1Values ORDER BY label ASC;
+  -- Column 2 Field ValueS
+  CREATE TABLE #Column2Values(label NVARCHAR(100));
+  INSERT INTO #Column2Values(label)
+  SELECT DISTINCT Column2 FROM WRBHBClientManagementAddClientGuest
+  WHERE IsActive = 1 AND IsDeleted = 0 AND CltmgntId = @ClientId AND
+  ISNULL(Column2,'') != '';
+  --
+  SELECT label FROM #Column2Values ORDER BY label ASC;
+  -- Column 3 Field ValueS
+  CREATE TABLE #Column3Values(label NVARCHAR(100));
+  INSERT INTO #Column3Values(label)
+  SELECT DISTINCT Column3 FROM WRBHBClientManagementAddClientGuest
+  WHERE IsActive = 1 AND IsDeleted = 0 AND CltmgntId = @ClientId AND
+  ISNULL(Column3,'') != '';
+  --
+  SELECT label FROM #Column3Values ORDER BY label ASC;
+  -- Column 4 Field ValueS
+  CREATE TABLE #Column4Values(label NVARCHAR(100));
+  INSERT INTO #Column4Values(label)
+  SELECT DISTINCT Column4 FROM WRBHBClientManagementAddClientGuest
+  WHERE IsActive = 1 AND IsDeleted = 0 AND CltmgntId = @ClientId AND
+  ISNULL(Column4,'') != '';
+  --
+  SELECT label FROM #Column4Values ORDER BY label ASC;
+  -- Column 5 Field ValueS
+  CREATE TABLE #Column5Values(label NVARCHAR(100));
+  INSERT INTO #Column5Values(label)
+  SELECT DISTINCT Column5 FROM WRBHBClientManagementAddClientGuest
+  WHERE IsActive = 1 AND IsDeleted = 0 AND CltmgntId = @ClientId AND
+  ISNULL(Column5,'') != '';
+  --
+  SELECT label FROM #Column5Values ORDER BY label ASC;
+  -- Column 6 Field ValueS
+  CREATE TABLE #Column6Values(label NVARCHAR(100));
+  INSERT INTO #Column6Values(label)
+  SELECT DISTINCT Column6 FROM WRBHBClientManagementAddClientGuest
+  WHERE IsActive = 1 AND IsDeleted = 0 AND CltmgntId = @ClientId AND
+  ISNULL(Column6,'') != '';
+  --
+  SELECT label FROM #Column6Values ORDER BY label ASC;
+  -- Column 7 Field ValueS
+  CREATE TABLE #Column7Values(label NVARCHAR(100));
+  INSERT INTO #Column7Values(label)
+  SELECT DISTINCT Column7 FROM WRBHBClientManagementAddClientGuest
+  WHERE IsActive = 1 AND IsDeleted = 0 AND CltmgntId = @ClientId AND
+  ISNULL(Column7,'') != '';
+  --
+  SELECT label FROM #Column7Values ORDER BY label ASC;
+  -- Column 8 Field ValueS
+  CREATE TABLE #Column8Values(label NVARCHAR(100));
+  INSERT INTO #Column8Values(label)
+  SELECT DISTINCT Column8 FROM WRBHBClientManagementAddClientGuest
+  WHERE IsActive = 1 AND IsDeleted = 0 AND CltmgntId = @ClientId AND
+  ISNULL(Column8,'') != '';
+  --
+  SELECT label FROM #Column8Values ORDER BY label ASC;
+  -- Column 9 Field ValueS
+  CREATE TABLE #Column9Values(label NVARCHAR(100));
+  INSERT INTO #Column9Values(label)
+  SELECT DISTINCT Column9 FROM WRBHBClientManagementAddClientGuest
+  WHERE IsActive = 1 AND IsDeleted = 0 AND CltmgntId = @ClientId AND
+  ISNULL(Column9,'') != '';
+  --
+  SELECT label FROM #Column9Values ORDER BY label ASC;
+  -- Column 10 Field ValueS
+  CREATE TABLE #Column10Values(label NVARCHAR(100));
+  INSERT INTO #Column10Values(label)
+  SELECT DISTINCT Column10 FROM WRBHBClientManagementAddClientGuest
+  WHERE IsActive = 1 AND IsDeleted = 0 AND CltmgntId = @ClientId AND
+  ISNULL(Column10,'') != '';
+  --
+  SELECT label FROM #Column10Values ORDER BY label ASC;
+  -- Guest Existing data
+  SELECT ISNULL(Column1,'') AS Column1,ISNULL(Column2,'') AS Column2,
+  ISNULL(Column3,'') AS Column3,ISNULL(Column4,'') AS Column4,
+  ISNULL(Column5,'') AS Column5,ISNULL(Column6,'') AS Column6,
+  ISNULL(Column7,'') AS Column7,ISNULL(Column8,'') AS Column8,
+  ISNULL(Column9,'') AS Column9,ISNULL(Column10,'') AS Column10
+  FROM WRBHBClientManagementAddClientGuest
+  WHERE Id = @Id1 AND CltmgntId = @ClientId;
+ END
 END

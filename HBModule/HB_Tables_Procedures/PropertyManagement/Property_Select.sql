@@ -73,12 +73,12 @@ SELECT @CityId=CityId FROM WRBHBProperty P  WHERE IsDeleted=0 AND  P.Id =@Select
  SELECT U.FirstName label,P.UserId,P.UserType,P.Id FROM WRBHBPropertyUsers P
  LEFT OUTER JOIN WRBHBUser U WITH(NOLOCK)ON U.Id=P.UserId   
  WHERE P.IsDeleted=0 AND U.IsDeleted=0 AND U.IsActive=1 AND
- PropertyId=@SelectId AND UserType='Other Roles';
+ PropertyId=@SelectId AND UserType='Ops Head';
    
  SELECT U.FirstName label,P.UserId,P.UserType,P.Id FROM WRBHBPropertyUsers P
  LEFT OUTER JOIN WRBHBUser U WITH(NOLOCK)ON U.Id=P.UserId   
  WHERE P.IsDeleted=0 AND U.IsDeleted=0 AND U.IsActive=1 AND
- PropertyId=@SelectId AND UserType='Sales';
+ PropertyId=@SelectId AND UserType='Finance';
    
  SELECT BlockDescription Description,BlockName Block,Id FROM dbo.WRBHBPropertyBlocks  
  WHERE PropertyId=@SelectId AND IsDeleted=0

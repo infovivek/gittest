@@ -66,7 +66,7 @@
 				//
 				FnHelp_PageLoad();FnHelp_Title();
 				//
-				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Apartment',1504]);
+				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Apartment',2250]);
 			}
 			
 			protected function FnHelp_PageLoad():void
@@ -955,7 +955,7 @@
 						ClientBookerName:ClientBookerName,ClientBookerEmail:ClientBookerEmail,
 						EmailtoGuest:Chk_EmailtoGuest.selected,Note:"",
 						SpecialRequirements:"",Id:Id,Status:"Step2",AMPM:Ddl_AMPM.selectedItem,
-						BookingLevel:"Apartment"}]);
+						BookingLevel:"Apartment",ExtraCCEmail:""}]);
 				var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
 				var GuestXml:String="";
 				GuestXml += "<ROOT>";
@@ -1262,7 +1262,7 @@
 						ClientBookerEmail:"",EmailtoGuest:Chk_EmailtoGuest.selected,Note:"",
 						SpecialRequirements:Txt_SpecialRequirements.text,
 						Id:Id,Status:"Direct Booked",AMPM:Ddl_AMPM.selectedItem,
-						BookingLevel:"Apartment"}]);
+						BookingLevel:"Apartment",ExtraCCEmail:""}]);
 				var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
 				var Tmp1:ArrayCollection=new ArrayCollection();
 				var GuestXml:String="";

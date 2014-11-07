@@ -814,6 +814,7 @@ IF @Action ='Property'
    FROM #Occupancy O  
    JOIN #BookingCount A ON O.BookingId=A.BookingId AND O.RoomId=A.RoomId   
      
+     
    --Get rooms are dedicated or non dedicater  
    IF  @PropertyType='Internal Property'  
    BEGIN  
@@ -864,7 +865,7 @@ IF @Action ='Property'
    GROUP BY O.Id,O.BedId,BookingId,O.RoomId,RoomName,GuestName,CheckInDt,CheckOutDt,Type,Occupancy,o.BookingLevel,  
    B.BookingCode,c.ClientName,GuestCount  
      
-    
+   
      
    --OCCUPANCY DATE   
    INSERT INTO #OccupancyData(Data)  
@@ -921,7 +922,7 @@ IF @Action ='Property'
 		SELECT @BookingId,@RoomId,CONVERT(NVARCHAR,DATEADD(DAY,@i,CONVERT(DATE,@ChkInDate,103)),103),  
 		@RoomName,@GuestName,@ChkInDate,@ChkOutDate,@Type,@Occupancy,@BookingLevel,@ClientName,  
 		@BookingCode,@BedId,@Id,@RoomType,@GuestCount  
-	      
+	     
 		SET @NoOfDays=@NoOfDays-1   
 		SET @i=@i+1  
 		IF @NoOfDays=0  
@@ -943,10 +944,24 @@ IF @Action ='Property'
 		 @Type=Type,@Occupancy=Occupancy,@BookingCode=BookingCode,@ClientName=ClientName,  
 		 @BedId=BedId,@Id=Id,@RoomType=RoomType,@GuestCount=GuestCount  
 		 FROM #OccupancyFinal  
-		 WHERE Split=0   
+		 WHERE Split=0 
+		 
+		 IF @NoOfDays<=0
+		 BEGIN
+		    UPDATE #OccupancyFinal SET Split=1,UBookingId=@BookingId,URoomId=@BedId  WHERE BookingId=@BookingId AND RoomId=@RoomId   
+			AND @Id=Id AND @ChkInDate=CheckInDt AND @ChkOutDate=CheckOutDt  AND @GuestName=GuestName  
+			
+			 SELECT TOP 1 @RoomName=RoomName,@RoomId=RoomId,@BookingId=BookingId,@GuestName=GuestName,  
+			 @NoOfDays=DATEDIFF(day, CONVERT(DATE,CheckInDt,103), CONVERT(DATE,CheckOutDt,103))+1,  
+			 @BookingLevel=BookingLevel,@ChkInDate=CheckInDt,@ChkOutDate=CheckOutDt,@i=0,  
+			 @Type=Type,@Occupancy=Occupancy,@BookingCode=BookingCode,@ClientName=ClientName,  
+			 @BedId=BedId,@Id=Id,@RoomType=RoomType,@GuestCount=GuestCount  
+			 FROM #OccupancyFinal  
+			 WHERE Split=0 
+		 END  
     END    
     END  
-
+    
 	INSERT INTO #OccupancyFinalCount1(BookingId,RoomId,DT,RoomName,GuestName,CheckInDt,CheckOutDt,Type,Occupancy,  
 	BookingLevel,ClientName,BookingCode,RoomType,GuestCount)  
 	SELECT BookingId,RoomId,DT,RoomName,GuestName,CONVERT(DATE,CheckInDt,103),CheckOutDt,Type,'Double',  

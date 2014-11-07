@@ -178,7 +178,7 @@
 				} 
 				else
 				{
-					alignAlert(Alert.show(" Do you want to Submit the PC Expense Report?", "Warning",Alert.YES | Alert.NO, null,
+					alignAlert(Alert.show(" Do you want to Approve the PC Request?", "Warning",Alert.YES | Alert.NO, null,
 						FnSave1, iconWarning, Alert.NO),10,"");
 				}
 			}

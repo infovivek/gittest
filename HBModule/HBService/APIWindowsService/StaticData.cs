@@ -10,7 +10,8 @@ using System.Data.SqlClient;
 namespace APIWindowsService
 {
    public class StaticData
-    {
+   {
+       string TmpCityCode = "";
        public void staticDateFun()
        {
            try
@@ -29,6 +30,7 @@ namespace APIWindowsService
                command.Parameters.Add("@Id4", SqlDbType.BigInt).Value = 0;
                DataSet dsCode = new WRBERPConnections().ExecuteDataSet(command, "");
                int CodeCnt = dsCode.Tables[0].Rows.Count;
+               APIEntity api = new APIEntity();
                for (int Q = 0; Q < CodeCnt; Q++)
                {
                    StringBuilder Header = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\" ?> ");
@@ -103,12 +105,14 @@ namespace APIWindowsService
                    Header.Append("<Amenity>Geyser In Bathroom</Amenity> <Amenity>Hot/cold Water</Amenity><Amenity>Iron</Amenity><Amenity>Wi-fi</Amenity></Amenities><Code>4</Code><RoomDescription>Executive</RoomDescription>");
                    Header.Append("<Name>Executive</Name> </Room></Rooms></Hotel></MMTHotelsSearchResponse>");
                    string NewHeader = Header.ToString();
+                   //api.CityId = Convert.ToInt32(dsCode.Tables[0].Rows[Q][1].ToString());
                    WebRequest webRequest = WebRequest.Create("https://apim-gateway.mmtcloud.com/mmt-htlsearch/1.0/staticsearch/v1.0/hotelData");
                    HttpWebRequest httpRequest = (HttpWebRequest)webRequest;
                    httpRequest.Method = "POST";
                    httpRequest.ContentType = "application/xml; charset=utf-8";
                    httpRequest.Headers.Add("MI_XMLPROTOCOLREQUEST", "MatrixRouteRequest");
-                   httpRequest.Headers.Add("Authorization", "Basic QUZGMTM0MTY6YWZmQDEyMw==, Bearer a6689e5ff46f0604151205f79c63b7b");
+                   //httpRequest.Headers.Add("Authorization", "Basic QUZGMTM0MTY6YWZmQDEyMw==, Bearer a6689e5ff46f0604151205f79c63b7b");
+                   httpRequest.Headers.Add("Authorization", "Basic QUZGMTQ0NTM6SHVtbWluZ0BCaXJk, Bearer a6689e5ff46f0604151205f79c63b7b"); // live
                    httpRequest.ProtocolVersion = HttpVersion.Version11;
                    httpRequest.Credentials = CredentialCache.DefaultCredentials;
                    httpRequest.Timeout = 100000000;
@@ -118,13 +122,13 @@ namespace APIWindowsService
                    StringBuilder StrBuil = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
                    StrBuil.Append("<MMTHotelSearchRequest Rows=\"0\" Offset=\"0\">");
                    StrBuil.Append("<POS>");
-                   StrBuil.Append("<Requestor type=\"AFF\" idContext=\"AFF\" id=\"AFF13416\" channel=\"AFF\"/>");
+                   StrBuil.Append("<Requestor type=\"AFF\" idContext=\"AFF\" id=\"AFF14453\" channel=\"AFF\"/>");
                    StrBuil.Append("<Source iSOCurrency=\"INR\"/>");
-                   StrBuil.Append("<Token>AFF13416</Token>");
+                   StrBuil.Append("<Token>AFF14453</Token>");
                    StrBuil.Append("</POS>");
                    StrBuil.Append("<RequestHotelParams>");
                    //StrBuil.Append("<CityCode>AGR</CityCode>");
-                   string SDSDSS = dsCode.Tables[0].Rows[Q][0].ToString();
+                   TmpCityCode = dsCode.Tables[0].Rows[Q][0].ToString();
                    StrBuil.Append("<CityCode>" + dsCode.Tables[0].Rows[Q][0].ToString() + "</CityCode>");                   
                    StrBuil.Append("<CityName/>");
                    StrBuil.Append("<Country/>");
@@ -139,7 +143,6 @@ namespace APIWindowsService
                    HttpWebResponse wr = (HttpWebResponse)httpRequest.GetResponse();
                    StreamReader srd = new StreamReader(wr.GetResponseStream());
                    string resulXmlFromWebService = srd.ReadToEnd();
-                   APIEntity api = new APIEntity();
                    command = new SqlCommand();
                    DataSet ds = new DataSet();
                    XmlDocument document = new XmlDocument();
@@ -150,7 +153,11 @@ namespace APIWindowsService
                    api.HotelCount = n;
                    for (int i = 0; i < n; i++)
                    {
-                       api.HotalId = document.SelectNodes("//Hotel")[i].Attributes["Id"].Value;                       
+                       api.HotalId = document.SelectNodes("//Hotel")[i].Attributes["Id"].Value;
+                       if (api.HotalId == "201301221658026139")
+                       {
+                           string ASD = "";
+                       }
                        bool CntFlg = true;
                        XmlNodeList xnList111 = document.DocumentElement.SelectNodes("/MMTHotelsSearchResponse/Hotel[@Id=" + api.HotalId + "]");
                        foreach (XmlNode xn in xnList111)
@@ -236,7 +243,7 @@ namespace APIWindowsService
                                    }
                                    else
                                    {
-                                       api.Area += "," + xn.InnerText;
+                                       api.Area += "," + xnN.InnerText;
                                    }
                                }                               
                                //api.City = document.DocumentElement.SelectNodes("/MMTHotelsSearchResponse/Hotel/AreaInfo/Address/City")[i].InnerText;
@@ -417,6 +424,21 @@ namespace APIWindowsService
                                    docp.LoadXml(str.ToString());
                                    api.DateUpdated = docp.SelectNodes("//DateUpdated")[0].InnerXml;
                                }
+                               // Latitude & Longitude
+                               api.Latitude = ""; 
+                               api.Longitude = "";
+                               XmlNodeList XmlNodeListLatitude = document.DocumentElement.SelectNodes("/MMTHotelsSearchResponse/Hotel[@Id=" + api.HotalId + "]/AreaInfo/GeoLocation");
+                               foreach (XmlNode xnlat in XmlNodeListLatitude)
+                               {
+                                   string str = xnlat.OuterXml;
+                                   XmlDocument docp = new XmlDocument();
+                                   docp.LoadXml(str.ToString());
+                                   api.Latitude = docp.SelectNodes("//Latitude")[0].InnerXml;
+                                   api.Longitude = docp.SelectNodes("//Longitude")[0].InnerXml;
+                               }
+                               //api.Latitude = document.DocumentElement.SelectNodes("/MMTHotelsSearchResponse/Hotel/AreaInfo/GeoLocation/Latitude")[i].InnerText;
+                               //api.Longitude = document.DocumentElement.SelectNodes("/MMTHotelsSearchResponse/Hotel/AreaInfo/GeoLocation/Longitude")[i].InnerText;
+                               //
                                command = new SqlCommand();
                                command.CommandText = "Sp_StaticData_Insert";
                                command.CommandType = CommandType.StoredProcedure;
@@ -431,8 +453,8 @@ namespace APIWindowsService
                                //command.Parameters.Add("@AlternateName", SqlDbType.NVarChar).Value = api.AlternateName;
                                command.Parameters.Add("@DateUpdated", SqlDbType.NVarChar).Value = api.DateUpdated;
                                command.Parameters.Add("@State", SqlDbType.NVarChar).Value = api.State;
-                               //command.Parameters.Add("@Latitude", SqlDbType.NVarChar).Value = api.Latitude;
-                               //command.Parameters.Add("@Longitude", SqlDbType.NVarChar).Value = api.Longitude;
+                               command.Parameters.Add("@Latitude", SqlDbType.NVarChar).Value = api.Latitude;
+                               command.Parameters.Add("@Longitude", SqlDbType.NVarChar).Value = api.Longitude;
                                command.Parameters.Add("@Email", SqlDbType.NVarChar).Value = api.Email;
                                //command.Parameters.Add("@Fax", SqlDbType.NVarChar).Value = api.Fax;
                                //command.Parameters.Add("@Mobile", SqlDbType.NVarChar).Value = api.Mobile;
@@ -453,9 +475,10 @@ namespace APIWindowsService
                                command.Parameters.Add("@TwentyFourHourCheckinAllowed", SqlDbType.NVarChar).Value = api.TwentyFourHourCheckinAllowed;
                                command.Parameters.Add("@WebAddress", SqlDbType.NVarChar).Value = api.WebAddress;
                                command.Parameters.Add("@Image", SqlDbType.NVarChar).Value = api.Image;
-                               command.Parameters.Add("@Amenity", SqlDbType.NVarChar).Value = api.Amenity;
+                               //command.Parameters.Add("@Amenity", SqlDbType.NVarChar).Value = api.Amenity;
                                command.Parameters.Add("@Area", SqlDbType.NVarChar).Value = api.Area;
                                command.Parameters.Add("@HotelCount", SqlDbType.Int).Value = api.HotelCount;
+                               //command.Parameters.Add("@CityId", SqlDbType.BigInt).Value = api.CityId;
                                ds = new WRBERPConnections().ExecuteDataSet(command, "");
                                /*AreasCount = 0;
                                XmlNodeList xnList2 = document.DocumentElement.SelectNodes("/MMTHotelsSearchResponse/Hotel[@Id=" + api.HotalId + "]/Rooms/Room");
@@ -481,6 +504,7 @@ namespace APIWindowsService
            catch (Exception Ex)
            {
                CreateLogFile Err = new CreateLogFile();
+               string fdf = TmpCityCode;
                Err.ErrorLog(Ex.Message);
                //ErrdT.Rows.Add("Error - " + Ex.Message + " | " + Ex.InnerException);
            }

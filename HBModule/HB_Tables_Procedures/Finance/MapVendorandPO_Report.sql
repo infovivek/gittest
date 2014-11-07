@@ -173,17 +173,36 @@ BEGIN
 	GROUP BY B.PONo,G.FirstName,H.Stay,B.BookingCode,H.ChkOutTariffTotal,H.Id,B.Id,h.GuestId	
 	ORDER BY H.Id ASC
 	
-	
-	--BOOKING TARIFF AMOUNT
+
+	--BOOKING TARIFF AMOUNT FOR Single OCCUPANCY
 	INSERT INTO #InvoicDateBooking(GuestName,POAmount,BookingId,GuestId,
 	CheckInDt,CheckOutDT,Flag)
-	SELECT G.FirstName,G.Tariff,G.BookingId,G.GuestId,
+	SELECT G.FirstName,A.SingleTariff,G.BookingId,G.GuestId,
 	CONVERT(NVARCHAR,G.ChkInDt,103),CONVERT(NVARCHAR,G.ChkOutDt,103),0
 	FROM #InvoicDateCheckout B
-	JOIN dbo.WRBHBBookingPropertyAssingedGuest  G WITH(NOLOCK) ON B.BookingId=G.BookingId 
+	JOIN dbo.WRBHBBookingPropertyAssingedGuest  G WITH(NOLOCK) ON B.BookingId=G.BookingId AND Occupancy='Single'
+	JOIN WRBHBBookingProperty A WITH(NOLOCK) ON A.BookingId=G.BookingId AND  G.BookingPropertyTableId=A.Id 
 	AND G.IsActive=1 AND G.IsDeleted=0 AND G.GuestId=B.GuestId
 	
+    --BOOKING TARIFF AMOUNT FOR Double OCCUPANCY
+	INSERT INTO #InvoicDateBooking(GuestName,POAmount,BookingId,GuestId,
+	CheckInDt,CheckOutDT,Flag)
+	SELECT G.FirstName,A.DoubleTariff,G.BookingId,G.GuestId,
+	CONVERT(NVARCHAR,G.ChkInDt,103),CONVERT(NVARCHAR,G.ChkOutDt,103),0
+	FROM #InvoicDateCheckout B
+	JOIN dbo.WRBHBBookingPropertyAssingedGuest  G WITH(NOLOCK) ON B.BookingId=G.BookingId AND Occupancy='Double'
+	JOIN WRBHBBookingProperty A WITH(NOLOCK) ON A.BookingId=G.BookingId AND  G.BookingPropertyTableId=A.Id 
+	AND G.IsActive=1 AND G.IsDeleted=0 AND G.GuestId=B.GuestId
 	
+	--BOOKING TARIFF AMOUNT FOR Triple OCCUPANCY
+	INSERT INTO #InvoicDateBooking(GuestName,POAmount,BookingId,GuestId,
+	CheckInDt,CheckOutDT,Flag)
+	SELECT G.FirstName,A.TripleTariff,G.BookingId,G.GuestId,
+	CONVERT(NVARCHAR,G.ChkInDt,103),CONVERT(NVARCHAR,G.ChkOutDt,103),0
+	FROM #InvoicDateCheckout B
+	JOIN dbo.WRBHBBookingPropertyAssingedGuest  G WITH(NOLOCK) ON B.BookingId=G.BookingId AND Occupancy='Triple'
+	JOIN WRBHBBookingProperty A WITH(NOLOCK) ON A.BookingId=G.BookingId AND  G.BookingPropertyTableId=A.Id 
+	AND G.IsActive=1 AND G.IsDeleted=0 AND G.GuestId=B.GuestId
 	
 	DECLARE @COUNT INT,@CheckInDT NVARCHAR(100),@CheckOutDT NVARCHAR(100),@TID INT,
 	@BookingId INT,@Tariff DECIMAL(27,2)
@@ -243,6 +262,7 @@ BEGIN
 	WHERE (POAmount-Adjustment)!=0 AND Adjustment!=0
 	GROUP BY PONo,GuestName,StayDuration,BookingCode,CheckOutId,
 	BookingId	
+	
 	
 	--UPDATE ADJUSEMENT AMOUT
 	UPDATE #InvoicDateFinal SET Adjustment = A.Adjustment
@@ -348,6 +368,7 @@ BEGIN
 		WHERE H.IsDeleted=0 AND H.IsActive=1 AND G.Occupancy='Triple'
 		ORDER BY H.Id ASC
 		
+		
 		--TAC NO UPDATE
 		UPDATE #ExternalDate SET BillNumber=TACInvoiceNo FROM  #ExternalDate H
 		JOIN WRBHBExternalChechkOutTAC D ON H.CheckOutHdrId=D.ChkOutHdrId
@@ -371,6 +392,7 @@ BEGIN
 		--PAYMENT  UPDATE
 		UPDATE #ExternalDate SET PaymentStatus='Payment Received' FROM  #ExternalDate H
 		JOIN dbo.WRBHBVendorSettlementInvoiceAmount D ON H.InvoiceId=D.InvoiceId
+		
 		
 		
 		IF @Param1='All'

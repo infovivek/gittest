@@ -48,6 +48,7 @@
 				dt_Date.selectedDate = new Date();
 				Txt_TotalAmount.text="0.00";
 				hlp_Property.text="";
+				ExpenseGroupLoad();
 			}
 			public function Help():void
 			{
@@ -108,14 +109,6 @@
 						TxtFlag=false;
 					}
 					ErrStr=ErrStr+" *   Property Name is Required \n";
-				}
-				if(ExpenseGroupId==0)
-				{
-					if(Flag==true)
-					{
-						Flag=false;
-					}
-					ErrStr=ErrStr+"*   Expense Group is Required.\n";
 				}
 				if(Txt_OpeningBalance.text=="")
 				{
@@ -232,11 +225,8 @@
 			}	
 			protected function ExpenseGroupLoad():void
 			{
-				ExpenseGroupId=Ddl_ExpenseGroup.selectedItem.data;
-				ExpenseGroup=Ddl_ExpenseGroup.selectedItem.label;
-				
 				var Tmp:ArrayCollection=new ArrayCollection
-					([{Action:GlobalXml,Param1:"PAGELOAD",Param2:ExpenseGroupId,Param3:0,prcName:"PettyCashHdr",
+					([{Action:GlobalXml,Param1:"PAGELOAD",Param2:0,Param3:0,prcName:"PettyCashHdr",
 						ctrlName:"hlpExpenseHead",grdWidth:"0,200",grdHeight:"50"}]);				
 				Grd_PettyCash1._bindHlpTextData(Tmp);
 				Tmp=new ArrayCollection();
@@ -270,7 +260,7 @@
 				</WrbComp:Button_BB>
 			</s:HGroup>
 			<s:Label x="116" y="57" text="Petty Cash" color="red"/>
-			<s:Label x="277" y="119" text="*" color="red"/>
+			<s:Label x="277" y="119" text="*" color="red" visible="false"/>
 			<s:Label x="245" y="67" text="*" color="red"/>
 			<mx:DateField x="561" y="64" width="106" id="dt_Date" yearNavigationEnabled="true" tabIndex="1" 
 						  
@@ -288,11 +278,11 @@
 			</WrbComp:ProDGrid1>
 			<s:TextInput id="Txt_TotalAmount" x="761" y="448" editable="false"/>
 			<s:Label x="681" y="453" text="Total Amount"/>
-			<mx:TextInput id="Txt_OpeningBalance" x="643" y="120" editable="false"/>
-			<s:Label x="544" y="126" text="Opening Balance"/>
+			<mx:TextInput id="Txt_OpeningBalance" x="297" y="120" editable="false"/>
+			<s:Label x="194" y="126" text="Opening Balance"/>
 			<s:DropDownList id="Ddl_ExpenseGroup" x="297" y="120" width="238" prompt="Select Expense Group"
-							change="ExpenseGroupLoad()" tabIndex="2"></s:DropDownList>
-			<s:Label x="193" y="126" width="86" text="Expense Group"/>
+							tabIndex="2" visible="false"></s:DropDownList>
+			<s:Label x="193" y="126" width="86" text="Expense Group" visible="false"/>
 			
 		</s:BorderContainer>
 	</s:VGroup>	

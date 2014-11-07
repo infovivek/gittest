@@ -37,14 +37,44 @@ If @Action ='PageLoad'
 If @Action ='Property'
 	
 		BEGIN
-			SELECT DISTINCT H.GuestName AS GuestName,(p.Category) AS GetTypeId,H.RoomNo AS RoomNoId,H.BookingCode AS BookingCodeId,
-			H.ClientName AS ClientNameId,ISNULL(H.GuestId,0) as GuestId,ISNULL(H.PropertyId,0) as PropertyId,H.RoomId,
+			CREATE TABLE #guest(Guestname NVARCHAR(100),Category NVARCHAR(100),RoomNo NVARCHAR(100),BookingCode NVARCHAR(100),
+			ClientName NVARCHAR(100),GuestId  INT,PropertyId INT, RoomId INT,BookingId INT,Id INT)
+			
+			INSERT INTO #guest(Guestname,Category,RoomNo,BookingCode,ClientName,GuestId,PropertyId
+			,RoomId,BookingId,Id)
+			SELECT DISTINCT H.GuestName ,p.Category ,H.RoomNo ,H.BookingCode,
+			H.ClientName,ISNULL(H.GuestId,0) as GuestId,ISNULL(H.PropertyId,0) as PropertyId,H.RoomId,
 			H.BookingId,H.Id 
 			FROM WRBHBCheckInHdr H
 			join WRBHBProperty p on p.Id = h.PropertyId AND P.IsActive=1 AND P.IsDeleted=0
-			WHERE H.PropertyId = @Id AND -- GETDATE() BETWEEN  H.ArrivalDate AND H.ChkoutDate AND 
-			H.IsActive=1 AND H.IsDeleted=0 AND
-			p.Category = 'Internal Property' AND  H.Id NOT IN(SELECT ChkInHdrId FROM WRBHBChechkOutHdr)
+			JOIN WRBHBBookingPropertyAssingedGuest B ON H.BookingId=B.BookingId AND B.IsActive=1 AND B.IsDeleted=0
+			WHERE H.PropertyId = @Id AND H.IsActive=1 AND H.IsDeleted=0 AND B.CurrentStatus='CheckIn'
+			AND p.Category = 'Internal Property' AND  H.Id NOT IN(SELECT ChkInHdrId FROM WRBHBChechkOutHdr)
+			
+			INSERT INTO #guest(Guestname,Category,RoomNo,BookingCode,ClientName,GuestId,PropertyId
+			,RoomId,BookingId,Id)
+			SELECT DISTINCT H.GuestName ,p.Category ,H.RoomNo ,H.BookingCode,
+			H.ClientName,ISNULL(H.GuestId,0) as GuestId,ISNULL(H.PropertyId,0) as PropertyId,H.RoomId,
+			H.BookingId,H.Id 
+			FROM WRBHBCheckInHdr H
+			join WRBHBProperty p on p.Id = h.PropertyId AND P.IsActive=1 AND P.IsDeleted=0
+			JOIN WRBHBApartmentBookingPropertyAssingedGuest B ON H.BookingId=B.BookingId AND B.IsActive=1 AND B.IsDeleted=0
+			WHERE H.PropertyId = @Id AND H.IsActive=1 AND H.IsDeleted=0 AND B.CurrentStatus='CheckIn'
+			AND p.Category = 'Internal Property' AND  H.Id NOT IN(SELECT ChkInHdrId FROM WRBHBChechkOutHdr)
+			
+			INSERT INTO #guest(Guestname,Category,RoomNo,BookingCode,ClientName,GuestId,PropertyId
+			,RoomId,BookingId,Id)
+			SELECT DISTINCT H.GuestName ,p.Category ,H.RoomNo ,H.BookingCode,
+			H.ClientName,ISNULL(H.GuestId,0) as GuestId,ISNULL(H.PropertyId,0) as PropertyId,H.RoomId,
+			H.BookingId,H.Id 
+			FROM WRBHBCheckInHdr H
+			join WRBHBProperty p on p.Id = h.PropertyId AND P.IsActive=1 AND P.IsDeleted=0
+			JOIN WRBHBBedBookingPropertyAssingedGuest B ON H.BookingId=B.BookingId AND B.IsActive=1 AND B.IsDeleted=0
+			WHERE H.PropertyId = @Id AND H.IsActive=1 AND H.IsDeleted=0 AND B.CurrentStatus='CheckIn'
+			AND p.Category = 'Internal Property' AND  H.Id NOT IN(SELECT ChkInHdrId FROM WRBHBChechkOutHdr)
+				
+			SELECT Guestname AS GuestName,Category AS CategoryId,RoomNo AS RoomNoId,BookingCode AS BookingCodeId,ClientName
+			AS ClientNameId,GuestId,PropertyId,RoomId,BookingId,Id FROM #guest
 					
    
 	--UserKOT

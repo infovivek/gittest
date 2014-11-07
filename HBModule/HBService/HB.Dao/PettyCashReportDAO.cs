@@ -27,6 +27,7 @@ namespace HB.Dao
             command.Parameters.Add("@Id", SqlDbType.Int).Value = Convert.ToInt32(data[2].ToString());
             command.Parameters.Add("@Str", SqlDbType.NVarChar).Value = data[4].ToString();
             command.Parameters.Add("@Str1", SqlDbType.NVarChar).Value = data[5].ToString();
+            command.Parameters.Add("@Str2", SqlDbType.NVarChar).Value = data[6].ToString();
             return new WrbErpConnection().ExecuteDataSet(command, UserData);
         }
     }

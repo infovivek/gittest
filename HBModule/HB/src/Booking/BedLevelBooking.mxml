@@ -62,7 +62,7 @@
 				//
 				FnHelp_PageLoad();FnHelp_Title();
 				//
-				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Bed',2037]);
+				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Bed',2223]);
 			}
 			
 			protected function FnHelp_PageLoad():void
@@ -223,7 +223,7 @@
 						alignAlert(Alert.show("Booking Confirmed Successfully.","Message !",Alert.OK, 
 							null, null, iconTickLarge, Alert.OK),10,"");*/
 						BookedId=Id;
-						useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Bed',BookedId]);
+						//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Bed',BookedId]);
 						FnClear();
 					}					
 				}
@@ -316,6 +316,25 @@
 					//
 					var sdfsdf:ArrayCollection=new ArrayCollection();
 					Grd_PropertyAssignedGst.dataProvider=sdfsdf;
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "BeforeSaveBedValidation_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						var Ac_Bed:ArrayCollection = new ArrayCollection();
+						Ac_Bed = Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						var BedStr:String="";
+						for(var j:int = 0; j < Ac_Bed.length; j++)
+						{
+							BedStr = BedStr +">> "+Ac_Bed[j].Bed + '.\n'
+						}
+						alignAlert(Alert.show(BedStr,"Bed Already Exists !",Alert.OK, 
+							null,null,iconWarning,Alert.OK),10,"");
+					}
+					else
+					{
+						FnSave_Tab3();
+					}
 				}
 			}		
 			
@@ -972,7 +991,7 @@
 						ClientBookerName:ClientBookerName,ClientBookerEmail:ClientBookerEmail,
 						EmailtoGuest:Chk_EmailtoGuest.selected,Note:"",
 						SpecialRequirements:"",Id:Id,Status:"Step2",AMPM:Ddl_AMPM.selectedItem,
-						BookingLevel:"Bed"}]);
+						BookingLevel:"Bed",ExtraCCEmail:""}]);
 				var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
 				var GuestXml:String="";
 				GuestXml += "<ROOT>";
@@ -1148,6 +1167,10 @@
 				{
 					Err = Err + "*  Property is Required.\n";
 				}
+				if(BedId == 0)
+				{
+					Err = Err + "*  Bed Type is Required.\n";
+				}
 				if(Number(Txt_Tariff.text) == 0)
 				{
 					Err = Err + "*  Tariff is Required.\n";
@@ -1228,7 +1251,17 @@
 					}					
 				}
 				Grd_GuestTab3.dataProvider=Tmp.source;
-				Grd_PropertyAssignedGst.dataProvider=Ac1;				
+				Grd_PropertyAssignedGst.dataProvider=Ac1;
+				
+				var Ac_BedType:ArrayCollection = new ArrayCollection();
+				Ac_BedType = Ddl_Bed.dataProvider as ArrayCollection;
+				
+				var index:int = Ddl_Bed.selectedIndex;
+				Ac_BedType.removeItemAt(Ddl_Bed.selectedIndex);
+				BedId=0;RoomId=0;BedType="";BedTariff=0;Txt_Tariff.text="";
+				Ddl_Bed.dataProvider = null;
+				Ddl_Bed.dataProvider = Ac_BedType;
+				Ddl_Bed.prompt = "Please Select Bed";
 			}
 			
 			protected function Btn_Backed_clickHandler(event:MouseEvent):void
@@ -1254,6 +1287,7 @@
 				}
 				if(Ac_Guest.length == 0)
 				{
+					//FnSave_Tab3_BedValidation();
 					FnSave_Tab3();
 				}
 			}
@@ -1262,8 +1296,36 @@
 			{
 				if (event.detail==Alert.YES) 
 				{
+					//FnSave_Tab3_BedValidation();
 					FnSave_Tab3();
 				}
+			}
+			
+			protected function FnSave_Tab3_BedValidation():void
+			{
+				var Ac_PAssdGst:ArrayCollection = new ArrayCollection();
+				Ac_PAssdGst = Grd_PropertyAssignedGst.dataProvider as ArrayCollection;
+				var BedIds:String="";
+				for(var i:int = 0; i < Ac_PAssdGst.length; i++)
+				{
+					if(Number(Ac_PAssdGst[i].BedId) != 0)
+					{
+						BedIds = BedIds + String(Number(Ac_PAssdGst[i].BedId)) + ",";
+					}
+				}
+				var FDt:String = Dt_ChkInDt.text;										
+				var FY:String = FDt.substr(6,10);
+				var FM:String = FDt.substr(3,2);
+				var FD:String = FDt.substr(0,2);
+				var ChkInDt:String=FY+'-'+FM+'-'+FD+' '+ExpInTime+' '+Ddl_AMPM.selectedItem;
+				var TDt:String = Dt_ChkOutDt.text;										
+				var TY:String = TDt.substr(6,10);
+				var TM:String = TDt.substr(3,2);
+				var TD:String = TDt.substr(0,2);
+				var ChkOutDt:String=TY+'-'+TM+'-'+TD+' '+'11:59:00 AM';
+				useWeb("BedBooking","BeforeSaveBedValidation_CUSTOM",
+					[GlobalXml,'BeforeSaveBedValidation',BedIds,'',ChkInDt,ChkOutDt,
+					0,0,0,BookingPropertyId,0,0,0]);
 			}
 			
 			protected function FnSave_Tab3():void
@@ -1278,7 +1340,8 @@
 						CityId:0,CityName:"",ClientBookerId:0,ClientBookerName:"",
 						ClientBookerEmail:"",EmailtoGuest:Chk_EmailtoGuest.selected,Note:"",
 						SpecialRequirements:Txt_SpecialRequirements.text,
-						Id:Id,Status:"Direct Booked",AMPM:Ddl_AMPM.selectedItem,BookingLevel:"Bed"}]);
+						Id:Id,Status:"Direct Booked",AMPM:Ddl_AMPM.selectedItem,BookingLevel:"Bed",
+						ExtraCCEmail:""}]);
 				var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
 				var Tmp1:ArrayCollection=new ArrayCollection();
 				var GuestXml:String="";
@@ -1538,6 +1601,51 @@
 					var str:String =  DataGridItemRenderer(event.itemRenderer).data.Phone;
 				}
 				Grd_Property.toolTip = str;*/
+			}
+			
+			public function Split(event:Event):void
+			{
+				var Index:int = Grd_PropertyAssignedGst.selectedIndex;				
+				var Ac:ArrayCollection = new ArrayCollection();
+				Ac = Grd_PropertyAssignedGst.dataProvider as ArrayCollection;
+				// GET VALUE TO GRID GUEST 
+				var EmpCode:String = StringUtil.trim(Ac[Index].EmpCode);
+				var FirstName:String = StringUtil.trim(Ac[Index].FirstName);
+				var LastName:String = StringUtil.trim(Ac[Index].LastName);
+				var Name:String = StringUtil.trim(Ac[Index].Name);
+				var GuestId:String = StringUtil.trim(Ac[Index].GuestId);
+				// 
+				var Ac_Guest:ArrayCollection = new ArrayCollection();
+				Ac_Guest = Grd_GuestTab3.dataProvider as ArrayCollection;
+				var GGG:ArrayCollection = new ArrayCollection
+					([{Tick:0,EmpCode:EmpCode,FirstName:FirstName,LastName:LastName,
+					Name:Name,GuestId:GuestId,Id:0}]);
+				Ac_Guest.addAll(GGG);
+				//
+				var df:ArrayCollection = new ArrayCollection();
+				Grd_GuestTab3.dataProvider = df;
+				Ac_Guest.refresh();
+				Grd_GuestTab3.dataProvider = Ac_Guest;
+				// GET VALUE TO DDL BED 	
+				var BedId:String = StringUtil.trim(Ac[Index].BedId);
+				var label:String = StringUtil.trim(Ac[Index].BedType);
+				var RoomId:String = StringUtil.trim(Ac[Index].RoomId);
+				var Tariff:String = StringUtil.trim(Ac[Index].Tariff);
+				// 
+				var Ac_Bed:ArrayCollection = new ArrayCollection();
+				Ac_Bed = Ddl_Bed.dataProvider as ArrayCollection;
+				var BBB:ArrayCollection = new ArrayCollection
+					([{BedId:BedId,label:label,RoomId:RoomId,Tariff:Tariff}]);
+				Ac_Bed.addAll(BBB);
+				// 
+				Ddl_Bed.dataProvider = null;Ddl_Bed.prompt = "Please Select Bed";
+				Ac_Bed.refresh();
+				Ddl_Bed.dataProvider = Ac_Bed;
+				// remove index in property Assinged guest grid				
+				Grd_PropertyAssignedGst.dataProvider = null;
+				Ac.removeItemAt(Index);
+				Ac.refresh();
+				Grd_PropertyAssignedGst.dataProvider = Ac;				
 			}
 			
 		]]>
@@ -1804,11 +1912,21 @@
 				</mx:DataGrid>
 				<mx:DataGrid id="Grd_PropertyAssignedGst" x="12" y="232" width="946" height="182">
 					<mx:columns>
+						<!--mx:DataGridColumn width="20" dataField="X">
+							<mx:itemRenderer>
+								<fx:Component>
+									<mx:HBox horizontalAlign="center" verticalAlign="middle">
+										<mx:Image source="@Embed(source='../Assets/CrossSmall.png')" 
+												  buttonMode="true" click="outerDocument.Split(event)"/>
+									</mx:HBox>
+								</fx:Component>
+							</mx:itemRenderer>
+						</mx:DataGridColumn-->
 						<mx:DataGridColumn width="0" dataField="EmpCode" editable="false"
 										   visible="false"/>
 						<mx:DataGridColumn width="0" dataField="FirstName" visible="false"/>
 						<mx:DataGridColumn width="0" dataField="LastName" visible="false"/>
-						<mx:DataGridColumn width="150" dataField="Name" visible="true"/>
+						<mx:DataGridColumn width="130" dataField="Name" visible="true"/>
 						<mx:DataGridColumn width="0" dataField="GuestId" visible="false"/>
 						<mx:DataGridColumn width="80" dataField="BedType" editable="false"/>
 						<mx:DataGridColumn width="80" dataField="Tariff" editable="false"/>
