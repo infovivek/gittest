@@ -40,6 +40,20 @@ BEGIN
 		JOIN WRBHBProperty P ON PU.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
 		WHERE P.Category IN('Internal Property','Managed G H') AND PU.IsActive=1 AND PU.IsDeleted=0 
 		ORDER BY P.Id ASC
+		
+		
+		SELECT (S.FirstName+''+S.LastName) AS Submittedby,P.PropertyName AS Property,
+		CONVERT(NVARCHAR,CAST(PC.CreatedDate AS Date),103) AS SubmittedOn,SUM(U.Paid) AS Amount,
+		'Both 1st and 2nd' AS FortNight,MONTH(CONVERT(date,PC.CreatedDate,103)) AS Month,
+		PC.PropertyId,PC.UserId,(S.FirstName+''+S.LastName) AS LastProcessedBy,'Submitted',
+		CONVERT(NVARCHAR,CAST(PC.CreatedDate AS Date),103) AS LastProcessedOn   
+		FROM WRBHBPettyCashStatusHdr  PC
+		JOIN WRBHBPettyCashStatus U ON PC.Id=U.PettyCashStatusHdrId  AND PC.IsActive=1 AND PC.IsDeleted=0
+		JOIN WRBHBUser S ON U.UserId=S.Id AND S.IsActive=1 AND S.IsDeleted=0
+		JOIN WRBHBProperty P ON U.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
+		WHERE  U.IsActive=1 AND U.IsDeleted=0 
+		group by S.FirstName,S.LastName,P.PropertyName,PC.CreatedDate,PC.PropertyId,PC.UserId
+		
 END
 IF @Action='UserLoad'
 BEGIN
@@ -304,22 +318,21 @@ IF @Action='Action'
 		CREATE TABLE #User (UserName NVARCHAR(100),Status NVARCHAR(100),Comments NVARCHAR(100),Processedon NVARCHAR(100))
 				
 		INSERT INTO #User(UserName,Status,Comments,Processedon)
+		SELECT DISTINCT(U.FirstName+' '+U.LastName) AS UserName,'Submitted' AS Status,'' AS Comments,
+		CONVERT(NVARCHAR,CAST(P.CreatedDate AS Date),103) AS Processedon
+	    FROM WRBHBPettyCashStatus P
+		JOIN WRBHBUser U ON  P.UserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
+		WHERE P.UserId=@UserId AND P.PropertyId=@Id AND P.IsActive=1 AND P.IsDeleted=0
+		AND CONVERT(NVARCHAR,CAST(P.CreatedDate AS Date),103)=CONVERT(NVARCHAR,@Str,103)
 		
-		SELECT DISTINCT (U.FirstName+' '+U.LastName) AS UserName,PC.ProcessedStatus AS Status,PC.Comments AS Comments,
+		INSERT INTO #User(UserName,Status,Comments,Processedon)
+		SELECT (U.FirstName+' '+U.LastName) AS UserName,PC.ProcessedStatus AS Status,PC.Comments AS Comments,
 		CONVERT(NVARCHAR(100),PC.LastProcessedon,103) AS Processedon		
 		From WRBHBNewPCExpenseApproval PC
 		JOIN WRBHBUser U ON  PC.UserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
 		WHERE PC.RequestedUserId=@UserId AND PC.PropertyId=@Id AND PC.IsActive=1 AND PC.IsDeleted=0
-		AND PC.RequestedOn=CONVERT(NVARCHAR,@Str,103);
-				
-		INSERT INTO #User(UserName,Status,Comments,Processedon)
-		SELECT DISTINCT	(U.FirstName+' '+U.LastName) AS UserName,P.Status AS Status,'' AS Comments,
-		CONVERT(NVARCHAR(100),PH.Date,103) AS Processedon
-	    FROM WRBHBPettyCash P
-	    JOIN WRBHBPettyCashHdr PH ON P.PettyCashHdrId= PH.Id AND PH.IsActive=0 AND PH.IsDeleted=1
-		JOIN WRBHBUser U ON  PH.UserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
-		WHERE PH.UserId=@UserId AND PH.PropertyId=@Id AND P.IsActive=1 AND P.IsDeleted=0
-		AND PH.Date=CONVERT(Date,@Str,103)
+		AND PC.RequestedOn=CONVERT(NVARCHAR,@Str,103)
+		ORDER BY PC.CreatedDate	
 		
 		SELECT UserName,Status,Comments,Processedon FROM #User 
 		ORDER BY CONVERT(date,Processedon,103) ASC
@@ -337,7 +350,7 @@ BEGIN
 		U.ExpenseHead,U.Description,U.Amount,U.Paid,U.BillLogo,U.Id
 		FROM WRBHBPettyCashStatus U 
 		JOIN WRBHBUser S ON U.UserId=S.Id AND S.IsActive=1 AND S.IsDeleted=0
-		WHERE U.UserId =@UserId AND U.PropertyId=@Id AND U.IsActive=0 AND U.IsDeleted=1
+		WHERE U.UserId =@UserId AND U.PropertyId=@Id AND U.IsActive=1 AND U.IsDeleted=0
 		AND CONVERT(NVARCHAR,CAST(U.CreatedDate AS Date),103)=CONVERT(NVARCHAR(100),@Str,103) 
 		
 		
@@ -431,7 +444,7 @@ END
 IF(@Action='DownloadReport')
 BEGIN
 		SELECT BillLogo FROM WRBHBPettyCashStatus  
-		WHERE PropertyId=@Id AND UserId=@UserId AND Id=CAST(@Str AS BIGINT) AND IsActive=0 AND IsDeleted=1
+		WHERE PropertyId=@Id AND UserId=@UserId AND Id=CAST(@Str AS BIGINT) AND IsActive=1 AND IsDeleted=0
 		--http:sstage.in/Client_images/Gas_1. Gas cylinder 1760.jpg    
 END
 IF(@Action='PCNewReport')

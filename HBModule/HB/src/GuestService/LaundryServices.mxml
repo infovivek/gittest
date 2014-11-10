@@ -72,16 +72,16 @@
 					{
 						hlp_Property.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
 					}
-					var sdfs:String=dt_Date.text;						
-					var D:String=sdfs.substr(0,2);
-					var M:String=sdfs.substr(3,2);
-					var Y:String=sdfs.substr(6,10);
-					var RangeMiddle:String=Y+'/'+M+'/'+D;
-					var RangeEnd:String=Y+'/'+M+'/'+String(Number(D));
-					var RangeStart:String=Y+'/'+M+'/'+String(Number(D)-1);
-					dt_Date.selectableRange = 
-						{rangeStart:new Date(RangeStart),rangeEnd:new Date(RangeEnd)};
-					dt_Date.selectedDate=new Date(RangeMiddle);
+//					var sdfs:String=dt_Date.text;						
+//					var D:String=sdfs.substr(0,2);
+//					var M:String=sdfs.substr(3,2);
+//					var Y:String=sdfs.substr(6,10);
+//					var RangeMiddle:String=Y+'/'+M+'/'+D;
+//					var RangeEnd:String=Y+'/'+M+'/'+String(Number(D));
+//					var RangeStart:String=Y+'/'+M+'/'+String(Number(D)-1);
+//					dt_Date.selectableRange = 
+//						{rangeStart:new Date(RangeStart),rangeEnd:new Date(RangeEnd)};
+//					dt_Date.selectedDate=new Date(RangeMiddle);
 				}
 				if (Ds_Objects.currentTarget.description.toString() == "Guest_CUSTOM")
 				{
@@ -501,7 +501,7 @@
 				
 				<mx:DateField x="121" y="48" width="100" id="dt_Date" yearNavigationEnabled="false" tabIndex="1" 
 							  formatString="DD/MM/YYYY" selectableRange="{{rangeEnd:new Date()}}" styleName="DisabledDateField"
-							  enabled="false"/>
+							  enabled="true"/>
 				<WrbHelpComp:HelpText id="hlp_Property" x="121" y="16" width="200" height="20"
 									  depth="100" onselection="{OnSelectionPropertyname()}"
 									  pxSetColumnsWidth="200,0" pxSetHeight="183" tabIndex="1">

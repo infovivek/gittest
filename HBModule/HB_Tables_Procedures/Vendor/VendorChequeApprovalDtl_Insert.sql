@@ -61,9 +61,7 @@ BEGIN
 
 	ELSE
 	BEGIN
-	     UPDATE WRBHBVendorRequest SET Flag=0 
-		 WHERE IsActive=1 AND IsDeleted=0 AND UserId=@RequestedUserId
-		
+	     
 		INSERT INTO	WRBHBVendorChequeApprovalNewDtl (VendorChequeApprovalHdrId,RequestedOn,Requestedby,
 		RequestedAmount,Status,Processedon,Processedby,
 		RequestedUserId,UserId,Process,IsActive,IsDeleted,CreatedBy,
@@ -80,11 +78,17 @@ BEGIN
 		'Approved by reporting authority',CONVERT(NVARCHAR(100),GETDATE(),103),@Processedby,@RequestedUserId,@UserId,@Process,1,0,@CreatedBy,GETDATE()
 		,@CreatedBy,GETDATE(),NEWID(),@PropertyId)	
 	
+		
+		
 		SELECT Id,RowId FROM WRBHBVendorChequeApprovalDtl WHERE Id=@@IDENTITY;
+		
+		UPDATE WRBHBVendorRequest SET ApprovalId=@@IDENTITY,Flag=0 
+		WHERE UserId=@RequestedUserId AND PropertyId=@PropertyId AND CONVERT(NVARCHAR(100),Date,103)=@RequestedOn
+		AND Flag=1
 	END
 END
 END
 	
-
-
+	
+	
 

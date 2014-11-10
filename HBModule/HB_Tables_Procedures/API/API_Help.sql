@@ -106,14 +106,14 @@ IF @Action = 'CityCode'
  END 
 IF @Action = 'GetCityId'
  BEGIN
-  /*SELECT Id FROM WRBHBCity 
-  WHERE ISNULL(CityCode,'') != '' AND IsActive=1 AND IsDeleted=0
-  ORDER BY Id ASC;*/
+  SELECT Id FROM WRBHBCity 
+  WHERE ISNULL(CityCode,'') != '' AND IsActive = 1 AND IsDeleted = 0
+  ORDER BY Id ASC;
   --SELECT 1107 AS Id; --BANGLORE
   --SELECT 2423 AS Id; --COIMBATORE
   --SELECT * FROM WRBHBCity WHERE CityCode='CJB'
   --SELECT * FROM WRBHBCity WHERE CityCode='BLR'
-  SELECT 0 AS Id;
+  --SELECT 0 AS Id;
   /*---------------
   select a.CityCode,a.CityId,count(b.HotelCount),b.HotelCount,a.IsActive 
   from WRBHBAPIHeader a

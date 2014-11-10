@@ -664,7 +664,7 @@ namespace HB.Dao
                                 " <table cellpadding=\"0\" cellspacing=\"0\" width=\"600\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
                                 " <tr style=\"font-size:11px; background-color:#eee;\">" +
                                 " <td width=\"600\" style=\"padding:12px 5px;\">" +
-                                " <p style=\"color:orange; font-weight:bold; margin:0px; font-size:14px;\"> Agreed Tariff & TAC :</p>" +
+                                " <p style=\"color:orange; font-weight:bold; margin:0px; font-size:14px;\"> Agreed Tariff & TAC (Per day / Room Night) :</p>" +
                                 " <p style=\"margin-top:5px; margin-left:25px\">" + Stng + "</p>" +
                                 " <p style=\"color:orange; font-weight:bold; margin:0px; font-size:0px;\"> Agreed Tariff & TAC :</p>" +
                                 " <p style=\"margin-top:5px; margin-left:25px\">" + BelowTACcontent + "</p>" +

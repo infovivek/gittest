@@ -321,6 +321,7 @@
     <EmbeddedResource Include="ExternalIntermediateCheckoutService.rdlc" />
     <EmbeddedResource Include="ExternalIntermediateCheckoutConsolidate.rdlc" />
     <EmbeddedResource Include="ExternalIntermediateTAC.rdlc" />
+    <EmbeddedResource Include="ExternalCheckoutNewTACMail.rdlc" />
     <EmbeddedResource Include="TAC Annexure.rdlc" />
     <EmbeddedResource Include="TACAnnuxpage1.rdlc" />
   </ItemGroup>
@@ -332,7 +333,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>4171</DevelopmentServerPort>
+          <DevelopmentServerPort>6236</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>
           </IISUrl>

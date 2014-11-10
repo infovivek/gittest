@@ -787,10 +787,14 @@
 							{
 								Grd_RoomBed._setGridSrc=Ds_Objects.result.Tables.Table1.Rows 
 									as ArrayCollection ;	
+								
+								Grd_RoomBed1._setGridSrc=Ds_Objects.result.Tables.Table1.Rows 
+									as ArrayCollection ;
 							}
 							else
 							{
 								Grd_RoomBed._clear();
+								Grd_RoomBed1._clear();
 							}						
 							Ddl_RoomCategory_RB_changeHandler();
 						}
@@ -979,7 +983,7 @@
 					{
 						txt_Bank.dataProvider= Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
 					}
-					if(dd_Category.selectedItem!="Internal Property")
+					if((dd_Category.selectedItem!="Internal Property")&&(dd_Category.selectedItem!="Managed G H"))
 					{
 						if (Ds_Objects.result.Tables.Table2.Rows.length > 0)
 						{	
@@ -2070,22 +2074,26 @@
 					}
 					ErrString=ErrString+"*  Sellable Apartment Type is Required.\n";
 				}
-				if(	Txt_RackTariff.text=="")
+				if(dd_Category.selectedItem!="Managed G H")
 				{
-					if(Flag==true)
+					if(	Txt_RackTariff.text=="")
 					{
-						Txt_RackTariff.setFocus();Flag=false;
+						if(Flag==true)
+						{
+							Txt_RackTariff.setFocus();Flag=false;
+						}
+						ErrString=ErrString+"*  Rack Tariff is Required.\n";
 					}
-					ErrString=ErrString+"*  Rack Tariff is Required.\n";
-				}
-				if(	Txt_MaxDiscountAllowed.text=="")
-				{
-					if(Flag==true)
+					if(	Txt_MaxDiscountAllowed.text=="")
 					{
-						Txt_MaxDiscountAllowed.setFocus();Flag=false;
+						if(Flag==true)
+						{
+							Txt_MaxDiscountAllowed.setFocus();Flag=false;
+						}
+						ErrString=ErrString+"*  Max Discount Allowed is Required.\n";
 					}
-					ErrString=ErrString+"*  Max Discount Allowed is Required.\n";
 				}
+				
 				return ErrString;
 			}
 			
@@ -2210,39 +2218,40 @@
 			public function FnValidation_RoomBed():String
 			{
 				ErrString="";var Flag:Boolean=true;
+				if(RoomBlockId==0)
+				{
+					Ddl_Block_RB.setFocus();Flag=false;
+					ErrString = ErrString + "*  Block No is Required.\n";
+				}
+				
+				if(Ddl_RoomType_RB.selectedItem=="Please Select Room Type")
+				{
+					if(Flag==true)
+					{
+						Ddl_RoomType_RB.setFocus();Flag=false;
+					}
+					ErrString=ErrString+"*  Room Type is Required.\n";
+				}
+				if(Txt_RoomNo_RB.text=="")
+				{
+					if(Flag==true)
+					{
+						Txt_RoomNo_RB.setFocus();Flag=false;
+					}
+					ErrString=ErrString+"*  Room No is Required.\n";
+				}
+				
+				if(RoomApartmentId==0)
+				{
+					if(Flag==true)
+					{
+						Ddl_Apartment_RB.setFocus();Flag=false;
+					}
+					ErrString=ErrString+"*  Apartment No is Required.\n";
+				}	
 				if(dd_Category.selectedItem!="Managed G H")
 				{
-					if(RoomBlockId==0)
-					{
-						Ddl_Block_RB.setFocus();Flag=false;
-						ErrString = ErrString + "*  Block No is Required.\n";
-					}
 									
-					if(Ddl_RoomType_RB.selectedItem=="Please Select Room Type")
-					{
-						if(Flag==true)
-						{
-							Ddl_RoomType_RB.setFocus();Flag=false;
-						}
-						ErrString=ErrString+"*  Room Type is Required.\n";
-					}
-					if(Txt_RoomNo_RB.text=="")
-					{
-						if(Flag==true)
-						{
-							Txt_RoomNo_RB.setFocus();Flag=false;
-						}
-						ErrString=ErrString+"*  Room No is Required.\n";
-					}
-			
-					if(RoomApartmentId==0)
-					{
-						if(Flag==true)
-						{
-							Ddl_Apartment_RB.setFocus();Flag=false;
-						}
-						ErrString=ErrString+"*  Apartment No is Required.\n";
-					}					
 					if(Txt_RackTariff_RB.text=="")
 					{
 						if(Flag==true)
@@ -2260,15 +2269,16 @@
 						ErrString=ErrString+"*  Room Category is Required.\n";
 					}
 				}
-				else
-				{
-					if((Grd_RoomsAndBedsHdr._getGridSrc==null)||(Grd_RoomsAndBedsHdr._getGridSrc.length==0))
-					{
-						ErrString=ErrString+"*  Room Details are Required.\n";
-						Grd_RoomsAndBedsHdr
-					}
-					
-				}
+//				else
+//				{
+//					
+//					if((Grd_RoomsAndBedsHdr._getGridSrc==null)||(Grd_RoomsAndBedsHdr._getGridSrc.length==0))
+//					{
+//						ErrString=ErrString+"*  Room Details are Required.\n";
+//						Grd_RoomsAndBedsHdr
+//					}
+//					
+//				}
 				/*if(Txt_MaxDiscount_RB.text=="")
 				{
 				if(Flag==true)
@@ -2288,7 +2298,7 @@
 				Ddl_Apartment_RB.dataProvider=null;AparmentId=0;
 				Ddl_Apartment_RB.prompt="Please Select Apartmenrt";
 				Grd_RoomBed._clear();FnHelp_Block();RoomBedId=0;lbl_RoomCount.text="";
-				Grd_RoomsAndBedsHdr._clear();
+				Grd_RoomsAndBedsHdr._clear();Grd_RoomBed1._clear();
 				DD_RoomsStatus.selectedIndex=0;
 			}			
 			protected function RoomBed_Save():void
@@ -2317,24 +2327,25 @@
 						RoomStatus:DD_RoomsStatus.selectedItem
 					}]);				
 				//Mode="PropertyRoom";
+				var HdrXml1:String="";
+				HdrXml1 += "<ROOT>";
+				HdrXml1 += ObjToXmlStr_Comm(Ac_RoomBed,"HdrXml");
+				HdrXml1 += "</ROOT>";
 				if(dd_Category.selectedItem!="Managed G H")
 				{
-					var HdrXml1:String="";
-					HdrXml1 += "<ROOT>";
-					HdrXml1 += ObjToXmlStr_Comm(Ac_RoomBed,"HdrXml");
-					HdrXml1 += "</ROOT>";
+					var GridXml:String="";
+					GridXml += "<ROOT>";
+					GridXml += ObjToXmlStr_Comm(Grd_RoomBed._getGridSrc,"GridXml")
+					GridXml += "</ROOT>";
 				}
 				else
 				{
-					var HdrXml1:String="";
-					HdrXml1 += "<ROOT>";
-					HdrXml1 += ObjToXmlStr_Comm(Grd_RoomsAndBedsHdr._getGridSrc as ArrayCollection,"HdrXml");
-					HdrXml1 += "</ROOT>";
-				}				
-				var GridXml:String="";
-				GridXml += "<ROOT>";
-				GridXml += ObjToXmlStr_Comm(Grd_RoomBed._getGridSrc,"GridXml")
-				GridXml += "</ROOT>";
+					var GridXml:String="";
+					GridXml += "<ROOT>";
+					GridXml += ObjToXmlStr_Comm(Grd_RoomBed1._getGridSrc,"GridXml")
+					GridXml += "</ROOT>";
+				}			
+				
 				useWeb("PropertyRoom","Save_CUSTOM",[GlobalXml,HdrXml1,GridXml]);
 			}
 			
@@ -2449,6 +2460,32 @@
 				Btn_Agreement._Label="Agreement";
 				Btn_Agreement.funlbl();	
 				Brd_OwnerExternalData
+				
+				//MGH new
+				Txt_RackTariff.visible=true;
+				Lbl_RackTariffApartment.visible=true;
+				lbl_StarRackTariffApartment.visible=true;			
+				lbl_MaxDiscountModeApartment.visible=true;
+				Rdb_Per.visible=true;
+				Rdb_Rs.visible=true;				
+				lbl_MaxDiscountAllowedApartment.visible=true;
+				Txt_MaxDiscountAllowed.visible=true;
+				lbl_RackTariffRoom.visible=true;
+				lbl_StarRackRateRoom.visible=true;
+				Txt_RackTariff_RB.visible=true;				
+				lbl_DoubleOccupancyTariff_R.visible=true;
+				Txt_DoubleTariff_RB.visible=true;	
+				lbl_DiscountMode_R.visible=true;
+				Rdb_Per_RB.visible=true;
+				Rdb_Rs_RB.visible=true;			
+				lbl_MaximumDiscountAllowed_R.visible=true;
+				Txt_MaxDiscount_RB.visible=true;
+				lbl_StarMaxDiscountAllowedApartment.visible=true;
+				Grp_BedMGH.visible=true;
+				Grp_BedInternal.visible=true;
+				Brd_OwnerApartment.visible=true;
+				bRD_OwnerBankDetails.visible=true;
+
 				if(dd_Category.selectedItem=="Other Hotels")
 				{	
 					btn_Apartment.visible=false;
@@ -2482,26 +2519,69 @@
 					Col_Apartment.headerText="Apartment Name";
 					FiltFirstName.prompt="Apartment Name";
 					Brd_RackTraiffProperty.visible=false;
+					Grp_BedMGH.visible=false;
+					Grp_BedInternal.visible=true;
 				}	
 				else if(dd_Category.selectedItem=="Managed G H")
 				{
-					btn_Apartment.visible=false;					
-					Btn_Owner.visible=false;
+//					btn_Apartment.visible=false;					
+//					Btn_Owner.visible=false;
+//					Btn_Agreement.visible=false;
+//					btn_Apartment.width=-6;					
+//					Btn_Owner.width=-6;
+//					Btn_Agreement.width=-6;
+//					txt_Prefix.text="MGH";
+//					txt_TotalNoRooms.text="";
+//					txt_PropertyRackTarrif.text="";
+//					Brd_ApartmentDetails.visible=false;
+//					Grd_RoomBed._Visible=false;
+//					ldl_BedInfo.visible=false;					
+//					lbl_Type.visible=false;
+//					lbl_TypeStar.visible=false;
+//					dd_Type.visible=false;
+//					Brd_RoomsandBedsHdr.visible=true;
+//					Brd_RackTraiffProperty.visible=false;
+//					
+					btn_Apartment.visible=true;
+					Btn_RoomsBeds.visible=true;
 					Btn_Agreement.visible=false;
-					btn_Apartment.width=-6;					
-					Btn_Owner.width=-6;
 					Btn_Agreement.width=-6;
+					btn_Apartment.width=120;
+					Btn_RoomsBeds.width=120;
 					txt_Prefix.text="MGH";
 					txt_TotalNoRooms.text="";
 					txt_PropertyRackTarrif.text="";
-					Brd_ApartmentDetails.visible=false;
-					Grd_RoomBed._Visible=false;
-					ldl_BedInfo.visible=false;					
-					lbl_Type.visible=false;
-					lbl_TypeStar.visible=false;
-					dd_Type.visible=false;
-					Brd_RoomsandBedsHdr.visible=true;
+					txt_PANNo.visible=true;
+					lbl_PANNo.visible=true;
+					//lbl_StarPanNo.visible=true;
+					chk_ListAp.label="List Of Apartments";
+					Col_Apartment.headerText="Apartment Name";
+					FiltFirstName.prompt="Apartment Name";
 					Brd_RackTraiffProperty.visible=false;
+					
+					Txt_RackTariff.visible=false;
+					Lbl_RackTariffApartment.visible=false;
+					lbl_StarRackTariffApartment.visible=false;			
+					lbl_MaxDiscountModeApartment.visible=false;
+					Rdb_Per.visible=false;
+					Rdb_Rs.visible=false;				
+					lbl_MaxDiscountAllowedApartment.visible=false;
+					Txt_MaxDiscountAllowed.visible=false;
+					lbl_RackTariffRoom.visible=false;
+					lbl_StarRackRateRoom.visible=false;
+					Txt_RackTariff_RB.visible=false;				
+					lbl_DoubleOccupancyTariff_R.visible=false;
+					Txt_DoubleTariff_RB.visible=false;	
+					lbl_DiscountMode_R.visible=false;
+					Rdb_Per_RB.visible=false;
+					Rdb_Rs_RB.visible=false;			
+					lbl_MaximumDiscountAllowed_R.visible=false;
+					Txt_MaxDiscount_RB.visible=false;
+					Grp_BedMGH.visible=true;
+					Grp_BedInternal.visible=false;
+					lbl_StarMaxDiscountAllowedApartment.visible=false;
+					Brd_OwnerApartment.visible=false;
+					bRD_OwnerBankDetails.visible=false;
 					
 				}
 				else if(dd_Category.selectedItem=="External Property")
@@ -2675,18 +2755,20 @@
 					TempApart_AC=new ArrayCollection();
 					Apartment_AC=new ArrayCollection();
 					Apartment_AC=Grd_ListApartments.dataProvider as ArrayCollection;
-					for(var i:int=0;i<Apartment_AC.length;i++)
+					if(dd_Category.selectedItem!="Managed G H")
 					{
-						if(Apartment_AC[i].Tick=="1")
+						for(var i:int=0;i<Apartment_AC.length;i++)
 						{
-							TempApart_AC.addItemAt(Apartment_AC[i],TempApart_AC.length);
+							if(Apartment_AC[i].Tick=="1")
+							{
+								TempApart_AC.addItemAt(Apartment_AC[i],TempApart_AC.length);
+							}
+						}	
+						if((TempApart_AC==null)||(TempApart_AC.length==0))
+						{
+							ErrString=ErrString+"*  Apartments are Required.\n";
 						}
-					}	
-					if((TempApart_AC==null)||(TempApart_AC.length==0))
-					{
-						ErrString=ErrString+"*  Apartments are Required.\n";
 					}
-					
 					if(txt_OwnerAddress.text=="")
 					{
 						if(Flag==true)
@@ -2730,69 +2812,74 @@
 				}
 				else
 				{
-					TempApart_AC=new ArrayCollection();
-					Apartment_AC=new ArrayCollection();
-					Apartment_AC=Grd_ListApartments.dataProvider as ArrayCollection;
-					for(var i:int=0;i<Apartment_AC.length;i++)
+					if(dd_Category.selectedItem!="Managed G H")
 					{
-						if(Apartment_AC[i].Tick=="1")
+						TempApart_AC=new ArrayCollection();
+						Apartment_AC=new ArrayCollection();
+						Apartment_AC=Grd_ListApartments.dataProvider as ArrayCollection;
+						for(var i:int=0;i<Apartment_AC.length;i++)
 						{
-							TempApart_AC.addItemAt(Apartment_AC[i],TempApart_AC.length);
+							if(Apartment_AC[i].Tick=="1")
+							{
+								TempApart_AC.addItemAt(Apartment_AC[i],TempApart_AC.length);
+							}
+						}					
+						if((TempApart_AC==null)||(TempApart_AC.length==0))
+						{
+							ErrString=ErrString+"*  Propertys are Required.\n";
 						}
-					}					
-					if((TempApart_AC==null)||(TempApart_AC.length==0))
-					{
-						ErrString=ErrString+"*  Propertys are Required.\n";
 					}
 					
+					
 				}
-							
-				if(txt_IFSC.text=="")
+				if(dd_Category.selectedItem!="Managed G H")
 				{
-					if(Flag==true)
-					{
-						txt_IFSC.setFocus();Flag=false;
-					}
-					ErrString=ErrString+"*  IFSC is Required.\n";
-				}
-				
-				
-				if(txt_PayeeName.text=="")
-				{
-					if(Flag==true)
-					{
-						txt_PayeeName.setFocus();Flag=false;
-					}
-					ErrString=ErrString+"*  Payee Name is Required.\n";
-				}
-				
-				if(Rdbg_Payment.selectedValue!=1)
-				{
-					if(txt_Bank.text=="")
+					if(txt_IFSC.text=="")
 					{
 						if(Flag==true)
 						{
-							txt_Bank.setFocus();Flag=false;
+							txt_IFSC.setFocus();Flag=false;
 						}
-						ErrString=ErrString+"*  Bank is Required.\n";
-					}
-					if(txt_AccountNumber.text=="")
-					{
-						if(Flag==true)
-						{
-							txt_AccountNumber.setFocus();Flag=false;
-						}
-						ErrString=ErrString+"*  Account Number is Required.\n";
-					}
-					if(dd_AccountType.selectedItem=="Please Select Account Type")
-					{
-						if(Flag==true)
-						{
-							dd_AccountType.setFocus();Flag=false;
-						}
-						ErrString=ErrString+"*  Account Type is Required.\n";
+						ErrString=ErrString+"*  IFSC is Required.\n";
 					}
 					
+					
+					if(txt_PayeeName.text=="")
+					{
+						if(Flag==true)
+						{
+							txt_PayeeName.setFocus();Flag=false;
+						}
+						ErrString=ErrString+"*  Payee Name is Required.\n";
+					}
+					
+					if(Rdbg_Payment.selectedValue!=1)
+					{
+						if(txt_Bank.text=="")
+						{
+							if(Flag==true)
+							{
+								txt_Bank.setFocus();Flag=false;
+							}
+							ErrString=ErrString+"*  Bank is Required.\n";
+						}
+						if(txt_AccountNumber.text=="")
+						{
+							if(Flag==true)
+							{
+								txt_AccountNumber.setFocus();Flag=false;
+							}
+							ErrString=ErrString+"*  Account Number is Required.\n";
+						}
+						if(dd_AccountType.selectedItem=="Please Select Account Type")
+						{
+							if(Flag==true)
+							{
+								dd_AccountType.setFocus();Flag=false;
+							}
+							ErrString=ErrString+"*  Account Type is Required.\n";
+						}
+				}				
 					
 				}
 				
@@ -4640,16 +4727,16 @@
 				<s:Label x="118" y="81.5" text="*" color="#eb1c24"/>
 				<s:Label x="128" y="122.5" text="*" color="#eb1c24"/>
 				<s:Label x="174" y="163.5" text="*" color="#eb1c24"/>
-				<s:Label x="568" y="38.5" text="*" color="#eb1c24"/>
-				<s:Label x="628" y="118" text="*" color="#eb1c24"/>
+				<s:Label x="568" y="38.5" text="*" color="#eb1c24" id="lbl_StarRackTariffApartment"/>
+				<s:Label x="628" y="118" text="*" color="#eb1c24" id="lbl_StarMaxDiscountAllowedApartment"/>
 				<mx:Label x="35" y="76" text="Apartment Name" visible="false"/>
 				<mx:Label x="35" y="77" text="Apartment No"/>
 				<mx:Label x="35" y="118" text="Apartment Type"/>
 				<mx:Label x="35" y="159" text="SellableApartment Type"/>
 				<mx:Label x="505" y="36" text="Ownership Mode" visible="false"/>
-				<mx:Label x="505" y="36" text="Rack Tariff"/>
-				<mx:Label x="505" y="77" text="Max Discount Mode"/>
-				<mx:Label x="505" y="118" text="Max Discount Allowed"/>
+				<mx:Label x="505" y="36" text="Rack Tariff" id="Lbl_RackTariffApartment"/>
+				<mx:Label x="505" y="77" text="Max Discount Mode" id="lbl_MaxDiscountModeApartment"/>
+				<mx:Label x="505" y="118" text="Max Discount Allowed" id="lbl_MaxDiscountAllowedApartment"/>
 				<s:DropDownList x="193" y="36" width="249" id="Ddl_BlockName" tabIndex="37" 
 								prompt="Please Select Block" change="Ddl_BlockName_changeHandler()"/>
 				<s:DropDownList x="193" y="118" width="249" id="Ddl_ApartmentType" tabIndex="40" 
@@ -4746,7 +4833,7 @@
 	<s:BorderContainer x="0" y="40" width="100%" height="100%" id="Bdr_RoomsBeds" visible="false" 
 					   borderVisible="false" backgroundColor="#fbf9f9">
 		<s:HGroup y="0" width="100%" height="416" horizontalAlign="center" id="Brd_ApartmentDetails" 
-				  visible="false">
+				  visible="true">
 		<s:Group x="32" y="0" width="856" height="417">
 			<s:DropDownList id="Ddl_Block_RB" x="145" y="40" width="220" height="21" tabIndex="57"
 							prompt="Please Select Block" change="Ddl_Block_RB_changeHandler(event)"/>
@@ -4779,33 +4866,48 @@
 			<s:Label x="127" y="205.5" text="*" color="red"/>
 			<s:TextInput id="Txt_RoomNo_RB" x="145" y="163.5" width="220" height="21" restrict="0-9a-zA-Z"
 						 tabIndex="60" prompt="Room No"/>
-			<s:HGroup x="75" y="242" width="781" height="175" horizontalAlign="center" verticalAlign="middle">
+			<s:HGroup x="75" y="242" width="781" height="175" horizontalAlign="center" verticalAlign="middle" id="Grp_BedInternal">
 			<WrbComp:ProDGrid1 x="0" y="0" width="600" height="171" id="Grd_RoomBed"
-							   _ColDataField="BedRackTarrif~DiscountModePer~DiscountModeRS~DiscountAllowed~Id"
-							   _ColHdrText="Rack Tariff~%~Rs~Maximum Discount~Id"
-							   _ColType="ntxt~Chk~Chk~ntxt~txt"
-							   _colVisible="1~1~1~1~0"
-							   _ColWidth="200~100~100~200~0"
-							   _editable="1~1~1~1~0"
+							   _ColDataField="BedName~BedRackTarrif~DiscountModePer~DiscountModeRS~DiscountAllowed~Id"
+							   _ColHdrText="Bed Name~Rack Tariff~%~Rs~Maximum Discount~Id"
+							   _ColType="txt~ntxt~Chk~Chk~ntxt~txt"
+							   _colVisible="1~1~1~1~1~0"
+							   _ColWidth="100~200~100~100~200~0"
+							   _editable="1~1~1~1~1~0"
 							   _HeaderTxtLbl="true" 
-							   _required="1~0~0~0~0"
+							   _required="1~1~0~0~0~0"
 							   _spltChar="~"
 							   _tabIndex="68"
 							   _DuplChk="false"
-							   _visibleColNos="4" ID="Roombed" _GridId="Roombed" />
-		</s:HGroup>		
+							   _visibleColNos="5" ID="Roombed" _GridId="Roombed" />
+		 </s:HGroup>	
+		 <s:HGroup x="75" y="242" width="781" height="175" horizontalAlign="center" verticalAlign="middle" id="Grp_BedMGH" visible="false">
+				<WrbComp:ProDGrid1 x="0" y="0" width="100" height="171" id="Grd_RoomBed1"
+								   _ColDataField="BedName~BedRackTarrif~DiscountModePer~DiscountModeRS~DiscountAllowed~Id"
+								   _ColHdrText="Bed Name~Rack Tariff~%~Rs~Maximum Discount~Id"
+								   _ColType="txt~ntxt~Chk~Chk~ntxt~txt"
+								   _colVisible="1~0~0~0~0~0"
+								   _ColWidth="100~0~0~0~0~0"
+								   _editable="1~0~0~0~0~0"
+								   _HeaderTxtLbl="true" 
+								   _required="1~0~0~0~0~0"
+								   _spltChar="~"
+								   _tabIndex="68"
+								   _DuplChk="false"
+								   _visibleColNos="1" ID="Roombed" _GridId="Roombed" />
+		</s:HGroup>
 			<s:BorderContainer x="418" y="9" width="438" height="225" borderVisible="false"  backgroundColor="#fbf9f9">
-				<mx:Label x="26" y="113.5" text="Discount Mode"/>
-				<mx:Label x="26" y="154.5" text="Maximum Discount Allowed"/>
+				<mx:Label x="26" y="113.5" text="Discount Mode" id="lbl_DiscountMode_R"/>
+				<mx:Label x="26" y="154.5" text="Maximum Discount Allowed" id="lbl_MaximumDiscountAllowed_R"/>
 				<mx:Label x="0" y="0" text="Room Count" color="red" id="lbl_RoomCount"/>
-				<s:Label x="91" y="31.5" text="*" color="red"/>
+				<s:Label x="91" y="31.5" text="*" color="red" id="lbl_StarRackRateRoom"/>
 				<s:TextInput id="Txt_MaxDiscount_RB" x="189" y="154.5" width="220" height="21" restrict="0-9."
 							 textAlign="right" tabIndex="66" prompt="Maximum Discount Allowed"/>
-				<mx:Label x="26" y="31" text="Rack Tariff"/>
+				<mx:Label x="26" y="31" text="Rack Tariff" id="lbl_RackTariffRoom"/>
 				<mx:Label x="26" y="196.5" text="Status"/>
 				<s:TextInput id="Txt_RackTariff_RB" x="189" y="31" width="220" height="21" restrict="0-9."
 							 tabIndex="62" textAlign="right" focusOut="DecimalChange('Txt_RackTariff_RB')" prompt="Rack Tariff"/>
-				<mx:Label x="26" y="71.5" text="Double Occupancy Tariff"/>
+				<mx:Label x="26" y="71.5" text="Double Occupancy Tariff" id="lbl_DoubleOccupancyTariff_R"/>
 				<s:TextInput id="Txt_DoubleTariff_RB" x="189" y="71.5" width="220" height="21" restrict="0-9."
 							 tabIndex="63" textAlign="right" focusOut="DecimalChange('Txt_DoubleTariff_RB')" prompt="Double Occupancy Tariff"/>
 				<s:HGroup x="189" y="113.5" gap="30">
@@ -4852,7 +4954,7 @@
 	<!-- Rooms and Beds End -->
 	<!-- Owner Starts -->
 	<s:BorderContainer x="0" y="42" width="100%" height="100%" id="brd_Owner" 
-					   borderVisible="false" visible="true"  backgroundColor="#fbf9f9">
+					   borderVisible="false" visible="false"  backgroundColor="#fbf9f9">
 		<s:VGroup x="0" y="0" width="100%" height="100%" horizontalAlign="left" verticalAlign="top">
 			<s:Group x="167" y="73" width="100%" height="449" visible="true">
 				<mx:Label x="29" y="40"  text="Title "/>
@@ -4861,14 +4963,8 @@
 				<mx:Label x="91" y="108" width="13" color="#eb1c24" text="*"/>
 				<mx:Label x="106" y="138" width="13" color="#eb1c24" text="*"/>
 				<mx:Label x="67" y="212" width="13" color="#eb1c24" text="*"/>
-				<mx:Label x="807" y="306" width="13" color="#eb1c24" text="*" id="Star_Acc"/>
-				<mx:Label x="787" y="337" width="13" color="#eb1c24" text="*" id="Star_Type"/>
-				<mx:Label x="61" y="377" width="13" color="#eb1c24" text="*"/>
-				<mx:Label x="402" y="307" width="13" color="#eb1c24" text="*" id="Star_Bank"/>
-				<mx:Label x="101" y="337" width="13" color="#eb1c24" text="*"/>
 				<!--mx:Label x="113" y="307" width="13" color="#eb1c24" text="*"/-->
 				<mx:Label x="9" y="10"  text="Owners Information" color="#eb1c24"/>
-				<mx:Label x="9" y="281"  text="Bank information" color="#eb1c24"/>
 				<mx:Label x="29" y="74" text="First Name"/>
 				<mx:Label x="29" y="109" text="Last Name"/>
 				<mx:Label x="29" y="143" text="Ledger Name"/>
@@ -4876,20 +4972,7 @@
 				<mx:Label x="29" y="215" text="Phone"/>
 				<mx:Label x="29" y="250" text="Alternate Phone"/>
 				<mx:Label x="370" y="215" text="TDS %" visible="false"/>
-				<mx:Label x="29" y="310" text="Payment Mode"/>
-				<mx:Label x="29" y="342" text="Payee Name"/>
-				<mx:Label x="712" y="311" text="Account Number"/>
-				<mx:Label x="712" y="342" text="Account Type"/>
-				<mx:Label x="370" y="311" text="Bank "/>
-				<mx:Label x="370" y="346" text="Branch Address"/>
-				<mx:Label x="370" y="381" text="SWIFT Code"/>
-				<mx:Label x="29" y="381" text="IFSC "/>
 				<s:TextInput x="130" y="74" width="220" height="21" prompt="First Name" tabIndex="73" id="txt_FirstName"/>
-				<s:TextInput x="820" y="311" width="190" height="21" tabIndex="95" prompt="Account Number" id="txt_AccountNumber" restrict="0-9"/>
-				<s:TextInput x="130" y="381" width="220" height="21" tabIndex="91" prompt="IFSC" id="txt_IFSC"/>
-				<s:TextInput x="465" y="381" width="220" height="21" prompt="SWIFT Code" id="txt_SWIFTCode" tabIndex="94" depth="5"/>
-				<s:TextInput x="130" y="342" width="220" height="21" tabIndex="90" prompt="Payee Name" id="txt_PayeeName"/>
-				<s:TextInput x="465" y="346" width="220" height="21" prompt="Branch Address" tabIndex="93" depth="6" id="txt_BranchAddress"/>
 				<s:TextInput x="130" y="109" width="220" height="21" tabIndex="74" prompt="Last name" id="txt_Lastname"/>
 				<s:TextInput x="130" y="143" width="220" height="21" tabIndex="75" prompt="Ledger Name" id="txt_LedgerName"/>
 				<s:TextInput x="130" y="180" width="220" height="21" tabIndex="76" change="txt_Email_changeHandler(event)" prompt="Email Id"
@@ -4909,55 +4992,15 @@
 						<fx:String>Mrs</fx:String>
 					</mx:ArrayCollection>
 				</s:DropDownList>
-				<s:DropDownList x="820" y="342" width="190" selectedItem="Please Select Account Type" tabIndex="96" id="dd_AccountType">
-					<mx:ArrayCollection>
-						<fx:String>Please Select Account Type</fx:String>
-						<fx:String>Saving</fx:String>
-						<fx:String>Current</fx:String>						
-					</mx:ArrayCollection>
-				</s:DropDownList>
-				<s:HGroup x="131" y="315" width="219" horizontalAlign="center" verticalAlign="middle" 
-						  gap="50">
-					<s:RadioButton label="Direct" groupName="Rdbg_Payment" value="0"
-								   id="Direct" buttonMode="true" tabIndex="88"/>
-					<s:RadioButton label="Courier" groupName="Rdbg_Payment"  value="1"
-								   id="Courier" buttonMode="true" tabIndex="89" />
-				</s:HGroup>
 				<!--s:RadioButton id="rd_Couriercheque" x="130" y="293" label="Courier cheque " tabIndex="65"/>
 				<s:RadioButton id="rd_DirectCredit" x="130" y="317"
 							   label="Direct Credit to Bank Account" tabIndex="66"/-->
-				<WrbHelpComp:HelpText x="465" y="311" width="220" height="21" pxSetPrompt="Bank" depth="30" pxSetColumnsWidth="220" PxGridSetUp="-140" pxSetHeight="140"    id="txt_Bank" pxTabIndex="92">
-				</WrbHelpComp:HelpText>
-				<s:CheckBox x="742" y="20" label="List of Apartments" tabIndex="98" id="chk_ListAp" change="ApartmentListAllSelect()"/>								
-				<mx:Label x="712" y="381" text="PAN No" id="lbl_PANNo"/>
-				<s:TextInput x="820" y="381" width="190" height="21" tabIndex="97" prompt="PAN No" enter="PanNoEnter()" id="txt_PANNo" text="{txt_PAN.text}" maxChars="12"/>
 				<!--s:Scroller x="742" y="43" width="200" height="200">
 					<s:VGroup width="100%" height="100%">
 						<s:Group id="grp_loadApartment" width="100%" height="100%" tabIndex="95">
 						</s:Group>
 					</s:VGroup>
 				</s:Scroller-->
-				<mx:DataGrid id="Grd_ListApartments" depth="100" x="722" y="45" width="250" height="226" tabIndex="10"
-							 dragEnabled="true" draggableColumns="false" dragMoveEnabled="true"
-							 dropEnabled="true" editable="true" focusEnabled="false" doubleClickEnabled="true" 					 
-							 textAlign="center" borderVisible="true" >
-					<mx:columns>				
-						<mx:DataGridColumn dataField="Tick" headerText="Select" width="50"  editable="false">
-							<mx:itemRenderer>
-								<fx:Component>
-									<mx:HBox horizontalAlign="center" verticalAlign="middle">
-										<mx:CheckBox selected="{data.Tick}" enabled="true" 
-													 change="outerDocument.FnChkChange(event);"/>
-									</mx:HBox>
-								</fx:Component>
-							</mx:itemRenderer>
-						</mx:DataGridColumn>										
-						<mx:DataGridColumn dataField="ApartmentName" width="180"  id="Col_Apartment"
-										   headerText="Apartment Name" editable="true" textAlign="left"/>
-						<mx:DataGridColumn dataField="ApartmentId" width="0" visible="false"/>
-						<mx:DataGridColumn dataField="Id" width="0" visible="false"/>				
-					</mx:columns>
-				</mx:DataGrid>
 				<s:BorderContainer x="358" y="28" width="346" height="200" depth="6" visible="false" borderVisible="false" id="Brd_OwnerAddress" backgroundColor="#fbf9f9">
 					<mx:Label x="59" y="149" width="13" color="#eb1c24" text="*"/>
 					<mx:Label x="78" y="109" width="13" color="#eb1c24" text="*" visible="false"/>
@@ -4989,9 +5032,72 @@
 					</WrbHelpComp:HelpText>	
 					
 				</s:BorderContainer>
-				<WrbComp:Button_HB x="478.5" y="412" width="123" _Label="Other Contacts" click="{brd_OtherContacts.visible=true}">
-				</WrbComp:Button_HB>
-				<s:TextInput x="870" y="18" width="135" height="22" prompt="Apartment Name" id="FiltFirstName" change="filter('ApartmentName')"/>
+				<s:BorderContainer x="-5" y="277" width="100%" height="172" borderVisible="false" id="bRD_OwnerBankDetails" backgroundColor="#fbf9f9">
+					<mx:Label x="807" y="26" width="13" color="#eb1c24" text="*" id="Star_Acc"/>
+					<mx:Label x="787" y="57" width="13" color="#eb1c24" text="*" id="Star_Type"/>
+					<mx:Label x="61" y="97" width="13" color="#eb1c24" text="*"/>
+					<mx:Label x="402" y="27" width="13" color="#eb1c24" text="*" id="Star_Bank"/>
+					<mx:Label x="101" y="57" width="13" color="#eb1c24" text="*"/>
+					<mx:Label x="9" y="1"  text="Bank information" color="#eb1c24"/>
+					<mx:Label x="29" y="30" text="Payment Mode"/>
+					<mx:Label x="29" y="62" text="Payee Name"/>
+					<mx:Label x="712" y="31" text="Account Number"/>
+					<mx:Label x="712" y="62" text="Account Type"/>
+					<mx:Label x="370" y="31" text="Bank "/>
+					<mx:Label x="370" y="66" text="Branch Address"/>
+					<mx:Label x="370" y="101" text="SWIFT Code"/>
+					<mx:Label x="29" y="101" text="IFSC "/>
+					<s:TextInput x="820" y="31" width="190" height="21" tabIndex="95" prompt="Account Number" id="txt_AccountNumber" restrict="0-9"/>
+					<s:TextInput x="130" y="101" width="220" height="21" tabIndex="91" prompt="IFSC" id="txt_IFSC"/>
+					<s:TextInput x="465" y="101" width="220" height="21" prompt="SWIFT Code" id="txt_SWIFTCode" tabIndex="94" depth="5"/>
+					<s:TextInput x="130" y="62" width="220" height="21" tabIndex="90" prompt="Payee Name" id="txt_PayeeName"/>
+					<s:TextInput x="465" y="66" width="220" height="21" prompt="Branch Address" tabIndex="93" depth="6" id="txt_BranchAddress"/>
+					<s:DropDownList x="820" y="62" width="190" selectedItem="Please Select Account Type" tabIndex="96" id="dd_AccountType">
+						<mx:ArrayCollection>
+							<fx:String>Please Select Account Type</fx:String>
+							<fx:String>Saving</fx:String>
+							<fx:String>Current</fx:String>						
+						</mx:ArrayCollection>
+					</s:DropDownList>
+					<s:HGroup x="131" y="35" width="219" horizontalAlign="center" verticalAlign="middle" 
+							  gap="50">
+						<s:RadioButton label="Direct" groupName="Rdbg_Payment" value="0"
+									   id="Direct" buttonMode="true" tabIndex="88"/>
+						<s:RadioButton label="Courier" groupName="Rdbg_Payment"  value="1"
+									   id="Courier" buttonMode="true" tabIndex="89" />
+					</s:HGroup>
+					<WrbHelpComp:HelpText x="465" y="31" width="220" height="21" pxSetPrompt="Bank" depth="30" pxSetColumnsWidth="220" PxGridSetUp="-140" pxSetHeight="140"    id="txt_Bank" pxTabIndex="92">
+					</WrbHelpComp:HelpText>
+					<mx:Label x="712" y="101" text="PAN No" id="lbl_PANNo"/>
+					<s:TextInput x="820" y="101" width="190" height="21" tabIndex="97" prompt="PAN No" enter="PanNoEnter()" id="txt_PANNo" text="{txt_PAN.text}" maxChars="12"/>
+					<WrbComp:Button_HB x="472.5" y="133" width="123" _Label="Other Contacts" click="{brd_OtherContacts.visible=true}">
+					</WrbComp:Button_HB>
+				</s:BorderContainer>
+				<s:BorderContainer x="711" y="10" width="272" height="261" borderVisible="false" id="Brd_OwnerApartment" backgroundColor="#fbf9f9">
+					<s:CheckBox x="9" y="7" label="List of Apartments" tabIndex="98" id="chk_ListAp" change="ApartmentListAllSelect()"/>
+					<mx:DataGrid id="Grd_ListApartments" depth="100" x="9" y="32" width="250" height="226" tabIndex="10"
+								 dragEnabled="true" draggableColumns="false" dragMoveEnabled="true"
+								 dropEnabled="true" editable="true" focusEnabled="false" doubleClickEnabled="true" 					 
+								 textAlign="center" borderVisible="true" >
+						<mx:columns>				
+							<mx:DataGridColumn dataField="Tick" headerText="Select" width="50"  editable="false">
+								<mx:itemRenderer>
+									<fx:Component>
+										<mx:HBox horizontalAlign="center" verticalAlign="middle">
+											<mx:CheckBox selected="{data.Tick}" enabled="true" 
+														 change="outerDocument.FnChkChange(event);"/>
+										</mx:HBox>
+									</fx:Component>
+								</mx:itemRenderer>
+							</mx:DataGridColumn>										
+							<mx:DataGridColumn dataField="ApartmentName" width="180"  id="Col_Apartment"
+											   headerText="Apartment Name" editable="true" textAlign="left"/>
+							<mx:DataGridColumn dataField="ApartmentId" width="0" visible="false"/>
+							<mx:DataGridColumn dataField="Id" width="0" visible="false"/>				
+						</mx:columns>
+					</mx:DataGrid>
+					<s:TextInput x="137" y="5" width="135" height="22" prompt="Apartment Name" id="FiltFirstName" change="filter('ApartmentName')"/>
+				</s:BorderContainer>
 				
 			</s:Group>			
 		</s:VGroup>

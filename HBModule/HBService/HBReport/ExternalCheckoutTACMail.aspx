@@ -21,9 +21,9 @@
         <rsweb:ReportViewer ID="ReportViewer1" runat="server" Height="100%" 
             Width="100%" Font-Names="Verdana" Font-Size="8pt" 
             InteractiveDeviceInfos="(Collection)" WaitMessageFont-Names="Verdana" 
-            WaitMessageFont-Size="14pt" AsyncRendering="False" SizeToReportContent="True"
-            ProcessingMode="Local"  PromptAreaCollapsed="true">
-            <LocalReport ReportPath="ExternalCheckoutTACMail.rdlc">
+            WaitMessageFont-Size="14pt" AsyncRendering="False" 
+            SizeToReportContent="True"  PromptAreaCollapsed="True">
+            <LocalReport ReportPath="ExternalCheckoutNewTACMail.rdlc">
                 <DataSources>
                     <rsweb:ReportDataSource DataSourceId="ObjectDataSource1" Name="DataSet1" />
                 </DataSources>

@@ -233,161 +233,156 @@ BEGIN
       order by Convert(date,ExpDate,103)
        
 --EXPECTED CHECKOUT
-		create table #TempExpChkout(GuestName NVARCHAR(100),RoomNo NVARCHAR(100),Type  NVARCHAR(100)
-		,PropertyType   NVARCHAR(100),HdrId BIGINT,ChkoutDate NVARCHAR(100),PrtyId BIGINT,
-		PropertyName Nvarchar(100),CityName NVARCHAR(100),CityId BIGINT,ClientName NVARCHAR(100),ClientId BIGINT)
-		CREATE TABLE  #GustDtls(GuestName NVARCHAR(100),GuestId BIGINT,StateId BIGINT,CheckInHdrId BIGINT,
-		PropertyId BIGINT ,RoomId BIGINT,ApartmentId BIGINT,BookingId BIGINT,BedId BIGINT,Typess NVARCHAR(100),
-		RoomNumber Nvarchar(100) )
-		CREATE TABLE  #GustDtlsNew(GuestName NVARCHAR(100),GuestId BIGINT,StateId BIGINT,CheckInHdrId BIGINT,
-		PropertyId BIGINT ,RoomId BIGINT,ApartmentId BIGINT,BookingId BIGINT,BedId BIGINT,Typess NVARCHAR(100),
-		RoomNumber Nvarchar(100) )
-		CREATE TABLE  #LEVELWISE(FirstName  NVARCHAR(200),BookingId BIGINT,GuestId BIGINT,RoomType  NVARCHAR(200),
-		BookType  NVARCHAR(200),BookingPropertyId BIGINT,ChkInDate NVARCHAR(100),ChkOutDate NVARCHAR(100))
-		
-		CREATE TABLE #TEMPFINALCHKOUTS(GuestName NVARCHAR(200),GuestId BIGINT,RoomNo NVARCHAR(200),RoomId BIGINT,
-   ChkOutDate NVARCHAR(200),Type NVARCHAR(200), PropertyName NVARCHAR(200) ,CityName NVARCHAR(200))
-   
-		CREATE TABLE #TEMPFINALCHKOUTSNew(GuestName NVARCHAR(200),GuestId BIGINT,RoomNo NVARCHAR(200),RoomId BIGINT,
-   ChkOutDate NVARCHAR(200),Type NVARCHAR(200), PropertyName NVARCHAR(200) ,CityName NVARCHAR(200))
-   
-   
-		INSERT INTO #TempExpChkout(HdrId,GuestName,RoomNo,Type,ChkoutDate,PrtyId,
-								PropertyName,CityName,CityId ,ClientName,ClientId)
-        SELECT DISTINCT  H.Id,ChkInGuest,RoomNo,Type ,CONVERT(NVARCHAR(100),ChkoutDate,103) ChkoutDate,D.Id,
-        D.PropertyName,C.CityName,C.Id,H.ClientName,0 as ClientId
-		FROM WRBHBCheckInHdr H
-		join WRBHBProperty D WITH(NOLOCK) ON H.PropertyId = D.Id and D.IsActive = 1 and D.IsDeleted = 0
-		join WRBHBCity C  WITH(NOLOCK) ON C.Id = D.CityId and C.IsActive = 1 and D.IsDeleted = 0
-		join WRBHBPropertyUsers PU WITH(NOLOCK) ON PU.PropertyId = D.Id and PU.IsActive = 1 and PU.IsDeleted = 0
-		join WRBHBUser U WITH(NOLOCK) ON   PU.UserId =U.Id and pu.IsActive = 1 and PU.IsDeleted = 0
-		join WRBHBUserRoles R WITH(NOLOCK) ON  U.Id =R.UserId  and R.IsActive = 1 and R.IsDeleted = 0
-		where H.IsActive = 1 and H.IsDeleted = 0  
-		and  H.ChkoutDate  between CONVERT(date,GETDATE(),103) 
-		AND  CONVERT(NVARCHAR,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103))) 
-		--and  H.ChkoutDate  between CONVERT(date,GETDATE(),103) 
-		--AND  CONVERT(NVARCHAR,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103))) 
-	 --	AND Month(CONVERT(date,H.ChkoutDate,103)) =Month(CONVERT(date,GETDATE(),103))
-		--and YEAR(CONVERT(date,H.ChkoutDate,103)) =YEAR(CONVERT(date,GETDATE(),103))
-		and pu.UserId=@Pram1
-		group by  ChkInGuest,RoomNo,Type ,Property,ChkoutDate,H.Id,D.Id, D.PropertyName,
-		C.CityName,C.Id,H.ClientName
-		
-		INSERT INTO #TempExpChkout(HdrId,GuestName,RoomNo,Type,ChkoutDate,PrtyId,
-								PropertyName,CityName,CityId ,ClientName,ClientId)
-        SELECT DISTINCT  H.Id,ChkInGuest,RoomNo,Type ,CONVERT(NVARCHAR(100),ChkoutDate,103) ChkoutDate,D.Id,
-        D.PropertyName,C.CityName,C.Id,H.ClientName,0 as ClientId
-		FROM WRBHBCheckInHdr H
-		join WRBHBProperty D WITH(NOLOCK) ON H.PropertyId = D.Id and D.IsActive = 1 and D.IsDeleted = 0
-		join WRBHBCity C  WITH(NOLOCK) ON C.Id = D.CityId and C.IsActive = 1 and D.IsDeleted = 0
-		join WRBHBPropertyUsers PU WITH(NOLOCK) ON PU.PropertyId = D.Id and PU.IsActive = 1 and PU.IsDeleted = 0
-		join WRBHBUser U WITH(NOLOCK) ON   PU.UserId =U.Id and pu.IsActive = 1 and PU.IsDeleted = 0
-		join WRBHBUserRoles R WITH(NOLOCK) ON  U.Id =R.UserId  and R.IsActive = 1 and R.IsDeleted = 0
-		where H.IsActive = 1 and H.IsDeleted = 0  
-		and  CONVERT(date,H.ChkoutDate,103) <=CONVERT(date,GETDATE(),103)
-		and pu.UserId=@Pram1
-	--	AND H.Id  IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where IsActive = 1 and IsDeleted = 0 )  
-		group by  ChkInGuest,RoomNo,Type ,Property,ChkoutDate,H.Id,D.Id, D.PropertyName,
-		C.CityName,C.Id,H.ClientName
+			     
+		CREATE TABLE #ExpChkout(BookedId BIGINT,PropertyName NVARCHAR(100),PropertyId BIGINT,
+		GuestName NVARCHAR(200),BookingLevel NVARCHAR(200),ExpDate NVARCHAR(100),
+		CityName NVARCHAR(200),CityId Bigint,ClientName NVARCHAR(100),ClientId BIGINT,BookingCode BIGINT,CheckInHdrId Bigint );
 	 
---For Getting Check In Details based on #TempExpChkout table details		
- DECLARE @Cnt int;
-   SET @Cnt=(SELECT COUNT(*) FROM #TempExpChkout); 
-    
-   while @Cnt>0
-   begin
-   DECLARE @chkHdrId int,@PrtyId int,@StayDiff int,@ReserevId int;
-   SELECT top 1 @chkHdrId=HdrId,@PrtyId=PrtyId  FROM #TempExpChkout 
+	 
+   	create TABLE #TEMPFINALCHKOUTS(GuestName NVARCHAR(200),GuestId BIGINT,CityId BIGINT,BookingId BIGINT,
+   ChkOutDate NVARCHAR(200),Type NVARCHAR(200), PropertyName NVARCHAR(200) ,CityName NVARCHAR(200),CheckInHdrId Bigint)
    
-   INSERT INTO #GustDtls(GuestName,GuestId,StateId,CheckInHdrId,PropertyId,RoomId,ApartmentId,BookingId,BedId,Typess,RoomNumber)
-   SELECT  GuestName,GuestId,StateId,Id AS CheckInHdrId,PropertyId,RoomId,ApartmentId,BookingId,BedId,Type as Level,RoomNo
-		From WRBHBCheckInHdr
-		WHERE IsActive=1 AND IsDeleted=0 AND  
-		PropertyId = @PrtyId and Id=@chkHdrId and 
-		Id NOT IN (Select ChkInHdrId FRom WRBHBChechkOutHdr  where isactive=1 and IsDeleted=0   )
-		
-	INSERT INTO #GustDtlsNew(GuestName,GuestId,StateId,CheckInHdrId,PropertyId,RoomId,ApartmentId,BookingId,BedId,Typess,RoomNumber)
-	SELECT  GuestName,GuestId,StateId,Id AS CheckInHdrId,PropertyId,RoomId,ApartmentId,BookingId,BedId,Type as Level,RoomNo
-	From WRBHBCheckInHdr
-	WHERE IsActive=1 AND IsDeleted=0 AND  
-	PropertyId = @PrtyId and Id=@chkHdrId and 
-	Id NOT IN (Select ChkInHdrId FRom WRBHBChechkOutHdr   where isactive=1 and IsDeleted=0 )
-		
-   delete  FROM #TempExpChkout where HdrId= @chkHdrId;
-   SET @Cnt=(SELECT COUNT(*) FROM #TempExpChkout); 
-   end 
    
---For Getting Check In Details based on #GustDtls table details	
-   	--Room Level,Bed Level,Apartment Level
-    DECLARE @Cnts int;
-   SET @Cnts=(SELECT COUNT(*) FROM #GustDtls); 
+   
+	 	TRUNCATE TABLE #ExpChkout;
+-- Room Level Property booked and direct booked	 
+       INSERT INTO #ExpChkout(BookedId,PropertyName,PropertyId,GuestName,BookingLevel,ExpDate,CityName,CityId,ClientName,ClientId,BookingCode,CheckInHdrId)
+        select distinct H.Id, P.PropertyName PropertyName,P.Id,AG.FirstName FirstName,H.BookingLevel,
+		convert(nvarchar(100),Ag.ChkOutDt,103) AS ExpDate,p.City,p.CityId,H.ClientName,H.ClientId,BookingCode,AG.CheckInHdrId
+		FROM WRBHBBooking H
+		--JOIN WRBHBBookingProperty A WITH(NOLOCK) ON H.Id= A.BookingId AND A.IsActive = 1 and A.IsDeleted = 0
+		JOIN WRBHBBookingPropertyAssingedGuest AG WITH(NOLOCK) ON H.Id= AG.BookingId AND AG.IsActive = 1 and AG.IsDeleted = 0
+		JOIN WRBHBProperty P WITH(NOLOCK) ON P.Id = AG.BookingpropertyId and P.IsActive = 1 --and A.IsDeleted = 0
+		JOIN WRBHBPropertyUsers PU WITH(NOLOCK) ON PU.PropertyId = P.Id and PU.IsActive = 1 and PU.IsDeleted = 0
+		JOIN WRBHBUser U WITH(NOLOCK) ON   PU.UserId =U.Id and pu.IsActive = 1 and PU.IsDeleted = 0
+        JOIN WRBHBUserRoles R WITH(NOLOCK) ON  U.Id =R.UserId  and R.IsActive = 1 and R.IsDeleted = 0
+		WHERE    AG.CurrentStatus='CheckIn' and AG.RoomShiftingFlag=0
+		and H.Cancelstatus !='Canceled' and CONVERT(date,Ag.ChkInDt,103) <=CONVERT(date,GETDATE(),103)
+	 	and pu.UserId=@Pram1
+	 	--and clientName='Jubilant Life Science' and BookingCode=3400
+		group by H.Id, P.PropertyName,H.ClientName ,H.CityName,AG.FirstName,H.BookingLevel,Ag.ChkOutDt,P.Id
+		,p.City,p.CityId,H.ClientName,H.ClientId,BookingCode  ,Ag.CheckInHdrId
+		order by H.Id desc
+		
+		    
+ -- Room Level Property booked and direct booked  
+     INSERT INTO #ExpChkout(BookedId,PropertyName,PropertyId,GuestName,BookingLevel,ExpDate,CityName,CityId,ClientName,ClientId,BookingCode,CheckInHdrId)
+        select distinct H.Id, P.PropertyName PropertyName,P.Id,AG.FirstName FirstName,H.BookingLevel,
+		convert(nvarchar(100),Ag.ChkOutDt,103) ExpDate ,p.City,p.CityId,H.ClientName,H.ClientId,BookingCode,Ag.CheckInHdrId
+		FROM WRBHBBooking H
+		--JOIN WRBHBBookingProperty A WITH(NOLOCK) ON H.Id= A.BookingId AND A.IsActive = 1 and A.IsDeleted = 0
+		JOIN WRBHBBookingPropertyAssingedGuest AG WITH(NOLOCK) ON H.Id= AG.BookingId AND AG.IsActive = 1 and AG.IsDeleted = 0
+		JOIN WRBHBProperty P WITH(NOLOCK) ON P.Id = Ag.BookingPropertyId and P.IsActive = 1 --and A.IsDeleted = 0
+		JOIN WRBHBPropertyUsers PU WITH(NOLOCK) ON PU.PropertyId = P.Id and PU.IsActive = 1 and PU.IsDeleted = 0
+		JOIN WRBHBUser U WITH(NOLOCK) ON   PU.UserId =U.Id and pu.IsActive = 1 and PU.IsDeleted = 0
+        JOIN WRBHBUserRoles R WITH(NOLOCK) ON  U.Id =R.UserId  and R.IsActive = 1 and R.IsDeleted = 0
+		WHERE  AG.CurrentStatus='CheckIn' and AG.RoomShiftingFlag=0
+		and H.Cancelstatus !='Canceled' AND H.Id NOT IN(SELECT BookedId FROM #ExpChkout) 
+		and Ag.ChkInDt  BETWEEN CONVERT(date,GETDATE(),103) AND  
+		CONVERT(NVARCHAR,DATEADD(DAY,7,CONVERT(DATE,GETDATE(),103)))
+	 	and pu.UserId=@Pram1
+		group by H.Id, P.PropertyName,AG.FirstName,H.BookingLevel,Ag.ChkOutDt,
+		P.Id,p.City,p.CityId,H.ClientName,H.ClientId,BookingCode,Ag.CheckInHdrId
+		order by H.Id desc
+--APARTMENT
+      INSERT INTO #ExpChkout(BookedId,PropertyName,PropertyId,GuestName,BookingLevel,ExpDate,CityName,CityId,ClientName,ClientId,BookingCode,CheckInHdrId)
+         select distinct H.Id, p.PropertyName PropertyName,p.Id,ABPA.FirstName FirstName,H.BookingLevel,
+		 convert(nvarchar(100),ABPA.ChkOutDt,103) ExpDate ,p.City,p.CityId,H.ClientName,H.ClientId,BookingCode,0
+		  FROM WRBHBBooking H
+		-- JOIN WRBHBApartmentBookingProperty ABP WITH(NOLOCK) ON H.Id = ABP.BookingId AND ABP.IsActive = 1 AND ABP.IsDeleted = 0
+		 JOIN WRBHBApartmentBookingPropertyAssingedGuest ABPA WITH(NOLOCK) ON H.Id = ABPA.BookingId AND ABPA.IsActive = 1 AND ABPA.IsDeleted = 0
+		 JOIN WRBHBProperty P WITH(NOLOCK) ON P.Id = ABPA.BookingPropertyId and P.IsActive = 1 and P.IsDeleted = 0
+		 JOIN WRBHBPropertyUsers PU WITH(NOLOCK) ON PU.PropertyId = P.Id and PU.IsActive = 1 and PU.IsDeleted = 0
+		 JOIN WRBHBUser U WITH(NOLOCK) ON   PU.UserId =U.Id and pu.IsActive = 1 and PU.IsDeleted = 0
+         JOIN WRBHBUserRoles R WITH(NOLOCK) ON  U.Id =R.UserId  and R.IsActive = 1 and R.IsDeleted = 0 
+		 WHERE  H.CancelStatus!='Canceled'  and ABPA.CurrentStatus='CheckIn'
+		 and CONVERT(date,ABPA.ChkInDt,103) <= CONVERT(date,GETDATE(),103)  
+		 and pu.UserId=@Pram1
+		group by H.Id, p.PropertyName,ABPA.FirstName,H.BookingLevel,ABPA.ChkOutDt,p.Id,
+		p.City,p.CityId,H.ClientName,H.ClientId,BookingCode  
+		order by H.Id desc 
+--APARTMENT   
+ 	 INSERT INTO #ExpChkout(BookedId,PropertyName,PropertyId,GuestName,BookingLevel,ExpDate,CityName,CityId,ClientName,ClientId,BookingCode,CheckInHdrId)
+ 	      SELECT DISTINCT H.Id, p.PropertyName PropertyName,p.Id,ABPA.FirstName FirstName,H.BookingLevel,
+		  convert(nvarchar(100),ABPA.ChkOutDt,103) ExpDate ,p.City,p.CityId,H.ClientName,H.ClientId,BookingCode,0
+		  FROM WRBHBBooking H
+		-- JOIN WRBHBApartmentBookingProperty ABP WITH(NOLOCK) ON H.Id = ABP.BookingId AND ABP.IsActive = 1 AND ABP.IsDeleted = 0
+		 JOIN WRBHBApartmentBookingPropertyAssingedGuest ABPA WITH(NOLOCK) ON H.Id= ABPA.BookingId  AND ABPA.IsActive = 1 AND ABPA.IsDeleted = 0
+		 JOIN WRBHBProperty P WITH(NOLOCK) ON P.Id = ABPA.BookingPropertyId and P.IsActive = 1 and P.IsDeleted = 0
+		 JOIN WRBHBPropertyUsers PU WITH(NOLOCK) ON PU.PropertyId = P.Id and PU.IsActive = 1 and PU.IsDeleted = 0
+		 JOIN WRBHBUser U WITH(NOLOCK) ON   PU.UserId =U.Id and pu.IsActive = 1 and PU.IsDeleted = 0
+		 JOIN WRBHBUserRoles R WITH(NOLOCK) ON  U.Id =R.UserId  and R.IsActive = 1 and R.IsDeleted = 0 
+		 WHERE   H.CancelStatus!='Canceled'  and ABPA.CurrentStatus='CheckIn'
+		 AND H.Id NOT IN(SELECT BookedId FROM #ExpChkout)
+		 and ABPA.ChkInDt  BETWEEN CONVERT(date,GETDATE(),103) AND  
+		 CONVERT(NVARCHAR,DATEADD(DAY,7,CONVERT(DATE,GETDATE(),103))) 
+		 and pu.UserId=@Pram1
+		 group by H.Id, P.PropertyName,ABPA.FirstName,H.BookingLevel,ABPA.ChkOutDt,
+		 P.Id,p.City,p.CityId,H.ClientName,H.ClientId,BookingCode
+		 order by H.Id desc
+		
+-- Bed Level Booked and DirectBooked Property
+  INSERT INTO #ExpChkout(BookedId,PropertyName,PropertyId,GuestName,BookingLevel,ExpDate,CityName,CityId,ClientName,ClientId,BookingCode,CheckInHdrId)
+		 select distinct H.Id, p.PropertyName PropertyName,p.Id,ABPA.FirstName FirstName,H.BookingLevel,
+		 convert(nvarchar(100),ABPA.ChkOutDt,103) ExpDate ,p.City,p.CityId,H.ClientName,H.ClientId,BookingCode,0
+		 FROM WRBHBBooking H
+		 --JOIN WRBHBApartmentBookingProperty ABP WITH(NOLOCK) ON H.Id = ABP.BookingId AND ABP.IsActive = 1 AND ABP.IsDeleted = 0
+		 JOIN WRBHBApartmentBookingPropertyAssingedGuest ABPA WITH(NOLOCK) ON H.Id= ABPA.BookingId  AND ABPA.IsActive = 1 AND ABPA.IsDeleted = 0
+		 JOIN WRBHBProperty P WITH(NOLOCK) ON P.Id = ABPA.BookingPropertyId and P.IsActive = 1 and P.IsDeleted = 0
+		 JOIN WRBHBPropertyUsers PU WITH(NOLOCK) ON PU.PropertyId = P.Id and PU.IsActive = 1 and PU.IsDeleted = 0
+		 JOIN WRBHBUser U WITH(NOLOCK) ON   PU.UserId =U.Id and pu.IsActive = 1 and PU.IsDeleted = 0
+		 JOIN WRBHBUserRoles R WITH(NOLOCK) ON  U.Id =R.UserId  and R.IsActive = 1 and R.IsDeleted = 0 
+		 WHERE   H.CancelStatus!='Canceled'  and ABPA.CurrentStatus='CheckIn'
+		 and  CONVERT(date,ABPA.ChkInDt,103) <= CONVERT(date,GETDATE(),103) 
+		 and pu.UserId=@Pram1
+		 group by H.Id, P.PropertyName,ABPA.FirstName,H.BookingLevel,ABPA.ChkOutDt,
+		P.Id,p.City,p.CityId,H.ClientName,H.ClientId,BookingCode  
+		 order by H.Id desc
+		
+		
+ -- Bed Level Booked and DirectBooked Property
+  INSERT INTO #ExpChkout(BookedId,PropertyName,PropertyId,GuestName,BookingLevel,ExpDate,CityName,CityId,ClientName,ClientId,BookingCode,CheckInHdrId)
+		 SELECT DISTINCT H.Id, p.PropertyName PropertyName,P.Id,ABPA.FirstName FirstName,H.BookingLevel,
+		 convert(nvarchar(100),ABPA.ChkOutDt,103) ExpDate ,p.City,p.CityId,H.ClientName,H.ClientId,BookingCode,0
+		 FROM WRBHBBooking H
+		-- JOIN WRBHBBedBookingProperty ABP WITH(NOLOCK) ON H.Id = ABP.BookingId AND ABP.IsActive = 1 AND	 ABP.IsDeleted = 0
+		 JOIN WRBHBBedBookingPropertyAssingedGuest ABPA WITH(NOLOCK) ON H.ID=ABPA.BookingId  AND ABPA.IsActive = 1 AND ABPA.IsDeleted = 0
+		 JOIN WRBHBProperty P WITH(NOLOCK) ON P.Id = ABPA.BookingPropertyId and P.IsActive = 1 and P.IsDeleted = 0
+		 JOIN WRBHBPropertyUsers PU WITH(NOLOCK) ON PU.PropertyId = P.Id and PU.IsActive = 1 and PU.IsDeleted = 0
+		 JOIN WRBHBUser U WITH(NOLOCK) ON   PU.UserId =U.Id and pu.IsActive = 1 and PU.IsDeleted = 0 
+		 JOIN WRBHBUserRoles R WITH(NOLOCK) ON  U.Id =R.UserId  and R.IsActive = 1 and R.IsDeleted = 0 
+		 WHERE   H.CancelStatus!='Canceled' and ABPA.CurrentStatus='CheckIn'
+		 AND H.Id NOT IN(SELECT BookedId FROM #ExpChkout)-- and P.Category in ('Internal Property') 
+		 and  ABPA.ChkInDt  BETWEEN CONVERT(date,GETDATE(),103) AND  
+		 CONVERT(NVARCHAR,DATEADD(DAY,7,CONVERT(DATE,GETDATE(),103))) 
+		 and pu.UserId=@Pram1
+		 group by H.Id, P.PropertyName,ABPA.FirstName,H.BookingLevel,ABPA.ChkOutDt,
+		 P.Id,p.City,p.CityId,H.ClientName,H.ClientId,BookingCode
+		 order by H.Id desc 
+    --#GRID VALUES 1 FOR TABLE0 
     
-   while @Cnts>0
-   begin
-   DECLARE @GuestId BIGINT,@PrtyIds BIGINT,@RoomId BIGINT,@ChkinhdrId BIGINT,@BookingLevel NVARCHAR(100),@BookingId BIGINT;
-   SELECT top 1 @GuestId= GuestId, @ChkinhdrId=CheckInHdrId,@PrtyIds=PropertyId,@RoomId=RoomId ,
-   @BookingLevel=Typess ,@BookingId=BookingId FROM #GustDtls   
-    	
-If @BookingLevel = 'Room' 
-	BEGIN
-		 INSERT INTO #LEVELWISE(FirstName,BookingId,GuestId,RoomType,BookType,BookingPropertyId,ChkInDate,ChkOutDate)
-		SELECT FirstName,BookingId,GuestId,RoomType,'RoomLevel',BookingPropertyId , CONVERT(nvarchar(100),ChkInDt,103),CONVERT(nvarchar(100),ChkOutDt,103) 
-		FROM WRBHBBookingPropertyAssingedGuest
-		WHERE GuestId = @GuestId and BookingId = @BookingId AND CurrentStatus='CheckIn'
-	END
-If @BookingLevel = 'Bed'
-	BEGIN
-		INSERT INTO #LEVELWISE(FirstName,BookingId,GuestId,RoomType,BookType,BookingPropertyId,ChkInDate,ChkOutDate)
-		select FirstName,BookingId,GuestId,BedType,'BedLevel',BookingPropertyId ,CONVERT(nvarchar(100),ChkInDt,103),CONVERT(nvarchar(100),ChkOutDt,103) 
-		from WRBHBBedBookingPropertyAssingedGuest
-		where GuestId = @GuestId and BookingId = @BookingId AND CurrentStatus='CheckIn'
-	END 
-If @BookingLevel = 'Apartment'
-	BEGIN
-			INSERT INTO #LEVELWISE(FirstName,BookingId,GuestId,RoomType,BookType,BookingPropertyId,ChkInDate,ChkOutDate)
-			select FirstName,BookingId,GuestId,ApartmentType,'AparmentLevel',BookingPropertyId ,CONVERT(nvarchar(100),ChkInDt,103),CONVERT(nvarchar(100),ChkOutDt,103) 
-			from WRBHBApartmentBookingPropertyAssingedGuest
-			where GuestId = @GuestId and BookingId = @BookingId AND CurrentStatus='CheckIn'
-			
-	END 
-			
-		delete  FROM #GustDtls where @GuestId= GuestId ;
-		SET @Cnts=(SELECT COUNT(*) FROM #GustDtls); 
-		end  
-   INSERT INTO #TEMPFINALCHKOUTS(GuestName,GuestId,RoomNo,RoomId,ChkOutDate,Type, PropertyName,CityName)
-		select GuestName,G.GuestId,RoomNumber RoomNo,RoomId,ISNULL(CONVERT(NVARCHAR(100),L.ChkOutDate,103),0) CheckOutDate,G.Typess Type,p.PropertyName PropertyName,
-		C.CityName CityName from #GustDtlsNew G
-		LEFT OUTER join #LEVELWISE L WITH(NOLOCK) ON L.BookingId=G.BookingId AND 
-		G.GuestId=L.GuestId --AND G.RoomNumber=L.RoomType
-		JOIN WRBHBProperty P WITH(NOLOCK) ON G.PropertyId=P.Id  and P.IsActive = 1 and P.IsDeleted = 0
-		join WRBHBPropertyUsers PU on PU.PropertyId = P.Id and PU.IsActive = 1 and PU.IsDeleted = 0 
-		join WRBHBCity C  WITH(NOLOCK) ON C.Id = P.CityId and C.IsActive = 1
-		WHERE  PU.UserId=@Pram1
- --#FINAL  SELECT TO FRONT  END GOES FROM HERE.(gRID2)
-  update #TEMPFINALCHKOUTS set RoomNo='Apartment' where RoomNo='0'
-  INSERT INTO #TEMPFINALCHKOUTSNew(GuestName,GuestId,RoomNo,RoomId,ChkOutDate,Type, PropertyName,CityName)
- SELECT    GuestName,GuestId,RoomNo,RoomId,CONVERT(NVARCHAR(100),ChkOutDate,103) CheckOutDate,Type, PropertyName,CityName 
- FROM #TEMPFINALCHKOUTS WHERE ChkOutDate!='0' 
- and CONVERT(date,ChkOutDate,103)<=CONVERT(date,GETDATE(),103) 
- GROUP BY  GuestId, GuestName,RoomNo,RoomId,ChkOutDate,Type, PropertyName,CityName
- order by CONVERT(date,ChkOutDate,103) ;
-  
---  INSERT INTO #TEMPFINALCHKOUTSNew(GuestName,GuestId,RoomNo,RoomId,ChkOutDate,Type, PropertyName,CityName)
---	SELECT    GuestName,GuestId,RoomNo,RoomId,CONVERT(NVARCHAR(100),ChkOutDate,103) CheckOutDate,Type, PropertyName,CityName 
---	FROM #TEMPFINALCHKOUTS WHERE ChkOutDate!='0'   
---	and CONVERT(NVARCHAR(100),ChkOutDate,103)  between CONVERT(NVARCHAR(100),GETDATE(),103) 
---	AND  CONVERT(NVARCHAR(100),DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103))) 
-
-INSERT INTO #TEMPFINALCHKOUTSNew(GuestName,GuestId,RoomNo,RoomId,ChkOutDate,Type, PropertyName,CityName)
-	SELECT   GuestName,GuestId, RoomNo,RoomId,CONVERT(NVARCHAR(100),ChkOutDate,103) CheckOutDate,Type, PropertyName,CityName 
-	FROM #TEMPFINALCHKOUTS WHERE ChkOutDate!='0'   
-	and CONVERT(date,ChkOutDate,103)  between CONVERT(date,GETDATE(),103) 
-	AND  CONVERT(date,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103))) 
-	--Front End Goes  here
-	Select  GuestName,GuestId,RoomNo,RoomId,ChkOutDate CheckOutDate,Type, PropertyName,CityName
-	from #TEMPFINALCHKOUTSNew
-	group by GuestName,GuestId,RoomNo,RoomId,ChkOutDate ,Type, PropertyName,CityName
-	order by CONVERT(date,ChkOutDate,103) ;
+    
+	
+    INSERT INTO #TEMPFINALCHKOUTS(GuestName,GuestId,Type, PropertyName,ChkOutDate,CityName,CityId,BookingId,CheckInHdrId)
+      select  GuestName as FirstName,0 as GuestId,BookingLevel Type,PropertyName, --PropertyId,BookingLevel,
+      Convert(nvarchar(100),ExpDate,103) CheckOutDate,C.CityName CityName,CityId,BookedId,CheckInHdrId--ClientName,ClientId,BookingCode
+       from #ExpChkout F
+       left join WRBHBCity C on c.Id=F.CityId
+      where Convert(date,ExpDate,103)<= CONVERT(date,GETDATE(),103) 
+      group by BookedId,PropertyName,PropertyId,GuestName,BookingLevel,
+      ExpDate,c.CityName ,CityId,ClientName,ClientId,BookingCode,CheckInHdrId
+      order by Convert(date,ExpDate,103)
+       
+       
+      
+       Select C.ChkInGuest GuestName ,C.Id,c.BookingId,C.RoomNo,C.RoomId ,
+        B.GuestId,B.Type, B.PropertyName,B.ChkOutDate CheckOutDate,B.CityName,B.CityId
+        from WRBHBCheckInHdr c
+        join #TEMPFINALCHKOUTS B on b.BookingId=c.BookingId and C.Id=b.CheckInHdrId
+        where IsActive=1 and IsDeleted=0
+       group by  B.GuestId,B.Type, B.PropertyName,B.ChkOutDate,B.CityName,B.CityId,
+       C.ChkInGuest,C.Id,c.BookingId,C.RoomNo,C.RoomId
+       order by Id desc
 --return;
 -- NEW PROPERTY WISE
 CREATE TABLE #PROPWSE(PropertyName NVARCHAR(200),Code NVARCHAR(200),Category NVARCHAR(200),CityName NVARCHAR(200),PrtyId BIGINT,Locality nvarchar(100))

@@ -38,7 +38,7 @@ If @Action ='Property'
 			
 			INSERT INTO #guest(Guestname,Category,RoomNo,BookingCode,ClientName,GuestId,PropertyId
 			,RoomId,BookingId,Id)
-			SELECT DISTINCT H.GuestName ,p.Category ,H.RoomNo ,H.BookingCode,
+			SELECT DISTINCT H.ChkInGuest ,p.Category ,H.RoomNo ,H.BookingCode,
 			H.ClientName,ISNULL(H.GuestId,0) as GuestId,ISNULL(H.PropertyId,0) as PropertyId,H.RoomId,
 			H.BookingId,H.Id 
 			FROM WRBHBCheckInHdr H
@@ -49,7 +49,7 @@ If @Action ='Property'
 			
 			INSERT INTO #guest(Guestname,Category,RoomNo,BookingCode,ClientName,GuestId,PropertyId
 			,RoomId,BookingId,Id)
-			SELECT DISTINCT H.GuestName ,p.Category ,H.RoomNo ,H.BookingCode,
+			SELECT DISTINCT H.ChkInGuest ,p.Category ,H.RoomNo ,H.BookingCode,
 			H.ClientName,ISNULL(H.GuestId,0) as GuestId,ISNULL(H.PropertyId,0) as PropertyId,H.RoomId,
 			H.BookingId,H.Id 
 			FROM WRBHBCheckInHdr H
@@ -60,7 +60,7 @@ If @Action ='Property'
 			
 			INSERT INTO #guest(Guestname,Category,RoomNo,BookingCode,ClientName,GuestId,PropertyId
 			,RoomId,BookingId,Id)
-			SELECT DISTINCT H.GuestName ,p.Category ,H.RoomNo ,H.BookingCode,
+			SELECT DISTINCT H.ChkInGuest ,p.Category ,H.RoomNo ,H.BookingCode,
 			H.ClientName,ISNULL(H.GuestId,0) as GuestId,ISNULL(H.PropertyId,0) as PropertyId,H.RoomId,
 			H.BookingId,H.Id 
 			FROM WRBHBCheckInHdr H
@@ -69,7 +69,7 @@ If @Action ='Property'
 			WHERE H.PropertyId = @Id AND H.IsActive=1 AND H.IsDeleted=0 AND B.CurrentStatus='CheckIn'
 			AND p.Category = 'Internal Property' AND  H.Id NOT IN(SELECT ChkInHdrId FROM WRBHBChechkOutHdr)
 				
-			SELECT Guestname,Category AS CategoryId,RoomNo AS RoomNoId,BookingCode AS BookingCodeId,ClientName
+			SELECT Guestname AS GuestName,Category AS CategoryId,RoomNo AS RoomNoId,BookingCode AS BookingCodeId,ClientName
 			AS ClientNameId,GuestId,PropertyId
 			,RoomId,BookingId,Id FROM #guest	
 					
@@ -80,7 +80,7 @@ If @Action ='Property'
 If @Action ='Date'
 	
 		BEGIN
-			SELECT DISTINCT H.GuestName AS GuestName,(p.Category) AS GetTypeId,H.RoomNo AS RoomNoId,H.BookingCode  AS BookingCodeId,
+			SELECT DISTINCT H.ChkInGuest AS GuestName,(p.Category) AS GetTypeId,H.RoomNo AS RoomNoId,H.BookingCode  AS BookingCodeId,
 			H.ClientName AS ClientNameId,ISNULL(H.GuestId,0) as GuestId,ISNULL(H.PropertyId,0) as PropertyId,H.RoomId,
 			H.BookingId,H.Id 
 			FROM WRBHBCheckInHdr H

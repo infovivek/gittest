@@ -28,7 +28,15 @@ namespace HB.Dao
               for (int i = 0; i < n; i++)
               {
 
-                  prptyRoomBed.BedRackTarrif = Convert.ToDecimal(document.SelectNodes("//GridXml")[i].Attributes["BedRackTarrif"].Value);
+                  
+                  if (document.SelectNodes("//GridXml")[i].Attributes["BedRackTarrif"].Value == "")
+                  {
+                      prptyRoomBed.BedRackTarrif = 0;
+                  }
+                  else
+                  {
+                      prptyRoomBed.BedRackTarrif = Convert.ToDecimal(document.SelectNodes("//GridXml")[i].Attributes["BedRackTarrif"].Value);
+                  }
                  // prptyRoomBed.RoomId = Convert.ToInt32(document.SelectSingleNode("//GridXml").Attributes["RoomId"].Value);
                   if (document.SelectNodes("//GridXml")[i].Attributes["DiscountAllowed"].Value == "")
                   {
@@ -38,8 +46,24 @@ namespace HB.Dao
                   {
                       prptyRoomBed.DiscountAllowed = Convert.ToDecimal(document.SelectNodes("//GridXml")[i].Attributes["DiscountAllowed"].Value);
                   }
-                  prptyRoomBed.DiscountModePer = Convert.ToBoolean(document.SelectNodes("//GridXml")[i].Attributes["DiscountModePer"].Value);
-                  prptyRoomBed.DiscountModeRS = Convert.ToBoolean(document.SelectNodes("//GridXml")[i].Attributes["DiscountModeRS"].Value);
+                  if (document.SelectNodes("//GridXml")[i].Attributes["DiscountModePer"].Value == "")
+                  {
+                      prptyRoomBed.DiscountModePer = false;
+                  }
+                  else
+                  {
+                      prptyRoomBed.DiscountModePer = Convert.ToBoolean(document.SelectNodes("//GridXml")[i].Attributes["DiscountModePer"].Value);
+                  }
+                  if (document.SelectNodes("//GridXml")[i].Attributes["DiscountModeRS"].Value == "")
+                  {
+                      prptyRoomBed.DiscountModeRS = false;
+                  }
+                  else
+                  {
+                      prptyRoomBed.DiscountModeRS = Convert.ToBoolean(document.SelectNodes("//GridXml")[i].Attributes["DiscountModeRS"].Value);
+                  }
+                  prptyRoomBed.BedName = document.SelectNodes("//GridXml")[i].Attributes["BedName"].Value;
+
                   if (document.SelectNodes("//GridXml")[i].Attributes["Id"].Value == "")
                   {
                       prptyRoomBed.Id = 0;
@@ -72,8 +96,8 @@ namespace HB.Dao
                   command.Parameters.Add("@BedRackTarrif", SqlDbType.Decimal).Value = prptyRoomBed.BedRackTarrif;
                   command.Parameters.Add("@DiscountModePer", SqlDbType.Bit).Value = prptyRoomBed.DiscountModePer;
                   command.Parameters.Add("@DiscountModeRS", SqlDbType.Bit).Value = prptyRoomBed.DiscountModeRS;
-                 
-
+                  command.Parameters.Add("@BedName", SqlDbType.NVarChar).Value = prptyRoomBed.BedName;
+                  
                   command.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = user.Id;
 
                   ds = new WrbErpConnection().ExecuteDataSet(command, UserData); 

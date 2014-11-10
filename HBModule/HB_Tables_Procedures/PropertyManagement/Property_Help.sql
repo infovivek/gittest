@@ -166,7 +166,7 @@ END
  BEGIN
  DECLARE @SelectId BIGINT;
 DECLARE @StateId BIGINT,@CityId BIGINT;
-	IF	@Pram2!='Internal Property'
+	IF	@Pram2='External Property'
 	BEGIN
 		SELECT PropertyName AS ApartmentName,0 Id,Id ApartmentId FROM WRBHBProperty 
 		WHERE IsDeleted=0 AND Category in ('External Property','Client Prefered','Other Hotels');
@@ -199,7 +199,7 @@ DECLARE @StateId BIGINT,@CityId BIGINT;
 	LEFT OUTER JOIN WRBHBLocality L ON P.LocalityId=L.Id   
 	WHERE p.IsDeleted=0 AND p.Id=@SelectId ; 
 	
-	IF @Pram2='Internal Property'
+	IF @Pram2='Internal Property' 
 	BEGIN
 		SELECT ApartmentId,ApartmentName,Id ,0 AS Tick 
 		FROM WRBHBPropertyOwnerApartment Ap 
@@ -208,9 +208,10 @@ DECLARE @StateId BIGINT,@CityId BIGINT;
 		SELECT ApartmentNo ApartmentName ,0 Id,Id ApartmentId ,0 AS Tick 
 		FROM dbo.WRBHBPropertyApartment
 		WHERE PropertyId=@PropertyId AND IsDeleted=0;
-    END
+    END    
     ELSE
     BEGIN
+    
 		SELECT PropertyId ApartmentId,PropertyName ApartmentName,Id ,0 AS Tick 
 		FROM WRBHBPropertyOwnerProperty Ap 
 		WHERE Ap.OwnerId=@SelectId  AND IsDeleted=0 

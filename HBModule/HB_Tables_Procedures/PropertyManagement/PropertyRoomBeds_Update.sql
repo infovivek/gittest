@@ -29,11 +29,12 @@ CREATE PROCEDURE [Sp_PropertyRoomBeds_Update] (
 @DiscountModeRS  		BIT, 
 @RoomId                 BIGINT,
 @CreatedBy				BIGINT,
-@Id                     BIGINT 
+@Id                     BIGINT ,
+@BedName				NVARCHAR(100)
 ) 
 AS
 BEGIN
-DECLARE @BedName BIGINT;
+--DECLARE @BedName BIGINT;
 --SET @BedName=(SELECT TOP 1 ISNULL(BedNO,0) FROM WRBHBPropertyRoomBeds WHERE RoomId=@RoomId ORDER BY Id DESC)
 ----select @BedName
 --IF ISNULL(@BedName,0)=0
@@ -65,6 +66,7 @@ DiscountModeRS=@DiscountModeRS,
 DiscountAllowed=@DiscountAllowed,
 BedRackTarrif=@BedRackTarrif,
 RoomId=@RoomId,
+BedNO=@BedName,
 ModifiedBy=@CreatedBy,ModifiedDate=GETDATE()
 WHERE Id=@Id;
 

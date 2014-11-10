@@ -42,7 +42,7 @@ If @Action ='Property'
 			
 			INSERT INTO #guest(Guestname,Category,RoomNo,BookingCode,ClientName,GuestId,PropertyId
 			,RoomId,BookingId,Id)
-			SELECT DISTINCT H.GuestName ,p.Category ,H.RoomNo ,H.BookingCode,
+			SELECT DISTINCT H.ChkInGuest ,p.Category ,H.RoomNo ,H.BookingCode,
 			H.ClientName,ISNULL(H.GuestId,0) as GuestId,ISNULL(H.PropertyId,0) as PropertyId,H.RoomId,
 			H.BookingId,H.Id 
 			FROM WRBHBCheckInHdr H
@@ -53,7 +53,7 @@ If @Action ='Property'
 			
 			INSERT INTO #guest(Guestname,Category,RoomNo,BookingCode,ClientName,GuestId,PropertyId
 			,RoomId,BookingId,Id)
-			SELECT DISTINCT H.GuestName ,p.Category ,H.RoomNo ,H.BookingCode,
+			SELECT DISTINCT H.ChkInGuest ,p.Category ,H.RoomNo ,H.BookingCode,
 			H.ClientName,ISNULL(H.GuestId,0) as GuestId,ISNULL(H.PropertyId,0) as PropertyId,H.RoomId,
 			H.BookingId,H.Id 
 			FROM WRBHBCheckInHdr H
@@ -64,7 +64,7 @@ If @Action ='Property'
 			
 			INSERT INTO #guest(Guestname,Category,RoomNo,BookingCode,ClientName,GuestId,PropertyId
 			,RoomId,BookingId,Id)
-			SELECT DISTINCT H.GuestName ,p.Category ,H.RoomNo ,H.BookingCode,
+			SELECT DISTINCT H.ChkInGuest ,p.Category ,H.RoomNo ,H.BookingCode,
 			H.ClientName,ISNULL(H.GuestId,0) as GuestId,ISNULL(H.PropertyId,0) as PropertyId,H.RoomId,
 			H.BookingId,H.Id 
 			FROM WRBHBCheckInHdr H
@@ -85,7 +85,7 @@ If @Action ='Property'
 If @Action ='Date'
 	
 		BEGIN
-			SELECT DISTINCT H.GuestName AS GuestName,(p.Category) AS GetTypeId,H.RoomNo AS RoomNoId,H.BookingCode  AS BookingCodeId,
+			SELECT DISTINCT H.ChkInGuest AS GuestName,(p.Category) AS GetTypeId,H.RoomNo AS RoomNoId,H.BookingCode  AS BookingCodeId,
 			H.ClientName AS ClientNameId,ISNULL(H.GuestId,0) as GuestId,ISNULL(H.PropertyId,0) as PropertyId,H.RoomId,
 			H.BookingId,H.Id 
 			FROM WRBHBCheckInHdr H

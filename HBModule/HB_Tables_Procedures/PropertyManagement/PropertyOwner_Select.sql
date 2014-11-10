@@ -87,7 +87,7 @@ IF @SelectId=0
 BEGIN  
  SELECT @Pram2=Category  FROM WRBHBProperty 
 	WHERE IsDeleted=0 AND Id=@Pram1;
-IF @Pram2='Internal Property'
+IF @Pram2='Internal Property' or @Pram2='Managed G H'
 	BEGIN	
 	 SELECT FirstName,Phone,C.CityName City,p.Id,ISNULL(ApartmentName,'') ApartmentName
 	 FROM dbo.WRBHBPropertyOwners p

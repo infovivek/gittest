@@ -672,13 +672,13 @@ BEGIN
  		 SELECT AgreementId,PropertyId ,PropertyName,ApartmentNo,ApartmentId,RentelAmount,RentType,0 
  		 FROM #TEMPPROPERTYAPARTMENTMAINTENANCE
  		 WHERE RentType='Arrears' 
- 		 AND MONTH(RentStartDate)=MONTH(@CDATE);
+ 		 AND MONTH(RentStartDate)<=MONTH(@CDATE);
 	 	 
  		 INSERT INTO #TEMPMAINTENANCECALCULATION(AgreementId,PropertyId ,PropertyName,ApartmentNo,ApartmentId,RentelAmount,RentType,TDSAMOUNT)
  		 SELECT AgreementId,PropertyId ,PropertyName,ApartmentNo,ApartmentId,RentelAmount,RentType,0 
  		 FROM #TEMPPROPERTYAPARTMENTMAINTENANCE
  		 WHERE  RentType='Advance' 
- 		 AND MONTH(DATEADD(month, -1, RentStartDate))=MONTH(@CDATE);
+ 		 AND MONTH(DATEADD(month, -1, RentStartDate))<=MONTH(@CDATE);
 	 	 
  		  ---old
  		  --RENT CALCULATION FOR WITHOUT TDS Old Entry

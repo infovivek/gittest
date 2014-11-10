@@ -285,7 +285,7 @@ END
 		@RoomId,@CheckInType,@ApartmentNo,@BedNo,@BedId,@ApartmentId,
 		@PropertyId,@GuestId,@BookingId,@StateId,@Direct ,
 		@BTC,@PropertyType,@STAgreedAmount,@LTAgreedAmount,@STRackAmount,@LTRackAmount,@Status,
-		@CheckInDate,@CheckOutDate,@InVoiceNo,0,@PrintInvoice,'UnPaid',@STTaxPer,@LTTaxPer,0,
+		@CheckInDate,@CheckOutDate,@InVoiceNo,1,@PrintInvoice,'UnPaid',@STTaxPer,@LTTaxPer,0,
 		@VATPer,@RestaurantSTPer,@BusinessSupportST,@ClientId,@CityId,@BillFromDate,@BillEndDate,@Intermediate,1,@PIInvoice)
 
 		SET @InsId=@@IDENTITY;

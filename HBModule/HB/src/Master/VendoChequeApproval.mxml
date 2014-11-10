@@ -290,11 +290,11 @@
 			public function FnHistory(Event):void
 			{ 
 				//var Grid_AC:ArrayCollection=new ArrayCollection();
-				UserId=Grd_Details.selectedItem.RequestedUserId;
+				Id=Grd_Details.selectedItem.Id;
 				PropertyId=Grd_Details.selectedItem.PropertyId;
 				Roles=Grd_Details.selectedItem.RequestedOn;
 				Grd_History.dataProvider=null;
-				useWeb("VendorChequeApproval","HistoryLoad_CUSTOM",[GlobalXml,"History",UserId,PropertyId,Roles]);
+				useWeb("VendorChequeApproval","HistoryLoad_CUSTOM",[GlobalXml,"History",Id,PropertyId,Roles]);
 				bdr_History.visible=true;
 				Grd_Details.visible=false;
 				bdr_Scroll.visible=false;
@@ -420,7 +420,8 @@
 			public function Download():void
 			{ 
 				var BillId=Grd_History.selectedItem.Id;
-				useWeb("VendorChequeApproval","Download_CUSTOM",[GlobalXml,"DownloadReport",UserId,PropertyId,BillId]);
+				var UserId1=Grd_History.selectedItem.UserId;
+				useWeb("VendorChequeApproval","Download_CUSTOM",[GlobalXml,"DownloadReport",UserId1,PropertyId,BillId]);
 			}
 			public var ImageFormat:String="";
 			private function init1():void 
@@ -523,7 +524,7 @@
 					   Lable_val="Search">
 	</WrbComp:Button_BB>
 	<s:BorderContainer x="57" y="33" width="856" height="415" id="bdr_History"
-					   borderVisible="true" visible="false" >
+					   borderVisible="true" visible="false" depth="1000">
 		<mx:Label x="19" y="62" text="Requestedby" />
 		<mx:Label x="19" y="362" text="Resident Manager" />
 		<mx:Label x="159" y="362" text="Operations Manager" />

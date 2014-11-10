@@ -47,7 +47,7 @@ BEGIN
 		INSERT INTO #Room(GuestName,BookingCode,Property,RoomType,BookingId,Id,PropertyId,BreakfastVeg,
 		BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg,CheckInId)
 		
-		SELECT DISTINCT H.GuestName,H.BookingCode AS BookingCode,H.Property,H.RoomNo,ISNULL(H.BookingId,0) as BookingId,
+		SELECT DISTINCT H.ChkInGuest,H.BookingCode AS BookingCode,H.Property,H.RoomNo,ISNULL(H.BookingId,0) as BookingId,
 		0 AS Id,ISNULL(H.PropertyId,0) as PropertyId,0 AS BreakfastVeg,
 		0 AS BreakfastNonVeg,0 AS LunchVeg,0 AS LunchNonVeg,0 AS DinnerVeg,0 AS DinnerNonVeg,H.Id
 		FROM WRBHBCheckInHdr H
@@ -62,7 +62,7 @@ BEGIN
 		INSERT INTO #Room(GuestName,BookingCode,Property,RoomType,BookingId,Id,PropertyId,BreakfastVeg,
 		BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg,CheckInId)
 		
-		SELECT DISTINCT H.GuestName,H.BookingCode AS BookingCode,H.Property,H.BedType,ISNULL(H.BookingId,0) as BookingId,
+		SELECT DISTINCT H.ChkInGuest,H.BookingCode AS BookingCode,H.Property,H.BedType,ISNULL(H.BookingId,0) as BookingId,
 		0 AS Id,ISNULL(H.PropertyId,0) as PropertyId,0 AS BreakfastVeg,
 		0 AS BreakfastNonVeg,0 AS LunchVeg,0 AS LunchNonVeg,0 AS DinnerVeg,0 AS DinnerNonVeg,H.Id
 		FROM WRBHBCheckInHdr H
@@ -75,7 +75,7 @@ BEGIN
 		INSERT INTO #Room(GuestName,BookingCode,Property,RoomType,BookingId,Id,PropertyId,BreakfastVeg,
 		BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg,CheckInId)
 		
-		SELECT DISTINCT H.GuestName,H.BookingCode AS BookingCode,H.Property,H.ApartmentType,ISNULL(H.BookingId,0) as BookingId,
+		SELECT DISTINCT H.ChkInGuest,H.BookingCode AS BookingCode,H.Property,H.ApartmentType,ISNULL(H.BookingId,0) as BookingId,
 		0 AS Id,ISNULL(H.PropertyId,0) as PropertyId,0 AS BreakfastVeg,
 		0 AS BreakfastNonVeg,0 AS LunchVeg,0 AS LunchNonVeg,0 AS DinnerVeg,0 AS DinnerNonVeg,H.Id
 		FROM WRBHBCheckInHdr H
@@ -117,7 +117,7 @@ BEGIN
 		INSERT INTO #Room(GuestName,BookingCode,Property,RoomType,BookingId,Id,PropertyId,BreakfastVeg,
 		BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg,CheckInId)
 		
-		SELECT DISTINCT H.GuestName,H.BookingCode AS BookingCode,H.Property,H.RoomNo,ISNULL(H.BookingId,0) as BookingId,
+		SELECT DISTINCT H.ChkInGuest,H.BookingCode AS BookingCode,H.Property,H.RoomNo,ISNULL(H.BookingId,0) as BookingId,
 		0 AS Id,ISNULL(H.PropertyId,0) as PropertyId,0 AS BreakfastVeg,
 		0 AS BreakfastNonVeg,0 AS LunchVeg,0 AS LunchNonVeg,0 AS DinnerVeg,0 AS DinnerNonVeg,H.Id
 		FROM WRBHBCheckInHdr H
@@ -131,7 +131,7 @@ BEGIN
 		INSERT INTO #Room(GuestName,BookingCode,Property,RoomType,BookingId,Id,PropertyId,BreakfastVeg,
 		BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg,CheckInId)
 		
-		SELECT DISTINCT H.GuestName,H.BookingCode AS BookingCode,H.Property,H.BedType,ISNULL(H.BookingId,0) as BookingId,
+		SELECT DISTINCT H.ChkInGuest,H.BookingCode AS BookingCode,H.Property,H.BedType,ISNULL(H.BookingId,0) as BookingId,
 		0 AS Id,ISNULL(H.PropertyId,0) as PropertyId,0 AS BreakfastVeg,
 		0 AS BreakfastNonVeg,0 AS LunchVeg,0 AS LunchNonVeg,0 AS DinnerVeg,0 AS DinnerNonVeg,H.Id
 		FROM WRBHBCheckInHdr H
@@ -144,7 +144,7 @@ BEGIN
 		INSERT INTO #Room(GuestName,BookingCode,Property,RoomType,BookingId,Id,PropertyId,BreakfastVeg,
 		BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg,CheckInId)
 		
-		SELECT DISTINCT H.GuestName,H.BookingCode AS BookingCode,H.Property,H.ApartmentType,ISNULL(H.BookingId,0) as BookingId,
+		SELECT DISTINCT H.ChkInGuest,H.BookingCode AS BookingCode,H.Property,H.ApartmentType,ISNULL(H.BookingId,0) as BookingId,
 		0 AS Id,ISNULL(H.PropertyId,0) as PropertyId,0 AS BreakfastVeg,
 		0 AS BreakfastNonVeg,0 AS LunchVeg,0 AS LunchNonVeg,0 AS DinnerVeg,0 AS DinnerNonVeg,H.Id
 		FROM WRBHBCheckInHdr H
@@ -171,7 +171,7 @@ ELSE
 BEGIN
 		INSERT INTO #Room(GuestName,BookingCode,Property,RoomType,BookingId,Id,PropertyId,BreakfastVeg,
 		BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg,CheckInId)
-		SELECT DISTINCT H.GuestName,H.BookingCode AS BookingCode,H.Property,H.RoomNo,ISNULL(H.BookingId,0) as BookingId,
+		SELECT DISTINCT H.ChkInGuest,H.BookingCode AS BookingCode,H.Property,H.RoomNo,ISNULL(H.BookingId,0) as BookingId,
 		0 AS Id,ISNULL(H.PropertyId,0) as PropertyId,0 AS BreakfastVeg,
 		0 AS BreakfastNonVeg,0 AS LunchVeg,0 AS LunchNonVeg,0 AS DinnerVeg,0 AS DinnerNonVeg,H.Id
 		FROM WRBHBCheckInHdr H
@@ -185,7 +185,7 @@ BEGIN
 		INSERT INTO #Room(GuestName,BookingCode,Property,RoomType,BookingId,Id,PropertyId,BreakfastVeg,
 		BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg,CheckInId)
 		
-		SELECT DISTINCT H.GuestName,H.BookingCode AS BookingCode,H.Property,H.BedType,ISNULL(H.BookingId,0) as BookingId,
+		SELECT DISTINCT H.ChkInGuest,H.BookingCode AS BookingCode,H.Property,H.BedType,ISNULL(H.BookingId,0) as BookingId,
 		0 AS Id,ISNULL(H.PropertyId,0) as PropertyId,0 AS BreakfastVeg,
 		0 AS BreakfastNonVeg,0 AS LunchVeg,0 AS LunchNonVeg,0 AS DinnerVeg,0 AS DinnerNonVeg,H.Id
 		FROM WRBHBCheckInHdr H
@@ -197,7 +197,7 @@ BEGIN
 			
 		INSERT INTO #Room(GuestName,BookingCode,Property,RoomType,BookingId,Id,PropertyId,BreakfastVeg,
 		BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg,CheckInId)
-		SELECT DISTINCT H.GuestName,H.BookingCode AS BookingCode,H.Property,H.ApartmentType,ISNULL(H.BookingId,0) as BookingId,
+		SELECT DISTINCT H.ChkInGuest,H.BookingCode AS BookingCode,H.Property,H.ApartmentType,ISNULL(H.BookingId,0) as BookingId,
 		0 AS Id,ISNULL(H.PropertyId,0) as PropertyId,0 AS BreakfastVeg,
 		0 AS BreakfastNonVeg,0 AS LunchVeg,0 AS LunchNonVeg,0 AS DinnerVeg,0 AS DinnerNonVeg,H.Id
 		FROM WRBHBCheckInHdr H

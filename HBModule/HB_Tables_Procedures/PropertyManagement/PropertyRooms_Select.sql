@@ -35,7 +35,7 @@ BEGIN
    WHERE R.Id=@Pram1;
    
    SELECT B.BedRackTarrif,B.DiscountAllowed,B.DiscountModePer,
-   B.DiscountModeRS,B.Id FROM WRBHBPropertyRoomBeds B
+   B.DiscountModeRS,B.Id,B.BedNO BedName FROM WRBHBPropertyRoomBeds B
    WHERE RoomId=@Pram1;
       
   END	

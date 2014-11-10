@@ -52,7 +52,7 @@ namespace HBReport
                 ReportViewer1.LocalReport.DataSources.Clear();
                 ReportViewer1.LocalReport.DataSources.Add(rds);
                 ReportViewer1.LocalReport.Refresh();
-                ReportViewer1.LocalReport.ReportPath = Server.MapPath("") + @"\ExternalCheckoutTACMail.rdlc";
+                ReportViewer1.LocalReport.ReportPath = Server.MapPath("") + @"\ExternalCheckoutNewTACMail.rdlc";
                 ReportViewer1.LocalReport.EnableExternalImages = true;
 
 
@@ -84,7 +84,7 @@ namespace HBReport
                 {
                     string Valid = ""; string Err = "";
                     string Email = "shiv@hummingbirdindia.com";
-               //     string Email = "shameem@warblerit.com";
+                   // string Email = "shameem@warblerit.com";
                     Valid = EmailValidate(Email);
 
                     if ((ds.Tables[0].Rows[0][0].ToString() != "UserName or EmailId Already Exist"))
@@ -104,6 +104,7 @@ namespace HBReport
                         message.Bcc.Add(new System.Net.Mail.MailAddress("shameem@warblerit.com"));
                         message.Bcc.Add(new System.Net.Mail.MailAddress("silam@hummingbirdindia.com"));
                         message.Bcc.Add(new System.Net.Mail.MailAddress("karthik@hummingbirdindia.com"));
+                        message.Bcc.Add(new System.Net.Mail.MailAddress("usha@hummingbirdindia.com"));
 
                         message.Subject = "TACInVoice : " + ds.Tables[0].Rows[0][8].ToString();
                         string Imagelocation = "";
@@ -126,7 +127,7 @@ namespace HBReport
                                   " <p style=\"margin-top:20px;\">" +
                                   " <span> System generated email. Please do not reply. </span>" +
                                   " <style=\"margin-top:20px;\">" +
-                                  " <span style=\"float:right\"  >   Date : " + ds.Tables[0].Rows[0][39].ToString() + "</span><br>" +
+                                  " <span style=\"float:right\"  >   Date : " + ds.Tables[0].Rows[0][40].ToString() + "</span><br>" +
                                   " </td></tr></table>";
                         string AddressDtls =
                                    " <table cellpadding=\"0\" cellspacing=\"0\" width=\"600\" border=\"0\" align=\"center\" style=\"padding-top:0px;\">" +
@@ -163,6 +164,9 @@ namespace HBReport
                                    //" </p><p style=\"margin-top:5px;\">" +
                                    " <span style=\"color:#f54d02; font-weight:bold\">Net Amount                 :</span> " + ds.Tables[0].Rows[0][11].ToString() + "" +
                                    " </p><p style=\"margin-top:5px;\">" +
+                                   "<br>"+
+                                   "<span> If you have any clarification, kindly call 080-42840492 or send a mail to commercials@hummingbirdindia.com" +
+                                   "<br>"+
                                    " </p></td></tr></table>";
 
                         string FooterDtls =
@@ -195,12 +199,13 @@ namespace HBReport
 
                         System.Net.Mail.SmtpClient smtp = new System.Net.Mail.SmtpClient();
                         smtp.EnableSsl = true;
-                      smtp.Host = "email-smtp.us-west-2.amazonaws.com"; 
-     //Local test       smtp.Host = "smtp.gmail.com"; 
+                        smtp.Host = "email-smtp.us-west-2.amazonaws.com"; 
+     //Local test
+                  //      smtp.Host = "smtp.gmail.com"; 
 
                         smtp.Port = 587;
                         smtp.Credentials = new System.Net.NetworkCredential("AKIAIIVF5D5D3CJAX7SQ", "ApmuZkd+L8tissEga8kac3quhhwohEi5CB+dYD36KTq3");
-            //            smtp.Credentials = new System.Net.NetworkCredential("stay@staysimplyfied.com", "stay1234");
+                 //       smtp.Credentials = new System.Net.NetworkCredential("stay@staysimplyfied.com", "stay1234");
                         try
                         {
                             smtp.Send(message);

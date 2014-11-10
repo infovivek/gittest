@@ -23,20 +23,21 @@ arun			20/6/14			Histroy				BedNO Bug fixed
 */
 CREATE PROCEDURE [dbo].[Sp_PropertyRoomBeds_Insert]
 (@DiscountAllowed DECIMAL(27,2),@BedRackTarrif DECIMAL(27,2),
-@DiscountModePer BIT,@DiscountModeRS BIT,@RoomId BIGINT,@CreatedBy BIGINT) 
+@DiscountModePer BIT,@DiscountModeRS BIT,@RoomId BIGINT,@CreatedBy BIGINT,
+@BedName NVARCHAR(100)) 
 AS
 BEGIN
-DECLARE @BedName BIGINT;
-SET @BedName=(SELECT TOP 1 ISNULL(BedNO,0) FROM WRBHBPropertyRoomBeds WHERE RoomId=@RoomId ORDER BY Id DESC)
---select @BedName
-IF ISNULL(@BedName,0)=0
-BEGIN
-SET @BedName=1;
-END
-ELSE
-BEGIN
-SET @BedName=@BedName+1
-END
+--DECLARE @BedName BIGINT;
+--SET @BedName=(SELECT TOP 1 ISNULL(BedNO,0) FROM WRBHBPropertyRoomBeds WHERE RoomId=@RoomId ORDER BY Id DESC)
+----select @BedName
+--IF ISNULL(@BedName,0)=0
+--BEGIN
+--SET @BedName=1;
+--END
+--ELSE
+--BEGIN
+--SET @BedName=@BedName+1
+--END
 --select @BedName
  INSERT INTO WRBHBPropertyRoomBeds(DiscountModePer,DiscountModeRS,
  DiscountAllowed,BedRackTarrif,RoomId,CreatedBy,CreatedDate,ModifiedBy,

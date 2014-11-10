@@ -13,8 +13,8 @@ namespace HB.Entity
         public bool DiscountModePer  { get; set; }
         public bool  DiscountModeRS { get; set; }
 
-        public decimal DiscountAllowed  { get; set; }  
-
+        public decimal DiscountAllowed  { get; set; }
+        public string BedName { get; set; }
         public string CreatedBy { get; set; }
         public int Id { get; set; } 
  

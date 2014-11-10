@@ -65,18 +65,18 @@
 					}
 					if(Ds_Objects.result.Tables.Table1.Rows.length > 0)
 					{
-						dt_Date.text=Ds_Objects.result.Tables.Table1.Rows[0].Date;
-						//			Date Restrict
-						var sdfs:String=dt_Date.text;						
-						var D:String=sdfs.substr(0,2);
-						var M:String=sdfs.substr(3,2);
-						var Y:String=sdfs.substr(6,10);
-						var RangeMiddle:String=Y+'/'+M+'/'+D;
-						var RangeEnd:String=Y+'/'+M+'/'+String(Number(D));
-						var RangeStart:String=Y+'/'+M+'/'+String(Number(D)-1);
-						dt_Date.selectableRange = 
-							{rangeStart:new Date(RangeStart),rangeEnd:new Date(RangeEnd)};
-						dt_Date.selectedDate=new Date(RangeMiddle);
+//						dt_Date.text=Ds_Objects.result.Tables.Table1.Rows[0].Date;
+//						//			Date Restrict
+//						var sdfs:String=dt_Date.text;						
+//						var D:String=sdfs.substr(0,2);
+//						var M:String=sdfs.substr(3,2);
+//						var Y:String=sdfs.substr(6,10);
+//						var RangeMiddle:String=Y+'/'+M+'/'+D;
+//						var RangeEnd:String=Y+'/'+M+'/'+String(Number(D));
+//						var RangeStart:String=Y+'/'+M+'/'+String(Number(D)-1);
+//						dt_Date.selectableRange = 
+//							{rangeStart:new Date(RangeStart),rangeEnd:new Date(RangeEnd)};
+//						dt_Date.selectedDate=new Date(RangeMiddle);
 					}
 					
 				}
