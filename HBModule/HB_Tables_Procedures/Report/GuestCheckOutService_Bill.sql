@@ -108,7 +108,7 @@ IF @Action='PageLoad'
 	d.Tariff,(p.PropertyName+','+p.Propertaddress) as Propertyaddress,(c.CityName+','+
 	s.StateName+','+p.Postal) as Propcity,c.CityName,s.StateName,p.Postal,
 	p.Phone,p.Email,@CompanyName as CompanyName,@LOGO AS logo,
-	
+	CONVERT(nvarchar(100),h.BillFromDate,103) ChkinDT,CONVERT(nvarchar(100),h.BillEndDate,103) as ChkoutDT,
 	'Regd Office : No. 122, Amarjyothi Layout, Domlur, Bangalore - 560071'+'.'+'www.hummingbirdindia.com' as CompanyAddress,
 	'INVOICE : For any invoice clarification revert within 7 days from the date of receipt' as Invoice,
 	'All cheque or demand drafts in payment of bills should be drawn in favor of Hummingbird Travel and stay pvt.ltd.
@@ -146,7 +146,7 @@ IF @Action='PageLoad'
 	h.ChkOutTariffHECess ,h.ChkOutTariffSC,h.CheckInDate,d.Tariff,p.PropertyName,p.Propertaddress,
 	c.CityName,s.StateName,p.Postal,p.Phone,p.Email,	
     H.VATPer,h.RestaurantSTPer ,
-    h.BusinessSupportST ,h.InVoiceNo
+    h.BusinessSupportST ,h.InVoiceNo,h.BillFromDate,h.BillEndDate
    
 	
 	END

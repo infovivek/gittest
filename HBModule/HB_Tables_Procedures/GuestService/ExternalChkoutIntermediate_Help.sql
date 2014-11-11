@@ -155,7 +155,7 @@ BEGIN
 		d.IsActive=1 and d.IsDeleted=0
 		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
 		h.PropertyType in ('External Property','Managed G H') and  
-		h.PropertyId = @PropertyId and   d.CurrentStatus = 'CheckIn' and 
+		h.PropertyId = @PropertyId and   --d.CurrentStatus = 'CheckIn' and 
 		-- CONVERT(nvarchar(100),ChkoutDate,103) = CONVERT(nvarchar(100),GETDATE(),103) and  
 		h.Id  IN (Select ChkInHdrId FROM WRBHBChechkOutHdr where isnull(Flag,0) = 0 and  
 		IsActive = 1 and IsDeleted = 0 ) 
@@ -448,15 +448,17 @@ BEGIN
 					FROM #ServiceTax;
 				END
 			END  
-		
-			SET @HR=(select CheckIn from WRBHBProperty where Id = @CheckInHdrId)
+			DECLARE @BookingPropertyId BIGINT;  
+			SELECT @BookingPropertyId=PropertyId FROM WRBHBCheckInHdr WHERE Id=@CheckInHdrId  
+			SET @HR=(select CheckIn from WRBHBProperty where Id =@BookingPropertyId) 
+	--		SET @HR=(select CheckIn from WRBHBProperty where Id = @CheckInHdrId)
 			--TARIFF SPLIT FOR CHECK IN TO CHECK OUT 
 			SELECT @NoOfDays=0,@chktime=ArrivalTime,@TimeType=TimeType,@Tariff=Tariff,@RackTariffSingle=RackTariffSingle,
 			@RackTariffDouble=RackTariffDouble,@i=0,@SingleMarkupAmount = SingleMarkupAmount,
 			@DoubleMarkupAmount = DoubleMarkupAmount,
 			--	@RackTariff=RackTariff,
 			@prtyId=PropertyId,@chkouttime= CONVERT(VARCHAR(8),GETDATE(),108) FROM WRBHBCheckInHdr where Id=@CheckInHdrId
-		
+	select 	@HR,@chkouttime
 			IF @HR='12'		
 			BEGIN
 			-- To Check Time

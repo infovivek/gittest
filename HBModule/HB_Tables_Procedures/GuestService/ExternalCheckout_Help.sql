@@ -159,7 +159,7 @@ BEGIN
 		d.IsActive=1 and d.IsDeleted=0
 		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
 		h.PropertyType in ('External Property','Managed G H') and  
-		h.PropertyId = @PropertyId and   d.CurrentStatus = 'CheckIn' and 
+		h.PropertyId = @PropertyId and  -- d.CurrentStatus = 'CheckIn' and 
 		-- CONVERT(nvarchar(100),ChkoutDate,103) = CONVERT(nvarchar(100),GETDATE(),103) and  
 		h.Id  IN (Select ChkInHdrId FROM WRBHBChechkOutHdr where isnull(Flag,0) = 0 and  
 		IsActive = 1 and IsDeleted = 0 ) 

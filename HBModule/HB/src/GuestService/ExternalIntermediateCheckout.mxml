@@ -80,7 +80,7 @@
 //				Str_ChkOut="http://localhost:4171/ExternalCheckOutTariff.aspx?";
 //				Str_Serv="http://localhost:4171/GuestCheckOutService1.aspx?";
 //				Str_Settle="http://localhost:4171/GuestCheckOutConsolidate1.aspx?";
-//				Str_ChkOutEXT ="http://localhost:4171/ExternalCheckoutTACMail.aspx?";
+//				Str_ChkOutEXT ="http://localhost:6236/ExternalCheckoutTACMail.aspx?";
 //				
 //				Str_ExIntTar="http://localhost:4171/ExternalIntermediateCheckOutTariff.aspx?";
 //				Str_ExIntServ="http://localhost:4171/ExternalIntermediateCheckoutService.aspx?";
@@ -118,8 +118,8 @@
 			
 			protected function Help():void
 			{				
-				useWeb("ExterIntermediateChkoutService","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId]);
-		//		useWeb("ExterIntermediateChkoutService","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65]);
+		//		useWeb("ExterIntermediateChkoutService","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId]);
+				useWeb("ExterIntermediateChkoutService","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65]);
 				//			useWeb("GuestCheckOut","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,0]);
 				Txt_ServiceBillAmt.editable=false;
 				Txt_ServiceVat.editable=false;
@@ -8117,48 +8117,72 @@
 			public function FnSelect(Event):void
 			{ 
 				// TODO Auto-generated method stub
-				var BillType:String="";
-				var OutStanding:String="";
-				BillType=Grid_Settle.selectedItem.BillType;
-				OutStanding=Grid_Settle.selectedItem.OutStanding;
-				//		
 				
-				if(BillType == "Tariff")
+				if(Checkout.selected==true)
 				{
-					if(OutStanding == "0")
+					var BillType:String="";
+					var OutStanding:String="";
+					BillType=Grid_Settle.selectedItem.BillType;
+					OutStanding=Grid_Settle.selectedItem.OutStanding;
+					if(BillType == "Tariff")
 					{
 						ExternalInterface.call("changeDocumentTitle",Str_ChkOut+PrintChkOutId);
 					}
-					else
-					{
-						ExternalInterface.call("changeDocumentTitle",Str_ExIntTar+PrintChkOutId);
-					}
-					
-				}
-				if(BillType == "Service")
-				{
-					if(OutStanding == "0")
+					if(BillType == "Service")
 					{
 						ExternalInterface.call("changeDocumentTitle",Str_Serv+PrintChkOutId);
 					}
-					else
-					{
-						ExternalInterface.call("changeDocumentTitle",Str_ExIntServ+PrintChkOutId);
-					}
-					
-				}
-				if(BillType == "Consolidate")
-				{
-					if(OutStanding == "0")
+					if(BillType == "Consolidate")
 					{
 						ExternalInterface.call("changeDocumentTitle",Str_Settle+PrintChkOutId);
 					}
-					else
-					{
-						ExternalInterface.call("changeDocumentTitle",Str_ExIntSettle+PrintChkOutId);
-					}
-					
 				}
+				else if(Intermediate.selected==true)
+				{
+					var BillType:String="";
+					var OutStanding:String="";
+					BillType=Grid_Settle.selectedItem.BillType;
+					OutStanding=Grid_Settle.selectedItem.OutStanding;
+					if(BillType == "Tariff")
+					{
+						if(OutStanding == "0")
+						{
+							ExternalInterface.call("changeDocumentTitle",Str_ChkOut+PrintChkOutId);
+						}
+						else
+						{
+							ExternalInterface.call("changeDocumentTitle",Str_ExIntTar+PrintChkOutId);
+						}
+						
+					}
+					if(BillType == "Service")
+					{
+						if(OutStanding == "0")
+						{
+							ExternalInterface.call("changeDocumentTitle",Str_Serv+PrintChkOutId);
+						}
+						else
+						{
+							ExternalInterface.call("changeDocumentTitle",Str_ExIntServ+PrintChkOutId);
+						}
+						
+					}
+					if(BillType == "Consolidate")
+					{
+						if(OutStanding == "0")
+						{
+							ExternalInterface.call("changeDocumentTitle",Str_Settle+PrintChkOutId);
+						}
+						else
+						{
+							ExternalInterface.call("changeDocumentTitle",Str_ExIntSettle+PrintChkOutId);
+						}
+						
+					}
+				}
+				//		
+				
+				
 			}
 			
 			

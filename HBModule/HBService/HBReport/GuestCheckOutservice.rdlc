@@ -535,7 +535,7 @@
           <Paragraph>
             <TextRuns>
               <TextRun>
-                <Value>=Fields!Name.Value</Value>
+                <Value>=Fields!GuestName.Value</Value>
                 <Style />
               </TextRun>
             </TextRuns>

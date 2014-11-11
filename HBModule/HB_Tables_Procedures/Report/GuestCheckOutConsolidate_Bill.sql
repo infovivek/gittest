@@ -90,6 +90,7 @@ DECLARE @CompanyName VARCHAR(100),@Address NVARCHAR(100),@PanCardNo VARCHAR(100)
 	sum(Cs.ChkOutServiceNetAmount) ChkOutServiceNetAmount,sum(cs.ChkOutServiceAmtl) as Amount,	
 	sum(CS.ChkOutServiceNetAmount) as ServiceNetAmt,sum(cs.ChkOutServiceVat) as Vat,
 	@CompanyName as CompanyName,'PAN NO :'+@PanCardNo AS PanCardNo,@LOGO AS logo,
+	CONVERT(nvarchar(100),h.BillFromDate,103) ChkinDT,CONVERT(nvarchar(100),h.BillEndDate,103) as ChkoutDT,
 	'Regd Office : No. 122, Amarjyothi Layout, Domlur, Bangalore - 560071'+'.'+'www.hummingbirdindia.com' as CompanyAddress,
 	'INVOICE : For any invoice clarification revert within 7 days from the date of receipt' as Invoice,
 	'All cheque or demand drafts in payment of bills should be drawn in favor of Hummingbird Travel and stay pvt.ltd.
@@ -117,6 +118,7 @@ DECLARE @CompanyName VARCHAR(100),@Address NVARCHAR(100),@PanCardNo VARCHAR(100)
     sum(CS.ChkOutServiceST) ChkOutServiceST,sum(CS.Cess) CessService,
     sum(CS.HECess) HECess,h.ChkOutTariffExtraAmount ExtraMatress,
     'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),GETDATE(),103) as InVoicedate
+    
 	--CSDD.BillAmount
 	
 	
@@ -143,7 +145,7 @@ DECLARE @CompanyName VARCHAR(100),@Address NVARCHAR(100),@PanCardNo VARCHAR(100)
 	c.CityName,s.StateName,p.Postal,p.Phone,p.Email,	
     H.VATPer,h.RestaurantSTPer ,
     h.BusinessSupportST,h.ChkOutTariffST1 ,H.LuxuryTaxPer,H.ServiceTaxPer,h.ChkOutTariffExtraAmount,
-    h.InVoiceNo,h.NoOfDays
+    h.InVoiceNo,h.NoOfDays,h.BillFromDate,h.BillEndDate
     
     
     

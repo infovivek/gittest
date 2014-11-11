@@ -72,7 +72,7 @@
 			public var ServiceChargeHCess:Number=0;
 			public var ServiceChargeValue:Number=0;
 			public var BTCSId:Number=0;
-			public var PaymentMode:String=""
+			public var PaymentMode:String="",TodayDate:String="",ExpChkoutDT:String="";
 			
 			//	var start:Date=new Date();
 			
@@ -86,9 +86,9 @@
 				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
 				GlobalXml += "</ROOT>";
 				// Rdlc Print
-//				Str_ChkOut="http://localhost:4171/GuestCheckOutTariff.aspx?";
-//				Str_Serv="http://localhost:4171/GuestCheckOutService.aspx?";
-//				Str_Settle="http://localhost:4171/GuestCheckOutConsolidate.aspx?";
+//				Str_ChkOut="http://localhost:6236/GuestCheckOutTariff.aspx?";
+//				Str_Serv="http://localhost:6236/GuestCheckOutService.aspx?";
+//				Str_Settle="http://localhost:6236/GuestCheckOutConsolidate.aspx?";
 //				
 //				Str_InChkTar="http://localhost:4171/IntermediateCheckoutTariff.aspx?";
 //				Str_InChkSer="http://localhost:4171/IntermediateCheckoutService.aspx?";
@@ -151,8 +151,8 @@
 			protected function Help():void
 			{				
 				
-			//	useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId,0]);
-			 	useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65,0]);
+				useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId,0]);
+			// 	useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65,0]);
 				Txt_ServiceBillAmt.editable=false;
 				Txt_ServiceVat.editable=false;
 				Txt_SerivceTax.editable=false;
@@ -274,6 +274,7 @@
 						Txt_CheckInDate.text=Ds_Objects.result.Tables.Table1.Rows[0].CheckInDate;
 						DT_BillFromDate.text=Ds_Objects.result.Tables.Table1.Rows[0].CheckInDate;
 						DT_BillTo.text=Ds_Objects.result.Tables.Table1.Rows[0].ChkoutDate;
+						ExpChkoutDT=Ds_Objects.result.Tables.Table1.Rows[0].ChkoutDate;
 						//lbl_tariff.text=Ds_Objects.result.Tables.Table1.Rows[0].Tariff;
 						dt_ServiceDate.text=Ds_Objects.result.Tables.Table1.Rows[0].CheckInDate;
 				//		Txt_AdditionalCharge.text=Ds_Objects.result.Tables.Table1.Rows[0].Tariff;
@@ -329,6 +330,7 @@
 					if(Ds_Objects.result.Tables.Table2.Rows.length > 0)
 					{
 						Txt_Billdate.text=Ds_Objects.result.Tables.Table2.Rows[0].BillDate;
+						TodayDate = Ds_Objects.result.Tables.Table2.Rows[0].TodayDate;
 					}	
 					if(Ds_Objects.result.Tables.Table3.Rows.length > 0)
 					{
@@ -404,7 +406,7 @@
 					}
 					if(Ds_Objects.result.Tables.Table4.Rows.length > 0)
 					{
-						if(Ds_Objects.result.Tables.Table4.Rows[0].Days > 1 )
+						if(Ds_Objects.result.Tables.Table4.Rows[0].Days > 5 )
 						{
 							if(Checkout.selected=true)
 							{
@@ -439,8 +441,8 @@
 //						Txt_Stay.text=Ds_Objects.result.Tables.Table.Rows[0].Stay;
 //						Txt_Property.text=Ds_Objects.result.Tables.Table.Rows[0].Property;
 						lbl_Nettariff.text=Ds_Objects.result.Tables.Table.Rows[0].Tariff;
-//						DT_CheckOutDate.text=Ds_Objects.result.Tables.Table.Rows[0].ChkoutDate;
-//						Txt_CheckInDate.text=Ds_Objects.result.Tables.Table.Rows[0].CheckInDate;
+						DT_CheckOutDate.text=Ds_Objects.result.Tables.Table.Rows[0].ChkoutDate;
+						Txt_CheckInDate.text=Ds_Objects.result.Tables.Table.Rows[0].CheckInDate;
 //						DT_BillFromDate.text=Ds_Objects.result.Tables.Table.Rows[0].CheckInDate;
 //						DT_BillTo.text=Ds_Objects.result.Tables.Table.Rows[0].ChkoutDate;
 //						//lbl_tariff.text=Ds_Objects.result.Tables.Table1.Rows[0].Tariff;
@@ -3802,6 +3804,7 @@
 			// Settlement Page Clear
 			protected function FnSettleClr():void
 			{
+				TodayDate="";
 				CheckOutHdrId=0;CheckInHdrId=0;StateId=0;
 				Txt_Pname.text="";
 				Txt_address.text="";
@@ -3886,6 +3889,10 @@
 				ClientId=0;
 				CityId=0;
 				ServiceChargeChk=0;
+				Intermediate.enabled=false;
+				Checkout.enabled=true;
+				DT_BillFromDate.enabled=false;
+				DT_BillTo.enabled=false;
 				
 				
 			}
@@ -7204,13 +7211,34 @@
 			public function FnSelect():void
 			{ 
 				// TODO Auto-generated method stub
-				
-				var BillType:String="";
-				var OutStanding:String="";
-				BillType=Grid_Settle.selectedItem.BillType;
-				OutStanding=Grid_Settle.selectedItem.OutStanding;
-				//		
-			
+				if(Checkout.selected==true)
+				{
+					var BillType:String="";
+					var OutStanding:String="";
+					BillType=Grid_Settle.selectedItem.BillType;
+					OutStanding=Grid_Settle.selectedItem.OutStanding;
+					if(BillType == "Tariff")
+					{
+						ExternalInterface.call("changeDocumentTitle",Str_ChkOut+PrintChkOutId);
+					}
+					if(BillType == "Service")
+					{
+						ExternalInterface.call("changeDocumentTitle",Str_Serv+PrintChkOutId);
+					}
+					if(BillType == "Consolidate")
+					{
+						ExternalInterface.call("changeDocumentTitle",Str_Settle+PrintChkOutId);
+					}
+					
+				}
+				else if(Intermediate.selected==true)
+				{
+					var BillType:String="";
+					var OutStanding:String="";
+					BillType=Grid_Settle.selectedItem.BillType;
+					OutStanding=Grid_Settle.selectedItem.OutStanding;
+					//		
+					
 					if(BillType == "Tariff")
 					{
 						if(OutStanding == "0")
@@ -7247,6 +7275,8 @@
 						}
 						
 					}
+				}
+				
 				
 			}
 			
@@ -7570,27 +7600,133 @@
 			
 			protected function Process_clickHandler(event:MouseEvent):void
 			{
+				
 				// TODO Auto-generated method stub
-				var BillFrom:String="";
-				var BillTo:String="";
-				BillFrom=DT_BillFromDate.text;
-				BillTo=DT_BillTo.text;
-				useWeb("CheckoutAndIntermediate","Guest_CUSTOM",[GlobalXml,"CHKINROOMDETAILS","",BillFrom,BillTo,CheckInHdrId,StateId,0,0,ExtraMaters]);
-		//		useWeb("CheckOutServiceHdr","TariffLoad_CUSTOM",[GlobalXml,"ProductLoad",BillFrom,,CheckInHdrId,GuestId,StateId,0,0,0]);
+				
+//				if(Checkout.selected == true)
+//				{
+					var BillFrom:String="";
+					var BillTo:String="";
+					BillFrom=DT_BillFromDate.text;
+					BillTo=DT_BillTo.text;
+					
+					var BillTo=DT_BillTo.text;	
+					//var TodayDate:String=TodayDate;
+					var BillTo:String=DT_BillTo.text;
+					var BillTo1:String=TodayDate;
+					var D:String=BillTo.substr(0,2);
+					var M:String=BillTo.substr(3,2);
+					var Y:String=BillTo.substr(6,10);
+					var D1:String=BillTo1.substr(0,2);
+					var M1:String=BillTo1.substr(3,2);
+					var Y1:String=BillTo1.substr(6,10);
+					var RangeMiddle:String=Y+'/'+M+'/'+D;
+					var RangeEnd:String=Y1+'/'+M1+'/'+String(Number(D1)+1);
+					var RangeStart:String=Y+'/'+M+'/'+D;
+//					var BillTo1 = 
+//						{rangeStart:new Date(RangeStart),rangeEnd:new Date(RangeEnd)};
+//					BillTo1=new Date(RangeEnd);
+					
+					if(RangeStart <= RangeEnd)
+					{
+						useWeb("CheckoutAndIntermediate","Guest_CUSTOM",[GlobalXml,"CHKINROOMDETAILS","",BillFrom,BillTo,CheckInHdrId,StateId,0,0,ExtraMaters]);
+						//		useWeb("CheckOutServiceHdr","TariffLoad_CUSTOM",[GlobalXml,"ProductLoad",BillFrom,,CheckInHdrId,GuestId,StateId,0,0,0]);
+						
+					}
+					else
+					{
+						alignAlert(Alert.show("Can't be Process Future Checkout","Alert Message !",
+							Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+						
+						return;
+						Sctrl.enabled=false;
+						
+					}	
+				//}
+//				else if(Intermediate.selected==true)
+//				{
+//					var BillFrom:String=DT_BillFromDate.text;
+//					//var BillTo:String=DT_BillTo.text;
+//					var BillTo:String=TodayDate;
+//					var D:String=BillFrom.substr(0,2);
+//					var M:String=BillFrom.substr(3,2);
+//					var Y:String=BillFrom.substr(6,10);
+//					var D1:String=BillTo.substr(0,2);
+//					var M1:String=BillTo.substr(3,2);
+//					var Y1:String=BillTo.substr(6,10);
+//					var RangeMiddle:String=Y+'/'+M+'/'+D;
+//					var RangeEnd:String=Y1+'/'+M1+'/'+String(Number(D1)+1);
+//					var RangeStart:String=Y+'/'+M+'/'+D;
+////					DT_BillTo.selectableRange = 
+////						{rangeStart:new Date(RangeStart),rangeEnd:new Date(RangeEnd)};
+////					DT_BillTo.selectedDate=new Date(RangeEnd);
+//					if(RangeStart <= RangeEnd)
+//					{
+//					useWeb("CheckoutAndIntermediate","Guest_CUSTOM",[GlobalXml,"CHKINROOMDETAILS","",BillFrom,BillTo,CheckInHdrId,StateId,0,0,ExtraMaters]);
+						//		useWeb("CheckOutServiceHdr","TariffLoad_CUSTOM",[GlobalXml,"ProductLoad",BillFrom,,CheckInHdrId,GuestId,StateId,0,0,0]);
+						
+//					}
+//				}
+				
 			}
 			
 			protected function Checkout_clickHandler(event:MouseEvent):void
 			{
+				var BillF:String=DT_BillFromDate.text;
+				//var BillTo:String=DT_BillTo.text;
+				var BillTo:String=ExpChkoutDT;
+				var D:String=BillF.substr(0,2);
+				var M:String=BillF.substr(3,2);
+				var Y:String=BillF.substr(6,10);
+				var D1:String=BillTo.substr(0,2);
+				var M1:String=BillTo.substr(3,2);
+				var Y1:String=BillTo.substr(6,10);
+				var RangeMiddle:String=Y+'/'+M+'/'+D;
+				var RangeEnd:String=Y1+'/'+M1+'/'+D1;
+				var RangeStart:String=Y+'/'+M+'/'+D;
+				DT_BillTo.selectableRange = 
+					{rangeStart:new Date(RangeStart),rangeEnd:new Date(RangeEnd)};
+				DT_BillTo.selectedDate=new Date(RangeEnd);
+				
 				// TODO Auto-generated method stub
 				DT_BillFromDate.enabled=false;
 				DT_BillTo.enabled=false;
+				//Sctrl.enabled=false;
+				FnClear();
+				FnServiceClr();
+				bdr_Tariff.enabled=false;
+			//	bdr_Service.enabled=false;
+			//	FnSettleClr();
 			}
 			
 			protected function Intermediate_clickHandler(event:MouseEvent):void
 			{
+				var BillF:String=DT_BillFromDate.text;
+				//var BillTo:String=DT_BillTo.text;
+				var BillTo:String=TodayDate;
+				var D:String=BillF.substr(0,2);
+				var M:String=BillF.substr(3,2);
+				var Y:String=BillF.substr(6,10);
+				var D1:String=BillTo.substr(0,2);
+				var M1:String=BillTo.substr(3,2);
+				var Y1:String=BillTo.substr(6,10);
+				var RangeMiddle:String=Y+'/'+M+'/'+D;
+				var RangeEnd:String=Y1+'/'+M1+'/'+String(Number(D1)+1);
+				var RangeStart:String=Y+'/'+M+'/'+D;
+				DT_BillTo.selectableRange = 
+					{rangeStart:new Date(RangeStart),rangeEnd:new Date(RangeEnd)};
+				DT_BillTo.selectedDate=new Date(RangeEnd);
+				
 				// TODO Auto-generated method stub
 				DT_BillFromDate.enabled=true;
 				DT_BillTo.enabled=true;
+				
+				//Sctrl.enabled=false;
+				FnClear();
+				FnServiceClr();
+				bdr_Tariff.enabled=false;
+			//	bdr_Service.enabled=false;
+				//FnSettleClr();
 			}
 			
 			protected function ProcessClear_clickHandler(event:MouseEvent):void

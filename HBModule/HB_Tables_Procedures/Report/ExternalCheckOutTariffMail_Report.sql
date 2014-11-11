@@ -48,27 +48,32 @@ IF @Action='PageLoad'
 	WHERE H.Id=@ClientId
 	
 	
-	select h.GuestName as GuestName,h.Name,h.Stay,h.Type,d.Type as BookingLevel,convert(nvarchar(100),CONVERT(DATE,h.CheckOutDate,103),110) as BillDate,  
+	select distinct h.GuestName as GuestName,h.Name,h.Stay,h.Type,d.Type as BookingLevel,
+	'Check Out :'+convert(nvarchar(100),CONVERT(nvarchar(100),h.CheckOutDate,103),110) as BillDate,  
 	 h.ClientName,h.CheckOutNo,T.TACInvoiceNo InVoiceNo,  
 	 T.Rate as Tariff,T.MarkUpAmount as TotalTariff,round(T.TACAmount,0) as NetAmount,  
 	 T.TotalBusinessSupportST as SerivceTax,T.ChkOutTariffCess as Cess,T.NoOfDays,  
 	 t.ChkOutTariffHECess as HCess,
-	 convert(nvarchar(100),h.CheckInDate,103) as ArrivalDate,  
-	 (p.PropertyName+','+p.Propertaddress) as Propertyaddress,(c.CityName+','+  
-	 s.StateName+','+p.Postal) as Propcity,c.CityName,s.StateName,p.Postal,  
-	 p.Phone,p.Email,p.PropertyName,
+	 'Check In :'+convert(nvarchar(100),h.CheckInDate,103) as ArrivalDate,  
+	 (p.Propertaddress) as Propertyaddress,(c.CityName+','+  
+	 s.StateName+','+p.Postal) as Propcity,c.CityName as City,s.StateName as State,p.Postal,  
+	 p.Phone as Phone,p.Email,p.PropertyName,
 	 @CompanyName as CompanyName,@LOGO AS logo,  
-	 'Regd Office : No. 122, Amarjyothi Layout, Domlur, Bangalore - 560071'+'.'+'www.hummingbirdindia.com'  AS CompanyAddress,
+	 'Humming Bird Travel & Stay Pvt lt. No 122, Amarjyothi Layout, Domlur Bangalore - 560071. CIN No - U72900KA2005PTC035942'  AS CompanyAddress,
 	 @ClientAddress as Address,  
-	 'INVOICE : For any invoice clarification revert within 7 days from the date of receipt' as Invoice,  
-	 'All cheque or demand drafts in payment of bills should be drawn in favor of Hummingbird Travel and stay pvt.ltd.  
-	 and should be crossed A/C PAYEE ONLY.' as Cheque,'PAN NO :'+@PanCardNo+'   |   '+'TIN : 29340489869'+'   |   '+'L Tax No : L00100571'+'  |  '
+	 'Guest Name :'+d.ChkInGuest as Product,
+	 
+	 'Rupees : '+dbo.fn_NtoWord(ROUND(T.TACAmount,0),'','') Invoice,  
+	 'Email Id - info@hummingbirdindia.com   -  Ph No - 080-42840420' as Cheque,'PAN NO :'+@PanCardNo+'   |   '+'TIN : 29340489869'+'   |   '+'L Tax No : L00100571'+'  |  '
 	 +'CIN No: U72900KA2005PTC035942' as TaxNo,  
 	 'LATE PAYMENT : Interest @18% per annum will be charged on all outstanding bill after due date.' as Latepay ,  
 	 'TIN : 29340489869' as Tin,'Taxable Category : Accommodation Service,Business Support Services and Restaurant Services' as Taxablename,  
-	 'Service Tax Regn. No : AABCH5874RST001' as ServiceTaxNo,'Luxury Tax @ '+CAST(H.LuxuryTaxPer AS NVARCHAR)+'%' LTPer,
+	 'AABCH5874RST001' as ServiceTaxNo,'Luxury Tax @ '+CAST(H.LuxuryTaxPer AS NVARCHAR)+'%' LTPer,
 	 'Service Tax @ '+CAST(H.ServiceTaxPer AS NVARCHAR)+'%' STPer,
-	 'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),CONVERT(DATE,GETDATE(),103),110) as InVoicedate
+	 'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),CONVERT(nvarchar(100),GETDATE(),103),110) as InVoicedate,
+	 'Rupees : '+dbo.fn_NtoWord(ROUND(T.TACAmount,0),'','') AS Invoice,'HDFC BANK' as Bank,'17552560000226' as AccountNo,
+	 'HDFC0001755' as IFSCCode,@PanCardNo as PanCardNo,
+	 'Business Support Service' as Category,p.Localityarea as Location
 	   
 	 from WRBHBChechkOutHdr h  
 	 join WRBHBExternalChechkOutTAC T on h.Id = T.ChkOutHdrId
@@ -76,9 +81,11 @@ IF @Action='PageLoad'
 	 join WRBHBProperty p on d.PropertyId = p.Id 
 	 join WRBHBState s on s.Id=p.StateId
 	 join WRBHBCity c on c.Id=p.CityId 
+--	 join WRBHBLocality L on L.CityId = c.Id
 	 join WRBHBBooking b on b.Id = d.BookingId 	   
 	 where h.IsActive = 1 and h.IsDeleted = 0 
 	 and   
 	 T.Id = @Id1  
+	 
 END
 END

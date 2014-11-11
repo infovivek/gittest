@@ -407,7 +407,8 @@ If @BookingLevel = 'Apartment'
     
     
  --BillDate   
-		SELECT CONVERT(NVARCHAR(103),@ChkOutDate,103) as BillDate 
+		SELECT CONVERT(NVARCHAR(103),@ChkOutDate,103) as BillDate ,convert(nvarchar(100),GETDATE(),103) as TodayDate
+		
 		
 		DECLARE @TariffPaymentMode nvarchar(100),@ServicePaymentMode nvarchar(100);  
 		set @TariffPaymentMode =( SELECT TOP 1 TariffPaymentMode FROM #LEVEL)   
@@ -438,8 +439,57 @@ BEGIN
  
 IF(ISNULL(@CID,0)=0)  
 BEGIN  
+-- this is chkin and chkout date to check directly from booking table
+		CREATE TABLE #LEVEL1(ChkInDate NVARCHAR(100),ChkOutDate NVARCHAR(100),Id BIGINT,
+		TariffPaymentMode NVARCHAR(100),ServicePaymentMode NVARCHAR(100))  
+		--DECLARE @BookingId BIGINT,@GuestId BIGINT,@BookingLevel nvarchar(100),@CheckInTime NVARCHAR(100),
+		--@NewCheckInDate NVARCHAR(100),@NewCheckInTimeType NVARCHAR(100);  
+		set @BookingId=(select BookingId from WRBHBCheckInHdr where Id = @CheckInHdrId and IsActive =1 and IsDeleted =0)  
+		set @GuestId=(select GuestId from WRBHBCheckInHdr where Id = @CheckInHdrId and IsActive =1 and IsDeleted =0)  
+		set @BookingLevel=(select Type from WRBHBCheckInHdr where Id = @CheckInHdrId and IsActive =1 and IsDeleted =0)  
+ --select @BookingId,@GuestId,@BookingLevel
+If @BookingLevel = 'Room'   
+	BEGIN  
+		INSERT INTO #LEVEL1(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode)  
+		
+		select top 1 CONVERT(nvarchar(100),(ChkInDt),103),CONVERT(nvarchar(100),(ChkOutDt),103) , 
+		TariffPaymentMode,ServicePaymentMode  
+		from WRBHBBookingPropertyAssingedGuest  
+		where GuestId = @GuestId and BookingId = @BookingId 
+		--group by TariffPaymentMode,ServicePaymentMode  ,ChkInDt,ChkOutDt
+		order by Id desc
+		--and IsDeleted=0 and IsActive=1 
+		
+	END  
+If @BookingLevel = 'Bed'  
+	BEGIN  
+		INSERT INTO #LEVEL1(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode )  
+		
+		select CONVERT(nvarchar(100),(ChkInDt),103),CONVERT(nvarchar(100),(ChkOutDt),103),
+		TariffPaymentMode,ServicePaymentMode     
+		from WRBHBBedBookingPropertyAssingedGuest  
+		where GuestId = @GuestId and BookingId = @BookingId  
+		order by Id desc
+	END   
+If @BookingLevel = 'Apartment'  
+	BEGIN  
+		INSERT INTO #LEVEL1(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode  )  
+		select CONVERT(nvarchar(100),(ChkInDt),103),CONVERT(nvarchar(100),(ChkOutDt),103)  ,
+		TariffPaymentMode,ServicePaymentMode   
+		from WRBHBApartmentBookingPropertyAssingedGuest  
+		where GuestId = @GuestId and BookingId = @BookingId 
+		order by Id desc
+		--group by TariffPaymentMode,ServicePaymentMode  
+		--and IsDeleted=0 and IsActive=1  
+	END   
+		DECLARE @ChkInDate1 nvarchar(100),@ChkOutDate1 nvarchar(100);  
+		set @ChkInDate1 =( SELECT TOP 1 ChkInDate FROM #LEVEL1)   
+		set @ChkOutDate1 =( SELECT TOP 1 ChkOutDate FROM #LEVEL1) 
+	--select @ChkInDate1,@ChkOutDate1
+	
+-- this is chkin and chkout date after comes selected bill date
 
-	CREATE TABLE #LEVEL1(ChkInDate NVARCHAR(100),ChkOutDate NVARCHAR(100),Id BIGINT)  
+	CREATE TABLE #LEVEL2(ChkInDate NVARCHAR(100),ChkOutDate NVARCHAR(100),Id BIGINT)  
 		--DECLARE @BookingId BIGINT,@GuestId BIGINT,@BookingLevel nvarchar(100),@CheckInTime NVARCHAR(100),
 		--@NewCheckInDate NVARCHAR(100),@NewCheckInTimeType NVARCHAR(100);  
 		set @BookingId=(select BookingId from WRBHBCheckInHdr where Id = @CheckInHdrId and IsActive =1 and IsDeleted =0)  
@@ -448,7 +498,7 @@ BEGIN
  --select @BookingId,@GuestId,@BookingLevel
 	If @BookingLevel = 'Room'  
 	BEGIN 
-		INSERT INTO #LEVEL1(ChkInDate,ChkOutDate) 
+		INSERT INTO #LEVEL2(ChkInDate,ChkOutDate) 
 		--select S@BillFrom,@BillTo 
 		select @BillFrom,@BillTo-- CONVERT(nvarchar(100),min(ChkInDt),103),CONVERT(nvarchar(100),max(ChkOutDt),103)  
 		from WRBHBBookingPropertyAssingedGuest  
@@ -457,7 +507,7 @@ BEGIN
 	END  
 	If @BookingLevel = 'Bed'  
 	BEGIN  
-		INSERT INTO #LEVEL1(ChkInDate,ChkOutDate)  
+		INSERT INTO #LEVEL2(ChkInDate,ChkOutDate)  
 		select @BillFrom,@BillTo
 		--select CONVERT(nvarchar(100),min(ChkInDt),103),CONVERT(nvarchar(100),max(ChkOutDt),103)   
 		from WRBHBBedBookingPropertyAssingedGuest  
@@ -466,7 +516,7 @@ BEGIN
 	END   
 	If @BookingLevel = 'Apartment'  
 	BEGIN  
-		INSERT INTO #LEVEL1(ChkInDate,ChkOutDate)  
+		INSERT INTO #LEVEL2(ChkInDate,ChkOutDate)  
 		select @BillFrom,@BillTo
 		--select CONVERT(nvarchar(100),min(ChkInDt),103),CONVERT(nvarchar(100),max(ChkOutDt),103)   
 		from WRBHBApartmentBookingPropertyAssingedGuest  
@@ -474,8 +524,8 @@ BEGIN
 		--and IsDeleted=0 and IsActive=1  
 	END   
 	--	DECLARE @ChkInDate nvarchar(100),@ChkOutDate nvarchar(100);  
-		set @ChkInDate =( SELECT TOP 1 ChkInDate FROM #LEVEL1)   
-		set @ChkOutDate =( SELECT TOP 1 ChkOutDate FROM #LEVEL1)  
+		set @ChkInDate =( SELECT TOP 1 ChkInDate FROM #LEVEL2)   
+		set @ChkOutDate =( SELECT TOP 1 ChkOutDate FROM #LEVEL2)  
 		
 		
    
@@ -499,14 +549,14 @@ BEGIN
 		SELECT @NewCheckInDate=@ChkInDate
 	end
 		SELECT Property,  
-		CONVERT(nvarchar(100),@NewCheckInDate,103)+' To '+CONVERT(nvarchar(100),@ChkOutDate,103) as Stay,Tariff,  
-		CONVERT(nvarchar(100),@ChkOutDate,103) as ChkoutDate,CONVERT(nvarchar(100),@NewCheckInDate,103) as CheckInDate  
+		CONVERT(nvarchar(100),@NewCheckInDate,103)+' To '+CONVERT(nvarchar(100),@ChkOutDate1,103) as Stay,Tariff,  
+		CONVERT(nvarchar(100),@ChkOutDate1,103) as ChkoutDate,CONVERT(nvarchar(100),@NewCheckInDate,103) as CheckInDate  
 		FROM WRBHBCheckInHdr  
 		WHERE IsActive = 1 and IsDeleted = 0 and Id =@CheckInHdrId;  
     
     
  --BillDate   
-		SELECT CONVERT(varchar(103),@ChkOutDate,103) as BillDate  
+		SELECT CONVERT(varchar(103),@ChkOutDate,103) as BillDate  ,convert(nvarchar(100),GETDATE(),103) as TodayDate
     
  ----AdditionalDays  
  -- --BillTime  
@@ -1242,7 +1292,7 @@ BEGIN
 		and Flag=0  
 
 		--BillDate   
-		SELECT CONVERT(VARCHAR(103),CheckOutDate ,103) AS BillDate   
+		SELECT CONVERT(VARCHAR(103),CheckOutDate ,103) AS BillDate   ,convert(nvarchar(100),GETDATE(),103) as TodayDate
 		FROM WRBHBChechkOutHdr  WHERE   Id=@CID --and IsActive=1 and IsDeleted=0
 		 and Flag=0  
 
