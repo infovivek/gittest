@@ -1,14 +1,9 @@
 
+GO
+/****** Object:  StoredProcedure [dbo].[SP_ExterInterCheckOutTAC_Insert]    Script Date: 11/12/2014 16:06:18 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
-GO
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-IF EXISTS (SELECT * FROM DBO.SYSOBJECTS WHERE ID = OBJECT_ID(N'[dbo].[SP_ExterInterCheckOutTAC_Insert]') AND OBJECTPROPERTY(ID, N'ISPROCEDURE') = 1)
-DROP PROCEDURE [dbo].[SP_ExterInterCheckOutTAC_Insert]
 GO
 /*=============================================
 Author Name  : shameem
@@ -23,7 +18,7 @@ Name			Date			Signature			Description of Changes
 
 *******************************************************************************************************
 -- =============================================*/
-CREATE PROCEDURE [dbo].[SP_ExterInterCheckOutTAC_Insert](@ChkOutHdrId int,
+ALTER PROCEDURE [dbo].[SP_ExterInterCheckOutTAC_Insert](@ChkOutHdrId int,
 @TACInvoiceNo NVARCHAR(100),@TACInvoiceFile nvarchar(max),@GuestName NVARCHAR(100),
 @BillDate NVARCHAR(100),@ClientName NVARCHAR(100),
 @Property NVARCHAR(100),@ChkOutTariffTotal DECIMAL(27,2),
@@ -50,7 +45,7 @@ BEGIN
 	SELECT TOP 1 @TACInvoiceNo='EXT/'+
 	CAST(CAST(SUBSTRING(TACInvoiceNo,5,LEN(TACInvoiceNo)) AS INT) + 1 AS VARCHAR)
 	FROM WRBHBExternalChechkOutTAC 
-	where PropertyType ='External Property'  and TACInvoiceNo!=''
+	where PropertyType ='External Property'  and TACInvoiceNo!='' and TACInvoiceNo!='0'
 	ORDER BY Id DESC;
 	END
 	ELSE
@@ -115,7 +110,7 @@ BEGIN
 		GETDATE(),1,0,NEWID(),@NoOfDays,
 		@RoomId,@PropertyId,@GuestId,@BookingId,@StateId,@Direct ,
 		@PropertyType,@Status,@CheckInDate,@CheckOutDate,@MarkUpAmount,@BusinessSupportST,@Rate,
-		@TotalBusinessSupportST,@TACAmount,'Paid','1',@BillFromDate,@BillEndDate,@Intermediate,1)
+		@TotalBusinessSupportST,@TACAmount,'Paid','1',@BillFromDate,@BillEndDate,@Intermediate,0)
 
 		SET @InsId=@@IDENTITY;
 		SELECT  Id ,RowId ,DATENAME(WEEKDAY, GETDATE())+','+CONVERT(VARCHAR(12), GETDATE(), 107),

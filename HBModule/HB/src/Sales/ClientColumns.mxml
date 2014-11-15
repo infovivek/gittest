@@ -102,6 +102,16 @@
 						Chk_Col8.selected = Ds_Objects.result.Tables.Table.Rows[0].Column8Mandatory;
 						Chk_Col9.selected = Ds_Objects.result.Tables.Table.Rows[0].Column9Mandatory;
 						Chk_Col10.selected = Ds_Objects.result.Tables.Table.Rows[0].Column10Mandatory;
+						Chk_UpdateCol1.selected = Ds_Objects.result.Tables.Table.Rows[0].UpdateChkColumn1;
+						Chk_UpdateCol2.selected = Ds_Objects.result.Tables.Table.Rows[0].UpdateChkColumn2;
+						Chk_UpdateCol3.selected = Ds_Objects.result.Tables.Table.Rows[0].UpdateChkColumn3;
+						Chk_UpdateCol4.selected = Ds_Objects.result.Tables.Table.Rows[0].UpdateChkColumn4;
+						Chk_UpdateCol5.selected = Ds_Objects.result.Tables.Table.Rows[0].UpdateChkColumn5;
+						Chk_UpdateCol6.selected = Ds_Objects.result.Tables.Table.Rows[0].UpdateChkColumn6;
+						Chk_UpdateCol7.selected = Ds_Objects.result.Tables.Table.Rows[0].UpdateChkColumn7;
+						Chk_UpdateCol8.selected = Ds_Objects.result.Tables.Table.Rows[0].UpdateChkColumn8;
+						Chk_UpdateCol9.selected = Ds_Objects.result.Tables.Table.Rows[0].UpdateChkColumn9;
+						Chk_UpdateCol10.selected = Ds_Objects.result.Tables.Table.Rows[0].UpdateChkColumn10;
 					}
 					else
 					{
@@ -112,6 +122,10 @@
 						Chk_Col4.selected = false;Chk_Col5.selected = false;Chk_Col6.selected = false;
 						Chk_Col7.selected = false;Chk_Col8.selected = false;Chk_Col9.selected = false;
 						Chk_Col10.selected = false;
+						Chk_UpdateCol1.selected = false;Chk_UpdateCol2.selected = false;Chk_UpdateCol3.selected = false;
+						Chk_UpdateCol4.selected = false;Chk_UpdateCol5.selected = false;Chk_UpdateCol6.selected = false;
+						Chk_UpdateCol7.selected = false;Chk_UpdateCol8.selected = false;Chk_UpdateCol9.selected = false;
+						Chk_UpdateCol10.selected = false;
 					}
 				}
 			}
@@ -257,7 +271,12 @@
 						   Column3Mandatory:Chk_Col3.selected,Column4Mandatory:Chk_Col4.selected,
 						   Column5Mandatory:Chk_Col5.selected,Column6Mandatory:Chk_Col6.selected,
 						   Column7Mandatory:Chk_Col7.selected,Column8Mandatory:Chk_Col8.selected,
-						   Column9Mandatory:Chk_Col9.selected,Column10Mandatory:Chk_Col10.selected
+						   Column9Mandatory:Chk_Col9.selected,Column10Mandatory:Chk_Col10.selected,
+						   Column1Update:Chk_UpdateCol1.selected,Column2Update:Chk_UpdateCol2.selected,
+						   Column3Update:Chk_UpdateCol3.selected,Column4Update:Chk_UpdateCol4.selected,
+						   Column5Update:Chk_UpdateCol5.selected,Column6Update:Chk_UpdateCol6.selected,
+						   Column7Update:Chk_UpdateCol7.selected,Column8Update:Chk_UpdateCol8.selected,
+						   Column9Update:Chk_UpdateCol9.selected,Column10Update:Chk_UpdateCol10.selected
 						}]);
 					var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
 					useWeb("ClientColumn","Save_CUSTOM",[GlobalXml,HdrXml]);
@@ -272,7 +291,12 @@
 				Chk_Col1.selected = false;Chk_Col2.selected = false;Chk_Col3.selected = false;
 				Chk_Col4.selected = false;Chk_Col5.selected = false;Chk_Col6.selected = false;
 				Chk_Col7.selected = false;Chk_Col8.selected = false;Chk_Col9.selected = false;
-				Chk_Col10.selected = false;Help();
+				Chk_Col10.selected = false;
+				Chk_UpdateCol1.selected = false;Chk_UpdateCol2.selected = false;Chk_UpdateCol3.selected = false;
+				Chk_UpdateCol4.selected = false;Chk_UpdateCol5.selected = false;Chk_UpdateCol6.selected = false;
+				Chk_UpdateCol7.selected = false;Chk_UpdateCol8.selected = false;Chk_UpdateCol9.selected = false;
+				Chk_UpdateCol10.selected = false;
+				Help();
 			}
 			public function fnGetClient():void
 			{
@@ -294,51 +318,62 @@
 	<s:HGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
 		<s:BorderContainer x="0" y="0" width="900" height="515" backgroundColor="#ffffff"
 						   borderVisible="false">
-			<s:Label x="274" y="26.5" text="Client"/>
-			<s:Label x="321" y="30.5" text="*" color="Red"/>
-			<WrbHelpComp:HelpText x="339" y="22.5" width="300" pxTabIndex="1" depth="10" 
+			<s:Label x="214" y="26.5" text="Client"/>
+			<s:Label x="261" y="30.5" text="*" color="Red"/>
+			<WrbHelpComp:HelpText x="279" y="22.5" width="382" pxTabIndex="1" depth="10" 
 								  pxSetPrompt="Select Client" id="Hlp_Client" 
-								  pxSetColumnsWidth="298,0" onselection="{fnGetClient()}">
+								  pxSetColumnsWidth="380,0" onselection="{fnGetClient()}">
 			</WrbHelpComp:HelpText>
-			<s:Label x="409" y="67" text="Field Name"/>
-			<s:Label x="582" y="67" text="Mandatory"/>
-			<s:TextInput id="Txt_Col1" x="339" y="93" width="205" height="20" maxChars="25"
+			<s:Label x="349" y="67" text="Field Name"/>
+			<s:Label x="522" y="67" text="Mandatory"/>
+			<s:TextInput id="Txt_Col1" x="279" y="93" width="205" height="20" maxChars="25"
 						 tabIndex="2" prompt="Field Name 1"/>
-			<s:TextInput id="Txt_COl2" x="339" y="130" width="205" height="20" maxChars="25"
-						 tabIndex="4" prompt="Field Name 2"/>
-			<s:TextInput id="Txt_COl3" x="339" y="167" width="205" height="20" maxChars="25"
-						 tabIndex="6" prompt="Field Name 3"/>
-			<s:TextInput id="Txt_COl4" x="339" y="203" width="205" height="20" maxChars="25"
-						 tabIndex="8" prompt="Field Name 4"/>
-			<s:TextInput id="Txt_COl5" x="339" y="240" width="205" height="20" maxChars="25"
-						 tabIndex="10" prompt="Field Name 5"/>
-			<s:TextInput id="Txt_COl6" x="339" y="277" width="205" height="20" maxChars="25"
-						 tabIndex="12" prompt="Field Name 6"/>
-			<s:TextInput id="Txt_COl7" x="339" y="314" width="205" height="20" maxChars="25"
-						 tabIndex="14" prompt="Field Name 7"/>
-			<s:TextInput id="Txt_COl8" x="339" y="351" width="205" height="20" maxChars="25"
-						 tabIndex="16" prompt="Field Name 8"/>
-			<s:TextInput id="Txt_COl9" x="339" y="388" width="205" height="20" maxChars="25"
-						 tabIndex="18" prompt="Field Name 9"/>
-			<s:TextInput id="Txt_COl10" x="339" y="424" width="205" height="20" maxChars="25"
-						 tabIndex="20" prompt="Field Name 10"/>
-			<s:HGroup x="339" y="470" width="300" height="32" horizontalAlign="center" verticalAlign="middle"
+			<s:TextInput id="Txt_COl2" x="279" y="130" width="205" height="20" maxChars="25"
+						 tabIndex="5" prompt="Field Name 2"/>
+			<s:TextInput id="Txt_COl3" x="279" y="167" width="205" height="20" maxChars="25"
+						 tabIndex="8" prompt="Field Name 3"/>
+			<s:TextInput id="Txt_COl4" x="279" y="203" width="205" height="20" maxChars="25"
+						 tabIndex="11" prompt="Field Name 4"/>
+			<s:TextInput id="Txt_COl5" x="279" y="240" width="205" height="20" maxChars="25"
+						 tabIndex="14" prompt="Field Name 5"/>
+			<s:TextInput id="Txt_COl6" x="279" y="277" width="205" height="20" maxChars="25"
+						 tabIndex="17" prompt="Field Name 6"/>
+			<s:TextInput id="Txt_COl7" x="279" y="314" width="205" height="20" maxChars="25"
+						 tabIndex="20" prompt="Field Name 7"/>
+			<s:TextInput id="Txt_COl8" x="279" y="351" width="205" height="20" maxChars="25"
+						 tabIndex="23" prompt="Field Name 8"/>
+			<s:TextInput id="Txt_COl9" x="279" y="388" width="205" height="20" maxChars="25"
+						 tabIndex="26" prompt="Field Name 9"/>
+			<s:TextInput id="Txt_COl10" x="279" y="424" width="205" height="20" maxChars="25"
+						 tabIndex="29" prompt="Field Name 10"/>
+			<s:HGroup x="279" y="470" width="382" height="32" horizontalAlign="center" verticalAlign="middle"
 					  gap="25">
 				<WrbComp:Button_HB _Label="Save" click="FnSave()">
 				</WrbComp:Button_HB>
 				<WrbComp:Button_HB _Label="Clear" click="FnClear()">
 				</WrbComp:Button_HB>
 			</s:HGroup>
-			<s:CheckBox x="601.5" y="94" id="Chk_Col1" tabIndex="3"/>
-			<s:CheckBox x="601.5" y="131" id="Chk_Col2" tabIndex="5"/>
-			<s:CheckBox x="601.5" y="168" id="Chk_Col3" tabIndex="7"/>
-			<s:CheckBox x="601.5" y="204" id="Chk_Col4" tabIndex="9"/>
-			<s:CheckBox x="601.5" y="241" id="Chk_Col5" tabIndex="11"/>
-			<s:CheckBox x="601.5" y="278" id="Chk_Col6" tabIndex="13"/>
-			<s:CheckBox x="601.5" y="315" id="Chk_Col7" tabIndex="15"/>
-			<s:CheckBox x="601.5" y="352" id="Chk_Col8" tabIndex="17"/>
-			<s:CheckBox x="601.5" y="389" id="Chk_Col9" tabIndex="19"/>
-			<s:CheckBox x="601.5" y="425" id="Chk_Col10" tabIndex="21"/>
+			<s:CheckBox x="541.5" y="94" id="Chk_Col1" tabIndex="3"/>
+			<s:CheckBox x="541.5" y="131" id="Chk_Col2" tabIndex="6"/>
+			<s:CheckBox x="541.5" y="168" id="Chk_Col3" tabIndex="9"/>
+			<s:CheckBox x="541.5" y="204" id="Chk_Col4" tabIndex="12"/>
+			<s:CheckBox x="541.5" y="241" id="Chk_Col5" tabIndex="15"/>
+			<s:CheckBox x="541.5" y="278" id="Chk_Col6" tabIndex="18"/>
+			<s:CheckBox x="541.5" y="315" id="Chk_Col7" tabIndex="21"/>
+			<s:CheckBox x="541.5" y="352" id="Chk_Col8" tabIndex="24"/>
+			<s:CheckBox x="541.5" y="389" id="Chk_Col9" tabIndex="27"/>
+			<s:CheckBox x="541.5" y="425" id="Chk_Col10" tabIndex="30"/>
+			<s:Label x="620" y="67" text="Update"/>
+			<s:CheckBox x="631.5" y="94" id="Chk_UpdateCol1" tabIndex="4"/>
+			<s:CheckBox x="631.5" y="131" id="Chk_UpdateCol2" tabIndex="7"/>
+			<s:CheckBox x="631.5" y="168" id="Chk_UpdateCol3" tabIndex="10"/>
+			<s:CheckBox x="631.5" y="204" id="Chk_UpdateCol4" tabIndex="13"/>
+			<s:CheckBox x="631.5" y="241" id="Chk_UpdateCol5" tabIndex="16"/>
+			<s:CheckBox x="631.5" y="278" id="Chk_UpdateCol6" tabIndex="19"/>
+			<s:CheckBox x="631.5" y="315" id="Chk_UpdateCol7" tabIndex="22"/>
+			<s:CheckBox x="631.5" y="352" id="Chk_UpdateCol8" tabIndex="25"/>
+			<s:CheckBox x="631.5" y="389" id="Chk_UpdateCol9" tabIndex="28"/>
+			<s:CheckBox x="631.5" y="425" id="Chk_UpdateCol10" tabIndex="31"/>
 		</s:BorderContainer>
 	</s:HGroup>
 </s:Application>

@@ -31,7 +31,6 @@ namespace HB.Dao
             DSBooking = new WrbErpConnection().ExecuteDataSet(command, UserData);
             if (DSBooking.Tables[4].Rows[0][0].ToString() == "RmdPty")
             {
-                //SmtpMail Mail = new SmtpMail("TryIt");
                 System.Net.Mail.MailMessage message = new System.Net.Mail.MailMessage();
                 //DSBooking.Tables[1].Rows[0][4].ToString()
                 if (DSBooking.Tables[8].Rows.Count > 0)
@@ -43,7 +42,7 @@ namespace HB.Dao
                     message.From = new System.Net.Mail.MailAddress("stay@staysimplyfied.com", "", System.Text.Encoding.UTF8);
                 }
                 //message.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
-                //message.Subject = "Recommended Hotel List -" + DSBooking.Tables[1].Rows[0][2].ToString();
+                //message.Subject = " Test Recommended Hotel List TID -" + DSBooking.Tables[1].Rows[0][2].ToString();
                 message.To.Add(new System.Net.Mail.MailAddress("booking_confirmation@staysimplyfied.com"));
                 if (DSBooking.Tables[2].Rows[0][0].ToString() == "0")
                 {
@@ -203,12 +202,12 @@ namespace HB.Dao
                 string GridBody =
                     " <table cellpadding=\"0\" cellspacing=\"0\" width=\"600\" border=\"0\" align=\"center\">" +
                     " <tr style=\"font-size:11px; font-weight:normal;\">" +
-                    " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Property</p></th>" +
+                    " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Property &darr;</p></th>" +
                     " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Location</p></th>" +
                     " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Room Type</p></th>" +
                     " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Single Tariff</p></th>" +
                      " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Double Tariff</p></th>" +
-                    " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #fff;\"><p>Inclusions</p></th>" +
+                    " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Inclusions</p></th>" +
                     " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #fff;\"><p>Check In Policy</p></th>" +
                     "</tr>";
                 for (int j = 0; j < DSBooking.Tables[0].Rows.Count; j++)
@@ -220,21 +219,23 @@ namespace HB.Dao
                         " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">" + DSBooking.Tables[0].Rows[j][3].ToString() + "</p></td>" +
                         " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">" + DSBooking.Tables[0].Rows[j][4].ToString() + "</p></td>" +
                         " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">" + DSBooking.Tables[0].Rows[j][7].ToString() + "</p></td>" +
-                        " <th style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #fff;\"><p style=\"text-align:center;\">" + DSBooking.Tables[0].Rows[j][5].ToString() + "</p></th>" +
-                        " <th style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #fff;\"><p style=\"text-align:center;\">" + DSBooking.Tables[0].Rows[j][8].ToString() + "</p></th>" +
+                        " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">" + DSBooking.Tables[0].Rows[j][5].ToString() + "</p></td>" +
+                        " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #fff;\"><p style=\"text-align:center;\">" + DSBooking.Tables[0].Rows[j][8].ToString() + "</p></td>" +
                         "</tr>";
                 }
                 GridBody += "</table>";
                 GridBody +=
+                    "<p style=\"margin-top:10px; margin-left:5px; font-size:11px;\">" +
+                    "<span style=\"color:#f54d02; font-weight:bold; font-size:11px;\">Tax </span><ul><li>  &#9733;   - Taxes as applicable</li><li> #   - Net Tariff</li></ul></p>" +
                     " <table cellpadding=\"0\" cellspacing=\"0\" width=\"600\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
                     " <tr style=\"font-size:11px; background-color:#eee;\">" +
                     " <td width=\"600\" style=\"padding:12px 5px;\">" +
+                    " <p style=\"margin-top:0px;\"><b>Conditions : </b> <ul><li>All rates quoted are subject to availability and duration of Stay.</li><li>All Tariff quoted are limited and subject to availability and has to be confirmed in 30 mins from the time when these tariff's are generated " + DSBooking.Tables[4].Rows[0][1].ToString() + ".</li><li>While every effort has been made to ensure the accuracy and availablity of all information.</li></ul></p>" +
                     " <p style=\"margin-top:0px;\"><b>Cancellation Policy : </b> <ul><li> Cancellation of booking to be confirmed through Email.</li> " +
                     "<li>Mail to be sent to stay@staysimplyfied.com and mention the booking ID no.</li>" +
                     "<li>100% refund will be made if cancellation request is sent 48 (forty eight) hours prior to the check-in date and NIL amount will be refunded if cancellation request sent beyond 48 (forty eight) hours to check-in date.</li> " +
                     "<li>1 day tariff will be charged for No-show without intimation.</li></ul>" +
                     " <p style=\"margin-top:20px;\"><b>Note : </b>" + DSBooking.Tables[1].Rows[0][5].ToString() + "<br>" +
-                    " <p style=\"margin-top:20px;\"><b>Tax :</b> Taxes as applicable<br>" +
                     " <p style=\"margin-top:20px;\">Kindly confirm the property at the earliest as rooms are subject to availability.<br>" +
                     " <br /> Thanking You,<br />" +
                     " </p><p style=\"margin-top:5px;\">" +
@@ -260,7 +261,7 @@ namespace HB.Dao
                 message.IsBodyHtml = true;
                 // SMTP Email email:
                 System.Net.Mail.SmtpClient smtp = new System.Net.Mail.SmtpClient();
-                smtp.EnableSsl = true;                
+                smtp.EnableSsl = true;
                 smtp.Port = 587;
                 smtp.Host = "email-smtp.us-west-2.amazonaws.com"; smtp.Credentials = new System.Net.NetworkCredential("AKIAIIVF5D5D3CJAX7SQ", "ApmuZkd+L8tissEga8kac3quhhwohEi5CB+dYD36KTq3");
                 //smtp.Host = "smtp.gmail.com"; smtp.Credentials = new System.Net.NetworkCredential("stay@staysimplyfied.com", "stay1234");

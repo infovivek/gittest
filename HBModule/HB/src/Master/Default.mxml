@@ -196,8 +196,8 @@
 								{
 									dd_Roles.dataProvider=Ds_Objects.result.Tables.Table3.Rows as ArrayCollection
 									dd_Roles.selectedIndex=0;
-									dd_Roles.visible=true;
-									lbl_Roles.visible=true;
+									//dd_Roles.visible=true;
+									//lbl_Roles.visible=true;
 								}
 								else
 								{
@@ -884,9 +884,9 @@
 					</s:HGroup>
 				</s:HGroup>
 				<s:HGroup width="50%" height="100%" verticalAlign="middle" horizontalAlign="right">
-					<mx:Label text="Roles" id="lbl_Roles"/>
+					<mx:Label text="Roles" id="lbl_Roles" visible="false"/>
 					<s:DropDownList id="dd_Roles" x="40" width="188"
-									change="dd_Roles_changeHandler(event)"></s:DropDownList>
+									change="dd_Roles_changeHandler(event)" visible="false"></s:DropDownList>
 					<s:BorderContainer width="316" height="48" borderVisible="false" >
 						<s:HGroup x="0" y="3" height="100%" width="100%" verticalAlign="middle" horizontalAlign="right" gap="0">
 							<s:HGroup x="0" width="266" horizontalAlign="right" verticalAlign="middle">

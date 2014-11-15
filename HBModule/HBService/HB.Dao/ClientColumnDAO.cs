@@ -43,6 +43,16 @@ namespace HB.Dao
             CC.Column9Mandatory = Convert.ToBoolean(document.SelectSingleNode("//HdrXml").Attributes["Column9Mandatory"].Value);
             CC.Column10Mandatory = Convert.ToBoolean(document.SelectSingleNode("//HdrXml").Attributes["Column10Mandatory"].Value);
             CC.Id = Convert.ToInt32(document.SelectSingleNode("//HdrXml").Attributes["Id"].Value);
+            CC.Column1Update = Convert.ToBoolean(document.SelectSingleNode("//HdrXml").Attributes["Column1Update"].Value);
+            CC.Column2Update = Convert.ToBoolean(document.SelectSingleNode("//HdrXml").Attributes["Column2Update"].Value);
+            CC.Column3Update = Convert.ToBoolean(document.SelectSingleNode("//HdrXml").Attributes["Column3Update"].Value);
+            CC.Column4Update = Convert.ToBoolean(document.SelectSingleNode("//HdrXml").Attributes["Column4Update"].Value);
+            CC.Column5Update = Convert.ToBoolean(document.SelectSingleNode("//HdrXml").Attributes["Column5Update"].Value);
+            CC.Column6Update = Convert.ToBoolean(document.SelectSingleNode("//HdrXml").Attributes["Column6Update"].Value);
+            CC.Column7Update = Convert.ToBoolean(document.SelectSingleNode("//HdrXml").Attributes["Column7Update"].Value);
+            CC.Column8Update = Convert.ToBoolean(document.SelectSingleNode("//HdrXml").Attributes["Column8Update"].Value);
+            CC.Column9Update = Convert.ToBoolean(document.SelectSingleNode("//HdrXml").Attributes["Column9Update"].Value);
+            CC.Column10Update = Convert.ToBoolean(document.SelectSingleNode("//HdrXml").Attributes["Column10Update"].Value);
             if (CC.Id == 0)
             {
                 UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
@@ -81,6 +91,16 @@ namespace HB.Dao
             command.Parameters.Add("@Column8Mandatory", SqlDbType.Bit).Value = CC.Column8Mandatory;
             command.Parameters.Add("@Column9Mandatory", SqlDbType.Bit).Value = CC.Column9Mandatory;
             command.Parameters.Add("@Column10Mandatory", SqlDbType.Bit).Value = CC.Column10Mandatory;
+            command.Parameters.Add("@UpdateChkColumn1", SqlDbType.Bit).Value = CC.Column1Update;
+            command.Parameters.Add("@UpdateChkColumn2", SqlDbType.Bit).Value = CC.Column2Update;
+            command.Parameters.Add("@UpdateChkColumn3", SqlDbType.Bit).Value = CC.Column3Update;
+            command.Parameters.Add("@UpdateChkColumn4", SqlDbType.Bit).Value = CC.Column4Update;
+            command.Parameters.Add("@UpdateChkColumn5", SqlDbType.Bit).Value = CC.Column5Update;
+            command.Parameters.Add("@UpdateChkColumn6", SqlDbType.Bit).Value = CC.Column6Update;
+            command.Parameters.Add("@UpdateChkColumn7", SqlDbType.Bit).Value = CC.Column7Update;
+            command.Parameters.Add("@UpdateChkColumn8", SqlDbType.Bit).Value = CC.Column8Update;
+            command.Parameters.Add("@UpdateChkColumn9", SqlDbType.Bit).Value = CC.Column9Update;
+            command.Parameters.Add("@UpdateChkColumn10", SqlDbType.Bit).Value = CC.Column10Update;
             ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
             return ds;
         }

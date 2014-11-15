@@ -1,18 +1,17 @@
 
+GO
+/****** Object:  StoredProcedure [dbo].[Sp_ExternalChkoutIntermediate_Help]    Script Date: 11/12/2014 15:03:23 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-IF EXISTS (SELECT * FROM DBO.SYSOBJECTS WHERE ID = OBJECT_ID(N'[dbo].[Sp_ExternalChkoutIntermediate_Help]') AND OBJECTPROPERTY(ID, N'ISPROCEDURE') = 1)
-DROP PROCEDURE [dbo].[Sp_ExternalChkoutIntermediate_Help]
-GO 
 -- ===============================================================================
 -- Author: Shameem
 -- Create date:09-07-2014
 -- ModifiedBy :          , ModifiedDate: 
 -- Description:	External Check Out
 -- =================================================================================
-CREATE PROCEDURE [dbo].[Sp_ExternalChkoutIntermediate_Help]
+ALTER PROCEDURE [dbo].[Sp_ExternalChkoutIntermediate_Help]
 (@Action NVARCHAR(100)=NULL,
 @Str1 NVARCHAR(100)=NULL,
 @BillFrom NVARCHAR(100),
@@ -451,14 +450,14 @@ BEGIN
 			DECLARE @BookingPropertyId BIGINT;  
 			SELECT @BookingPropertyId=PropertyId FROM WRBHBCheckInHdr WHERE Id=@CheckInHdrId  
 			SET @HR=(select CheckIn from WRBHBProperty where Id =@BookingPropertyId) 
-	--		SET @HR=(select CheckIn from WRBHBProperty where Id = @CheckInHdrId)
+			--SET @HR=(select CheckIn from WRBHBProperty where Id = @CheckInHdrId)
 			--TARIFF SPLIT FOR CHECK IN TO CHECK OUT 
 			SELECT @NoOfDays=0,@chktime=ArrivalTime,@TimeType=TimeType,@Tariff=Tariff,@RackTariffSingle=RackTariffSingle,
 			@RackTariffDouble=RackTariffDouble,@i=0,@SingleMarkupAmount = SingleMarkupAmount,
 			@DoubleMarkupAmount = DoubleMarkupAmount,
 			--	@RackTariff=RackTariff,
 			@prtyId=PropertyId,@chkouttime= CONVERT(VARCHAR(8),GETDATE(),108) FROM WRBHBCheckInHdr where Id=@CheckInHdrId
-	select 	@HR,@chkouttime
+		
 			IF @HR='12'		
 			BEGIN
 			-- To Check Time
@@ -487,26 +486,26 @@ BEGIN
 				END		 
 			END		 
 		 --GET AFTER 1 CL CHECKOUT TIME TARIFF ADD  AND ABOVE ONE HR TARIFF ADD  
-		--	IF(@OutPutHour>1)
-		--	BEGIN
-		--		IF(@NoOfDays = 1)
-		--		BEGIN
-		--			SELECT @NoOfDays=@NoOfDays 
-		--			INSERT INTO #ExTariff(Tariff,RackTariffSingle,RackTariffDouble,STAgreed,LTAgreed,STRack,LTRack,Occupancy,Date,
-		--			SingleMarkupAmount,DoubleMarkupAmount)
-		--			SELECT @Tariff,@RackTariffSingle,@RackTariffDouble,@STAgreed,@LTAgreed,@STRack,@LTRack,@Occupancy,
-		--			CONVERT(NVARCHAR,DATEADD(DAY,@DateDiff,CONVERT(DATE,@ChkInDate,103)),103),@SingleMarkupAmount,
-		--			@DoubleMarkupAmount
-		--		END
-		--		ELSE
-		--		BEGIN
-		--			SELECT @NoOfDays=@NoOfDays + 1
-		--			INSERT INTO #ExTariff(Tariff,RackTariffSingle,RackTariffDouble,STAgreed,LTAgreed,STRack,LTRack,Occupancy,Date,
-		--			SingleMarkupAmount,DoubleMarkupAmount)
-		--			SELECT @Tariff,@RackTariffSingle,@RackTariffDouble,@STAgreed,@LTAgreed,@STRack,@LTRack,@Occupancy,
-		--			CONVERT(NVARCHAR,DATEADD(DAY,@DateDiff,CONVERT(DATE,@ChkInDate,103)),103),@SingleMarkupAmount,
-		--			@DoubleMarkupAmount
-		--		END
+			IF(@OutPutHour>12)
+			BEGIN
+				IF(@NoOfDays = 1)
+				BEGIN
+					SELECT @NoOfDays=@NoOfDays 
+					INSERT INTO #ExTariff(Tariff,RackTariffSingle,RackTariffDouble,STAgreed,LTAgreed,STRack,LTRack,Occupancy,Date,
+					SingleMarkupAmount,DoubleMarkupAmount)
+					SELECT @Tariff,@RackTariffSingle,@RackTariffDouble,@STAgreed,@LTAgreed,@STRack,@LTRack,@Occupancy,
+					CONVERT(NVARCHAR,DATEADD(DAY,@DateDiff,CONVERT(DATE,@ChkInDate,103)),103),@SingleMarkupAmount,
+					@DoubleMarkupAmount
+				END
+				ELSE
+				BEGIN
+					SELECT @NoOfDays=@NoOfDays + 1
+					INSERT INTO #ExTariff(Tariff,RackTariffSingle,RackTariffDouble,STAgreed,LTAgreed,STRack,LTRack,Occupancy,Date,
+					SingleMarkupAmount,DoubleMarkupAmount)
+					SELECT @Tariff,@RackTariffSingle,@RackTariffDouble,@STAgreed,@LTAgreed,@STRack,@LTRack,@Occupancy,
+					CONVERT(NVARCHAR,DATEADD(DAY,@DateDiff,CONVERT(DATE,@ChkInDate,103)),103),@SingleMarkupAmount,
+					@DoubleMarkupAmount
+				END
 			
 		 
 		--	--SELECT @NoOfDays=@NoOfDays+1
@@ -515,7 +514,7 @@ BEGIN
 		--	--SELECT @Tariff,@RackTariffSingle,@RackTariffDouble,@STAgreed,@LTAgreed,@STRack,@LTRack,@Occupancy,
 		--	--CONVERT(NVARCHAR,DATEADD(DAY,@DateDiff,CONVERT(DATE,@ChkInDate,103)),103),@SingleMarkupAmount,@DoubleMarkupAmount
 		----	SELECT @Tariff,@RackTariff,CONVERT(NVARCHAR,DATEADD(DAY,@DateDiff,CONVERT(DATE,@ChkInDate,103)),103)
-		--	END	
+			END	
 		 --DAYS TARIFF ADD	
 		 			
 			WHILE (@DateDiff>0)
@@ -551,7 +550,7 @@ BEGIN
 		    
 		   --ABOVE 1 HR IT WILL WORK
 		   --select @OutPutHour;
-			IF(@OutPutHour>1)
+			IF(@OutPutHour>12)
 			BEGIN
 			IF (@NoOfDays = 1)
 				BEGIN

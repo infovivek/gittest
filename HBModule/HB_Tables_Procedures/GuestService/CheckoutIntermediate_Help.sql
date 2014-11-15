@@ -380,6 +380,8 @@ If @BookingLevel = 'Apartment'
 		SELECT  @CheckInTime=ArrivalTime,@NewCheckInTimeType=TimeType,
 		@NewCheckInDate=convert(nvarchar(100),Cast(NewCheckInDate as DATE),103)	FROM WRBHBCheckInHdr  
 		WHERE IsActive = 1 and IsDeleted = 0 and Id =@CheckInHdrId
+		
+		
   
    
 	IF(UPPER(@NewCheckInTimeType)=UPPER('AM'))  
@@ -425,6 +427,8 @@ If @BookingLevel = 'Apartment'
 		SELECT DATEDIFF(day, CAST(CAST(ArrivalDate AS NVARCHAR)+' '+ArrivalTime AS DATETIME), CAST(ChkoutDate AS NVARCHAR)) AS Days,  
 		Id--,ArrivalDate  
 		FROM WRBHBCheckInHdr WHERE Id=@CheckInHdrId; 
+		
+		
  END
    
    
@@ -529,25 +533,30 @@ If @BookingLevel = 'Apartment'
 		
 		
    
-		SELECT  @CheckInTime=ArrivalTime,@NewCheckInTimeType=TimeType	FROM WRBHBCheckInHdr  
+		SELECT  @CheckInTime=ArrivalTime,@NewCheckInTimeType=TimeType,
+		@NewCheckInDate=convert(nvarchar(100),Cast(NewCheckInDate as DATE),103)	FROM WRBHBCheckInHdr  
 		WHERE IsActive = 1 and IsDeleted = 0 and Id =@CheckInHdrId
+		
+		
   
 	IF(UPPER(@NewCheckInTimeType)=UPPER('AM'))  
 	BEGIN  
 		IF(CAST(@CheckInTime AS TIME)<CAST('11:00:00' AS TIME))  
 		BEGIN 
-			select @NewCheckInDate=CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,@ChkInDate,103)),103)
+			select @NewCheckInDate=CONVERT(NVARCHAR,DATEADD(DAY,0,CONVERT(DATE,@ChkInDate,103)),103)
 		END
 		 
 		ELSE
 		BEGIN
 			SELECT @NewCheckInDate=@ChkInDate
 		END
-	end
-	else -- new added this else 
-	begin
+	END
+	ELSE -- NEW ADDED THIS ELSE 
+	BEGIN
 		SELECT @NewCheckInDate=@ChkInDate
-	end
+	END
+	
+	--SELECT @NewCheckInDate
 		SELECT Property,  
 		CONVERT(nvarchar(100),@NewCheckInDate,103)+' To '+CONVERT(nvarchar(100),@ChkOutDate1,103) as Stay,Tariff,  
 		CONVERT(nvarchar(100),@ChkOutDate1,103) as ChkoutDate,CONVERT(nvarchar(100),@NewCheckInDate,103) as CheckInDate  
@@ -705,7 +714,7 @@ If @BookingLevel = 'Apartment'
 		CONVERT(varchar(100),ISNULL(DateTo,GETDATE()),103),ISNULL(RackTariff,0),Id,TariffAmtFrom,TariffAmtFrom1,  
 		TariffAmtFrom2,TariffAmtFrom3,TariffAmtTo,TariffAmtTo1,TariffAmtTo2,TariffAmtTo3    
 		FROM WRBHBTaxMaster  
-		WHERE CONVERT(nvarchar(100),Date,103) between CONVERT(nvarchar(100),@ChkInDate,103) and  
+		WHERE CONVERT(nvarchar(100),Date,103) between CONVERT(nvarchar(100),@NewCheckInDate,103) and  
 		CONVERT(nvarchar(100),@ChkOutDate,103)    
 		AND IsActive=1 AND IsDeleted=0 AND StateId=@StateId  
 
@@ -715,7 +724,7 @@ If @BookingLevel = 'Apartment'
 		CONVERT(varchar(100),ISNULL(DateTo,GETDATE()),103),ISNULL(RackTariff,0),Id,TariffAmtFrom,TariffAmtFrom1,  
 		TariffAmtFrom2,TariffAmtFrom3,TariffAmtTo,TariffAmtTo1,TariffAmtTo2,TariffAmtTo3    
 		FROM WRBHBTaxMaster  
-		WHERE CONVERT(nvarchar(100),DateTo,103) between CONVERT(nvarchar(100),@ChkInDate,103) and  
+		WHERE CONVERT(nvarchar(100),DateTo,103) between CONVERT(nvarchar(100),@NewCheckInDate,103) and  
 		CONVERT(nvarchar(100),@ChkOutDate,103)    
 		AND IsActive=1 AND IsDeleted=0 AND StateId=@StateId  
 
@@ -725,7 +734,7 @@ If @BookingLevel = 'Apartment'
 		CONVERT(varchar(100),ISNULL(DateTo,GETDATE()),103),ISNULL(RackTariff,0),Id,TariffAmtFrom,TariffAmtFrom1,  
 		TariffAmtFrom2,TariffAmtFrom3,TariffAmtTo,TariffAmtTo1,TariffAmtTo2,TariffAmtTo3    
 		FROM WRBHBTaxMaster  
-		WHERE CONVERT(nvarchar(100),Date,103) <= CONVERT(nvarchar(100),@ChkInDate,103)   
+		WHERE CONVERT(nvarchar(100),Date,103) <= CONVERT(nvarchar(100),@NewCheckInDate,103)   
 		AND IsActive=1 AND IsDeleted=0 AND StateId=@StateId  
 
 		INSERT INTO #LuxuryTax1(LuxuryTax,LuxuryTax1,LuxuryTax2,LuxuryTax3,ServiceTax,FromDT,ToDT,RackTariffFlag,Id,TariffAmtFrom,TariffAmtFrom1,TariffAmtFrom2,  
@@ -770,7 +779,7 @@ If @BookingLevel = 'Apartment'
 
 		--TARIFF SPLIT FOR CHECK IN TO CHECK OUT   
 		SELECT @NoOfDays=0,@chktime=ArrivalTime,@TimeType=TimeType,@Tariff=Tariff,@RackTariffSingle=RackTariffSingle,  
-		@RackTariffDouble=RackTariffDouble,@i=0,  
+		@RackTariffDouble=RackTariffDouble,@i=1,  
 		-- @RackTariff=RackTariff,  
 		@prtyId=PropertyId,@chkouttime= CONVERT(VARCHAR(8),GETDATE(),108) FROM WRBHBCheckInHdr where Id=@CheckInHdrId  
     
@@ -778,9 +787,9 @@ If @BookingLevel = 'Apartment'
 		IF @HR='12'    
 		BEGIN  
 		-- To Check Time  
-		SET @MIN=(SELECT DATEDIFF(MINUTE,CAST(YEAR(CONVERT(DATE,@ChkInDate,103)) AS VARCHAR)+'-'+  
-		CAST(MONTH(CONVERT(DATE,@ChkInDate,103)) AS VARCHAR)+'-'+  
-		CAST(DAY(CONVERT(DATE,@ChkInDate,103)) AS VARCHAR)+' '+'12:00:00',CAST(YEAR(CONVERT(DATE,@ChkOutDate,103)) AS VARCHAR)+'-'+  
+		SET @MIN=(SELECT DATEDIFF(MINUTE,CAST(YEAR(CONVERT(DATE,@NewCheckInDate,103)) AS VARCHAR)+'-'+  
+		CAST(MONTH(CONVERT(DATE,@NewCheckInDate,103)) AS VARCHAR)+'-'+  
+		CAST(DAY(CONVERT(DATE,@NewCheckInDate,103)) AS VARCHAR)+' '+'12:00:00',CAST(YEAR(CONVERT(DATE,@ChkOutDate,103)) AS VARCHAR)+'-'+  
 		CAST(MONTH(CONVERT(DATE,@ChkOutDate,103)) AS VARCHAR)+'-'+  
 		CAST(DAY(CONVERT(DATE,@ChkOutDate,103)) AS VARCHAR)+' '+'23:59:59') AS M  
 		);  
@@ -792,17 +801,17 @@ If @BookingLevel = 'Apartment'
 		--Select @MIN/720 as NoDays,(@MIN % 720)/60 as NoHours,(@MIN % 60) as NoMinutes   
  --   
 		--ADD BEFORE CHECKIN TIME TARIFF  
-		IF(UPPER(@TimeType)=UPPER('AM'))  
-		BEGIN  
-			IF(CAST(@chktime AS TIME)<CAST('11:00:00' AS TIME))  
-			BEGIN  
-				SELECT @NoOfDays=@NoOfDays+1  
-				INSERT INTO #Tariff(Tariff,RackTariffSingle ,RackTariffDouble,Date)  
-				SELECT @Tariff,@RackTariffSingle,@RackTariffDouble,  
-				CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,@ChkInDate,103)),103)     
-			END     
-		END  
-    
+		--IF(UPPER(@TimeType)=UPPER('AM'))  
+		--BEGIN  
+		--	IF(CAST(@chktime AS TIME)<CAST('11:00:00' AS TIME))  
+		--	BEGIN  
+		--		SELECT @NoOfDays=@NoOfDays  
+		--		INSERT INTO #Tariff(Tariff,RackTariffSingle ,RackTariffDouble,Date)  
+		--		SELECT @Tariff,@RackTariffSingle,@RackTariffDouble,  
+		--		CONVERT(NVARCHAR,DATEADD(DAY,0,CONVERT(DATE,@NewCheckInDate,103)),103)     
+		--	END     
+		--END  
+   
 		   --GET AFTER 1 CL CHECKOUT TIME TARIFF ADD  AND ABOVE ONE HR TARIFF ADD     
 		   IF(CAST(@chkouttime AS TIME)>CAST('13:00:00' AS TIME))  
 		   BEGIN  
@@ -810,7 +819,7 @@ If @BookingLevel = 'Apartment'
 				BEGIN    
 					INSERT INTO #TariffADD(Tariff,RackTariffSingle ,RackTariffDouble,Date)  
 					SELECT @Tariff,@RackTariffSingle,@RackTariffDouble,  
-					CONVERT(NVARCHAR,DATEADD(DAY,@DateDiff,CONVERT(DATE,@ChkInDate,103)),103)     
+					CONVERT(NVARCHAR,DATEADD(DAY,@DateDiff,CONVERT(DATE,@NewCheckInDate,103)),103)     
 		        END   
 	      END  
 	      IF(CAST(@chkouttime AS TIME)>CAST('23:00:00' AS TIME))  
@@ -820,17 +829,20 @@ If @BookingLevel = 'Apartment'
 					SELECT @NoOfDays=@NoOfDays+1       
 					INSERT INTO #Tariff(Tariff,RackTariffSingle ,RackTariffDouble,Date)  
 					SELECT @Tariff,@RackTariffSingle,@RackTariffDouble,  
-					CONVERT(NVARCHAR,DATEADD(DAY,@DateDiff,CONVERT(DATE,@ChkInDate,103)),103)   
+					CONVERT(NVARCHAR,DATEADD(DAY,@DateDiff,CONVERT(DATE,@NewCheckInDate,103)),103)   
 	      
 		            DELETE FROM #TariffADD;    
            END   
           END      
-   --DAYS TARIFF ADD      
+   --DAYS TARIFF ADD 
+  --  TRUNCATE TABLE #Tariff;     
+  -- Select @i,@NoOfDays,@DateDiff
           WHILE (@DateDiff>0)  
           BEGIN   
-				   SELECT @NoOfDays=@NoOfDays+1       
+          --TRUNCATE TABLE #Tariff;
+				   SELECT @NoOfDays=@NoOfDays+1      
 				   INSERT INTO #Tariff(Tariff,RackTariffSingle ,RackTariffDouble,Date)  
-				   SELECT @Tariff,@RackTariffSingle,@RackTariffDouble,CONVERT(NVARCHAR,DATEADD(DAY,@i,CONVERT(DATE,@ChkInDate,103)),103)  
+				   SELECT @Tariff,@RackTariffSingle,@RackTariffDouble,CONVERT(NVARCHAR,DATEADD(DAY,@i,CONVERT(DATE,@NewCheckInDate,103)),103)  
 				   --SELECT @Tariff,@RackTariff,CONVERT(NVARCHAR,DATEADD(DAY,@i,CONVERT(DATE,@ChkInDate,103)),103)  
 				   SET @i=@i+1  
 				   SET @DateDiff=@DateDiff-1      
@@ -841,9 +853,9 @@ If @BookingLevel = 'Apartment'
           BEGIN  
    --Get Date Differance  
  --  select @ChkInDate,@ChkOutDate,@chktime,@chkouttime  
-	   SET @MIN=(SELECT DATEDIFF(MINUTE,CAST(YEAR(CONVERT(DATE,@ChkInDate,103)) AS VARCHAR)+'-'+  
-	   CAST(MONTH(CONVERT(DATE,@ChkInDate,103)) AS VARCHAR)+'-'+  
-	   CAST(DAY(CONVERT(DATE,@ChkInDate,103)) AS VARCHAR)+' '+@chktime,CAST(YEAR(CONVERT(DATE,@ChkOutDate,103)) AS VARCHAR)+'-'+  
+	   SET @MIN=(SELECT DATEDIFF(MINUTE,CAST(YEAR(CONVERT(DATE,@NewCheckInDate,103)) AS VARCHAR)+'-'+  
+	   CAST(MONTH(CONVERT(DATE,@NewCheckInDate,103)) AS VARCHAR)+'-'+  
+	   CAST(DAY(CONVERT(DATE,@NewCheckInDate,103)) AS VARCHAR)+' '+@chktime,CAST(YEAR(CONVERT(DATE,@ChkOutDate,103)) AS VARCHAR)+'-'+  
 	   CAST(MONTH(CONVERT(DATE,@ChkOutDate,103)) AS VARCHAR)+'-'+  
 	   CAST(DAY(CONVERT(DATE,@ChkOutDate,103)) AS VARCHAR)+' '+@chkouttime) AS M  
 	   );  
@@ -861,7 +873,7 @@ If @BookingLevel = 'Apartment'
 		SELECT @NoOfDays=@NoOfDays+1        
 		INSERT INTO #Tariff(Tariff,RackTariffSingle ,RackTariffDouble,Date)  
 		SELECT @Tariff,@RackTariffSingle ,@RackTariffDouble,  
-		CONVERT(NVARCHAR,DATEADD(DAY,@DateDiff,CONVERT(DATE,@ChkInDate,103)),103)     
+		CONVERT(NVARCHAR,DATEADD(DAY,@DateDiff,CONVERT(DATE,@NewCheckInDate,103)),103)     
       END  
       --DAYS TARIFF ADD  
         
@@ -870,7 +882,7 @@ If @BookingLevel = 'Apartment'
 		SELECT @NoOfDays=@NoOfDays+1       
 		INSERT INTO #Tariff(Tariff,RackTariffSingle ,RackTariffDouble,Date)  
 		SELECT @Tariff,@RackTariffSingle,@RackTariffDouble,  
-		CONVERT(NVARCHAR,DATEADD(DAY,@i,CONVERT(DATE,@ChkInDate,103)),103)   
+		CONVERT(NVARCHAR,DATEADD(DAY,@i,CONVERT(DATE,@NewCheckInDate,103)),103)   
 		SET @i=@i+1  
 		SET @DateDiff=@DateDiff-1                    
 	   END     

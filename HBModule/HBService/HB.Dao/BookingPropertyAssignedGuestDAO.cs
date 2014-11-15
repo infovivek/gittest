@@ -67,6 +67,17 @@ namespace HB.Dao
                 PtoG.Column8 = document.SelectNodes("//GridXml")[i].Attributes["Column8"].Value;
                 PtoG.Column9 = document.SelectNodes("//GridXml")[i].Attributes["Column9"].Value;
                 PtoG.Column10 = document.SelectNodes("//GridXml")[i].Attributes["Column10"].Value;
+                //
+                /*PtoG.ChkColumn1 = Convert.ToBoolean(document.SelectNodes("//GridXml")[i].Attributes["ChkColumn1"].Value);
+                PtoG.ChkColumn2 = Convert.ToBoolean(document.SelectNodes("//GridXml")[i].Attributes["ChkColumn2"].Value);
+                PtoG.ChkColumn3 = Convert.ToBoolean(document.SelectNodes("//GridXml")[i].Attributes["ChkColumn3"].Value);
+                PtoG.ChkColumn4 = Convert.ToBoolean(document.SelectNodes("//GridXml")[i].Attributes["ChkColumn4"].Value);
+                PtoG.ChkColumn5 = Convert.ToBoolean(document.SelectNodes("//GridXml")[i].Attributes["ChkColumn5"].Value);
+                PtoG.ChkColumn6 = Convert.ToBoolean(document.SelectNodes("//GridXml")[i].Attributes["ChkColumn6"].Value);
+                PtoG.ChkColumn7 = Convert.ToBoolean(document.SelectNodes("//GridXml")[i].Attributes["ChkColumn7"].Value);
+                PtoG.ChkColumn8 = Convert.ToBoolean(document.SelectNodes("//GridXml")[i].Attributes["ChkColumn8"].Value);
+                PtoG.ChkColumn9 = Convert.ToBoolean(document.SelectNodes("//GridXml")[i].Attributes["ChkColumn9"].Value);
+                PtoG.ChkColumn10 = Convert.ToBoolean(document.SelectNodes("//GridXml")[i].Attributes["ChkColumn10"].Value);*/
                 command = new SqlCommand();
                 if (PtoG.Id != 0)
                 {
@@ -107,6 +118,16 @@ namespace HB.Dao
                 command.Parameters.Add("@Column8", SqlDbType.NVarChar).Value = PtoG.Column8;
                 command.Parameters.Add("@Column9", SqlDbType.NVarChar).Value = PtoG.Column9;
                 command.Parameters.Add("@Column10", SqlDbType.NVarChar).Value = PtoG.Column10;
+                /*command.Parameters.Add("@ChkColumn1", SqlDbType.Bit).Value = PtoG.ChkColumn1;
+                command.Parameters.Add("@ChkColumn2", SqlDbType.Bit).Value = PtoG.ChkColumn2;
+                command.Parameters.Add("@ChkColumn3", SqlDbType.Bit).Value = PtoG.ChkColumn3;
+                command.Parameters.Add("@ChkColumn4", SqlDbType.Bit).Value = PtoG.ChkColumn4;
+                command.Parameters.Add("@ChkColumn5", SqlDbType.Bit).Value = PtoG.ChkColumn5;
+                command.Parameters.Add("@ChkColumn6", SqlDbType.Bit).Value = PtoG.ChkColumn6;
+                command.Parameters.Add("@ChkColumn7", SqlDbType.Bit).Value = PtoG.ChkColumn7;
+                command.Parameters.Add("@ChkColumn8", SqlDbType.Bit).Value = PtoG.ChkColumn8;
+                command.Parameters.Add("@ChkColumn9", SqlDbType.Bit).Value = PtoG.ChkColumn9;
+                command.Parameters.Add("@ChkColumn10", SqlDbType.Bit).Value = PtoG.ChkColumn10;*/
                 ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
             }
             if (n == 0)

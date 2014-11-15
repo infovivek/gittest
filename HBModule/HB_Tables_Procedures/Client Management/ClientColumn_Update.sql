@@ -24,7 +24,11 @@ CREATE PROCEDURE [dbo].[Sp_ClientColumn_update](@ClientId BIGINT,
 @Column10 NVARCHAR(100),@Column1Mandatory BIT,@Column2Mandatory BIT,
 @Column3Mandatory BIT,@Column4Mandatory BIT,@Column5Mandatory BIT,
 @Column6Mandatory BIT,@Column7Mandatory BIT,@Column8Mandatory BIT,
-@Column9Mandatory BIT,@Column10Mandatory BIT,@UsrId BIGINT,@Id BIGINT)
+@Column9Mandatory BIT,@Column10Mandatory BIT,@UsrId BIGINT,@Id BIGINT,
+@UpdateChkColumn1 BIT,@UpdateChkColumn2 BIT,@UpdateChkColumn3 BIT,
+@UpdateChkColumn4 BIT,@UpdateChkColumn5 BIT,@UpdateChkColumn6 BIT,
+@UpdateChkColumn7 BIT,@UpdateChkColumn8 BIT,@UpdateChkColumn9 BIT,
+@UpdateChkColumn10 BIT)
 AS
 BEGIN
  UPDATE WRBHBClientColumns SET Column1 = @Column1,Column2 = @Column2,
@@ -35,6 +39,12 @@ BEGIN
  Column5Mandatory = @Column5Mandatory,Column6Mandatory = @Column6Mandatory,
  Column7Mandatory = @Column7Mandatory,Column8Mandatory = @Column8Mandatory,
  Column9Mandatory = @Column9Mandatory,Column10Mandatory = @Column10Mandatory,
- ModifiedBy = @UsrId,ModifiedDate = GETDATE() WHERE Id = @Id;
+ ModifiedBy = @UsrId,ModifiedDate = GETDATE(),
+ UpdateChkColumn1 = @UpdateChkColumn1,UpdateChkColumn2 = @UpdateChkColumn2,
+ UpdateChkColumn3 = @UpdateChkColumn3,UpdateChkColumn4 = @UpdateChkColumn4,
+ UpdateChkColumn5 = @UpdateChkColumn5,UpdateChkColumn6 = @UpdateChkColumn6,
+ UpdateChkColumn7 = @UpdateChkColumn7,UpdateChkColumn8 = @UpdateChkColumn8,
+ UpdateChkColumn9 = @UpdateChkColumn9,UpdateChkColumn10 = @UpdateChkColumn10
+ WHERE Id = @Id;
  SELECT Id,RowId FROM WRBHBClientColumns WHERE Id = @Id;
 END		

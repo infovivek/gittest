@@ -50,6 +50,6 @@ VALUES (CONVERT(datetime,@Date,103),@Amount,@DepositeToId,@CreatedBy,@Comments,@
 		GETDATE(),@CreatedBy,GETDATE(),NEWID(),@ImageName,@PId,'',@TotalAmount,@BTCTo,@BTCMode,@DoneBy,
 		@ChequeNo,@ChkOutHdrId,@ClientId)
 		
- SELECT Id,RowId FROM WRBHBDeposits
+ SELECT Id,RowId,Mode FROM WRBHBDeposits
  WHERE Id=@@IDENTITY;		
 END		

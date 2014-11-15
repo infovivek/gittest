@@ -31,7 +31,11 @@ BEGIN
    SELECT TOP 1 Id,Column1,Column2,Column3,Column4,Column5,Column6,Column7,
    Column8,Column9,Column10,ClientId,Column1Mandatory,Column2Mandatory,
    Column3Mandatory,Column4Mandatory,Column5Mandatory,Column6Mandatory,
-   Column7Mandatory,Column8Mandatory,Column9Mandatory,Column10Mandatory
+   Column7Mandatory,Column8Mandatory,Column9Mandatory,Column10Mandatory,
+   UpdateChkColumn1,UpdateChkColumn2,UpdateChkColumn3,
+   UpdateChkColumn4,UpdateChkColumn5,UpdateChkColumn6,
+   UpdateChkColumn7,UpdateChkColumn8,UpdateChkColumn9,
+   UpdateChkColumn10
    FROM WRBHBClientColumns 
    WHERE IsActive = 1 AND IsDeleted = 0 AND ClientId = @Id
    ORDER BY Id DESC;

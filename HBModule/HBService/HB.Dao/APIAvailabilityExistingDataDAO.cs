@@ -18,6 +18,7 @@ namespace HB.Dao
         string FlagStr = "";
         DataSet ds = new DataSet();
         string UserData = "";
+        string UpdateTariffFlag = "";
         public DataSet FnAvailabilityExistingData(string[] data, User User)
         {
             try
@@ -120,10 +121,70 @@ namespace HB.Dao
                     }                    
                     if (api.AvaavailStatus == "B")
                     {
-                        int n1 = document.SelectNodes("//Tariff").Count;
+                        decimal RoomRate1 = 0, RoomRate2 = 0, RoomDiscount1 = 0, RoomDiscount2 = 0;
+                        decimal Taxes1 = 0, Taxes2 = 0;
+                        XmlNodeList XmlRoomTariffs1 = document.DocumentElement.SelectNodes("/MMTHotelAvailResponse/Hotel/PropertyInfo/RoomStays/RoomStay/RoomRates/RoomRate/Rate/RoomTariffs/RoomTariff");
+                        foreach (XmlNode xnRT in XmlRoomTariffs1)
+                        {
+                            //string RoomTariffs = xnRT.InnerXml;XmlDocument XmlDoc = new XmlDocument();XmlDoc.LoadXml(RoomTariffs);
+                            string RoomTariffs1 = xnRT.OuterXml;
+                            XmlDocument XmlDoc1 = new XmlDocument();
+                            XmlDoc1.LoadXml(RoomTariffs1);                            
+                            if (XmlDoc1.SelectNodes("//RoomTariff ")[0].Attributes["roomNumber"].Value == "1")
+                            {
+                                int cnt = XmlDoc1.SelectNodes("//Tariff").Count;
+                                for (int x = 0; x < cnt; x++)
+                                {
+                                    if (XmlDoc1.SelectNodes("//Tariff")[x].Attributes["group"].Value == "RoomRate")
+                                    {
+                                        RoomRate1 =
+                                            Convert.ToDecimal(XmlDoc1.SelectNodes("//Tariff")[x].Attributes["amount"].Value);
+                                    }
+                                    if (XmlDoc1.SelectNodes("//Tariff")[x].Attributes["group"].Value == "RoomDiscount")
+                                    {
+                                        RoomDiscount1 =
+                                            Convert.ToDecimal(XmlDoc1.SelectNodes("//Tariff")[x].Attributes["amount"].Value);
+                                    }
+                                    if (XmlDoc1.SelectNodes("//Tariff")[x].Attributes["group"].Value == "Taxes")
+                                    {
+                                        Taxes1 =
+                                            Convert.ToDecimal(XmlDoc1.SelectNodes("//Tariff")[x].Attributes["amount"].Value);
+                                    }
+                                }
+                            }
+                            if (XmlDoc1.SelectNodes("//RoomTariff ")[0].Attributes["roomNumber"].Value == "2")
+                            {
+                                int cnt = XmlDoc1.SelectNodes("//Tariff").Count;
+                                for (int x = 0; x < cnt; x++)
+                                {
+                                    if (XmlDoc1.SelectNodes("//Tariff")[x].Attributes["group"].Value == "RoomRate")
+                                    {
+                                        RoomRate2 =
+                                            Convert.ToDecimal(XmlDoc1.SelectNodes("//Tariff")[x].Attributes["amount"].Value);
+                                    }
+                                    if (XmlDoc1.SelectNodes("//Tariff")[x].Attributes["group"].Value == "RoomDiscount")
+                                    {
+                                        RoomDiscount2 =
+                                            Convert.ToDecimal(XmlDoc1.SelectNodes("//Tariff")[x].Attributes["amount"].Value);
+                                    }
+                                    if (XmlDoc1.SelectNodes("//Tariff")[x].Attributes["group"].Value == "Taxes")
+                                    {
+                                        Taxes2 = 
+                                            Convert.ToDecimal(XmlDoc1.SelectNodes("//Tariff")[x].Attributes["amount"].Value);
+                                    }
+                                }
+                            }
+                        }
+                        /*int n1 = document.SelectNodes("//RoomTariff").Count;
                         int n2 = 0;
+                        int RoomDiscountn1 = 0;
+                        int RoomDiscountn2 = 0;
                         decimal RoomNo1amount = 0;
                         decimal RoomNo2amount = 0;
+                        decimal RoomDiscountamount1 = 0;
+                        decimal RoomDiscountamount2 = 0;
+                        decimal Taxesamount1 = 0;
+                        decimal Taxesamount2 = 0;
                         for (int d = 0; d < n1; d++)
                         {
                             string Tariffgroup = document.SelectNodes("//Tariff")[d].Attributes["group"].Value;
@@ -131,17 +192,17 @@ namespace HB.Dao
                             {
                                 if (n2 == 0)
                                 {
-                                    RoomNo1amount = Convert.ToDecimal(document.SelectNodes("//Tariff")[d].Attributes["amount"].Value);
+                                    RoomNo1amount = 
+                                        Convert.ToDecimal(document.SelectNodes("//Tariff")[d].Attributes["amount"].Value);
                                     n2 += 1;
                                 }
                                 else
                                 {
-                                    RoomNo2amount = Convert.ToDecimal(document.SelectNodes("//Tariff")[d].Attributes["amount"].Value);
-                                    d = n1;
+                                    RoomNo2amount = 
+                                        Convert.ToDecimal(document.SelectNodes("//Tariff")[d].Attributes["amount"].Value);
                                 }
                             }
-                        }
-                        //
+                        }*/
                         command = new SqlCommand();
                         ds = new DataSet();
                         command.CommandText = StoredProcedures.API_Help;
@@ -162,41 +223,58 @@ namespace HB.Dao
                         //
                         FlagStr = "";
                         //
-                        if ((RoomNo1Existsamt >= RoomNo1amount) && (RoomNo2Existsamt >= RoomNo2amount) && (RoomAvaCnt >= GstCnt))
+                        if ((RoomNo1Existsamt >= RoomRate1) && (RoomNo2Existsamt >= RoomRate2) && (RoomAvaCnt >= GstCnt))
                         {
                             Flag = true;
                         }
                         else
                         {
-                            Flag = false;
+                            Flag = false; UpdateTariffFlag = "123";
                             // Tariff is Changed for this Hotel.
                             FlagStr = "Tariff is Changed.";
-                        }                                                
-                        /*api.AvaRatePlanCode = document.SelectNodes("//RoomRate")[0].Attributes["ratePlanCode"].Value;
-                        api.AmountAfterTax = Convert.ToDecimal(document.SelectNodes("//AmountAfterTax")[0].InnerText);
-                        api.AmountBeforeTax = Convert.ToDecimal(document.SelectNodes("//AmountBeforeTax")[0].InnerText);
-                        api.AvaResponseCode = document.SelectNodes("//ResponseCode")[0].Attributes["success"].Value;
-                        api.AvaResponseReferenceKey = document.SelectNodes("//ResponseReferenceKey")[0].InnerText;
-                        if (api.ExistingAmountAfterTariff == api.AmountAfterTax)
-                        {
-                            Flag = true;
+                            command = new SqlCommand();
+                            ds = new DataSet();
+                            command.CommandText = StoredProcedures.API_Help;
+                            command.CommandType = CommandType.StoredProcedure;
+                            command.Parameters.Add("@Action", SqlDbType.NVarChar).Value = "MMTTariffTaxesUpdate";
+                            command.Parameters.Add("@Str1", SqlDbType.NVarChar).Value = api.HotelId;
+                            command.Parameters.Add("@Str2", SqlDbType.NVarChar).Value = api.RatePlanCode;
+                            command.Parameters.Add("@Str3", SqlDbType.NVarChar).Value = api.RoomTypecode;
+                            command.Parameters.Add("@Str4", SqlDbType.NVarChar).Value = api.HeaderId;
+                            command.Parameters.Add("@Id1", SqlDbType.BigInt).Value = RoomRate1;
+                            command.Parameters.Add("@Id2", SqlDbType.BigInt).Value = RoomRate2;
+                            command.Parameters.Add("@Id3", SqlDbType.BigInt).Value = Taxes1;
+                            command.Parameters.Add("@Id4", SqlDbType.BigInt).Value = Taxes2;
+                            ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
+                            if ((RoomDiscount1 != 0) || (RoomDiscount2 != 0))
+                            {
+                                command = new SqlCommand();
+                                ds = new DataSet();
+                                command.CommandText = StoredProcedures.API_Help;
+                                command.CommandType = CommandType.StoredProcedure;
+                                command.Parameters.Add("@Action", SqlDbType.NVarChar).Value = "MMTDiscountUpdate";
+                                command.Parameters.Add("@Str1", SqlDbType.NVarChar).Value = api.HotelId;
+                                command.Parameters.Add("@Str2", SqlDbType.NVarChar).Value = api.RatePlanCode;
+                                command.Parameters.Add("@Str3", SqlDbType.NVarChar).Value = api.RoomTypecode;
+                                command.Parameters.Add("@Str4", SqlDbType.NVarChar).Value = api.HeaderId;
+                                command.Parameters.Add("@Id1", SqlDbType.BigInt).Value = RoomDiscount1;
+                                command.Parameters.Add("@Id2", SqlDbType.BigInt).Value = RoomDiscount2;
+                                command.Parameters.Add("@Id3", SqlDbType.BigInt).Value = 0;
+                                command.Parameters.Add("@Id4", SqlDbType.BigInt).Value = 0;
+                                ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
+                            }
                         }
-                        else
-                        {
-                            Flag = false;
-                            // Tariff is Changed for this Hotel.
-                        }*/
                     }
                     else
                     {
-                        Flag = false;
+                        Flag = false; UpdateTariffFlag = "";
                         // Room is Not Avaliable for this Date Range.
                         FlagStr = "Room is Not Avaliable";
                     }
                 }
                 else
                 {
-                    Flag = false;
+                    Flag = false; UpdateTariffFlag = "";
                     // Hotel is Not Avaliable for this Date Range.
                     FlagStr = "Hotel is Not Avaliable";
                 }
@@ -216,7 +294,7 @@ namespace HB.Dao
                 command.CommandType = CommandType.StoredProcedure;
                 command.Parameters.Add("@Action", SqlDbType.NVarChar).Value = "FalseFlagLoad";
                 command.Parameters.Add("@Str1", SqlDbType.NVarChar).Value = FlagStr;
-                command.Parameters.Add("@Str2", SqlDbType.NVarChar).Value = "";
+                command.Parameters.Add("@Str2", SqlDbType.NVarChar).Value = UpdateTariffFlag;
                 command.Parameters.Add("@Str3", SqlDbType.NVarChar).Value = "";
                 command.Parameters.Add("@Str4", SqlDbType.NVarChar).Value = "";
                 command.Parameters.Add("@Id1", SqlDbType.BigInt).Value = 0;

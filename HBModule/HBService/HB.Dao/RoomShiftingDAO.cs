@@ -59,6 +59,8 @@ namespace HB.Dao
             //
             command.Parameters.Add("@TariffMode", SqlDbType.NVarChar).Value = RS.TariffMode;
             command.Parameters.Add("@ServiceMode", SqlDbType.NVarChar).Value = RS.ServiceMode;
+            command.Parameters.Add("@Type", SqlDbType.NVarChar).Value =
+                document.SelectSingleNode("HdrXml").Attributes["Type"].Value;
             DataSet ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
             if (document.SelectSingleNode("HdrXml").Attributes["Mail"].Value == "Yes")
             {

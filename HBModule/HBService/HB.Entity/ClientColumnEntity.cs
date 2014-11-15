@@ -29,5 +29,16 @@ namespace HB.Entity
         public bool Column8Mandatory { get; set; }
         public bool Column9Mandatory { get; set; }
         public bool Column10Mandatory { get; set; }
+        //
+        public bool Column1Update { get; set; }
+        public bool Column2Update { get; set; }
+        public bool Column3Update { get; set; }
+        public bool Column4Update { get; set; }
+        public bool Column5Update { get; set; }
+        public bool Column6Update { get; set; }
+        public bool Column7Update { get; set; }
+        public bool Column8Update { get; set; }
+        public bool Column9Update { get; set; }
+        public bool Column10Update { get; set; }
     }
 }

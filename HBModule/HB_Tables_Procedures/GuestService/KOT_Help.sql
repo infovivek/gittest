@@ -39,7 +39,6 @@ BEGIN
 	CREATE TABLE #Room(GuestName NVARCHAR(100),BookingCode INT,Property NVARCHAR(100),RoomType NVARCHAR(100),BookingId INT,
 	Id INT,PropertyId INT,BreakfastVeg INT,BreakfastNonVeg INT,LunchVeg INT,LunchNonVeg INT,DinnerVeg INT,DinnerNonVeg INT,
 	CheckInId INT)
-
 IF(@PropertyId !=0)
 BEGIN
   IF(@Str2=CONVERT(NVARCHAR(100),GETDATE(),103))
@@ -57,7 +56,7 @@ BEGIN
 		H.Id NOT IN (SELECT ChkInHdrId FROM WRBHBChechkOutHdr) AND H.RoomNo !='0' AND H.RoomNo !='Standard' 
 		AND H.RoomNo !='Special over 30 days' AND H.RoomNo !='Special' 
 		AND H.RoomNo !='Group Stay' AND H.RoomNo !='Executive' AND H.RoomNo !='Superior'
-		
+	
 		INSERT INTO #Room(GuestName,BookingCode,Property,RoomType,BookingId,Id,PropertyId,BreakfastVeg,
 		BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg,CheckInId)
 		
@@ -108,6 +107,7 @@ BEGIN
 		JOIN WRBHBPropertyUsers PU ON H.Id=PU.UserId AND PU.IsActive=1 AND PU.IsDeleted=0
 		JOIN WRBHBProperty P ON PU.PropertyId = P.Id AND P.IsActive=1 AND P.IsDeleted=0
 		WHERE PU.PropertyId = @Id2 AND H.IsActive=1 AND H.IsDeleted=0
+		
 	END
 	IF(ISNULL(@Str2,0)=(SELECT DISTINCT CONVERT(NVARCHAR,Date,103)FROM WRBHBKOTHdr WHERE PropertyId=@Id2 AND 
 	CONVERT(NVARCHAR,Date,103)=@Str2 AND IsActive=1 AND IsDeleted=0))
@@ -150,7 +150,7 @@ BEGIN
 		FROM WRBHBCheckInHdr H
 		JOIN WRBHBBookingPropertyAssingedGuest D ON H.Id = D.CheckInHdrId AND D.IsActive=1 AND D.IsDeleted=0
 		WHERE H.PropertyId =@Id2  AND H.IsActive=1 AND H.IsDeleted=0 AND 
-		CONVERT(date,GETDATE(),103) BETWEEN D.ChkInDt AND D.ChkOutDt AND
+		CONVERT(date,@Str2,103) BETWEEN D.ChkInDt AND D.ChkOutDt AND
 		H.Id IN (SELECT ChkInHdrId FROM WRBHBChechkOutHdr WHERE IsActive=1 AND IsDeleted=0 and isnull(IntermediateFlag,0) = 1) 
 		AND H.RoomNo !='0' AND H.RoomNo !='Standard' 
 		AND H.RoomNo !='Special over 30 days' AND H.RoomNo !='Special' 
@@ -184,8 +184,6 @@ BEGIN
 		SELECT GuestName,BookingCode,Property,RoomType AS RoomNo,BookingId,Id,PropertyId,BreakfastVeg,
 		BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg,CheckInId FROM #Room 
 		
-		--AND CONVERT(NVARCHAR,GETDATE(),103)=@Str2 
-	    
 		SELECT DISTINCT (H.FirstName+''+H.LastName) AS UserName,H.Id AS UserId,
 		0 AS Id,0 AS BreakfastVeg,
 		0 AS BreakfastNonVeg,0 AS LunchVeg,0 AS LunchNonVeg,0 AS DinnerVeg,0 AS DinnerNonVeg
@@ -193,12 +191,13 @@ BEGIN
 		JOIN WRBHBPropertyUsers PU ON H.Id=PU.UserId AND PU.IsActive=1 AND PU.IsDeleted=0
 		JOIN WRBHBProperty P ON PU.PropertyId = P.Id AND P.IsActive=1 AND P.IsDeleted=0
 		WHERE PU.PropertyId = @Id2 AND H.IsActive=1 AND H.IsDeleted=0
-	END
+END
 END
 ELSE
 BEGIN
 		INSERT INTO #Room(GuestName,BookingCode,Property,RoomType,BookingId,Id,PropertyId,BreakfastVeg,
 		BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg,CheckInId)
+		
 		SELECT DISTINCT H.ChkInGuest,H.BookingCode AS BookingCode,H.Property,H.RoomNo,ISNULL(H.BookingId,0) as BookingId,
 		0 AS Id,ISNULL(H.PropertyId,0) as PropertyId,0 AS BreakfastVeg,
 		0 AS BreakfastNonVeg,0 AS LunchVeg,0 AS LunchNonVeg,0 AS DinnerVeg,0 AS DinnerNonVeg,H.Id
@@ -211,13 +210,14 @@ BEGIN
 		
 		INSERT INTO #Room(GuestName,BookingCode,Property,RoomType,BookingId,Id,PropertyId,BreakfastVeg,
 		BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg,CheckInId)
+		
 		SELECT DISTINCT H.ChkInGuest,H.BookingCode AS BookingCode,H.Property,H.RoomNo,ISNULL(H.BookingId,0) as BookingId,
 		0 AS Id,ISNULL(H.PropertyId,0) as PropertyId,0 AS BreakfastVeg,
 		0 AS BreakfastNonVeg,0 AS LunchVeg,0 AS LunchNonVeg,0 AS DinnerVeg,0 AS DinnerNonVeg,H.Id
 		FROM WRBHBCheckInHdr H
 		JOIN WRBHBBookingPropertyAssingedGuest D ON H.Id = D.CheckInHdrId AND D.IsActive=1 AND D.IsDeleted=0
 		WHERE H.PropertyId =@Id2  AND H.IsActive=1 AND H.IsDeleted=0 AND 
-		CONVERT(date,GETDATE(),103) BETWEEN D.ChkInDt AND D.ChkOutDt AND
+		CONVERT(date,@Str2,103) BETWEEN D.ChkInDt AND D.ChkOutDt AND
 		H.Id IN (SELECT ChkInHdrId FROM WRBHBChechkOutHdr WHERE IsActive=1 AND IsDeleted=0 and isnull(IntermediateFlag,0) = 1) 
 		AND H.RoomNo !='0' AND H.RoomNo !='Standard' 
 		AND H.RoomNo !='Special over 30 days' AND H.RoomNo !='Special' 
@@ -250,8 +250,6 @@ BEGIN
 		SELECT GuestName,BookingCode,Property,RoomType AS RoomNo,BookingId,Id,PropertyId,BreakfastVeg,
 		BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg FROM #Room  
 		
-		--AND CONVERT(NVARCHAR,GETDATE(),103)=@Str2 
-	    
 		SELECT DISTINCT (H.FirstName+''+H.LastName) AS UserName,H.Id AS UserId,
 		0 AS Id,0 AS BreakfastVeg,
 		0 AS BreakfastNonVeg,0 AS LunchVeg,0 AS LunchNonVeg,0 AS DinnerVeg,0 AS DinnerNonVeg

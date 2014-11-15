@@ -55,7 +55,15 @@ IF @Action = 'MMTdata'
 IF @Action = 'FalseFlagLoad'
  BEGIN
   --SELECT 'No' AS Sts,@Str1 AS Strg;
-  SELECT 'No' AS Sts,'Rooms are not available on the specified date range' AS Strg;
+  IF @Str2 = '123'
+   BEGIN
+    SELECT 'No' AS Sts,'Cannot process. New Tariff Updated.' AS Strg;
+   END
+  ELSE
+   BEGIN
+    SELECT 'No' AS Sts,
+    'Rooms are not available on the specified date range' AS Strg;
+   END
  END
 IF @Action = 'TrueFlagLoad'
  BEGIN
@@ -106,10 +114,10 @@ IF @Action = 'CityCode'
  END 
 IF @Action = 'GetCityId'
  BEGIN
-  SELECT Id FROM WRBHBCity 
+  /*SELECT Id FROM WRBHBCity 
   WHERE ISNULL(CityCode,'') != '' AND IsActive = 1 AND IsDeleted = 0
-  ORDER BY Id ASC;
-  --SELECT 1107 AS Id; --BANGLORE
+  ORDER BY Id ASC;*/
+  SELECT 1107 AS Id; --BANGLORE
   --SELECT 2423 AS Id; --COIMBATORE
   --SELECT * FROM WRBHBCity WHERE CityCode='CJB'
   --SELECT * FROM WRBHBCity WHERE CityCode='BLR'
@@ -140,5 +148,133 @@ IF @Action = 'GetCityId'
   select COUNT(*) from WRBHBAPIRoomTypeDtls--21224
   select COUNT(*) from WRBHBAPITariffDtls--117572
   -------------*/
- END 
+ END
+IF @Action = 'MMTTariffTaxesUpdate'
+ BEGIN
+  UPDATE WRBHBAPITariffDtls SET Tariffamount = @Id1
+  WHERE Id IN (SELECT T.Id FROM WRBHBAPIRoomRateDtls RR
+  LEFT OUTER JOIN WRBHBAPITariffDtls T WITH(NOLOCK)ON 
+  T.HeaderId = RR.HeaderId AND T.RoomRateHdrId = RR.Id
+  WHERE RR.HotelId = @Str1 AND RR.RoomRateratePlanCode = @Str2 AND
+  RR.RoomRateroomTypeCode = @Str3 AND RR.HeaderId = @Str4 AND
+  T.Tariffgroup = 'RoomRate' AND RoomTariffroomNumber = '1');
+  UPDATE WRBHBAPITariffDtls SET Tariffamount = @Id2
+  WHERE Id IN (SELECT T.Id FROM WRBHBAPIRoomRateDtls RR
+  LEFT OUTER JOIN WRBHBAPITariffDtls T WITH(NOLOCK)ON 
+  T.HeaderId = RR.HeaderId AND T.RoomRateHdrId = RR.Id
+  WHERE RR.HotelId = @Str1 AND RR.RoomRateratePlanCode = @Str2 AND
+  RR.RoomRateroomTypeCode = @Str3 AND RR.HeaderId = @Str4 AND
+  T.Tariffgroup = 'RoomRate' AND RoomTariffroomNumber = '2');  
+  IF EXISTS(SELECT NULL FROM WRBHBAPIRoomRateDtls RR
+  LEFT OUTER JOIN WRBHBAPITariffDtls T WITH(NOLOCK)ON 
+  T.HeaderId = RR.HeaderId AND T.RoomRateHdrId = RR.Id
+  WHERE RR.HotelId = @Str1 AND RR.RoomRateratePlanCode = @Str2 AND
+  RR.RoomRateroomTypeCode = @Str3 AND RR.HeaderId = @Str4 AND
+  T.Tariffgroup = 'Taxes' AND RoomTariffroomNumber = '1')
+   BEGIN
+    UPDATE WRBHBAPITariffDtls SET Tariffamount = @Id3
+    WHERE Id IN (SELECT T.Id FROM WRBHBAPIRoomRateDtls RR
+    LEFT OUTER JOIN WRBHBAPITariffDtls T WITH(NOLOCK)ON 
+    T.HeaderId = RR.HeaderId AND T.RoomRateHdrId = RR.Id
+    WHERE RR.HotelId = @Str1 AND RR.RoomRateratePlanCode = @Str2 AND
+    RR.RoomRateroomTypeCode = @Str3 AND RR.HeaderId = @Str4 AND
+    T.Tariffgroup = 'Taxes' AND RoomTariffroomNumber = '1');
+   END
+  ELSE
+   BEGIN
+    INSERT INTO WRBHBAPITariffDtls(HeaderId,HotelId,RoomRateHdrId,
+    RoomTariffroomNumber,Tarifftype,Tariffgroup,Tariffamount)
+    SELECT T.HeaderId,T.HotelId,T.RoomRateHdrId,T.RoomTariffroomNumber,
+    'Taxes','Taxes',@Id3 FROM WRBHBAPIRoomRateDtls RR
+    LEFT OUTER JOIN WRBHBAPITariffDtls T WITH(NOLOCK)ON 
+    T.HeaderId = RR.HeaderId AND T.RoomRateHdrId = RR.Id
+    WHERE RR.HotelId = @Str1 AND RR.RoomRateratePlanCode = @Str2 AND
+    RR.RoomRateroomTypeCode = @Str3 AND RR.HeaderId = @Str4 AND
+    T.Tariffgroup = 'RoomRate' AND RoomTariffroomNumber = '1';
+   END
+  IF EXISTS(SELECT NULL FROM WRBHBAPIRoomRateDtls RR
+  LEFT OUTER JOIN WRBHBAPITariffDtls T WITH(NOLOCK)ON 
+  T.HeaderId = RR.HeaderId AND T.RoomRateHdrId = RR.Id
+  WHERE RR.HotelId = @Str1 AND RR.RoomRateratePlanCode = @Str2 AND
+  RR.RoomRateroomTypeCode = @Str3 AND RR.HeaderId = @Str4 AND
+  T.Tariffgroup = 'Taxes' AND RoomTariffroomNumber = '2')
+   BEGIN
+    UPDATE WRBHBAPITariffDtls SET Tariffamount = @Id4
+    WHERE Id IN (SELECT T.Id FROM WRBHBAPIRoomRateDtls RR
+    LEFT OUTER JOIN WRBHBAPITariffDtls T WITH(NOLOCK)ON 
+    T.HeaderId = RR.HeaderId AND T.RoomRateHdrId = RR.Id
+    WHERE RR.HotelId = @Str1 AND RR.RoomRateratePlanCode = @Str2 AND
+    RR.RoomRateroomTypeCode = @Str3 AND RR.HeaderId = @Str4 AND
+    T.Tariffgroup = 'Taxes' AND RoomTariffroomNumber = '2');
+   END
+  ELSE
+   BEGIN
+    INSERT INTO WRBHBAPITariffDtls(HeaderId,HotelId,RoomRateHdrId,
+    RoomTariffroomNumber,Tarifftype,Tariffgroup,Tariffamount)
+    SELECT T.HeaderId,T.HotelId,T.RoomRateHdrId,T.RoomTariffroomNumber,
+    'Taxes','Taxes',@Id3 FROM WRBHBAPIRoomRateDtls RR
+    LEFT OUTER JOIN WRBHBAPITariffDtls T WITH(NOLOCK)ON 
+    T.HeaderId = RR.HeaderId AND T.RoomRateHdrId = RR.Id
+    WHERE RR.HotelId = @Str1 AND RR.RoomRateratePlanCode = @Str2 AND
+    RR.RoomRateroomTypeCode = @Str3 AND RR.HeaderId = @Str4 AND
+    T.Tariffgroup = 'RoomRate' AND RoomTariffroomNumber = '2';
+   END
+ END
+IF @Action = 'MMTDiscountUpdate'
+ BEGIN
+  IF EXISTS(SELECT NULL FROM WRBHBAPIRoomRateDtls RR
+  LEFT OUTER JOIN WRBHBAPITariffDtls T WITH(NOLOCK)ON 
+  T.HeaderId = RR.HeaderId AND T.RoomRateHdrId = RR.Id
+  WHERE RR.HotelId = @Str1 AND RR.RoomRateratePlanCode = @Str2 AND
+  RR.RoomRateroomTypeCode = @Str3 AND RR.HeaderId = @Str4 AND
+  T.Tariffgroup = 'RoomDiscount' AND RoomTariffroomNumber = '1')
+   BEGIN
+    UPDATE WRBHBAPITariffDtls SET Tariffamount = @Id1
+    WHERE Id IN (SELECT T.Id FROM WRBHBAPIRoomRateDtls RR
+    LEFT OUTER JOIN WRBHBAPITariffDtls T WITH(NOLOCK)ON 
+    T.HeaderId = RR.HeaderId AND T.RoomRateHdrId = RR.Id
+    WHERE RR.HotelId = @Str1 AND RR.RoomRateratePlanCode = @Str2 AND
+    RR.RoomRateroomTypeCode = @Str3 AND RR.HeaderId = @Str4 AND
+    T.Tariffgroup = 'RoomDiscount' AND RoomTariffroomNumber = '1');
+   END
+  ELSE
+   BEGIN
+    INSERT INTO WRBHBAPITariffDtls(HeaderId,HotelId,RoomRateHdrId,
+    RoomTariffroomNumber,Tarifftype,Tariffgroup,Tariffamount)
+    SELECT T.HeaderId,T.HotelId,T.RoomRateHdrId,T.RoomTariffroomNumber,
+    'RoomDiscount','RoomDiscount',@Id3 FROM WRBHBAPIRoomRateDtls RR
+    LEFT OUTER JOIN WRBHBAPITariffDtls T WITH(NOLOCK)ON 
+    T.HeaderId = RR.HeaderId AND T.RoomRateHdrId = RR.Id
+    WHERE RR.HotelId = @Str1 AND RR.RoomRateratePlanCode = @Str2 AND
+    RR.RoomRateroomTypeCode = @Str3 AND RR.HeaderId = @Str4 AND
+    T.Tariffgroup = 'RoomRate' AND RoomTariffroomNumber = '1';
+   END
+  IF EXISTS(SELECT NULL FROM WRBHBAPIRoomRateDtls RR
+  LEFT OUTER JOIN WRBHBAPITariffDtls T WITH(NOLOCK)ON 
+  T.HeaderId = RR.HeaderId AND T.RoomRateHdrId = RR.Id
+  WHERE RR.HotelId = @Str1 AND RR.RoomRateratePlanCode = @Str2 AND
+  RR.RoomRateroomTypeCode = @Str3 AND RR.HeaderId = @Str4 AND
+  T.Tariffgroup = 'RoomDiscount' AND RoomTariffroomNumber = '2')
+   BEGIN
+    UPDATE WRBHBAPITariffDtls SET Tariffamount = @Id2
+    WHERE Id IN (SELECT T.Id FROM WRBHBAPIRoomRateDtls RR
+    LEFT OUTER JOIN WRBHBAPITariffDtls T WITH(NOLOCK)ON 
+    T.HeaderId = RR.HeaderId AND T.RoomRateHdrId = RR.Id
+    WHERE RR.HotelId = @Str1 AND RR.RoomRateratePlanCode = @Str2 AND
+    RR.RoomRateroomTypeCode = @Str3 AND RR.HeaderId = @Str4 AND
+    T.Tariffgroup = 'RoomDiscount' AND RoomTariffroomNumber = '2');
+   END
+  ELSE
+   BEGIN
+    INSERT INTO WRBHBAPITariffDtls(HeaderId,HotelId,RoomRateHdrId,
+    RoomTariffroomNumber,Tarifftype,Tariffgroup,Tariffamount)
+    SELECT T.HeaderId,T.HotelId,T.RoomRateHdrId,T.RoomTariffroomNumber,
+    'RoomDiscount','RoomDiscount',@Id3 FROM WRBHBAPIRoomRateDtls RR
+    LEFT OUTER JOIN WRBHBAPITariffDtls T WITH(NOLOCK)ON 
+    T.HeaderId = RR.HeaderId AND T.RoomRateHdrId = RR.Id
+    WHERE RR.HotelId = @Str1 AND RR.RoomRateratePlanCode = @Str2 AND
+    RR.RoomRateroomTypeCode = @Str3 AND RR.HeaderId = @Str4 AND
+    T.Tariffgroup = 'RoomRate' AND RoomTariffroomNumber = '2';
+   END
+ END
 END

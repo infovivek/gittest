@@ -104,10 +104,10 @@
 				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Room',5223]);//
 				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Bed',1528]);
 				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Apartment',2027]);
-				//useWeb("BookingMail","RecommendMail_CUSTOM",[GlobalXml,'Recommend',5052]);
+				//useWeb("BookingMail","RecommendMail_CUSTOM",[GlobalXml,'Recommend',5809]);
 				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'MMT',4781]);				
-				//var ChkInDt:String="2014-11-14 12:00:00 PM";
-				//var ChkOutDt:String="2014-11-15 12:00:00 PM";
+				//var ChkInDt:String="2014-11-29 12:00:00 PM";
+				//var ChkOutDt:String="2014-11-30 12:00:00 PM";
 				//CityId=2905;
 				//CityId = 1107;
 				//CityId = 0;
@@ -293,14 +293,21 @@
 										Hlp_Column1.dataProvider = null;
 										Hlp_Column1.fnClear();
 									}
+									//Chk_C1.selected = false;
+									Lbl_C1Name.visible = true;
+									Lbl_C1M.visible = true;									
+									Hlp_Column1.visible = true;									
+									//Chk_C1.visible = true;									
 								}
 								else
 								{
-									Lbl_C1Name.visible = false;
-									Lbl_C1M.visible = false;
 									Lbl_C1M.text = "";
-									Hlp_Column1.visible = false;
 									Hlp_Column1.fnClear();
+									//Chk_C1.visible = false;
+									//Chk_C1.selected = false;
+									Lbl_C1Name.visible = false;
+									Lbl_C1M.visible = false;									
+									Hlp_Column1.visible = false;							
 								}
 								
 							}
@@ -328,14 +335,20 @@
 										Hlp_Column2.dataProvider = null;
 										Hlp_Column2.fnClear();
 									}
+									Lbl_C2Name.visible = true;
+									Lbl_C2M.visible = true;
+									//Chk_C2.visible = true;
+									Hlp_Column2.visible = true;
+									//Chk_C2.selected = false;
 								}
 								else
 								{
+									Lbl_C2M.text = "";
+									Hlp_Column2.fnClear();
 									Lbl_C2Name.visible = false;
 									Lbl_C2M.visible = false;
-									Lbl_C2M.text = "";
-									Hlp_Column2.visible = false;
-									Hlp_Column2.fnClear();
+									//Chk_C2.visible = false;
+									Hlp_Column2.visible = false;									
 								}
 							}
 							if(Ac_Column[q].Id == 3)
@@ -362,14 +375,21 @@
 										Hlp_Column3.dataProvider = null;
 										Hlp_Column3.fnClear();
 									}
+									//Chk_C3.selected = false;
+									Lbl_C3Name.visible = true;
+									Lbl_C3M.visible = true;
+									Hlp_Column3.visible = true;
+									//Chk_C3.visible = true;
 								}
 								else
 								{
+									Lbl_C3M.text = "";									
+									Hlp_Column3.fnClear();
+									//Chk_C3.selected = false;
 									Lbl_C3Name.visible = false;
 									Lbl_C3M.visible = false;
-									Lbl_C3M.text = "";
 									Hlp_Column3.visible = false;
-									Hlp_Column3.fnClear();
+									//Chk_C3.visible = false;
 								}
 							}
 							if(Ac_Column[q].Id == 4)
@@ -396,6 +416,11 @@
 										Hlp_Column4.dataProvider = null;
 										Hlp_Column4.fnClear();
 									}
+									Lbl_C4Name.visible = true;
+									Lbl_C4M.visible = true;
+									Hlp_Column4.visible = true;
+									//Chk_C4.selected = false;
+									//Chk_C4.visible = true;
 								}
 								else
 								{
@@ -404,6 +429,8 @@
 									Lbl_C4M.text = "";
 									Hlp_Column4.visible = false;
 									Hlp_Column4.fnClear();
+									//Chk_C4.selected = false;
+									//Chk_C4.visible = false;
 								}
 							}
 							if(Ac_Column[q].Id == 5)
@@ -430,6 +457,11 @@
 										Hlp_Column5.dataProvider = null;
 										Hlp_Column5.fnClear();
 									}
+									Lbl_C5Name.visible = true;
+									Lbl_C5M.visible = true;
+									Hlp_Column5.visible = true;
+									//Chk_C5.visible = true;
+									//Chk_C5.selected = false;
 								}
 								else
 								{
@@ -438,6 +470,8 @@
 									Lbl_C5M.text = "";
 									Hlp_Column5.visible = false;
 									Hlp_Column5.fnClear();
+									//Chk_C5.visible = false;
+									//Chk_C5.selected = false;
 								}
 							}
 							if(Ac_Column[q].Id == 6)
@@ -455,15 +489,19 @@
 									}
 									if (Ds_Objects.result.Tables.Table6.Rows.length > 0)
 									{
-										Hlp_Column6.dataProvider = null;
-										Hlp_Column6.fnClear();									
+										Hlp_Column6.dataProvider = null;																			
 										Hlp_Column6.dataProvider = Ds_Objects.result.Tables.Table6.Rows as ArrayCollection;
 									}
 									else
 									{
 										Hlp_Column6.dataProvider = null;
-										Hlp_Column6.fnClear();
 									}
+									Lbl_C6Name.visible = true;
+									Lbl_C6M.visible = true;									
+									Hlp_Column6.visible = true;
+									Hlp_Column6.fnClear();
+									//Chk_C6.selected = false;
+									//Chk_C6.visible = true;
 								}
 								else
 								{
@@ -472,6 +510,8 @@
 									Lbl_C6M.text = "";
 									Hlp_Column6.visible = false;
 									Hlp_Column6.fnClear();
+									//Chk_C6.selected = false;
+									//Chk_C6.visible = false;
 								}
 							}
 							if(Ac_Column[q].Id == 7)
@@ -490,22 +530,30 @@
 									if (Ds_Objects.result.Tables.Table7.Rows.length > 0)
 									{
 										Hlp_Column7.dataProvider = null;
-										Hlp_Column7.fnClear();
+										//Hlp_Column7.fnClear();
 										Hlp_Column7.dataProvider = Ds_Objects.result.Tables.Table7.Rows as ArrayCollection;
 									}
 									else
 									{
 										Hlp_Column7.dataProvider = null;
-										Hlp_Column7.fnClear();
+										//Hlp_Column7.fnClear();
 									}
+									Lbl_C7Name.visible = true;
+									Lbl_C7M.visible = true;
+									Hlp_Column7.visible = true;									
+									Hlp_Column7.fnClear();
+									//Chk_C7.selected = false;
+									//Chk_C7.visible = true;
 								}
 								else
 								{
 									Lbl_C7Name.visible = false;
 									Lbl_C7M.visible = false;
-									Lbl_C7M.text = "";
 									Hlp_Column7.visible = false;
+									Lbl_C7M.text = "";									
 									Hlp_Column7.fnClear();
+									//Chk_C7.selected = false;
+									//Chk_C7.visible = false;
 								}
 							}
 							if(Ac_Column[q].Id == 8)
@@ -524,14 +572,20 @@
 									if (Ds_Objects.result.Tables.Table8.Rows.length > 0)
 									{
 										Hlp_Column8.dataProvider = null;
-										Hlp_Column8.fnClear();
+										//Hlp_Column8.fnClear();
 										Hlp_Column8.dataProvider = Ds_Objects.result.Tables.Table8.Rows as ArrayCollection;
 									}
 									else
 									{
 										Hlp_Column8.dataProvider = null;
-										Hlp_Column8.fnClear();
+										//Hlp_Column8.fnClear();
 									}
+									Lbl_C8Name.visible = true;
+									Lbl_C8M.visible = true;									
+									Hlp_Column8.visible = true;
+									Hlp_Column8.fnClear();
+									//Chk_C8.selected = false;
+									//Chk_C8.visible = true;
 								}
 								else
 								{
@@ -540,6 +594,8 @@
 									Lbl_C8M.text = "";
 									Hlp_Column8.visible = false;
 									Hlp_Column8.fnClear();
+									//Chk_C8.selected = false;
+									//Chk_C8.visible = false;
 								}
 							}
 							if(Ac_Column[q].Id == 9)
@@ -566,6 +622,12 @@
 										Hlp_Column9.dataProvider = null;
 										Hlp_Column9.fnClear();
 									}
+									Lbl_C9Name.visible = true;
+									Lbl_C9M.visible = true;									
+									Hlp_Column9.visible = true;
+									Hlp_Column9.fnClear();
+									//Chk_C9.selected = false;
+									//Chk_C9.visible = true;
 								}
 								else
 								{
@@ -574,6 +636,8 @@
 									Lbl_C9M.text = "";
 									Hlp_Column9.visible = false;
 									Hlp_Column9.fnClear();
+									//Chk_C9.selected = false;
+									//Chk_C9.visible = false;
 								}
 							}
 							if(Ac_Column[q].Id == 10)
@@ -600,6 +664,12 @@
 										Hlp_Column10.dataProvider = null;
 										Hlp_Column10.fnClear();
 									}
+									Lbl_C10Name.visible = true;
+									Lbl_C10M.visible = true;									
+									Hlp_Column10.visible = true;
+									Hlp_Column10.fnClear();
+									//Chk_C10.visible = true;
+									//Chk_C10.selected = false;
 								}
 								else
 								{
@@ -608,6 +678,8 @@
 									Lbl_C10M.text = "";
 									Hlp_Column10.visible = false;
 									Hlp_Column10.fnClear();
+									//Chk_C10.visible = false;
+									//Chk_C10.selected = false;
 								}
 							}
 							Hlp_Column1.text = Hlp_Client.text=Ds_Objects.result.Tables.Table11.Rows[0].Column1;
@@ -625,7 +697,8 @@
 						Btn_BackTab3.enabled = false;
 						Btn_Backed.enabled = false;
 					}
-					else
+					return;
+					//else
 					{
 						Hlp_Column1.fnClear();Hlp_Column2.fnClear();Hlp_Column3.fnClear();
 						Hlp_Column4.fnClear();Hlp_Column5.fnClear();Hlp_Column6.fnClear();
@@ -2806,6 +2879,7 @@
 				}
 			}
 			
+			public var GuestId:int = 0;
 			public function FnChkChangeTab3(event:Event):void
 			{
 				var Ac:ArrayCollection=new ArrayCollection();				
@@ -2814,11 +2888,16 @@
 				if(Ac[Index].Tick == 0)
 				{
 					Ac[Index].Tick = 1;
+					//
+					GuestId = Ac[Index].GuestId;
+					useWeb("BOOKING","CustomFields_CUSTOM",
+						[GlobalXml,'CustomFields','','','','',0,0,ClientId,0,0,Ac[Index].GuestId,0]);
+					//Pnl_CustomFields.visible = true;
 				}
 				else
 				{
-					Ac[Index].Tick = 0;
-				}
+					Ac[Index].Tick = 0;GuestId = 0;
+				}				
 			}
 			
 			protected function Ddl_PropertyType_changeHandler(event:IndexChangeEvent):void
@@ -3202,11 +3281,11 @@
 					}
 				}
 				//if(ClientId == 1657){Txt_Tariff.text="0";}
-				var Ac:ArrayCollection=new ArrayCollection();
-				var Ac1:ArrayCollection=new ArrayCollection();
-				Ac=Tmp;
-				Ac1=Grd_PropertyAssignedGuest.dataProvider as ArrayCollection;
-				var Len1:int=Ac1.length;
+				var Ac:ArrayCollection = new ArrayCollection();
+				var Ac1:ArrayCollection = new ArrayCollection();
+				Ac = Tmp;
+				Ac1 = Grd_PropertyAssignedGuest.dataProvider as ArrayCollection;
+				var Len1:int = Ac1.length;
 				if(Ac1.length != 0)
 				{
 					if((PropertyType == "InP")||(PropertyType == "MGH")||(PropertyType == "DdP"))
@@ -3241,9 +3320,9 @@
 				//Pnl.visible = true;
 				//Pnl_CustomFields.visible = true;
 				//useWeb("BOOKING","ComponentCreation_CUSTOM",[GlobalXml,'ComponentCreation','','','','',0,0,ClientId,0,0,0,0]);				
-				useWeb("BOOKING","CustomFields_CUSTOM",
-					[GlobalXml,'CustomFields','','','','',0,0,ClientId,0,0,GstId,0]);				
-				return;
+				//useWeb("BOOKING","CustomFields_CUSTOM",
+				//	[GlobalXml,'CustomFields','','','','',0,0,ClientId,0,0,GstId,0]);				
+				//return;
 				var RoomCaptured:Number=0,maxValue:Number=1;
 				for each (var o:Object in Ac1)
 				{
@@ -3253,8 +3332,8 @@
 					}
 				}				
 				RoomCaptured = maxValue + 1;
-				Grd_GuestTab3.dataProvider=null;
-				var Len:int=Ac.length;
+				Grd_GuestTab3.dataProvider = null;
+				var Len:int = Ac.length;
 				for(var j:int = 0; j < Len; j++)
 				{
 					if(Ac[j].Tick == 1)
@@ -3267,13 +3346,24 @@
 								BookingPropertyId:BookingPropertyId,SSPId:SSPId,
 								BookingPropertyTableId:BookingPropertyTableId,Id:0,
 								ServicePaymentMode:ServicePaymentMode,TariffPaymentMode:TariffPaymentMode,
-								Name:Ac[j].Name,RoomCaptured:RoomCaptured});
+								Name:Ac[j].Name,RoomCaptured:RoomCaptured,
+							    //
+								Column1:Ac[j].Txt_C1,Column2:Ac[j].Txt_C2,Column3:Ac[j].Txt_C3,Column4:Ac[j].Txt_C4,
+								Column5:Ac[j].Txt_C5,Column6:Ac[j].Txt_C6,Column7:Ac[j].Txt_C7,Column8:Ac[j].Txt_C8,
+								Column9:Ac[j].Txt_C9,Column10:Ac[j].Txt_C10,
+							    //
+								ChkColumn1:Ac[j].Chk_C1,ChkColumn2:Ac[j].Chk_C2,ChkColumn3:Ac[j].Chk_C3,
+								ChkColumn4:Ac[j].Chk_C4,ChkColumn5:Ac[j].Chk_C5,ChkColumn6:Ac[j].Chk_C6,
+								ChkColumn7:Ac[j].Chk_C7,ChkColumn8:Ac[j].Chk_C8,ChkColumn9:Ac[j].Chk_C9,
+								ChkColumn10:Ac[j].Chk_C10});
 						Tmp.removeItemAt(j);
-						j=0;Len=Ac.length;j=j-1;
+						j = 0;
+						Len = Ac.length;
+						j = j - 1;
 					}					
 				}
-				Grd_GuestTab3.dataProvider=Tmp.source;
-				Grd_PropertyAssignedGuest.dataProvider=Ac1;
+				Grd_GuestTab3.dataProvider = Tmp.source;
+				Grd_PropertyAssignedGuest.dataProvider = Ac1;
 				// clear
 				/*RoomType="";Single=0;Double=0;Triple=0;SSPId=0;RoomId=0;
 				Ddl_Room.prompt="";Ddl_Room.prompt="Please Select Room";				
@@ -3864,6 +3954,43 @@
 						Alert.OK,null,null,iconErrLarge,Alert.OK),10,"");
 					return;
 				}
+				
+				var ACC_Guest:ArrayCollection = new ArrayCollection();
+				ACC_Guest = Grd_GuestTab3.dataProvider as ArrayCollection;
+				var ACC_Guestlength:int = ACC_Guest.length;
+				Grd_GuestTab3.dataProvider = null;
+				for(var f:int = 0; f < ACC_Guestlength; f++)
+				{
+					if(GuestId == ACC_Guest[f].GuestId)
+					{
+						ACC_Guest[f].Txt_C1 = Hlp_Column1.text;
+						ACC_Guest[f].Txt_C2 = Hlp_Column2.text;
+						ACC_Guest[f].Txt_C3 = Hlp_Column3.text;
+						ACC_Guest[f].Txt_C4 = Hlp_Column4.text;
+						ACC_Guest[f].Txt_C5 = Hlp_Column5.text;
+						ACC_Guest[f].Txt_C6 = Hlp_Column6.text;
+						ACC_Guest[f].Txt_C7 = Hlp_Column7.text;
+						ACC_Guest[f].Txt_C8 = Hlp_Column8.text;
+						ACC_Guest[f].Txt_C9 = Hlp_Column9.text;
+						ACC_Guest[f].Txt_C10 = Hlp_Column10.text;
+						/*ACC_Guest[f].Chk_C1 = Chk_C1.selected;
+						ACC_Guest[f].Chk_C2 = Chk_C2.selected;
+						ACC_Guest[f].Chk_C3 = Chk_C3.selected;
+						ACC_Guest[f].Chk_C4 = Chk_C4.selected;
+						ACC_Guest[f].Chk_C5 = Chk_C5.selected;
+						ACC_Guest[f].Chk_C6 = Chk_C6.selected;
+						ACC_Guest[f].Chk_C7 = Chk_C7.selected;
+						ACC_Guest[f].Chk_C8 = Chk_C8.selected;
+						ACC_Guest[f].Chk_C9 = Chk_C9.selected;
+						ACC_Guest[f].Chk_C10 = Chk_C10.selected;*/
+						f = ACC_Guestlength;
+					}
+				}
+				Grd_GuestTab3.dataProvider = ACC_Guest;
+				Btn_BackTab3.enabled = true;
+				Btn_Backed.enabled = true;
+				Pnl_CustomFields.visible = false;
+				return;
 				var Ac1:ArrayCollection = new ArrayCollection();
 				Ac1 = Grd_PropertyAssignedGuest.dataProvider as ArrayCollection; 
 				var RoomCaptured:Number = 0,maxValue:Number = 1;
@@ -4318,6 +4445,26 @@
 						<mx:DataGridColumn width="0" dataField="Name" visible="false"/>
 						<mx:DataGridColumn width="0" dataField="GuestId" visible="false"/>
 						<mx:DataGridColumn width="0" dataField="Id" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Txt_C1" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Txt_C2" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Txt_C3" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Txt_C4" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Txt_C5" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Txt_C6" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Txt_C7" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Txt_C8" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Txt_C9" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Txt_C10" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Chk_C1" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Chk_C2" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Chk_C3" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Chk_C4" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Chk_C5" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Chk_C6" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Chk_C7" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Chk_C8" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Chk_C9" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Chk_C10" visible="false"/>
 					</mx:columns>
 				</mx:DataGrid>
 				<mx:DataGrid id="Grd_PropertyAssignedGuest" x="12" y="232" width="946" height="182"
@@ -4353,15 +4500,25 @@
 						<mx:DataGridColumn width="0" dataField="Column8" visible="false"/>
 						<mx:DataGridColumn width="0" dataField="Column9" visible="false"/>
 						<mx:DataGridColumn width="0" dataField="Column10" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="ChkColumn1" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="ChkColumn2" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="ChkColumn3" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="ChkColumn4" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="ChkColumn5" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="ChkColumn6" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="ChkColumn7" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="ChkColumn8" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="ChkColumn9" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="ChkColumn10" visible="false"/>
 					</mx:columns>
 				</mx:DataGrid>
 				<s:TextInput x="395" y="98.3" id="Txt_Tariff" height="23" width="80" textAlign="center"
 							 editable="false" focusEnabled="false"/>
 				<s:TextInput x="159" y="189.5" id="Txt_ClientAdvAmt" height="23" width="80" textAlign="center"
 							 editable="false" focusEnabled="false"/>
-				<s:Panel id="Pnl_CustomFields" x="278" y="5" width="461" height="417" depth="1"
+				<s:Panel id="Pnl_CustomFields" x="250" y="3" width="470" height="419" depth="1"
 						 title="Custom Fields" visible="false">
-					<s:Label x="438" y="-22" text="X" toolTip="Close" click="Btn_PnlClose_click()"/>
+					<s:Label x="447" y="-22" text="X" toolTip="Close" click="Btn_PnlClose_click()"/>
 					<WrbHelpComp:HelpText id="Hlp_Column1" x="245" y="11" width="200" height="20"
 										  depth="11" pxSetColumnsWidth="198" pxSetHeight="154"
 										  pxTabIndex="67"/>
@@ -4421,7 +4578,7 @@
 							 text="Column9Name"/>
 					<s:Label id="Lbl_C10Name" x="14" y="302" width="200" height="12"
 							 text="Column10Name"/>
-					<s:HGroup x="14" y="334" width="431" height="32" horizontalAlign="center">
+					<s:HGroup x="9" y="337" width="449" height="32" horizontalAlign="center">
 						<WrbComp:Button_HB id="Btn_PnlSave" _Label="Add"
 										   click="Btn_PnlSave_clickHandler()"/>
 						<WrbComp:Button_HB id="Btn_PnlClose" _Label="Close" click="Btn_PnlClose_click()"/>

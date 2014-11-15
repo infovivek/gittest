@@ -32,63 +32,78 @@ AS
 BEGIN			--DROP TABLE #TEMPCASH	
 	--Cash temp table
 			CREATE TABLE #TEMPCASH (BillType NVARCHAR(100),InvoiceNo NVARCHAR(100),Total DECIMAL(27,2),
-			ChkOutHdrId BIGINT,Mode NVARCHAR(100),ClientId BIGINT,Property NVARCHAR(100),PId BIGINT)
+			ChkOutHdrId BIGINT,Mode NVARCHAR(100),ClientId BIGINT,Property NVARCHAR(100),PId BIGINT,
+			CheckIn NVARCHAR(100),CheckOut NVARCHAR(100))
 			
-			INSERT INTO #TEMPCASH(BillType,InvoiceNo,Total,ChkOutHdrId,Mode,ClientId,Property,PId)
+			INSERT INTO #TEMPCASH(BillType,InvoiceNo,Total,ChkOutHdrId,Mode,ClientId,Property,PId,
+			CheckIn,CheckOut)
 			
 			SELECT DISTINCT Payment AS BillType,COH.InVoiceNo,SUM(AmountPaid) AS Total,COH.Id AS ChkOutHdrId,'Cash',
-			CM.Id AS ClientId,COH.Property AS Property,COH.PropertyId AS PId
+			CM.Id AS ClientId,COH.Property AS Property,COH.PropertyId AS PId,
+			CheckInDate,CheckOutDate
 			FROM WRBHBChechkOutPaymentCash PC
 			JOIN WRBHBChechkOutHdr COH ON PC.ChkOutHdrId=COH.Id
 			JOIN WRBHBClientManagement CM ON COH.ClientName=CM.ClientName WHERE COH.PropertyId=@Id
-			GROUP BY Payment,COH.InVoiceNo,COH.Id,CM.Id,COH.Property,COH.PropertyId
+			GROUP BY Payment,COH.InVoiceNo,COH.Id,CM.Id,COH.Property,COH.PropertyId,
+			CheckInDate,CheckOutDate
 			
 			--select * from #TEMPCASH
 	--Cheque temp table		
 			CREATE TABLE #TEMPCHEQUE (BillType NVARCHAR(100),InvoiceNo NVARCHAR(100),Total DECIMAL(27,2),
-			ChkOutHdrId BIGINT,Mode NVARCHAR(100),ClientId BIGINT,Property NVARCHAR(100),PId BIGINT)
+			ChkOutHdrId BIGINT,Mode NVARCHAR(100),ClientId BIGINT,Property NVARCHAR(100),PId BIGINT,
+			CheckIn NVARCHAR(100),CheckOut NVARCHAR(100))
 			
-			INSERT INTO #TEMPCHEQUE(BillType,InvoiceNo,Total,ChkOutHdrId,Mode,ClientId,Property,PId)
+			INSERT INTO #TEMPCHEQUE(BillType,InvoiceNo,Total,ChkOutHdrId,Mode,ClientId,Property,PId,
+			CheckIn,CheckOut)
 			
 			SELECT DISTINCT Payment AS BillType,COH.InVoiceNo,SUM(AmountPaid) AS Total,COH.Id AS ChkOutHdrId,
-			'Cheque',CM.Id AS ClientId,COH.Property AS Property,COH.PropertyId AS PId
+			'Cheque',CM.Id AS ClientId,COH.Property AS Property,COH.PropertyId AS PId,
+			CheckInDate,CheckOutDate
 			FROM WRBHBChechkOutPaymentCheque PC
 			JOIN WRBHBChechkOutHdr COH ON PC.ChkOutHdrId=COH.Id
 			JOIN WRBHBClientManagement CM ON COH.ClientName=CM.ClientName WHERE COH.PropertyId=@Id
-			GROUP BY Payment,COH.InVoiceNo,COH.Id,CM.Id,COH.Property,COH.PropertyId
+			GROUP BY Payment,COH.InVoiceNo,COH.Id,CM.Id,COH.Property,COH.PropertyId,
+			CheckInDate,CheckOutDate
 	--BTC temp table
 			CREATE TABLE #TEMPBTC (BillType NVARCHAR(100),InvoiceNo NVARCHAR(100),Total DECIMAL(27,2),
-			ChkOutHdrId BIGINT,Mode NVARCHAR(100),ClientId BIGINT,Property NVARCHAR(100),PId BIGINT)
+			ChkOutHdrId BIGINT,Mode NVARCHAR(100),ClientId BIGINT,Property NVARCHAR(100),PId BIGINT,
+			CheckIn NVARCHAR(100),CheckOut NVARCHAR(100))
 			
-			INSERT INTO #TEMPBTC(BillType,InvoiceNo,Total,ChkOutHdrId,Mode,ClientId,Property,PId)
+			INSERT INTO #TEMPBTC(BillType,InvoiceNo,Total,ChkOutHdrId,Mode,ClientId,Property,PId,
+			CheckIn,CheckOut)
 					
 			SELECT DISTINCT Payment AS BillType,COH.InVoiceNo,SUM(AmountPaid) AS Total,COH.Id AS ChkOutHdrId,
-			'BTC',CM.Id AS ClientId,COH.Property AS Property,COH.PropertyId AS PId
+			'BTC',CM.Id AS ClientId,COH.Property AS Property,COH.PropertyId AS PId,
+			CheckInDate,CheckOutDate
 			FROM WRBHBChechkOutPaymentCompanyInvoice PC
 			JOIN WRBHBChechkOutHdr COH ON PC.ChkOutHdrId=COH.Id
 			JOIN WRBHBClientManagement CM ON COH.ClientName=CM.ClientName WHERE COH.PropertyId=@Id
-			GROUP BY Payment,COH.InVoiceNo,COH.Id,CM.Id,COH.Property,COH.PropertyId
+			GROUP BY Payment,COH.InVoiceNo,COH.Id,CM.Id,COH.Property,COH.PropertyId,
+			CheckInDate,CheckOutDate
 			
 	IF @Action='Pageload'
 	BEGIN
 	--Cash Deposits
-	SELECT Convert(NVARCHAR(100),DepositedDate,103) AS Date,Amount,BA.AccountDetails as DepositeTo,U.FirstName as DepositedBy,--DepositedBy,
+	SELECT Convert(NVARCHAR(100),DepositedDate,103) AS Date,P.PropertyName AS Property,Amount,BA.AccountDetails as DepositeTo,U.FirstName as DepositedBy,--DepositedBy,
 	Comments,ChallanImage,D.Id FROM WRBHBDeposits D 
 	JOIN WRBHBBankAccounts BA ON BA.BankAccountID=D.DepositeToId
+	JOIN WRBHBProperty P ON D.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
 	JOIN WRBHBUser U ON U.Id=D.DepositedBy
 	where Mode='Cash' AND D.IsActive=1	AND D.IsDeleted=0  AND MONTH(D.DepositedDate) = MONTH(GETDATE())
 	
 	--Cheque Deposits
-	SELECT Convert(NVARCHAR(100),DepositedDate,103) AS Date,Amount,BA.AccountDetails as DepositeTo,U.FirstName as DepositedBy,--DepositedBy,
+	SELECT Convert(NVARCHAR(100),DepositedDate,103) AS Date,P.PropertyName AS Property,Amount,BA.AccountDetails as DepositeTo,U.FirstName as DepositedBy,--DepositedBy,
 	Comments,ChallanImage,D.Id FROM WRBHBDeposits D 
 	JOIN WRBHBBankAccounts BA ON BA.BankAccountID=D.DepositeToId
+	JOIN WRBHBProperty P ON D.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
 	JOIN WRBHBUser U ON U.Id=D.DepositedBy
 	where Mode='Cheque' AND D.IsActive=1	AND D.IsDeleted=0 AND MONTH(D.DepositedDate) = MONTH(GETDATE())
 	
 	--BTC Deposits
-	SELECT Convert(NVARCHAR(100),DepositedDate,103) AS Date,D.Amount,D.Comments,BTCTo,BTCMode,D.Id
+	SELECT Convert(NVARCHAR(100),DepositedDate,103) AS Date,P.PropertyName AS Property,D.Amount,D.Comments,BTCTo,BTCMode,D.Id
 	FROM WRBHBDeposits D 
 	JOIN WRBHBUser U ON U.Id=D.DepositedBy
+	JOIN WRBHBProperty P ON D.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
 	where Mode='BTC' AND D.IsActive=1	AND D.IsDeleted=0 AND MONTH(D.DepositedDate) = MONTH(GETDATE())
 	
 	
@@ -97,7 +112,7 @@ BEGIN			--DROP TABLE #TEMPCASH
 	
 	select DISTINCT P.PropertyName AS Property,P.Id AS ZId 
 	From WRBHBProperty P
-	JOIN WRBHBChechkOutHdr COH ON P.Id=COH.PropertyId
+	JOIN WRBHBChechkOutHdr COH ON P.Id=COH.PropertyId AND COH.IsActive=1 AND COH.IsDeleted=0
 	JOIN WRBHBPropertyUsers PU ON COH.PropertyId=PU.PropertyId AND PU.IsActive=1 AND PU.IsDeleted=0
 	WHERE PU.UserId=@Id AND P.IsActive=1 AND P.IsDeleted=0
 	
@@ -109,12 +124,14 @@ BEGIN			--DROP TABLE #TEMPCASH
 		Comments,ImageName,P.PropertyName as Property,D.TotalAmount as TotalAmount,D.InvoiceNo,D.Id,D.ChequeNo 
 		FROM WRBHBDeposits D
 		JOIN WRBHBBankAccounts BA ON BA.BankAccountID=D.DepositeToId
-		JOIN WRBHBProperty P ON D.PropertyId=P.Id
+		JOIN WRBHBProperty P ON D.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
 		WHERE D.Id=@Id and D.IsActive=1 and D.IsDeleted=0
 		
-		SELECT BillType,InvoiceNo,Amount Total,ChkOutHdrId,ClientId,CM.ClientName,Tick 
+		SELECT DISTINCT D.BillType,D.InvoiceNo,Amount Total,ChkOutHdrId,D.ClientId,CM.ClientName AS Client,Tick,
+		COH.CheckInDate AS CheckIn,COH.CheckOutDate AS CheckOut
 		From WRBHBDepositsDlts D
 		JOIN WRBHBClientManagement CM ON D.ClientId=CM.Id AND CM.IsActive=1 AND CM.IsDeleted=0
+		JOIN WRBHBChechkOutHdr COH ON D.ChkOutHdrId=COH.Id AND COH.IsActive=1 AND COH.IsDeleted=0
 		WHERE D.DepHdrId=@Id AND D.IsActive=1 AND D.IsDeleted=0
 		
 	END
@@ -122,13 +139,15 @@ BEGIN			--DROP TABLE #TEMPCASH
 	BEGIN
 		SELECT convert(nvarchar(100),DepositedDate,103) as Date,TotalAmount AS Amount,Comments as Remarks,BTCMode,BTCTo,DoneBy,
 		D.Id,P.PropertyName as Property,CM.ClientName FROM WRBHBDeposits D
-		JOIN WRBHBProperty P ON D.PropertyId=P.Id
+		JOIN WRBHBProperty P ON D.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
 		JOIN WRBHBClientManagement CM ON D.ClientId=CM.Id AND CM.IsActive=1 AND CM.IsDeleted=0
 		WHERE D.Id=@Id and D.IsActive=1 and D.IsDeleted=0 AND Mode='BTC'
 		
-		SELECT BillType,InvoiceNo,Amount Total,ChkOutHdrId,ClientId,Tick,CM.ClientName AS Client 
+		SELECT D.BillType,D.InvoiceNo,Amount Total,ChkOutHdrId,D.ClientId,Tick,CM.ClientName AS Client,
+		COH.CheckInDate AS CheckIn,COH.CheckOutDate AS CheckOut 
 		from WRBHBDepositsDlts D
 		JOIN WRBHBClientManagement CM ON D.ClientId=CM.Id AND CM.IsActive=1 AND CM.IsDeleted=0
+		JOIN WRBHBChechkOutHdr COH ON D.ChkOutHdrId=COH.Id AND COH.IsActive=1 AND COH.IsDeleted=0
 		WHERE D.DepHdrId=@Id
 	END
 	IF @Action='IMAGEUPLOAD'
@@ -140,7 +159,7 @@ BEGIN			--DROP TABLE #TEMPCASH
 	BEGIN	
 		IF @Str='Cash'
 		BEGIN
-			SELECT BillType,InvoiceNo,Total,ChkOutHdrId,ClientId FROM #TEMPCASH WHERE Total!=0.00 AND InvoiceNo!=''	
+			SELECT BillType,InvoiceNo,Total,ChkOutHdrId,ClientId,CheckIn,CheckOut FROM #TEMPCASH WHERE Total!=0.00 AND InvoiceNo!=''	
 			AND InVoiceNo NOT IN(SELECT InVoiceNo FROM WRBHBDepositsDlts WHERE IsActive=1)
 			
 			SELECT DISTINCT ClientId AS ZId,CM.ClientName AS Client FROM #TEMPCASH TC
@@ -148,7 +167,7 @@ BEGIN			--DROP TABLE #TEMPCASH
 		END	
 		IF @Str='Cheque'
 		BEGIN
-			SELECT BillType,InvoiceNo,Total,ChkOutHdrId FROM #TEMPCHEQUE WHERE Total!=0.00 AND InvoiceNo!=''
+			SELECT BillType,InvoiceNo,Total,ChkOutHdrId,CheckIn,CheckOut FROM #TEMPCHEQUE WHERE Total!=0.00 AND InvoiceNo!=''
 			AND InVoiceNo NOT IN(SELECT InVoiceNo FROM WRBHBDepositsDlts WHERE IsActive=1)
 			
 			SELECT DISTINCT ClientId AS ZId,CM.ClientName AS Client FROM #TEMPCHEQUE TCQ
@@ -156,7 +175,7 @@ BEGIN			--DROP TABLE #TEMPCASH
 		END	
 		IF @Str='BTC'
 		BEGIN
-			SELECT BillType,InvoiceNo,Total,ChkOutHdrId,CM.ClientName AS Client 
+			SELECT BillType,InvoiceNo,Total,ChkOutHdrId,CM.ClientName AS Client,TC.CheckIn,TC.CheckOut 
 			FROM #TEMPBTC TC
 			JOIN WRBHBClientManagement CM ON TC.ClientId=CM.Id WHERE CM.IsActive=1 AND CM.IsDeleted=0
 			AND Total!=0.00 AND InvoiceNo!='' AND InVoiceNo NOT IN(SELECT InVoiceNo FROM WRBHBDepositsDlts)
@@ -169,7 +188,7 @@ BEGIN			--DROP TABLE #TEMPCASH
 	BEGIN
 		IF @Str='BTC'
 		BEGIN
-			SELECT BillType,InvoiceNo,Total,ChkOutHdrId,ClientId,CM.ClientName AS Client  FROM #TEMPBTC TC
+			SELECT BillType,InvoiceNo,Total,ChkOutHdrId,ClientId,CM.ClientName AS Client,CheckIn,CheckOut  FROM #TEMPBTC TC
 			JOIN WRBHBClientManagement CM ON TC.ClientId=CM.Id AND CM.IsActive=1 AND CM.IsDeleted=0			
 			WHERE ClientId=@Id2 AND 
 			Total!=0.00 AND InvoiceNo!='' AND InVoiceNo NOT IN(SELECT InVoiceNo FROM WRBHBDepositsDlts 

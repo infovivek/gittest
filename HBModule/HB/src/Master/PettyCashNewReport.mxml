@@ -264,7 +264,7 @@
 				FromDate=dt_DateFrom.text;
 				ToDate=dt_DateTo.text;
 				//var MFromDate:String = String(b)+'/'+'01/'+String(c);
-				useWeb("PettyCashReport","HistoryLoad_CUSTOM",[GlobalXml,"PCNewReport",0,0,FromDate,ToDate]);
+				useWeb("PettyCashReport","HistoryLoad_CUSTOM",[GlobalXml,"PCNewReport",0,0,FromDate,ToDate,'']);
 				Grd_History.visible=true;
 				
 			}

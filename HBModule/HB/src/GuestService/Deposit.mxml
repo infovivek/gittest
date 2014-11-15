@@ -103,9 +103,11 @@
 				}
 				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
 				{
+					var Mode1:String="";
 					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
 					{
 						DId=Ds_Objects.result.Tables.Table.Rows[0].Id;
+						Mode1=Ds_Objects.result.Tables.Table.Rows[0].Mode;
 					}
 					if(FilePath.text!="")
 					{
@@ -114,12 +116,27 @@
 					}	
 					if (Id == 0)
 					{
-						alignAlert(Alert.show("Deposit Saved Successfully.","Message !",Alert.OK, 
+						if(Mode1=="BTC")
+						{
+						alignAlert(Alert.show("BTC Submission Saved Successfully.","Message !",Alert.OK, 
 							null, null, iconTickLarge, Alert.OK),10,"");
-						
+						 BTCCancel();
+						}
+						else if(Mode1=="Cash")
+						{
+							alignAlert(Alert.show("Cash Deposit Saved Successfully.","Message !",Alert.OK, 
+								null, null, iconTickLarge, Alert.OK),10,"");
+							CashCancel();
+						}
+						else if(Mode1=="Cheque")
+						{
+							alignAlert(Alert.show("Cheque Deposit Saved Successfully.","Message !",Alert.OK, 
+								null, null, iconTickLarge, Alert.OK),10,"");
+							CashCancel();
+						}	
 					}
-					CashCancel();
-					BTCCancel();
+					
+					
 				}
 				if (Ds_Objects.currentTarget.description.toString() == "ImageUpload_CUSTOM")
 				{
@@ -379,7 +396,7 @@
 					alignAlert(Alert.show("Do you want to Save this item?", "Warning",Alert.YES | Alert.NO, null,
 						FnCashSave, iconWarning, Alert.NO),10,"");
 				}
-				Help();
+				
 			}
 			protected function FnCashSave(event:CloseEvent):void
 			{ 
@@ -763,6 +780,7 @@
 				txt_ChkNo.visible=true;
 				hlp_Property.enabled=true;
 				Grd_Invoice.enabled=true;
+				
 			}
 			
 			protected function btn_BTC_Click(event:MouseEvent):void
@@ -788,6 +806,7 @@
 				Drp_BTCTo.enabled=true;
 				txt_BTCRemarks.editable=true;
 				btn_BTCSave.visible=true;
+				
 			}
 			
 			protected function CashCancel():void
@@ -1391,14 +1410,16 @@
 						</fx:Component>
 					</mx:itemRenderer>
 				</mx:DataGridColumn>
+				<mx:DataGridColumn dataField="Client" width="50" visible="true"/>
 				<mx:DataGridColumn dataField="InvoiceNo" headerText="Invoice No" width="70" editable="false" visible="true"/>
+				<mx:DataGridColumn dataField="CheckIn"  visible="true" width="75"/>
+				<mx:DataGridColumn dataField="CheckOut"  visible="true" width="75"/>
 				<mx:DataGridColumn dataField="Total" width="70" visible="true" editable="false"/>
 				<mx:DataGridColumn dataField="ChkOutHdrId" width="10" visible="false"/>
 				<mx:DataGridColumn dataField="BillType" width="50" visible="false"/>
 				<mx:DataGridColumn dataField="ClientId" width="10" visible="false"/>
-				<mx:DataGridColumn dataField="Client" width="50" visible="true"/>
-				<mx:DataGridColumn dataField="CheckIn"  visible="true" width="75"/>
-				<mx:DataGridColumn dataField="CheckOut"  visible="true" width="75"/>
+				
+				
 				
 			</mx:columns>
 		</mx:DataGrid>
@@ -1410,7 +1431,7 @@
 	</s:BorderContainer>
 	<s:Image x="632" y="311" width="100" height="100" id="Img_CompanyLogo"
 			 source="@Embed(source='../Assets/user.jpg')" visible="false"/>
-	<s:HGroup x="0" y="44" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle" visible="false" >
+	<s:HGroup x="0" y="44" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle" visible="true" >
 		<s:BorderContainer id="Brd_BTC" visible="false" x="2" y="1" width="100%" height="100%"
 						   backgroundColor="#fbf9f9">
 			<mx:DataGrid x="126" y="117"  verticalAlign="middle" editable="true" visible="true"
@@ -1507,16 +1528,16 @@
 							</mx:HBox>
 						</fx:Component>
 					</mx:itemRenderer>
-				</mx:DataGridColumn> 
+				</mx:DataGridColumn>
+				<mx:DataGridColumn dataField="Client" headerText="Client" width="100" visible="true"/>
 				<mx:DataGridColumn dataField="InvoiceNo" headerText="Invoice No" width="60" editable="false" visible="true"/>
-				<mx:DataGridColumn dataField="ChkOutHdrId" width="10" visible="false"/>
-				<mx:DataGridColumn dataField="Total" visible="true" editable="false"/>
-				<mx:DataGridColumn dataField="BillType"  visible="false" width="70" />
-				<mx:DataGridColumn dataField="ClientId"  visible="false" width="10"/>
 				<mx:DataGridColumn dataField="CheckIn"  visible="true" width="75"/>
 				<mx:DataGridColumn dataField="CheckOut"  visible="true" width="75"/>
-				<mx:DataGridColumn dataField="Client" headerText="Client" width="100" visible="true">
-				</mx:DataGridColumn> 
+				<mx:DataGridColumn dataField="BillType"  visible="false" width="70" />
+				<mx:DataGridColumn dataField="ClientId"  visible="false" width="10"/>
+				<mx:DataGridColumn dataField="ChkOutHdrId" width="10" visible="false"/>
+				<mx:DataGridColumn dataField="Total" visible="true" editable="false"/>
+				
 			</mx:columns>
 		</mx:DataGrid>
 		<s:TextInput id="txt_BTCTotal" x="280" y="371" enabled="false"/>
