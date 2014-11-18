@@ -1109,6 +1109,7 @@
 				else
 				{
 					hlp_ClientName.text="";
+					ClientId=0;
 				}
 			}
 			public function FnChkChange(event:Event):void
@@ -1410,10 +1411,10 @@
 						</fx:Component>
 					</mx:itemRenderer>
 				</mx:DataGridColumn>
-				<mx:DataGridColumn dataField="Client" width="50" visible="true"/>
+				<mx:DataGridColumn dataField="Client" width="50" visible="true" editable="false"/>
 				<mx:DataGridColumn dataField="InvoiceNo" headerText="Invoice No" width="70" editable="false" visible="true"/>
-				<mx:DataGridColumn dataField="CheckIn"  visible="true" width="75"/>
-				<mx:DataGridColumn dataField="CheckOut"  visible="true" width="75"/>
+				<mx:DataGridColumn dataField="CheckIn"  visible="true" width="75" editable="false"/>
+				<mx:DataGridColumn dataField="CheckOut"  visible="true" width="75" editable="false"/>
 				<mx:DataGridColumn dataField="Total" width="70" visible="true" editable="false"/>
 				<mx:DataGridColumn dataField="ChkOutHdrId" width="10" visible="false"/>
 				<mx:DataGridColumn dataField="BillType" width="50" visible="false"/>
@@ -1529,14 +1530,14 @@
 						</fx:Component>
 					</mx:itemRenderer>
 				</mx:DataGridColumn>
-				<mx:DataGridColumn dataField="Client" headerText="Client" width="100" visible="true"/>
+				<mx:DataGridColumn dataField="Client" headerText="Client" width="100" visible="true" editable="false"/>
 				<mx:DataGridColumn dataField="InvoiceNo" headerText="Invoice No" width="60" editable="false" visible="true"/>
-				<mx:DataGridColumn dataField="CheckIn"  visible="true" width="75"/>
-				<mx:DataGridColumn dataField="CheckOut"  visible="true" width="75"/>
+				<mx:DataGridColumn dataField="CheckIn"  visible="true" width="75" editable="false"/>
+				<mx:DataGridColumn dataField="CheckOut"  visible="true" width="75" editable="false"/>
 				<mx:DataGridColumn dataField="BillType"  visible="false" width="70" />
 				<mx:DataGridColumn dataField="ClientId"  visible="false" width="10"/>
 				<mx:DataGridColumn dataField="ChkOutHdrId" width="10" visible="false"/>
-				<mx:DataGridColumn dataField="Total" visible="true" editable="false"/>
+				<mx:DataGridColumn dataField="Total" visible="true" editable="false" />
 				
 			</mx:columns>
 		</mx:DataGrid>

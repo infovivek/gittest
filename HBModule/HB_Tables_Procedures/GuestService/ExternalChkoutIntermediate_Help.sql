@@ -222,7 +222,7 @@ BEGIN
 	WHERE  Id=@CheckInHdrId AND IsActive=1 AND IsDeleted=0 
 	
 	CREATE TABLE #LEVEL(ChkInDate NVARCHAR(100),ChkOutDate NVARCHAR(100),
-	TariffPaymentMode NVARCHAR(100),ServicePaymentMode NVARCHAR(100),TAC nvarchar(100))
+	TariffPaymentMode NVARCHAR(100),ServicePaymentMode NVARCHAR(100),TAC nvarchar(100),TACPer DECIMAL(27,2))
 	DECLARE @BookingId BIGINT,@GuestId BIGINT,@BookingLevel nvarchar(100),@NewCheckInDate NVARCHAR(100);
 	SET @BookingId=(SELECT BookingId FROM WRBHBCheckInHdr where Id = @CheckInHdrId and IsActive = 1 and IsDeleted =0)
 	SET @GuestId=(SELECT GuestId from WRBHBCheckInHdr where Id = @CheckInHdrId and IsActive = 1 and IsDeleted =0)
@@ -230,25 +230,26 @@ BEGIN
 	
 	IF @BookingLevel = 'Room' 
 	BEGIN
-		INSERT INTO #LEVEL(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode,TAC)
+		INSERT INTO #LEVEL(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode,TAC,TACPer)
 		SELECT CONVERT(nvarchar(100),min(d.ChkInDt),103),CONVERT(nvarchar(100),max(d.ChkOutDt),103),
-		d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC
+		d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,isnull((d.Tariff*h.TACPer/100),0)
 		FROM  WRBHBBookingProperty h 
 		JOIN WRBHBBookingPropertyAssingedGuest d on h.BookingId= d.BookingId and
 		h.PropertyId = d.BookingPropertyId
 		AND h.IsActive = 1 and
 		h.IsDeleted = 0
 		where d.GuestId  = @GuestId and d.BookingId = @BookingId and d.IsActive = 1 and d.IsDeleted = 0
-		group by d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC
+		group by d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,h.TACPer,d.Tariff
 	END
 	
-	DECLARE @ChkInDate nvarchar(100),@ChkOutDate nvarchar(100),@TariffPaymentMode nvarchar(100),
-	@ServicePaymentMode nvarchar(100),@TAC nvarchar(100);
+	DECLARE @ChkInDate NVARCHAR(100),@ChkOutDate NVARCHAR(100),@TariffPaymentMode NVARCHAR(100),
+	@ServicePaymentMode NVARCHAR(100),@TAC NVARCHAR(100),@TACPer DECIMAL(27,2);
 	SET @ChkInDate =( SELECT ChkInDate FROM #LEVEL)	
 	SET @ChkOutDate =( SELECT ChkOutDate FROM #LEVEL)
 	SET @TariffPaymentMode =(SELECT TariffPaymentMode FROM #LEVEL)
 	SET @ServicePaymentMode =(SELECT ServicePaymentMode FROM #LEVEL)
 	SET @TAC=(SELECT TAC from #LEVEL)
+	SET @TACPer=(SELECT TACPer from #LEVEL)
 	
 	SELECT  
 		@NewCheckInDate=convert(nvarchar(100),Cast(NewCheckInDate as DATE),103)	FROM WRBHBCheckInHdr  
@@ -263,7 +264,7 @@ BEGIN
 		
 		
 	--BillDate 
-	SELECT CONVERT(varchar(103),@ChkOutDate,103) as BillDate
+	SELECT CONVERT(varchar(103),@ChkOutDate,103) as BillDate,convert(nvarchar(100),GETDATE(),103) as TodayDate
 	
 	
 
@@ -293,7 +294,7 @@ BEGIN
 	BEGIN  
 	
 			CREATE TABLE #LEVEL1(ChkInDate NVARCHAR(100),ChkOutDate NVARCHAR(100),
-			TariffPaymentMode NVARCHAR(100),ServicePaymentMode NVARCHAR(100),TAC nvarchar(100))
+			TariffPaymentMode NVARCHAR(100),ServicePaymentMode NVARCHAR(100),TAC nvarchar(100),TACPer decimal(27,2))
 			--DECLARE @BookingId BIGINT,@GuestId BIGINT,@BookingLevel nvarchar(100);
 			SET @BookingId=(SELECT BookingId FROM WRBHBCheckInHdr where Id = @CheckInHdrId and IsActive = 1 and IsDeleted =0)
 			SET @GuestId=(SELECT GuestId from WRBHBCheckInHdr where Id = @CheckInHdrId and IsActive = 1 and IsDeleted =0)
@@ -301,16 +302,16 @@ BEGIN
 --select @GuestId ,@BookingId
 		IF @BookingLevel = 'Room' 
 		BEGIN
-			INSERT INTO #LEVEL1(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode,TAC)
+			INSERT INTO #LEVEL1(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode,TAC,TACPer)
 			SELECT @BillFrom,@BillTo,
-			d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC
+			d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,isnull((d.Tariff*h.TACPer/100),0)
 			FROM  WRBHBBookingProperty h 
 			JOIN WRBHBBookingPropertyAssingedGuest d on h.BookingId= d.BookingId and
 			h.PropertyId = d.BookingPropertyId
 			AND h.IsActive = 1 and
 			h.IsDeleted = 0
 			where d.GuestId  = @GuestId and d.BookingId = @BookingId and d.IsActive = 1 and d.IsDeleted = 0
-			group by d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC
+			group by d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,h.TACPer,d.Tariff
 		END
 	
 			--DECLARE @ChkInDate nvarchar(100),@ChkOutDate nvarchar(100),@TariffPaymentMode nvarchar(100),
@@ -320,6 +321,7 @@ BEGIN
 			SET @TariffPaymentMode =(SELECT TariffPaymentMode FROM #LEVEL1)
 			SET @ServicePaymentMode =(SELECT ServicePaymentMode FROM #LEVEL1)
 			SET @TAC=(SELECT TAC from #LEVEL1)
+			SET @TACPer=(SELECT TACPer from #LEVEL1)
 		 
 			SELECT Property,
 			CONVERT(nvarchar(100),@ChkInDate,103)+' To '+CONVERT(nvarchar(100),@ChkOutDate,103) as Stay,Tariff,
@@ -329,7 +331,7 @@ BEGIN
 		
 		
 	--BillDate 
-			SELECT CONVERT(varchar(103),@ChkOutDate,103) as BillDate
+			SELECT CONVERT(varchar(103),@ChkOutDate,103) as BillDate,convert(nvarchar(100),GETDATE(),103) as TodayDate
 		
 	--Type
 			SELECT GuestName as Name,RoomNo,EmpCode,ApartmentType,BedType,PropertyType FROM WRBHBCheckInHdr
@@ -353,7 +355,8 @@ BEGIN
 
 			CREATE TABLE #ExTariff(Tariff DECIMAL(27,2),RackTariffSingle DECIMAL(27,2),RackTariffDouble DECIMAL(27,2),
 			STAgreed Decimal(27,2),LTAgreed Decimal(27,2),STRack decimal(27,2),LTRack decimal(27,2),
-			Occupancy nvarchar(100),Date nvarchar(100),ServiceTax decimal(27,2),SingleMarkupAmount DECIMAL(27,2),DoubleMarkupAmount DECIMAL(27,2),)
+			Occupancy nvarchar(100),Date nvarchar(100),ServiceTax decimal(27,2),SingleMarkupAmount DECIMAL(27,2),
+			DoubleMarkupAmount DECIMAL(27,2),TACPer DECIMAL(27,2))
 
 			CREATE TABLE #FINALTAX(Tariff DECIMAL(27,2),STAgreed Decimal(27,2),LTAgreed Decimal(27,2),STRack decimal(27,2),
 			LTRack decimal(27,2),Occupancy nvarchar(100),Date nvarchar(100),ServiceTax decimal(27,2),
@@ -479,9 +482,10 @@ BEGIN
 				BEGIN
 					SELECT @NoOfDays=@NoOfDays+1
 					INSERT INTO #ExTariff(Tariff,RackTariffSingle,RackTariffDouble,STAgreed,LTAgreed,STRack,LTRack,Occupancy,Date,
-					SingleMarkupAmount,DoubleMarkupAmount)
+					SingleMarkupAmount,DoubleMarkupAmount,TACPer)
 					SELECT @Tariff,@RackTariffSingle,@RackTariffDouble,@STAgreed,@LTAgreed,@STRack,@LTRack,@Occupancy,
-					CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,@ChkInDate,103)),103),@SingleMarkupAmount,@DoubleMarkupAmount
+					CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,@ChkInDate,103)),103),@SingleMarkupAmount,@DoubleMarkupAmount,
+					@TACPer
 				--	SELECT @Tariff,@RackTariff,CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,@ChkInDate,103)),103)
 				END		 
 			END		 
@@ -492,19 +496,19 @@ BEGIN
 				BEGIN
 					SELECT @NoOfDays=@NoOfDays 
 					INSERT INTO #ExTariff(Tariff,RackTariffSingle,RackTariffDouble,STAgreed,LTAgreed,STRack,LTRack,Occupancy,Date,
-					SingleMarkupAmount,DoubleMarkupAmount)
+					SingleMarkupAmount,DoubleMarkupAmount,TACPer)
 					SELECT @Tariff,@RackTariffSingle,@RackTariffDouble,@STAgreed,@LTAgreed,@STRack,@LTRack,@Occupancy,
 					CONVERT(NVARCHAR,DATEADD(DAY,@DateDiff,CONVERT(DATE,@ChkInDate,103)),103),@SingleMarkupAmount,
-					@DoubleMarkupAmount
+					@DoubleMarkupAmount,@TACPer
 				END
 				ELSE
 				BEGIN
 					SELECT @NoOfDays=@NoOfDays + 1
 					INSERT INTO #ExTariff(Tariff,RackTariffSingle,RackTariffDouble,STAgreed,LTAgreed,STRack,LTRack,Occupancy,Date,
-					SingleMarkupAmount,DoubleMarkupAmount)
+					SingleMarkupAmount,DoubleMarkupAmount,TACPer)
 					SELECT @Tariff,@RackTariffSingle,@RackTariffDouble,@STAgreed,@LTAgreed,@STRack,@LTRack,@Occupancy,
 					CONVERT(NVARCHAR,DATEADD(DAY,@DateDiff,CONVERT(DATE,@ChkInDate,103)),103),@SingleMarkupAmount,
-					@DoubleMarkupAmount
+					@DoubleMarkupAmount,@TACPer
 				END
 			
 		 
@@ -521,9 +525,10 @@ BEGIN
 			BEGIN	
 					SELECT @NoOfDays=@NoOfDays+1					
 					INSERT INTO #ExTariff(Tariff,RackTariffSingle,RackTariffDouble,STAgreed,LTAgreed,STRack,LTRack,Occupancy,Date,
-					SingleMarkupAmount,DoubleMarkupAmount)
+					SingleMarkupAmount,DoubleMarkupAmount,TACPer)
 					SELECT @Tariff,@RackTariffSingle,@RackTariffDouble,@STAgreed,@LTAgreed,@STRack,@LTRack,@Occupancy,
-					CONVERT(NVARCHAR,DATEADD(DAY,@i,CONVERT(DATE,@ChkInDate,103)),103),@SingleMarkupAmount,@DoubleMarkupAmount
+					CONVERT(NVARCHAR,DATEADD(DAY,@i,CONVERT(DATE,@ChkInDate,103)),103),@SingleMarkupAmount,@DoubleMarkupAmount,
+					@TACPer
 					--SELECT @Tariff,@RackTariff,CONVERT(NVARCHAR,DATEADD(DAY,@i,CONVERT(DATE,@ChkInDate,103)),103)
 					SET @i=@i+1
 					SET @DateDiff=@DateDiff-1   
@@ -556,19 +561,19 @@ BEGIN
 				BEGIN
 					SELECT @NoOfDays=@NoOfDays 
 					INSERT INTO #ExTariff(Tariff,RackTariffSingle,RackTariffDouble,STAgreed,LTAgreed,STRack,LTRack,Occupancy,Date,
-					SingleMarkupAmount,DoubleMarkupAmount)
+					SingleMarkupAmount,DoubleMarkupAmount,TACPer)
 					SELECT @Tariff,@RackTariffSingle,@RackTariffDouble,@STAgreed,@LTAgreed,@STRack,@LTRack,@Occupancy,
 					CONVERT(NVARCHAR,DATEADD(DAY,@DateDiff,CONVERT(DATE,@ChkInDate,103)),103),@SingleMarkupAmount,
-					@DoubleMarkupAmount
+					@DoubleMarkupAmount,@TACPer
 				END
 				ELSE
 				BEGIN
 					SELECT @NoOfDays=@NoOfDays + 1
 					INSERT INTO #ExTariff(Tariff,RackTariffSingle,RackTariffDouble,STAgreed,LTAgreed,STRack,LTRack,Occupancy,Date,
-					SingleMarkupAmount,DoubleMarkupAmount)
+					SingleMarkupAmount,DoubleMarkupAmount,TACPer)
 					SELECT @Tariff,@RackTariffSingle,@RackTariffDouble,@STAgreed,@LTAgreed,@STRack,@LTRack,@Occupancy,
 					CONVERT(NVARCHAR,DATEADD(DAY,@DateDiff,CONVERT(DATE,@ChkInDate,103)),103),@SingleMarkupAmount,
-					@DoubleMarkupAmount
+					@DoubleMarkupAmount,@TACPer
 				
 				END
 				
@@ -582,10 +587,10 @@ BEGIN
 			BEGIN	
 				SELECT @NoOfDays=@NoOfDays 	+1			
 				INSERT INTO #ExTariff(Tariff,RackTariffSingle,RackTariffDouble,STAgreed,LTAgreed,STRack,LTRack,Occupancy,Date,
-				SingleMarkupAmount,DoubleMarkupAmount)
+				SingleMarkupAmount,DoubleMarkupAmount,TACPer)
 				SELECT @Tariff,@RackTariffSingle,@RackTariffDouble,@STAgreed,@LTAgreed,@STRack,@LTRack,@Occupancy,
 				CONVERT(NVARCHAR,DATEADD(DAY,@i,CONVERT(DATE,@ChkInDate,103)),103),@SingleMarkupAmount,
-				@DoubleMarkupAmount
+				@DoubleMarkupAmount,@TACPer
 	--			SELECT @Tariff,@RackTariff,CONVERT(NVARCHAR,DATEADD(DAY,@i,CONVERT(DATE,@ChkInDate,103)),103)
 				SET @i=@i+1
 				SET @DateDiff=@DateDiff-1			               
@@ -595,6 +600,8 @@ BEGIN
 	--	select * from #ExTariff
 	--	SELECT @TariffPaymentMode;
 	--	select @NoOfDays,@DateDiff
+	
+	--select @TAC
 		IF @TariffPaymentMode IN('Bill to Company (BTC)','Bill to Client')
 		BEGIN
 		--select @TAC
@@ -693,6 +700,7 @@ BEGIN
 	--	select * from #FINALTAX
 --	select * from #ServiceTax2
 	--select * from #ExTariff
+	--select @TAC,@TACPer
 		If @TariffPaymentMode ='Direct'
 		BEGIN
 			IF @TAC='0'
@@ -721,11 +729,12 @@ BEGIN
 		ELSE
 		BEGIN
 		--(RACK TARIFF SINGLE)
+		
 				INSERT INTO #FINALTAX(Tariff,STAgreed,LTAgreed,STRack,LTRack,Occupancy,ServiceTax,Amount,
 				BusinessSupportST,BST,NetAmountTAC,ST)
-				SELECT Tariff,0,0,0,0,d.Occupancy,isnull(d.Tariff*h.ServiceTax/100,0),ISNULL(d.Tariff-d.RackTariffSingle,0),
-				isnull(d.Tariff*h.BusinessSupportST/100,0),h.BusinessSupportST,
-				ISNULL(d.Tariff-d.RackTariffSingle,0),h.ServiceTax
+				SELECT Tariff,0,0,0,0,d.Occupancy,isnull(d.Tariff*h.ServiceTax/100,0),ISNULL(@TACPer,0),
+				isnull(@TACPer*h.BusinessSupportST/100,0),h.BusinessSupportST,
+				ISNULL(@TACPer,0),h.ServiceTax
 				FROM #ServiceTax2 h
 				join #ExTariff d on h.DATE = d.Date
 				WHERE Occupancy ='Single' AND ISNULL(h.ServiceTax,0)!=0
@@ -733,9 +742,9 @@ BEGIN
 		--(RACK TARIFF DOUBLE)
 				INSERT INTO #FINALTAX(Tariff,STAgreed,LTAgreed,STRack,LTRack,Occupancy,ServiceTax,Amount,
 				BusinessSupportST,BST,NetAmountTAC,ST)
-				SELECT Tariff,0,0,0,0,d.Occupancy,isnull(d.Tariff*h.ServiceTax/100,0),ISNULL(d.Tariff-d.RackTariffDouble,0),
-				isnull(d.Tariff*h.BusinessSupportST/100,0),h.BusinessSupportST,
-				ISNULL(d.Tariff-d.RackTariffDouble,0),h.ServiceTax
+				SELECT Tariff,0,0,0,0,d.Occupancy,isnull(d.Tariff*h.ServiceTax/100,0),ISNULL(@TACPer,0),
+				isnull(@TACPer*h.BusinessSupportST/100,0),h.BusinessSupportST,
+				ISNULL(@TACPer,0),h.ServiceTax
 				FROM #ServiceTax2 h
 				join #ExTariff d on h.DATE = d.Date
 				WHERE Occupancy ='Double' AND ISNULL(h.ServiceTax,0)!=0
@@ -1017,7 +1026,7 @@ BEGIN
 		FROM WRBHBChechkOutHdr WHERE  Id=@CID and  IsActive=1 and IsDeleted=0 and Flag=0  
 
 		--BillDate   
-		SELECT CONVERT(VARCHAR(103),CheckOutDate ,103) AS BillDate   
+		SELECT CONVERT(VARCHAR(103),CheckOutDate ,103) AS BillDate,convert(nvarchar(100),GETDATE(),103) as TodayDate   
 		FROM WRBHBChechkOutHdr  WHERE   Id=@CID and IsActive=1 and IsDeleted=0 and Flag=0  
 
 		--Type  

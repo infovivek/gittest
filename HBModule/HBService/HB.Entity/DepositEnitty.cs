@@ -32,6 +32,6 @@ namespace HB.Entity
         public int DepHdrId { get; set; }
         public int DepDtlId { get; set; }
         public string BillType { get; set; }
-        public int Tick { get; set; }
+        public bool Tick { get; set; }
     }
 }

@@ -64,7 +64,7 @@
 			public var Mode1:String="";
 			public var BTCSId:Number=0;
 			public var ItemId:int=0;
-			public var PaymentMode:String="",TypeService:String="";
+			public var PaymentMode:String="",TypeService:String="",TodayDate:String="",ExpChkoutDT:String="";
 			//	var start:Date=new Date();
 			
 			protected function PageLoad():void
@@ -107,6 +107,7 @@
 				//				init1();
 				init();
 				Chk_PrintInvoice.visible=false;
+				Chk_collectvendor.visible=false;
 				
 				Checkout.selected=true;
 				Intermediate.selected=false;
@@ -118,8 +119,8 @@
 			
 			protected function Help():void
 			{				
-		//		useWeb("ExterIntermediateChkoutService","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId]);
-				useWeb("ExterIntermediateChkoutService","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65]);
+				useWeb("ExterIntermediateChkoutService","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId]);
+		//		useWeb("ExterIntermediateChkoutService","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65]);
 				//			useWeb("GuestCheckOut","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,0]);
 				Txt_ServiceBillAmt.editable=false;
 				Txt_ServiceVat.editable=false;
@@ -231,6 +232,7 @@
 						Txt_CheckInDate.text=Ds_Objects.result.Tables.Table1.Rows[0].CheckInDate;
 						DT_BillFromDate.text=Ds_Objects.result.Tables.Table1.Rows[0].CheckInDate;
 						DT_BillTo.text=Ds_Objects.result.Tables.Table1.Rows[0].ChkoutDate;
+						ExpChkoutDT=Ds_Objects.result.Tables.Table1.Rows[0].ChkoutDate;
 						//lbl_tariff.text=Ds_Objects.result.Tables.Table1.Rows[0].Tariff;
 						dt_ServiceDate.text=Ds_Objects.result.Tables.Table1.Rows[0].CheckInDate;
 						//		Txt_AdditionalCharge.text=Ds_Objects.result.Tables.Table1.Rows[0].Tariff;
@@ -286,6 +288,7 @@
 					if(Ds_Objects.result.Tables.Table2.Rows.length > 0)
 					{
 						Txt_Billdate.text=Ds_Objects.result.Tables.Table2.Rows[0].BillDate;
+						TodayDate = Ds_Objects.result.Tables.Table2.Rows[0].TodayDate;
 					}	
 					if(Ds_Objects.result.Tables.Table3.Rows.length > 0)
 					{
@@ -386,8 +389,8 @@
 		//				Txt_Stay.text=Ds_Objects.result.Tables.Table.Rows[0].Stay;
 						Txt_Property.text=Ds_Objects.result.Tables.Table.Rows[0].Property;
 						lbl_Nettariff.text=Ds_Objects.result.Tables.Table.Rows[0].Tariff;
-		//				DT_CheckOutDate.text=Ds_Objects.result.Tables.Table.Rows[0].ChkoutDate;
-		//				Txt_CheckInDate.text=Ds_Objects.result.Tables.Table.Rows[0].CheckInDate
+						DT_CheckOutDate.text=Ds_Objects.result.Tables.Table.Rows[0].ChkoutDate;
+						Txt_CheckInDate.text=Ds_Objects.result.Tables.Table.Rows[0].CheckInDate;
 						//lbl_tariff.text=Ds_Objects.result.Tables.Table1.Rows[0].Tariff;
 					}
 //					if(Ds_Objects.result.Tables.Table1.Rows.length > 0)
@@ -4936,6 +4939,7 @@
 			}
 			protected function FnSettleClr():void
 			{
+				TodayDate="";
 				CheckOutHdrId=0;CheckInHdrId=0;StateId=0;
 				Txt_Pname.text="";
 				Txt_address.text="";
@@ -8367,6 +8371,9 @@
 				// TODO Auto-generated method stub
 				if(Chk_PrintInvoice.selected == true)
 				{
+					Chk_collectvendor.visible=true;
+					Chk_collectvendor.selected=true;
+					Chk_collectvendor.enabled=false;
 					Sctrl.visible=false;
 					Sctrl.enabled=false;
 					Sctrl1.visible = true;
@@ -8421,6 +8428,7 @@
 				}
 				else
 				{
+					Chk_collectvendor.visible=false;
 					Sctrl.visible=true;
 					Sctrl.enabled=true;
 					Sctrl1.visible = false;
@@ -8832,11 +8840,44 @@
 			protected function Process_clickHandler(event:MouseEvent):void
 			{
 				// TODO Auto-generated method stub
+				
+				
 				var BillFrom:String="";
 				var BillTo:String="";
 				BillFrom=DT_BillFromDate.text;
 				BillTo=DT_BillTo.text;
-				useWeb("ExterIntermediateChkoutService","Guest_CUSTOM",[GlobalXml,"CHKINROOMDETAILS","",BillFrom,BillTo,CheckInHdrId,StateId,0,0]);
+				
+				var BillFrom:String="";
+				var BillTo:String="";
+				BillFrom=DT_BillFromDate.text;
+				BillTo=DT_BillTo.text;
+				
+				var BillTo=DT_BillTo.text;	
+				//var TodayDate:String=TodayDate;
+				var BillTo:String=DT_BillTo.text;
+				var BillTo1:String=TodayDate;
+				var D:String=BillTo.substr(0,2);
+				var M:String=BillTo.substr(3,2);
+				var Y:String=BillTo.substr(6,10);
+				var D1:String=BillTo1.substr(0,2);
+				var M1:String=BillTo1.substr(3,2);
+				var Y1:String=BillTo1.substr(6,10);
+				var RangeMiddle:String=Y+'/'+M+'/'+D;
+				var RangeEnd:String=Y1+'/'+M1+'/'+String(Number(D1)+1);
+				var RangeStart:String=Y+'/'+M+'/'+D;
+				
+				if(RangeStart <= RangeEnd)
+				{
+					useWeb("ExterIntermediateChkoutService","Guest_CUSTOM",[GlobalXml,"CHKINROOMDETAILS","",BillFrom,BillTo,CheckInHdrId,StateId,0,0]);
+				}
+				else
+				{
+					alignAlert(Alert.show("Can't be Process Future Checkout","Alert Message !",
+						Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+					
+					return;
+					Sctrl.enabled=false;
+				}
 			}
 			
 			protected function ProcessClear_clickHandler(event:MouseEvent):void
@@ -8848,15 +8889,56 @@
 			protected function Checkout_clickHandler(event:MouseEvent):void
 			{
 				// TODO Auto-generated method stub
+				var BillF:String=DT_BillFromDate.text;
+				//var BillTo:String=DT_BillTo.text;
+				var BillTo:String=ExpChkoutDT;
+				var D:String=BillF.substr(0,2);
+				var M:String=BillF.substr(3,2);
+				var Y:String=BillF.substr(6,10);
+				var D1:String=BillTo.substr(0,2);
+				var M1:String=BillTo.substr(3,2);
+				var Y1:String=BillTo.substr(6,10);
+				var RangeMiddle:String=Y+'/'+M+'/'+D;
+				var RangeEnd:String=Y1+'/'+M1+'/'+D1;
+				var RangeStart:String=Y+'/'+M+'/'+D;
+				DT_BillTo.selectableRange = 
+					{rangeStart:new Date(RangeStart),rangeEnd:new Date(RangeEnd)};
+				DT_BillTo.selectedDate=new Date(RangeEnd);
+				
+				
 				DT_BillFromDate.enabled=false;
 				DT_BillTo.enabled=false;
+				
+				FnClear1();
+				FnServiceClr();
+				bdr_Tariff.enabled=false;
 			}
 			
 			protected function Intermediate_clickHandler(event:MouseEvent):void
 			{
 				// TODO Auto-generated method stub
+				var BillF:String=DT_BillFromDate.text;
+				//var BillTo:String=DT_BillTo.text;
+				var BillTo:String=TodayDate;
+				var D:String=BillF.substr(0,2);
+				var M:String=BillF.substr(3,2);
+				var Y:String=BillF.substr(6,10);
+				var D1:String=BillTo.substr(0,2);
+				var M1:String=BillTo.substr(3,2);
+				var Y1:String=BillTo.substr(6,10);
+				var RangeMiddle:String=Y+'/'+M+'/'+D;
+				var RangeEnd:String=Y1+'/'+M1+'/'+String(Number(D1)+1);
+				var RangeStart:String=Y+'/'+M+'/'+D;
+				DT_BillTo.selectableRange = 
+					{rangeStart:new Date(RangeStart),rangeEnd:new Date(RangeEnd)};
+				DT_BillTo.selectedDate=new Date(RangeEnd);
+				
 				DT_BillFromDate.enabled=true;
 				DT_BillTo.enabled=true;
+				
+				FnClear1();
+				FnServiceClr();
+				bdr_Tariff.enabled=false;
 			}
 			
 		]]>
@@ -8996,6 +9078,7 @@
 					<s:CheckBox x="258" y="428" label="TAC Invoice" id="Chk_TAC" click="Chk_TAC_clickHandler(event)" visible="false"/>
 					<WrbComp:Button_HB id="Sctrl1" x="445" y="422" height="30" click="FnSave1()" visible="true" Lable_val="CheckOut">
 					</WrbComp:Button_HB>
+					<s:CheckBox x="91" y="428" label="Collected by vendor" id="Chk_collectvendor" enabled="false" visible="true"/>
 				</s:BorderContainer>
 				<s:HGroup x="0" y="1" width="100%" height="40" horizontalAlign="center">
 					<s:Spacer x="11" width="138" height="10"/>

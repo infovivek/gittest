@@ -119,7 +119,7 @@ DECLARE @CompanyName VARCHAR(100),@Address NVARCHAR(100),@PanCardNo VARCHAR(100)
     sum(CS.OtherService) OtherService,
     sum(CS.ChkOutServiceST) ChkOutServiceST,sum(CS.Cess) CessService,
     sum(CS.HECess) HECess,h.ChkOutTariffExtraAmount ExtraMatress,
-    'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),GETDATE(),103) as InVoicedate
+    'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),h.CreatedDate,103) as InVoicedate
 	--CSDD.BillAmount
 	
 	
@@ -147,7 +147,7 @@ DECLARE @CompanyName VARCHAR(100),@Address NVARCHAR(100),@PanCardNo VARCHAR(100)
     H.VATPer,h.RestaurantSTPer ,
     h.BusinessSupportST,h.ChkOutTariffST1 ,H.LuxuryTaxPer,H.ServiceTaxPer,h.ChkOutTariffExtraAmount,
     h.InVoiceNo,h.PIInvoice,h.BillFromDate,h.BillEndDate,d.ArrivalDate,h.CheckOutDate,
-    h.NoOfDays
+    h.NoOfDays,h.CreatedDate
     
     
     

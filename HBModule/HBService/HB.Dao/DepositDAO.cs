@@ -190,7 +190,7 @@ namespace HB.Dao
                     Dep.DepDtlId = Convert.ToInt32(doc.SelectNodes("//DepDtls")[i].Attributes["Id"].Value);
                     Dep.InvoiceNo = doc.SelectNodes("//DepDtls")[i].Attributes["InvoiceNo"].Value;
                     Dep.Amount = Convert.ToDecimal(doc.SelectNodes("//DepDtls")[i].Attributes["Amount"].Value);
-                    Dep.Tick = Convert.ToInt32(doc.SelectNodes("//DepDtls")[i].Attributes["Tick"].Value);
+                    Dep.Tick = Convert.ToBoolean(doc.SelectNodes("//DepDtls")[i].Attributes["Tick"].Value);
                     if (doc.SelectNodes("//DepDtls")[i].Attributes["ClientId"].Value == "")
                     {
                         Dep.ClientId = 0;

@@ -76,7 +76,7 @@ namespace HBReport
                 //string date = (now.ToString("yyyyMMddThhmmss"));
 
                 using (FileStream fs = File.Create(@"D:\Backend\flex_bin\TACInVoice\" + ds.Tables[0].Rows[0][0].ToString() + ".pdf"))
-            //    using (FileStream fs = File.Create(@"E:\Project\HBModule\HB\flex_bin\TACInVoice\" + ds.Tables[0].Rows[0][0].ToString() + ".pdf"))
+         //       using (FileStream fs = File.Create(@"E:\Project\HBModule\HB\flex_bin\TACInVoice\" + ds.Tables[0].Rows[0][0].ToString() + ".pdf"))
                 {
                     fs.Write(mybytes, 0, mybytes.Length);
                 }
@@ -84,7 +84,7 @@ namespace HBReport
                 {
                     string Valid = ""; string Err = "";
                     string Email = "shiv@hummingbirdindia.com";
-                   // string Email = "shameem@warblerit.com";
+              //      string Email = "shameem@warblerit.com";
                     Valid = EmailValidate(Email);
 
                     if ((ds.Tables[0].Rows[0][0].ToString() != "UserName or EmailId Already Exist"))
@@ -185,7 +185,7 @@ namespace HBReport
 
                         //  message.Subject = "TAC InVoice ";
                         message.Attachments.Add(new Attachment(@"D:\Backend\flex_bin\TACInVoice\" + ds.Tables[0].Rows[0][0].ToString() + ".pdf"));
-                   //     message.Attachments.Add(new Attachment(@"E:\Project\HBModule\HB\flex_bin\TACInVoice\" + ds.Tables[0].Rows[0][0].ToString() + ".pdf"));
+              //          message.Attachments.Add(new Attachment(@"E:\Project\HBModule\HB\flex_bin\TACInVoice\" + ds.Tables[0].Rows[0][0].ToString() + ".pdf"));
                         //string[] files = new string[20];
                         //System.Net.Mail.Attachment attachment;
                         //MailMessage mail = new MailMessage();
@@ -205,7 +205,7 @@ namespace HBReport
 
                         smtp.Port = 587;
                         smtp.Credentials = new System.Net.NetworkCredential("AKIAIIVF5D5D3CJAX7SQ", "ApmuZkd+L8tissEga8kac3quhhwohEi5CB+dYD36KTq3");
-                 //       smtp.Credentials = new System.Net.NetworkCredential("stay@staysimplyfied.com", "stay1234");
+                  //      smtp.Credentials = new System.Net.NetworkCredential("stay@staysimplyfied.com", "stay1234");
                         try
                         {
                             smtp.Send(message);

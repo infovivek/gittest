@@ -1,14 +1,9 @@
 
+GO
+/****** Object:  StoredProcedure [dbo].[SP_ExterInterCheckOutHdr_Insert]    Script Date: 11/14/2014 15:44:42 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
-GO
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-IF EXISTS (SELECT * FROM DBO.SYSOBJECTS WHERE ID = OBJECT_ID(N'[dbo].[SP_ExterInterCheckOutHdr_Insert]') AND OBJECTPROPERTY(ID, N'ISPROCEDURE') = 1)
-DROP PROCEDURE [dbo].[SP_ExterInterCheckOutHdr_Insert]
 GO
 /*=============================================
 Author Name  : shameem
@@ -23,7 +18,7 @@ Name			Date			Signature			Description of Changes
 
 *******************************************************************************************************
 -- =============================================*/
-CREATE PROCEDURE [dbo].[SP_ExterInterCheckOutHdr_Insert](
+ALTER PROCEDURE [dbo].[SP_ExterInterCheckOutHdr_Insert](
 @CheckOutNo NVARCHAR(100),@GuestName NVARCHAR(100),@Stay NVARCHAR(100),
 @Type NVARCHAR(100),@BookingLevel NVARCHAR(100),@BillDate NVARCHAR(100),@ClientName NVARCHAR(100),
 @Property NVARCHAR(100),@ChkOutTariffTotal DECIMAL(27,2),@ChkOutTariffAdays DECIMAL(27,2),
@@ -307,6 +302,11 @@ END
 			UPDATE WRBHBChechkOutHdr set PaymentStatus = 'Paid'  ,IntermediateFlag = 1,IsActive=1
 			WHERE Id = @InsId and PropertyType =  'Managed G H' 
 		END
+		IF @PrintInvoice = 1
+		BEGIN
+			UPDATE WRBHBChechkOutHdr set CollectVendor = 'CollectVendor'  
+			WHERE Id = @InsId and PropertyType =  'External Property'
+		END
  END
  ELSE
  BEGIN
@@ -359,12 +359,14 @@ END
 			UPDATE WRBHBChechkOutHdr set PaymentStatus = 'Paid'  ,Flag = 1
 			WHERE Id = @InsId and PropertyType =  'Managed G H' 
 		END
+		IF @PrintInvoice = 1
+		BEGIN
+			UPDATE WRBHBChechkOutHdr set CollectVendor = 'CollectVendor'  
+			WHERE Id = @InsId and PropertyType =  'External Property'
+		END
  END
  
 
 
 END
-
-GO
- 
 

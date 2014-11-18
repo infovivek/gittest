@@ -151,8 +151,8 @@
 			protected function Help():void
 			{				
 				
-			//	useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId,0]);
-			 	useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65,0]);
+				useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId,0]);
+		//	 	useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65,0]);
 				Txt_ServiceBillAmt.editable=false;
 				Txt_ServiceVat.editable=false;
 				Txt_SerivceTax.editable=false;
@@ -445,9 +445,9 @@
 						Txt_CheckInDate.text=Ds_Objects.result.Tables.Table.Rows[0].CheckInDate;
 //						DT_BillFromDate.text=Ds_Objects.result.Tables.Table.Rows[0].CheckInDate;
 //						DT_BillTo.text=Ds_Objects.result.Tables.Table.Rows[0].ChkoutDate;
-//						//lbl_tariff.text=Ds_Objects.result.Tables.Table1.Rows[0].Tariff;
+//						lbl_tariff.text=Ds_Objects.result.Tables.Table.Rows[0].Tariff;
 //						dt_ServiceDate.text=Ds_Objects.result.Tables.Table.Rows[0].CheckInDate;
-//						Txt_AdditionalCharge.text=Ds_Objects.result.Tables.Table.Rows[0].Tariff;
+						Txt_AdditionalCharge.text=Ds_Objects.result.Tables.Table.Rows[0].Tariff;
 //						
 //						var sdfs:String=dt_ServiceDate.text;			
 //						var sdfs1:String=DT_CheckOutDate.text;
@@ -3593,7 +3593,11 @@
 				//luxury=Number(ExtraMatress*luxury/100)
 				//Txt_Luxury.text=NF_Two.format(luxury);
 				ExtraMaters=Number(Extra);
-				useWeb("CheckoutAndIntermediate","Guest_CUSTOM",[GlobalXml,"CHKINROOMDETAILS","","","",CheckInHdrId,StateId,0,0,ExtraMaters]);
+				var BillFrom:String="";
+				var BillTo:String="";
+				BillFrom=DT_BillFromDate.text;
+				BillTo=DT_BillTo.text;
+				useWeb("CheckoutAndIntermediate","Guest_CUSTOM",[GlobalXml,"CHKINROOMDETAILS","",BillFrom,BillTo,CheckInHdrId,StateId,0,0,ExtraMaters]);
 				//				var service:Number=(Number(lbl_TariffST.text));
 				//				service=Number(ExtraMatress*service/100)
 				//				Txt_ServiceTax12.text=NF_Two.format(service);

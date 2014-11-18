@@ -22,14 +22,14 @@ SET ANSI_WARNINGS OFF
 IF @Action = 'BookingLoad'  
  BEGIN  
   -- Get CheckIn Booking  
-  CREATE TABLE #TMP(BookingCode INT,BookingId INT,Guest NVARCHAR(100),  
-  RoomId INT,RoomCaptured INT,CurrentStatus NVARCHAR(100),  
-  PropertyName NVARCHAR(100),RoomType NVARCHAR(100));  
+  CREATE TABLE #TMP(BookingCode BIGINT,BookingId BIGINT,Guest NVARCHAR(100),  
+  RoomId BIGINT,RoomCaptured INT,CurrentStatus NVARCHAR(100),  
+  PropertyName NVARCHAR(100),RoomType NVARCHAR(100),PropertyType NVARCHAR(100));  
   INSERT INTO #TMP(BookingCode,BookingId,Guest,RoomId,RoomCaptured,  
-  CurrentStatus,PropertyName,RoomType)  
+  CurrentStatus,PropertyName,RoomType,PropertyType)  
   SELECT B.BookingCode,BG.BookingId,  
   BG.FirstName+' '+BG.LastName AS Guest,BG.RoomId,BG.RoomCaptured,  
-  BG.CurrentStatus,BP.PropertyName,BG.RoomType   
+  BG.CurrentStatus,BP.PropertyName,BG.RoomType,BP.PropertyType   
   FROM WRBHBBooking B  
   LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON  
   BP.BookingId=B.Id    
@@ -38,58 +38,63 @@ IF @Action = 'BookingLoad'
   BG.BookingPropertyId=BP.PropertyId    
   WHERE B.IsActive=1 AND B.IsDeleted=0 AND BP.IsActive=1 AND  
   BP.IsDeleted=0 AND BG.IsActive=1 AND BG.IsDeleted=0 AND  
-  BG.CurrentStatus IN ('CheckIn','Booked') AND  
-  B.BookingLevel='Room' AND --BP.PropertyType NOT IN ('MMT','CPP') AND  
-  BP.PropertyType IN ('InP','MGH','DdP','ExP') AND   
-  --BG.RoomId != 0 AND   
-  ISNULL(RoomShiftingFlag,0) = 0;-- AND   
-  --CONVERT(DATE,BG.ChkOutDt,103) >= CONVERT(DATE,GETDATE(),103);  
+  BG.CurrentStatus IN ('CheckIn','Booked') AND B.BookingLevel='Room' AND 
+  BP.PropertyType IN ('InP','MGH','DdP','ExP') AND
+  ISNULL(RoomShiftingFlag,0) = 0;
   -- Guest Joined in RoomId  
   CREATE TABLE #TMP1(Guest NVARCHAR(100),BookingCode INT,BookingId INT,  
   RoomId INT,RoomCapturedId INT,BookingLevelId NVARCHAR(100),  
-  CurrentStatus NVARCHAR(100),PropertyName NVARCHAR(100),RoomType NVARCHAR(100));  
+  CurrentStatus NVARCHAR(100),PropertyName NVARCHAR(100),
+  RoomType NVARCHAR(100),PropertyType NVARCHAR(100));
   INSERT INTO #TMP1(Guest,BookingCode,BookingId,RoomId,RoomCapturedId,  
-  BookingLevelId,CurrentStatus,PropertyName,RoomType)  
-  SELECT STUFF((SELECT ', ' + BA.Guest  
-  FROM #TMP BA   
-  WHERE BA.BookingId=B.BookingId AND BA.RoomId=B.RoomId AND  
-  BA.RoomCaptured=B.RoomCaptured  
+  BookingLevelId,CurrentStatus,PropertyName,RoomType,PropertyType)  
+  SELECT STUFF((SELECT ', ' + BA.Guest FROM #TMP BA   
+  WHERE BA.BookingId = B.BookingId AND BA.RoomId = B.RoomId AND  
+  BA.RoomCaptured = B.RoomCaptured  
   FOR XML PATH('')),1,1,'') AS Guest,B.BookingCode,B.BookingId,  
   B.RoomId,B.RoomCaptured AS RoomCapturedId,'Room' AS BookingLevelId,  
-  B.CurrentStatus,B.PropertyName,B.RoomType FROM #TMP AS B   
+  B.CurrentStatus,B.PropertyName,B.RoomType,b.PropertyType FROM #TMP AS B   
   GROUP BY B.BookingCode,B.BookingId,B.RoomCaptured,B.RoomId,B.CurrentStatus,  
-  B.PropertyName,B.RoomType;  
-  -- Get CheckOut Date   
-  CREATE TABLE #TMP2(Guest NVARCHAR(100),BookingCode INT,BookingId INT,  
-  RoomId INT,RoomCapturedId INT,BookingLevelId NVARCHAR(100),  
-  ChkOutDtId NVARCHAR(100),CurrentStatus NVARCHAR(100),  
-  PropertyName NVARCHAR(100),RoomType NVARCHAR(100));  
-  INSERT INTO #TMP2(Guest,BookingCode,BookingId,RoomId,RoomCapturedId,  
-  BookingLevelId,ChkOutDtId,CurrentStatus,PropertyName,RoomType)  
-  SELECT T.Guest,T.BookingCode,T.BookingId,T.RoomId,T.RoomCapturedId,  
-  T.BookingLevelId,CONVERT(VARCHAR(100),B.ChkOutDt,103) AS ChkOutDtId,  
-  T.CurrentStatus,T.PropertyName,T.RoomType FROM #TMP1 T  
-  LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest B WITH(NOLOCK)ON  
-  B.BookingId=T.BookingId AND B.RoomId=T.RoomId  
-  WHERE B.IsActive=1 AND IsDeleted=0 AND B.RoomShiftingFlag=0 AND  
-  B.BookingId=T.BookingId AND B.RoomId=T.RoomId AND   
-  B.RoomCaptured=T.RoomCapturedId;  
-  -- GET  
-  SELECT T.Guest,T.BookingCode,T.BookingId,T.RoomId,T.RoomCapturedId,  
-  T.BookingLevelId,T.ChkOutDtId,T.PropertyName,-- AS PropertyNameId,  
-  T.RoomType AS RoomNoId,T.CurrentStatus FROM #TMP2 T    
-  GROUP BY T.Guest,T.BookingCode,T.BookingId,T.RoomId,T.RoomCapturedId,  
-  T.BookingLevelId,T.ChkOutDtId,T.PropertyName,T.RoomType,T.CurrentStatus  
-  ORDER BY T.BookingCode,T.RoomCapturedId ASC;  
-  --  
-  --DROP TABLE #TMP,#TMP1,#TMP2;  
-  --  
-  SELECT CAST(YEAR(GETDATE()) AS VARCHAR)+'/'+  
-  CAST(MONTH(GETDATE()) AS VARCHAR)+'/'+  
-  CAST(DAY(GETDATE()) AS VARCHAR) AS ChkInDt,  
-  CAST(YEAR(GETDATE()) AS VARCHAR)+'/'+  
-  CAST(MONTH(GETDATE()) AS VARCHAR)+'/'+  
-  CAST(DAY(GETDATE())+1 AS VARCHAR) AS ChkOutDt;  
+  B.PropertyName,B.RoomType,B.PropertyType;
+  -- GET
+  IF @Str1 = 'Shift'
+   BEGIN
+    CREATE TABLE #TMP2(BookingCode BIGINT,BookingId BIGINT,
+    BookingLevelId NVARCHAR(100),CurrentStatus NVARCHAR(100),
+    Guest NVARCHAR(100),PropertyName NVARCHAR(100),RoomId BIGINT,
+    RoomCapturedId INT,RoomNoId NVARCHAR(100));
+    INSERT INTO #TMP2(BookingCode,BookingId,BookingLevelId,CurrentStatus,
+    Guest,PropertyName,RoomId,RoomCapturedId,RoomNoId)
+    SELECT T.BookingCode,T.BookingId,T.BookingLevelId,T.CurrentStatus,
+    T.Guest,T.PropertyName,T.RoomId,T.RoomCapturedId,T.RoomType AS RoomNoId
+    FROM #TMP1 T
+    WHERE T.PropertyType IN ('InP','MGH','DdP') AND T.CurrentStatus = 'Booked'
+    GROUP BY T.Guest,T.BookingCode,T.BookingId,T.RoomId,T.RoomCapturedId,
+    T.BookingLevelId,T.PropertyName,T.RoomType,T.CurrentStatus;
+    INSERT INTO #TMP2(BookingCode,BookingId,BookingLevelId,CurrentStatus,
+    Guest,PropertyName,RoomId,RoomCapturedId,RoomNoId)
+    SELECT T.BookingCode,T.BookingId,T.BookingLevelId,T.CurrentStatus,
+    T.Guest,T.PropertyName,T.RoomId,T.RoomCapturedId,T.RoomType AS RoomNoId
+    FROM #TMP1 T
+    WHERE T.PropertyType IN ('InP','MGH','DdP') AND T.CurrentStatus = 'CheckIn' 
+    AND T.BookingId IN (SELECT BG.BookingId 
+    FROM WRBHBBookingPropertyAssingedGuest BG WHERE BG.IsActive = 1 AND 
+    BG.IsDeleted = 0 AND BG.ChkOutDt >= CONVERT(DATE,GETDATE(),103))
+    GROUP BY T.Guest,T.BookingCode,T.BookingId,T.RoomId,T.RoomCapturedId,
+    T.BookingLevelId,T.PropertyName,T.RoomType,T.CurrentStatus;
+    SELECT BookingCode,BookingId,BookingLevelId,CurrentStatus,
+    Guest,PropertyName,RoomId,RoomCapturedId,RoomNoId FROM #TMP2
+    ORDER BY BookingCode,RoomCapturedId ASC;
+   END
+  ELSE
+   BEGIN
+    SELECT T.BookingCode,T.BookingId,T.BookingLevelId,T.CurrentStatus,
+    T.Guest,T.PropertyName,T.RoomId,T.RoomCapturedId,T.RoomType AS RoomNoId
+    FROM #TMP1 T WHERE T.PropertyType IN ('InP','MGH','DdP','ExP')
+    GROUP BY T.Guest,T.BookingCode,T.BookingId,T.RoomId,T.RoomCapturedId,
+    T.BookingLevelId,T.PropertyName,T.RoomType,T.CurrentStatus
+    ORDER BY T.BookingCode,T.RoomCapturedId ASC;
+   END 
  END  
 IF @Action = 'DateLoad'  
  BEGIN  
@@ -102,63 +107,42 @@ IF @Action = 'DateLoad'
   WHERE BG.IsActive = 1 AND BG.IsDeleted = 0 AND BP.IsActive = 1 AND  
   BP.IsDeleted = 0 AND BP.BookingId = @BookingId AND   
   BG.RoomCaptured = @Id1 ORDER BY BG.Id DESC;  
-  --  
-  DECLARE @DtCnt INT=0,@FromDt DATE,@ToDt DATE,@Dtt DATE;  
-  SET @DtCnt=(SELECT COUNT(*) FROM WRBHBBookingPropertyAssingedGuest  
-  WHERE IsActive=1 AND IsDeleted=0 AND BookingId=@BookingId AND  
-  RoomId=@RoomId AND ISNULL(RoomShiftingFlag,0)=0 AND  
-  RoomCaptured=@Id1 AND  
-  CONVERT(DATE,GETDATE(),103) BETWEEN  
-  CONVERT(DATE,ChkInDt,103) AND CONVERT(DATE,ChkOutDt,103));  
-  IF @DtCnt = 0  
-   BEGIN  
-    SELECT @FromDt=ChkInDt,@ToDt=ChkOutDt,@Dtt=ChkInDt   
+  --
+  DECLARE @EChkInDt DATE,@EChkOutDt DATE,@ChkInDtStart DATE;
+  DECLARE @ChkInDtEnd DATE,@ChkOutDtStart DATE;
+  --
+  IF @Str1 = 'Shift'
+  BEGIN
+  IF @PtyType IN ('InP','MGH','DdP') AND @CurrentStatus = 'Booked'
+   BEGIN
+    SELECT MIN(ChkInDt) AS ChkInDt,
+    MAX(ChkOutDt) AS ChkOutDt,
+    CONVERT(DATE,GETDATE(),103) AS ChkInDtStart,
+    CONVERT(DATE,DATEADD(YEAR,1,GETDATE()),103) AS ChkInDtEnd,
+    CONVERT(DATE,DATEADD(DAY,1,GETDATE()),103) AS ChkOutDtStart
     FROM WRBHBBookingPropertyAssingedGuest  
-    WHERE IsActive=1 AND IsDeleted=0 AND BookingId=@BookingId AND  
-    RoomId=@RoomId AND ISNULL(RoomShiftingFlag,0)=0 AND RoomCaptured=@Id1;  
-   END  
-  ELSE  
-   BEGIN  
-    SELECT @FromDt=CONVERT(DATE,GETDATE(),103),@ToDt=ChkOutDt,@Dtt=ChkInDt   
+    WHERE IsActive = 1 AND IsDeleted = 0 AND BookingId = @BookingId AND  
+    RoomCaptured = @Id1;
+   END
+  IF @PtyType IN ('InP','MGH','DdP') AND @CurrentStatus = 'CheckIn'
+   BEGIN    
+    SELECT MIN(ChkInDt) AS ChkInDt,MAX(ChkOutDt) AS ChkOutDt,
+    MIN(ChkInDt) AS ChkInDtStart,
+    MAX(ChkOutDt) AS ChkInDtEnd,
+    DATEADD(DAY,1,MIN(ChkInDt)) AS ChkOutDtStart
     FROM WRBHBBookingPropertyAssingedGuest  
-    WHERE IsActive=1 AND IsDeleted=0 AND BookingId=@BookingId AND  
-    RoomId=@RoomId AND ISNULL(RoomShiftingFlag,0)=0 AND RoomCaptured=@Id1;  
-   END  
-  IF @PtyType NOT IN ('InP','MGH','DdP') AND @CurrentStatus NOT IN ('CheckIn')  
-   BEGIN  
-    SELECT CAST(YEAR(@FromDt) AS VARCHAR)+'/'+CAST(MONTH(@FromDt) AS VARCHAR)  
-    +'/'+CAST(DAY(@FromDt) AS VARCHAR) AS ChkInRangeStart,  
-    CAST(YEAR(@ToDt) AS VARCHAR)+'/'+CAST(MONTH(@ToDt) AS VARCHAR)+'/'+  
-    CAST(DAY(@ToDt) AS VARCHAR) AS ChkInRangeEnd,  
-    CAST(YEAR(@FromDt) AS VARCHAR)+'/'+CAST(MONTH(@FromDt) AS VARCHAR)  
-    +'/'+CAST(DAY(@FromDt)+1 AS VARCHAR) AS ChkOutRangeStart,  
-    CAST(YEAR(@Dtt) AS VARCHAR)+'/'+CAST(MONTH(@Dtt) AS VARCHAR)  
-    +'/'+CAST(DAY(@Dtt) AS VARCHAR) AS ChkInRangeStart1;  
-   END  
-  ELSE  
-   BEGIN  
-    SELECT CAST(YEAR(DATEADD(DAY,-1,@FromDt)) AS VARCHAR)+'/'+  
-    CAST(MONTH(DATEADD(DAY,-1,@FromDt)) AS VARCHAR)+'/'+  
-    CAST(DAY(DATEADD(DAY,-1,@FromDt)) AS VARCHAR) AS ChkInRangeStart,  
-    CAST(YEAR(@ToDt) AS VARCHAR)+'/'+  
-    CAST(MONTH(@ToDt) AS VARCHAR)+'/'+  
-    CAST(DAY(@ToDt) AS VARCHAR) AS ChkInRangeEnd,  
-    CAST(YEAR(@FromDt) AS VARCHAR)+'/'+  
-    CAST(MONTH(@FromDt) AS VARCHAR)+'/'+  
-    CAST(DAY(@FromDt) AS VARCHAR) AS ChkOutRangeStart,  
-    CAST(YEAR(@Dtt) AS VARCHAR)+'/'+  
-    CAST(MONTH(@Dtt) AS VARCHAR)+'/'+  
-    CAST(DAY(@Dtt) AS VARCHAR) AS ChkInRangeStart1;  
-   END  
-  --  
+    WHERE IsActive = 1 AND IsDeleted = 0 AND BookingId = @BookingId AND  
+    RoomCaptured = @Id1;
+   END
+  END
+  --    
   SELECT TOP 1 BP.PropertyType,BG.TariffPaymentMode,  
   BG.ServicePaymentMode FROM WRBHBBookingProperty BP  
   LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON  
-  BG.BookingId=BP.BookingId AND BG.BookingPropertyTableId=BP.Id AND  
-  BG.BookingPropertyId=BP.PropertyId  
-  WHERE BG.IsActive=1 AND BG.IsDeleted=0 AND BP.IsActive=1 AND  
-  BP.IsDeleted=0 AND BP.BookingId=@BookingId AND   
-  BG.RoomCaptured = @Id1  
+  BG.BookingId = BP.BookingId AND BG.BookingPropertyTableId = BP.Id AND  
+  BG.BookingPropertyId = BP.PropertyId  
+  WHERE BG.IsActive = 1 AND BG.IsDeleted = 0 AND BP.IsActive = 1 AND  
+  BP.IsDeleted = 0 AND BP.BookingId = @BookingId AND BG.RoomCaptured = @Id1  
   GROUP BY BP.PropertyType,BG.TariffPaymentMode,BG.ServicePaymentMode;  
   --  
   DECLARE @BTC BIT=0;  

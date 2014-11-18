@@ -10,6 +10,7 @@ namespace HB.Entity
         public int Id { get; set; }
         public int PriceId { get; set; }
         public int ClientId { get; set; }
-        public string Date { get; set; }
+        public string FromDate { get; set; }
+        public string ToDate { get; set; }
     }
 }

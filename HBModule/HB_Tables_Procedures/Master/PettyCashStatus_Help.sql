@@ -125,7 +125,7 @@ BEGIN
 		FROM #Final
 				
 		--Expense
-		SELECT HeaderName,Id AS ExpenseId FROM WRBHBExpenseHeads
+		SELECT HeaderName AS ExpenseHead,Id AS ExpenseId FROM WRBHBExpenseHeads
 		Where Status='Active'
 		
 		SELECT OpeningBalance AS ClosingBalance FROM WRBHBPettyCashHdr 

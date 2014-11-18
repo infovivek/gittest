@@ -285,7 +285,7 @@ BEGIN
 	    CP.ProductName='Dinner (Non-Veg)' AND  VC.ProductName='Dinner (Non-Veg)' AND KD.DinnerNonVeg !=0
 	   
 	    
-	    SELECT ServiceItem,ItemId,SUM(Quantity) AS Quantity,Cost,SUM(Total) AS Total,
+	    SELECT ServiceItem,SUM(Quantity) AS Quantity,Cost,SUM(Total) AS Total,
 	    SUM(Revenue) AS Revenue FROM #Cost
 	    group by ServiceItem,ItemId,Cost,Flag	
 	    Order by Flag ASC  
@@ -295,10 +295,12 @@ BEGIN
 		TotalCost NVARCHAR(100),Revenue NVARCHAR(100),Flag int) 
 	    
 	    INSERT INTO #Final(ServiceItem,ItemId,Quantity,VendorRate,TotalCost,Revenue,Flag)
+	   
 	    SELECT ServiceItem,ItemId,SUM(Quantity) AS Quantity,Cost,SUM(Total) AS Total,
 	    SUM(Revenue) AS Revenue,1 FROM #Cost
-	    group by ServiceItem,ItemId,Cost
-	    
+	    group by ServiceItem,ItemId,Cost,Flag
+	     ORDER BY Flag ASC
+	     
 	    INSERT INTO #Final(ServiceItem,ItemId,Quantity,VendorRate,TotalCost,Revenue,Flag)
 	    SELECT '' AS ServiceItem,'' AS ItemId,'' AS Quantity,'' AS Cost,'' AS Total,
 	    '' AS Revenue,2 
@@ -308,8 +310,8 @@ BEGIN
 	    SUM(Revenue) AS Revenue,3 FROM #Cost
 	   	    
 	    
-	    SELECT ServiceItem,ItemId,Quantity,VendorRate,TotalCost,Revenue FROM #Final
-	    ORDER BY Flag ASC
+	    SELECT ServiceItem,Quantity,VendorRate,TotalCost,Revenue FROM #Final
+	   
 	    
 	  END 
 	  IF @Action='NewServiceload'
@@ -558,19 +560,20 @@ BEGIN
 	    CP.ProductName='Dinner (Non-Veg)' AND  VC.ProductName='Dinner (Non-Veg)' AND KD.DinnerNonVeg !=0
 	   
 	    
-	    SELECT ServiceItem,ItemId,SUM(Quantity) AS Quantity,Cost,SUM(Total) AS Total,
+	    SELECT ServiceItem,SUM(Quantity) AS Quantity,Cost,SUM(Total) AS Total,
 	    SUM(Revenue) AS Revenue FROM #Costs
 	    group by ServiceItem,ItemId,Cost,Flag	
 	    Order by Flag ASC  
 	   
 	  
-	   CREATE TABLE #Finals(ServiceItem NVARCHAR(100),ItemId NVARCHAR(100),Quantity NVARCHAR(100),VendorRate NVARCHAR(100),
+		CREATE TABLE #Finals(ServiceItem NVARCHAR(100),ItemId NVARCHAR(100),Quantity NVARCHAR(100),VendorRate NVARCHAR(100),
 		TotalCost NVARCHAR(100),Revenue NVARCHAR(100),Flag int) 
 	    
 	    INSERT INTO #Finals(ServiceItem,ItemId,Quantity,VendorRate,TotalCost,Revenue,Flag)
 	    SELECT ServiceItem,ItemId,SUM(Quantity) AS Quantity,Cost,SUM(Total) AS Total,
 	    SUM(Revenue) AS Revenue,1 FROM #Costs
-	    group by ServiceItem,ItemId,Cost
+	    group by ServiceItem,ItemId,Cost,Flag
+	    ORDER BY Flag ASC
 	    
 	    INSERT INTO #Finals(ServiceItem,ItemId,Quantity,VendorRate,TotalCost,Revenue,Flag)
 	    SELECT '' AS ServiceItem,'' AS ItemId,'' AS Quantity,'' AS Cost,'' AS Total,
@@ -581,8 +584,8 @@ BEGIN
 	    SUM(Revenue) AS Revenue,3 FROM #Costs
 	   	    
 	    
-	    SELECT ServiceItem,ItemId,Quantity,VendorRate,TotalCost,Revenue FROM #Finals
-	    ORDER BY Flag ASC
+	    SELECT ServiceItem,Quantity,VendorRate,TotalCost,Revenue FROM #Finals
+	   
 	    
 	  END 
  END

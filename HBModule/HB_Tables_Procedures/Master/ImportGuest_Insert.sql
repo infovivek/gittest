@@ -22,145 +22,41 @@ GO
 */
 CREATE PROCEDURE [dbo].[Sp_ImportGuest_Insert]
 ( 
-@CompanyName	NVARCHAR(100),
-@ClientId		BIGINT,
-@EmpCode		NVARCHAR(100),
-@FirstName		NVARCHAR(100),
-@LastName		NVARCHAR(100),
-@Grade			NVARCHAR(100),
-@MobileNumber	NVARCHAR(100),
-@Email			NVARCHAR(100),
-@Designation	NVARCHAR(100),
-@CreatedBy		BIGINT,
-@Nationality	NVARCHAR(100),
-@C1				NVARCHAR(100),
-@C2				NVARCHAR(100),
-@C3				NVARCHAR(100),
-@C4				NVARCHAR(100),
-@C5				NVARCHAR(100),
-@C6				NVARCHAR(100),
-@C7				NVARCHAR(100),
-@C8				NVARCHAR(100),
-@C9				NVARCHAR(100),
-@C10			NVARCHAR(100)
+	@Id    BIGINT
 )
 AS
 BEGIN
-DECLARE @Identity int,@GradeId int
+DECLARE @Email NVARCHAR(100),@ECode NVARCHAR(100),@Id1 INT
 
-IF EXISTS(SELECT NULL FROM WRBHBGradeMaster WITH(NOLOCK) WHERE IsDeleted=0 AND IsActive=1 AND Grade=@Grade 
-AND ClientId=@ClientId ) 
-BEGIN
-	SET @GradeId=(SELECT Id FROM WRBHBGradeMaster WHERE Grade=@Grade AND IsActive=1 AND IsDeleted=0 AND 
-	ClientId=@ClientId)
+SET @Email=(SELECT Email FROM WRBHBImportGuest WHERE Id=@Id)
+SET @ECode=(SELECT EmpCode FROM WRBHBImportGuest WHERE Id=@Id)
 	
-	IF EXISTS(SELECT NULL FROM WRBHBClientManagementAddClientGuest WHERE EmpCode=@EmpCode AND 
-	EmailId=@Email AND IsActive=1 AND IsDeleted=0)
+SET @Id1=(SELECT Id FROM WRBHBClientManagementAddClientGuest 
+WHERE EmailId=@Email AND EmpCode=@ECode)
+IF ISNULL(@Id1,0)=0
 	BEGIN
-		UPDATE WRBHBClientManagementAddClientGuest SET CltmgntId=@ClientId,CompanyName=ISNULL(@CompanyName,''),
-		EmpCode=@EmpCode,FirstName=ISNULL(@FirstName,''),LastName=ISNULL(@LastName,''),Grade=@Grade,
-		GMobileNo=ISNULL(@MobileNumber,''),EmailId=@Email,ModifiedBy=@CreatedBy,ModifiedDate=GETDATE(),
-		Designation=ISNULL(@Designation,''),GradeId=@GradeId,Nationality=ISNULL(@Nationality,''),
-		Column1=ISNULL(@C1,''),
-		Column2=ISNULL(@C2,''),
-		Column3=ISNULL(@C3,''),
-		Column4=ISNULL(@C4,''),
-		Column5=ISNULL(@C5,''),
-		Column6=ISNULL(@C6,''),
-		Column7=ISNULL(@C7,''),
-		Column8=ISNULL(@C8,''),
-		Column9=ISNULL(@C9,''),
-		Column10=ISNULL(@C10,'')
-		WHERE EmpCode=@EmpCode AND EmailId=@Email AND IsActive=1 AND IsDeleted=0
+		INSERT INTO WRBHBClientManagementAddClientGuest(CltmgntId,CompanyName,EmpCode,FirstName,LastName,Grade,
+		GMobileNo,EmailId,RangeMin,RangeMax,Designation,GradeId,Nationality,Title,Column1,Column2,
+		Column3,Column4,Column5,Column6,Column7,Column8,Column9,Column10,CreatedBy,CreatedDate,ModifiedBy,
+		ModifiedDate,IsActive,IsDeleted,RowId)
 		
-		
-		--SELECT Id,RowId FROM WRBHBClientManagementAddClientGuest WHERE Id=@Identity
-		SELECT CompanyName,EmpCode,FirstName,LastName,Grade,GMobileNo,EmailId,Designation,
-		RangeMin,RangeMax,Id,RowId FROM WRBHBClientManagementAddClientGuest WHERE CltmgntId=@ClientId
-		AND IsActive=1 AND IsDeleted=0;
+		SELECT ClientId,'' AS CompanyName,EmpCode,FirstName,LastName,Grade,MobileNo AS GMobileNo,Email AS EmailId,
+		0.00 AS RangeMin,0.00 AS RangeMax,Designation,0 AS GradeId,Nationality,'' AS Title,Column1,Column2,
+		Column3,Column4,Column5,Column6,Column7,Column8,Column9,Column10,1 AS CreatedBy,GETDATE(),1 AS ModifiedBy,
+		GETDATE(),1,0,NEWID() FROM WRBHBImportGuest
+		WHERE Id=@Id 
+	
 	END
 	ELSE
 	BEGIN
-		INSERT INTO WRBHBClientManagementAddClientGuest (CltmgntId,CompanyName,EmpCode,FirstName,LastName,Grade,
-					GMobileNo,EmailId,Designation,RangeMin,RangeMax,IsActive,IsDeleted,	CreatedBy,CreatedDate,
-					ModifiedBy,ModifiedDate,RowId,GradeId,Nationality,Title,Column1,Column2,Column3,Column4,Column5,
-					Column6,Column7,Column8,Column9,Column10)
-		VALUES (@ClientId,ISNULL(@CompanyName,''),@EmpCode,ISNULL(@FirstName,''),ISNULL(@LastName,''),
-		@Grade,ISNULL(@MobileNumber,''),@Email,ISNULL(@Designation,''),0,0,1,
-				0,@CreatedBy,GETDATE(),@CreatedBy,GETDATE(),NEWID(),
-				ISNULL(@GradeId,0),
-				ISNULL(@Nationality,''),'',
-				ISNULL(@C1,''),
-				ISNULL(@C2,''),
-				ISNULL(@C3,''),
-				ISNULL(@C4,''),
-				ISNULL(@C5,''),
-				ISNULL(@C6,''),
-				ISNULL(@C7,''),
-				ISNULL(@C8,''),
-				ISNULL(@C9,''),
-				ISNULL(@C10,''))
-		SELECT CompanyName,EmpCode,FirstName,LastName,Grade,GMobileNo,EmailId,Designation,
-		RangeMin,RangeMax,Id,RowId FROM WRBHBClientManagementAddClientGuest WHERE CltmgntId=@ClientId
-		AND IsActive=1 AND IsDeleted=0;		
+		UPDATE WRBHBClientManagementAddClientGuest SET CltmgntId=IG.ClientId,CompanyName='',
+		EmpCode=IG.EmpCode,FirstName=IG.FirstName,LastName=IG.LastName,Grade=IG.Grade,
+		GMobileNo=IG.MobileNo,EmailId=IG.Email,Designation=IG.Designation,Nationality=IG.Nationality,
+		Column1=IG.Column1,Column2=IG.Column2,Column3=IG.Column3,Column4=IG.Column4,Column5=IG.Column5,
+		Column6=IG.Column6,Column7=IG.Column7,Column8=IG.Column8,Column9=IG.Column9,Column10=IG.Column10,
+		ModifiedBy=1,ModifiedDate=GETDATE() FROM WRBHBImportGuest IG
+		JOIN WRBHBClientManagementAddClientGuest C ON IG.ClientId=C.CltmgntId AND C.IsActive=1 AND C.IsDeleted=0
+		WHERE C.Id=@Id1 
 	END
-END
-ELSE
-BEGIN
-	INSERT INTO WRBHBGradeMaster(Grade,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId,
-	ClientId) VALUES(@Grade,@CreatedBy,GETDATE(),@CreatedBy,@CreatedBy,1,0,NEWID(),@ClientId)
-
-	SELECT @Identity=@@IDENTITY
-
-	IF EXISTS(SELECT NULL FROM WRBHBClientManagementAddClientGuest WHERE EmpCode=@EmpCode AND EmailId=ISNULL(@Email,'') AND IsActive=1 AND IsDeleted=0)
-	BEGIN
-		UPDATE WRBHBClientManagementAddClientGuest SET CltmgntId=@ClientId,CompanyName=ISNULL(@CompanyName,''),
-		EmpCode=@EmpCode,FirstName=ISNULL(@FirstName,''),LastName=ISNULL(@LastName,''),Grade=@Grade,
-		GMobileNo=ISNULL(@MobileNumber,''),EmailId=@Email,ModifiedBy=@CreatedBy,ModifiedDate=GETDATE(),
-		Designation=ISNULL(@Designation,''),GradeId=@GradeId,Nationality=ISNULL(@Nationality,''),
-		Column1=ISNULL(@C1,''),
-		Column2=ISNULL(@C2,''),
-		Column3=ISNULL(@C3,''),
-		Column4=ISNULL(@C4,''),
-		Column5=ISNULL(@C5,''),
-		Column6=ISNULL(@C6,''),
-		Column7=ISNULL(@C7,''),
-		Column8=ISNULL(@C8,''),
-		Column9=ISNULL(@C9,''),
-		Column10=ISNULL(@C10,'')
-		 WHERE EmpCode=@EmpCode AND EmailId=ISNULL(@Email,'') AND IsActive=1 AND IsDeleted=0
-		
-		
-		--SELECT Id,RowId FROM WRBHBClientManagementAddClientGuest WHERE Id=@Identity
-		SELECT CompanyName,EmpCode,FirstName,LastName,Grade,GMobileNo,EmailId,Designation,
-		RangeMin,RangeMax,Id,RowId FROM WRBHBClientManagementAddClientGuest WHERE CltmgntId=@ClientId
-		AND IsActive=1 AND IsDeleted=0;
-	END
-	ELSE
-	BEGIN
-		INSERT INTO WRBHBClientManagementAddClientGuest (CltmgntId,CompanyName,EmpCode,FirstName,LastName,Grade,
-					GMobileNo,EmailId,Designation,RangeMin,RangeMax,IsActive,IsDeleted,	CreatedBy,CreatedDate,
-					ModifiedBy,ModifiedDate,RowId,GradeId,Nationality,Title,Column1,Column2,Column3,Column4,Column5,
-					Column6,Column7,Column8,Column9,Column10)
-		VALUES (@ClientId,ISNULL(@CompanyName,''),@EmpCode,ISNULL(@FirstName,''),ISNULL(@LastName,''),@Grade,
-				ISNULL(@MobileNumber,''),@Email,ISNULL(@Designation,''),0,0,1,0,@CreatedBy,GETDATE(),
-				@CreatedBy,GETDATE(),NEWID(),@Identity,ISNULL(@Nationality,''),'',
-				ISNULL(@C1,''),
-				ISNULL(@C2,''),
-				ISNULL(@C3,''),
-				ISNULL(@C4,''),
-				ISNULL(@C5,''),
-				ISNULL(@C6,''),
-				ISNULL(@C7,''),
-				ISNULL(@C8,''),
-				ISNULL(@C9,''),
-				ISNULL(@C10,''))
-				
-		SELECT CompanyName,EmpCode,FirstName,LastName,Grade,GMobileNo,EmailId,Designation,
-		RangeMin,RangeMax,Id,RowId FROM WRBHBClientManagementAddClientGuest WHERE CltmgntId=@ClientId
-		AND IsActive=1 AND IsDeleted=0;
-	--SELECT Id,RowId FROM WRBHBClientManagementAddClientGuest WHERE Id=@Identity
-	END	
-END
 END
 

@@ -410,7 +410,7 @@ MobileNo, EmailId,City,CheckinDate,ChkOutDt,ClientId,BookingCode,GuestId )
 	join WRBHBStaticHotels S   WITH(NOLOCK) ON Ag.BookingPropertyId = S.HotalId 
 	left outer join  WRBHBBookingGuestDetails H on C.id=H.Bookingid   and Ag.Guestid=H.Guestid
 	 where Convert(date,Ag.ChkOutDt,103)>= CONVERT(date,'01/09/2014',103)  --and c.Id=3787
-	   and AG.CurrentStatus='CheckIn'
+	   and AG.CurrentStatus='Booked'
 	group by C.id,C.clientname,ag.FirstName,Ag.ChkInDt,aG.ID,C.ClientId,
 	Ag.BookingPropertyId,H.MobileNo, EmailId ,S.City,S.HotalName,Ag.ChkOutDt, c.BookingCode,Ag.guestid
 

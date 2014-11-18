@@ -127,7 +127,7 @@ IF @Action='PageLoad'
     'Service Tax @'+CAST(h.RestaurantSTPer  AS NVARCHAR)+'% on Food and Beverages' ServiceFB,
     'Service Tax @'+CAST(h.BusinessSupportST AS NVARCHAR)+'% on Others' ServiceOT,sum(CS.OtherService) OtherService,
     sum(CS.ChkOutServiceST) ChkOutServiceST,sum(CS.Cess) CessService,sum(CS.HECess) HECess,
-    'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),GETDATE(),103) as InVoicedate
+    'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),h.CreatedDate,103) as InVoicedate
 	
 	from  WRBHBCheckInHdr d
 	 join WRBHBChechkOutHdr h on h.ChkInHdrId = d.Id --and d.IsActive = 1 and d.IsDeleted = 0
@@ -147,7 +147,7 @@ IF @Action='PageLoad'
 	c.CityName,s.StateName,p.Postal,p.Phone,p.Email,	
     H.VATPer,h.RestaurantSTPer ,
     h.BusinessSupportST ,h.InVoiceNo,d.ArrivalDate,h.PIInvoice,h.CheckOutDate,h.BillFromDate,
-    h.BillEndDate,h.NoOfDays
+    h.BillEndDate,h.NoOfDays,h.CreatedDate
    
 	
 	END

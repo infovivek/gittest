@@ -32,7 +32,8 @@ namespace HB.Dao
             for (int i = 0; i < n; i++)
             {
                 PE.ClientId = Convert.ToInt32(document.SelectNodes("//HdrXml")[i].Attributes["ClientId"].Value);
-                PE.Date = document.SelectNodes("//HdrXml")[i].Attributes["Date"].Value;
+                PE.FromDate = document.SelectNodes("//HdrXml")[i].Attributes["Date"].Value;
+                PE.ToDate = document.SelectNodes("//HdrXml")[i].Attributes["Date"].Value;
                 command = new SqlCommand();
                 if (PE.Id != 0)
                 {
@@ -47,7 +48,8 @@ namespace HB.Dao
                 command.CommandType = CommandType.StoredProcedure;
                 command.Parameters.Add("@PricingModelId", SqlDbType.BigInt).Value = PE.Id;
                 command.Parameters.Add("@ClientId", SqlDbType.BigInt).Value = PE.ClientId;
-                command.Parameters.Add("@Date", SqlDbType.NVarChar).Value = PE.Date;
+                command.Parameters.Add("@FromDate", SqlDbType.NVarChar).Value = PE.FromDate;
+                command.Parameters.Add("@ToDate", SqlDbType.NVarChar).Value = PE.ToDate;
                 command.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = user.Id;
                 ds = new WrbErpConnection().ExecuteDataSet(command, "");
             }

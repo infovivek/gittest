@@ -69,6 +69,7 @@
     <Content Include="GuestCheckOutService.aspx" />
     <Content Include="GuestCheckOutService1.aspx" />
     <Content Include="GuestCheckOutTariff.aspx" />
+    <Content Include="ImportExcel.aspx" />
     <Content Include="IntermediateCheckoutConsolidate.aspx" />
     <Content Include="IntermediateCheckoutService.aspx" />
     <Content Include="IntermediateCheckoutTariff.aspx" />
@@ -224,6 +225,13 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>HBDataSet1.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ImportExcel.aspx.cs">
+      <DependentUpon>ImportExcel.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ImportExcel.aspx.designer.cs">
+      <DependentUpon>ImportExcel.aspx</DependentUpon>
     </Compile>
     <Compile Include="IntermediateCheckoutConsolidate.aspx.cs">
       <DependentUpon>IntermediateCheckoutConsolidate.aspx</DependentUpon>

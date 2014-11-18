@@ -603,8 +603,12 @@
 				bdr_Upload.visible=true;
 				Grd_User.visible=false;
 				bdr_Action.visible=false;
-				ExpenseId=Grd_User.selectedItem.ExpenseId;
-				useWeb("PettyCashStatus","ActionUpload_CUSTOM",[GlobalXml,"EXPENSEUPLOAD",'',PropertyId,Global_AC[0].UsrId,ExpenseId]);
+				var TempProduct_AC:ArrayCollection=new ArrayCollection();
+				TempProduct_AC=Grd_User.dataProvider as ArrayCollection
+				Txt_desupload.text=Grd_User.selectedItem.Description;
+				Txt_ExpenseHead.text=Grd_User.selectedItem.ExpenseHead;
+//				ExpenseId=Grd_User.selectedItem.ExpenseId;
+//				useWeb("PettyCashStatus","ActionUpload_CUSTOM",[GlobalXml,"EXPENSEUPLOAD",'',PropertyId,Global_AC[0].UsrId,ExpenseId]);
 				
 			}
 			public function FnClose_clickHandler2(event):void
@@ -799,7 +803,7 @@
 				<mx:Label x="483" y="352" width="98" id="lbl_Total" textAlign="center"/>
 				<mx:Label x="586" y="351" width="98" id="lbl_PaidTotal" textAlign="center"/>
 				<WrbHelpComp:HelpText x="106" y="384" width="190" id="hlp_Expense" depth="100" tabIndex="1"
-									  onselection="{OnSelectionExpense()}" pxSetColumnsWidth="190,0">
+								PxGridSetUp="-300" pxSetHeight="300" onselection="{OnSelectionExpense()}" pxSetColumnsWidth="190,0">
 				</WrbHelpComp:HelpText>
 				<mx:TextInput x="376" y="384" width="165" id="Txt_des" tabIndex="2"/>
 				<mx:Label x="494" y="56" text="OpeningBalance" id="lbl_Des0"/>

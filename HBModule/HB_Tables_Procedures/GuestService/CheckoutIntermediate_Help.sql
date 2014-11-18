@@ -418,7 +418,7 @@ If @BookingLevel = 'Apartment'
 		--SELECT ClientName,Direct,BTC,Id From  WRBHBCheckInHdr    
 		--WHERE Id=@CheckInHdrId AND IsActive=1 AND IsDeleted=0  
    
-		SELECT ClientName,ClientId,CityId,ServiceCharge,@TariffPaymentMode as TariffPaymentMode,@ServicePaymentMode as ServicePaymentMode,  
+		SELECT ClientName,ClientId,CityId,ServiceCharge as ServiceChargeChk,@TariffPaymentMode as TariffPaymentMode,@ServicePaymentMode as ServicePaymentMode,  
 		Id From  WRBHBCheckInHdr    
 		WHERE Id=@CheckInHdrId AND IsActive=1 AND IsDeleted=0  
 		--Day Count  
@@ -620,7 +620,7 @@ If @BookingLevel = 'Apartment'
 		--SELECT ClientName,Direct,BTC,Id From  WRBHBCheckInHdr    
 		--WHERE Id=@CheckInHdrId AND IsActive=1 AND IsDeleted=0  
    
-		SELECT ClientName,@TariffPaymentMode as TariffPaymentMode,@ServicePaymentMode as ServicePaymentMode,  
+		SELECT ClientName,ClientId,CityId,ServiceCharge as ServiceChargeChk,@TariffPaymentMode as TariffPaymentMode,@ServicePaymentMode as ServicePaymentMode,  
 		Id From  WRBHBCheckInHdr    
 		WHERE Id=@CheckInHdrId AND IsActive=1 AND IsDeleted=0  
 		--Day Count  
