@@ -42,15 +42,15 @@ namespace HB.Dao
                 //message.To.Add(new System.Net.Mail.MailAddress("vivek@warblerit.com"));
                 //message.Subject = "MMT Testing Booking Confirmation - " + ds.Tables[2].Rows[0][0].ToString();
                 message.To.Add(new System.Net.Mail.MailAddress("booking_confirmation@staysimplyfied.com"));
-                /*if (ds.Tables[2].Rows[0][6].ToString() == "0")
-                {
-                    if (ds.Tables[2].Rows[0][7].ToString() != "")
-                    {
-                        message.To.Add(new System.Net.Mail.MailAddress(ds.Tables[2].Rows[0][7].ToString()));
-                    }
-                }
-                else
-                {*/
+                //if (ds.Tables[2].Rows[0][6].ToString() == "0")
+                //{
+                //    if (ds.Tables[2].Rows[0][7].ToString() != "")
+                //    {
+                //        message.To.Add(new System.Net.Mail.MailAddress(ds.Tables[2].Rows[0][7].ToString()));
+                //    }
+                //}
+                //else
+                //{
                     for (int i = 0; i < ds.Tables[3].Rows.Count; i++)
                     {
                         if (ds.Tables[3].Rows[i][0].ToString() != "")
@@ -101,11 +101,11 @@ namespace HB.Dao
                     " <td width=\"300\" style=\" padding-bottom:1px;\">" +
                     " <p style=\"font-weight:bold; color:orange;\">Booking confirmation details" +
                     " <span style=\"color:#000; background-color:#ffcc00; padding:5px;\">Booking # : " + ds.Tables[2].Rows[0][0].ToString() + " </span></p>" + //Reservation
-                    " <p style=\"margin:0px;\">Ref : <span>" + ds.Tables[2].Rows[0][8].ToString() + "</span></p><br>" +             //Ref                    
+                    /*" <p style=\"margin:0px;\">Ref : <span>" + ds.Tables[2].Rows[0][8].ToString() + "</span></p><br>" +*/
                     " <p style=\"margin:0px;\">Booked by : <span>" + ds.Tables[2].Rows[0][1].ToString() + "</span></p><br>" +             //Name                    
                     " <p style=\"margin:0px;\">Reservation Date : <span>" + ds.Tables[2].Rows[0][2].ToString() + "</span></p><br>" + //Date
                     " <p style=\"margin:0px;\">Company Name : <span>" + ds.Tables[2].Rows[0][3].ToString() + "</span></p><br>" + //company name
-                    " </td><td width=\"300\"><p style=\"padding:25px 25px 25px 25px; font-size:13px; color:#000; font-weight:bold; background-color:#ffcc00;\">Please refer your name and reference number at the time of checkin</p>" +
+                    " </td><td width=\"300\"><p style=\"padding:25px 25px 25px 25px; font-size:13px; color:#000; font-weight:bold; background-color:#ffcc00;\">Please refer your name and reference number - " + ds.Tables[2].Rows[0][8].ToString() + " at the time of check-In</p>" +
                     " <p style=\"margin-top:0px;\"> <span style=\"color:orange; font-size:12px;\"></span></p>" +
                     " </td></tr><tr><td width=\"600\" style=\"margin-bottom:\">" +
                     " <p style=\"color:orange; font-weight:bold; font-size:14px;\"> Guest Details</p>" +
@@ -165,7 +165,7 @@ namespace HB.Dao
                 //
                 string AddressDtls =
                     "<p style=\"margin-top:10px; margin-left:5px; font-size:11px;\">" +
-                    " <span style=\"color:#f54d02; font-weight:bold; font-size:11px;\">Tax :</span> Net Tariff" +
+                    " <span style=\"color:#f54d02; font-weight:bold; font-size:11px;\">Tax :</span> " + ds.Tables[3].Rows[0][1].ToString() + "" +
                     " </p>"+
                     " <table cellpadding=\"0\" cellspacing=\"0\" width=\"600\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
                     " <tr style=\"font-size:11px; background-color:#eee;\">" +
@@ -203,7 +203,7 @@ namespace HB.Dao
                         " <td width=\"200\" style=\"padding:10px; border-right:1px solid #ccc; margin-bottom:20px; border-bottom:1px solid #ccc;\">" +
                         "  <p style=\"color:orange; font-weight:bold; margin:0px; font-size:0px;\"> QR Code</p>" +
                         "  <br /><br />" +
-                        "  <img src=\"http://sstage.in/images/images.jpg\" width=\"100\" height=\"100\" />" +
+                        "  <img src=" + ds.Tables[2].Rows[0][10].ToString() + " width=\"100\" height=\"100\" />" +
                         " <p style=\"margin-top:5px;\">" +
                         "  *NOTE: Download QRCode reader to get propery address to your maps" +
                         "    </p>" +
@@ -227,8 +227,10 @@ namespace HB.Dao
                 System.Net.Mail.SmtpClient smtp = new System.Net.Mail.SmtpClient();
                 smtp.EnableSsl = true;                
                 smtp.Port = 587;
-                //smtp.Host = "smtp.gmail.com";smtp.Credentials = new System.Net.NetworkCredential("stay@staysimplyfied.com", "stay1234");
-                smtp.Host = "email-smtp.us-west-2.amazonaws.com";smtp.Credentials = new System.Net.NetworkCredential("AKIAIIVF5D5D3CJAX7SQ", "ApmuZkd+L8tissEga8kac3quhhwohEi5CB+dYD36KTq3");
+                //smtp.Host = "smtp.gmail.com";
+                //smtp.Credentials = new System.Net.NetworkCredential("stay@staysimplyfied.com", "stay1234");
+                smtp.Host = "email-smtp.us-west-2.amazonaws.com";
+                smtp.Credentials = new System.Net.NetworkCredential("AKIAIIVF5D5D3CJAX7SQ", "ApmuZkd+L8tissEga8kac3quhhwohEi5CB+dYD36KTq3");
                 smtp.Send(message);
             }
             catch (Exception ex)

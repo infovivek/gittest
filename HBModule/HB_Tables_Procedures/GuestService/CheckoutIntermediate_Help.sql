@@ -424,10 +424,19 @@ If @BookingLevel = 'Apartment'
 		--Day Count  
 		--CREATE TABLE #CountDays(NoofDays INT,CheckInHdrId INT)  
 		--INSERT INTO #CountDays (NoofDays,CheckInHdrId)  
-		SELECT DATEDIFF(day, CAST(CAST(ArrivalDate AS NVARCHAR)+' '+ArrivalTime AS DATETIME), CAST(ChkoutDate AS NVARCHAR)) AS Days,  
+		--SELECT DATEDIFF(day, CAST(CAST(ArrivalDate AS NVARCHAR)+' '+ArrivalTime AS DATETIME), CAST(ChkoutDate AS NVARCHAR)) AS Days,  
+		--Id--,ArrivalDate  
+		--FROM WRBHBCheckInHdr WHERE Id=@CheckInHdrId; 
+		
+		--Declare @dt6 NVARCHAR(100), @dt7 NVARCHAR(100);
+		--set @dt6 =(select    (CONVERT(NVARCHAR(100),@NewCheckInDate,103) ))
+		-- set @dt7 =(select    CONVERT(NVARCHAR(100),@ChkOutDate ,103)  )
+		
+		--select @dt6,@dt7;
+		  
+		SELECT DATEDIFF(day,CONVERT(date,@NewCheckInDate,103), CONVERT(date,@ChkOutDate ,103) ) AS Days,  
 		Id--,ArrivalDate  
 		FROM WRBHBCheckInHdr WHERE Id=@CheckInHdrId; 
-		
 		
  END
    
@@ -683,6 +692,7 @@ If @BookingLevel = 'Apartment'
 		--set @ChkInDate = (select CONVERT(nvarchar(100),ArrivalDate,103) FROM WRBHBCheckInHdr WHERE Id=@CheckInHdrId);  
 		--set @ChkOutDate = (select CONVERT(nvarchar(100),ChkoutDate,103) FROM WRBHBCheckInHdr WHERE Id=@CheckInHdrId)  
 
+
 		CREATE TABLE #LuxuryTax(LuxuryTax DECIMAL(27,2),ServiceTax DECIMAL(27,2),LT DECIMAL(27,2),ST DECIMAL(27,2))  
 
 		CREATE TABLE #LuxuryTax1(LuxuryTax DECIMAL(27,2),LuxuryTax1 DECIMAL(27,2),LuxuryTax2 DECIMAL(27,2),LuxuryTax3 DECIMAL(27,2),  
@@ -711,7 +721,7 @@ If @BookingLevel = 'Apartment'
 		INSERT INTO #LuxuryTax1(LuxuryTax,LuxuryTax1,LuxuryTax2,LuxuryTax3,ServiceTax,FromDT,ToDT,RackTariffFlag,Id,TariffAmtFrom,TariffAmtFrom1,TariffAmtFrom2,  
 		TariffAmtFrom3,TariffAmtTo,TariffAmtTo1,TariffAmtTo2,TariffAmtTo3)  
 		SELECT ISNULL(LTaxPer,0),ISNULL(LTaxPer1,0),ISNULL(LTaxPer2,0),ISNULL(LTaxPer3,0),ISNULL(ServiceTaxOnTariff,0),CONVERT(varchar(100),Date,103),  
-		CONVERT(varchar(100),ISNULL(DateTo,GETDATE()),103),ISNULL(RackTariff,0),Id,TariffAmtFrom,TariffAmtFrom1,  
+		CONVERT(varchar(100),ISNULL(DateTo,GETDATE()+1),103),ISNULL(RackTariff,0),Id,TariffAmtFrom,TariffAmtFrom1,  
 		TariffAmtFrom2,TariffAmtFrom3,TariffAmtTo,TariffAmtTo1,TariffAmtTo2,TariffAmtTo3    
 		FROM WRBHBTaxMaster  
 		WHERE CONVERT(nvarchar(100),Date,103) between CONVERT(nvarchar(100),@NewCheckInDate,103) and  
@@ -721,7 +731,7 @@ If @BookingLevel = 'Apartment'
 		INSERT INTO #LuxuryTax1(LuxuryTax,LuxuryTax1,LuxuryTax2,LuxuryTax3,ServiceTax,FromDT,ToDT,RackTariffFlag,Id,TariffAmtFrom,TariffAmtFrom1,TariffAmtFrom2,  
 		TariffAmtFrom3,TariffAmtTo,TariffAmtTo1,TariffAmtTo2,TariffAmtTo3)  
 		SELECT ISNULL(LTaxPer,0),ISNULL(LTaxPer1,0),ISNULL(LTaxPer2,0),ISNULL(LTaxPer3,0),ISNULL(ServiceTaxOnTariff,0),CONVERT(varchar(100),Date,103),  
-		CONVERT(varchar(100),ISNULL(DateTo,GETDATE()),103),ISNULL(RackTariff,0),Id,TariffAmtFrom,TariffAmtFrom1,  
+		CONVERT(varchar(100),ISNULL(DateTo,GETDATE()+1),103),ISNULL(RackTariff,0),Id,TariffAmtFrom,TariffAmtFrom1,  
 		TariffAmtFrom2,TariffAmtFrom3,TariffAmtTo,TariffAmtTo1,TariffAmtTo2,TariffAmtTo3    
 		FROM WRBHBTaxMaster  
 		WHERE CONVERT(nvarchar(100),DateTo,103) between CONVERT(nvarchar(100),@NewCheckInDate,103) and  
@@ -731,7 +741,7 @@ If @BookingLevel = 'Apartment'
 		INSERT INTO #LuxuryTax1(LuxuryTax,LuxuryTax1,LuxuryTax2,LuxuryTax3,ServiceTax,FromDT,ToDT,RackTariffFlag,Id,TariffAmtFrom,TariffAmtFrom1,TariffAmtFrom2,  
 		TariffAmtFrom3,TariffAmtTo,TariffAmtTo1,TariffAmtTo2,TariffAmtTo3)  
 		SELECT ISNULL(LTaxPer,0),ISNULL(LTaxPer1,0),ISNULL(LTaxPer2,0),ISNULL(LTaxPer3,0),ISNULL(ServiceTaxOnTariff,0),CONVERT(varchar(100),Date,103),  
-		CONVERT(varchar(100),ISNULL(DateTo,GETDATE()),103),ISNULL(RackTariff,0),Id,TariffAmtFrom,TariffAmtFrom1,  
+		CONVERT(varchar(100),ISNULL(DateTo,GETDATE()+1),103),ISNULL(RackTariff,0),Id,TariffAmtFrom,TariffAmtFrom1,  
 		TariffAmtFrom2,TariffAmtFrom3,TariffAmtTo,TariffAmtTo1,TariffAmtTo2,TariffAmtTo3    
 		FROM WRBHBTaxMaster  
 		WHERE CONVERT(nvarchar(100),Date,103) <= CONVERT(nvarchar(100),@NewCheckInDate,103)   
@@ -740,7 +750,7 @@ If @BookingLevel = 'Apartment'
 		INSERT INTO #LuxuryTax1(LuxuryTax,LuxuryTax1,LuxuryTax2,LuxuryTax3,ServiceTax,FromDT,ToDT,RackTariffFlag,Id,TariffAmtFrom,TariffAmtFrom1,TariffAmtFrom2,  
 		TariffAmtFrom3,TariffAmtTo,TariffAmtTo1,TariffAmtTo2,TariffAmtTo3)  
 		SELECT ISNULL(LTaxPer,0),ISNULL(LTaxPer1,0),ISNULL(LTaxPer2,0),ISNULL(LTaxPer3,0),ISNULL(ServiceTaxOnTariff,0),CONVERT(varchar(100),Date,103),  
-		CONVERT(varchar(100),ISNULL(DateTo,GETDATE()),103),ISNULL(RackTariff,0),Id,TariffAmtFrom,TariffAmtFrom1,  
+		CONVERT(varchar(100),ISNULL(DateTo,GETDATE()+1),103),ISNULL(RackTariff,0),Id,TariffAmtFrom,TariffAmtFrom1,  
 		TariffAmtFrom2,TariffAmtFrom3,TariffAmtTo,TariffAmtTo1,TariffAmtTo2,TariffAmtTo3    
 		FROM WRBHBTaxMaster  
 		WHERE CONVERT(nvarchar(100),@ChkOutDate,103)<= CONVERT(nvarchar(100),DateTo,103)    
@@ -783,7 +793,7 @@ If @BookingLevel = 'Apartment'
 		-- @RackTariff=RackTariff,  
 		@prtyId=PropertyId,@chkouttime= CONVERT(VARCHAR(8),GETDATE(),108) FROM WRBHBCheckInHdr where Id=@CheckInHdrId  
     
-		-- SELECT @DateDiff,@ChkInDate,@ChkOutDate,@HR  
+		--SELECT @DateDiff,@ChkInDate,@ChkOutDate,@HR  
 		IF @HR='12'    
 		BEGIN  
 		-- To Check Time  
@@ -849,8 +859,11 @@ If @BookingLevel = 'Apartment'
 			 --  Select @i,@DateDiff    
               END  
           END    
+          
           ELSE   
           BEGIN  
+          
+          
    --Get Date Differance  
  --  select @ChkInDate,@ChkOutDate,@chktime,@chkouttime  
 	   SET @MIN=(SELECT DATEDIFF(MINUTE,CAST(YEAR(CONVERT(DATE,@NewCheckInDate,103)) AS VARCHAR)+'-'+  
@@ -887,6 +900,10 @@ If @BookingLevel = 'Apartment'
 		SET @DateDiff=@DateDiff-1                    
 	   END     
 	  ENd   
+	  
+	  
+	  
+	  
     
   --Select * from #Tariff   
   --select * from #LuxuryTax2  
@@ -986,7 +1003,8 @@ If @BookingLevel = 'Apartment'
 		join #Tariff d ON H.Date = D.Date  
 		WHERE  (Tariff+@ExtraMatters) between h.TariffAmtFrom2 AND h.TariffAmtTo2  
 		AND RackTariffFlag=0  
-
+	--	select * from #LuxuryTax2
+	--	select * from #Tariff
 		--SLAB 4 CHECK   
 		INSERT INTO #FINALLuxury(TARIFF,LuxuryTax,ServiceTax,LT,ST,Date)  
 		SELECT D.Tariff,ISNULL(h.LuxuryTax3*(D.Tariff+@ExtraMatters)/100,0),0,ISNULL(h.LuxuryTax3,0),  
@@ -1002,7 +1020,8 @@ If @BookingLevel = 'Apartment'
 		GROUP BY TARIFF,LuxuryTax,ServiceTax,LT,ST  
 		  
 		
-		--Select * from #Tariff;  
+	--	Select * from #FINALLuxury; 
+	--	select * from #FINAL;
 		--  SELECT ChkInDate,ChkOutDate FROM #LEVEL;  
 		SELECT @NoOfDays AS NoofDays --FROM #Tariff  
 		SELECT TARIFF AS NetTariff,LuxuryTax,ServiceTax,LT,ST FROM #FINAL  

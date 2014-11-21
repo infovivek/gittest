@@ -35,15 +35,16 @@ IF @Action='PAGELOAD'
 	END
 IF @Action='CLIENTLOAD'
 	BEGIN
-		SELECT ClientName,Id AS ClientId,CONVERT(nvarchar(100),GETDATE(),103) as DateId--,0 as Id
-		 FROM WRBHBClientManagement 
+		SELECT ClientName,Id AS ClientId,CONVERT(nvarchar(100),GETDATE(),103) as DateId
+		FROM WRBHBClientManagement 
 		WHERE Id NOT IN (SELECT ClientId FROM WRBHBClientwisePricingModel WHERE IsActive=1) AND IsActive=1 AND IsDeleted=0 
 		ORDER BY ClientName
 	END
 IF @Action='LASTCLIENT'	
 	BEGIN	
 		SELECT CM.ClientName,CPM.ClientId,CPM.Id,
-		ISNULL (CONVERT(NVARCHAR(100),EffectivefromDate,103),CONVERT(NVARCHAR(100),GETDATE(),103)) AS Date--as Date,Convert(NVARCHAR(100),EffectivefromDate,103) AS DATE 
+		ISNULL (CONVERT(NVARCHAR(100),EffectivefromDate,103),CONVERT(NVARCHAR(100),GETDATE(),103)) AS FromDate
+		,Convert(NVARCHAR(100),EffectiveToDate,103) AS ToDate
 		FROM WRBHBClientwisePricingModel CPM
 		JOIN WRBHBTransSubsPriceModel PM ON PM.Id=CPM.PricingModelId
 		JOIN WRBHBClientManagement CM ON CM.Id=CPM.ClientId

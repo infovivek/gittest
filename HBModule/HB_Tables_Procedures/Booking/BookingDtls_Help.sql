@@ -64,9 +64,9 @@ IF @Action = 'ClientGuestLoad'
   CREATE TABLE #ASDS(CityName NVARCHAR(100),PropertyName NVARCHAR(100),
   Locality NVARCHAR(100),RoomType NVARCHAR(100),SingleandMarkup1 NVARCHAR(100),
   Inclusions NVARCHAR(100),Id BIGINT,DoubleandMarkup1 NVARCHAR(100),
-  CheckInType NVARCHAR(100));
+  CheckInType NVARCHAR(100),Typee NVARCHAR(100));
   INSERT INTO #ASDS(CityName,PropertyName,Locality,RoomType,SingleandMarkup1,
-  Inclusions,Id,DoubleandMarkup1,CheckInType)
+  Inclusions,Id,DoubleandMarkup1,CheckInType,Typee)
   SELECT C.CityName,BP.PropertyName,BP.Locality,BP.RoomType,
   CASE WHEN BP.TaxAdded = 'N' THEN CAST(BP.SingleandMarkup1 AS VARCHAR) +' <SUP>#</SUP>'
        WHEN BP.TaxAdded = 'T' THEN CAST(BP.SingleandMarkup1 AS VARCHAR) +' <SUP>&#9733;</SUP>'
@@ -77,7 +77,8 @@ IF @Action = 'ClientGuestLoad'
        WHEN BP.TaxAdded = 'T' THEN CAST(BP.DoubleandMarkup1 AS VARCHAR) +' <SUP>&#9733;</SUP>'
        WHEN BP.TaxAdded = '' THEN CAST(BP.DoubleandMarkup1 AS VARCHAR) +' <SUP>&#9733;</SUP>'
        ELSE CAST(BP.DoubleandMarkup1 AS VARCHAR) +' <SUP>&#9733;</SUP>' END,
-  CAST(P.CheckIn AS VARCHAR)+' '+P.CheckInType
+  CAST(P.CheckIn AS VARCHAR)+' '+P.CheckInType,
+  BP.PropertyType AS Typee
   FROM WRBHBBookingProperty BP
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK) ON P.Id = BP.PropertyId
   LEFT OUTER JOIN WRBHBLocality L WITH(NOLOCK) ON L.Id = BP.LocalityId
@@ -86,20 +87,38 @@ IF @Action = 'ClientGuestLoad'
   BP.PropertyType IN ('ExP','CPP','InP','MGH','DdP');
   --
   INSERT INTO #ASDS(CityName,PropertyName,Locality,RoomType,SingleandMarkup1,
-  Inclusions,Id,DoubleandMarkup1,CheckInType)
+  Inclusions,Id,DoubleandMarkup1,CheckInType,Typee)
   SELECT B.CityName,BP.PropertyName,BP.Locality,BP.RoomType,
   CAST(BP.SingleandMarkup1 AS VARCHAR)+' <SUP>#</SUP>',BP.Inclusions,BP.Id,
-  CAST(BP.DoubleandMarkup1 AS VARCHAR)+' <SUP>#</SUP>',SH.CheckInTime
-  FROM WRBHBBooking B
+  CAST(BP.DoubleandMarkup1 AS VARCHAR)+' <SUP>#</SUP>',SH.CheckInTime,
+  'MMT' FROM WRBHBBooking B
   LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId = B.Id
   LEFT OUTER JOIN WRBHBCity C WITH(NOLOCK) ON C.Id = B.CityId
   LEFT OUTER JOIN WRBHBStaticHotels SH WITH(NOLOCK)ON 
   SH.HotalId = BP.PropertyId AND SH.CityCode = C.CityCode  
   WHERE BP.BookingId = @Id AND BP.PropertyType IN ('MMT');
   --
+  CREATE TABLE #TTEEMMPP(CityName NVARCHAR(100),PropertyName NVARCHAR(100),
+  Locality NVARCHAR(100),RoomType NVARCHAR(100),SingleandMarkup1 NVARCHAR(100),
+  Inclusions NVARCHAR(100),Id NVARCHAR(100),DoubleandMarkup1 NVARCHAR(100),
+  CheckInType NVARCHAR(100),Typee NVARCHAR(100));
+  INSERT INTO #TTEEMMPP(CityName,PropertyName,Locality,RoomType,
+  SingleandMarkup1,Inclusions,Id,DoubleandMarkup1,CheckInType,Typee)
   SELECT CityName,PropertyName,Locality,RoomType,SingleandMarkup1,Inclusions,
-  Id,DoubleandMarkup1,CheckInType FROM #ASDS
-  ORDER BY PropertyName ASC;
+  Id,DoubleandMarkup1,CheckInType,'Company Prefered' FROM #ASDS
+  WHERE Typee = 'CPP';
+  INSERT INTO #TTEEMMPP(CityName,PropertyName,Locality,RoomType,
+  SingleandMarkup1,Inclusions,Id,DoubleandMarkup1,CheckInType,Typee)
+  SELECT CityName,PropertyName,Locality,RoomType,SingleandMarkup1,Inclusions,
+  Id,DoubleandMarkup1,CheckInType,'Guest House' FROM #ASDS
+  WHERE Typee = 'MGH';
+  INSERT INTO #TTEEMMPP(CityName,PropertyName,Locality,RoomType,
+  SingleandMarkup1,Inclusions,Id,DoubleandMarkup1,CheckInType,Typee)
+  SELECT CityName,PropertyName,Locality,RoomType,SingleandMarkup1,Inclusions,
+  Id,DoubleandMarkup1,CheckInType,'Others' FROM #ASDS
+  WHERE Typee NOT IN ('CPP','MGH');
+  SELECT CityName,PropertyName,Locality,RoomType,SingleandMarkup1,Inclusions,
+  Id,DoubleandMarkup1,CheckInType,Typee FROM #TTEEMMPP;
   /*-- dataset table 0
   SELECT C.CityName,BP.PropertyName,BP.Locality,RoomType,
   SingleandMarkup1 AS Tariff,Inclusions,BP.Id,DoubleandMarkup1,
@@ -288,7 +307,7 @@ IF @Action = 'RoomBookingConfirmed'
   WHERE G.BookingId=@Id AND P.GetType='Property' AND
   P.PropertyType='ExP')
    BEGIN    
-    SELECT TOP 1 @Taxes = (CASE WHEN ISNULL(R.Inclusive,0) = 1 THEN 'Net Tariff' 
+    SELECT TOP 1 @Taxes = (CASE WHEN ISNULL(R.Inclusive,0) = 1 THEN 'Including Tax' 
     ELSE 'Taxes as applicable' END),@TACPer = ISNULL(A.TACPer,0)
     FROM WRBHBProperty P
     LEFT OUTER JOIN WRBHBPropertyAgreements A WITH(NOLOCK)ON 
@@ -438,7 +457,12 @@ IF @Action = 'RoomBookingConfirmed'
   CltmgntId=(SELECT ClientId FROM WRBHBBooking B WHERE B.Id=@Id);
   -- Dataset Table 8
   --SELECT ClientBookerEmail FROM WRBHBBooking WHERE Id=@Id;
-  SELECT B.ClientBookerEmail,BP.PropertyType,B.ExtraCCEmail FROM WRBHBBooking B
+  DECLARE @RPId NVARCHAR(100) = 
+  (SELECT TOP 1 CAST(ISNULL(BookingPropertyId,'') AS VARCHAR) 
+  FROM WRBHBBookingPropertyAssingedGuest
+  WHERE BookingId = @Id GROUP BY BookingPropertyId);
+  SELECT B.ClientBookerEmail,BP.PropertyType,B.ExtraCCEmail,
+  'http://sstage.in/qr/'+@RPId+'.png' FROM WRBHBBooking B
   LEFT OUTER JOIN WRBHBBookingProperty BP 
   WITH(NOLOCK)ON BP.BookingId=B.Id
   LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG
@@ -635,7 +659,12 @@ IF @Action = 'BedBookingConfirmed'
   WHERE IsActive=1 AND IsDeleted=0 AND ContactType='Extra C C' AND
   CltmgntId=(SELECT ClientId FROM WRBHBBooking B WHERE B.Id=@Id);
   -- Dataset Table 8
-  SELECT ClientBookerEmail,ExtraCCEmail  FROM WRBHBBooking WHERE Id=@Id;
+  DECLARE @BPId NVARCHAR(100) = 
+  (SELECT TOP 1 CAST(ISNULL(BookingPropertyId,'') AS VARCHAR) 
+  FROM WRBHBBedBookingPropertyAssingedGuest
+  WHERE BookingId = @Id GROUP BY BookingPropertyId);
+  SELECT ClientBookerEmail,ExtraCCEmail,
+  'http://sstage.in/qr/'+@BPId+'.png' FROM WRBHBBooking WHERE Id=@Id;
   -- Dataset Table 9 Email Address Begin
   CREATE TABLE #BedMail(Id INT,Email NVARCHAR(100));
   -- Guest Email
@@ -781,7 +810,13 @@ IF @Action = 'ApartmentBookingConfirmed'
   WHERE IsActive=1 AND IsDeleted=0 AND ContactType='Extra C C' AND
   CltmgntId=(SELECT ClientId FROM WRBHBBooking B WHERE B.Id=@Id);
   -- Dataset Table 8
-  SELECT ClientBookerEmail,ExtraCCEmail FROM WRBHBBooking WHERE Id=@Id;
+  DECLARE @PId NVARCHAR(100) = 
+  (SELECT TOP 1 CAST(ISNULL(BookingPropertyId,'') AS VARCHAR) 
+  FROM WRBHBApartmentBookingPropertyAssingedGuest
+  WHERE BookingId = @Id GROUP BY BookingPropertyId);
+  SELECT ClientBookerEmail,ExtraCCEmail,
+  'http://sstage.in/qr/'+@PId+'.png' FROM WRBHBBooking 
+  WHERE Id = @Id;
   -- Dataset Table 9 Email Address Begin
   CREATE TABLE #AMail(Id INT,Email NVARCHAR(100));
   -- Guest Email
@@ -894,19 +929,24 @@ IF @Action = 'MMTBookingConfirmed'
   FROM WRBHBStaticHotels SH
   WHERE SH.HotalId=@BookingPropertyId AND SH.IsActive=1 AND SH.IsDeleted=0;
   -- dataset table 2
+  DECLARE @MMTPId NVARCHAR(100) = 
+  (SELECT TOP 1 CAST(ISNULL(BookingPropertyId,'') AS VARCHAR) 
+  FROM WRBHBApartmentBookingPropertyAssingedGuest
+  WHERE BookingId = @Id GROUP BY BookingPropertyId);
   SELECT B.BookingCode,U.UserName,
   REPLACE(CONVERT(VARCHAR(11), B.CreatedDate, 106), ' ', '-') AS ReservationDt,
   C.ClientName,U.Email,B.SpecialRequirements,
   CAST(B.EmailtoGuest AS INT),B.ClientBookerEmail,
-  BP.BookHotelReservationIdvalue,B.ExtraCCEmail
+  BP.BookHotelReservationIdvalue,B.ExtraCCEmail,
+  'http://sstage.in/qr/'+@MMTPId+'.png'
   FROM WRBHBBooking B
   LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id
   LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK) ON  C.Id=B.ClientId
   LEFT OUTER JOIN WRBHBUser U  WITH(NOLOCK) ON  U.Id=B.CreatedBy
   WHERE B.Id=@Id;
   -- dataset table 3
-  SELECT EmailId FROM WRBHBBookingGuestDetails WHERE BookingId=@Id
-  GROUP BY EmailId;
+  SELECT EmailId,'Including Tax' FROM WRBHBBookingGuestDetails 
+  WHERE BookingId=@Id GROUP BY EmailId;
   -- Dataset Table 4
   IF EXISTS (SELECT NULL FROM WRBHBClientwisePricingModel 
   WHERE IsActive=1 AND IsDeleted=0 AND ClientId=@ClientId1)

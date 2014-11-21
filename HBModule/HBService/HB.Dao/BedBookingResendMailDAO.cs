@@ -213,7 +213,7 @@ namespace HB.Dao
                     " <td width=\"200\" style=\"padding:10px; border-right:1px solid #ccc; margin-bottom:20px; border-bottom:1px solid #ccc;\">" +
                     "  <p style=\"color:orange; font-weight:bold; margin:0px; font-size:0px;\"> QR Code</p>" +
                     "  <br /><br />" +
-                    "  <img src=\"http://sstage.in/images/images.jpg\" width=\"100\" height=\"100\" />" +
+                    "  <img src=" + ds.Tables[8].Rows[0][2].ToString() + " width=\"100\" height=\"100\" />" +
                     " <p style=\"margin-top:5px;\">" +
                     "  *NOTE: Download QRCode reader to get propery address to your maps" +
                     "    </p>" +

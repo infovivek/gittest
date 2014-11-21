@@ -345,17 +345,25 @@
 				{
 					if(Ds_Objects.result.Tables.Table.Rows.length>0)
 					{						
-						
-						RoomCount=Ds_Objects.result.Tables.Table.Rows[0].RoomCount;
-						lbl_RoomCount.text="Pending Room Count : "+String(Room_Types-RoomCount);	
-						if(RoomCount>=Room_Types)
+						if(Ds_Objects.result.Tables.Table.Rows[0].RoomCount=='Villa')
 						{
-							Ddl_Apartment_RB.selectedItem="";
-							RoomApartmentId=0;
-							Ddl_Apartment_RB.prompt="Please Select Apartment";
-							alignAlert(Alert.show("Room Entry Already Finished.","Error !",
-								Alert.OK, null, null, iconErrLarge, Alert.OK),10,"");
+							lbl_RoomCount.text="Villa";
+							lbl_RoomCount.visible=false;
 						}
+						else
+						{
+							RoomCount=Ds_Objects.result.Tables.Table.Rows[0].RoomCount;
+							lbl_RoomCount.text="Pending Room Count : "+String(Room_Types-RoomCount);
+							lbl_RoomCount.visible=true;
+							if(RoomCount>=Room_Types)
+							{
+								Ddl_Apartment_RB.selectedItem="";
+								RoomApartmentId=0;
+								Ddl_Apartment_RB.prompt="Please Select Apartment";
+								alignAlert(Alert.show("Room Entry Already Finished.","Error !",
+									Alert.OK, null, null, iconErrLarge, Alert.OK),10,"");
+							}
+						}						
 					}					
 				}
 				if (Ds_Objects.currentTarget.description.toString() == "Copy_CUSTOM")
@@ -3826,6 +3834,26 @@
 							
 						}
 					}
+				}	
+				//Arun Added for MGH grid on 21/11/14
+				else if(arrObj.GridId=="RoomBed1")
+				{
+					var Ac:ArrayCollection=new ArrayCollection();
+					Ac=Grd_RoomBed1._getGridSrc;
+					if(Ddl_RoomCategory_RB.selectedItem == "Single")
+					{
+						if(Ac.length > 0)
+						{
+							ErrString="Room Category is Single, Only one bed is Allowed.";
+						}
+					}
+					if(Ddl_RoomCategory_RB.selectedItem == "Double")
+					{
+						if(Ac.length > 1)
+						{
+							ErrString="Room Category is Double, Only two beds Allowed.";
+						}
+					}
 				}
 				// sakthi changes in 31 may 2014. vivek told category wise grid count;
 				else 
@@ -3849,7 +3877,9 @@
 							}
 						}
 					}
+					
 				}
+				
 				/*else
 				{
 					if(Ddl_RoomCategory_RB.selectedItem!="Multiple Beds")
@@ -4717,7 +4747,7 @@
 	</s:HGroup>
 	<!-- Apartment Start -->
 	<s:BorderContainer x="0" y="41" width="100%" height="100%" borderVisible="false" 
-					   backgroundColor="#fbf9f9" id="brdApartment" visible="false">
+					   backgroundColor="#fbf9f9" id="brdApartment" visible="true">
 		<s:VGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="top">
 			<s:BorderContainer x="27" y="60" width="902" height="252" borderVisible="false" backgroundColor="#fbf9f9">
 				<mx:Label x="35" y="36" text="Block Name"/>
@@ -4755,7 +4785,8 @@
 						<fx:String>2 BHK</fx:String>
 						<fx:String>3 BHK</fx:String>
 						<fx:String>4 BHK</fx:String>
-						<fx:String>HUB</fx:String>						
+						<fx:String>HUB</fx:String>	
+						<fx:String>Villa</fx:String>	
 					</mx:ArrayCollection>
 				</s:DropDownList> 
 				<mx:Label x="505" y="159" text="Status"/>
@@ -4877,8 +4908,7 @@
 							   _HeaderTxtLbl="true" 
 							   _required="1~1~0~0~0~0"
 							   _spltChar="~"
-							   _tabIndex="68"
-							   _DuplChk="false"
+							   _tabIndex="68"							   
 							   _visibleColNos="5" ID="Roombed" _GridId="Roombed" />
 		 </s:HGroup>	
 		 <s:HGroup x="75" y="242" width="781" height="175" horizontalAlign="center" verticalAlign="middle" id="Grp_BedMGH" visible="false">
@@ -4892,9 +4922,8 @@
 								   _HeaderTxtLbl="true" 
 								   _required="1~0~0~0~0~0"
 								   _spltChar="~"
-								   _tabIndex="68"
-								   _DuplChk="false"
-								   _visibleColNos="1" ID="Roombed" _GridId="Roombed" />
+								   _tabIndex="68"								  
+								   _visibleColNos="1" ID="RoomBed1" _GridId="RoomBed1" />
 		</s:HGroup>
 			<s:BorderContainer x="418" y="9" width="438" height="225" borderVisible="false"  backgroundColor="#fbf9f9">
 				<mx:Label x="26" y="113.5" text="Discount Mode" id="lbl_DiscountMode_R"/>

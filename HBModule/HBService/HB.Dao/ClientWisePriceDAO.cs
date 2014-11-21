@@ -32,8 +32,8 @@ namespace HB.Dao
             for (int i = 0; i < n; i++)
             {
                 PE.ClientId = Convert.ToInt32(document.SelectNodes("//HdrXml")[i].Attributes["ClientId"].Value);
-                PE.FromDate = document.SelectNodes("//HdrXml")[i].Attributes["Date"].Value;
-                PE.ToDate = document.SelectNodes("//HdrXml")[i].Attributes["Date"].Value;
+                PE.FromDate = document.SelectNodes("//HdrXml")[i].Attributes["FromDate"].Value;
+                PE.ToDate = document.SelectNodes("//HdrXml")[i].Attributes["ToDate"].Value;
                 command = new SqlCommand();
                 if (PE.Id != 0)
                 {

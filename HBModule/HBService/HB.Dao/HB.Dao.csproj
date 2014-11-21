@@ -229,6 +229,7 @@
     <Compile Include="VendorCostDAO.cs" />
     <Compile Include="VendorDao.cs" />
     <Compile Include="VendorRequestDAO.cs" />
+    <Compile Include="VendorRequestDtlDAO.cs" />
     <Compile Include="VendorSettlementDAO.cs" />
     <Compile Include="WrbErpConnection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

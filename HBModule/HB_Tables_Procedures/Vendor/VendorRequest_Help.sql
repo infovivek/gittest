@@ -44,7 +44,7 @@ CREATE PROCEDURE [dbo].[Sp_VendorRequest_Help]
 END
  IF @Action='Property'
  BEGIN	
-	SELECT DISTINCT CategoryId AS data,VendorCategory AS label 
+	SELECT DISTINCT CategoryId ,VendorCategory  
     FROM WRBHBVendor 
     WHERE IsActive=1 AND IsDeleted=0 
  END 
@@ -64,13 +64,27 @@ END
  END
  IF @Action='Apartment'
  BEGIN
-    SELECT (B.BlockName+'-'+A.ApartmentNo) AS ApartmentNo,A.Id AS ApartmentId FROM WRBHBPropertyApartment A
+    SELECT (B.BlockName+'-'+A.ApartmentNo) AS ApartmentNo,A.Id AS ApartmentId
+    FROM WRBHBPropertyApartment A
+    JOIN WRBHBPropertyBlocks B ON A.PropertyId=B.PropertyId AND  B.IsActive=1 AND B.IsDeleted=0
+    WHERE A.IsActive=1 AND A.IsDeleted=0 AND A.PropertyId=@Id
+    
+     SELECT (B.BlockName+'-'+A.ApartmentNo) AS ApartmentNo,A.Id AS ApartmentId,0 AS RoomId,
+    '' AS Description,'' AS FilePath,'' AS BillNo,'' AS Amount 
+    FROM WRBHBPropertyApartment A
     JOIN WRBHBPropertyBlocks B ON A.PropertyId=B.PropertyId AND  B.IsActive=1 AND B.IsDeleted=0
     WHERE A.IsActive=1 AND A.IsDeleted=0 AND A.PropertyId=@Id
  END
  IF @Action ='Room'
  BEGIN
     SELECT (C.BlockName+'-'+B.ApartmentNo+'-'+A.RoomNo+'-'+A.RoomType) AS RoomNo,A.Id As RoomId
+    FROM WRBHBPropertyRooms A
+    JOIN WRBHBPropertyApartment B ON A.ApartmentId=B.Id AND  B.IsActive=1 AND B.IsDeleted=0
+    JOIN WRBHBPropertyBlocks C ON B.BlockId=C.Id AND  C.IsActive=1 AND C.IsDeleted=0
+    WHERE A.IsActive=1 AND A.IsDeleted=0 AND A.PropertyId=@Id AND A.ApartmentId=@UserId
+    
+    SELECT (C.BlockName+'-'+B.ApartmentNo+'-'+A.RoomNo+'-'+A.RoomType) AS RoomNo,A.Id As RoomId,
+    A.ApartmentId AS ApartmentId,'' AS Description,'' AS FilePath ,'' AS BillNo,'' AS Amount 
     FROM WRBHBPropertyRooms A
     JOIN WRBHBPropertyApartment B ON A.ApartmentId=B.Id AND  B.IsActive=1 AND B.IsDeleted=0
     JOIN WRBHBPropertyBlocks C ON B.BlockId=C.Id AND  C.IsActive=1 AND C.IsDeleted=0

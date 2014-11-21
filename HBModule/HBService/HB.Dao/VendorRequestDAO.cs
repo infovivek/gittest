@@ -50,11 +50,49 @@ namespace HB.Dao
                 VR.RoomId = Convert.ToInt32(doc.SelectSingleNode("//HdrXml").Attributes["RoomId"].Value);
             }
             VR.Date = doc.SelectSingleNode("//HdrXml").Attributes["Date"].Value;
-            VR.Amount = Convert.ToDecimal(doc.SelectSingleNode("//HdrXml").Attributes["Amount"].Value);
-            VR.BillNo = doc.SelectSingleNode("//HdrXml").Attributes["BillNo"].Value;
-            VR.Duedate = doc.SelectSingleNode("//HdrXml").Attributes["Duedate"].Value;
-            VR.VendorBill = doc.SelectSingleNode("//HdrXml").Attributes["VendorBill"].Value;
-            VR.Des = doc.SelectSingleNode("//HdrXml").Attributes["Des"].Value;
+            if (doc.SelectSingleNode("//HdrXml").Attributes["Amount"].Value == "")
+            {
+                VR.Amount = 0;
+            }
+            else
+            {
+                 VR.Amount = Convert.ToDecimal(doc.SelectSingleNode("//HdrXml").Attributes["Amount"].Value);
+            }
+            if (doc.SelectSingleNode("//HdrXml").Attributes["BillNo"].Value == "")
+            {
+                VR.BillNo = "";
+            }
+            else
+            {
+                VR.BillNo = doc.SelectSingleNode("//HdrXml").Attributes["BillNo"].Value;
+            }
+            if (doc.SelectSingleNode("//HdrXml").Attributes["Duedate"].Value == "")
+            {
+                VR.Duedate = "";
+            }
+            else
+            {
+
+                VR.Duedate = doc.SelectSingleNode("//HdrXml").Attributes["Duedate"].Value;
+            }
+            if (doc.SelectSingleNode("//HdrXml").Attributes["VendorBill"].Value == "")
+            {
+                VR.VendorBill = "";
+            }
+            else
+            {
+
+                VR.VendorBill = doc.SelectSingleNode("//HdrXml").Attributes["VendorBill"].Value;
+            }
+            if (doc.SelectSingleNode("//HdrXml").Attributes["Des"].Value == "")
+            {
+                VR.Des = "";
+            }
+            else
+            {
+
+                VR.Des = doc.SelectSingleNode("//HdrXml").Attributes["Des"].Value;
+            }
             command = new SqlCommand();
             if (VR.Id != 0)
             {

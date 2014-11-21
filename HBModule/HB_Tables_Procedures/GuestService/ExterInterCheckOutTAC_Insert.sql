@@ -42,7 +42,7 @@ BEGIN
 	IF EXISTS (SELECT NULL FROM WRBHBExternalChechkOutTAC
 	WHERE PropertyType ='External Property' and ISNULL(TACInvoiceNo,'') != '')
 	BEGIN
-	SELECT TOP 1 @TACInvoiceNo='EXT/'+
+	SELECT TOP 1 @TACInvoiceNo='COM/'+
 	CAST(CAST(SUBSTRING(TACInvoiceNo,5,LEN(TACInvoiceNo)) AS INT) + 1 AS VARCHAR)
 	FROM WRBHBExternalChechkOutTAC 
 	where PropertyType ='External Property'  and TACInvoiceNo!='' and TACInvoiceNo!='0'
@@ -50,7 +50,7 @@ BEGIN
 	END
 	ELSE
 	BEGIN
-	set @TACInvoiceNo='EXT/01';
+	set @TACInvoiceNo='COM/01';
 	END
 END
 ELSE

@@ -21,7 +21,7 @@ Reviewed By	: <Reviewed By (Leave it blank)>
 *******************************************************************************************************
 */
 
-CREATE PROCEDURE [dbo].[Sp_PettyCashHdr_Help]
+CREATE PROCEDURE [dbo].Sp_PettyCashHdr_Help
 (
 @Action NVARCHAR(100),
 --@Str NVARCHAR(100),
@@ -46,10 +46,13 @@ CREATE PROCEDURE [dbo].[Sp_PettyCashHdr_Help]
 	 
 	  --Expanse Group
     SELECT Id as data,ExpenseHead as label FROM WRBHBExpenseGroup
-    
-    SELECT ClosingBalance FROM    WRBHBPettyCashHdr 
-    WHERE UserId=@UserId AND Id = (SELECT MAX(Id)  FROM WRBHBPettyCashHdr WHERE UserId=@UserId)
-    
+      
+ END
+ IF @Action='PETTYLOAD'
+ BEGIN
+		SELECT ClosingBalance FROM WRBHBPettyCashHdr 
+		WHERE PropertyId=@Id AND UserId=@UserId AND 
+		Id = (SELECT MAX(Id)  FROM WRBHBPettyCashHdr WHERE UserId=@UserId AND PropertyId=@Id)
  END
  END
  

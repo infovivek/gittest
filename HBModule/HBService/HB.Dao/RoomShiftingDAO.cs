@@ -8,6 +8,7 @@ using System.Data.SqlClient;
 using System.Xml;
 using System.Configuration;
 using System.Collections;
+using System.Text.RegularExpressions;
 
 namespace HB.Dao
 {
@@ -35,6 +36,8 @@ namespace HB.Dao
             //
             RS.TariffMode = document.SelectSingleNode("HdrXml").Attributes["TariffMode"].Value;
             RS.ServiceMode = document.SelectSingleNode("HdrXml").Attributes["ServiceMode"].Value;
+            RS.Type = document.SelectSingleNode("HdrXml").Attributes["Type"].Value;
+            RS.MailStatus = document.SelectSingleNode("HdrXml").Attributes["Mail"].Value;
             command = new SqlCommand();
             if (RS.Id != 0)
             {
@@ -59,15 +62,13 @@ namespace HB.Dao
             //
             command.Parameters.Add("@TariffMode", SqlDbType.NVarChar).Value = RS.TariffMode;
             command.Parameters.Add("@ServiceMode", SqlDbType.NVarChar).Value = RS.ServiceMode;
-            command.Parameters.Add("@Type", SqlDbType.NVarChar).Value =
-                document.SelectSingleNode("HdrXml").Attributes["Type"].Value;
+            command.Parameters.Add("@Type", SqlDbType.NVarChar).Value = RS.Type;
             DataSet ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
-            if (document.SelectSingleNode("HdrXml").Attributes["Mail"].Value == "Yes")
+            if ((RS.MailStatus == "Yes") && (RS.Type == "Stay"))
             {
                 try
                 {
-                    System.Net.Mail.MailMessage message = new System.Net.Mail.MailMessage();
-                    //DSBooking.Tables[1].Rows[0][4].ToString()
+                    System.Net.Mail.MailMessage message = new System.Net.Mail.MailMessage();                    
                     message.From = new System.Net.Mail.MailAddress("stay@staysimplyfied.com", "", System.Text.Encoding.UTF8);
                     //message.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
                     //message.Subject = "Testing Modification Book # : " + ds.Tables[0].Rows[0][0].ToString();
@@ -89,6 +90,41 @@ namespace HB.Dao
                             //string sds = ds.Tables[4].Rows[0][0].ToString();
                             message.CC.Add(new System.Net.Mail.MailAddress(ds.Tables[4].Rows[0][0].ToString()));
                         }
+                    }
+                    if (ds.Tables[9].Rows.Count > 0)
+                    {
+                        string pattern = @"\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*";
+                        for (int i = 0; i < ds.Tables[9].Rows.Count; i++)
+                        {
+                            string PropertyMail = ds.Tables[9].Rows[i][0].ToString();
+                            var PtyMail = PropertyMail.Split(',');
+                            int cnt = PtyMail.Length;
+                            if (cnt == 1)
+                            {
+                                System.Text.RegularExpressions.Match match =
+                                        Regex.Match(PtyMail[0].ToString(), pattern, RegexOptions.IgnoreCase);
+                                if (match.Success == true)
+                                {
+                                    message.To.Add(new System.Net.Mail.MailAddress(PtyMail[0].ToString()));
+                                }
+                            }
+                            else
+                            {
+                                for (int j = 0; j < cnt; j++)
+                                {
+                                    System.Text.RegularExpressions.Match match =
+                                        Regex.Match(PtyMail[0].ToString(), pattern, RegexOptions.IgnoreCase);
+                                    if (match.Success == true)
+                                    {
+                                        message.To.Add(new System.Net.Mail.MailAddress(PtyMail[j].ToString()));
+                                    }
+                                }
+                            }                           
+                        }
+                    }
+                    else
+                    {
+                        string asd = "";
                     }
                     //Extra CC
                     for (int i = 0; i < ds.Tables[6].Rows.Count; i++)
@@ -159,7 +195,7 @@ namespace HB.Dao
 
 
                     string GuestDetailsTable1 =
-                        " <table cellpadding=\"0\" cellspacing=\"0\" width=\"600\" border=\"0\" align=\"center\">" +
+                        " <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" align=\"center\">" +
                         " <tr style=\"font-size:11px; font-weight:normal;\">" +
                         " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Guest Name</p></th>" +
                         " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Previous Check-In  Date</p></th>" +
@@ -169,7 +205,7 @@ namespace HB.Dao
                         " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Expected Arrival Time</p></th>" +
                         " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>No Of Room Nights</p></th>" +
                         " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Tariff PaymentMode</p></th>" +
-                        " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Service PaymentMode</p></th>" +
+                        " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #ccc;\"><p>Service PaymentMode</p></th>" +
                         " </tr>";
 
                     GuestDetailsTable1 +=
@@ -182,7 +218,7 @@ namespace HB.Dao
                             " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">" + ds.Tables[8].Rows[0][5].ToString() + "</p></td>" +
                             " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">" + ds.Tables[8].Rows[0][6].ToString() + "</p></td>" +
                             " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">" + ds.Tables[8].Rows[0][7].ToString() + "</p></td>" +
-                            " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">" + ds.Tables[8].Rows[0][8].ToString() + "</p></td>" +
+                            " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #ccc;\"><p style=\"text-align:center;\">" + ds.Tables[8].Rows[0][8].ToString() + "</p></td>" +
                             " </tr></table>";
 
                     string UserName = "";
@@ -255,8 +291,10 @@ namespace HB.Dao
                     System.Net.Mail.SmtpClient SMTP = new System.Net.Mail.SmtpClient();
                     SMTP.EnableSsl = true;
                     SMTP.Port = 587;
-                    //SMTP.Host = "smtp.gmail.com";SMTP.Credentials = new System.Net.NetworkCredential("stay@staysimplyfied.com", "stay1234");
-                    SMTP.Host = "email-smtp.us-west-2.amazonaws.com";SMTP.Credentials = new System.Net.NetworkCredential("AKIAIIVF5D5D3CJAX7SQ", "ApmuZkd+L8tissEga8kac3quhhwohEi5CB+dYD36KTq3");
+                    //SMTP.Host = "smtp.gmail.com";
+                    //SMTP.Credentials = new System.Net.NetworkCredential("stay@staysimplyfied.com", "stay1234");
+                    SMTP.Host = "email-smtp.us-west-2.amazonaws.com";
+                    SMTP.Credentials = new System.Net.NetworkCredential("AKIAIIVF5D5D3CJAX7SQ", "ApmuZkd+L8tissEga8kac3quhhwohEi5CB+dYD36KTq3");
                     SMTP.Send(message);
                 }
                 catch (Exception ex)

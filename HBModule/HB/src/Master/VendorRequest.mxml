@@ -113,25 +113,35 @@
 				{
 					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
 					{
-						hlp_apartment.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;		
+						hlp_apartment.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						
+					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Grd_Apartment.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
 					}
 				}
 				if (Ds_Objects.currentTarget.description.toString() == "Apartment_CUSTOM")
 				{
 					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
 					{
-						hlp_Room.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;		
+						hlp_Room.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						
+					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Grd_Room.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
 					}
 				}
 				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
 				{
 					if (AddMode == true)
 					{
-						alignAlert(Alert.show(" Vendor Payment Request Approved Successfully..","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+						alignAlert(Alert.show(" Vendor Payment Requested  Successfully..","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
 					}
 					else
 					{
-						alignAlert(Alert.show(" Vendor Payment Request Approved Successfully..","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+						alignAlert(Alert.show(" Vendor Payment Requested Successfully..","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
 					}
 					FnClear();
 				}
@@ -185,41 +195,7 @@
 					}
 					ErrStr=ErrStr+"*  Allocation Type is Required.\n";
 				}
-				if(Type == "Room")
-				{
-				if(hlp_apartment.text=="")
-				 {
-				 if(Flag==true)
-				 {
-						hlp_apartment.setFocus();
-						Flag=false;
-				 }
-					ErrStr=ErrStr+"*  ApartmentNo is Required.\n";
-				 }
-				 if(hlp_Room.text=="")
-				 {
-					  if(Flag==true)
-					  {
-						  hlp_Room.setFocus();
-						  Flag=false;
-					  }
-					  ErrStr=ErrStr+"*  RoomNo is Required.\n";
-				   }
-				  }
-				else if(Type == "Apartment")
-				{
-					if(hlp_apartment.text=="")
-					{
-						if(Flag==true)
-						{
-							hlp_apartment.setFocus();
-							Flag=false;
-						}
-						ErrStr=ErrStr+"*  ApartmentNo is Required.\n";
-					}
-				}
-				
-			    if(dt_Date.text =="")
+				if(dt_Date.text =="")
 				 {
 					if(Flag==true)
 					{
@@ -228,16 +204,9 @@
 					}
 					ErrStr=ErrStr+"*  Requested On is Required.\n";
 				 }
-				 if(Txt_Amount.text =="")
+				 if(Type =="Property")
 				 {
-					if(Flag==true)
-					{
-						Txt_Amount.setFocus();
-						Flag=false;
-					}
-					ErrStr=ErrStr+"*  Bill Amount is Required.\n";
-				 }
-				 if(txt_ImageName.text =="")
+				 if(txt_ImageName.text="") 
 				 {
 					 if(Flag==true)
 					 {
@@ -245,6 +214,7 @@
 						 Flag=false;
 					 }
 					 ErrStr=ErrStr+"*  Bill is Required.\n";
+				 }
 				 }
 				return ErrStr;
 			}	
@@ -271,7 +241,7 @@
 					var arrcopy:ArrayCollection = new ArrayCollection
 						([{ 
 							PropertyId:PropertyId,Property:hlp_Property.text,CategoryId:CategoryId,
-							Category:Ddl_Category.selectedItem.label,VendorId:VendorId,VendorName:hlp_Vendor.text,
+							Category:Category,VendorId:VendorId,VendorName:hlp_Vendor.text,
 							Service:hlp_service.text,Type:hlp_Type.text,ApartmentId:ApartmentId,
 							RoomId:RoomId,Date:dt_Date.text,Amount:Txt_Amount.text,BillNo:Txt_Billno.text,
 							Duedate:dt_Duedate.text,VendorBill:txt_ImageName.text,Des:Txt_Des.text,
@@ -282,7 +252,26 @@
 					HdrXml += "<ROOT>";	
 					HdrXml += ObjToXmlStr_Comm(arrcopy,"HdrXml") 
 					HdrXml += "</ROOT>";
-					useWeb("VendorRequest","Save_CUSTOM",[GlobalXml,HdrXml]);
+					
+					var HdrXml1:String="";
+					if((Type =="Apartment")&&(hlp_apartment.text==""))
+					{
+						HdrXml1 += "<ROOT>";
+						HdrXml1 += ObjToXmlStr_Comm(Grd_Apartment.dataProvider as ArrayCollection,"HdrXml1")
+						HdrXml1 += "</ROOT>";		
+					}
+					else if((Type =="Room")&&(hlp_Room.text==""))
+					{
+						HdrXml1 += "<ROOT>";
+						HdrXml1 += ObjToXmlStr_Comm(Grd_Room.dataProvider as ArrayCollection,"HdrXml1")
+						HdrXml1 += "</ROOT>";	
+					}
+					else if(HdrXml1=="")
+					{
+						HdrXml1 += "<ROOT>";
+						HdrXml1 += "</ROOT>";	
+					}
+			 		useWeb("VendorRequest","Save_CUSTOM",[GlobalXml,HdrXml,HdrXml1]);
 				}
 			}
 			
@@ -290,7 +279,7 @@
 			{
 				CategoryId=0;PropertyId=0;VendorId=0;ApartmentId=0;RoomId=0;
 				hlp_Property.dataProvider=null;
-				Ddl_Category.selectedItem="Select Category"
+				Ddl_Category.dataProvider=null;Ddl_Category.text="";
 				hlp_Vendor.dataProvider=null;hlp_Vendor.text="";
 				hlp_service.dataProvider=null;hlp_service.text="";
 				hlp_Type.dataProvider=null;hlp_Type.text="";
@@ -299,23 +288,24 @@
 				dt_Date.selectedDate = new Date();
 				Txt_Amount.text="";Txt_Billno.text="";
 				dt_Duedate.text="";Txt_Des.text="";txt_ImageName.text="";
-				hlp_Property.text="";
-				Help();
+				hlp_Property.text="";hlp_apartment.visible=false;
+				Help();hlp_Room.visible=false;
+				Grd_Apartment.visible=false;Grd_Room.visible=false
+				Grd_Apartment.dataProvider=null;Grd_Room.dataProvider=null;
+				Txt_Apart.visible=false;Txt_Room.visible=false;
 				
 			}
 			protected function ExpenseGroupLoad():void
 			{
-				 
-				CategoryId=Ddl_Category.selectedItem.data;
-				Category=Ddl_Category.selectedItem.label;
+				CategoryId=Ddl_Category.Select_Row.CategoryId;
+				Category=Ddl_Category.Select_Row.VendorCategory;
+				Ddl_Category.text=Category;
 				useWeb("VendorRequest","Category_CUSTOM",[GlobalXml,'Category',CategoryId,0,'']);
 				hlp_Vendor.setFocus();
 				
 			}
 			public function Ddl_Property_changeHandler():void
 			{
-				
-				
 				if(hlp_Property.selected())
 				{
 					PropertyName=hlp_Property.Select_Row.Property;
@@ -374,17 +364,17 @@
 						if(Type =="Apartment")
 						{
 						 useWeb("VendorRequest","Type_CUSTOM",[GlobalXml,'Apartment',PropertyId,0,'Type']);
-						 lbl_Apart.visible=true;
 						 Txt_Apart.visible=true;
 						 hlp_apartment.visible=true;
 						 hlp_apartment.setFocus();
+						 Grd_Apartment.visible=true;
 						}
 						else if(Type =="Room")
 						{
 							useWeb("VendorRequest","Type_CUSTOM",[GlobalXml,'Apartment',PropertyId,0,'Type']);
-							lbl_Apart.visible=true;
 							Txt_Apart.visible=true;
 							hlp_apartment.visible=true;
+							
 						}
 					}
 				}
@@ -400,13 +390,14 @@
 					var Apartment=hlp_apartment.Select_Row.ApartmentNo;
 					ApartmentId=hlp_apartment.Select_Row.ApartmentId;
 					hlp_apartment.text=Apartment;
+					Grd_Apartment.visible=false;
 					if(Type=="Room")
 					{
 						useWeb("VendorRequest","Apartment_CUSTOM",[GlobalXml,'Room',PropertyId,ApartmentId,'']);
-						lbl_Room.visible=true;
 						Txt_Room.visible=true;
 						hlp_Room.visible=true;
 						hlp_Room.setFocus();
+						Grd_Room.visible=true;
 					}
 					else
 					{
@@ -426,6 +417,7 @@
 					var Room=hlp_Room.Select_Row.RoomNo;
 					RoomId=hlp_Room.Select_Row.RoomId
 					hlp_Room.text=Room;
+					Grd_Room.visible=false;
 				}
 				else
 				{
@@ -445,8 +437,25 @@
 				// This URL should be replaced with your server side URL
 				//				var browserUrl:String = ExternalInterface.call("eval", "window.location.href");
 				//				var arr:Array =browserUrl.split("/");
+				var str:String="";
+				var sId:int=0
+				if(Type =="Apartment")
+				{
+					str=Grd_Apartment.selectedItem.ApartmentNo;
+					sId=Grd_Apartment.selectedItem.ApartmentId;
+				}
+				else if(Type =="Room")
+				{
+					str=Grd_Room.selectedItem.RoomNo;
+					sId=Grd_Room.selectedItem.RoomId;
+				}
+				else if(Type =="Property")
+				{
+					str=hlp_Vendor.text;
+					sId=VendorId;
+				}
 				ImageFormat=FilePath.text;				
-				uploadURL.url = "http://sstage.in/VendorBill.php?id="+hlp_Vendor.text+"&pid="+VendorId+"&imgcount="+ImageCount+"&imgformat="+ImageFormat;
+				uploadURL.url = "http://sstage.in/VendorBill.php?id="+str+"&pid="+sId+"&imgcount="+ImageCount+"&imgformat="+ImageFormat;
 				uploadURL.method = "POST"; // OR "POST" as you need it
 				uploadURL.contentType = "multipart/form-data";				
 				// Event Listeners for UI Buttons (Upload/Browse)
@@ -512,8 +521,39 @@
 				}
 				else
 				{
-					txt_ImageName.text="http://sstage.in/Vendor_Bill/"+resultsTxtField.text;				
-					Brd_imageUpload.visible=false;
+					if(hlp_Type.text =="Property")
+					{
+						txt_ImageName.text="http://sstage.in/Vendor_Bill/"+resultsTxtField.text;				
+						Brd_imageUpload.visible=false;
+					}
+					else if((hlp_Type.text =="Apartment")&&(hlp_apartment.text==""))
+					{
+						var Ac_Vendor:ArrayCollection=new ArrayCollection();
+						Ac_Vendor=Grd_Apartment.dataProvider as ArrayCollection;
+						var Uploadindex:int=Grd_Apartment.selectedIndex;
+						Ac_Vendor[Uploadindex].FilePath="http://sstage.in/Vendor_Bill/"+resultsTxtField.text;				
+						Grd_Apartment.dataProvider=Ac_Vendor;
+						Brd_imageUpload.visible=false;
+					}
+					else if ((hlp_Type.text =="Apartment")&&(hlp_apartment.text !=""))
+					{
+						txt_ImageName.text="http://sstage.in/Vendor_Bill/"+resultsTxtField.text;				
+						Brd_imageUpload.visible=false;
+					}
+					else if((hlp_Type.text =="Room")&&(hlp_Room.text ==""))
+					{
+						var Ac_Vendorr:ArrayCollection=new ArrayCollection();
+						Ac_Vendorr=Grd_Room.dataProvider as ArrayCollection;
+						var Uploadindex:int=Grd_Room.selectedIndex;
+						Ac_Vendorr[Uploadindex].FilePath="http://sstage.in/Vendor_Bill/"+resultsTxtField.text;				
+						Grd_Room.dataProvider=Ac_Vendorr;
+						Brd_imageUpload.visible=false;
+					}
+					else if((hlp_Type.text =="Room")&&(hlp_Room.text !=""))
+					{
+						txt_ImageName.text="http://sstage.in/Vendor_Bill/"+resultsTxtField.text;				
+						Brd_imageUpload.visible=false;
+					}
 				}
 			}
 			
@@ -588,7 +628,10 @@
 				uploadFiles();
 				init1();
 			}
-
+			public function FnUpload(Event):void
+			{
+				FnClick_Btn_Browse();
+			}
 			
 		]]>
 	</fx:Script>
@@ -597,7 +640,7 @@
 						   borderVisible="false">
 			<mx:Label x="83" y="62" text="Property"/>
 			<WrbHelpComp:HelpText id="hlp_Property" x="207" y="62" width="200" height="22" pxSetColumnsWidth="0,200" 
-								  onselection="{Ddl_Property_changeHandler()}"  pxTabIndex="1" depth="5000">
+								  onselection="{Ddl_Property_changeHandler()}" pxTabIndex="1" depth="5000">
 			</WrbHelpComp:HelpText>
 			<mx:HRule x="0" y="444" width="100%" strokeColor="#eb1c24"/>
 			<s:HGroup x="0" y="458" width="100%" height="50" horizontalAlign="center" verticalAlign="middle">
@@ -614,15 +657,12 @@
 			<s:Label x="182" y="142" text="*" color="red"/>
 			<s:Label x="183" y="181" text="*" color="red"/>
 			<s:Label x="182" y="216" text="*" color="red"/>
-			<s:Label x="183" y="273" text="*" color="red" visible="false" id="lbl_Apart"/>
-			<s:Label x="182" y="306" text="*" color="red" visible="false" id="lbl_Room"/>
 			<s:Label x="553" y="66" text="*" color="red"/>
-			<s:Label x="552" y="98" text="*" color="red"/>
 			<mx:DateField x="578" y="62" width="126" id="dt_Date" yearNavigationEnabled="true" tabIndex="8" 
 						  formatString="DD/MM/YYYY" selectableRange="{{rangeEnd:new Date()}}" enabled="false"/>
-			<s:DropDownList id="Ddl_Category" x="207" y="101" width="200" prompt="Select Category"
-						change="ExpenseGroupLoad()"	 tabIndex="2">
-			</s:DropDownList>
+			<WrbHelpComp:HelpText x="207" y="99" id="Ddl_Category" width="200" height="22" pxSetColumnsWidth="0,200" 
+								  onselection="{ExpenseGroupLoad()}"  pxTabIndex="2" depth="4000">
+			</WrbHelpComp:HelpText>			
 			<mx:Label x="83" y="100" width="86" text="Category"/>
 			<mx:Label x="83" y="138" width="96" text="Vendor Name"/>
 			<mx:Label x="83" y="271" width="96" text="Apartment No" visible="false" id="Txt_Apart"/>
@@ -630,34 +670,83 @@
 			<mx:Label x="82" y="304" width="96" text="Room" visible="false" id="Txt_Room"/>
 			<mx:Label x="83" y="175" width="96" text="service"/>
 			<mx:Label x="473" y="271" width="96" text="Description"/>
-			<mx:Label x="473" y="100" width="96" text="Amount"/>
-			<mx:Label x="473" y="138" width="96" text="Bill No"/>
+			<mx:Label x="473" y="140" width="96" text="Amount"/>
+			<mx:Label x="473" y="175" width="96" text="Bill No"/>
 			<mx:Label x="473" y="215" width="96" height="26" text="Bill upload"/>
-			<mx:Label x="473" y="175" width="96" height="26" text="Due Date"/>
+			<mx:Label x="473" y="99" width="96" height="26" text="Due Date"/>
 			<mx:Label x="473" y="62" width="96" text="Request On"/>
 			<WrbHelpComp:HelpText x="207" y="139" id="hlp_Vendor" width="200" height="22" pxSetColumnsWidth="0,200" 
 								  onselection="{Ddl_Vendor_changeHandler()}"  pxTabIndex="3" depth="3000">
 			</WrbHelpComp:HelpText>
 			<WrbHelpComp:HelpText x="207" y="267" width="200" id="hlp_apartment" height="22" pxSetColumnsWidth="0,200" 
-								  onselection="{Ddl_Apartment_changeHandler()}"  pxTabIndex="6" depth="2000" visible="false">
+								  onselection="{Ddl_Apartment_changeHandler()}"  pxTabIndex="6" depth="1500" visible="false">
 			</WrbHelpComp:HelpText>
 			<WrbHelpComp:HelpText x="207" y="177" width="200" id="hlp_service" height="22" pxSetColumnsWidth="200" 
-								  onselection="{Ddl_Service_changeHandler()}"  pxTabIndex="4" depth="2000">
+								  onselection="{Ddl_Service_changeHandler()}"  pxTabIndex="4" depth="2500">
 			</WrbHelpComp:HelpText>
 			<s:TextArea x="577" y="270" width="200" height="83" id="Txt_Des" tabIndex="12"/>
-			<s:TextInput x="577" y="101" width="126" id="Txt_Amount" tabIndex="9" restrict="0-9"/>
-			<s:TextInput x="577" y="139" id="Txt_Billno" tabIndex="10"/>
-			<mx:DateField x="578" y="177" width="126" id="dt_Duedate" yearNavigationEnabled="true" tabIndex="11" 
+			<s:TextInput x="577" y="141" width="126" id="Txt_Amount" tabIndex="9" restrict="0-9"/>
+			<s:TextInput x="577" y="176" id="Txt_Billno" tabIndex="10"/>
+			<mx:DateField x="578" y="101" width="126" id="dt_Duedate" yearNavigationEnabled="true" tabIndex="11" 
 						  formatString="DD/MM/YYYY"  enabled="true"/>
 			
 			<WrbHelpComp:HelpText x="207" y="216" width="200" id="hlp_Type" height="22" pxSetColumnsWidth="200" 
-								  onselection="{Ddl_Type_changeHandler()}"  pxTabIndex="5" depth="1000">
+								  onselection="{Ddl_Type_changeHandler()}"  pxTabIndex="5" depth="2000">
 			</WrbHelpComp:HelpText>
 			<WrbHelpComp:HelpText x="207" y="304" width="200" id="hlp_Room" height="22" pxSetColumnsWidth="0,200" 
 								  onselection="{Ddl_Room_changeHandler()}"  pxTabIndex="7" depth="1000" visible="false" >
 			</WrbHelpComp:HelpText>
 			<WrbComp:Button_HB id="Btn_Browse" x="580" y="216" width="118" height="20" buttonMode="true"
 							   _Label="Bill Upload" click="FnClick_Btn_Browse()" depth="0" focusEnabled="false" visible="true"/>
+			
+			<mx:DataGrid id="Grd_Apartment" x="436" y="141"  editable="true" visible="false"
+						 width="475" height="225" >
+				<mx:columns>
+					<mx:DataGridColumn dataField="ApartmentNo" headerText="ApartmentNo" width="75" editable="false" visible="true"/>
+					<mx:DataGridColumn dataField="ApartmentId" headerText="ApartmentId" width="10"  visible="false"/>
+					<mx:DataGridColumn dataField="RoomId" headerText="RoomId" width="10"  visible="false"/>
+					<mx:DataGridColumn dataField="Description" headerText="Description" width="125"
+									   editable="true" visible="true"/>
+					<mx:DataGridColumn dataField="BillNo" headerText="BillNo" width="65"  visible="true" editable="true"/>
+					<mx:DataGridColumn dataField="Amount" headerText="Amount" width="70"  visible="true" editable="true"/>
+					<mx:DataGridColumn dataField="Action" headerText="Action" width="40" editable="false"
+									   visible="true">
+						<mx:itemRenderer >
+							<fx:Component>
+								<mx:HBox horizontalAlign="center" verticalAlign="middle">										
+									<mx:Image source="@Embed(source='../Assets/application_get.png')" buttonMode="true"
+											  click="outerDocument.FnUpload(event)"/>
+								</mx:HBox>	
+							</fx:Component>
+						</mx:itemRenderer>
+					</mx:DataGridColumn>
+					<mx:DataGridColumn dataField="FilePath" headerText="FilePath" width="75" editable="false" visible="true"/>
+				</mx:columns>
+			</mx:DataGrid>
+			<mx:DataGrid id="Grd_Room" x="436" y="135"  editable="true" visible="false"
+						 width="475" height="225" >
+				<mx:columns>
+					<mx:DataGridColumn dataField="RoomNo" headerText="RoomNo" width="75" editable="false" visible="true"/>
+					<mx:DataGridColumn dataField="ApartmentId" headerText="ApartmentId" width="10"  visible="false"/>
+					<mx:DataGridColumn dataField="RoomId" headerText="RoomId" width="10"  visible="false"/>
+					<mx:DataGridColumn dataField="Description" headerText="Description" width="125" 
+									   editable="true"/>
+					<mx:DataGridColumn dataField="BillNo" headerText="BillNo" width="65"  visible="true" editable="true"/>
+					<mx:DataGridColumn dataField="Amount" headerText="Amount" width="70"  visible="true" editable="true"/>
+					<mx:DataGridColumn dataField="Action" headerText="Action" width="40" editable="false"
+									   visible="true">
+						<mx:itemRenderer >
+							<fx:Component>
+								<mx:HBox horizontalAlign="center" verticalAlign="middle">										
+									<mx:Image source="@Embed(source='../Assets/application_get.png')" buttonMode="true"
+											  click="outerDocument.FnUpload(event)"/>
+								</mx:HBox>	
+							</fx:Component>
+						</mx:itemRenderer>
+					</mx:DataGridColumn>
+					<mx:DataGridColumn dataField="FilePath" headerText="FilePath" width="75" editable="false" visible="true"/>
+				</mx:columns>
+			</mx:DataGrid>
 			<s:BorderContainer x="243" y="260" width="437" height="237" id="Brd_imageUpload" visible="false" 
 							   borderVisible="true" backgroundColor="#fbf9f9" cornerRadius="5" depth="2500">
 				<mx:Panel x="37" y="39" title="Bill Uploader">

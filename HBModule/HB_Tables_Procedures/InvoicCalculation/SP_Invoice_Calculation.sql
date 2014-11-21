@@ -17,6 +17,8 @@ CREATE PROCEDURE [dbo].[SP_Invoice_Calculation](@Action NVARCHAR(100),
 @Date NVARCHAR(100),@Str2 NVARCHAR(100),@Id1 BIGINT,@Id2 BIGINT)			
 AS
 BEGIN
+INSERT INTO WindowsServiceWork(Type,CurrentDate)
+VALUES(@Action,GETDATE())
 DECLARE @CDATE DATETIME,@Flage BIT;
 IF @Action ='RENTLOAD'
 BEGIN
@@ -61,7 +63,7 @@ BEGIN
 	 END
 	 ELSE
 	 BEGIN
-		IF ((day('01/25/2014')=day(GETDATE()))AND(YEAR(@CDATE)=YEAR(GETDATE()))AND(MONTH(@CDATE)=MONTH(GETDATE())))
+		IF ((day(@CDATE)=day(GETDATE()))AND(YEAR(@CDATE)=YEAR(GETDATE()))AND(MONTH(@CDATE)=MONTH(GETDATE())))
 		BEGIN		
 			SET @Flage=0
 		END
@@ -1134,7 +1136,7 @@ BEGIN
 		JOIN WRBHBProperty P ON P.Id=B.PropertyId AND P.IsActive=1 AND P.IsDeleted=0
 		GROUP BY ClientId,C.ClientName,B.PropertyType,EndDate,P.PropertyName,RoomNo,BookingLevel		
 END
-IF @Action ='Booking Close'
+IF @Action ='Booking Close1'
 BEGIN
 		
 		CREATE TABLE #BookingData(BookingId BIGINT,PropertyAssingedGuestId BIGINT,BookingLevel NVARCHAR(100),

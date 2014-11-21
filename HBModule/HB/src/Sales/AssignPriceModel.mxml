@@ -196,20 +196,38 @@
 			}
 			public function getHlpData(event:Event):void
 			{
-				var Date:String=event.currentTarget.selectedRow.DateId;
-				try{
+				var FromDate:String=event.currentTarget.selectedRow.DateId;
 				if(event.currentTarget.ID == "hlpClientName")
 				{	
 					Grd_Client._setValuetoCtrl("hlpClientName",event.currentTarget.selectedRow.ClientName);
 					Grd_Client._setValuetoCtrl("txtClientId",event.currentTarget.selectedRow.ClientId); 
-					Grd_Client._setValuetoCtrl("dtDate",Date);
-//					Grd_Client._setValuetoCtrl("txtId",event.currentTarget.selectedRow.Id);
+					Grd_Client._setValuetoCtrl("dtFromDate",FromDate);
+					//Grd_Client._setValuetoCtrl("txtId",event.currentTarget.selectedRow.Id);
 					var Pettyidhlp=(event.currentTarget.selectedRow.ClientId);
 					//Grd_Client._setFocus(8);
 					Grd_Client._setFocusFlag(false);	
 					//event.currentTarget.selectedRow = null;
-				}}
-				catch(Exception){}
+				}
+			}
+			public function Custom_Grid_Tab(event:Object,arrObj:Object, GridMode:Boolean, Index:int):String
+			{
+				if(arrObj.FromDate=="")
+				{
+					alignAlert(Alert.show(ErrStr,"Effective from Date is Required!",Alert.OK,
+						this,null,iconErrLarge),10,"");
+				}
+				else
+				{
+					var ToDate:String='';
+					var sdfs:String=arrObj.FromDate;						
+					var D:String=sdfs.substr(0,2);
+					var M:String=sdfs.substr(3,2);
+					var Y:String=sdfs.substr(6,10);
+					var RangeStart:String=String(String(Number(D)-1)+'/'+M+'/'+(Number(Y)+1));
+					ToDate=RangeStart;
+					Grd_Client._setValuetoCtrl("dtToDate",ToDate);
+				}
+				return '';
 			}
 			protected function clearMyTextInput1():void
 			{
@@ -247,18 +265,18 @@
 							prompt="Select Pricing Model" change="PriceLoad()"></s:DropDownList>
 			<s:TextInput x="439" y="372" width="154" id="txt_Filter"  focusIn="clearMyTextInput1()"
 						 change="filter1('ClientName')" maxChars="100"/>
-			<WrbComp:ProDGrid1 id="Grd_Client" x="375" y="49" width="480" height="286"
+			<WrbComp:ProDGrid1 id="Grd_Client" x="355" y="49" width="500" height="300"
 							   _borderVisible="true" _getHlpTxtData="getHlpData(event)"
-							   _ColDataField="ClientName~Date~ClientId~Id"
-							   _ColHdrText="ClientName~Bill Start From *~ClientId~Id"
-							   _ColType="hlp~dtf~txt~txt"
-							   _colVisible="1~1~0~0"
-							   _ColWidth="300~150~0~0" 
-							   _editable="1~1~0~0"
-							   _required="1~1~0~0" 
+							   _ColDataField="ClientName~FromDate~ToDate~ClientId~Id"
+							   _ColHdrText="ClientName~Bill Start From *~Bill End To *~ClientId~Id"
+							   _ColType="hlp~dtf~dtf~txt~txt"
+							   _colVisible="1~1~1~0~0"
+							   _ColWidth="200~150~150~0~0" 
+							   _editable="1~1~1~0~0"
+							   _required="1~1~1~0~0" 
 							   _spltChar="~" 
 							   _DuplChk="true"
-							   _visibleColNos="2" >
+							   _visibleColNos="3" >
 			</WrbComp:ProDGrid1>
 			<s:Button x="363" y="442" label="Save" click="FnSave()"/>
 			<s:Button x="489" y="442" label="Clear" click="FnClear()"/>

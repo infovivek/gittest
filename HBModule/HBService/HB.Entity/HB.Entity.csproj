@@ -179,6 +179,7 @@
     <Compile Include="VendorChequeApprovalDtl.cs" />
     <Compile Include="VendorCost.cs" />
     <Compile Include="VendorRequest.cs" />
+    <Compile Include="VendorRequestDtl.cs" />
     <Compile Include="VendorSettlementEntity.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

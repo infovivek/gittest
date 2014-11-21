@@ -31,9 +31,10 @@ BEGIN
 IF @SelectId <> 0    
 BEGIN   
 DECLARE @ClientId BIGINT;   
-	SELECT ClientName,g.Grade,G.Id,ClientId,
+	SELECT ClientName,GM.Grade,G.Id,G.ClientId,
 	GradeId,MinValue,MaxValue,NeedGH,StarRatingId,P.PropertyType,ValueStarRatingFlag 
 	FROM dbo.WRBHBClientGradeValue G
+	LEFT OUTER JOIN dbo.WRBHBGradeMaster GM ON GM.Id=G.GradeId
 	LEFT OUTER JOIN WRBHBClientManagement C ON C.Id=G.ClientId	
 	LEFT OUTER JOIN WRBHBPropertyTYPE P ON P.Id=G.StarRatingId
 	WHERE  G.Id=@SelectId
@@ -54,8 +55,9 @@ END
    
 IF @SelectId=0  
 BEGIN  
-	SELECT ClientName,g.Grade,G.Id 
+	SELECT ClientName,GM.Grade,G.Id,MinValue,MaxValue 
 	FROM dbo.WRBHBClientGradeValue G
+	LEFT OUTER JOIN dbo.WRBHBGradeMaster GM ON GM.Id=G.GradeId
 	LEFT OUTER JOIN WRBHBClientManagement C ON C.Id=G.ClientId
 	LEFT OUTER JOIN WRBHBClientManagementAddClientGuest A ON A.Id=G.GradeId
 	WHERE  G.IsDeleted=0 ORDER BY Id DESC   

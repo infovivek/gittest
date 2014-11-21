@@ -32,10 +32,18 @@ BEGIN
   END
   IF @PAction ='SelectApartment'
   BEGIN
-  DECLARE @Id BIGINT;
-  SELECT COUNT(*)RoomCount FROM WRBHBPropertyRooms R 
-  WHERE ApartmentId=@Pram1 AND PropertyId=@PropertyId AND IsDeleted=0 AND IsActive=1;
+  DECLARE @Id BIGINT,@ApartmentType NVARCHAR(100) ;
+  SELECT @ApartmentType=SellableApartmentType FROM WRBHBPropertyApartment WHERE Id=@Pram1
   
+  IF @ApartmentType!='Villa'
+  BEGIN
+	  SELECT COUNT(*)RoomCount FROM WRBHBPropertyRooms R 
+	  WHERE ApartmentId=@Pram1 AND PropertyId=@PropertyId AND IsDeleted=0 AND IsActive=1;
+  END
+  ELSE
+  BEGIN
+	SELECT 'Villa' RoomCount
+  END
    --SELECT B.BlockName,R.BlockId,A.ApartmentNo,R.ApartmentId,R.RoomType,
    --R.RoomNo,R.RackTariff,R.DoubleOccupancyTariff,R.RoomCategory,
    --R.DiscountModePer,R.DiscountModeRS,R.DiscountAllowed,R.Id,A.SellableApartmentType

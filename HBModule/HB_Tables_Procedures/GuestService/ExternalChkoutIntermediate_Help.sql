@@ -231,15 +231,16 @@ BEGIN
 	IF @BookingLevel = 'Room' 
 	BEGIN
 		INSERT INTO #LEVEL(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode,TAC,TACPer)
-		SELECT CONVERT(nvarchar(100),min(d.ChkInDt),103),CONVERT(nvarchar(100),max(d.ChkOutDt),103),
+		SELECT top 1 CONVERT(nvarchar(100),(d.ChkInDt),103),CONVERT(nvarchar(100),(d.ChkOutDt),103),
 		d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,isnull((d.Tariff*h.TACPer/100),0)
 		FROM  WRBHBBookingProperty h 
 		JOIN WRBHBBookingPropertyAssingedGuest d on h.BookingId= d.BookingId and
 		h.PropertyId = d.BookingPropertyId
 		AND h.IsActive = 1 and
 		h.IsDeleted = 0
-		where d.GuestId  = @GuestId and d.BookingId = @BookingId and d.IsActive = 1 and d.IsDeleted = 0
-		group by d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,h.TACPer,d.Tariff
+		where d.GuestId  = @GuestId and d.BookingId = @BookingId --and d.IsActive = 1 and d.IsDeleted = 0
+		--group by d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,h.TACPer,d.Tariff,d.ChkInDt,d.ChkOutDt
+		order by d.Id desc;
 	END
 	
 	DECLARE @ChkInDate NVARCHAR(100),@ChkOutDate NVARCHAR(100),@TariffPaymentMode NVARCHAR(100),
@@ -303,6 +304,39 @@ BEGIN
 		IF @BookingLevel = 'Room' 
 		BEGIN
 			INSERT INTO #LEVEL1(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode,TAC,TACPer)
+			SELECT top 1 CONVERT(NVARCHAR(100),(d.ChkInDt),103),CONVERT(NVARCHAR(100),(d.ChkOutDt),103),
+			d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,isnull((d.Tariff*h.TACPer/100),0)
+			FROM  WRBHBBookingProperty h 
+			JOIN WRBHBBookingPropertyAssingedGuest d on h.BookingId= d.BookingId and
+			h.PropertyId = d.BookingPropertyId
+			AND h.IsActive = 1 and
+			h.IsDeleted = 0
+			where d.GuestId  = @GuestId and d.BookingId = @BookingId --and d.IsActive = 1 and d.IsDeleted = 0
+			--group by d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,h.TACPer,d.Tariff
+			order by d.Id desc;
+		END
+	
+			DECLARE @ChkInDate1 nvarchar(100),@ChkOutDate1 nvarchar(100),@TariffPaymentMode1 nvarchar(100),
+			@ServicePaymentMode1 nvarchar(100),@TAC1 nvarchar(100),@TACPer1 nvarchar(100);
+			SET @ChkInDate1 =( SELECT ChkInDate FROM #LEVEL1)	
+			SET @ChkOutDate1 =( SELECT ChkOutDate FROM #LEVEL1)
+			SET @TariffPaymentMode1 =(SELECT TariffPaymentMode FROM #LEVEL1)
+			SET @ServicePaymentMode1 =(SELECT ServicePaymentMode FROM #LEVEL1)
+			SET @TAC1=(SELECT TAC from #LEVEL1)
+			SET @TACPer1=(SELECT TACPer from #LEVEL1)
+			
+-- this is chkin and chkout date after comes selected bill date		
+			
+			CREATE TABLE #LEVEL2(ChkInDate NVARCHAR(100),ChkOutDate NVARCHAR(100),
+			TariffPaymentMode NVARCHAR(100),ServicePaymentMode NVARCHAR(100),TAC nvarchar(100),TACPer decimal(27,2))
+			--DECLARE @BookingId BIGINT,@GuestId BIGINT,@BookingLevel nvarchar(100);
+			SET @BookingId=(SELECT BookingId FROM WRBHBCheckInHdr where Id = @CheckInHdrId and IsActive = 1 and IsDeleted =0)
+			SET @GuestId=(SELECT GuestId from WRBHBCheckInHdr where Id = @CheckInHdrId and IsActive = 1 and IsDeleted =0)
+			SET @BookingLevel=(SELECT Type from WRBHBCheckInHdr where Id = @CheckInHdrId and IsActive = 1 and IsDeleted =0)
+--select @GuestId ,@BookingId
+		IF @BookingLevel = 'Room' 
+		BEGIN
+			INSERT INTO #LEVEL2(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode,TAC,TACPer)
 			SELECT @BillFrom,@BillTo,
 			d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,isnull((d.Tariff*h.TACPer/100),0)
 			FROM  WRBHBBookingProperty h 
@@ -310,22 +344,26 @@ BEGIN
 			h.PropertyId = d.BookingPropertyId
 			AND h.IsActive = 1 and
 			h.IsDeleted = 0
-			where d.GuestId  = @GuestId and d.BookingId = @BookingId and d.IsActive = 1 and d.IsDeleted = 0
-			group by d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,h.TACPer,d.Tariff
+			where d.GuestId  = @GuestId and d.BookingId = @BookingId --and d.IsActive = 1 and d.IsDeleted = 0
+			--group by d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,h.TACPer,d.Tariff
+			--order by d.Id desc;
 		END
 	
 			--DECLARE @ChkInDate nvarchar(100),@ChkOutDate nvarchar(100),@TariffPaymentMode nvarchar(100),
 			--@ServicePaymentMode nvarchar(100),@TAC nvarchar(100);
-			SET @ChkInDate =( SELECT ChkInDate FROM #LEVEL1)	
-			SET @ChkOutDate =( SELECT ChkOutDate FROM #LEVEL1)
-			SET @TariffPaymentMode =(SELECT TariffPaymentMode FROM #LEVEL1)
-			SET @ServicePaymentMode =(SELECT ServicePaymentMode FROM #LEVEL1)
-			SET @TAC=(SELECT TAC from #LEVEL1)
-			SET @TACPer=(SELECT TACPer from #LEVEL1)
+			SET @ChkInDate =( SELECT ChkInDate FROM #LEVEL2)	
+			SET @ChkOutDate =( SELECT ChkOutDate FROM #LEVEL2)
+			SET @TariffPaymentMode =(SELECT TariffPaymentMode FROM #LEVEL2)
+			SET @ServicePaymentMode =(SELECT ServicePaymentMode FROM #LEVEL2)
+			SET @TAC=(SELECT TAC from #LEVEL2)
+			SET @TACPer=(SELECT TACPer from #LEVEL2)
+			
+			SELECT @NewCheckInDate=convert(nvarchar(100),Cast(NewCheckInDate as DATE),103)	FROM WRBHBCheckInHdr  
+		    WHERE IsActive = 1 and IsDeleted = 0 and Id =@CheckInHdrId
 		 
 			SELECT Property,
-			CONVERT(nvarchar(100),@ChkInDate,103)+' To '+CONVERT(nvarchar(100),@ChkOutDate,103) as Stay,Tariff,
-			CONVERT(nvarchar(100),@ChkOutDate,103) as ChkoutDate,CONVERT(nvarchar(100),@NewCheckInDate,103) as CheckInDate
+			CONVERT(nvarchar(100),@ChkInDate,103)+' To '+CONVERT(nvarchar(100),@ChkOutDate1,103) as Stay,Tariff,
+			CONVERT(nvarchar(100),@ChkOutDate1,103) as ChkoutDate,CONVERT(nvarchar(100),@NewCheckInDate,103) as CheckInDate
 			FROM WRBHBCheckInHdr
 			WHERE IsActive = 1 and IsDeleted = 0 and Id =@CheckInHdrId;
 		

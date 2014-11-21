@@ -30,5 +30,9 @@ namespace HB.Entity
         public string TariffMode { get; set; }
 
         public string ServiceMode { get; set; }
+
+        public string Type { get; set; }
+
+        public string MailStatus { get; set; }
     }
 }

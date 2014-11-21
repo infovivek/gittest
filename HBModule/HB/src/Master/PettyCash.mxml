@@ -66,21 +66,13 @@
 					{
 						Ddl_ExpenseGroup.dataProvider=Ds_Objects.result.Tables.Table2.Rows as ArrayCollection;		
 					}
-					if (Ds_Objects.result.Tables.Table3.Rows.length > 0)
-					{
-						Txt_OpeningBalance.text=Ds_Objects.result.Tables.Table3.Rows[0].ClosingBalance;		
-					}
+					
 				}
 				if (Ds_Objects.currentTarget.description.toString() == "GRID_CUSTOM")
 				{
 					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
 					{
-						Grd_PettyCash1._setGridSrc=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
-					}
-					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
-					{
-						Txt_TotalAmount.text=Ds_Objects.result.Tables.Table1.Rows[0].Total;
-						AddMode=false;
+						Txt_OpeningBalance.text=Ds_Objects.result.Tables.Table.Rows[0].ClosingBalance;		
 					}
 				}
 				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
@@ -205,18 +197,20 @@
 				hlp_Property.text="";
 				//txtExpenseHeaderId=0;
 				Txt_TotalAmount.text="0.00";
+				Txt_OpeningBalance.text="0.00";
 				Help();
 			}
 			public function Ddl_Property_changeHandler():void
 			{
 				Grd_PettyCash1._clear();
+				Txt_OpeningBalance.text="0.00";
 				Txt_TotalAmount.text="0.00"
 				if(hlp_Property.selected())
 				{
 					PropertyName=hlp_Property.Select_Row.Property;
 					PropertyId=hlp_Property.Select_Row.Id;
 					hlp_Property.text=PropertyName;
-					//useWeb("PettyCash","GRID_CUSTOM",[GlobalXml,'PETTYLOAD',PropertyId,Global_AC[0].UsrId]);
+					useWeb("PettyCashHdr","GRID_CUSTOM",[GlobalXml,'PETTYLOAD',PropertyId,Global_AC[0].UsrId]);
 				}
 				else
 				{

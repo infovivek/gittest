@@ -43,8 +43,10 @@ CREATE PROCEDURE Sp_ContractClientPref_Help
   IF @PAction='GridPropertyManaged'
   BEGIN 
   --Table2 DateFunction
-    Select Id as PropertyId,PropertyName as Property from WRBHBProperty 
-    where IsActive=1 and IsDeleted=0 AND Category='External Property';
+    Select P.Id as PropertyId,(P.PropertyName+','+C.CityName+','+S.StateName) as Property from WRBHBProperty P
+    JOIN WRBHBState S ON P.StateId=S.Id AND S.IsActive=1
+    JOIN WRBHBCity C  ON P.CityId=C.Id AND C.IsActive=1 AND C.IsDeleted=0
+    where P.IsActive=1 and P.IsDeleted=0 AND Category='External Property';
  End
  IF @PAction='LastData'
  BEGIN

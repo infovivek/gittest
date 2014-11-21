@@ -24,20 +24,122 @@ namespace HB.Dao
            XmlDocument document = new XmlDocument();
            document.LoadXml(Hdrval);
            Apartment Aptment = new Apartment();
-           Aptment.PropertyId = Convert.ToInt32(document.SelectSingleNode("HdrXml").Attributes["PropertyId"].Value);
-           Aptment.BlockId = Convert.ToInt32(document.SelectSingleNode("HdrXml").Attributes["BlockId"].Value);
-           Aptment.BlockName = document.SelectSingleNode("HdrXml").Attributes["BlockName"].Value;
-           Aptment.ApartmentName = document.SelectSingleNode("HdrXml").Attributes["ApartmentName"].Value;
-           Aptment.ApartmentType = document.SelectSingleNode("HdrXml").Attributes["ApartmentType"].Value;
-           Aptment.ApartmentNo = document.SelectSingleNode("HdrXml").Attributes["ApartmentNo"].Value;
-           Aptment.SellableApartmentType = document.SelectSingleNode("HdrXml").Attributes["SellableApartmentType"].Value;
-           Aptment.OwnershipType = document.SelectSingleNode("HdrXml").Attributes["OwnershipType"].Value;
-           Aptment.RackTariff = Convert.ToDecimal(document.SelectSingleNode("HdrXml").Attributes["RackTariff"].Value);
-           Aptment.DiscountModePer = Convert.ToBoolean(document.SelectSingleNode("HdrXml").Attributes["DiscountModePer"].Value);
-           Aptment.DiscountModeRS = Convert.ToBoolean(document.SelectSingleNode("HdrXml").Attributes["DiscountModeRS"].Value);
-           Aptment.DiscountAllowed = Convert.ToDecimal(document.SelectSingleNode("HdrXml").Attributes["DiscountAllowed"].Value);
-           Aptment.Status = document.SelectSingleNode("HdrXml").Attributes["Status"].Value;
-           Aptment.Id = Convert.ToInt32(document.SelectSingleNode("HdrXml").Attributes["Id"].Value); 
+           if (document.SelectSingleNode("HdrXml").Attributes["PropertyId"].Value == "")
+           {
+               Aptment.PropertyId = 0;
+           }
+           else
+           {
+               Aptment.PropertyId = Convert.ToInt32(document.SelectSingleNode("HdrXml").Attributes["PropertyId"].Value);
+           }
+           if (document.SelectSingleNode("HdrXml").Attributes["PropertyId"].Value == "")
+           {
+               Aptment.PropertyId = 0;
+           }
+           else
+           {
+
+               Aptment.BlockId = Convert.ToInt32(document.SelectSingleNode("HdrXml").Attributes["BlockId"].Value);
+           }
+           if (document.SelectSingleNode("HdrXml").Attributes["BlockName"].Value == "")
+           {
+               Aptment.BlockName = "";
+           }
+           else
+           {
+               Aptment.BlockName = document.SelectSingleNode("HdrXml").Attributes["BlockName"].Value;
+           }
+
+           if (document.SelectSingleNode("HdrXml").Attributes["ApartmentName"].Value == "")
+           {
+               Aptment.ApartmentName = "";
+           }
+           else
+           {
+               Aptment.ApartmentName = document.SelectSingleNode("HdrXml").Attributes["ApartmentName"].Value;
+           }
+
+           if (document.SelectSingleNode("HdrXml").Attributes["ApartmentType"].Value == "")
+           {
+               Aptment.ApartmentType = "";
+           }
+           else
+           {
+               Aptment.ApartmentType = document.SelectSingleNode("HdrXml").Attributes["ApartmentType"].Value;
+           }
+           if (document.SelectSingleNode("HdrXml").Attributes["ApartmentNo"].Value == "")
+           {
+               Aptment.ApartmentNo = "";
+           }
+           else
+           {
+               Aptment.ApartmentNo = document.SelectSingleNode("HdrXml").Attributes["ApartmentNo"].Value;
+           }
+           if (document.SelectSingleNode("HdrXml").Attributes["SellableApartmentType"].Value == "")
+           {
+               Aptment.SellableApartmentType = "";
+           }
+           else
+           {
+               Aptment.SellableApartmentType = document.SelectSingleNode("HdrXml").Attributes["SellableApartmentType"].Value;
+           }
+           if (document.SelectSingleNode("HdrXml").Attributes["OwnershipType"].Value == "")
+           {
+               Aptment.OwnershipType = "";
+           }
+           else
+           {
+               Aptment.OwnershipType = document.SelectSingleNode("HdrXml").Attributes["OwnershipType"].Value;
+           }
+           if (document.SelectSingleNode("HdrXml").Attributes["RackTariff"].Value == "")
+           {
+               Aptment.RackTariff = 0;
+           }
+           else
+           {
+               Aptment.RackTariff = Convert.ToDecimal(document.SelectSingleNode("HdrXml").Attributes["RackTariff"].Value);
+           }
+           if (document.SelectSingleNode("HdrXml").Attributes["DiscountModePer"].Value == "")
+           {
+               Aptment.DiscountModePer = false;
+           }
+           else
+           {
+               Aptment.DiscountModePer = Convert.ToBoolean(document.SelectSingleNode("HdrXml").Attributes["DiscountModePer"].Value);
+           }
+           if (document.SelectSingleNode("HdrXml").Attributes["DiscountModeRS"].Value == "")
+           {
+               Aptment.DiscountModeRS = false;
+           }
+           else
+           {
+               Aptment.DiscountModeRS = Convert.ToBoolean(document.SelectSingleNode("HdrXml").Attributes["DiscountModeRS"].Value);
+           }
+           if (document.SelectSingleNode("HdrXml").Attributes["DiscountAllowed"].Value == "")
+           {
+               Aptment.DiscountAllowed = 0;
+           }
+           else
+           {
+               Aptment.DiscountAllowed = Convert.ToDecimal(document.SelectSingleNode("HdrXml").Attributes["DiscountAllowed"].Value);
+           }
+           if (document.SelectSingleNode("HdrXml").Attributes["Status"].Value == "")
+           {
+               Aptment.Status = "";
+           }
+           else
+           {
+               Aptment.Status = document.SelectSingleNode("HdrXml").Attributes["Status"].Value;
+           }
+           if (document.SelectSingleNode("HdrXml").Attributes["Id"].Value == "")
+           {
+               Aptment.Id = 0;
+           }
+           else
+           {
+               Aptment.Id = Convert.ToInt32(document.SelectSingleNode("HdrXml").Attributes["Id"].Value);
+           }
+            
            if (Aptment.Id != 0)
            {
                UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +

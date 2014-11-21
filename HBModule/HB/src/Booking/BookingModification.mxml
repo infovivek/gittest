@@ -64,10 +64,13 @@
 						if(Status=="Booking")
 						{
 							Grp_Checkin.visible=false;
+							Grp_Chkin.visible=false;
 						}
 						else
 						{
 							Grp_Checkin.visible=true;
+							Grp_Chkin.visible=true;
+							Grd_Property._setFocusFlag(false);
 						}
 						if(Status=="CheckOut")
 						{
@@ -431,6 +434,10 @@
 	</WrbComp:ProDGrid1>
 	<s:CheckBox x="644" y="344" label="Send Mail" id="Chk_Mail"/>
 	<s:Group x="633" y="110" width="88" height="35" id="Grp_Checkin">
+		<s:Label x="0" y="0"  text="" height="100%" width="100%"/>
+		<s:Label x="0" y="0"  text="" height="100%" width="100%"/>
+	</s:Group>
+	<s:Group x="38" y="110" width="250" height="35" id="Grp_Chkin">
 		<s:Label x="0" y="0"  text="" height="100%" width="100%"/>
 	</s:Group>
 </s:Application>

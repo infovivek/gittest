@@ -181,10 +181,13 @@
 						if(Status=="Booking")
 						{
 							Grp_Checkin.visible=false;
+							Grp_Chkin.visible=false;
 						}
 						else
 						{
 							Grp_Checkin.visible=true;
+							Grp_Chkin.visible=true;
+							Grd_Property._setFocusFlag(false);
 						}
 						if(Status=="CheckOut")
 						{
@@ -1339,7 +1342,7 @@
 	</WrbComp:Button_HB>
 	<WrbHelpComp:HelpText x="188" y="72.5" depth="5" pxTabIndex="1" width="303" id="hlp_Property" onselection="{fnGetProperty()}" pxSetColumnsWidth="300,150,300">
 	</WrbHelpComp:HelpText>
-	<s:BorderContainer x="0" y="54" width="100%" height="479" id="Brd_BookingModification" visible="false" 
+	<s:BorderContainer x="0" y="54" width="100%" height="479" id="Brd_BookingModification" visible="true" 
 					   depth="10" backgroundColor="#E5E4E2">
 		<mx:Label x="74" y="76" text="Filter"/>
 		<mx:Label x="295" y="36" text="Client"/>
@@ -1372,16 +1375,21 @@
 						   >
 		</WrbComp:ProDGrid1>
 		<mx:Label x="37" y="36" text="Booking No"/>
-		<s:Image x="1000" y="9" source="@Embed(source='../Assets/CrossSmall.png')" click="Close()" toolTip="Close"/>
+		<s:Image x="980" y="9" source="@Embed(source='../Assets/CrossSmall.png')" click="Close()" toolTip="Close"/>
 		<s:CheckBox x="644" y="344" label="Send Mail" id="Chk_Mail"/>
 		<s:Group x="633" y="110" width="88" height="35" id="Grp_Checkin">
+			<s:Label x="0" y="0"  text="" height="100%" width="100%"/>
+		</s:Group>
+		<s:Group x="38" y="110" width="250" height="35" id="Grp_Chkin">
 			<s:Label x="0" y="0"  text="" height="100%" width="100%"/>
 		</s:Group>
 		<mx:Label x="250" y="76" text="Booking Level"/>
 		<s:TextInput x="339" y="76.5" width="135" id="txt_BookingLevel" enabled="false"/>		
 			<s:HGroup id="TopCntl1" x="0" y="0" width="100%" height="30" gap="5" depth="2010" horizontalAlign="left" verticalAlign="middle">			
 				<mx:Label text="Select Booking No"/>
-			</s:HGroup>		
+			</s:HGroup>	
+		
+		
 	</s:BorderContainer>
 	<s:BorderContainer x="420" y="36" width="17" height="16" backgroundColor="green">
 	</s:BorderContainer>

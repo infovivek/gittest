@@ -202,15 +202,17 @@
 					var i:int=0;
 					for( i ;i<Grid_AC1.length;i++)
 					{
-						if(Grid_AC1[i].FilePath =="")
-						{  
-							var Err:String="";
-							Err=Grid_AC1[i].ExpenseHead+" Bill is Required.\n";
-							ErrStr=ErrStr+Err;
-						} 	
-					}
+						if(Grid_AC1[i].Paid !=0)
+						{ 
+							if(Grid_AC1[i].FilePath =="")
+							{  
+								var Err:String="";
+								Err=Grid_AC1[i].ExpenseHead+" Bill is Required.\n";
+								ErrStr=ErrStr+Err;
+							} 
+					    }
+				    }
 				}
-							
 			}
 			protected function FnSave():void
 			{
@@ -360,6 +362,7 @@
 							Amount:0,
 							Status:"",
 							Paid:Txt_amt.text,
+							BillNo:"",
 							ExpenseId:ExpenseId1,
 							FilePath:"",
 							Id:0
@@ -403,15 +406,23 @@
 				var Foodindex:int=Grd_User.selectedIndex;
 				var Tmp:ArrayCollection=new ArrayCollection([{ExpenseHead:Ac_PettyCash[Foodindex].ExpenseHead,
 					Description:Ac_PettyCash[Foodindex].Description,Amount:Ac_PettyCash[Foodindex].Amount,
-					Paid:Ac_PettyCash[Foodindex].Paid}]);				
-				Ac_PettyCash.removeItemAt(Foodindex);
-				for(var i:int=0;i<Tmp.length;i++)
+					Paid:Ac_PettyCash[Foodindex].Paid}]);
+				if(Ac_PettyCash[Foodindex].Amount==0)
 				{
-					TotAmt+=Number(Tmp[i].Paid);
+					Ac_PettyCash.removeItemAt(Foodindex);
+					for(var i:int=0;i<Tmp.length;i++)
+					{
+						TotAmt+=Number(Tmp[i].Paid);
+					}
+					var TB:String=NF_Two.format(total-TotAmt);
+					lbl_PaidTotal.text=TB.replace(",","");
+					Grd_User.dataProvider=Ac_PettyCash.source;
 				}
-				var TB:String=NF_Two.format(total-TotAmt);
-				lbl_PaidTotal.text=TB.replace(",","");
-				Grd_User.dataProvider=Ac_PettyCash.source;
+				else
+				{
+					alignAlert(Alert.show("This ExpenseHead Already Approved Delete only New Entry!","Error !",
+					Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+				}
 			}
 			public function FnClose_clickHandler1(event):void
 			{
@@ -603,8 +614,6 @@
 				bdr_Upload.visible=true;
 				Grd_User.visible=false;
 				bdr_Action.visible=false;
-				var TempProduct_AC:ArrayCollection=new ArrayCollection();
-				TempProduct_AC=Grd_User.dataProvider as ArrayCollection
 				Txt_desupload.text=Grd_User.selectedItem.Description;
 				Txt_ExpenseHead.text=Grd_User.selectedItem.ExpenseHead;
 //				ExpenseId=Grd_User.selectedItem.ExpenseId;
@@ -628,6 +637,8 @@
 			protected function AmountValidation(event:FocusEvent):void
 			{
 				
+			  if(Grd_User.selectedItem.Amount !=0)
+			  {
 				if(event.currentTarget.selectedItem !=null)
 				{
 					var Paid:Number=event.currentTarget.selectedItem.Paid	
@@ -657,7 +668,7 @@
 				var Tmp_AC:ArrayCollection=new ArrayCollection();
 				try
 				{
-					if(lbl_Total.text<lbl_PaidTotal.text)
+					if(TotalAmount<TotalPaidAmount)
 					{
 							var m:int=0;
 							Tmp_AC=Grd_User.dataProvider as ArrayCollection
@@ -686,6 +697,7 @@
 				{
 				
 				}
+			  }
 			}
 			
 		]]>
@@ -734,9 +746,9 @@
 			<mx:Label x="347" y="56" text="Property"/>
 			<mx:Label x="261" y="30" text="PettyCash Recieved Status" color="red"/>
 			<mx:HRule x="0" y="425" width="100%" strokeColor="#eb1c24"/>
-			<s:BorderContainer x="150" y="8" width="776" height="449" id="bdr_Action" visible="false" 
+			<s:BorderContainer x="73" y="8" width="853" height="449" id="bdr_Action" visible="false" 
 							   depth="1000">
-				<s:BorderContainer x="0" y="0" width="775" height="42" borderVisible="true"  
+				<s:BorderContainer x="0" y="0" width="851" height="42" borderVisible="true"  
 								   backgroundColor="#c2c2c2">
 					<s:Label x="15" y="12" text="Recieved Amount History" color="red"/>
 				</s:BorderContainer>
@@ -748,13 +760,13 @@
 				</WrbComp:Button_BB>
 				<mx:Label x="15" y="46" text="Spend Status" color="red"/>
 				
-				<s:Image x="753" y="14" source="@Embed(source='../Assets/CrossSmall.png')" 
+				<s:Image x="823" y="14" source="@Embed(source='../Assets/CrossSmall.png')" 
 						 buttonMode="true" toolTip="Close" click="FnClose_clickHandler(event)"/>
-				<mx:DataGrid x="12" y="96"  verticalAlign="middle" editable="true" visible="true"
-							 width="750" height="248"  id="Grd_User" focusOut="AmountValidation(event)"
+				<mx:DataGrid x="1" y="96"  verticalAlign="middle" editable="true" visible="true"
+							 width="850" height="248"  id="Grd_User" focusOut="AmountValidation(event)"
 							 change="PaidAmount()">
 					<mx:columns>
-						<mx:DataGridColumn dataField="Remove" width="75"  editable="false">
+						<mx:DataGridColumn dataField="Remove" width="50"  editable="false">
 							<mx:itemRenderer>
 								<fx:Component>
 									<mx:HBox horizontalAlign="center" verticalAlign="top">										
@@ -765,30 +777,31 @@
 								</fx:Component>
 							</mx:itemRenderer>
 						</mx:DataGridColumn>
-						<mx:DataGridColumn dataField="ExpenseHead" headerText="ExpenseHead" width="150" editable="false"
+						<mx:DataGridColumn dataField="ExpenseHead" headerText="ExpenseHead" width="120" editable="false"
 										   visible="true">
 						</mx:DataGridColumn>
-						<mx:DataGridColumn dataField="Description" headerText="Description" width="160" 
+						<mx:DataGridColumn dataField="Description" headerText="Description" width="140" 
 										   editable="false" visible="true">
 						</mx:DataGridColumn>
-						<mx:DataGridColumn dataField="BillNo" headerText="BillNo" width="100" 
-										   editable="true" visible="true">
-						</mx:DataGridColumn>
+						
 						<mx:DataGridColumn dataField="Amount" headerText="Amount" width="100" editable="false">
 						</mx:DataGridColumn>
 						<mx:DataGridColumn dataField="Paid" headerText="Paid" width="100" editable="true" />
-						<mx:DataGridColumn dataField="Action" headerText="Action" width="75" editable="false"
+						<mx:DataGridColumn dataField="BillNo" headerText="BillNo" width="100" 
+										   editable="true" visible="true">
+						</mx:DataGridColumn>
+						<mx:DataGridColumn dataField="Action" headerText="Action" width="50" editable="false"
 										   visible="true">
 							<mx:itemRenderer >
 								<fx:Component>
 									<mx:HBox horizontalAlign="center" verticalAlign="middle">										
-										<mx:Image source="@Embed(source='../Assets/Comment.png')" buttonMode="true"
+										<mx:Image source="@Embed(source='../Assets/application_get.png')" buttonMode="true"
 												  click="outerDocument.FnUpload(event)"/>
 									</mx:HBox>	
 								</fx:Component>
 							</mx:itemRenderer>
 						</mx:DataGridColumn>
-						<mx:DataGridColumn dataField="FilePath" headerText="FilePath" width="50" editable="true" visible="false"/>
+						<mx:DataGridColumn dataField="FilePath" headerText="FilePath" width="100" editable="false" visible="true"/>
 						<mx:DataGridColumn dataField="Id" headerText="Id" width="10" editable="true" visible="false"/>
 						<mx:DataGridColumn dataField="ExpenseId" headerText="ExpenseId" width="10" editable="true" visible="false"/>
 						<mx:DataGridColumn dataField="BillDate" headerText="BillDate" width="10" editable="false" visible="false"/>
@@ -799,9 +812,9 @@
 				<mx:Label x="16" y="384" text="ExpenseHead" id="lbl_Expense"/>
 				<mx:Label x="304" y="384" text="Description" id="lbl_Des"/>
 				<mx:Label x="559" y="384" text="Amount"/>
-				<mx:Label x="396" y="352" text="TotalAmount"/>
-				<mx:Label x="483" y="352" width="98" id="lbl_Total" textAlign="center"/>
-				<mx:Label x="586" y="351" width="98" id="lbl_PaidTotal" textAlign="center"/>
+				<mx:Label x="266" y="352" text="TotalAmount"/>
+				<mx:Label x="353" y="352" width="98" id="lbl_Total" textAlign="center"/>
+				<mx:Label x="461" y="351" width="98" id="lbl_PaidTotal" textAlign="center"/>
 				<WrbHelpComp:HelpText x="106" y="384" width="190" id="hlp_Expense" depth="100" tabIndex="1"
 								PxGridSetUp="-300" pxSetHeight="300" onselection="{OnSelectionExpense()}" pxSetColumnsWidth="190,0">
 				</WrbHelpComp:HelpText>

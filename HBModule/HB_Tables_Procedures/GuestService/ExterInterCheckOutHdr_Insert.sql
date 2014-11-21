@@ -75,7 +75,7 @@ IF ISNULL(@PrintInvoice,0) = '1'
 				SELECT @PIInvoice='PI/1';
 			END
 			
-		IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
+	IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
 		WHERE PropertyType ='External Property' and PrintInvoice = 1 and MONTH(CreatedDate)=MONTH(GETDATE()) AND
 		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(InVoiceNo,'') != '')
 			BEGIN
@@ -91,10 +91,10 @@ IF ISNULL(@PrintInvoice,0) = '1'
 				SELECT @InVoiceNo='HBE/1';
 			END
 	END
-	ELSE
-	BEGIN
-		set @InVoiceNo='0';
-	END
+	--ELSE
+	--BEGIN
+	--	set @InVoiceNo='0';
+	--END
 	IF @BTC = 'Bill to Company (BTC)'  OR @PrintInvoice = 1 
 	BEGIN
 	IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr

@@ -105,7 +105,7 @@
 				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Bed',1528]);
 				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Apartment',2027]);
 				//useWeb("BookingMail","RecommendMail_CUSTOM",[GlobalXml,'Recommend',5809]);
-				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'MMT',4781]);				
+				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'MMT',5765]);				
 				//var ChkInDt:String="2014-11-29 12:00:00 PM";
 				//var ChkOutDt:String="2014-11-30 12:00:00 PM";
 				//CityId=2905;

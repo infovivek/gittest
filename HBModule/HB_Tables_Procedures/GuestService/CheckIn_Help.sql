@@ -1,6 +1,6 @@
 
 GO
-/****** Object:  StoredProcedure [dbo].[Sp_CheckIn_Help]    Script Date: 11/11/2014 09:57:00 ******/
+/****** Object:  StoredProcedure [dbo].[Sp_CheckIn_Help]    Script Date: 11/18/2014 12:32:37 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -60,8 +60,8 @@ IF @SSPId =0
 		join WRBHBUser U on   PU.UserId =U.Id and pu.IsActive = 1 and PU.IsDeleted = 0
 
 		join WRBHBUserRoles R on  U.Id =R.UserId  and R.IsActive = 1 and R.IsDeleted = 0
-		join wrbhbcity C on C.Id = H.cityId and C.IsActive = 1
-		join wrbhbstate s on S.Id = H.StateId and s.IsActive = 1
+		join wrbhbcity C on C.Id = P.cityId and C.IsActive = 1
+		join wrbhbstate s on S.Id = C.StateId and s.IsActive = 1
 		WHERE  H.IsActive=1 and H.IsDeleted =0 and 
 		H.Status IN('Booked','Direct Booked')  
 		and H.Cancelstatus !='Canceled'
@@ -83,8 +83,8 @@ IF @SSPId =0
 		join WRBHBUser U on   PU.UserId =U.Id and pu.IsActive = 1 and PU.IsDeleted = 0
 
 		join WRBHBUserRoles R on  U.Id =R.UserId  and R.IsActive = 1 and R.IsDeleted = 0
-		join wrbhbcity C on C.Id = H.cityId and C.IsActive = 1
-		join wrbhbstate s on S.Id = H.StateId and s.IsActive = 1
+		join wrbhbcity C on C.Id = P.cityId and C.IsActive = 1
+		join wrbhbstate s on S.Id = C.StateId and s.IsActive = 1
 		WHERE  H.IsActive=1 and H.IsDeleted =0 and 
 		H.Status IN('Booked','Direct Booked')  
 		and H.Cancelstatus !='Canceled'
@@ -112,8 +112,8 @@ IF @SSPId =0
 		 join WRBHBUser U on   PU.UserId =U.Id and pu.IsActive = 1 and PU.IsDeleted = 0
 
 		 join WRBHBUserRoles R on  U.Id =R.UserId  and R.IsActive = 1 and R.IsDeleted = 0 
-		 join wrbhbcity C on C.Id = H.cityId and C.IsActive = 1
-		join wrbhbstate s on S.Id = H.StateId and s.IsActive = 1
+		 join wrbhbcity C on C.Id = P.cityId and C.IsActive = 1
+		join wrbhbstate s on S.Id = C.StateId and s.IsActive = 1
 		 WHERE  H.IsActive=1 and H.IsDeleted =0 and 
 		 H.Status IN('Booked','Direct Booked')  and H.CancelStatus!='Canceled' 
 		 and P.Category in ('Internal Property') 
@@ -138,8 +138,8 @@ IF @SSPId =0
 		 join WRBHBUser U on   PU.UserId =U.Id and pu.IsActive = 1 and PU.IsDeleted = 0
 
 		 join WRBHBUserRoles R on  U.Id =R.UserId  and R.IsActive = 1 and R.IsDeleted = 0 
-		 join wrbhbcity C on C.Id = H.cityId and C.IsActive = 1
-		join wrbhbstate s on S.Id = H.StateId and s.IsActive = 1
+		 join wrbhbcity C on C.Id = P.cityId and C.IsActive = 1
+		join wrbhbstate s on S.Id = C.StateId and s.IsActive = 1
 		 WHERE H.IsActive=1 and H.IsDeleted =0 and
 		  H.Status IN('Booked','Direct Booked')  and H.CancelStatus!='Canceled'
 		 and P.Category in ('Internal Property') 
@@ -163,8 +163,8 @@ END
 		join WRBHBUser U on   PU.UserId =U.Id and pu.IsActive = 1 and PU.IsDeleted = 0
 
 		join WRBHBUserRoles R on  U.Id =R.UserId  and R.IsActive = 1 and R.IsDeleted = 0
-		join wrbhbcity C on C.Id = H.cityId and C.IsActive = 1
-		join wrbhbstate s on S.Id = H.StateId and s.IsActive = 1
+		join wrbhbcity C on C.Id = P.cityId and C.IsActive = 1
+		join wrbhbstate s on S.Id = C.StateId and s.IsActive = 1
 		WHERE H.IsActive=1 and H.IsDeleted =0 and
 		 H.Status IN('Booked','Direct Booked')  and H.CancelStatus!='Canceled'
 		and P.Category in ('External Property') 
@@ -188,8 +188,8 @@ END
 		join WRBHBUser U on   PU.UserId =U.Id and pu.IsActive = 1 and PU.IsDeleted = 0
 
 		join WRBHBUserRoles R on  U.Id =R.UserId  and R.IsActive = 1 and R.IsDeleted = 0
-		join wrbhbcity C on C.Id = H.cityId and C.IsActive = 1
-		join wrbhbstate s on S.Id = H.StateId and s.IsActive = 1
+		join wrbhbcity C on C.Id = P.cityId and C.IsActive = 1
+		join wrbhbstate s on S.Id = C.StateId and s.IsActive = 1
 		WHERE H.IsActive=1 and H.IsDeleted =0 and
 		 H.Status IN('Booked','Direct Booked')  and H.CancelStatus!='Canceled'
 		and P.Category in ('Internal Property','External Property','Managed G H','Client Prefered') 
@@ -216,8 +216,8 @@ END
 		 join WRBHBUser U on   PU.UserId =U.Id and pu.IsActive = 1 and PU.IsDeleted = 0
 
 		 join WRBHBUserRoles R on  U.Id =R.UserId  and R.IsActive = 1 and R.IsDeleted = 0 
-		 join wrbhbcity C on C.Id = H.cityId and C.IsActive = 1
-		join wrbhbstate s on S.Id = H.StateId and s.IsActive = 1
+		 join wrbhbcity C on C.Id = P.cityId and C.IsActive = 1
+		join wrbhbstate s on S.Id = C.StateId and s.IsActive = 1
 		 WHERE H.IsActive=1 and H.IsDeleted =0 and
 		  H.Status IN('Booked','Direct Booked')  and H.CancelStatus!='Canceled'
 		 and P.Category in ('Internal Property') 
@@ -242,8 +242,8 @@ END
 		 join WRBHBUser U on   PU.UserId =U.Id and pu.IsActive = 1 and PU.IsDeleted = 0
 
 		 join WRBHBUserRoles R on  U.Id =R.UserId  and R.IsActive = 1 and R.IsDeleted = 0 
-		 join wrbhbcity C on C.Id = H.cityId and C.IsActive = 1
-		join wrbhbstate s on S.Id = H.StateId and s.IsActive = 1
+		 join wrbhbcity C on C.Id = P.cityId and C.IsActive = 1
+		join wrbhbstate s on S.Id = C.StateId and s.IsActive = 1
 		 WHERE  H.IsActive=1 and H.IsDeleted =0 and
 		 H.Status IN('Booked','Direct Booked')  and H.CancelStatus!='Canceled'
 		 and P.Category in ('Internal Property') 
@@ -268,15 +268,15 @@ If @Action = 'GuestLoad'
 	
 	
 -- Table1 ( for Guest Name Load )
-		CREATE TABLE #CheckIn1(Id INT,PropertyId INT,CheckInGuest NVARCHAR(100),GuestId NVARCHAR(100),RefGuestId Nvarchar(100),BookingId INT,RoomId INT,ApartmentId INT,BookingLevel NVARCHAR(100),BedId INT,
+		CREATE TABLE #CheckIn1(Id INT,PropertyId INT,CheckInGuest NVARCHAR(500),GuestId NVARCHAR(500),RefGuestId Nvarchar(500),BookingId INT,RoomId INT,ApartmentId INT,BookingLevel NVARCHAR(500),BedId INT,
 		RoomCaptureId INT,BookingAssGuestId int)
-		CREATE TABLE #CheckIn2(Id INT,PropertyId INT,CheckInGuest NVARCHAR(100),GuestId NVARCHAR(100),RefGuestId Nvarchar(100),BookingId INT,RoomId INT,ApartmentId INT,BookingLevel NVARCHAR(100),BedId INT,
+		CREATE TABLE #CheckIn2(Id INT,PropertyId INT,CheckInGuest NVARCHAR(500),GuestId NVARCHAR(500),RefGuestId Nvarchar(500),BookingId INT,RoomId INT,ApartmentId INT,BookingLevel NVARCHAR(500),BedId INT,
 		RoomCaptureId INT,BookingAssGuestId int)
-		CREATE TABLE #CheckIn3(Id INT,PropertyId INT,CheckInGuest NVARCHAR(100),GuestId NVARCHAR(100),RefGuestId Nvarchar(100),BookingId INT,RoomId INT,ApartmentId INT,BookingLevel NVARCHAR(100),BedId INT,
+		CREATE TABLE #CheckIn3(Id INT,PropertyId INT,CheckInGuest NVARCHAR(500),GuestId NVARCHAR(500),RefGuestId Nvarchar(500),BookingId INT,RoomId INT,ApartmentId INT,BookingLevel NVARCHAR(500),BedId INT,
 		RoomCaptureId INT,BookingAssGuestId int)
-		CREATE TABLE #CheckInfinal(Id INT,PropertyId INT,CheckInGuest NVARCHAR(100),GuestId NVARCHAR(100),RefGuestId Nvarchar(100),BookingId INT,RoomId INT,ApartmentId INT,BookingLevel NVARCHAR(100),BedId INT,
+		CREATE TABLE #CheckInfinal(Id INT,PropertyId INT,CheckInGuest NVARCHAR(500),GuestId NVARCHAR(500),RefGuestId Nvarchar(500),BookingId INT,RoomId INT,ApartmentId INT,BookingLevel NVARCHAR(500),BedId INT,
 		RoomCaptureId INT,BookingAssGuestId int,PId BIGINT PRIMARY KEY IDENTITY (1,1))
-		CREATE TABLE #CheckInfinal2(Id INT,PropertyId INT,CheckInGuest NVARCHAR(100),GuestId NVARCHAR(100),RefGuestId Nvarchar(100),BookingId INT,RoomId INT,ApartmentId INT,BookingLevel NVARCHAR(100),BedId INT,
+		CREATE TABLE #CheckInfinal2(Id INT,PropertyId INT,CheckInGuest NVARCHAR(500),GuestId NVARCHAR(500),RefGuestId Nvarchar(500),BookingId INT,RoomId INT,ApartmentId INT,BookingLevel NVARCHAR(500),BedId INT,
 		RoomCaptureId INT,BookingAssGuestId int)
 		
 		DECLARE @NoData INT,@BookingId1 BIGINT,@RoomId1 BIGINT,@AparmentId BIGINT,@BedId BIGINT,

@@ -20,12 +20,24 @@ namespace HB.BusinessService.BusinessService
             dTable.Columns.Add("Exception");
             try
             {
-                //string Hdrval = (data[1].ToString());
-                DataSet ds1 = new VendorRequestBO().Save(data, user);
-                if (ds1.Tables["DBERRORTBL"].Rows.Count > 0)
+                string Hdrval = (data[1].ToString());
+                 ds = new VendorRequestBO().Save(data, user);
+                if (ds.Tables["DBERRORTBL"].Rows.Count > 0)
                 {
-                    dTable.Rows.Add(ds1.Tables["DBERRORTBL"].Rows[0][0].ToString());
+                    dTable.Rows.Add(ds.Tables["DBERRORTBL"].Rows[0][0].ToString());
                 }
+                else //if (ds.Tables[0].Rows[0][3].ToString() != "Property")
+                {
+                    Int32 VendorRequestHdrId = Convert.ToInt32(ds.Tables[0].Rows[0][0].ToString());
+                    string VendorRequestHdrRowId = ds.Tables[0].Rows[0][1].ToString();
+                    string VendorRequestHdr = data[2].ToString();
+                    DataSet ds1 = new VendorRequestDtlBO().Save(VendorRequestHdr, user, VendorRequestHdrId);
+                    if (ds1.Tables["DBERRORTBL"].Rows.Count > 0)
+                    {
+                        dTable.Rows.Add(ds1.Tables["DBERRORTBL"].Rows[0][0].ToString());
+                    }
+                }
+             
             }
             catch (Exception Ex)
             {

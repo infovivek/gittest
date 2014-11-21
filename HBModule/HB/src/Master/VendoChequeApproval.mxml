@@ -549,7 +549,7 @@
 					</mx:itemRenderer>
 				</mx:DataGridColumn>
 				<mx:DataGridColumn dataField="BillDate" headerText="BillDate" width="75" editable="false"/>
-				<mx:DataGridColumn dataField="ExpenseHead" headerText="ExpenseHead" width="100" editable="false"/>
+				<mx:DataGridColumn dataField="ExpenseHead" headerText="NatureOfService" width="100" editable="false"/>
 				<mx:DataGridColumn dataField="VendorName" headerText="VendorName" width="125" editable="false"/>
 				<mx:DataGridColumn dataField="Property" headerText="Property" width="100" editable="false"/>
 				<mx:DataGridColumn dataField="Type" headerText="Type" width="100" editable="false"/>

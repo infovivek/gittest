@@ -628,6 +628,8 @@ namespace HB.Dao
         public const string VendorRequest_Select = "Sp_VendorRequest_Select";
         public const string VendorRequest_Help = "Sp_VendorRequest_Help";
         public const string VendorRequest_Delete = "Sp_VendorRequest_Delete";
+        public const string VendorRequestDtl_Insert = "Sp_VendorRequestDtl_Insert";
+        public const string VendorRequestDtl_Update = "Sp_VendorRequestDtl_Update";
 
         //Contract Bill
         public const string ContractBill_Help = "Sp_ContractBill_Help";

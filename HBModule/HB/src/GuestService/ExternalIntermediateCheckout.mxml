@@ -8847,11 +8847,6 @@
 				BillFrom=DT_BillFromDate.text;
 				BillTo=DT_BillTo.text;
 				
-				var BillFrom:String="";
-				var BillTo:String="";
-				BillFrom=DT_BillFromDate.text;
-				BillTo=DT_BillTo.text;
-				
 				var BillTo=DT_BillTo.text;	
 				//var TodayDate:String=TodayDate;
 				var BillTo:String=DT_BillTo.text;
@@ -8920,19 +8915,55 @@
 				var BillF:String=DT_BillFromDate.text;
 				//var BillTo:String=DT_BillTo.text;
 				var BillTo:String=TodayDate;
-				var D:String=BillF.substr(0,2);
-				var M:String=BillF.substr(3,2);
-				var Y:String=BillF.substr(6,10);
-				var D1:String=BillTo.substr(0,2);
-				var M1:String=BillTo.substr(3,2);
-				var Y1:String=BillTo.substr(6,10);
-				var RangeMiddle:String=Y+'/'+M+'/'+D;
-				var RangeEnd:String=Y1+'/'+M1+'/'+String(Number(D1)+1);
-				var RangeStart:String=Y+'/'+M+'/'+D;
-				DT_BillTo.selectableRange = 
-					{rangeStart:new Date(RangeStart),rangeEnd:new Date(RangeEnd)};
-				DT_BillTo.selectedDate=new Date(RangeEnd);
+				var BillTo1:String=ExpChkoutDT;
 				
+				if(ExpChkoutDT <= TodayDate)
+				{
+					//					var BillF:String=DT_BillFromDate.text;
+					//					//var BillTo:String=DT_BillTo.text;
+					//					var BillTo:String=ExpChkoutDT;
+					var D:String=BillF.substr(0,2);
+					var M:String=BillF.substr(3,2);
+					var Y:String=BillF.substr(6,10);
+					var D1:String=BillTo1.substr(0,2);
+					var M1:String=BillTo1.substr(3,2);
+					var Y1:String=BillTo1.substr(6,10);
+					var RangeMiddle:String=Y+'/'+M+'/'+D;
+					var RangeEnd:String=Y1+'/'+M1+'/'+D1;
+					var RangeStart:String=Y+'/'+M+'/'+D;
+					DT_BillTo.selectableRange = 
+						{rangeStart:new Date(RangeStart),rangeEnd:new Date(RangeEnd)};
+					DT_BillTo.selectedDate=new Date(RangeEnd);
+				}
+				else
+				{
+					var D:String=BillF.substr(0,2);
+					var M:String=BillF.substr(3,2);
+					var Y:String=BillF.substr(6,10);
+					var D1:String=BillTo.substr(0,2);
+					var M1:String=BillTo.substr(3,2);
+					var Y1:String=BillTo.substr(6,10);
+					var RangeMiddle:String=Y+'/'+M+'/'+D;
+					var RangeEnd:String=Y1+'/'+M1+'/'+String(Number(D1)+1);
+					var RangeStart:String=Y+'/'+M+'/'+D;
+					DT_BillTo.selectableRange = 
+						{rangeStart:new Date(RangeStart),rangeEnd:new Date(RangeEnd)};
+					DT_BillTo.selectedDate=new Date(RangeEnd);
+				}
+//				var D:String=BillF.substr(0,2);
+//				var M:String=BillF.substr(3,2);
+//				var Y:String=BillF.substr(6,10);
+//				var D1:String=BillTo.substr(0,2);
+//				var M1:String=BillTo.substr(3,2);
+//				var Y1:String=BillTo.substr(6,10);
+//				var RangeMiddle:String=Y+'/'+M+'/'+D;
+//				var RangeEnd:String=Y1+'/'+M1+'/'+String(Number(D1)+1);
+//				var RangeStart:String=Y+'/'+M+'/'+D;
+//				DT_BillTo.selectableRange = 
+//					{rangeStart:new Date(RangeStart),rangeEnd:new Date(RangeEnd)};
+//				DT_BillTo.selectedDate=new Date(RangeEnd);
+				
+				// TODO Auto-generated method stub
 				DT_BillFromDate.enabled=true;
 				DT_BillTo.enabled=true;
 				

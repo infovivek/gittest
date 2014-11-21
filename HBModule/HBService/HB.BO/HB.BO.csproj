@@ -194,6 +194,7 @@
     <Compile Include="VendorChequeApprovalHdrBO.cs" />
     <Compile Include="VendorCostBO.cs" />
     <Compile Include="VendorRequestBO.cs" />
+    <Compile Include="VendorRequestDtlBO.cs" />
     <Compile Include="VendorSettlementBO.cs" />
   </ItemGroup>
   <ItemGroup>
