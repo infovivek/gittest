@@ -102,7 +102,7 @@ END
  BEGIN
         --table1
         SELECT DISTINCT (U.FirstName+' '+U.LastName) AS Requestedby,P.PropertyName AS PCAccount,
-		CONVERT(NVARCHAR,CAST(PC.CreatedDate AS Date),103) AS RequestedOn,'Submitted' AS Status,
+		CONVERT(NVARCHAR,CAST(PC.CreatedDate AS Date),103) AS RequestedOn,PH.ClosingBalance AS Closingbalance,
 		SUM(PC.Amount) AS Amount,PH.OpeningBalance,PC.PropertyId,PC.UserId
 		From WRBHBPettyCashStatus PC
 		JOIN WRBHBPettyCashHdr PH ON PC.PropertyId=PH.PropertyId AND 
@@ -112,7 +112,7 @@ END
 		WHERE PC.UserId=@UserId AND PC.PropertyId=@PropertyId AND PC.IsActive=1 AND PC.IsDeleted=0
 		AND CONVERT(NVARCHAR,CAST(PC.CreatedDate AS Date),103)=CONVERT(NVARCHAR,@Str,103)
 		group by  U.FirstName,U.LastName,P.PropertyName,CONVERT(NVARCHAR,CAST(PC.CreatedDate AS Date),103),
-		PC.Status,PC.UserId,PC.PropertyId,PH.OpeningBalance
+		PH.ClosingBalance,PC.UserId,PC.PropertyId,PH.OpeningBalance
 		--table2
 		Select  DISTINCT 
 		CONVERT(NVARCHAR(100),PC.CreatedDate,103) AS RequestedOn,

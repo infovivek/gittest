@@ -30,8 +30,9 @@ namespace HB.BusinessService.BusinessService
                 {
                     Int32 VendorRequestHdrId = Convert.ToInt32(ds.Tables[0].Rows[0][0].ToString());
                     string VendorRequestHdrRowId = ds.Tables[0].Rows[0][1].ToString();
+                    Int32 TempSave = Convert.ToInt32(ds.Tables[0].Rows[0][2].ToString());
                     string VendorRequestHdr = data[2].ToString();
-                    DataSet ds1 = new VendorRequestDtlBO().Save(VendorRequestHdr, user, VendorRequestHdrId);
+                    DataSet ds1 = new VendorRequestDtlBO().Save(VendorRequestHdr, user, VendorRequestHdrId, TempSave);
                     if (ds1.Tables["DBERRORTBL"].Rows.Count > 0)
                     {
                         dTable.Rows.Add(ds1.Tables["DBERRORTBL"].Rows[0][0].ToString());

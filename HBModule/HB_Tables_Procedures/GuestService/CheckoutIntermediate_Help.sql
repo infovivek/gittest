@@ -315,8 +315,18 @@ BEGIN
   
  IF @Action = 'GuestDetails'
  BEGIN
- 
-		SELECT GuestName as Name,RoomNo,EmpCode,ApartmentType,BedType,PropertyType FROM WRBHBCheckInHdr  
+		Declare @IntId BIGINT;
+		
+		SET @IntId=(SELECT TOP 1 ISNULL(Id,0) AS chekoutId FROM WRBHBChechkOutHdr WHERE ChkInHdrId = @CheckInHdrId AND ISNULL(IntermediateFlag,0)=1
+		AND Status = 'UnSettled' AND IsActive= 1 AND IsDeleted =0);
+		
+		
+		
+IF (ISNULL(@IntId,0)!=0)
+BEGIN
+
+
+SELECT GuestName as Name,RoomNo,EmpCode,ApartmentType,BedType,PropertyType FROM WRBHBCheckInHdr  
 		WHERE  Id=@CheckInHdrId AND IsActive=1 AND IsDeleted=0 
  
 		CREATE TABLE #LEVEL(ChkInDate NVARCHAR(100),ChkOutDate NVARCHAR(100),Id BIGINT,
@@ -376,37 +386,49 @@ If @BookingLevel = 'Apartment'
 		set @ChkOutDate =( SELECT TOP 1 ChkOutDate FROM #LEVEL)  
 		
 		
+		
    
-		SELECT  @CheckInTime=ArrivalTime,@NewCheckInTimeType=TimeType,
-		@NewCheckInDate=convert(nvarchar(100),Cast(NewCheckInDate as DATE),103)	FROM WRBHBCheckInHdr  
-		WHERE IsActive = 1 and IsDeleted = 0 and Id =@CheckInHdrId
+	--	SELECT  @CheckInTime=ArrivalTime,@NewCheckInTimeType=TimeType,
+	--	@NewCheckInDate=convert(nvarchar(100),Cast(NewCheckInDate as DATE),103)	FROM WRBHBCheckInHdr  
+	--	WHERE IsActive = 1 and IsDeleted = 0 and Id =@CheckInHdrId
+		
 		
 		
   
    
-	IF(UPPER(@NewCheckInTimeType)=UPPER('AM'))  
-	BEGIN  
-		IF(CAST(@CheckInTime AS TIME)<CAST('11:00:00' AS TIME))  
-		BEGIN 
-			select @NewCheckInDate=CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,@NewCheckInDate,103)),103)
-		END
+	--IF(UPPER(@NewCheckInTimeType)=UPPER('AM'))  
+	--BEGIN  
+	--	IF(CAST(@CheckInTime AS TIME)<CAST('11:00:00' AS TIME))  
+	--	BEGIN 
+	--		select @NewCheckInDate=CONVERT(NVARCHAR,DATEADD(DAY,0,CONVERT(DATE,@NewCheckInDate,103)),103)
+	--	END
 		 
-		ELSE
-		BEGIN
-			SELECT @NewCheckInDate=convert(nvarchar(100),@NewCheckInDate,103)
-		END
-	END
-	ELSE -- new added this else 
-	BEGIN
-		SELECT @NewCheckInDate=convert(nvarchar(100),@NewCheckInDate,103)
-	END
+	--	ELSE
+	--	BEGIN
+	--		SELECT @NewCheckInDate=convert(nvarchar(100),@NewCheckInDate,103)
+	--	END
+	--END
+	--ELSE -- new added this else 
+	--BEGIN
+	--	SELECT @NewCheckInDate=convert(nvarchar(100),@NewCheckInDate,103)
+	--END
+	
+	
 	 
-		SELECT Property,  
-		CONVERT(NVARCHAR(100),ArrivalDate,103)+' To '+CONVERT(NVARCHAR(100),@ChkOutDate,103) AS Stay,Tariff,  
-		CONVERT(NVARCHAR(100),@ChkOutDate,103) as ChkoutDate,CONVERT(NVARCHAR(100),@NewCheckInDate,103) AS CheckInDate  
-		FROM WRBHBCheckInHdr  
-		WHERE IsActive = 1 and IsDeleted = 0 and Id =@CheckInHdrId;  
-    
+		--SELECT Property,  
+		--CONVERT(NVARCHAR(100),ArrivalDate,103)+' To '+CONVERT(NVARCHAR(100),@ChkOutDate,103) AS Stay,Tariff,  
+		--CONVERT(NVARCHAR(100),@ChkOutDate,103) as ChkoutDate,CONVERT(NVARCHAR(100),@NewCheckInDate,103) AS CheckInDate  
+		--FROM WRBHBCheckInHdr  
+		--WHERE IsActive = 1 and IsDeleted = 0 and Id =@CheckInHdrId;  
+		
+		SELECT Property, Stay,ChkOutTariffTotal AS  Tariff,  
+		CONVERT(NVARCHAR(100),BillEndDate,103) AS ChkoutDate,CONVERT(NVARCHAR(100),BillFromDate,103) AS CheckInDate  
+		FROM WRBHBChechkOutHdr  
+		WHERE IsActive = 1 AND IsDeleted = 0 AND Status = 'UnSettled' AND ChkInHdrId =@CheckInHdrId
+		
+		--order by Id desc;
+		
+		--select * from WRBHBChechkOutHdr where Id = 1894
     
  --BillDate   
 		SELECT CONVERT(NVARCHAR(103),@ChkOutDate,103) as BillDate ,convert(nvarchar(100),GETDATE(),103) as TodayDate
@@ -434,10 +456,151 @@ If @BookingLevel = 'Apartment'
 		
 		--select @dt6,@dt7;
 		  
+		--SELECT DATEDIFF(day,CONVERT(date,@NewCheckInDate,103), CONVERT(date,@ChkOutDate ,103) ) AS Days,  
+		--Id--,ArrivalDate  
+		--FROM WRBHBCheckInHdr WHERE Id=@CheckInHdrId;
+		
+		SELECT DATEDIFF(day,CONVERT(date,BillFromDate,103), CONVERT(date,BillEndDate ,103) ) AS Days,  
+		Id--,ArrivalDate  
+		FROM WRBHBChechkOutHdr WHERE  Status = 'UnSettled' AND ChkInHdrId=@CheckInHdrId;
+		
+		SELECT IntermediateFlag FROM WRBHBChechkOutHdr where Status = 'UnSettled' AND ChkInHdrId=@CheckInHdrId;
+		
+END
+ELSE
+BEGIN
+
+
+
+SELECT GuestName as Name,RoomNo,EmpCode,ApartmentType,BedType,PropertyType FROM WRBHBCheckInHdr  
+		WHERE  Id=@CheckInHdrId AND IsActive=1 AND IsDeleted=0 
+ 
+		CREATE TABLE #LEVELs(ChkInDate NVARCHAR(100),ChkOutDate NVARCHAR(100),Id BIGINT,
+		TariffPaymentMode NVARCHAR(100),ServicePaymentMode NVARCHAR(100))  
+		--DECLARE @BookingId BIGINT,@GuestId BIGINT,@BookingLevel nvarchar(100),@CheckInTime NVARCHAR(100),
+		--@NewCheckInDate NVARCHAR(100),@NewCheckInTimeType NVARCHAR(100);  
+		set @BookingId=(select BookingId from WRBHBCheckInHdr where Id = @CheckInHdrId and IsActive =1 and IsDeleted =0)  
+		set @GuestId=(select GuestId from WRBHBCheckInHdr where Id = @CheckInHdrId and IsActive =1 and IsDeleted =0)  
+		set @BookingLevel=(select Type from WRBHBCheckInHdr where Id = @CheckInHdrId and IsActive =1 and IsDeleted =0)  
+ --select @BookingId,@GuestId,@BookingLevel
+If @BookingLevel = 'Room'   
+	BEGIN  
+		INSERT INTO #LEVELs(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode)  
+		--select top 1 CONVERT(nvarchar(100),min(ChkInDt),103),CONVERT(nvarchar(100),max(ChkOutDt),103) , 
+		--TariffPaymentMode,ServicePaymentMode  
+		--from WRBHBBookingPropertyAssingedGuest  
+		--where GuestId = 29544 and BookingId = 4976 
+		--group by TariffPaymentMode,ServicePaymentMode  
+		--and IsDeleted=0 and IsActive=1 
+		select top 1 CONVERT(nvarchar(100),(ChkInDt),103),CONVERT(nvarchar(100),(ChkOutDt),103) , 
+		TariffPaymentMode,ServicePaymentMode  
+		from WRBHBBookingPropertyAssingedGuest  
+		where GuestId = @GuestId and BookingId = @BookingId 
+		--group by TariffPaymentMode,ServicePaymentMode  ,ChkInDt,ChkOutDt
+		order by Id desc
+		--and IsDeleted=0 and IsActive=1 
+		
+	END  
+If @BookingLevel = 'Bed'  
+	BEGIN  
+		INSERT INTO #LEVELs(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode )  
+		--select CONVERT(nvarchar(100),min(ChkInDt),103),CONVERT(nvarchar(100),max(ChkOutDt),103),
+		--TariffPaymentMode,ServicePaymentMode     
+		--from WRBHBBedBookingPropertyAssingedGuest  
+		--where GuestId = @GuestId and BookingId = @BookingId  
+		--group by TariffPaymentMode,ServicePaymentMode  
+		--and IsDeleted=0 and IsActive=1 
+		select CONVERT(nvarchar(100),(ChkInDt),103),CONVERT(nvarchar(100),(ChkOutDt),103),
+		TariffPaymentMode,ServicePaymentMode     
+		from WRBHBBedBookingPropertyAssingedGuest  
+		where GuestId = @GuestId and BookingId = @BookingId  
+		order by Id desc
+	END   
+If @BookingLevel = 'Apartment'  
+	BEGIN  
+		INSERT INTO #LEVELs(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode  )  
+		select CONVERT(nvarchar(100),(ChkInDt),103),CONVERT(nvarchar(100),(ChkOutDt),103)  ,
+		TariffPaymentMode,ServicePaymentMode   
+		from WRBHBApartmentBookingPropertyAssingedGuest  
+		where GuestId = @GuestId and BookingId = @BookingId 
+		order by Id desc
+		--group by TariffPaymentMode,ServicePaymentMode  
+		--and IsDeleted=0 and IsActive=1  
+	END   
+		--DECLARE @ChkInDate nvarchar(100),@ChkOutDate nvarchar(100);  
+		set @ChkInDate =( SELECT TOP 1 ChkInDate FROM #LEVELs)   
+		set @ChkOutDate =( SELECT TOP 1 ChkOutDate FROM #LEVELs)  
+		
+		
+		
+   
+		SELECT  @CheckInTime=ArrivalTime,@NewCheckInTimeType=TimeType,
+		@NewCheckInDate=convert(nvarchar(100),Cast(NewCheckInDate as DATE),103)	FROM WRBHBCheckInHdr  
+		WHERE IsActive = 1 and IsDeleted = 0 and Id =@CheckInHdrId
+		
+		
+		
+  
+   
+	IF(UPPER(@NewCheckInTimeType)=UPPER('AM'))  
+	BEGIN  
+		IF(CAST(@CheckInTime AS TIME)<CAST('11:00:00' AS TIME))  
+		BEGIN 
+			select @NewCheckInDate=CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,@NewCheckInDate,103)),103)
+		END
+		 
+		ELSE
+		BEGIN
+			SELECT @NewCheckInDate=convert(nvarchar(100),@NewCheckInDate,103)
+		END
+	END
+	ELSE -- new added this else 
+	BEGIN
+		SELECT @NewCheckInDate=convert(nvarchar(100),@NewCheckInDate,103)
+	END
+	
+	
+	 
+		SELECT Property,  
+		CONVERT(NVARCHAR(100),ArrivalDate,103)+' To '+CONVERT(NVARCHAR(100),@ChkOutDate,103) AS Stay,Tariff,  
+		CONVERT(NVARCHAR(100),@ChkOutDate,103) as ChkoutDate,CONVERT(NVARCHAR(100),@NewCheckInDate,103) AS CheckInDate  
+		FROM WRBHBCheckInHdr  
+		WHERE IsActive = 1 and IsDeleted = 0 and Id =@CheckInHdrId;  
+    
+    
+ --BillDate   
+		SELECT CONVERT(NVARCHAR(103),@ChkOutDate,103) as BillDate ,convert(nvarchar(100),GETDATE(),103) as TodayDate
+		
+		
+		--DECLARE @TariffPaymentMode nvarchar(100),@ServicePaymentMode nvarchar(100);  
+		set @TariffPaymentMode =( SELECT TOP 1 TariffPaymentMode FROM #LEVELs)   
+		set @ServicePaymentMode =( SELECT TOP 1 ServicePaymentMode FROM #LEVELs)  
+		--SELECT ClientName,Direct,BTC,Id From  WRBHBCheckInHdr    
+		--WHERE Id=@CheckInHdrId AND IsActive=1 AND IsDeleted=0  
+   
+		SELECT ClientName,ClientId,CityId,ServiceCharge as ServiceChargeChk,@TariffPaymentMode as TariffPaymentMode,@ServicePaymentMode as ServicePaymentMode,  
+		Id From  WRBHBCheckInHdr    
+		WHERE Id=@CheckInHdrId AND IsActive=1 AND IsDeleted=0  
+		--Day Count  
+		--CREATE TABLE #CountDays(NoofDays INT,CheckInHdrId INT)  
+		--INSERT INTO #CountDays (NoofDays,CheckInHdrId)  
+		--SELECT DATEDIFF(day, CAST(CAST(ArrivalDate AS NVARCHAR)+' '+ArrivalTime AS DATETIME), CAST(ChkoutDate AS NVARCHAR)) AS Days,  
+		--Id--,ArrivalDate  
+		--FROM WRBHBCheckInHdr WHERE Id=@CheckInHdrId; 
+		
+		--Declare @dt6 NVARCHAR(100), @dt7 NVARCHAR(100);
+		--set @dt6 =(select    (CONVERT(NVARCHAR(100),@NewCheckInDate,103) ))
+		-- set @dt7 =(select    CONVERT(NVARCHAR(100),@ChkOutDate ,103)  )
+		
+		--select @dt6,@dt7;
+		  
 		SELECT DATEDIFF(day,CONVERT(date,@NewCheckInDate,103), CONVERT(date,@ChkOutDate ,103) ) AS Days,  
 		Id--,ArrivalDate  
-		FROM WRBHBCheckInHdr WHERE Id=@CheckInHdrId; 
+		FROM WRBHBCheckInHdr WHERE Id=@CheckInHdrId;
 		
+		SELECT IntermediateFlag FROM WRBHBChechkOutHdr where Status = 'UnSettled' AND ChkInHdrId=@CheckInHdrId;
+END		
+
  END
    
    
@@ -1044,7 +1207,10 @@ If @BookingLevel = 'Apartment'
 		FROM WRBHBChechkOutHdr WHERE ChkInHdrId = @CheckInHdrId  and ISNULL(Flag,0)= 0
 		 
 		SELECT COUNT(Tariff) AS Tariff FROM #TariffADD  
-     
+		
+		
+        
+        
    -- Settlement Grid Load  
      
 --DROP TABLE #TariffSet  
@@ -1404,6 +1570,9 @@ BEGIN
 		 
 		 SELECT @CheckOutId=Id FROM WRBHBChechkOutHdr WHERE ChkInHdrId=@CheckInHdrId
 		 AND IsActive = 1 and IsDeleted = 0
+		 
+		 
+		 
 		  
 		CREATE TABLE #TariffSet1(BillNo INT,BillType NVARCHAR(100),Amount DECIMAL(27,2),  
 		NetAmount DECIMAL(27,2),OutStanding decimal(27,2),PaymentStatus nvarchar(100),
@@ -1582,6 +1751,8 @@ BEGIN
 		--FROM #Tariffs  
 		--WHERE ROUND((@TARIFAMT+@SERVICEAMT),0)!=0  
 	--	SELECT 1 AS UnPaid;   
+	
+	--	SELECT IntermediateFlag FROM WRBHBChechkOutHdr where Status = 'UnSettled' AND ChkInHdrId=@CheckInHdrId;
 	END
 		
 	

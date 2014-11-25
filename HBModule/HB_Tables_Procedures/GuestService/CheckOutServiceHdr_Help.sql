@@ -15,8 +15,11 @@ GO
 CREATE PROCEDURE [dbo].[Sp_CheckoutService_Help]
 (@Action NVARCHAR(100)=NULL,
 @Str1 NVARCHAR(100)=NULL,
+
 @CheckInHdrId INT=NULL,
-@StateId INT)
+@StateId INT,
+@BillFrom NVARCHAR(100)=NULL,
+@BillTo NVARCHAR(100)=NULL)
 AS
 BEGIN
 IF @Action='ProductLoad'
@@ -129,7 +132,7 @@ BEGIN
 		
 		
 		--KOT COUNT
-		CREATE TABLE #Kot(ServiceItem NVARCHAR(100),Quantity INT,Date datetime,Id INT,PropertyId INT,TypeService NVARCHAR(100))
+		CREATE TABLE #Kot(ServiceItem NVARCHAR(100),Quantity INT,Date date,Id INT,PropertyId INT,TypeService NVARCHAR(100))
 		
 		INSERT INTO #Kot(ServiceItem,Quantity,Date,Id,PropertyId,TypeService)
 		SELECT 'Breakfast' AS ServiceItem,SUM(KD.BreakfastVeg) AS Quantity,KH.Date,
@@ -138,7 +141,7 @@ BEGIN
 		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
 		JOIN WRBHBCheckInHdr C ON KD.CheckInId=C.Id AND C.IsActive=1 AND C.IsDeleted=0
 		WHERE KD.IsActive=1 AND KD.IsDeleted=0  AND KD.BreakfastVeg !=0 
-		AND C.Id=CAST(@Str1 AS BIGINT)
+		AND C.Id=CAST(@Str1 AS BIGINT) AND ISNULL(KH.ChkoutServiceFlag,0) = 0
 		group by KH.Date,KD.Id,KH.PropertyId
 		
 			
@@ -149,7 +152,7 @@ BEGIN
 		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
 		JOIN WRBHBCheckInHdr C ON KD.CheckInId=C.Id AND C.IsActive=1 AND C.IsDeleted=0
 		WHERE KD.IsActive=1 AND KD.IsDeleted=0  AND KD.BreakfastNonVeg !=0 
-		AND C.Id=CAST(@Str1 AS BIGINT)
+		AND C.Id=CAST(@Str1 AS BIGINT) AND ISNULL(KD.ChkoutServiceFlag,0) = 0
 		group by KH.Date,KD.Id,KH.PropertyId
 		
 		
@@ -160,7 +163,7 @@ BEGIN
 		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
 		JOIN WRBHBCheckInHdr C ON KD.CheckInId=C.Id AND C.IsActive=1 AND C.IsDeleted=0
 		WHERE KD.IsActive=1 AND KD.IsDeleted=0  AND KD.LunchVeg !=0 
-		AND C.Id=CAST(@Str1 AS BIGINT)
+		AND C.Id=CAST(@Str1 AS BIGINT) AND ISNULL(KD.ChkoutServiceFlag,0) = 0
 		group by KH.Date,KD.Id,KH.PropertyId
 		
 		
@@ -171,7 +174,7 @@ BEGIN
 		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
 		JOIN WRBHBCheckInHdr C ON KD.CheckInId=C.Id AND C.IsActive=1 AND C.IsDeleted=0
 		WHERE KD.IsActive=1 AND KD.IsDeleted=0  AND KD.LunchNonVeg !=0 
-		AND C.Id=CAST(@Str1 AS BIGINT)
+		AND C.Id=CAST(@Str1 AS BIGINT) AND ISNULL(KD.ChkoutServiceFlag,0) = 0
 		group by KH.Date,KD.Id,KH.PropertyId
 		
 		
@@ -182,7 +185,7 @@ BEGIN
 		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
 		JOIN WRBHBCheckInHdr C ON KD.CheckInId=C.Id AND C.IsActive=1 AND C.IsDeleted=0
 		WHERE KD.IsActive=1 AND KD.IsDeleted=0  AND KD.DinnerVeg !=0 
-		AND C.Id=CAST(@Str1 AS BIGINT)
+		AND C.Id=CAST(@Str1 AS BIGINT) AND ISNULL(KD.ChkoutServiceFlag,0) = 0
 		group by KH.Date,KD.Id,KH.PropertyId
 		
 		
@@ -193,23 +196,28 @@ BEGIN
 		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
 		JOIN WRBHBCheckInHdr C ON KD.CheckInId=C.Id AND C.IsActive=1 AND C.IsDeleted=0
 		WHERE KD.IsActive=1 AND KD.IsDeleted=0  AND KD.DinnerNonVeg !=0 
-		AND C.Id=CAST(@Str1 AS BIGINT)
+		AND C.Id=CAST(@Str1 AS BIGINT) AND ISNULL(KD.ChkoutServiceFlag,0) = 0
 		group by KH.Date,KD.Id,KH.PropertyId
+		
+		
+		
 		
 									
 		INSERT #Final(ServiceItem,Quantity,Amount,Date,Id,ProductId,TypeService)
-		SELECT K.ServiceItem,K.Quantity,(K.Quantity * S.Price) AS Amount,CONVERT(NVARCHAR,Date,103) AS Date,
+		SELECT K.ServiceItem,K.Quantity,(K.Quantity * S.Price) AS Amount,CONVERT(NVARCHAR(100),Date,103) AS Date,
 		S.Id,S.ProductId,'Food And Beverages' TypeService FROM #Kot K
 		JOIN #SERVICRAMOUNTFinal S ON K.ServiceItem=S.ServiceName
 		
+		
 		--SNCK KOT
 		INSERT #Final(ServiceItem,Quantity,Amount,Date,Id,ProductId,TypeService)
-		SELECT ServiceItem,Quantity,CAST(ISNULL(Amount,0)as DECIMAL(27,2)) AS Amount,Convert(NVARCHAR(100),
-		KH.Date,103) AS Date,
+		SELECT ServiceItem,Quantity,CAST(ISNULL(Amount,0)as DECIMAL(27,2)) AS Amount,
+		Convert(NVARCHAR(100),CAST(KH.Date as DATE),103) AS Date,
 		KD.Id,KD.ItemId,'Food And Beverages' as ServiceType
 		FROM WRBHBNewKOTEntryDtl KD  
 		JOIN WRBHBNewKOTEntryHdr KH ON KD.NewKOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0  
-		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KH.GuestId=20223 AND BookingId=@BookingId ;
+		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KH.GuestId=@CheckInHdrId AND BookingId=@BookingId 
+		AND ISNULL(KH.ChkoutServiceFlag,0) = 0;
 		
 		
 		SELECT VAT,RestaurantST,BusinessSupportST ,Cess,HECess --,'Food And Beverages' as Type  
@@ -225,13 +233,14 @@ BEGIN
 		
 		----Laundry
 		INSERT #Final(ServiceItem,Quantity,Amount,Date,Id,ProductId,TypeService)
-		SELECT ServiceItem,Quantity,CAST(ISNULL(Amount,0)as DECIMAL(27,2)) AS Amount,Convert(NVARCHAR(100),
-		LH.Date,103) AS Date,
+		SELECT ServiceItem,Quantity,CAST(ISNULL(Amount,0)as DECIMAL(27,2)) AS Amount,
+		--Convert(NVARCHAR(100),LH.Date,103) AS Date,
+		CONVERT(nvarchar(100),CAST(LH.Date as DATE),103) AS Date,
 		LD.Id,LD.ItemId,LD.ServiceType
 		FROM WRBHBLaundrServiceDtl LD 
 		JOIN WRBHBLaundrServiceHdr LH ON LD.LaundryHdrId=LH.Id AND LH.IsActive=1 AND LH.IsDeleted=0  
 		WHERE LD.IsActive=1 AND LD.IsDeleted=0 AND LH.GuestId=@CheckInHdrId AND BookingId=@BookingId and
-		LD.ServiceType = 'Laundry';
+		LD.ServiceType = 'Laundry' AND ISNULL(LH.ChkoutServiceFlag,0) = 0;
 		
 		----SELECT VAT,RestaurantST,BusinessSupportST ,Cess,HECess ,'Laundry' as Type  
 		----FROM WRBHBTaxMaster  
@@ -244,13 +253,14 @@ BEGIN
 		
 		--Service
 		INSERT #Final(ServiceItem,Quantity,Amount,Date,Id,ProductId,TypeService)
-		SELECT ServiceItem,Quantity,CAST(ISNULL(Amount,0)as DECIMAL(27,2)) AS Amount,Convert(NVARCHAR(100),
-		LH.Date,103) AS Date,
+		SELECT ServiceItem,Quantity,CAST(ISNULL(Amount,0)as DECIMAL(27,2)) AS Amount,
+	--	Convert(NVARCHAR(100),LH.Date,103) AS Date,
+		CONVERT(nvarchar(100),CAST(LH.Date as DATE),103) AS Date,
 		LD.Id,LD.ItemId,LD.ServiceType
 		FROM WRBHBLaundrServiceDtl LD 
 		JOIN WRBHBLaundrServiceHdr LH ON LD.LaundryHdrId=LH.Id AND LH.IsActive=1 AND LH.IsDeleted=0  
 		WHERE LD.IsActive=1 AND LD.IsDeleted=0 AND LH.GuestId=@CheckInHdrId AND BookingId=@BookingId and
-		LD.ServiceType = 'Services';
+		LD.ServiceType = 'Services' and ISNULL(LH.ChkoutServiceFlag,0) = 0;
 		
 		----SELECT VAT,RestaurantST,BusinessSupportST ,Cess,HECess ,'Services' as Type  
 		----FROM WRBHBTaxMaster  
@@ -263,11 +273,21 @@ BEGIN
 		
 		SELECT ServiceItem,Quantity,Amount,Date,Id,ProductId AS ItemId, TypeService
 		FROM #Final
+		WHERE CONVERT(NVARCHAR(100),Date,103) BETWEEN CONVERT(NVARCHAR(100),@BillFrom,103) AND 
+		CONVERT(NVARCHAR(100),@BillTo,103)
 		GROUP BY ServiceItem,Quantity,Amount,Date,Id,ProductId ,TypeService
 		
-	-- Final service Load in service grid frond end 			
+	-- Final service Load in service grid frond end 	
+	--Select @BillFrom,@BillTo;		
+	
+	
+	
 		SELECT ServiceItem,Quantity,Amount,Date,Id,ProductId AS ItemId, TypeService
 		FROM #FinalService
+		--WHERE CONVERT(NVARCHAR(100),Date,103) BETWEEN CONVERT(NVARCHAR(100),@BillFrom,103) AND 
+		--CONVERT(NVARCHAR(100),@BillTo,103)
+		 --WHERE CONVERT(date,Date,103) BETWEEN CONVERT(date,@BillFrom,103) AND 
+		 --CONVERT(date,@BillTo,103)
 		GROUP BY ServiceItem,Quantity,Amount,Date,Id,ProductId ,TypeService
 		
 		--Help Load

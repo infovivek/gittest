@@ -84,7 +84,7 @@
 						Txt_RequestedOn.text=Ds_Objects.result.Tables.Table.Rows[0].RequestedOn;
 						Txt_RequestedProperty.text=Ds_Objects.result.Tables.Table.Rows[0].PCAccount;
 						Txt_Requestedamount.text=Ds_Objects.result.Tables.Table.Rows[0].Amount;
-						Txt_Requestedstatus.text=Ds_Objects.result.Tables.Table.Rows[0].Status;
+						Txt_Closingbalance.text=Ds_Objects.result.Tables.Table.Rows[0].Closingbalance;
 						Txt_Openingbalance.text=Ds_Objects.result.Tables.Table.Rows[0].OpeningBalance;
 						PId=Ds_Objects.result.Tables.Table.Rows[0].PropertyId;
 						UId=Ds_Objects.result.Tables.Table.Rows[0].UserId;
@@ -297,22 +297,22 @@
 	<s:BorderContainer x="46" y="33" width="851" height="473" id="bdr_History"
 					   borderVisible="true" visible="false" depth="1500">
 		<mx:Label x="82" y="58" text="Expensed by"/>
-		<mx:Label x="454" y="58" text="Expensed on"/>
-		<mx:Label x="82" y="100" text="Expensed Status"/>
-		<mx:Label x="454" y="103" text="Expensed Amount"/>
-		<mx:Label x="82" y="141" text="Expensed Property"/>
+		<mx:Label x="454" y="58" text="Submitted on"/>
+		<mx:Label x="82" y="100" text="Expensed Property"/>
+		<mx:Label x="454" y="103" text="Approved Amount"/>
+		<mx:Label x="82" y="141" text="Opening Balance"/>
 		<s:TextInput x="215" y="50" width="199" height="29"  id="Txt_Requestedby" editable="false"/>
 		<s:TextInput x="576" y="50" width="199" height="29" id="Txt_RequestedOn" editable="false"/>
-		<s:TextInput x="215" y="135" width="199" height="29" id="Txt_RequestedProperty" editable="false"/>
+		<s:TextInput x="215" y="135" width="199" height="29" id="Txt_Openingbalance" editable="false"/>
 		<s:TextInput x="256" y="433" width="98" height="29" id="Txt_PropertyId" visible="false" editable="false"/>
 		<s:TextInput x="395" y="435" width="95" height="29" id="Txt_UserID" visible="false" editable="false"/>
 		<mx:Label x="3" y="401" text="Approved and OpeningBalance"/>
 		<s:TextInput x="178" y="396" width="81" height="29" id="Txt_AOAmount" editable="false"/>
 		<s:TextInput x="273" y="396" width="81" height="29" id="Txt_ExpAmount" editable="false"/>
 		<s:TextInput x="576" y="93" width="199" height="29" id="Txt_Requestedamount" editable="false"/>
-		<mx:Label x="454" y="143" text="Opening Balance"/>
-		<s:TextInput x="576" y="133" width="199" height="29" id="Txt_Openingbalance" editable="false"/>
-		<s:TextInput x="215" y="93" width="199" height="29" id="Txt_Requestedstatus" editable="false"/>
+		<mx:Label x="454" y="143" text="Closing Balance"/>
+		<s:TextInput x="576" y="133" width="199" height="29" id="Txt_Closingbalance" editable="false"/>
+		<s:TextInput x="215" y="93" width="199" height="29" id="Txt_RequestedProperty" editable="false"/>
 		<mx:DataGrid x="61" y="174"  verticalAlign="middle" editable="true" visible="true"
 					 width="750" height="220" tabIndex="4" id="Grd_History" >
 			<mx:columns>

@@ -24,6 +24,7 @@ namespace HB.Entity
         public string VendorBill { get; set; }
         public string Des { get; set; }
         public int Id { get; set; }
+        public bool Temp { get; set; }
                     
     }
 }

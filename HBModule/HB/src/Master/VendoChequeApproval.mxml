@@ -531,7 +531,7 @@
 		<mx:Label x="319" y="362" text="Head Operations" />
 		<mx:Label x="461" y="362" text="Account Manager" />
 		<mx:Label x="581" y="362" text="Total Amount" />
-		<mx:Label x="365" y="60" text="Requested Month" />
+		<mx:Label x="365" y="60" text="Requested On" />
 		
 		<mx:DataGrid x="0" y="98"  verticalAlign="middle" editable="true" visible="true"
 					 width="100%" height="220" tabIndex="4" id="Grd_History"

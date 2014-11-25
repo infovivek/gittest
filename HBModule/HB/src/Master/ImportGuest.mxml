@@ -2,91 +2,294 @@
 <s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
 			   xmlns:s="library://ns.adobe.com/flex/spark"
 			   xmlns:mx="library://ns.adobe.com/flex/mx"
-			   xmlns:WrbComp="WrbComp.*"
 			   xmlns:Controls="fx.com.adobe.Controls.*"
 			   xmlns:WrbHelpComp="WrbHelpComp.*"
-			   width="100%" height="100%"  creationComplete="PageLoad()"
-			   pageTitle="Import Guest">
+			   xmlns:WrbComp="WrbComp.*"
+			   xmlns:flexlib="http://code.google.com/p/flexlib/"
+			   width="100%" height="100%" creationComplete="PageLoad()" pageTitle="Bank Statement">
 	<fx:Declarations>
-				
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
-	<fx:Style source="..\\Common\\ApplicationCSS.css" />
-	<fx:Script source="..\\Common\\CommonScript.as" />
-	<fx:Script source="..\\Common\\Functions.as"/>
+	
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
 	<fx:Script>
-		
 		<![CDATA[
 			import WrbComp.frmsearchwindow;
 			
-			import com.as3xls.xls.Cell;
-			import com.as3xls.xls.ExcelFile;
-			import com.as3xls.xls.Sheet;
-			
-			import flash.events.Event;
-			import flash.net.FileFilter;
-			import flash.net.FileReference;
-			import flash.utils.ByteArray;
+			import WrbHelpComp.HlpGridHdr;
 			
 			import mx.collections.ArrayCollection;
-			import mx.controls.Label;
-			import mx.controls.Text;
-			import mx.core.Repeater;
-			import mx.graphics.shaderClasses.SaturationShader;
-			import mx.utils.OrderedObject;
-			import mx.utils.object_proxy;
-			
-			import spark.events.GridEvent;
-			private var ef:ExcelFile;        
-			private var ba:ByteArray;        
-			private var fr:FileReference;    
-			
-			public var FltNm:String="";
-			private var FilterAC:ArrayCollection;
-			private var firstTime:Boolean = true;
-			private var myArrayCollection:ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.CalendarLayoutChangeEvent;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.events.IndexChangedEvent;
+			import mx.graphics.codec.PNGEncoder;
 			
 			import spark.events.IndexChangeEvent;
-			import mx.events.CloseEvent;
-			public var ErrStr:String="";
-			public static var GlobalXml:String="";					
-			public static var Global_AC:ArrayCollection=new ArrayCollection();
-			private var SubGroupId:int=0,ClientId:int=0,ClientName:String=""; 
-			private var Id:int=0,Code:int=0; 
-			public var AddMode:Boolean = true,Flag:Boolean=true;
+			import spark.events.TextOperationEvent;
 			private var SearchPopUp:frmsearchwindow = new frmsearchwindow();
-			public var myFileReference:FileReference = new FileReference(); 
-			private var HdrpkId:Number=0; 
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "",TypeServiceId:int=0,ErrStr:String="";
+			public var Id:int=0,ErrMsg:String="",CityId:int=0,City:String="",UserId:int=0;
+			public var AddMode:Boolean=true,Flag:Boolean=true;
+			public var CompanyLogo:String="",StateId:int=0,State:String="",Str_Email:String="";
 			private var fileRef:FileReference = new FileReference();
-			private var urlReq:URLRequest;
+			private var fileTypes:Array = new Array();
+			public var ClientId:int=0,ClientName:String="";
 			private var arrColl:ArrayCollection;
-			public var Str_ChkOut:String="";
-			public function PageLoad():void
+			private var fr:FileReference;    
+			//public var uploadURL:URLRequest = new URLRequest();
+			private var documentTypes:FileFilter = new FileFilter("Excel (*.xls,*.xlsx)",("*.xls; *.xlsx"));
+			//private var FILE_URL:String = "";
+			public var ImageCount:Number=0;
+			//public var ImageFormat:String="";
+			private var urlReq:URLRequest;
+			public var Save_Flag:Boolean=true; 
+			public var uploadURL:URLRequest = new URLRequest();
+			private const FILE_URL:String= "http://sstage.in/Guest_Import/SampleBankSt.xlsx";
+			
+			protected function PageLoad():void
 			{
 				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
 				GlobalXml="";
 				GlobalXml += "<ROOT>";
 				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
 				GlobalXml += "</ROOT>";
-				Str_ChkOut="http://sstage.in/HBReport/ImportExcel.aspx?";
-		//		Str_ChkOut="http://localhost:6236/ImportExcel.aspx?";
+				init1();
+				init();
+				Save_PettyCash.setButtonRights("Delete",true);
+				Save_PettyCash.setButtonRights("Refresh",true);
+				Save_PettyCash.setButtonRights("Search",true);
+				FilePath.text="";
+				useWeb("ImportGuest","Pageload_CUSTOM",[GlobalXml,"Pageload",0,0,0]);
+			}
+			
+			private function Custom_WebSer_Result (Ds_Objects:Object):void				
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "Pageload_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						hlp_Client.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
+			}
+			
+			private function FnValidation_BeforeSave():String
+			{
+				var TxtFlag:Boolean=true;var ErrStr:String="";
+				if(FilePath.text=="")
+				{
+					if(TxtFlag=true)
+					{
+						FilePath.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+" *   Excel file is Required \n";
+				}
+				return ErrStr;
+			}
+			
+			protected function Save():void
+			{
+				var ErrStr:String=FnValidation_BeforeSave();
+				if(ErrStr!="")
+				{
+					alignAlert(Alert.show(ErrStr,"Requierd Field(s) !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+					
+					return;
+				}
+				var Ac:ArrayCollection=new ArrayCollection
+					([{
+						
+						ImageName:FilePath.text,
+						Id:Id
+					}]);
+					var HdrXml:String="";
+					HdrXml += "<ROOT>";
+					HdrXml += ObjToXmlStr_Comm(Ac,"HdrXml")
+					HdrXml += "</ROOT>";
+				useWeb("ImportGuest","Save_CUSTOM",[GlobalXml,"",HdrXml,CompanyLogo]);
+			}
+			public function Ddl_Property_changeHandler():void
+			{
+				if(hlp_Client.selected())
+				{
+					ClientName=hlp_Client.Select_Row.Client;
+					ClientId=hlp_Client.Select_Row.Id;
+					hlp_Client.text=ClientName;
+				}
+				else
+				{
+					hlp_Client.text="";
+				}
+			}
+			
+			public var ImageFormat:String="";
+			public function init():void
+			{
+				ImageFormat=FilePath.text;				
+				uploadURL.url = "http://sstage.in/GuestImport.php?id="+hlp_Client.text+"&pid="+ClientId+"&imgcount="+ImageCount+"&imgformat="+Global_AC[0].UsrId;
+				uploadURL.method = "POST"; // OR "POST" as you need it
+				uploadURL.contentType = "multipart/form-data";				
+				Filedata.addEventListener(MouseEvent.CLICK, browseFiles);
+				uploadbutton.addEventListener(MouseEvent.CLICK,uploadFiles);
+				fileRef.addEventListener(Event.SELECT, selectHandler);
+			}
+			private function browseFiles(event:Event):void
+			{
+				//fileTypes.push(imageTypes);
+				fileTypes.push(documentTypes);
+				fileRef.browse(fileTypes);
 				
 			}
-			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			private function selectHandler(event:Event):void
 			{
-								
+				FilePath.text = event.currentTarget.name.toString();
+				ImageFormat=FilePath.text;	
 			}
-			private function FnSave():void
+			private function uploadFiles():void
 			{
-				ExternalInterface.call("changeDocumentTitle",Str_ChkOut);
+				
+				fileRef.addEventListener(Event.COMPLETE, completeHandler);
+				fileRef.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA,dataHandler);
+				fileRef.addEventListener(SecurityErrorEvent.SECURITY_ERROR,securityErrorHandler);
+				fileRef.addEventListener(HTTPStatusEvent.HTTP_STATUS,httpStatusHandler);
+				fileRef.addEventListener(IOErrorEvent.IO_ERROR,ioErrorHandler);
+				fileRef.upload(uploadURL);
 			}
-		
+			private function completeHandler(event:Event):void
+			{
+				//Alert.show("File Uploaded successfully");
+			}
+			private function dataHandler(event:DataEvent):void
+			{
+				//Alert.show("File Uploaded successfully");
+				var Error:String="";
+				var browserUrl:String = ExternalInterface.call("eval", "window.location.href");
+				var arr:Array =browserUrl.split("/");
+				resultsTxtField.text = event.data.toString();
+				Error=resultsTxtField.text;
+				txt_ImageName.text="http://sstage.in/"+resultsTxtField.text;
+							
+				//useWeb("CompanyMaster","ImageUpload_CUSTOM",[GlobalXml,'IMAGEUPLOAD',"http://sstage.in/Company_Images/"+resultsTxtField.text,0,0,0]);
+			}
+			private function ioErrorHandler(event:IOErrorEvent):void
+			{
+				mx.controls.Alert.show(String(event),"ioError",0);
+			}
+			private function securityErrorHandler(event:SecurityErrorEvent):void
+			{
+				mx.controls.Alert.show(String(event),"Security Error",0);
+			}
+			private function httpStatusHandler(event:HTTPStatusEvent):void
+			{
+				if (event.status != 200)
+				{
+					mx.controls.Alert.show(String(event),"Error",0);
+				}
+			}
+			//Image Download
+			public var PropertyImageId:int=0;			
+			private function init1():void {
+				// Initialize the array collection to an empty collection. 
+				arrColl = new ArrayCollection();
+				
+				// Set up the URL request to download the file specified by the FILE_URL variable. 
+				urlReq = new URLRequest(FILE_URL);
+				
+				// Define file reference object and add a bunch of event listeners. 
+				fileRef = new FileReference();
+				fileRef.addEventListener(Event.CANCEL, doEvent);
+				fileRef.addEventListener(Event.COMPLETE, doEvent);
+				fileRef.addEventListener(Event.OPEN, doEvent);
+				fileRef.addEventListener(Event.SELECT, doEvent);
+				fileRef.addEventListener(HTTPStatusEvent.HTTP_STATUS, doEvent);
+				fileRef.addEventListener(IOErrorEvent.IO_ERROR, doEvent);
+				fileRef.addEventListener(ProgressEvent.PROGRESS, doEvent);
+				fileRef.addEventListener(SecurityErrorEvent.SECURITY_ERROR, doEvent);
+			}
+			
+			private function doEvent(evt:Event):void {
+				
+				FilePath.text="";
+			}
+			
+			private function downloadSourceCodeZip():void 
+			{
+				fileRef.download(urlReq);
+			}
+			
+			private function showAlert(item:Object):void {
+				Alert.show(item.eventString, item.type);
+			}
 		]]>
 	</fx:Script>
-	
-	<s:BorderContainer x="33" y="15" width="100%" height="100%" backgroundColor="#fbf9f9" borderVisible="false" borderWeight="2" cornerRadius="10">
-		<mx:Label x="362" y="99" text="Import Guest Excel" color="red"/>
-		<mx:Label x="302" y="148" text="Click here To Import Excel"/>
-		<mx:Button x="466" y="146" label="Import" click="FnSave()"/>
-	</s:BorderContainer> 
-	
+	<s:VGroup x="0" y="0" width="100%" height="100%" gap="5" horizontalAlign="center" verticalAlign="top">
+		<s:BorderContainer x="37" y="319" width="100%" height="100%" backgroundColor="#fbf9f9"
+						   borderVisible="false">
+			<s:Label x="35" y="28" text="Bank Statement Upload" color="Red"/>
+			<s:Label x="116" y="67" text="ClientName" />
+			<s:HGroup x="0" y="473" width="100%" height="41" horizontalAlign="center">
+				<WrbComp:SaveControl x="193" y="451" id="Save_PettyCash" docSave="Save()"
+									 docClear="PageLoad()" docRefresh="PageLoad()">
+				</WrbComp:SaveControl>
+			</s:HGroup>
+			<WrbHelpComp:HelpText id="hlp_Client" x="197" y="62" width="221" height="22" pxSetColumnsWidth="221,0" 
+								  onselection="{Ddl_Property_changeHandler()}" pxTabIndex="1" depth="5000">
+			</WrbHelpComp:HelpText>
+			<mx:HRule x="0" y="466" width="100%" strokeColor="#eb1c24"/>
+			<s:Scroller x="0" y="190" width="100%" height="250" id="Scr_Grid" visible="true">
+				<s:VGroup width="100%" height="100%">
+			<mx:DataGrid x="0" y="199"  verticalAlign="middle" editable="true" visible="true"
+						 width="100%" height="250" tabIndex="4" id="Grd_Details">
+				<mx:columns>
+				
+					<mx:DataGridColumn dataField="EmpdCode" headerText="EmpdCode" width="75" editable="false" visible="true"/>
+					<mx:DataGridColumn dataField="FirstName" headerText="FirstName" width="100" editable="false"/>
+					<mx:DataGridColumn dataField="LastName" headerText="LastName" width="100" editable="false"/>
+					<mx:DataGridColumn dataField="Grade" headerText="Grade" width="100" editable="false"/>
+					<mx:DataGridColumn dataField="MobileNo" headerText="MobileNo" width="100"  editable="false"/>
+					<mx:DataGridColumn dataField="Email" headerText="Email" width="100" editable="false"/>
+					<mx:DataGridColumn dataField="Designation" headerText="Designation" width="100" editable="false"/>
+					<mx:DataGridColumn dataField="Nationality" headerText="Nationality" width="100" editable="false"/>
+					<mx:DataGridColumn dataField="Column1" headerText="Column1" width="100" editable="false"/>
+					<mx:DataGridColumn dataField="Column2" headerText="Column2" width="100" editable="false" />
+					<mx:DataGridColumn dataField="Column3" headerText="Column3" width="100" editable="false" />
+					<mx:DataGridColumn dataField="Column4" headerText="Column4" width="100" editable="false" />
+					<mx:DataGridColumn dataField="Column5" headerText="Column5" width="100" editable="false"/>
+					<mx:DataGridColumn dataField="Column6" headerText="Column6" width="100" editable="false" />
+					<mx:DataGridColumn dataField="Column7" headerText="Column7" width="100" editable="false" />
+					<mx:DataGridColumn dataField="Column8" headerText="Column8" width="100" editable="false" />
+					<mx:DataGridColumn dataField="Column9" headerText="Column9" width="100" editable="false"/>
+					<mx:DataGridColumn dataField="Column10" headerText="Column10" width="100" editable="false" />
+					
+				</mx:columns>
+			</mx:DataGrid>
+		</s:VGroup>
+		</s:Scroller>
+		</s:BorderContainer>
+	</s:VGroup>
+	<s:BorderContainer x="469" y="40" width="426" height="141" id="Brd_imageUpload" visible="true" borderVisible="true"
+					   backgroundColor="#fbf9f9" cornerRadius="5">
+		<mx:Panel x="27" y="19" title="Excel Uploader">
+			<mx:ControlBar>
+				<mx:Spacer width="80%"/>
+				<mx:HBox>
+					<mx:TextInput id="FilePath" width="150"  visible="true"/>
+					<mx:Button id="Filedata" label="Browse File" name="Filedata" />
+					<mx:Button label="UpLoad File" name="uploadbutton" id="uploadbutton" visible="false" width="0" />
+				</mx:HBox>
+				<mx:TextArea id="resultsTxtField"  width="0"  name="resultsTxtField" visible="false"/>
+			</mx:ControlBar>
+		</mx:Panel>
+		<s:TextInput x="27" y="152" width="189" height="40" id="txt_ImageName" enabled="false" visible="false"/>		
+		
+		<WrbComp:Button_HB x="329" y="152" height="40" _Label="Close" click="{Brd_imageUpload.visible=false;}" visible="false"/>
+		<!--WrbComp:Button_HB id="downloadBtn" x="237" y="152" height="40" _Label="Download"
+		click="downloadSourceCodeZip();"  toolTip="{FILE_URL}" visible="false"/-->
+	</s:BorderContainer>
 </s:Application>

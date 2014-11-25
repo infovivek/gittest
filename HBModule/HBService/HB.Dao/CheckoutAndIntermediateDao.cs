@@ -189,6 +189,7 @@ namespace HB.Dao
             ChkOut.BillFromDate = doc.SelectSingleNode("HdrXml").Attributes["BillFromDate"].Value;
             ChkOut.BillEndDate = doc.SelectSingleNode("HdrXml").Attributes["BillEndDate"].Value;
             ChkOut.Intermediate = doc.SelectSingleNode("HdrXml").Attributes["Intermediate"].Value;
+            ChkOut.Preformainvoice = Convert.ToBoolean(doc.SelectSingleNode("HdrXml").Attributes["Preformainvoice"].Value);
             if (doc.SelectSingleNode("HdrXml").Attributes["STAgreedAmount"].Value == "")
             {
                 ChkOut.STAgreedAmount = 0;
@@ -334,6 +335,7 @@ namespace HB.Dao
             Cmd.Parameters.Add("@BillFromDate", SqlDbType.NVarChar).Value = ChkOut.BillFromDate;
             Cmd.Parameters.Add("@BillEndDate", SqlDbType.NVarChar).Value = ChkOut.BillEndDate;
             Cmd.Parameters.Add("@Intermediate", SqlDbType.NVarChar).Value = ChkOut.Intermediate;
+            Cmd.Parameters.Add("@Preformainvoice", SqlDbType.Bit).Value = ChkOut.Preformainvoice;
             //      Cmd.Parameters.Add("@Flag", SqlDbType.Bit).Value = ChkOut.Flag;
             Cmd.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = user.Id;
             ds = new WrbErpConnection().ExecuteDataSet(Cmd, UserData);

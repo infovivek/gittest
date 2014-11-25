@@ -186,13 +186,13 @@ BEGIN
 		 P.Id,p.City,p.CityId,H.ClientName,H.ClientId,BookingCode,P.Category,ABPA.GuestId
 		 order by H.Id desc 
     --#GRID VALUES 1 FOR TABLE0 
-
+ 
 Insert into #Temps(id,FirstName,clientname,HotalName,
 MobileNo, EmailId,City,CheckinDate,ChkOutDt,ClientId,BookingCode,GuestId )
 
 Select Distinct C.id,ag.FirstName,C.clientname,S.HotalName,
 H.MobileNo, EmailId as Email,S.City,convert(nvarchar(100),Ag.ChkInDt,103) CheckinDate,
-convert(date,Ag.ChkOutDt,103),c.ClientId ,c.BookingCode,Ag.guestid
+convert(nvarchar(100),Ag.ChkOutDt,103),c.ClientId ,c.BookingCode,Ag.guestid
  from wrbhbbooking C
   join  WRBHBBookingPropertyAssingedGuest AG WITH(NOLOCK) ON C.Id= AG.BookingId AND AG.IsActive = 1 and AG.IsDeleted = 0
 join WRBHBStaticHotels S   WITH(NOLOCK) ON Ag.BookingPropertyId = S.HotalId 
@@ -205,7 +205,7 @@ Ag.BookingPropertyId,H.MobileNo, EmailId ,S.City,S.HotalName,Ag.ChkOutDt,aG.cURR
 MobileNo, EmailId,City,CheckinDate,ChkOutDt,ClientId,BookingCode,GuestId)    
       select B.Id ,GuestName as GuestName,B.ClientName as Company ,PropertyName+' - '+B.CityName Property,
       H.MobileNo, EmailId as Email,B.CityName,--H.guestid,F.guestid,
-      Convert(nvarchar(100),ExpDate,103) CheckinDate ,Convert(date,B.CheckoutDate,103) CheckoutDate,
+      Convert(nvarchar(100),ExpDate,103) CheckinDate ,Convert(nvarchar(100),B.CheckoutDate,103) CheckoutDate,
       B.ClientId,B.BookingCode,f.GuestId--F.GuestName,h.fIRSTnAME
       from #ExpChkin F
      LEFT OUTER join WRBHBBookingGuestDetails H on F.BookedId=H.Bookingid AND h.GuestId=F.GuestId
@@ -442,7 +442,7 @@ MobileNo, EmailId,City,CheckinDate,ChkOutDt,ClientId,BookingCode,GuestId )
 			-- between  CONVERT(Nvarchar(100),@FromDt,103) AND CONVERT(Nvarchar(100),@ToDt,103) 
 			  and CONVERT(date,ChkOutDt,103)  --=  CONVERT(date,'4/11/2014',103)
 			 between CONVERT(date,@FromDt,103)  AND CONVERT(date,@ToDt ,103) 
-			--where clientname!=''
+			 and clientname!=''
 			order by BookingCode desc;
 		   
 		Select id,FirstName,clientname as ClientName,HotalName PropertyName,
@@ -461,7 +461,7 @@ MobileNo, EmailId,City,CheckinDate,ChkOutDt,ClientId,BookingCode,GuestId )
 			MobileNo, EmailId,City,CheckinDate,ChkOutDt,ClientId,BookingCode
 			from #Temps  where    CONVERT(date,ChkOutDt,103)  --=  CONVERT(date,'4/11/2014',103)
 			 between CONVERT(date,@FromDt,103)  AND CONVERT(date,@ToDt ,103) 
-			--where clientname!=''
+			 and clientname!=''
 			order by BookingCode desc;
 			
 		Select id,FirstName,clientname as ClientName,HotalName PropertyName,

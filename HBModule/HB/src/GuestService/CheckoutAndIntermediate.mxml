@@ -90,9 +90,9 @@
 //				Str_Serv="http://localhost:6236/GuestCheckOutService.aspx?";
 //				Str_Settle="http://localhost:6236/GuestCheckOutConsolidate.aspx?";
 //				
-//				Str_InChkTar="http://localhost:4171/IntermediateCheckoutTariff.aspx?";
-//				Str_InChkSer="http://localhost:4171/IntermediateCheckoutService.aspx?";
-//				Str_InChkSett="http://localhost:4171/IntermediateCheckoutConsolidate.aspx?";
+//				Str_InChkTar="http://localhost:6236/IntermediateCheckoutTariff.aspx?";
+//				Str_InChkSer="http://localhost:6236/IntermediateCheckoutService.aspx?";
+//				Str_InChkSett="http://localhost:6236/IntermediateCheckoutConsolidate.aspx?";
 				
 				
 //				Str_ChkOut="http://warsoft.in/HBReport/GuestCheckOutTariff.aspx?";
@@ -142,6 +142,7 @@
 				lbl_Billto.visible=true;
 				DT_BillFromDate.enabled=false;
 				DT_BillTo.enabled=false;
+				Chk_PIInvoice.visible=false
 				
 			}
 			
@@ -151,8 +152,8 @@
 			protected function Help():void
 			{				
 				
-	//			useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId,0]);
-			 	useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65,0]);
+				useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId,0]);
+	//		 	useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65,0]);
 				Txt_ServiceBillAmt.editable=false;
 				Txt_ServiceVat.editable=false;
 				Txt_SerivceTax.editable=false;
@@ -434,6 +435,31 @@
 						}
 						
 					}
+					if(Ds_Objects.result.Tables.Table5.Rows.length > 0)
+					{
+						if(Ds_Objects.result.Tables.Table5.Rows[0].IntermediateFlag==1 )
+						{
+							Checkout.selected=false;
+							Checkout.enabled=false;
+							Intermediate.selected=true;
+							Intermediate.enabled=true;
+//							if(Checkout.selected==true)
+//							{
+//								alignAlert(Alert.show("Please Settlement for the Intermediate Bill","Alert Message !",
+//									Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+//								
+//								return;
+//								Intermediate.enabled=true;
+//								Intermediate.selected=true;
+//								Checkout.selected=false;
+//								Checkout.enabled=false;
+//							}
+//							else if(Intermediate.selected==true)
+//							{
+//								Intermediate.enabled=true;
+//							}
+						}
+					}
 					
 				}
 				
@@ -623,7 +649,12 @@
 						//						}
 						if(Ds_Objects.result.Tables.Table8.Rows[0].Id2==0 )
 						{
-							useWeb("CheckOutServiceHdr","TariffLoad_CUSTOM",[GlobalXml,"ProductLoad",CheckInHdrId,GuestId,StateId,0,0,0]);
+							var BillFrom:String="";
+							var BillTo:String="";
+							BillFrom=DT_BillFromDate.text;
+							BillTo=DT_BillTo.text;
+							
+							useWeb("CheckOutServiceHdr","TariffLoad_CUSTOM",[GlobalXml,"ProductLoad",CheckInHdrId,GuestId,StateId,BillFrom,BillTo,0]);
 							
 							
 						}
@@ -1194,6 +1225,23 @@
 							Txt_NetAmount.text=NF_Two.format(Number(total*NoOfdays))
 						} 
 					}
+//					if(Ds_Objects.result.Tables.Table16.Rows.length > 0)
+//					{
+//						if(Ds_Objects.result.Tables.Table16.Rows[0].IntermediateFlag==1 )
+//						{
+//							if(Checkout.selected==true)
+//							{
+//								alignAlert(Alert.show("Please Settlement for the Intermediate Bill","Alert Message !",
+//									Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+//								
+//								return;
+//							}
+//							else if(Intermediate.selected==true)
+//							{
+//								Intermediate.enabled=true;
+//							}
+//						}
+//					}
 					
 				}
 				//F1(First)-- Tariff
@@ -1203,26 +1251,72 @@
 					{
 						if(Intermediate.selected==true)
 						{
-							PrintChkOutId=0;
-							if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+							if(Chk_PIInvoice.selected == true)
 							{
-								PrintChkOutId=Ds_Objects.result.Tables.Table.Rows[0].Id;
-								ExternalInterface.call("changeDocumentTitle",Str_InChkTar+PrintChkOutId);
-								//						alignAlert(Alert.show("Check Out Successfully.","Message !",Alert.OK,
-								//							null, FnOk,	iconTickLarge, Alert.OK),10,"");
+								PrintChkOutId=0;
+								if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+								{
+									PrintChkOutId=Ds_Objects.result.Tables.Table.Rows[0].Id;
+									ExternalInterface.call("changeDocumentTitle",Str_InChkTar+PrintChkOutId);
+									//						alignAlert(Alert.show("Check Out Successfully.","Message !",Alert.OK,
+									//							null, FnOk,	iconTickLarge, Alert.OK),10,"");
+								}
+								else
+								{
+									alignAlert(Alert.show("Guest Checked Out Successfully.","Message !",Alert.OK,
+										null, FnOk,	iconTickLarge, Alert.OK),10,"");
+								}
+								//	PageLoad();
+								btn_Tariff.enabled=false;
+								btn_Service.enabled=true;
+								Btn_Settlement.enabled=true;
+								Btn_ServiceGenerate.enabled=true;
+								FnClear();
+								btn_Service_clickHandler();
 							}
 							else
 							{
-								alignAlert(Alert.show("Guest Checked Out Successfully.","Message !",Alert.OK,
-									null, FnOk,	iconTickLarge, Alert.OK),10,"");
+								if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+								{
+									PrintChkOutId=Ds_Objects.result.Tables.Table.Rows[0].Id;
+					//				ExternalInterface.call("changeDocumentTitle",Str_InChkTar+PrintChkOutId);
+									ExternalInterface.call("changeDocumentTitle",Str_ChkOut+PrintChkOutId);
+									//						alignAlert(Alert.show("Check Out Successfully.","Message !",Alert.OK,
+									//							null, FnOk,	iconTickLarge, Alert.OK),10,"");
+								}
+								else
+								{
+									alignAlert(Alert.show("Guest Checked Out Successfully.","Message !",Alert.OK,
+										null, FnOk,	iconTickLarge, Alert.OK),10,"");
+								}
+								//	PageLoad();
+								btn_Tariff.enabled=false;
+								btn_Service.enabled=true;
+								Btn_Settlement.enabled=true;
+								Btn_ServiceGenerate.enabled=true;
+								FnClear();
+								btn_Service_clickHandler();
 							}
-							//	PageLoad();
-							btn_Tariff.enabled=false;
-							btn_Service.enabled=true;
-							Btn_Settlement.enabled=true;
-							Btn_ServiceGenerate.enabled=true;
-							FnClear();
-							btn_Service_clickHandler();
+//							PrintChkOutId=0;
+//							if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+//							{
+//								PrintChkOutId=Ds_Objects.result.Tables.Table.Rows[0].Id;
+//								ExternalInterface.call("changeDocumentTitle",Str_InChkTar+PrintChkOutId);
+//								//						alignAlert(Alert.show("Check Out Successfully.","Message !",Alert.OK,
+//								//							null, FnOk,	iconTickLarge, Alert.OK),10,"");
+//							}
+//							else
+//							{
+//								alignAlert(Alert.show("Guest Checked Out Successfully.","Message !",Alert.OK,
+//									null, FnOk,	iconTickLarge, Alert.OK),10,"");
+//							}
+//							//	PageLoad();
+//							btn_Tariff.enabled=false;
+//							btn_Service.enabled=true;
+//							Btn_Settlement.enabled=true;
+//							Btn_ServiceGenerate.enabled=true;
+//							FnClear();
+//							btn_Service_clickHandler();
 						}
 						else
 						{
@@ -1258,7 +1352,7 @@
 							if (Ds_Objects.result.Tables.Table.Rows.length > 0)
 							{
 								PrintChkOutId=Ds_Objects.result.Tables.Table.Rows[0].Id;
-								ExternalInterface.call("changeDocumentTitle",Str_InChkSer+PrintChkOutId);
+								ExternalInterface.call("changeDocumentTitle",Str_Serv+PrintChkOutId);
 							}
 							else
 							{
@@ -1386,6 +1480,10 @@
 							{
 								alignAlert(Alert.show("Payment Added Successfully.","Message !",
 									Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+							// just showing display paid amount
+								lbl_tariffpaid.text=Txt_TariffPayAmount.text
+								lbl_tariffpaymode.text='Cash'
+									
 							}
 							else
 							{
@@ -1418,6 +1516,9 @@
 							{
 								alignAlert(Alert.show("Payment Added Successfully.","Message !",
 									Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+								// just showing display paid amount
+								lbl_tariffpaid.text=Txt_TariffPayAmount.text
+								lbl_tariffpaymode.text='Card'
 							}
 							else
 							{
@@ -1448,6 +1549,10 @@
 							{
 								alignAlert(Alert.show("Payment Added Successfully.","Message !",
 									Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+								
+								// just showing display paid amount
+								lbl_tariffpaid.text=Txt_TariffPayAmount.text
+								lbl_tariffpaymode.text='Cheque'
 							}
 							else
 							{
@@ -1484,6 +1589,10 @@
 							{
 								alignAlert(Alert.show("Company Invoice Added Successfully.","Message !",
 									Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+								
+								// just showing display paid amount
+								lbl_tariffpaid.text=Txt_TariffPayAmount.text
+								lbl_tariffpaymode.text='CompanyInvoice'
 							}
 							else
 							{
@@ -1515,6 +1624,9 @@
 							{
 								alignAlert(Alert.show("Payment Added Successfully.","Message !",
 									Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+								// just showing display paid amount
+								lbl_tariffpaid.text=Txt_TariffPayAmount.text
+								lbl_tariffpaymode.text='NEFT'
 							}
 								
 							else
@@ -1550,6 +1662,10 @@
 							{
 								alignAlert(Alert.show("Payment Added Successfully.","Message !",
 									Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+								
+								// just showing display paid amount
+								lbl_ServicePaid.text=Txt_ServicePayAmount.text
+								lbl_ServicePayMode.text='Cash'
 							}
 							else
 							{
@@ -1581,6 +1697,10 @@
 							{
 								alignAlert(Alert.show("Payment Added Successfully.","Message !",
 									Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+								
+								// just showing display paid amount
+								lbl_ServicePaid.text=Txt_ServicePayAmount.text
+								lbl_ServicePayMode.text='Card'
 							}
 							else
 							{
@@ -1612,6 +1732,10 @@
 							{
 								alignAlert(Alert.show("Payment Added Successfully.","Message !",
 									Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+								
+								// just showing display paid amount
+								lbl_ServicePaid.text=Txt_ServicePayAmount.text
+								lbl_ServicePayMode.text='Cheque'
 							}
 							else
 							{
@@ -1648,6 +1772,10 @@
 							{
 								alignAlert(Alert.show("Company Invoice Added Successfully.","Message !",
 									Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+								
+								// just showing display paid amount
+								lbl_ServicePaid.text=Txt_ServicePayAmount.text
+								lbl_ServicePayMode.text='CompanyInvoice'
 							}
 							else
 							{
@@ -1678,6 +1806,10 @@
 							{
 								alignAlert(Alert.show("Payment Added Successfully.","Message !",
 									Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+								
+								// just showing display paid amount
+								lbl_ServicePaid.text=Txt_ServicePayAmount.text
+								lbl_ServicePayMode.text='NEFT'
 							}
 								
 							else
@@ -1712,6 +1844,11 @@
 							{
 								alignAlert(Alert.show("Payment Added Successfully.","Message !",
 									Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+								
+								// just showing display paid amount
+								lbl_ConPaid.text=Txt_ConsolidatePayment.text
+								lbl_ConPaymode.text='Cash'
+								
 							}
 							else
 							{
@@ -1743,6 +1880,10 @@
 							{
 								alignAlert(Alert.show("Payment Added Successfully.","Message !",
 									Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+								
+								// just showing display paid amount
+								lbl_ConPaid.text=Txt_ConsolidatePayment.text
+								lbl_ConPaymode.text='Card'
 							}
 							else
 							{
@@ -1773,6 +1914,10 @@
 							{
 								alignAlert(Alert.show("Payment Added Successfully.","Message !",
 									Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+								
+								// just showing display paid amount
+								lbl_ConPaid.text=Txt_ConsolidatePayment.text
+								lbl_ConPaymode.text='Cheque'
 							}
 							else
 							{
@@ -1809,6 +1954,10 @@
 							{
 								alignAlert(Alert.show("Company Invoice Added Successfully.","Message !",
 									Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+								
+								// just showing display paid amount
+								lbl_ConPaid.text=Txt_ConsolidatePayment.text
+								lbl_ConPaymode.text='CompanyInvoice'
 							}
 							else
 							{
@@ -1840,6 +1989,10 @@
 							{
 								alignAlert(Alert.show("Payment Added Successfully.","Message !",
 									Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+								
+								// just showing display paid amount
+								lbl_ConPaid.text=Txt_ConsolidatePayment.text
+								lbl_ConPaymode.text='NEFT'
 							}
 								
 							else
@@ -2590,7 +2743,7 @@
 						
 						Laundry_BST=TT2.replace(",","");
 						
-						var Tax:Number=Number(Laundry_SerivceTax)+Number(Laundry_BST);							
+						var Tax:Number=Number(0)+Number(Laundry_BST);							
 						
 						var CS:String=NF_Two.format(Tax*Cess/100);
 						
@@ -2600,7 +2753,7 @@
 						
 						Laundry_serviceHECess=HCS.replace(",","");
 						
-						var Tmp:Number=Number(Laundry_ServiceBillAmt)+Number(Laundry_ServiceVat)+Number(Laundry_SerivceTax)+
+						var Tmp:Number=Number(Laundry_ServiceBillAmt)+Number(Laundry_ServiceVat)+Number(0)+
 							Number(Laundry_ServiceEcess)+Number(Laundry_serviceHECess)+Number(Laundry_BST);
 						
 						Laundry_ServiceNetAmount=NF_Two.format(Math.round(Tmp));	
@@ -2710,65 +2863,131 @@
 				}
 				else if(Intermediate.selected == true)
 				{
-					F1="First";
-					var ErrStr:String="";var Flag:Boolean=true;
-					if(hlp_property.text=="")
+					if(Chk_PIInvoice.selected == true)
 					{
-						if(Flag==true)
+						F1="First";
+						var ErrStr:String="";var Flag:Boolean=true;
+						if(hlp_property.text=="")
 						{
-							hlp_property.setFocus();Flag=false;
+							if(Flag==true)
+							{
+								hlp_property.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"* Property Name is Required.\n";					
 						}
-						ErrStr=ErrStr+"* Property Name is Required.\n";					
-					}
-					if(hlp_GuestName.text=="")
-					{
-						if(Flag==true)
+						if(hlp_GuestName.text=="")
 						{
-							hlp_GuestName.setFocus();Flag=false;
+							if(Flag==true)
+							{
+								hlp_GuestName.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*  Guest Name is Required.\n";					
 						}
-						ErrStr=ErrStr+"*  Guest Name is Required.\n";					
+						
+						if(ErrStr!="")
+						{
+							alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
+							return;					
+						}
+						
+						if( Mode1=="Direct1")
+						{
+							Direct.selected=true;
+							
+							
+						}
+						else if(Mode1=="Bill to Company (BTC)")
+						{
+							BTC.selected=true;
+							CompanyInvoice.enabled=true;
+							Cash.enabled=false;
+							CreditCard.enabled=false;
+							Cheque.enabled=false;
+							NEFT.enabled=false;
+							
+						}
+						else if(Mode1="Bill to Client")
+						{
+							BTC.selected=true;
+							CompanyInvoice.enabled=true;
+							Cash.enabled=false;
+							CreditCard.enabled=false;
+							Cheque.enabled=false;
+							NEFT.enabled=false;
+						}
+						
+						if(Id == 0)
+						{ 
+							//		useWeb("GuestCheckOut","Save_CUSTOM",[GlobalXml,HdrXml]);
+							alignAlert(Alert.show("Do you want Generate Tariff Proforma Invoice ?", "Warning",Alert.YES | Alert.NO, null,
+								FnUpdate, iconWarning, Alert.NO),10,"");
+							btn_Service.enabled=true;
+							Btn_Settlement.enabled=true;
+						}
+					}
+					else
+					{
+						F1="First";
+						var ErrStr:String="";var Flag:Boolean=true;
+						if(hlp_property.text=="")
+						{
+							if(Flag==true)
+							{
+								hlp_property.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"* Property Name is Required.\n";					
+						}
+						if(hlp_GuestName.text=="")
+						{
+							if(Flag==true)
+							{
+								hlp_GuestName.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*  Guest Name is Required.\n";					
+						}
+						
+						if(ErrStr!="")
+						{
+							alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
+							return;					
+						}
+						
+						if( Mode1=="Direct1")
+						{
+							Direct.selected=true;
+							
+							
+						}
+						else if(Mode1=="Bill to Company (BTC)")
+						{
+							BTC.selected=true;
+							CompanyInvoice.enabled=true;
+							Cash.enabled=false;
+							CreditCard.enabled=false;
+							Cheque.enabled=false;
+							NEFT.enabled=false;
+							
+						}
+						else if(Mode1="Bill to Client")
+						{
+							BTC.selected=true;
+							CompanyInvoice.enabled=true;
+							Cash.enabled=false;
+							CreditCard.enabled=false;
+							Cheque.enabled=false;
+							NEFT.enabled=false;
+						}
+						
+						if(Id == 0)
+						{ 
+							//		useWeb("GuestCheckOut","Save_CUSTOM",[GlobalXml,HdrXml]);
+							alignAlert(Alert.show("Do you want Generate Tariff Invoice ?", "Warning",Alert.YES | Alert.NO, null,
+								FnUpdate, iconWarning, Alert.NO),10,"");
+							btn_Service.enabled=true;
+							Btn_Settlement.enabled=true;
+						}
 					}
 					
-					if(ErrStr!="")
-					{
-						alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
-						return;					
-					}
-					
-					if( Mode1=="Direct1")
-					{
-						Direct.selected=true;
-						
-						
-					}
-					else if(Mode1=="Bill to Company (BTC)")
-					{
-						BTC.selected=true;
-						CompanyInvoice.enabled=true;
-						Cash.enabled=false;
-						CreditCard.enabled=false;
-						Cheque.enabled=false;
-						NEFT.enabled=false;
-						
-					}
-					else if(Mode1="Bill to Client")
-					{
-						BTC.selected=true;
-						CompanyInvoice.enabled=true;
-						Cash.enabled=false;
-						CreditCard.enabled=false;
-						Cheque.enabled=false;
-						NEFT.enabled=false;
-					}
-					
-					if(Id == 0)
-					{ 
-						//		useWeb("GuestCheckOut","Save_CUSTOM",[GlobalXml,HdrXml]);
-						alignAlert(Alert.show("Do you want Generate Tariff Invoice ?", "Warning",Alert.YES | Alert.NO, null,
-							FnUpdate, iconWarning, Alert.NO),10,"");
-						btn_Service.enabled=true;
-						Btn_Settlement.enabled=true;
-					}
 				}
 				
 				
@@ -2807,7 +3026,8 @@
 									InVoiceNo:Txt_ChkoutInvoice.text,LT:lbl_tarffLT.text,ST:lbl_TariffST.text,
 									VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 									ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk,
-									BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:""
+									BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"",
+									Preformainvoice:Chk_PIInvoice.selected
 									//Flag:Flag1
 								}]);
 							var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
@@ -2816,6 +3036,7 @@
 					}
 					else if(Mode1=="Bill to Company (BTC)")
 					{
+						
 						if ((event.detail==Alert.YES)) 
 						{
 							var Ac_Hdr:ArrayCollection=new ArrayCollection
@@ -2841,7 +3062,8 @@
 									InVoiceNo:Txt_ChkoutInvoice.text,LT:lbl_tarffLT.text,ST:lbl_TariffST.text,
 									VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 									ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk,
-									BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:""
+									BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"",
+									Preformainvoice:Chk_PIInvoice.selected
 									//Flag:Flag1
 								}]);
 							var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
@@ -2876,7 +3098,8 @@
 									InVoiceNo:Txt_ChkoutInvoice.text,LT:lbl_tarffLT.text,ST:lbl_TariffST.text,
 									VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 									ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk,
-									BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:""
+									BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"",
+									Preformainvoice:Chk_PIInvoice.selected
 									//Flag:Flag1
 								}]);
 							var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
@@ -2886,109 +3109,226 @@
 				}
 				else if(Intermediate.selected == true)
 				{
-					if( Mode1=="Direct1")
+					if(Chk_PIInvoice.selected==true)
 					{
-						if ((event.detail==Alert.YES)) 
+						if( Mode1=="Direct1")
 						{
-							var Ac_Hdr:ArrayCollection=new ArrayCollection
-								([{
-									CheckOutNo:Txt_ChkoutNo.text,GuestName:hlp_GuestName.text,Stay:Txt_Stay.text,
-									Type:Txt_type.text,BookingLevel:Txt_bookinlevel.text,BillDate:DT_CheckOutDate.text,
-									ClientName:Txt_Client.text,Property:Txt_Property.text,TotalTariff:Txt_TotalTariff.text,
-									NetAmount:Txt_NetAmount.text,AdditionalCharge:Txt_AdditionalCharge.text,Discountperday:Txt_Discount.text,
-									TotalDiscount:Txt_Totaldiscount.text,LuxuryTax:Txt_Luxury.text,
-									SerivceTax:Txt_ServiceTax12.text,SerivceNet:Txt_ServiceTax7.text,
-									ServiceCharge:Txt_ServiceCharge2.text,ServiceTaxService:Txt_Servicecharge12.text,
-									Cess:Txt_Cess.text,HECess:Txt_HECess.text,
-									NetAmount:Txt_NetAmount.text,Referance:Txt_referance.text,
-									ExtraDays:txt_itemdays.text,ExtraAmount:lbl_ExtraMatress.text,
-									ExtraType:ddl_Items.selectedItem,
-									Id:Id,ChkInHdrId:CheckInHdrId,Name:Txt_Name.text,NoOfDays:lbl_tariff.text,
-									CheckInType:Txt_CheckInType.text,ApartmentNo:Txt_Apartment.text,
-									BedNo:Txt_Bed.text,ApartmentId:ApartmentId,BedId:BedId,RoomId:RoomId,BookingId:BookingId,
-									PropertyId:PropertyId,GuestId:GuestId,StateId:StateId,
-									Direct:Direct1,BTC:"",PropertyType:Txt_PropertyType.text,
-									STAgreedAmount:0.00,LTAgreedAmount:0.00,STRackAmount:0.00,LTRackAmount:0.00,
-									Status:"UnSettled",CheckOutDate:DT_CheckOutDate.text,CheckInDate:Txt_CheckInDate.text,
-									InVoiceNo:Txt_ChkoutInvoice.text,LT:lbl_tarffLT.text,ST:lbl_TariffST.text,
-									VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
-									ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk,
-									BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate"
-									//Flag:Flag1
-								}]);
-							var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
-							useWeb("CheckoutAndIntermediate","Save_CUSTOM",[GlobalXml,HdrXml]);
+							if ((event.detail==Alert.YES)) 
+							{
+								var Ac_Hdr:ArrayCollection=new ArrayCollection
+									([{
+										CheckOutNo:Txt_ChkoutNo.text,GuestName:hlp_GuestName.text,Stay:Txt_Stay.text,
+										Type:Txt_type.text,BookingLevel:Txt_bookinlevel.text,BillDate:DT_CheckOutDate.text,
+										ClientName:Txt_Client.text,Property:Txt_Property.text,TotalTariff:Txt_TotalTariff.text,
+										NetAmount:Txt_NetAmount.text,AdditionalCharge:Txt_AdditionalCharge.text,Discountperday:Txt_Discount.text,
+										TotalDiscount:Txt_Totaldiscount.text,LuxuryTax:Txt_Luxury.text,
+										SerivceTax:Txt_ServiceTax12.text,SerivceNet:Txt_ServiceTax7.text,
+										ServiceCharge:Txt_ServiceCharge2.text,ServiceTaxService:Txt_Servicecharge12.text,
+										Cess:Txt_Cess.text,HECess:Txt_HECess.text,
+										NetAmount:Txt_NetAmount.text,Referance:Txt_referance.text,
+										ExtraDays:txt_itemdays.text,ExtraAmount:lbl_ExtraMatress.text,
+										ExtraType:ddl_Items.selectedItem,
+										Id:Id,ChkInHdrId:CheckInHdrId,Name:Txt_Name.text,NoOfDays:lbl_tariff.text,
+										CheckInType:Txt_CheckInType.text,ApartmentNo:Txt_Apartment.text,
+										BedNo:Txt_Bed.text,ApartmentId:ApartmentId,BedId:BedId,RoomId:RoomId,BookingId:BookingId,
+										PropertyId:PropertyId,GuestId:GuestId,StateId:StateId,
+										Direct:Direct1,BTC:"",PropertyType:Txt_PropertyType.text,
+										STAgreedAmount:0.00,LTAgreedAmount:0.00,STRackAmount:0.00,LTRackAmount:0.00,
+										Status:"UnSettled",CheckOutDate:DT_CheckOutDate.text,CheckInDate:Txt_CheckInDate.text,
+										InVoiceNo:Txt_ChkoutInvoice.text,LT:lbl_tarffLT.text,ST:lbl_TariffST.text,
+										VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
+										ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk,
+										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate",
+										Preformainvoice:Chk_PIInvoice.selected
+										//Flag:Flag1
+									}]);
+								var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
+								useWeb("CheckoutAndIntermediate","Save_CUSTOM",[GlobalXml,HdrXml]);
+							}
+						}
+						else if(Mode1=="Bill to Company (BTC)")
+						{
+							if ((event.detail==Alert.YES)) 
+							{
+								var Ac_Hdr:ArrayCollection=new ArrayCollection
+									([{
+										CheckOutNo:Txt_ChkoutNo.text,GuestName:hlp_GuestName.text,Stay:Txt_Stay.text,
+										Type:Txt_type.text,BookingLevel:Txt_bookinlevel.text,BillDate:DT_CheckOutDate.text,
+										ClientName:Txt_Client.text,Property:Txt_Property.text,TotalTariff:Txt_TotalTariff.text,
+										NetAmount:Txt_NetAmount.text,AdditionalCharge:Txt_AdditionalCharge.text,Discountperday:Txt_Discount.text,
+										TotalDiscount:Txt_Totaldiscount.text,LuxuryTax:Txt_Luxury.text,
+										SerivceTax:Txt_ServiceTax12.text,SerivceNet:Txt_ServiceTax7.text,
+										ServiceCharge:Txt_ServiceCharge2.text,ServiceTaxService:Txt_Servicecharge12.text,
+										Cess:Txt_Cess.text,HECess:Txt_HECess.text,
+										NetAmount:Txt_NetAmount.text,Referance:Txt_referance.text,
+										ExtraDays:txt_itemdays.text,ExtraAmount:lbl_ExtraMatress.text,
+										ExtraType:ddl_Items.selectedItem,
+										Id:Id,ChkInHdrId:CheckInHdrId,Name:Txt_Name.text,NoOfDays:lbl_tariff.text,
+										CheckInType:Txt_CheckInType.text,ApartmentNo:Txt_Apartment.text,
+										BedNo:Txt_Bed.text,ApartmentId:ApartmentId,BedId:BedId,RoomId:RoomId,BookingId:BookingId,
+										PropertyId:PropertyId,GuestId:GuestId,StateId:StateId,
+										Direct:"",BTC:BTC1,PropertyType:Txt_PropertyType.text,
+										STAgreedAmount:0.00,LTAgreedAmount:0.00,STRackAmount:0.00,LTRackAmount:0.00,
+										Status:"UnSettled",CheckOutDate:DT_CheckOutDate.text,CheckInDate:Txt_CheckInDate.text,
+										InVoiceNo:Txt_ChkoutInvoice.text,LT:lbl_tarffLT.text,ST:lbl_TariffST.text,
+										VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
+										ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk,
+										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate",
+										Preformainvoice:Chk_PIInvoice.selected
+										//Flag:Flag1
+									}]);
+								var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
+								useWeb("CheckoutAndIntermediate","Save_CUSTOM",[GlobalXml,HdrXml]);
+							}
+						}
+							
+						else if(Mode1="Bill to Client")
+						{
+							if ((event.detail==Alert.YES)) 
+							{
+								var Ac_Hdr:ArrayCollection=new ArrayCollection
+									([{
+										CheckOutNo:Txt_ChkoutNo.text,GuestName:hlp_GuestName.text,Stay:Txt_Stay.text,
+										Type:Txt_type.text,BookingLevel:Txt_bookinlevel.text,BillDate:DT_CheckOutDate.text,
+										ClientName:Txt_Client.text,Property:Txt_Property.text,TotalTariff:Txt_TotalTariff.text,
+										NetAmount:Txt_NetAmount.text,AdditionalCharge:Txt_AdditionalCharge.text,Discountperday:Txt_Discount.text,
+										TotalDiscount:Txt_Totaldiscount.text,LuxuryTax:Txt_Luxury.text,
+										SerivceTax:Txt_ServiceTax12.text,SerivceNet:Txt_ServiceTax7.text,
+										ServiceCharge:Txt_ServiceCharge2.text,ServiceTaxService:Txt_Servicecharge12.text,
+										Cess:Txt_Cess.text,HECess:Txt_HECess.text,
+										NetAmount:Txt_NetAmount.text,Referance:Txt_referance.text,
+										ExtraDays:txt_itemdays.text,ExtraAmount:lbl_ExtraMatress.text,
+										ExtraType:ddl_Items.selectedItem,
+										Id:Id,ChkInHdrId:CheckInHdrId,Name:Txt_Name.text,NoOfDays:lbl_tariff.text,
+										CheckInType:Txt_CheckInType.text,ApartmentNo:Txt_Apartment.text,
+										BedNo:Txt_Bed.text,ApartmentId:ApartmentId,BedId:BedId,RoomId:RoomId,BookingId:BookingId,
+										PropertyId:PropertyId,GuestId:GuestId,StateId:StateId,
+										Direct:"",BTC:BTC1,PropertyType:Txt_PropertyType.text,
+										STAgreedAmount:0.00,LTAgreedAmount:0.00,STRackAmount:0.00,LTRackAmount:0.00,
+										Status:"UnSettled",CheckOutDate:DT_CheckOutDate.text,CheckInDate:Txt_CheckInDate.text,
+										InVoiceNo:Txt_ChkoutInvoice.text,LT:lbl_tarffLT.text,ST:lbl_TariffST.text,
+										VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
+										ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk,
+										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate",
+										Preformainvoice:Chk_PIInvoice.selected
+										//Flag:Flag1
+									}]);
+								var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
+								useWeb("CheckoutAndIntermediate","Save_CUSTOM",[GlobalXml,HdrXml]);
+							}
 						}
 					}
-					else if(Mode1=="Bill to Company (BTC)")
+					else
 					{
-						if ((event.detail==Alert.YES)) 
-						{
-							var Ac_Hdr:ArrayCollection=new ArrayCollection
-								([{
-									CheckOutNo:Txt_ChkoutNo.text,GuestName:hlp_GuestName.text,Stay:Txt_Stay.text,
-									Type:Txt_type.text,BookingLevel:Txt_bookinlevel.text,BillDate:DT_CheckOutDate.text,
-									ClientName:Txt_Client.text,Property:Txt_Property.text,TotalTariff:Txt_TotalTariff.text,
-									NetAmount:Txt_NetAmount.text,AdditionalCharge:Txt_AdditionalCharge.text,Discountperday:Txt_Discount.text,
-									TotalDiscount:Txt_Totaldiscount.text,LuxuryTax:Txt_Luxury.text,
-									SerivceTax:Txt_ServiceTax12.text,SerivceNet:Txt_ServiceTax7.text,
-									ServiceCharge:Txt_ServiceCharge2.text,ServiceTaxService:Txt_Servicecharge12.text,
-									Cess:Txt_Cess.text,HECess:Txt_HECess.text,
-									NetAmount:Txt_NetAmount.text,Referance:Txt_referance.text,
-									ExtraDays:txt_itemdays.text,ExtraAmount:lbl_ExtraMatress.text,
-									ExtraType:ddl_Items.selectedItem,
-									Id:Id,ChkInHdrId:CheckInHdrId,Name:Txt_Name.text,NoOfDays:lbl_tariff.text,
-									CheckInType:Txt_CheckInType.text,ApartmentNo:Txt_Apartment.text,
-									BedNo:Txt_Bed.text,ApartmentId:ApartmentId,BedId:BedId,RoomId:RoomId,BookingId:BookingId,
-									PropertyId:PropertyId,GuestId:GuestId,StateId:StateId,
-									Direct:"",BTC:BTC1,PropertyType:Txt_PropertyType.text,
-									STAgreedAmount:0.00,LTAgreedAmount:0.00,STRackAmount:0.00,LTRackAmount:0.00,
-									Status:"UnSettled",CheckOutDate:DT_CheckOutDate.text,CheckInDate:Txt_CheckInDate.text,
-									InVoiceNo:Txt_ChkoutInvoice.text,LT:lbl_tarffLT.text,ST:lbl_TariffST.text,
-									VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
-									ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk,
-									BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate"
-									//Flag:Flag1
-								}]);
-							var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
-							useWeb("CheckoutAndIntermediate","Save_CUSTOM",[GlobalXml,HdrXml]);
-						}
-					}
 						
-					else if(Mode1="Bill to Client")
-					{
-						if ((event.detail==Alert.YES)) 
+						if( Mode1=="Direct1")
 						{
-							var Ac_Hdr:ArrayCollection=new ArrayCollection
-								([{
-									CheckOutNo:Txt_ChkoutNo.text,GuestName:hlp_GuestName.text,Stay:Txt_Stay.text,
-									Type:Txt_type.text,BookingLevel:Txt_bookinlevel.text,BillDate:DT_CheckOutDate.text,
-									ClientName:Txt_Client.text,Property:Txt_Property.text,TotalTariff:Txt_TotalTariff.text,
-									NetAmount:Txt_NetAmount.text,AdditionalCharge:Txt_AdditionalCharge.text,Discountperday:Txt_Discount.text,
-									TotalDiscount:Txt_Totaldiscount.text,LuxuryTax:Txt_Luxury.text,
-									SerivceTax:Txt_ServiceTax12.text,SerivceNet:Txt_ServiceTax7.text,
-									ServiceCharge:Txt_ServiceCharge2.text,ServiceTaxService:Txt_Servicecharge12.text,
-									Cess:Txt_Cess.text,HECess:Txt_HECess.text,
-									NetAmount:Txt_NetAmount.text,Referance:Txt_referance.text,
-									ExtraDays:txt_itemdays.text,ExtraAmount:lbl_ExtraMatress.text,
-									ExtraType:ddl_Items.selectedItem,
-									Id:Id,ChkInHdrId:CheckInHdrId,Name:Txt_Name.text,NoOfDays:lbl_tariff.text,
-									CheckInType:Txt_CheckInType.text,ApartmentNo:Txt_Apartment.text,
-									BedNo:Txt_Bed.text,ApartmentId:ApartmentId,BedId:BedId,RoomId:RoomId,BookingId:BookingId,
-									PropertyId:PropertyId,GuestId:GuestId,StateId:StateId,
-									Direct:"",BTC:BTC1,PropertyType:Txt_PropertyType.text,
-									STAgreedAmount:0.00,LTAgreedAmount:0.00,STRackAmount:0.00,LTRackAmount:0.00,
-									Status:"UnSettled",CheckOutDate:DT_CheckOutDate.text,CheckInDate:Txt_CheckInDate.text,
-									InVoiceNo:Txt_ChkoutInvoice.text,LT:lbl_tarffLT.text,ST:lbl_TariffST.text,
-									VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
-									ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk,
-									BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate"
-									//Flag:Flag1
-								}]);
-							var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
-							useWeb("CheckoutAndIntermediate","Save_CUSTOM",[GlobalXml,HdrXml]);
+							if ((event.detail==Alert.YES)) 
+							{
+								var Ac_Hdr:ArrayCollection=new ArrayCollection
+									([{
+										CheckOutNo:Txt_ChkoutNo.text,GuestName:hlp_GuestName.text,Stay:Txt_Stay.text,
+										Type:Txt_type.text,BookingLevel:Txt_bookinlevel.text,BillDate:DT_CheckOutDate.text,
+										ClientName:Txt_Client.text,Property:Txt_Property.text,TotalTariff:Txt_TotalTariff.text,
+										NetAmount:Txt_NetAmount.text,AdditionalCharge:Txt_AdditionalCharge.text,Discountperday:Txt_Discount.text,
+										TotalDiscount:Txt_Totaldiscount.text,LuxuryTax:Txt_Luxury.text,
+										SerivceTax:Txt_ServiceTax12.text,SerivceNet:Txt_ServiceTax7.text,
+										ServiceCharge:Txt_ServiceCharge2.text,ServiceTaxService:Txt_Servicecharge12.text,
+										Cess:Txt_Cess.text,HECess:Txt_HECess.text,
+										NetAmount:Txt_NetAmount.text,Referance:Txt_referance.text,
+										ExtraDays:txt_itemdays.text,ExtraAmount:lbl_ExtraMatress.text,
+										ExtraType:ddl_Items.selectedItem,
+										Id:Id,ChkInHdrId:CheckInHdrId,Name:Txt_Name.text,NoOfDays:lbl_tariff.text,
+										CheckInType:Txt_CheckInType.text,ApartmentNo:Txt_Apartment.text,
+										BedNo:Txt_Bed.text,ApartmentId:ApartmentId,BedId:BedId,RoomId:RoomId,BookingId:BookingId,
+										PropertyId:PropertyId,GuestId:GuestId,StateId:StateId,
+										Direct:Direct1,BTC:"",PropertyType:Txt_PropertyType.text,
+										STAgreedAmount:0.00,LTAgreedAmount:0.00,STRackAmount:0.00,LTRackAmount:0.00,
+										Status:"UnSettled",CheckOutDate:DT_CheckOutDate.text,CheckInDate:Txt_CheckInDate.text,
+										InVoiceNo:Txt_ChkoutInvoice.text,LT:lbl_tarffLT.text,ST:lbl_TariffST.text,
+										VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
+										ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk,
+										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate",
+										Preformainvoice:Chk_PIInvoice.selected
+										//Flag:Flag1
+									}]);
+								var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
+								useWeb("CheckoutAndIntermediate","Save_CUSTOM",[GlobalXml,HdrXml]);
+							}
+						}
+						else if(Mode1=="Bill to Company (BTC)")
+						{
+							if ((event.detail==Alert.YES)) 
+							{
+								var Ac_Hdr:ArrayCollection=new ArrayCollection
+									([{
+										CheckOutNo:Txt_ChkoutNo.text,GuestName:hlp_GuestName.text,Stay:Txt_Stay.text,
+										Type:Txt_type.text,BookingLevel:Txt_bookinlevel.text,BillDate:DT_CheckOutDate.text,
+										ClientName:Txt_Client.text,Property:Txt_Property.text,TotalTariff:Txt_TotalTariff.text,
+										NetAmount:Txt_NetAmount.text,AdditionalCharge:Txt_AdditionalCharge.text,Discountperday:Txt_Discount.text,
+										TotalDiscount:Txt_Totaldiscount.text,LuxuryTax:Txt_Luxury.text,
+										SerivceTax:Txt_ServiceTax12.text,SerivceNet:Txt_ServiceTax7.text,
+										ServiceCharge:Txt_ServiceCharge2.text,ServiceTaxService:Txt_Servicecharge12.text,
+										Cess:Txt_Cess.text,HECess:Txt_HECess.text,
+										NetAmount:Txt_NetAmount.text,Referance:Txt_referance.text,
+										ExtraDays:txt_itemdays.text,ExtraAmount:lbl_ExtraMatress.text,
+										ExtraType:ddl_Items.selectedItem,
+										Id:Id,ChkInHdrId:CheckInHdrId,Name:Txt_Name.text,NoOfDays:lbl_tariff.text,
+										CheckInType:Txt_CheckInType.text,ApartmentNo:Txt_Apartment.text,
+										BedNo:Txt_Bed.text,ApartmentId:ApartmentId,BedId:BedId,RoomId:RoomId,BookingId:BookingId,
+										PropertyId:PropertyId,GuestId:GuestId,StateId:StateId,
+										Direct:"",BTC:BTC1,PropertyType:Txt_PropertyType.text,
+										STAgreedAmount:0.00,LTAgreedAmount:0.00,STRackAmount:0.00,LTRackAmount:0.00,
+										Status:"UnSettled",CheckOutDate:DT_CheckOutDate.text,CheckInDate:Txt_CheckInDate.text,
+										InVoiceNo:Txt_ChkoutInvoice.text,LT:lbl_tarffLT.text,ST:lbl_TariffST.text,
+										VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
+										ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk,
+										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate",
+										Preformainvoice:Chk_PIInvoice.selected
+										//Flag:Flag1
+									}]);
+								var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
+								useWeb("CheckoutAndIntermediate","Save_CUSTOM",[GlobalXml,HdrXml]);
+							}
+						}
+							
+						else if(Mode1="Bill to Client")
+						{
+							if ((event.detail==Alert.YES)) 
+							{
+								var Ac_Hdr:ArrayCollection=new ArrayCollection
+									([{
+										CheckOutNo:Txt_ChkoutNo.text,GuestName:hlp_GuestName.text,Stay:Txt_Stay.text,
+										Type:Txt_type.text,BookingLevel:Txt_bookinlevel.text,BillDate:DT_CheckOutDate.text,
+										ClientName:Txt_Client.text,Property:Txt_Property.text,TotalTariff:Txt_TotalTariff.text,
+										NetAmount:Txt_NetAmount.text,AdditionalCharge:Txt_AdditionalCharge.text,Discountperday:Txt_Discount.text,
+										TotalDiscount:Txt_Totaldiscount.text,LuxuryTax:Txt_Luxury.text,
+										SerivceTax:Txt_ServiceTax12.text,SerivceNet:Txt_ServiceTax7.text,
+										ServiceCharge:Txt_ServiceCharge2.text,ServiceTaxService:Txt_Servicecharge12.text,
+										Cess:Txt_Cess.text,HECess:Txt_HECess.text,
+										NetAmount:Txt_NetAmount.text,Referance:Txt_referance.text,
+										ExtraDays:txt_itemdays.text,ExtraAmount:lbl_ExtraMatress.text,
+										ExtraType:ddl_Items.selectedItem,
+										Id:Id,ChkInHdrId:CheckInHdrId,Name:Txt_Name.text,NoOfDays:lbl_tariff.text,
+										CheckInType:Txt_CheckInType.text,ApartmentNo:Txt_Apartment.text,
+										BedNo:Txt_Bed.text,ApartmentId:ApartmentId,BedId:BedId,RoomId:RoomId,BookingId:BookingId,
+										PropertyId:PropertyId,GuestId:GuestId,StateId:StateId,
+										Direct:"",BTC:BTC1,PropertyType:Txt_PropertyType.text,
+										STAgreedAmount:0.00,LTAgreedAmount:0.00,STRackAmount:0.00,LTRackAmount:0.00,
+										Status:"UnSettled",CheckOutDate:DT_CheckOutDate.text,CheckInDate:Txt_CheckInDate.text,
+										InVoiceNo:Txt_ChkoutInvoice.text,LT:lbl_tarffLT.text,ST:lbl_TariffST.text,
+										VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
+										ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk,
+										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate",
+										Preformainvoice:Chk_PIInvoice.selected
+										//Flag:Flag1
+									}]);
+								var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
+								useWeb("CheckoutAndIntermediate","Save_CUSTOM",[GlobalXml,HdrXml]);
+							}
 						}
 					}
+					
 				}
 				
 				
@@ -3901,6 +4241,16 @@
 				Checkout.enabled=true;
 				DT_BillFromDate.enabled=false;
 				DT_BillTo.enabled=false;
+				Chk_PIInvoice.selected="";
+				
+				lbl_tariffpaymode.text="";
+				lbl_tariffpaid.text="";
+				
+				lbl_ServicePaid.text="";
+				lbl_ServicePayMode.text="";
+				
+				lbl_ConPaid.text="";
+				lbl_ConPaymode.text="";
 				
 				
 			}
@@ -3980,6 +4330,16 @@
 				bdr_ConsolidateCmpnyInvoice1.visible=false;
 				bdr_ConsolidateNEFT1.visible=false;
 				PageLoad();
+				Chk_PIInvoice.selected="";
+				
+				lbl_tariffpaymode.text="";
+				lbl_tariffpaid.text="";
+				
+				lbl_ServicePaid.text="";
+				lbl_ServicePayMode.text="";
+				
+				lbl_ConPaid.text="";
+				lbl_ConPaymode.text="";
 			}
 			
 			protected function Chk_Select_clickHandler(event:MouseEvent):void
@@ -4552,6 +4912,8 @@
 								Id:Id,OutStanding:txt_TariffOutstanding.text}]);
 						var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"CashXml");
 						useWeb("CheckOutPaymentCash","Save_CUSTOM",[GlobalXml,HdrXml]);
+						
+						
 					}
 					
 					if(radiogroup1.selectedValue=="Card")
@@ -7249,38 +7611,44 @@
 					
 					if(BillType == "Tariff")
 					{
-						if(OutStanding == "0")
-						{
-							ExternalInterface.call("changeDocumentTitle",Str_ChkOut+PrintChkOutId);
-						}
-						else
-						{
-							ExternalInterface.call("changeDocumentTitle",Str_InChkTar+PrintChkOutId);
-						}
+						ExternalInterface.call("changeDocumentTitle",Str_ChkOut+PrintChkOutId);
+			//			ExternalInterface.call("changeDocumentTitle",Str_InChkTar+PrintChkOutId);
+//						if(OutStanding == "0")
+//						{
+//							ExternalInterface.call("changeDocumentTitle",Str_ChkOut+PrintChkOutId);
+//						}
+//						else
+//						{
+//							ExternalInterface.call("changeDocumentTitle",Str_InChkTar+PrintChkOutId);
+//						}
 						
 					}
 					if(BillType == "Service")
 					{
-						if(OutStanding == "0")
-						{
-							ExternalInterface.call("changeDocumentTitle",Str_Serv+PrintChkOutId);
-						}
-						else
-						{
-							ExternalInterface.call("changeDocumentTitle",Str_InChkSer+PrintChkOutId);
-						}
+						ExternalInterface.call("changeDocumentTitle",Str_Serv+PrintChkOutId);
+			//			ExternalInterface.call("changeDocumentTitle",Str_InChkSer+PrintChkOutId);
+//						if(OutStanding == "0")
+//						{
+//							ExternalInterface.call("changeDocumentTitle",Str_Serv+PrintChkOutId);
+//						}
+//						else
+//						{
+//							ExternalInterface.call("changeDocumentTitle",Str_InChkSer+PrintChkOutId);
+//						}
 						
 					}
 					if(BillType == "Consolidate")
 					{
-						if(OutStanding == "0")
-						{
-							ExternalInterface.call("changeDocumentTitle",Str_Settle+PrintChkOutId);
-						}
-						else
-						{
-							ExternalInterface.call("changeDocumentTitle",Str_InChkSett+PrintChkOutId);
-						}
+						ExternalInterface.call("changeDocumentTitle",Str_Settle+PrintChkOutId);
+			//			ExternalInterface.call("changeDocumentTitle",Str_InChkSett+PrintChkOutId);
+//						if(OutStanding == "0")
+//						{
+//							ExternalInterface.call("changeDocumentTitle",Str_Settle+PrintChkOutId);
+//						}
+//						else
+//						{
+//							ExternalInterface.call("changeDocumentTitle",Str_InChkSett+PrintChkOutId);
+//						}
 						
 					}
 				}
@@ -7680,6 +8048,7 @@
 			
 			protected function Checkout_clickHandler(event:MouseEvent):void
 			{
+				Chk_PIInvoice.visible=false;
 				var BillF:String=DT_BillFromDate.text;
 				//var BillTo:String=DT_BillTo.text;
 				var BillTo:String=ExpChkoutDT;
@@ -7709,6 +8078,7 @@
 			
 			protected function Intermediate_clickHandler(event:MouseEvent):void
 			{
+				Chk_PIInvoice.visible=false;
 				var BillF:String=DT_BillFromDate.text;
 				//var BillTo:String=DT_BillTo.text;
 				var BillTo:String=TodayDate;
@@ -7765,6 +8135,12 @@
 			{
 				// TODO Auto-generated method stub
 				FnSettleClr();
+			}
+			
+			protected function Chk_PIInvoice_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				
 			}
 			
 		]]>
@@ -7896,6 +8272,7 @@
 					</WrbComp:Button_BB>
 					<WrbComp:SaveControl x="372" y="422" id="btn_Sctrl" docRefresh="Sctrl_docRefreshHandler(event)">
 					</WrbComp:SaveControl>
+					<s:CheckBox x="163" y="431" label="Proforma Invoice" id="Chk_PIInvoice" click="Chk_PIInvoice_clickHandler(event)" visible="false"/>
 				</s:BorderContainer>
 				<s:HGroup x="0" y="1" width="100%" height="40" horizontalAlign="center">
 					<s:Spacer x="11" width="138" height="10"/>
@@ -8065,30 +8442,42 @@
 					<mx:Label x="23" y="170" text="Payment" color="Red"/>
 					<s:BorderContainer x="23" y="222" width="602" height="200" id="bdr_tarserpay" backgroundColor="#fbf9f9" borderVisible="false"
 									   depth="500" visible="true">
-						<mx:Label x="16" y="36" text="Payee Name" id="lbl_pName"/>
-						<mx:Label x="340" y="36" text="Payee Name" />
-						<s:TextInput id="Txt_Pname" x="96" y="36" width="159"/>
-						<mx:Label x="16" y="70" text="Address"/>
-						<mx:Label x="340" y="70" text="Address"/>
-						<s:TextArea id="Txt_address" x="96" y="68" width="185" height="73" depth="10" />
-						<mx:Label x="7" y="10" text="Tariff Payments" color="Red"/>
-						<mx:Label x="316" y="10" text="Service Payments" color="Red"/>
+						<mx:Label x="12" y="30" text="Payee Name" id="lbl_pName"/>
+						<mx:Label x="323" y="30" text="Payee Name" />
+						<s:TextInput id="Txt_Pname" x="96" y="30" width="159"/>
+						<mx:Label x="12" y="59" text="Address"/>
+						<mx:Label x="323" y="59" text="Address"/>
+						<s:TextArea id="Txt_address" x="96" y="60" width="185" height="57" depth="10" />
+						<mx:Label x="4" y="5" text="Tariff Payments" color="Red"/>
+						<mx:Label x="309" y="5" text="Service Payments" color="Red"/>
 						<WrbComp:Button_HB x="134" y="160" width="149" Lable_val="Add Payment" id="btn_TarPay" click="btn_TarPay_clickHandler(event)">
 						</WrbComp:Button_HB>
 						<WrbComp:Button_HB x="444" y="160" width="149" Lable_val="Add Payment" id="btn_SerPay" click="btn_SerPay_clickHandler(event)">
 						</WrbComp:Button_HB>
-						<s:TextInput x="418" y="36" width="159" id="Txt_SName"/>
-						<s:TextInput x="418" y="68" width="175" height="73" id="Txt_SAddress"/>
+						<s:TextInput x="418" y="30" width="159" id="Txt_SName"/>
+						<s:TextInput x="418" y="60" width="175" height="57" id="Txt_SAddress"/>
+						<mx:Label id="lbl_tariffpaid" x="118" y="125" width="78"/>
+						<mx:Label id="lbl_tariffpaymode" x="198" y="125" width="94"/>
+						<mx:Label x="12" y="125" text="Amount Paid"/>
+						<mx:Label x="94" y="125" width="26" text="Rs:"/>
+						<mx:Label x="321" y="125" text="Amount Paid"/>
+						<mx:Label x="410" y="125" width="26" text="Rs:"/>
+						<mx:Label id="lbl_ServicePaid" x="432" y="125" width="72" text=""/>
+						<mx:Label id="lbl_ServicePayMode" x="506" y="125" width="90"/>
 					</s:BorderContainer>
 					<s:BorderContainer x="23" y="215" width="602" height="200" id="bdr_Consolidate" borderVisible="false" backgroundColor="#fbf9f9" 
 									   visible="false">
-						<s:Label x="27" y="12" text="Consolidate Payment" color="Red"/>
-						<s:Label x="47" y="42" text="Payee Name" />
-						<s:TextInput  x="147" y="37" width="159" id="Txt_CName"/>
-						<s:Label x="47" y="73" text="Address"/>
-						<s:TextArea  x="146" y="71" width="185" height="73" id="Txt_CAddress"/>
+						<mx:Label x="27" y="12" text="Consolidate Payment" color="Red"/>
+						<mx:Label x="43" y="33" text="Payee Name" />
+						<s:TextInput  x="147" y="33" width="159" id="Txt_CName"/>
+						<mx:Label x="47" y="64" text="Address"/>
+						<s:TextArea  x="146" y="64" width="185" height="57" id="Txt_CAddress"/>
 						<WrbComp:Button_HB x="186" y="163" width="149" Lable_val="Add Payment" id="btn_ConPay" click="btn_ConPay_clickHandler(event)">
 						</WrbComp:Button_HB>
+						<mx:Label x="48" y="136" text="Amount Paid :"/>
+						<mx:Label x="131" y="136" text="Rs :"/>
+						<mx:Label id="lbl_ConPaid" x="161" y="136" width="86" text=""/>
+						<mx:Label x="251" y="136" width="84" text="" id="lbl_ConPaymode"/>
 					</s:BorderContainer>
 					<WrbComp:SaveControl x="325" y="430" id="btn_Sctrl1" docRefresh="btn_Sctrl1_docRefreshHandler()">
 					</WrbComp:SaveControl>

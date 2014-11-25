@@ -170,7 +170,9 @@ BEGIN
 			
 		IF @Str='Cash'
 		BEGIN
-			SELECT BillType,InvoiceNo,Total,ChkOutHdrId,ClientId,CheckIn,CheckOut,CM.ClientName AS Client FROM #TEMPCASH T
+			SELECT 0 AS Tick,BillType,InvoiceNo,Total,ChkOutHdrId,ClientId,CheckIn,CheckOut,CM.ClientName AS Client,
+			CM.Id AS ClientId 
+			FROM #TEMPCASH T
 			JOIN WRBHBClientManagement CM ON T.ClientId=CM.Id AND CM.IsActive=1 AND CM.IsDeleted=0
 			WHERE Total!=0.00 AND InvoiceNo!=''	
 			AND InVoiceNo NOT IN(SELECT InVoiceNo FROM WRBHBDepositsDlts WHERE IsActive=1)
@@ -180,7 +182,9 @@ BEGIN
 		END	
 		IF @Str='Cheque'
 		BEGIN
-			SELECT BillType,InvoiceNo,Total,ChkOutHdrId,CheckIn,CheckOut,CM.ClientName AS Client FROM #TEMPCHEQUE T
+			SELECT 0 AS Tick,BillType,InvoiceNo,Total,ChkOutHdrId,CheckIn,CheckOut,CM.ClientName AS Client,
+			CM.Id AS ClientId  
+			FROM #TEMPCHEQUE T
 			JOIN WRBHBClientManagement CM ON T.ClientId=CM.Id AND CM.IsActive=1 AND CM.IsDeleted=0
 			WHERE Total!=0.00 AND InvoiceNo!=''
 			AND InVoiceNo NOT IN(SELECT InVoiceNo FROM WRBHBDepositsDlts WHERE IsActive=1)
@@ -190,7 +194,8 @@ BEGIN
 		END	
 		IF @Str='BTC'
 		BEGIN
-			SELECT BillType,InvoiceNo,Total,ChkOutHdrId,CM.ClientName AS Client,TC.CheckIn,TC.CheckOut 
+			SELECT 0 AS Tick,BillType,InvoiceNo,Total,ChkOutHdrId,CM.ClientName AS Client,TC.CheckIn,TC.CheckOut,
+			CM.Id AS ClientId 
 			FROM #TEMPBTC TC
 			JOIN WRBHBClientManagement CM ON TC.ClientId=CM.Id WHERE CM.IsActive=1 AND CM.IsDeleted=0
 			AND Total!=0.00 AND InvoiceNo!='' AND InVoiceNo NOT IN(SELECT InVoiceNo FROM WRBHBDepositsDlts)

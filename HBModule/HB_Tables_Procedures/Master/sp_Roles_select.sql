@@ -39,7 +39,7 @@ SELECT ScreenName AS ScreenName,scrId AS scrId,
 		order by OrderNumber
 	   
 SELECT ScreenName ,scrId ,ModuleName ,ModuleId ,Id ,Rights FROM #ScreenRoles
-
+order by ScreenName
 End
 
 Else

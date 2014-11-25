@@ -1,111 +1,410 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" xmlns="*" creationComplete="init()" height="727" width="777">
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:Controls="fx.com.adobe.Controls.*"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   xmlns:WrbComp="WrbComp.*"
+			   xmlns:flexlib="http://code.google.com/p/flexlib/"
+			   width="100%" height="100%" creationComplete="PageLoad()" pageTitle="Bank Statement">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
 	
-	<mx:Script>
-
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
+	<fx:Script>
 		<![CDATA[
-			import com.as3xls.xls.ExcelFile;
-			import com.as3xls.xls.Sheet;
+			import WrbComp.frmsearchwindow;
+			
+			import WrbHelpComp.HlpGridHdr;
 			
 			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.CalendarLayoutChangeEvent;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.events.IndexChangedEvent;
+			import mx.graphics.codec.PNGEncoder;
 			
-			//Based on example from: http://blog.flexexamples.com/2007/09/21/uploading-files-in-flex-using-the-filereference-class/
+			import spark.events.IndexChangeEvent;
+			import spark.events.TextOperationEvent;
+			private var SearchPopUp:frmsearchwindow = new frmsearchwindow();
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "",TypeServiceId:int=0,ErrStr:String="";
+			public var Id:int=0,ErrMsg:String="",CityId:int=0,City:String="",UserId:int=0;
+			public var AddMode:Boolean=true,Flag:Boolean=true;
+			public var CompanyLogo:String="",StateId:int=0,State:String="",Str_Email:String="";
+			private var fileRef:FileReference = new FileReference();
+			private var fileTypes:Array = new Array();
+			public var CompanyId:int=0;
+			private var arrColl:ArrayCollection;
+			private var fr:FileReference;    
+			//public var uploadURL:URLRequest = new URLRequest();
+			private var documentTypes:FileFilter = new FileFilter("Excel (*.xls,*.xlsx)",("*.xls; *.xlsx"));
+			//private var FILE_URL:String = "";
+			public var ImageCount:Number=0;
+			//public var ImageFormat:String="";
+			private var urlReq:URLRequest;
+			public var Save_Flag:Boolean=true; 
+			public var uploadURL:URLRequest = new URLRequest();
+			private const FILE_URL:String= "http://sstage.in/Guest_Import/SampleBankSt.xlsx";
 			
-			private var fileRef:FileReference;
-			private var ba:ByteArray;
-			private var xlFile:ExcelFile;
-			private var hdrs:Array;
-			private var runOnce:Boolean;
-			
-			
-			[Bindable]
-			private var xlsheet:ArrayCollection;
-			
-			private const FILE_URL:String = "http://localhost:8500/fileref/uploader.cfm";
-			private const XLS_FILTER:FileFilter = new FileFilter("EXCEL FILES (*.xls, *.xlsx)", "*.xls; *.xlsx");
-			private const TXT_FILTER:FileFilter = new FileFilter("TEXT FILES (*.txt, *.csv, *.tsv)", "*.txt; *.csv; *.tsv");
-			private const ALL_FILTER:FileFilter = new FileFilter("ALL FILES (*.*)", "*.*");
-			
-			private function init():void {
-				fileRef = new FileReference();
-				fileRef.addEventListener(Event.SELECT, fileRef_select);
-				fileRef.addEventListener(ProgressEvent.PROGRESS, fileRef_progress);
-				fileRef.addEventListener(Event.COMPLETE, fileRef_complete);
-				
-				ba = new ByteArray();
-				xlFile = new ExcelFile();
-				hdrs = new Array();
-				xlsheet = new ArrayCollection();
+			protected function PageLoad():void
+			{
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";
+				init1();
+				init();
+				State="Please Select State";
+				City="Please Select City";
+				Save_PettyCash.setButtonRights("Delete",true);
+				Save_PettyCash.setButtonRights("Refresh",true);
+				Save_PettyCash.setButtonRights("Search",true);
+				FilePath.text="";
+				//Save_PettyCash.setButtonRights("Clear",true);
+				//useWeb("CompanyMaster","Pageload_CUSTOM",[GlobalXml,"Pageload","","",0,GlobalXml.UserId]);
 			}
 			
-			private function browseAndUpload():void {
-				fileRef.browse([XLS_FILTER, TXT_FILTER, ALL_FILTER]);
-				message.text = "";
-				
-				
-			}
-			
-			private function fileRef_select(evt:Event):void {
-				try {
-					message.text = "size (bytes): "+ numberFormatter.format(fileRef.size);
-					message.text += " | " + fileRef.name
-					
-					//Alert.show (fileRef.name);
-					fileRef.load();
-					
-				} catch(err:Error) {
-					message.text = "ERROR: zero-byte file";
+			private function Custom_WebSer_Result (Ds_Objects:Object):void				
+			{
+				//				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				//				{
+				//					alignAlert(Alert.show("Bank Statement Saved Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+				//					
+				//					//useWeb("CompanyMaster","Pageload_CUSTOM",[GlobalXml,"Pageload","","",0,0]);
+				//					//FnClear();
+				//				}
+				if (Ds_Objects.currentTarget.description.toString() == "Pageload_CUSTOM")
+				{
+					//StateId=0;State="";CityId=0;City="";
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						
+						//FilePath.text=Ds_Objects.result.Tables.Table.Rows[0].ImageName;
+						
+						//FILE_URL=Ds_Objects.result.Tables.Table.Rows[0].Logo;
+						if(Ds_Objects.result.Tables.Table.Rows[0].Logo!="")
+						{
+							Img_logo.visible=true;
+							Img_logo.source=Ds_Objects.result.Tables.Table.Rows[0].Logo;
+						}
+						else
+						{
+							Img_logo.visible=false;
+						}						
+						Id=Ds_Objects.result.Tables.Table.Rows[0].Id;
+					}
+					AddMode=false;
 				}
-			}
-			
-			private function fileRef_progress(evt:ProgressEvent):void{
-				progressBar.visible = true;
-			}
-			
-			private function fileRef_complete(evt:Event):void{
-				
-				try {
-					message.text += " (complete)";
-					progressBar.visible = false;
-					grid.initialize()               
-					
-					ba=fileRef["data"];
-					xlFile.loadFromByteArray(ba);
-					xlsheet = xlFile.sheets[0].values;
-					
-					hdrs =  xlsheet[0];
-					xlsheet.removeItemAt(0);
-					
-					grid.dataProvider = xlsheet;
-				} catch (err:Error) {
-					message.text = "An error occurred";
-				}
-				
-			}
-			
-			private function updateHeaders(): void {
-				if(grid.columnCount>=1){
-					for (var i:int=0; i<=grid.columnCount-1; i++){
-						grid.columns[i].headerText=hdrs[i];
+				if (Ds_Objects.currentTarget.description.toString() == "ImageUpload_CUSTOM")
+				{
+					if(Ds_Objects.result.Tables.Table.Rows[0].Logo!="")
+					{
+						Img_logo.source=Ds_Objects.result.Tables.Table.Rows[0].Logo;
 					}
 					
 				}
+				
+				if (Ds_Objects.currentTarget.description.toString() == "ImageUpload_CUSTOM")
+				{
+					//					if(Ds_Objects.result.Tables.Table.Rows.length > 0)
+					//					{
+					//						ImageCount=Ds_Objects.result.Tables.Table.Rows[0].CNT
+					//						if(ImageCount !=0)
+					//						{
+					//							ImageCount=ImageCount+1;
+					//						}
+					//						if(Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					//						{
+					//							//Grd_Image.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					//						}
+					//						else
+					//						{
+					//							//Grd_Image.dataProvider=null;
+					//						}
+					//						
+					//						init();
+					//						FilePath.text="";
+					//						
+					//					}
+				}
+			}
+			public function FunCall(event:CloseEvent):void
+			{
+				if (event.detail == Alert.OK) 
+				{	
+					//txt_title.setFocus();
+					//txt_LegalCompanyName.setFocus();
+				}
+			}
+			private function FnValidation_BeforeSave():String
+			{
+				var TxtFlag:Boolean=true;var ErrStr:String="";
+				if(FilePath.text=="")
+				{
+					if(TxtFlag=true)
+					{
+						FilePath.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+" *   Excel file is Required \n";
+				}
+				return ErrStr;
 			}
 			
+			protected function Save():void
+			{
+				
+				var ErrStr:String=FnValidation_BeforeSave();
+				
+				if(ImgFlag == false)
+				{
+					CompanyLogo="";
+				}
+				CompanyLogo="";
+				
+				
+				if(ErrStr!="")
+				{
+					alignAlert(Alert.show(ErrStr,"Requierd Field(s) !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+					
+					return;
+				}
+				
+				var Ac:ArrayCollection=new ArrayCollection
+					([{
+						
+						ImageName:FilePath.text,
+						Id:Id
+					}]);
+				//				var HdrXml:String="";
+				//				HdrXml += "<ROOT>";
+				//				HdrXml += ObjToXmlStr_Comm(Ac,"HdrXml")
+				//				HdrXml += "</ROOT>";
+				//useWeb("CompanyMaster","Save_CUSTOM",[GlobalXml,"",HdrXml,CompanyLogo]);
+				init();
+				uploadFiles();
+				//alignAlert(Alert.show("Bank Statement Saved Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
+			}
+			
+			
+			
+			public var ImageFormat:String="";
+			public function init():void
+			{
+				
+				// This URL should be replaced with your server side URL
+				//				var browserUrl:String = ExternalInterface.call("eval", "window.location.href");
+				//				var arr:Array =browserUrl.split("/");
+				ImageFormat=FilePath.text;				
+				uploadURL.url = "http://sstage.in/bank_import.php?id="+Global_AC[0].UsrId;
+				//uploadURL.url = "http://sstage.in/bank_import.php?id="+FilePath.text+"&pid="+0+"&imgcount="+ImageCount+"&imgformat="+Global_AC[0].UsrId;
+				uploadURL.method = "POST"; // OR "POST" as you need it
+				uploadURL.contentType = "multipart/form-data";				
+				// Event Listeners for UI Buttons (Upload/Browse)
+				
+				Filedata.addEventListener(MouseEvent.CLICK, browseFiles);
+				uploadbutton.addEventListener(MouseEvent.CLICK,uploadFiles);
+				fileRef.addEventListener(Event.SELECT, selectHandler);
+			}
+			
+			//Browse for files
+			
+			private function browseFiles(event:Event):void
+			{
+				//fileTypes.push(imageTypes);
+				fileTypes.push(documentTypes);
+				fileRef.browse(fileTypes);
+				
+			}
+			
+			// called after user selects a file form the browse window.
+			
+			private function selectHandler(event:Event):void
+			{
+				
+				FilePath.text = event.currentTarget.name.toString();
+				ImageFormat=FilePath.text;	
+				
+				//if()
+				
+			}
+			
+			// called when user clicks on the Upload button to upload the file
+			
+			private function uploadFiles():void
+			{
+				
+				fileRef.addEventListener(Event.COMPLETE, completeHandler);
+				fileRef.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA,dataHandler);
+				fileRef.addEventListener(SecurityErrorEvent.SECURITY_ERROR,securityErrorHandler);
+				fileRef.addEventListener(HTTPStatusEvent.HTTP_STATUS,httpStatusHandler);
+				fileRef.addEventListener(IOErrorEvent.IO_ERROR,ioErrorHandler);
+				fileRef.upload(uploadURL);
+			}
+			
+			// called after a file is uploaded
+			
+			private function completeHandler(event:Event):void
+			{
+				//Alert.show("File Uploaded successfully");
+				
+			}
+			
+			//called after file upload is done and Data has been returned from Server
+			
+			private function dataHandler(event:DataEvent):void
+			{
+				//Alert.show("File Uploaded successfully");
+				var Error:String="";
+				var browserUrl:String = ExternalInterface.call("eval", "window.location.href");
+				var arr:Array =browserUrl.split("/");
+				resultsTxtField.text = event.data.toString();
+				Img_CompanyLogo.visible=false;
+				Error=resultsTxtField.text;
+				Img_CompanyLogo.source="http://sstage.in/"+resultsTxtField.text;
+				//alignAlert(Alert.show("Statement Uploaded Successfully","Message",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+				alignAlert(Alert.show("Statement Uploaded Successfully",null,Alert.OK, null, null,iconTickLarge, Alert.OK),10,"");	
+				//useWeb("CompanyMaster","ImageUpload_CUSTOM",[GlobalXml,'IMAGEUPLOAD',"http://sstage.in/Company_Images/"+resultsTxtField.text,0,0,0]);
+			}
+			
+			// called if there is an error detected by flash player browsing or uploading a file
+			
+			private function ioErrorHandler(event:IOErrorEvent):void
+			{
+				mx.controls.Alert.show(String(event),"ioError",0);
+			}
+			// called if a security error
+			
+			private function securityErrorHandler(event:SecurityErrorEvent):void
+			{
+				mx.controls.Alert.show(String(event),"Security Error",0);
+			}
+			// server will return an http status code, code 200 means all is good
+			
+			private function httpStatusHandler(event:HTTPStatusEvent):void
+			{
+				if (event.status != 200)
+				{
+					mx.controls.Alert.show(String(event),"Error",0);
+				}
+			}
+			
+			//Image Download
+			public var PropertyImageId:int=0;			
+			private function init1():void {
+				// Initialize the array collection to an empty collection. 
+				arrColl = new ArrayCollection();
+				
+				// Set up the URL request to download the file specified by the FILE_URL variable. 
+				urlReq = new URLRequest(FILE_URL);
+				
+				// Define file reference object and add a bunch of event listeners. 
+				fileRef = new FileReference();
+				fileRef.addEventListener(Event.CANCEL, doEvent);
+				fileRef.addEventListener(Event.COMPLETE, doEvent);
+				fileRef.addEventListener(Event.OPEN, doEvent);
+				fileRef.addEventListener(Event.SELECT, doEvent);
+				fileRef.addEventListener(HTTPStatusEvent.HTTP_STATUS, doEvent);
+				fileRef.addEventListener(IOErrorEvent.IO_ERROR, doEvent);
+				fileRef.addEventListener(ProgressEvent.PROGRESS, doEvent);
+				fileRef.addEventListener(SecurityErrorEvent.SECURITY_ERROR, doEvent);
+			}
+			
+			private function doEvent(evt:Event):void {
+				
+				FilePath.text="";
+			}
+			
+			private function downloadSourceCodeZip():void 
+			{
+				fileRef.download(urlReq);
+			}
+			
+			private function showAlert(item:Object):void {
+				Alert.show(item.eventString, item.type);
+			}
+			
+			
+			public var ImgFlag:Boolean=false;
+			protected function FnClick_Btn_Browse():void
+			{
+				try
+				{
+					var imageTypes:FileFilter = new FileFilter("Excel (*.xls,*.xlsx)", "*.xls;*.xlsx");
+					//var textTypes:FileFilter = new FileFilter("Text Files (*.txt, *.rtf)", "*.txt; *.rtf");
+					var allTypes:Array = new Array(imageTypes);
+					var fileRef:FileReference = new FileReference();
+					fileRef.browse(allTypes);				
+					//fileRef = new FileReference();
+					fileRef.addEventListener(Event.SELECT, selectHandler);
+					fileRef.addEventListener(Event.COMPLETE, completeHandler);				
+					function selectHandler(event:Event):void
+					{
+						FilePath.text = event.currentTarget.name.toString();
+						fileRef.load();
+					}
+					function completeHandler(event:Event):void
+					{
+						Img_CompanyLogo.source = fileRef.data;
+						ImgFlag=true;					
+					}
+					//Brd_imageUpload.visible=true;
+					init1();
+					init();
+				}
+				catch(Exception)
+				{
+					
+				}
+			}			
+			
 		]]>
+	</fx:Script>
+	<s:VGroup x="0" y="0" width="100%" height="100%" gap="5" horizontalAlign="center" verticalAlign="top">
+		<s:BorderContainer x="37" y="319" width="100%" height="100%" backgroundColor="#fbf9f9"
+						   borderVisible="false">
+			<s:Label x="35" y="28" text="Bank Statement Upload" color="Red"/>
+			<mx:Button id="downloadBtn" x="731" y="45" width="163" height="36"
+					   label="Download Sample Excel" click="downloadSourceCodeZip()"
+					   toolTip="{FILE_URL}"/>
+			<s:Label x="539" y="272" text="Logo" visible="false"/>
+			<s:Label x="574" y="269" text="*" color="red" visible="false"/>
+			<s:HGroup x="0" y="423" width="100%" height="41" horizontalAlign="center">
+				<WrbComp:SaveControl x="193" y="451" id="Save_PettyCash" docSave="Save()"
+									 docClear="PageLoad()" docRefresh="PageLoad()">
+				</WrbComp:SaveControl>
+			</s:HGroup>
+			
+			<s:Image x="462" y="311" width="100" height="100" id="Img_CompanyLogo"
+					 source="@Embed(source='../Assets/user.jpg')" visible="false"/>
+			<s:Image x="688" y="90" width="185" height="125" visible="false" id="Img_logo"/>
+			<mx:HRule x="0" y="417" width="100%" strokeColor="#eb1c24"/>
+			
+		</s:BorderContainer>
+	</s:VGroup>
+	<s:BorderContainer x="241" y="145" width="426" height="141" id="Brd_imageUpload" visible="true" borderVisible="true"
+					   backgroundColor="#fbf9f9" cornerRadius="5">
+		<mx:Panel x="27" y="19" title="Excel Uploader">
+			<mx:ControlBar>
+				<mx:Spacer width="80%"/>
+				<mx:HBox>
+					<mx:TextInput id="FilePath" width="150"  visible="true"/>
+					<mx:Button id="Filedata" label="Browse File" name="Filedata" />
+					<mx:Button label="UpLoad File" name="uploadbutton" id="uploadbutton" visible="false" width="0" />
+				</mx:HBox>
+				<mx:TextArea id="resultsTxtField"  width="0"  name="resultsTxtField" visible="false"/>
+			</mx:ControlBar>
+		</mx:Panel>
+		<s:TextInput x="27" y="152" width="189" height="40" id="txt_ImageName" enabled="false" visible="false"/>		
 		
-	</mx:Script>
-	
-	<mx:NumberFormatter id="numberFormatter"/>
-	<mx:Button label="Upload File"
-			   click="browseAndUpload();" labelPlacement="left"/>
-	<mx:Label id="message"/>
-	<mx:ProgressBar id="progressBar"
-					indeterminate="true"
-					visible = "false"/>
-	
-	<mx:DataGrid id="grid"
-				 updateComplete="updateHeaders();"/>
-	
-	
-</mx:Application>
+		<WrbComp:Button_HB x="329" y="152" height="40" _Label="Close" click="{Brd_imageUpload.visible=false;}" visible="false"/>
+		<!--WrbComp:Button_HB id="downloadBtn" x="237" y="152" height="40" _Label="Download"
+		click="downloadSourceCodeZip();"  toolTip="{FILE_URL}" visible="false"/-->
+	</s:BorderContainer>
+</s:Application>

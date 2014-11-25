@@ -632,7 +632,10 @@
 			{
 				FnClick_Btn_Browse();
 			}
-			
+			public function FnTempSave():void
+			{
+				
+			}
 		]]>
 	</fx:Script>
 	<s:VGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
@@ -699,6 +702,9 @@
 			<WrbComp:Button_HB id="Btn_Browse" x="580" y="216" width="118" height="20" buttonMode="true"
 							   _Label="Bill Upload" click="FnClick_Btn_Browse()" depth="0" focusEnabled="false" visible="true"/>
 			
+			<WrbComp:Button_BB id="Sctrl_TempSave" x="80" y="400" width="120" height="30"
+							   click="FnTempSave()" Lable_val="Tempsave"/>
+				
 			<mx:DataGrid id="Grd_Apartment" x="436" y="141"  editable="true" visible="false"
 						 width="475" height="225" >
 				<mx:columns>

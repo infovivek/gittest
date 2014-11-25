@@ -474,7 +474,7 @@
 										ChkOutHdrId:AC[J].ChkOutHdrId,
 										ClientId:AC[J].ClientId,
 										Amount:AC[J].Total,
-										Tick:AC[J].Tick
+										Tick:"True"
 										
 									});
 								}
@@ -514,7 +514,7 @@
 										ChkOutHdrId:AC1[J].ChkOutHdrId,
 										ClientId:AC1[J].ClientId,
 										Amount:AC1[J].Total,
-										Tick:AC1[J].Tick
+										Tick:"True"
 									});
 								}
 							}

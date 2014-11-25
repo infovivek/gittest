@@ -106,7 +106,7 @@ namespace HBReport
                         message.Bcc.Add(new System.Net.Mail.MailAddress("karthik@hummingbirdindia.com"));
                         message.Bcc.Add(new System.Net.Mail.MailAddress("usha@hummingbirdindia.com"));
 
-                        message.Subject = "TACInVoice : " + ds.Tables[0].Rows[0][8].ToString();
+                        message.Subject = "TACInvoice : " + ds.Tables[0].Rows[0][8].ToString();
                         string Imagelocation = "";
                         {
                             if (ds.Tables[0].Rows[0][0].ToString() != "")

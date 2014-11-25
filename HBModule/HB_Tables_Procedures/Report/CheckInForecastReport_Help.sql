@@ -141,7 +141,7 @@ INSERT INTO #TFFINALS( GuestName,GuestId,RoomId,Typess,ClientName,Property,Prope
 			Select  D.FirstName,GuestId,RoomId,D.RoomType,ClientName,''Property,d.BookingPropertyId PropertyId,
 			'Internal Property'PropertyType,Tariff,CONVERT(NVARCHAR,d.ChkOutDt,103),CONVERT(NVARCHAR,d.ChkInDt,103),
 			DateDiff(day,d.ChkInDt,d.ChkOutDt) NofDays,D.Occupancy ,
-			BookingId,isnull(D.CheckInHdrId,0),isnull(D.CheckOutHdrId,0),TariffpaymentMode,D.CurrentStatus,'RoomLvl'Btypes
+			BookingId,isnull(D.CheckOutHdrId,0),isnull(D.CheckInHdrId,0),TariffpaymentMode,D.CurrentStatus,'RoomLvl'Btypes
 			from WRBHBBooking H
 			JOIN WRBHBBookingPropertyAssingedGuest D ON H.Id=D.BookingId
 			WHERE d.RoomShiftingFlag=0  AND CurrentStatus !=('Canceled')

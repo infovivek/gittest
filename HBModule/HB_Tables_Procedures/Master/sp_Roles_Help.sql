@@ -26,7 +26,7 @@ IF @Action = 'Dataload'
 		SELECT ScreenName AS ScreenName,Id AS scrId,
 		ModuleName AS ModuleName,ModuleId AS ModuleId,0 AS Id,0 as Rights
 		FROM WRBHBScreenMaster WHERE IsActive=0 AND IsDeleted=0 AND ModuleId !=0
-		order by OrderNumber;
+		order by ScreenName,OrderNumber;
 END;
 IF @Action = 'Selectall'  
 		BEGIN 

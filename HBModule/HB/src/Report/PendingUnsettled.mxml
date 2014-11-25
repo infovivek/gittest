@@ -161,27 +161,41 @@
 						var sheet:Sheet = new Sheet();
 						
 						sheet.resize(arrExportResult.length+2,14);
-						//BookedId,PropertyName,PropertyId,FirstName,BookingLevel,
-						//ExpDate,C.CityName,CityId,,ClientId,BookingCode,Category
-						sheet.setCell(0,3,Type+"PendingUnsettled Report");
-						sheet.setCell(1,0,'Property Name');
-						sheet.setCell(1,1,'Client Name');
-						sheet.setCell(1,2,'FirstName');
-						sheet.setCell(1,3,'ExpDate');
-						sheet.setCell(1,4,'CityName'); 
-						sheet.setCell(1,5,'CheckOutNo');
-						sheet.setCell(1,6,'ChkOutTariffNetAmount');
+						//PropertyName ,ClientName,ChkOutTariffNetAmount,BookingCode,LastBillDate,FirstName,Propertytype,
+						//CheckOutNo,CityName,CheckInDate,CheckOutDate,NoOfDays,Discount,Tariff,Guest,Sno
+						sheet.setCell(0,3,Type+"PendingUnBilled Report");
+						sheet.setCell(1,0,'S.No');
+						sheet.setCell(1,1,'Location');
+						sheet.setCell(1,2,'Property');
+						sheet.setCell(1,3,'Company');
+						sheet.setCell(1,4,'Guest'); 
+						sheet.setCell(1,5,'Booking ID');
+						sheet.setCell(1,6,'Check-In Date');
+						sheet.setCell(1,7,'Check-Out Date');
+						//sheet.setCell(1,8,'Last Bill Date');
+						sheet.setCell(1,8,'Tariff');
+						sheet.setCell(1,9,'Discount');
+						sheet.setCell(1,10,'No Of Days'); 
+						//sheet.setCell(1,11,'Net Amount');
+						sheet.setCell(1,11,'Total');
 						//sheet.setCell(1,7,'');
 						
 						for(var i:int=0;i<arrExportResult.length;i++)
 						{
-							sheet.setCell(i+2, 0, arrExportResult[i].ClientName);
-							sheet.setCell(i+2, 1, arrExportResult[i].PropertyName);
-							sheet.setCell(i+2, 2, arrExportResult[i].FirstName);
-							sheet.setCell(i+2, 3, arrExportResult[i].ChkOutDate);
-							sheet.setCell(i+2, 4, arrExportResult[i].CityName);
-							sheet.setCell(i+2, 5, arrExportResult[i].CheckOutNo);
-							sheet.setCell(i+2, 6, arrExportResult[i].ChkOutTariffNetAmount);
+							sheet.setCell(i+2, 0, arrExportResult[i].Sno);
+							sheet.setCell(i+2, 1, arrExportResult[i].CityName);
+							sheet.setCell(i+2, 2, arrExportResult[i].PropertyName);
+							sheet.setCell(i+2, 3, arrExportResult[i].ClientName);
+							sheet.setCell(i+2, 4, arrExportResult[i].FirstName);
+							sheet.setCell(i+2, 5, arrExportResult[i].BookingCode);
+							sheet.setCell(i+2, 6, arrExportResult[i].CheckInDate);
+							sheet.setCell(i+2, 7, arrExportResult[i].CheckOutDate);
+							//sheet.setCell(i+2, 8, arrExportResult[i].CheckOutDate);
+							sheet.setCell(i+2, 8, arrExportResult[i].Tariff);
+							sheet.setCell(i+2, 9, arrExportResult[i].Discount);
+							sheet.setCell(i+2, 10, arrExportResult[i].NoOfDays);
+							sheet.setCell(i+2, 11, arrExportResult[i].ChkOutTariffNetAmount);
+							//sheet.setCell(i+2, 11, arrExportResult[i].ChkOutTariffNetAmount);
 							//sheet.setCell(i+2, 8, arrExportResult[i].); 
 						}			 
 						
@@ -189,8 +203,8 @@
 						xlsFile.sheets.addItem(sheet);      
 						var bytes: ByteArray = xlsFile.saveToByteArray();
 						var fr:FileReference = new FileReference(); 
-						var str:String="PendingUnSettled.xls";
-						fr.save(bytes,"PendingUnSettled.xls");
+						var str:String="PendingUnBilled.xls";
+						fr.save(bytes,"PendingUnBilled.xls");
 					}
 					else
 					{
@@ -266,7 +280,7 @@
 					<s:RadioButton label="External" groupName="Modes"  value="1"
 								   id="External" buttonMode="true"  /> 
 					<s:RadioButton label="Managed GH" groupName="Modes"  value="2"
-								   id="Managed" buttonMode="true"  />
+								   id="Managed" buttonMode="true"   />
 				</s:HGroup>
 				<s:Label x="414" y="44" height="29" text="Filter by &#xd;CheckOutNo"/>
 				<s:TextInput id="txtCheckOutNo" x="526" y="44" width="109" height="25"
@@ -279,16 +293,24 @@
 		<s:HGroup  width="100%" height="100%">
 			<mx:DataGrid id="Grd_ListClient1" width="100%" height="402" borderStyle="outset"
 						 depth="100" tabIndex="10"> 
-				<mx:columns>		 				
-					<mx:DataGridColumn dataField="ClientName" width="150" />
+				<mx:columns>
+					<mx:DataGridColumn dataField="Sno" width="90" /> 
+					<mx:DataGridColumn dataField="CityName" width="100" textAlign="left" />
 					<mx:DataGridColumn dataField="PropertyName" width="150"  headerText="Property Name" editable="False" textAlign="left"/>
-					<mx:DataGridColumn dataField="CityName" width="100" textAlign="left" /> 
-					<mx:DataGridColumn dataField="FirstName" width="190"   headerText="Guest Name" textAlign="left"/> 
-					<mx:DataGridColumn dataField="ChkOutDate" width="150" /> 
-					<mx:DataGridColumn dataField="ChkOutTariffNetAmount" width="150" /> 
-					<mx:DataGridColumn dataField="CheckOutNo" width="91" headerText="CheckOut No" textAlign="left"/> 
-					<mx:DataGridColumn dataField="Propertytype" width="100" headerText="Propertytype" textAlign="center"/> 
-				</mx:columns>
+					<mx:DataGridColumn dataField="ClientName" width="150" />
+					<mx:DataGridColumn dataField="Guest" width="190"   headerText="Guest Name" textAlign="left"/> 
+					<mx:DataGridColumn dataField="BookingCode" width="150"  headerText="B.Code"  textAlign="center"/> 
+					<mx:DataGridColumn dataField="CheckInDate" width="190"    textAlign="left"/> 
+					<mx:DataGridColumn dataField="CheckOutDate" width="150" /> 
+					<mx:DataGridColumn dataField="Tariff" width="150" />
+					<mx:DataGridColumn dataField="Discount" width="150" />
+					<mx:DataGridColumn dataField="NoOfDays" width="150" /> 
+					<mx:DataGridColumn dataField="ChkOutTariffNetAmount" headerText="Total" width="150" />
+					
+					<mx:DataGridColumn dataField="LastBillDate" visible="false" />
+					<mx:DataGridColumn dataField="CheckOutNo" width="91" visible="false"/> 
+					<mx:DataGridColumn dataField="Propertytype" headerText="Propertytype" textAlign="center" visible="false"/> 
+				 </mx:columns>
 			</mx:DataGrid> 
 			
 		</s:HGroup> 

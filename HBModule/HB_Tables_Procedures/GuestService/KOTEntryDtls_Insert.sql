@@ -26,14 +26,20 @@ AS
 BEGIN
 DECLARE @InsId INT;
 -- CHECKIN PROPERTY GUEST DETAILS INSERT
+DECLARE @HdrDate date
+SET @HdrDate=(SELECT Date FROM WRBHBKOTHdr WHERE Id=@KOTEntryHdrId and IsActive=1 and IsDeleted=0)
+
 INSERT INTO WRBHBKOTDtls(KOTEntryHdrId,PropertyId,BookingId,
 BookingCode,GuestName,RoomNo,BreakfastVeg,BreakfastNonVeg,LunchVeg,
 LunchNonVeg,DinnerVeg,DinnerNonVeg,CreatedBy,CreatedDate,ModifiedBy,
-ModifiedDate,IsActive,IsDeleted,RowId,CheckInId)
+ModifiedDate,IsActive,IsDeleted,RowId,CheckInId,HdrDate)
 
 VALUES(@KOTEntryHdrId,@PropertyId,@BookingId,@BookingCode,@GuestName,
 @RoomNo,@BreakfastVeg,@BreakfastNonVeg,@LunchVeg,@LunchNonVeg,@DinnerVeg,
-@DinnerNonVeg,@UserId,GETDATE(),@UserId,GETDATE(),1,0,NEWID(),@CheckInId)
+@DinnerNonVeg,@UserId,GETDATE(),@UserId,GETDATE(),1,0,NEWID(),@CheckInId,ISNULL(@HdrDate,''))
+
+
+
 
 SET @InsId=@@IDENTITY;
 SELECT Id,RowId FROM WRBHBKOTDtls WHERE Id=@InsId;

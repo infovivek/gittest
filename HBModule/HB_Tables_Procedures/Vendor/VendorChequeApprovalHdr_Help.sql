@@ -166,7 +166,7 @@ END
         SET @Type =(SELECT DISTINCT Type From WRBHBVendorRequest WHERE PropertyId=@CreatedById
         AND UserId=@UserId AND Date=CONVERT(Date,@Str,103))
         
-        IF @Type !=''
+        IF ISNULL(@Type,'') !='Property'
         BEGIN
 			SELECT CONVERT(NVARCHAR(100),GETDATE(),103) AS BillDate,
 			VR.Service AS ExpenseHead,VR.VendorName AS VendorName,
@@ -180,7 +180,7 @@ END
 			VR.Flag=1 AND VR.Date=CONVERT(Date,@Str,103)
 			group by VR.Service,VR.VendorName,P.PropertyName,VR.Duedate ,VR.Type,VD.BillNo,VD.Amount,
 			VR.UserId,VR.PropertyId,VR.Id
-							
+				
 			SELECT DISTINCT(U.FirstName+' '+U.LastName) AS Requestedby,CONVERT(NVARCHAR(100),GETDATE(),103) AS
 			RequestedOn
 			FROM WRBHBVendorRequest VR

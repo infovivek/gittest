@@ -38,6 +38,7 @@ CREATE PROCEDURE [dbo].[Sp_VendorRequest_Insert]
 @Duedate		NVARCHAR(100),
 @VendorBill		NVARCHAR(100),
 @Description	NVARCHAR(max),
+@Temp			Bit,
 @CreatedBy		INT,
 @Status			NVARCHAR(100),
 @UserId			BIGINT
@@ -45,7 +46,9 @@ CREATE PROCEDURE [dbo].[Sp_VendorRequest_Insert]
 AS
 BEGIN
 DECLARE @Identity int
-INSERT INTO	WRBHBVendorRequest (PropertyId,Property,CategoryId,Category,VendorId,VendorName,Service,Type,
+IF(ISNULL(@Temp,'') !='false')
+BEGIN
+INSERT INTO	WRBHBVendorRequestTemp (PropertyId,Property,CategoryId,Category,VendorId,VendorName,Service,Type,
 			ApartmentId,RoomId,Date,Amount,BillNo,Duedate,VendorBill,Description,
 			IsActive,IsDeleted,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,RowId,Status,UserId,Flag,Partial)
 	VALUES (@PropertyId,@Property,@CategoryId,@Category,@VendorId,@VendorName,@Service,@Type,@ApartmentId,
@@ -54,7 +57,21 @@ INSERT INTO	WRBHBVendorRequest (PropertyId,Property,CategoryId,Category,VendorId
 			NEWID(),@Status,@UserId,1,0)
 	
 	SET  @Identity=@@IDENTITY
-SELECT Id,Rowid FROM WRBHBVendorRequest WHERE Id=@Identity;
+	SELECT Id,Rowid,@Temp FROM WRBHBVendorRequest WHERE Id=@Identity;
+END
+ELSE
+BEGIN
+INSERT INTO	WRBHBVendorRequest (PropertyId,Property,CategoryId,Category,VendorId,VendorName,Service,Type,
+			ApartmentId,RoomId,Date,Amount,BillNo,Duedate,VendorBill,Description,
+			IsActive,IsDeleted,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,RowId,Status,UserId,Flag,Partial)
+	VALUES (@PropertyId,@Property,@CategoryId,@Category,@VendorId,@VendorName,@Service,@Type,@ApartmentId,
+			@RoomId,Convert(date,@Date,103),@Amount,@BillNo,@Duedate,@VendorBill,
+			@Description,1,0,@CreatedBy,GETDATE(),@CreatedBy,GETDATE(),
+			NEWID(),@Status,@UserId,1,0)
+			
+			SET  @Identity=@@IDENTITY
+			SELECT Id,Rowid,'false' FROM WRBHBVendorRequest WHERE Id=@Identity;
+END
 END			
 
  

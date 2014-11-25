@@ -139,6 +139,8 @@ namespace HB.Dao
             Cmd.Parameters.Add("@Str1", SqlDbType.NVarChar).Value = data[2].ToString();
             Cmd.Parameters.Add("@CheckInHdrId", SqlDbType.Int).Value = Convert.ToInt32(data[3].ToString());
             Cmd.Parameters.Add("@StateId", SqlDbType.Int).Value = Convert.ToInt32(data[4].ToString());
+            Cmd.Parameters.Add("@BillFrom", SqlDbType.NVarChar).Value = data[5].ToString();
+            Cmd.Parameters.Add("@BillTo", SqlDbType.NVarChar).Value = data[6].ToString();
             return new WrbErpConnection().ExecuteDataSet(Cmd, UserData);
         }
     }

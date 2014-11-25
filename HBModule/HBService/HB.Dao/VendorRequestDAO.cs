@@ -93,6 +93,15 @@ namespace HB.Dao
 
                 VR.Des = doc.SelectSingleNode("//HdrXml").Attributes["Des"].Value;
             }
+            if (doc.SelectSingleNode("//HdrXml").Attributes["Temp"].Value == "")
+            {
+                VR.Temp = false;
+            }
+            else
+            {
+
+                VR.Temp = Convert.ToBoolean(doc.SelectSingleNode("//HdrXml").Attributes["Temp"].Value);
+            }
             command = new SqlCommand();
             if (VR.Id != 0)
             {
@@ -127,6 +136,7 @@ namespace HB.Dao
                 command.Parameters.Add("@Duedate", SqlDbType.NVarChar).Value = VR.Duedate;
                 command.Parameters.Add("@VendorBill", SqlDbType.NVarChar).Value = VR.VendorBill;
                 command.Parameters.Add("@Description", SqlDbType.NVarChar).Value = VR.Des;
+                command.Parameters.Add("@Temp", SqlDbType.Bit).Value = VR.Temp;
                 command.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = user.Id;
                 command.Parameters.Add("@Status", SqlDbType.NVarChar).Value = "Submitted";
                 command.Parameters.Add("@UserId", SqlDbType.BigInt).Value = user.Id;
