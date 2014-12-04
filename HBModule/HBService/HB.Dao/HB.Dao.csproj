@@ -174,8 +174,10 @@
     <Compile Include="RoomShiftingDAO.cs" />
     <Compile Include="SearchBookingDAO.cs" />
     <Compile Include="SearchBookingGuestDAO.cs" />
+    <Compile Include="SearchDetailServiceInvoiceDAO.cs" />
     <Compile Include="SearchInvoiceReportDao.cs" />
     <Compile Include="SlabTaxDAO.cs" />
+    <Compile Include="SMSDAO.cs" />
     <Compile Include="SnackKOTHistoryDAO.cs" />
     <Compile Include="SSPCodeGenerationApartmentDAO.cs" />
     <Compile Include="SSPCodeGenerationRoomsDAO.cs" />

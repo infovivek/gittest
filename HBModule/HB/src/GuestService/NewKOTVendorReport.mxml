@@ -48,6 +48,7 @@
 			public var Value_AC:ArrayCollection=new ArrayCollection();
 			public var AddMode:Boolean=true,Flag:Boolean=true;
 			public var Identity:String="";private var xlsFile:ExcelFile;
+			public var Str_KOT:String="";
 			protected function PageLoad():void
 			{
 				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
@@ -55,6 +56,8 @@
 				GlobalXml += "<ROOT>";
 				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
 				GlobalXml += "</ROOT>";
+				Str_KOT="http://localhost::6236/KOTVendorReport.aspx?";
+				//Str_KOT="http://sstage.in/HBReport/NewSnackKOTEntry.aspx?";
 				useWeb("NewKOTVendorReport","PAGELOAD_CUSTOM",[GlobalXml,'PageLoad',0,0,'','']);
 				hlp_vendor.setFocus();
 			}
@@ -223,6 +226,7 @@
 				}
 				return ErrStr; 
 			}
+			public var From:String="",To:String="";
 			public function Grd_DetailsClick():void
 			{
 				Grd_Status.dataProvider=null;
@@ -236,7 +240,6 @@
 				} 
 				else
 				{			
-				var From:String="",To:String="";
 				From=dt_From.text;
 				To=dt_To.text;
 				if(hlp_Property.text !="")
@@ -248,6 +251,17 @@
 					useWeb("NewKOTVendorReport","NewGridLoad_CUSTOM",[GlobalXml,'NewServiceload',VendorId,0,From,To]);
 				}
 				
+				}
+			}
+			protected function Print():void
+			{
+				if(hlp_Property.text !="")
+				{
+					ExternalInterface.call("changeDocumentTitle",Str_KOT+VendorId+"?"+PropertyId+"?"+From+"?"+To);
+				}
+				else
+				{
+					ExternalInterface.call("changeDocumentTitle",Str_KOT+VendorId+"?"+0+"?"+From+"?"+To);
 				}
 			}
 			protected function ExportExcel(event:MouseEvent):void
@@ -338,6 +352,8 @@
 						  pxSetHeight="183" pxTabIndex="1">
 	</WrbHelpComp:HelpText>
 	<WrbComp:Button_BB x="440" y="465" Lable_val="Export" id="btn_Excel" click="ExportExcel(event)">
+	</WrbComp:Button_BB>
+	<WrbComp:Button_BB x="550" y="465" Lable_val="Print" id="btn_Print" click="Print()">
 	</WrbComp:Button_BB>
 	<mx:Label x="697" y="56" text="To"/>
 	<mx:Label x="714" y="51" width="10" height="12" text="*" color="Red"/>

@@ -77,19 +77,17 @@ BEGIN
 			INSERT INTO #Final(UserName,Property,ProcessedOn,TransferredAmount,Fortnight,PropertyId,UserId,
 			Processedby,Status,LastProcessedOn)
 			SELECT (S.FirstName+''+S.LastName) AS UserName,P.PropertyName,
-			CONVERT(NVARCHAR,CAST(U.CreatedDate AS Date),103) AS ProcessedOn,U.Amount,1, 
-			U.PropertyId,U.UserId,(US.FirstName+''+US.LastName) AS Processedby,PC.ProcessedStatus,
+			CONVERT(NVARCHAR,PC.RequestedOn,103) AS ProcessedOn,PC.ExpenseAmount,2, 
+			PC.PropertyId,PC.RequestedUserId,(US.FirstName+''+US.LastName) AS Processedby,PC.ProcessedStatus,
 			PC.LastProcessedon
-			FROM WRBHBPettyCashStatus U 
-			JOIN WRBHBPCExpenseApproval PC ON U.PropertyId=PC.PropertyId AND U.UserId=PC.UserId AND PC.IsActive=1 AND PC.IsDeleted=0
-			JOIN WRBHBUser S ON U.UserId=S.Id AND S.IsActive=1 AND S.IsDeleted=0
+			FROM WRBHBPCExpenseApproval PC
+			JOIN WRBHBUser S ON PC.RequestedUserId=S.Id AND S.IsActive=1 AND S.IsDeleted=0
 			JOIN WRBHBUser US ON PC.UserId=US.Id AND S.IsActive=1 AND S.IsDeleted=0
-			JOIN WRBHBProperty P ON U.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
-			WHERE  U.IsActive=1 AND U.IsDeleted=0 AND U.PropertyId=@Id AND PC.ProcessedStatus=@Str2 
-			AND U.Flag=0 AND  CONVERT(date,CAST(DATEADD(mm, DATEDIFF(mm, 0, U.CreatedDate), 0) AS Date),103)=
-			Convert(date,@Str1,103)
-			group by S.FirstName,S.LastName,P.PropertyName,U.CreatedDate,U.Amount,U.PropertyId,U.UserId
-			,US.FirstName,US.LastName, PC.ProcessedStatus,PC.LastProcessedon 
+			JOIN WRBHBProperty P ON PC.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
+			WHERE  PC.IsActive=1 AND PC.IsDeleted=0 AND PC.PropertyId=@Id AND PC.ProcessedStatus=@Str2
+			AND MONTH(CONVERT(date,PC.RequestedOn,103))=MONTH(Convert(date,@Str1,103))
+			group by S.FirstName,S.LastName,P.PropertyName,PC.RequestedOn,PC.ExpenseAmount,PC.PropertyId,PC.RequestedUserId
+			,US.FirstName,US.LastName, PC.ProcessedStatus,PC.LastProcessedon  
 			
 			INSERT INTO #Final(UserName,Property,ProcessedOn,TransferredAmount,Fortnight,PropertyId,UserId,
 			Processedby,Status,LastProcessedOn)
@@ -101,7 +99,7 @@ BEGIN
 			JOIN WRBHBPettyCashStatus U ON PC.Id=U.PettyCashStatusHdrId  AND PC.IsActive=1 AND PC.IsDeleted=0
 			JOIN WRBHBUser S ON U.UserId=S.Id AND S.IsActive=1 AND S.IsDeleted=0
 			JOIN WRBHBProperty P ON U.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
-			WHERE  U.IsActive=1 AND U.IsDeleted=0 AND U.PropertyId=@Id AND PC.Flag=1
+			WHERE  U.IsActive=1 AND U.IsDeleted=0 AND U.PropertyId=@Id AND PC.Flag=1 AND PC.NewEntry=0
 			AND MONTH(CONVERT (date,PC.CreatedDate,103))=MONTH(Convert(date,@Str1,103))
 			group by S.FirstName,S.LastName,P.PropertyName,PC.CreatedDate,PC.PropertyId,PC.UserId
 		END
@@ -110,19 +108,17 @@ BEGIN
 		    INSERT INTO #Final(UserName,Property,ProcessedOn,TransferredAmount,Fortnight,PropertyId,UserId,
 		    Processedby,Status,LastProcessedOn)
 			SELECT (S.FirstName+''+S.LastName) AS UserName,P.PropertyName,
-			CONVERT(NVARCHAR,CAST(U.CreatedDate AS Date),103) AS ProcessedOn,U.Amount,2, 
-			U.PropertyId,U.UserId,(US.FirstName+''+US.LastName) AS Processedby,PC.ProcessedStatus,
+			CONVERT(NVARCHAR,PC.RequestedOn,103) AS ProcessedOn,PC.ExpenseAmount,2, 
+			PC.PropertyId,PC.RequestedUserId,(US.FirstName+''+US.LastName) AS Processedby,PC.ProcessedStatus,
 			PC.LastProcessedon
-			FROM WRBHBPettyCashStatus U 
-			JOIN WRBHBPCExpenseApproval PC ON U.PropertyId=PC.PropertyId AND U.UserId=PC.UserId AND PC.IsActive=1 AND PC.IsDeleted=0
-			JOIN WRBHBUser S ON U.UserId=S.Id AND S.IsActive=1 AND S.IsDeleted=0
+			FROM WRBHBPCExpenseApproval PC
+			JOIN WRBHBUser S ON PC.RequestedUserId=S.Id AND S.IsActive=1 AND S.IsDeleted=0
 			JOIN WRBHBUser US ON PC.UserId=US.Id AND S.IsActive=1 AND S.IsDeleted=0
-			JOIN WRBHBProperty P ON U.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
-			WHERE  U.IsActive=0 AND U.IsDeleted=1 AND U.PropertyId=@Id AND PC.ProcessedStatus=@Str2
-			AND U.Flag=0 AND CONVERT(date,CAST(DATEADD(mm, DATEDIFF(mm, 0, U.CreatedDate), 0) AS Date),103)=
-			Convert(date,@Str1,103)
-			group by S.FirstName,S.LastName,P.PropertyName,U.CreatedDate,U.Amount,U.PropertyId,U.UserId
-			,US.FirstName,US.LastName, PC.ProcessedStatus,PC.LastProcessedon  
+			JOIN WRBHBProperty P ON PC.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
+			WHERE  PC.IsActive=1 AND PC.IsDeleted=0 AND PC.PropertyId=@Id AND PC.ProcessedStatus=@Str2
+			AND MONTH(CONVERT(date,PC.RequestedOn,103))=MONTH(Convert(date,@Str1,103))
+			group by S.FirstName,S.LastName,P.PropertyName,PC.RequestedOn,PC.ExpenseAmount,PC.PropertyId,PC.RequestedUserId
+			,US.FirstName,US.LastName, PC.ProcessedStatus,PC.LastProcessedon   
 			
 			INSERT INTO #Final(UserName,Property,ProcessedOn,TransferredAmount,Fortnight,PropertyId,UserId,
 			Processedby,Status,LastProcessedOn)
@@ -134,7 +130,7 @@ BEGIN
 			JOIN WRBHBPettyCashStatus U ON PC.Id=U.PettyCashStatusHdrId  AND PC.IsActive=1 AND PC.IsDeleted=0
 			JOIN WRBHBUser S ON U.UserId=S.Id AND S.IsActive=1 AND S.IsDeleted=0
 			JOIN WRBHBProperty P ON U.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
-			WHERE  U.IsActive=1 AND U.IsDeleted=0 AND U.PropertyId=@Id AND PC.Flag=1
+			WHERE  U.IsActive=1 AND U.IsDeleted=0 AND U.PropertyId=@Id AND PC.Flag=1 AND PC.NewEntry=0
 			AND MONTH(CONVERT (date,PC.CreatedDate,103))=MONTH(Convert(date,@Str1,103))
 			group by S.FirstName,S.LastName,P.PropertyName,PC.CreatedDate,PC.PropertyId,PC.UserId
 			
@@ -148,19 +144,17 @@ BEGIN
 			INSERT INTO #Final(UserName,Property,ProcessedOn,TransferredAmount,Fortnight,PropertyId,UserId,
 			Processedby,Status,LastProcessedOn)
 			SELECT (S.FirstName+''+S.LastName) AS UserName,P.PropertyName,
-			CONVERT(NVARCHAR,CAST(U.CreatedDate AS Date),103) AS ProcessedOn,U.Amount,1, 
-			U.PropertyId,U.UserId,(US.FirstName+''+US.LastName) AS Processedby,PC.ProcessedStatus,
+			CONVERT(NVARCHAR,PC.RequestedOn,103) AS ProcessedOn,PC.ExpenseAmount,2, 
+			PC.PropertyId,PC.RequestedUserId,(US.FirstName+''+US.LastName) AS Processedby,PC.ProcessedStatus,
 			PC.LastProcessedon
-			FROM WRBHBPettyCashStatus U 
-			JOIN WRBHBPCExpenseApproval PC ON U.PropertyId=PC.PropertyId AND U.UserId=PC.UserId AND PC.IsActive=1 AND PC.IsDeleted=0
-			JOIN WRBHBUser S ON U.UserId=S.Id AND S.IsActive=1 AND S.IsDeleted=0
+			FROM WRBHBPCExpenseApproval PC
+			JOIN WRBHBUser S ON PC.RequestedUserId=S.Id AND S.IsActive=1 AND S.IsDeleted=0
 			JOIN WRBHBUser US ON PC.UserId=US.Id AND S.IsActive=1 AND S.IsDeleted=0
-			JOIN WRBHBProperty P ON U.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
-			WHERE  U.IsActive=1 AND U.IsDeleted=0 AND  PC.ProcessedStatus=@Str2 
-			AND U.Flag=0 AND  CONVERT(date,CAST(DATEADD(mm, DATEDIFF(mm, 0, U.CreatedDate), 0) AS Date),103)=
-			Convert(date,@Str1,103)
-			group by S.FirstName,S.LastName,P.PropertyName,U.CreatedDate,U.Amount,U.PropertyId,U.UserId
-			,US.FirstName,US.LastName, PC.ProcessedStatus,PC.LastProcessedon  
+			JOIN WRBHBProperty P ON PC.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
+			WHERE  PC.IsActive=1 AND PC.IsDeleted=0 AND PC.ProcessedStatus=@Str2
+			AND MONTH(CONVERT(date,PC.RequestedOn,103))=MONTH(Convert(date,@Str1,103))
+			group by S.FirstName,S.LastName,P.PropertyName,PC.RequestedOn,PC.ExpenseAmount,PC.PropertyId,PC.RequestedUserId
+			,US.FirstName,US.LastName, PC.ProcessedStatus,PC.LastProcessedon   
 			
 			INSERT INTO #Final(UserName,Property,ProcessedOn,TransferredAmount,Fortnight,PropertyId,UserId,
 			Processedby,Status,LastProcessedOn)
@@ -172,27 +166,27 @@ BEGIN
 			JOIN WRBHBPettyCashStatus U ON PC.Id=U.PettyCashStatusHdrId  AND PC.IsActive=1 AND PC.IsDeleted=0
 			JOIN WRBHBUser S ON U.UserId=S.Id AND S.IsActive=1 AND S.IsDeleted=0
 			JOIN WRBHBProperty P ON U.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
-			WHERE  U.IsActive=1 AND U.IsDeleted=0 AND PC.Flag=1
+			WHERE  U.IsActive=1 AND U.IsDeleted=0 AND PC.Flag=1 AND PC.NewEntry=0
 			AND MONTH(CONVERT (date,PC.CreatedDate,103))=MONTH(Convert(date,@Str1,103))
 			group by S.FirstName,S.LastName,P.PropertyName,PC.CreatedDate,PC.PropertyId,PC.UserId
 		END
 		ELSE IF(@Str ='Second')
 		BEGIN
+		
 			INSERT INTO #Final(UserName,Property,ProcessedOn,TransferredAmount,Fortnight,PropertyId,UserId,
 		    Processedby,Status,LastProcessedOn)
+			
 			SELECT (S.FirstName+''+S.LastName) AS UserName,P.PropertyName,
-			CONVERT(NVARCHAR,CAST(U.CreatedDate AS Date),103) AS ProcessedOn,U.Amount,2, 
-			U.PropertyId,U.UserId,(US.FirstName+''+US.LastName) AS Processedby,PC.ProcessedStatus,
+			CONVERT(NVARCHAR,PC.RequestedOn,103) AS ProcessedOn,PC.ExpenseAmount,2, 
+			PC.PropertyId,PC.RequestedUserId,(US.FirstName+''+US.LastName) AS Processedby,PC.ProcessedStatus,
 			PC.LastProcessedon
-			FROM WRBHBPettyCashStatus U 
-			JOIN WRBHBPCExpenseApproval PC ON U.PropertyId=PC.PropertyId AND U.UserId=PC.UserId AND PC.IsActive=1 AND PC.IsDeleted=0
-			JOIN WRBHBUser S ON U.UserId=S.Id AND S.IsActive=1 AND S.IsDeleted=0
+			FROM WRBHBPCExpenseApproval PC
+			JOIN WRBHBUser S ON PC.RequestedUserId=S.Id AND S.IsActive=1 AND S.IsDeleted=0
 			JOIN WRBHBUser US ON PC.UserId=US.Id AND S.IsActive=1 AND S.IsDeleted=0
-			JOIN WRBHBProperty P ON U.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
-			WHERE  U.IsActive=0 AND U.IsDeleted=1 AND PC.ProcessedStatus=@Str2
-			AND U.Flag=0 AND CONVERT(date,CAST(DATEADD(mm, DATEDIFF(mm, 0, U.CreatedDate), 0) AS Date),103)=
-			Convert(date,@Str1,103)
-			group by S.FirstName,S.LastName,P.PropertyName,U.CreatedDate,U.Amount,U.PropertyId,U.UserId
+			JOIN WRBHBProperty P ON PC.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
+			WHERE  PC.IsActive=1 AND PC.IsDeleted=0 AND PC.ProcessedStatus=@Str2
+			AND MONTH(CONVERT(date,PC.RequestedOn,103))=MONTH(Convert(date,@Str1,103))
+			group by S.FirstName,S.LastName,P.PropertyName,PC.RequestedOn,PC.ExpenseAmount,PC.PropertyId,PC.RequestedUserId
 			,US.FirstName,US.LastName, PC.ProcessedStatus,PC.LastProcessedon  
 			
 			INSERT INTO #Final(UserName,Property,ProcessedOn,TransferredAmount,Fortnight,PropertyId,UserId,
@@ -205,7 +199,7 @@ BEGIN
 			JOIN WRBHBPettyCashStatus U ON PC.Id=U.PettyCashStatusHdrId  AND PC.IsActive=1 AND PC.IsDeleted=0
 			JOIN WRBHBUser S ON U.UserId=S.Id AND S.IsActive=1 AND S.IsDeleted=0
 			JOIN WRBHBProperty P ON U.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
-			WHERE  U.IsActive=1 AND U.IsDeleted=0 AND  PC.Flag=1
+			WHERE  U.IsActive=1 AND U.IsDeleted=0 AND  PC.Flag=1 AND PC.NewEntry=0
 			AND MONTH(CONVERT (date,PC.CreatedDate,103))=MONTH(Convert(date,@Str1,103))
 			group by S.FirstName,S.LastName,P.PropertyName,PC.CreatedDate,PC.PropertyId,PC.UserId
 		END
@@ -359,11 +353,12 @@ BEGIN
 		ISNULL(Bill,'')AS Bill
 		FROM #PettyCash1
 		
-		SELECT OpeningBalance FROM WRBHBPettyCashHdr
+		SELECT Balance AS OpeningBalance FROM WRBHBPettyCashStatusHdr
 		WHERE UserId =@UserId AND PropertyId=@Id AND IsActive=1 AND IsDeleted=0
-		AND CONVERT(date,Date,103)=CONVERT(date,@Str,103)
+		AND CONVERT(NVARCHAR,CAST(CreatedDate AS Date),103)=CONVERT(NVARCHAR(100),@Str,103) AND Id=
+		(SELECT MAX(Id)  FROM WRBHBPettyCashStatus WHERE UserId=@UserId AND PropertyId=@Id)
 		
-		SELECT DISTINCT Balance FROM WRBHBPettyCashStatus
+		SELECT DISTINCT Balance FROM WRBHBPettyCashStatusHdr
 		WHERE UserId =@UserId AND PropertyId=@Id AND IsActive=1 AND IsDeleted=0
 		AND CONVERT(NVARCHAR,CAST(CreatedDate AS Date),103)=CONVERT(NVARCHAR(100),@Str,103)
 		

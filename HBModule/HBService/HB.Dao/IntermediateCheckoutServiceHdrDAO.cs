@@ -133,12 +133,14 @@ namespace HB.Dao
         {
             UserData = "   UserId : " + User.Id + ", UsreName : " + User.LoginUserName + ", ScreenName : " + User.ScreenName + ", SctId : " + User.SctId + ", BranchId : " + User.BranchId + "";
             Cmd = new SqlCommand();
-            Cmd.CommandText = StoredProcedures.CheckOutHdrService_Help;
+            Cmd.CommandText = StoredProcedures.ExternalCheckoutService_Help;
             Cmd.CommandType = CommandType.StoredProcedure;
             Cmd.Parameters.Add("@Action", SqlDbType.NVarChar).Value = data[1].ToString();
             Cmd.Parameters.Add("@Str1", SqlDbType.NVarChar).Value = data[2].ToString();
             Cmd.Parameters.Add("@CheckInHdrId", SqlDbType.Int).Value = Convert.ToInt32(data[3].ToString());
             Cmd.Parameters.Add("@StateId", SqlDbType.Int).Value = Convert.ToInt32(data[4].ToString());
+            Cmd.Parameters.Add("@BillFrom", SqlDbType.NVarChar).Value = data[5].ToString();
+            Cmd.Parameters.Add("@BillTo", SqlDbType.NVarChar).Value = data[6].ToString();
             return new WrbErpConnection().ExecuteDataSet(Cmd, UserData);
         }
     }

@@ -152,8 +152,8 @@
 			protected function Help():void
 			{				
 				
-				useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId,0]);
-	//		 	useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65,0]);
+	//			useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId,0]);
+			 	useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65,0]);
 				Txt_ServiceBillAmt.editable=false;
 				Txt_ServiceVat.editable=false;
 				Txt_SerivceTax.editable=false;
@@ -7832,6 +7832,7 @@
 					Txt_ServiceNetAmount.text=String(Number(Txt_ServiceNetAmount.text)-misValue)
 					txt_MiscellaneousRemarks.text="";
 					txt_MiscellaneousAmount.text="";
+					txt_MiscellaneousAmount.enabled=true;
 				}
 			}
 			
@@ -7951,7 +7952,7 @@
 				//	Txt_ServiceNetAmount.text = NF_Two.format((Number(Txt_ServiceNetAmount.text)+Number(MA)));
 				Txt_ServiceNetAmount.text = String(Number(Txt_ServiceNetAmount.text)+Number(txt_MiscellaneousAmount.text));
 				
-				
+				txt_MiscellaneousAmount.enabled=false;
 				//		Txt_ServiceNetAmount.text=String(Number(Txt_ServiceNetAmount.text)+Number(txt_MiscellaneousAmount.text))
 				
 			}
@@ -7979,70 +7980,99 @@
 				
 				// TODO Auto-generated method stub
 				
-//				if(Checkout.selected == true)
-//				{
-					var BillFrom:String="";
-					var BillTo:String="";
-					BillFrom=DT_BillFromDate.text;
-					BillTo=DT_BillTo.text;
-					
-					var BillTo=DT_BillTo.text;	
-					//var TodayDate:String=TodayDate;
-					var BillTo:String=DT_BillTo.text;
-					var BillTo1:String=TodayDate;
-					var D:String=BillTo.substr(0,2);
-					var M:String=BillTo.substr(3,2);
-					var Y:String=BillTo.substr(6,10);
-					var D1:String=BillTo1.substr(0,2);
-					var M1:String=BillTo1.substr(3,2);
-					var Y1:String=BillTo1.substr(6,10);
-					var RangeMiddle:String=Y+'/'+M+'/'+D;
-					var RangeEnd:String=Y1+'/'+M1+'/'+String(Number(D1)+1);
-					var RangeStart:String=Y+'/'+M+'/'+D;
-//					var BillTo1 = 
-//						{rangeStart:new Date(RangeStart),rangeEnd:new Date(RangeEnd)};
-//					BillTo1=new Date(RangeEnd);
-					
-					if(RangeStart <= RangeEnd)
+
+					if(Checkout.selected == true)
 					{
-						useWeb("CheckoutAndIntermediate","Guest_CUSTOM",[GlobalXml,"CHKINROOMDETAILS","",BillFrom,BillTo,CheckInHdrId,StateId,0,0,ExtraMaters]);
-						//		useWeb("CheckOutServiceHdr","TariffLoad_CUSTOM",[GlobalXml,"ProductLoad",BillFrom,,CheckInHdrId,GuestId,StateId,0,0,0]);
+						var BillFrom:String="";
+						var BillTo:String="";
+						BillFrom=DT_BillFromDate.text;
+						BillTo=DT_BillTo.text;
 						
+						var BillTo=DT_BillTo.text;	
+						//var TodayDate:String=TodayDate;
+						var BillTo:String=DT_BillTo.text;
+						var BillTo1:String=TodayDate;
+						var D:String=BillTo.substr(0,2);
+						var M:String=BillTo.substr(3,2);
+						var Y:String=BillTo.substr(6,10);
+						var D1:String=BillTo1.substr(0,2);
+						var M1:String=BillTo1.substr(3,2);
+						var Y1:String=BillTo1.substr(6,10);
+						var RangeMiddle:String=Y+'/'+M+'/'+D;
+						var RangeEnd:String=Y1+'/'+M1+'/'+String(Number(D1)+1);
+						var RangeStart:String=Y+'/'+M+'/'+D;
+						//					var BillTo1 = 
+						//						{rangeStart:new Date(RangeStart),rangeEnd:new Date(RangeEnd)};
+						//					BillTo1=new Date(RangeEnd);
+						
+						if(RangeStart <= RangeEnd)
+						{
+							useWeb("CheckoutAndIntermediate","Guest_CUSTOM",[GlobalXml,"CHKINROOMDETAILS","",BillFrom,BillTo,CheckInHdrId,StateId,0,0,ExtraMaters]);
+							//		useWeb("CheckOutServiceHdr","TariffLoad_CUSTOM",[GlobalXml,"ProductLoad",BillFrom,,CheckInHdrId,GuestId,StateId,0,0,0]);
+							
+						}
+							
+						else
+						{
+							alignAlert(Alert.show("Can't be Process Future Checkout","Alert Message !",
+								Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+							
+							return;
+							Sctrl.enabled=false;
+							
+						}
 					}
-					else
+					
+					if(Intermediate.selected == true)
 					{
-						alignAlert(Alert.show("Can't be Process Future Checkout","Alert Message !",
-							Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+						var BillFrom:String="";
+						var BillTo:String="";
+						BillFrom=DT_BillFromDate.text;
+						BillTo=DT_BillTo.text;
 						
-						return;
-						Sctrl.enabled=false;
+						var BillTo=DT_BillTo.text;	
+						//var TodayDate:String=TodayDate;
+						var BillTo:String=DT_BillTo.text;
+						var BillTo1:String=TodayDate;
+						var D:String=BillTo.substr(0,2);
+						var M:String=BillTo.substr(3,2);
+						var Y:String=BillTo.substr(6,10);
+						var D1:String=BillTo1.substr(0,2);
+						var M1:String=BillTo1.substr(3,2);
+						var Y1:String=BillTo1.substr(6,10);
+						var RangeMiddle:String=Y+'/'+M+'/'+D;
+						var RangeEnd:String=Y1+'/'+M1+'/'+D1;
+						var RangeStart:String=Y+'/'+M+'/'+D;
+						//					var BillTo1 = 
+						//						{rangeStart:new Date(RangeStart),rangeEnd:new Date(RangeEnd)};
+						//					BillTo1=new Date(RangeEnd);
+						if(RangeStart == RangeEnd)
+						{
+							alignAlert(Alert.show("Can't be Process Intermediate for Checkout Date","Alert Message !",
+								Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+							
+							return;
+						}
+						if(RangeStart <= RangeEnd)
+						{
+							useWeb("CheckoutAndIntermediate","Guest_CUSTOM",[GlobalXml,"CHKINROOMDETAILS","",BillFrom,BillTo,CheckInHdrId,StateId,0,0,ExtraMaters]);
+							//		useWeb("CheckOutServiceHdr","TariffLoad_CUSTOM",[GlobalXml,"ProductLoad",BillFrom,,CheckInHdrId,GuestId,StateId,0,0,0]);
+							
+						}
+							
+						else
+						{
+							alignAlert(Alert.show("Can't be Process Future Checkout","Alert Message !",
+								Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+							
+							return;
+							Sctrl.enabled=false;
+							
+						}
+					}
+					
 						
-					}	
-				//}
-//				else if(Intermediate.selected==true)
-//				{
-//					var BillFrom:String=DT_BillFromDate.text;
-//					//var BillTo:String=DT_BillTo.text;
-//					var BillTo:String=TodayDate;
-//					var D:String=BillFrom.substr(0,2);
-//					var M:String=BillFrom.substr(3,2);
-//					var Y:String=BillFrom.substr(6,10);
-//					var D1:String=BillTo.substr(0,2);
-//					var M1:String=BillTo.substr(3,2);
-//					var Y1:String=BillTo.substr(6,10);
-//					var RangeMiddle:String=Y+'/'+M+'/'+D;
-//					var RangeEnd:String=Y1+'/'+M1+'/'+String(Number(D1)+1);
-//					var RangeStart:String=Y+'/'+M+'/'+D;
-////					DT_BillTo.selectableRange = 
-////						{rangeStart:new Date(RangeStart),rangeEnd:new Date(RangeEnd)};
-////					DT_BillTo.selectedDate=new Date(RangeEnd);
-//					if(RangeStart <= RangeEnd)
-//					{
-//					useWeb("CheckoutAndIntermediate","Guest_CUSTOM",[GlobalXml,"CHKINROOMDETAILS","",BillFrom,BillTo,CheckInHdrId,StateId,0,0,ExtraMaters]);
-						//		useWeb("CheckOutServiceHdr","TariffLoad_CUSTOM",[GlobalXml,"ProductLoad",BillFrom,,CheckInHdrId,GuestId,StateId,0,0,0]);
-						
-//					}
-//				}
+				
 				
 			}
 			
@@ -8102,7 +8132,7 @@
 						{rangeStart:new Date(RangeStart),rangeEnd:new Date(RangeEnd)};
 					DT_BillTo.selectedDate=new Date(RangeEnd);
 				}
-				else
+				else 
 				{
 					var D:String=BillF.substr(0,2);
 					var M:String=BillF.substr(3,2);
@@ -8117,6 +8147,7 @@
 						{rangeStart:new Date(RangeStart),rangeEnd:new Date(RangeEnd)};
 					DT_BillTo.selectedDate=new Date(RangeEnd);
 				}
+				
 				
 				
 				// TODO Auto-generated method stub

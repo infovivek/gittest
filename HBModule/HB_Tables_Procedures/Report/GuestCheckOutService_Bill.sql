@@ -114,7 +114,7 @@ IF @Action='PageLoad'
 	'All cheque or demand drafts in payment of bills should be drawn in favor of Hummingbird Travel and stay pvt.ltd.
 	and should be crossed A/C PAYEE ONLY.' as Cheque,
 	'LATE PAYMENT : Interest @18% per annum will be charged on all outstanding bill after due date.' as Latepay ,
-	'PAN NO :'+@PanCardNo+'   |   '+'TIN : 29340489869'+'   |   '+'L Tax No : L00100571'+'  |  '
+	'PAN NO :'+@PanCardNo+'   |   '+'TIN : 29340489869'+'   |   '+'L Tax No :'+ t.LuxuryNo+'  |  '
 	 +'CIN No: U72900KA2005PTC035942' as TaxNo,
 	'Service Tax Regn. No : AABCH5874RST001' as ServiceTaxNo,
 	'Taxable Category : Accommodation Service,Business Support Services and Restaurant Services' as Taxablename,
@@ -139,6 +139,7 @@ IF @Action='PageLoad'
 	join WRBHBState s on s.Id=p.StateId
 	 join WRBHBCity c on c.Id=p.CityId 
 	join WRBHBBooking b on b.Id = d.BookingId	
+	join WRBHBTaxMaster t on t.StateId=s.Id   
 	where h.IsActive = 1 and h.IsDeleted = 0 and CS.CheckOutHdrId =  @Id1
 	group by h.GuestName ,h.Name,h.Stay,h.Type,h.BookingLevel,
 	BillDate,h.ClientName,h.Id,	h.ChkOutTariffTotal ,h.ChkOutTariffLT ,h.ChkOutTariffNetAmount,
@@ -146,7 +147,7 @@ IF @Action='PageLoad'
 	h.ChkOutTariffHECess ,h.ChkOutTariffSC,h.CheckInDate,d.Tariff,p.PropertyName,p.Propertaddress,
 	c.CityName,s.StateName,p.Postal,p.Phone,p.Email,	
     H.VATPer,h.RestaurantSTPer ,
-    h.BusinessSupportST ,h.InVoiceNo,h.BillFromDate,h.BillEndDate
+    h.BusinessSupportST ,h.InVoiceNo,h.BillFromDate,h.BillEndDate,t.LuxuryNo
    
 	
 	END

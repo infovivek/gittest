@@ -35,7 +35,17 @@ CREATE PROCEDURE [dbo].[SP_BedBookingPropertyAssingedGuest_Insert](
 @BookingPropertyId BIGINT,
 @BookingPropertyTableId BIGINT,
 @UsrId BIGINT,
-@SSPId BIGINT)
+@SSPId BIGINT,
+@Column1 NVARCHAR(100),
+@Column2 NVARCHAR(100),
+@Column3 NVARCHAR(100),
+@Column4 NVARCHAR(100),
+@Column5 NVARCHAR(100),
+@Column6 NVARCHAR(100),
+@Column7 NVARCHAR(100),
+@Column8 NVARCHAR(100),
+@Column9 NVARCHAR(100),
+@Column10 NVARCHAR(100))
 AS
 BEGIN
  IF @SSPId != 0
@@ -94,13 +104,91 @@ BEGIN
  TariffPaymentMode,ChkInDt,ChkOutDt,ExpectChkInTime,AMPM,CreatedBy,
  CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId,
  ApartmentId,RackTariff,PtyChkInAMPM,PtyChkOutAMPM,PtyChkInTime,
- PtyChkOutTime,PtyGraceTime,CurrentStatus,Title)
+ PtyChkOutTime,PtyGraceTime,CurrentStatus,Title,
+ Column1,Column2,Column3,Column4,Column5,Column6,Column7,Column8,Column9,
+ Column10)
  VALUES(@BookingId,@EmpCode,@FirstName,@LastName,@GuestId,@BedType,
  @Tariff,@RoomId,@BedId,@SSPId,@BookingPropertyId,@BookingPropertyTableId,
  @ServicePaymentMode,@TariffPaymentMode,@ChkInDt,@ChkOutDt,@ExptTime,
  @AMPM,@UsrId,GETDATE(),@UsrId,GETDATE(),1,0,NEWID(),
  @ApartmentId,@RackTariff,@PtyChkInAMPM,@PtyChkOutAMPM,@PtyChkInTime,
- @PtyChkOutTime,@PtyGraceTime,'Booked',@Title);
+ @PtyChkOutTime,@PtyGraceTime,'Booked',@Title,
+ @Column1,@Column2,@Column3,@Column4,@Column5,@Column6,@Column7,@Column8,
+ @Column9,@Column10);
  SELECT Id,RowId FROM WRBHBBedBookingPropertyAssingedGuest 
- WHERE Id=@@IDENTITY;
+ WHERE Id = @@IDENTITY;
+ --
+ DECLARE @CltId BIGINT = (SELECT ClientId FROM WRBHBBooking 
+ WHERE Id = @BookingId);
+ DECLARE @UpdateChkColumn1 BIT = 0,@UpdateChkColumn2 BIT = 0;
+ DECLARE @UpdateChkColumn3 BIT = 0,@UpdateChkColumn4 BIT = 0;
+ DECLARE @UpdateChkColumn5 BIT = 0,@UpdateChkColumn6 BIT = 0;
+ DECLARE @UpdateChkColumn7 BIT = 0,@UpdateChkColumn8 BIT = 0;
+ DECLARE @UpdateChkColumn9 BIT = 0,@UpdateChkColumn10 BIT = 0;
+ IF EXISTS(SELECT NULL FROM WRBHBClientColumns WHERE ClientId = @CltId AND
+ IsActive = 1 AND IsDeleted = 0)
+  BEGIN
+   SELECT @UpdateChkColumn1 = ISNULL(UpdateChkColumn1,0),
+   @UpdateChkColumn2 = ISNULL(UpdateChkColumn2,0),
+   @UpdateChkColumn3 = ISNULL(UpdateChkColumn3,0),
+   @UpdateChkColumn4 = ISNULL(UpdateChkColumn4,0),
+   @UpdateChkColumn5 = ISNULL(UpdateChkColumn5,0),
+   @UpdateChkColumn6 = ISNULL(UpdateChkColumn6,0),
+   @UpdateChkColumn7 = ISNULL(UpdateChkColumn7,0),
+   @UpdateChkColumn8 = ISNULL(UpdateChkColumn8,0),
+   @UpdateChkColumn9 = ISNULL(UpdateChkColumn9,0),
+   @UpdateChkColumn10 = ISNULL(UpdateChkColumn10,0) FROM WRBHBClientColumns 
+   WHERE ClientId = @CltId AND IsActive = 1 AND IsDeleted = 0;
+   -- Update Columns
+   IF @Column1 != '' AND @UpdateChkColumn1 = 1
+    BEGIN
+     UPDATE WRBHBClientManagementAddClientGuest SET Column1 = @Column1
+     WHERE Id = @GuestId;
+    END
+   IF @Column2 != '' AND @UpdateChkColumn2 = 1
+    BEGIN
+     UPDATE WRBHBClientManagementAddClientGuest SET Column2 = @Column2
+     WHERE Id = @GuestId;
+    END
+   IF @Column3 != '' AND @UpdateChkColumn3 = 1
+    BEGIN
+     UPDATE WRBHBClientManagementAddClientGuest SET Column3 = @Column3
+     WHERE Id = @GuestId;
+    END
+   IF @Column4 != '' AND @UpdateChkColumn4 = 1
+    BEGIN
+     UPDATE WRBHBClientManagementAddClientGuest SET Column4 = @Column4
+     WHERE Id = @GuestId;
+    END
+   IF @Column5 != '' AND @UpdateChkColumn5 = 1
+    BEGIN
+     UPDATE WRBHBClientManagementAddClientGuest SET Column5 = @Column5
+     WHERE Id = @GuestId;
+    END
+   IF @Column6 != '' AND @UpdateChkColumn6 = 1
+    BEGIN
+     UPDATE WRBHBClientManagementAddClientGuest SET Column6 = @Column6
+     WHERE Id = @GuestId;
+    END
+   IF @Column7 != '' AND @UpdateChkColumn7 = 1
+    BEGIN
+     UPDATE WRBHBClientManagementAddClientGuest SET Column7 = @Column7
+     WHERE Id = @GuestId;
+    END
+   IF @Column8 != '' AND @UpdateChkColumn8 = 1
+    BEGIN
+     UPDATE WRBHBClientManagementAddClientGuest SET Column8 = @Column8
+     WHERE Id = @GuestId;
+    END
+   IF @Column9 != '' AND @UpdateChkColumn9 = 1
+    BEGIN
+     UPDATE WRBHBClientManagementAddClientGuest SET Column9 = @Column9
+     WHERE Id = @GuestId;
+    END
+   IF @Column10 != '' AND @UpdateChkColumn10 = 1
+    BEGIN
+     UPDATE WRBHBClientManagementAddClientGuest SET Column10 = @Column10
+     WHERE Id = @GuestId;
+    END
+  END
 END

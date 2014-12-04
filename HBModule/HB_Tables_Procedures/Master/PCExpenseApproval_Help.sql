@@ -37,20 +37,21 @@ CREATE PROCEDURE dbo.[SP_PCExpenseApproval_Help]
  BEGIN
  		CREATE TABLE #Request(Requestedby NVARCHAR(100),PCAccount NVARCHAR(100),
 		ProcessedStatus NVARCHAR(100),Comments NVARCHAR(100),RequestedOn NVARCHAR(100),Process BIT,
-		ApprovedAmount DECIMAL(27,2),ExpenseAmount DECIMAL(27,2),OP DECIMAL(27,2),
-		Processedon NVARCHAR(100),
+		ApprovedAmount DECIMAL(27,2),ExpenseAmount DECIMAL(27,2),
+		Processedon NVARCHAR(100),Date NVARCHAR(100),OP DECIMAL(27,2),
 		Processedby NVARCHAR(100),RequestedUserId INT,Id INT,PropertyId INT,PCId INT)
 		--OpeningBalance DECIMAL(27,2)
 		
 		BEGIN
 		INSERT INTO #Request(Requestedby,PCAccount,ProcessedStatus,Comments,
-		RequestedOn,Process,ApprovedAmount,ExpenseAmount,OP,Processedon,Processedby,
+		RequestedOn,Process,ApprovedAmount,ExpenseAmount,Processedon,Date,OP,Processedby,
 		RequestedUserId,Id,PropertyId,PCId)
 		SELECT DISTINCT(U.FirstName+' '+U.LastName)AS Requestedby, PCAccount,
 		PC.ProcessedStatus AS ProcessedStatus,PC.Comments AS Comments,
 		CONVERT(NVARCHAR(100),PC.RequestedOn,103) AS RequestedOn,0 AS Process,
-		PC.ApprovedAmount AS ApprovedAmount,PC.ExpenseAmount AS ExpenseAmount,0 AS OP,
-		CONVERT(NVARCHAR(100),GETDATE(),103) AS Processedon,(US.FirstName+' '+US.LastName) AS Processedby,
+		PC.ApprovedAmount AS ApprovedAmount,PC.ExpenseAmount AS ExpenseAmount,
+		CONVERT(NVARCHAR(100),PC.LastProcessedon,103) AS Processedon,'' AS Date,0 AS OP,
+		(US.FirstName+' '+US.LastName) AS Processedby,
 		PC.RequestedUserId AS RequestedUserId, PC.Id,
 		PC.PropertyId,0 AS PCId
 		From  WRBHBPCExpenseApproval PC
@@ -65,38 +66,39 @@ CREATE PROCEDURE dbo.[SP_PCExpenseApproval_Help]
 		AND PU.UserType IN('Resident Managers','Assistant Resident Managers','Operations Managers',
 		'Ops Head','Finance')	
 		
-				
+			
 		INSERT INTO #Request(Requestedby,PCAccount,ProcessedStatus,Comments,
-		RequestedOn,Process,ApprovedAmount,ExpenseAmount,OP,Processedon,Processedby,
+		RequestedOn,Process,ApprovedAmount,ExpenseAmount,Processedon,Date,OP,Processedby,
 		RequestedUserId,Id,PropertyId,PCId)
 		
 		SELECT DISTINCT (U.FirstName+' '+U.LastName) AS Requestedby,P.PropertyName AS PCAccount,
 		'Waiting For Operation Manager Approval' AS ProcessedStatus,'Processing' AS Comments,
-		CONVERT(NVARCHAR,CAST(PC.CreatedDate AS Date),103) AS RequestedOn,0 AS Process,
-		(PC.Amount) AS ApprovedAmount,(PC.Paid) AS ExpenseAmount,PH.OPeningBalance,
-		CONVERT(NVARCHAR(100),GETDATE(),103) AS Processedon,(U.FirstName+' '+U.LastName) AS Processedby,
+		CONVERT(NVARCHAR,CAST(H.ModifiedDate AS Date),103) AS RequestedOn,0 AS Process,
+		(PC.Amount) AS ApprovedAmount,(PC.Paid) AS ExpenseAmount,
+		CONVERT(NVARCHAR(100),GETDATE(),103) AS Processedon,PC.Status AS Date,PH.OpeningBalance,
+		(U.FirstName+' '+U.LastName) AS Processedby,
 		PC.UserId AS RequestedUserId, 0 AS Id,PC.PropertyId,PC.Id AS PCId
 		From WRBHBPettyCashStatus PC
 		JOIN WRBHBPettyCashStatusHdr H ON PC.PettyCashStatusHdrId=H.Id AND H.IsActive=1 AND H.IsDeleted=0
-		JOIN WRBHBPettyCashHdr PH ON PC.PropertyId=PH.PropertyId AND PH.IsActive=1 AND PH.IsDeleted=0
+		JOIN WRBHBPettyCashHdr PH ON H.UserId=PH.UserId AND H.PropertyId=PH.PropertyId 
+		AND PC.Status=CONVERT(NVARCHAR(100),PH.Date,103)
 		JOIN WRBHBProperty P ON PC.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
 		JOIN WRBHBPropertyUsers PU ON P.Id=PU.PropertyId AND PU.IsActive=1 AND PU.IsDeleted=0
 		JOIN WRBHBUser U ON  PC.UserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
-		WHERE PC.IsActive=1 AND PC.IsDeleted=0 AND PC.Flag=1 AND H.NewEntry=0
+		WHERE PC.IsActive=1 AND PC.IsDeleted=0 AND H.NewEntry=0 AND H.Flag=1
 		AND PU.UserId=@UserId 
 		AND P.Category IN('Internal Property','Managed G H')
 		AND PU.UserType IN('Resident Managers','Assistant Resident Managers','Operations Managers',
 		'Ops Head')
-		END
-		
+				
+	END
 		SELECT Requestedby,PCAccount,ProcessedStatus,Comments,
 		RequestedOn,Process,SUM(ApprovedAmount)+(OP) AS ApprovedAmount,SUM(ExpenseAmount) AS ExpenseAmount,
-		Processedon,Processedby,RequestedUserId,Id,PropertyId 
-		FROM #Request
+		Processedon,Processedby,RequestedUserId,R.Id,R.PropertyId 
+		FROM #Request R
 		group by Requestedby,PCAccount,ProcessedStatus,Comments,OP,
-		RequestedOn,Process,Processedon,Processedby,RequestedUserId,Id,PropertyId
+		RequestedOn,Process,Processedon,Processedby,RequestedUserId,R.Id,R.PropertyId
 		
-
 END
  IF @Action='History'
  BEGIN
@@ -125,7 +127,7 @@ END
 		WHERE PC.UserId=@UserId AND PC.PropertyId=@PropertyId AND PC.IsActive=1 AND PC.IsDeleted=0 
 		AND CONVERT(NVARCHAR,CAST(PC.CreatedDate AS Date),103)=CONVERT(NVARCHAR,@Str,103) 
 		 END
-		 
+		
 		
 		 
  IF @Action='Action'

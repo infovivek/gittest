@@ -34,7 +34,7 @@
 			public var ErrStr:String="",GradeName:String="",BookedId:int=0;
 			public var BookingPropertyId:int=0,BookingPropertyTableId:int=0;
 			public var ClientBookerId:int=0,ClientBookerName:String="",Flag:Boolean=true;
-			public var Save_Method:String="";
+			public var Save_Method:String="",GuestId:int = 0;
 			public var Time:String="",Hr:String="",Min:String="",ExpInTime:String="";
 			protected function Application1_creationCompleteHandler(event:FlexEvent):void
 			{
@@ -223,7 +223,7 @@
 						alignAlert(Alert.show("Booking Confirmed Successfully.","Message !",Alert.OK, 
 							null, null, iconTickLarge, Alert.OK),10,"");*/
 						BookedId=Id;
-						//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Bed',BookedId]);
+						useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Bed',BookedId]);
 						FnClear();
 					}					
 				}
@@ -336,7 +336,434 @@
 						FnSave_Tab3();
 					}
 				}
-			}		
+				if (Ds_Objects.currentTarget.description.toString() == "CustomFields_CUSTOM")
+				{
+					var Ac_Column:ArrayCollection = new ArrayCollection();
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Ac_Column = Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						for(var q:int = 0; q < Ac_Column.length; q++)
+						{
+							if(Ac_Column[q].Id == 1)
+							{
+								if(Ac_Column[q].FieldName != "")
+								{
+									Lbl_C1Name.text = Ac_Column[q].FieldName;								
+									if(String(Ac_Column[q].Mandatory) == "true")
+									{
+										Lbl_C1M.text = "*";
+									}
+									else
+									{
+										Lbl_C1M.text = "";
+									}
+									if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+									{
+										Hlp_Column1.dataProvider = null;
+										Hlp_Column1.fnClear();									
+										Hlp_Column1.dataProvider = Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+									}
+									else
+									{
+										Hlp_Column1.dataProvider = null;Hlp_Column1.fnClear();
+									}
+									Lbl_C1Name.visible = true;Lbl_C1M.visible = true;Hlp_Column1.visible = true;			
+								}
+								else
+								{
+									Lbl_C1M.text = "";Hlp_Column1.fnClear();Lbl_C1Name.visible = false;
+									Lbl_C1M.visible = false;Hlp_Column1.visible = false;							
+								}
+								
+							}
+							if(Ac_Column[q].Id == 2)
+							{
+								if(Ac_Column[q].FieldName != "")
+								{
+									Lbl_C2Name.text = Ac_Column[q].FieldName;
+									if(String(Ac_Column[q].Mandatory) == "true")
+									{
+										Lbl_C2M.text = "*";
+									}
+									else
+									{
+										Lbl_C2M.text = "";
+									}
+									if (Ds_Objects.result.Tables.Table2.Rows.length > 0)
+									{
+										Hlp_Column2.dataProvider = null;
+										Hlp_Column2.fnClear();
+										Hlp_Column2.dataProvider = Ds_Objects.result.Tables.Table2.Rows as ArrayCollection;
+									}
+									else
+									{
+										Hlp_Column2.dataProvider = null;
+										Hlp_Column2.fnClear();
+									}
+									Lbl_C2Name.visible = true;
+									Lbl_C2M.visible = true;
+									//Chk_C2.visible = true;
+									Hlp_Column2.visible = true;
+									//Chk_C2.selected = false;
+								}
+								else
+								{
+									Lbl_C2M.text = "";
+									Hlp_Column2.fnClear();
+									Lbl_C2Name.visible = false;
+									Lbl_C2M.visible = false;
+									//Chk_C2.visible = false;
+									Hlp_Column2.visible = false;									
+								}
+							}
+							if(Ac_Column[q].Id == 3)
+							{
+								if(Ac_Column[q].FieldName != "")
+								{
+									Lbl_C3Name.text = Ac_Column[q].FieldName;
+									if(String(Ac_Column[q].Mandatory) == "true")
+									{
+										Lbl_C3M.text = "*";
+									}
+									else
+									{
+										Lbl_C3M.text = "";
+									}
+									if (Ds_Objects.result.Tables.Table3.Rows.length > 0)
+									{
+										Hlp_Column3.dataProvider = null;
+										Hlp_Column3.fnClear();									
+										Hlp_Column3.dataProvider = Ds_Objects.result.Tables.Table3.Rows as ArrayCollection;
+									}
+									else
+									{
+										Hlp_Column3.dataProvider = null;
+										Hlp_Column3.fnClear();
+									}
+									//Chk_C3.selected = false;
+									Lbl_C3Name.visible = true;
+									Lbl_C3M.visible = true;
+									Hlp_Column3.visible = true;
+									//Chk_C3.visible = true;
+								}
+								else
+								{
+									Lbl_C3M.text = "";									
+									Hlp_Column3.fnClear();
+									//Chk_C3.selected = false;
+									Lbl_C3Name.visible = false;
+									Lbl_C3M.visible = false;
+									Hlp_Column3.visible = false;
+									//Chk_C3.visible = false;
+								}
+							}
+							if(Ac_Column[q].Id == 4)
+							{
+								if(Ac_Column[q].FieldName != "")
+								{
+									Lbl_C4Name.text = Ac_Column[q].FieldName;
+									if(String(Ac_Column[q].Mandatory) == "true")
+									{
+										Lbl_C4M.text = "*";
+									}
+									else
+									{
+										Lbl_C4M.text = "";
+									}
+									if (Ds_Objects.result.Tables.Table4.Rows.length > 0)
+									{
+										Hlp_Column4.dataProvider = null;
+										Hlp_Column4.fnClear();									
+										Hlp_Column4.dataProvider = Ds_Objects.result.Tables.Table4.Rows as ArrayCollection;
+									}
+									else
+									{
+										Hlp_Column4.dataProvider = null;
+										Hlp_Column4.fnClear();
+									}
+									Lbl_C4Name.visible = true;
+									Lbl_C4M.visible = true;
+									Hlp_Column4.visible = true;
+									//Chk_C4.selected = false;
+									//Chk_C4.visible = true;
+								}
+								else
+								{
+									Lbl_C4Name.visible = false;
+									Lbl_C4M.visible = false;
+									Lbl_C4M.text = "";
+									Hlp_Column4.visible = false;
+									Hlp_Column4.fnClear();
+									//Chk_C4.selected = false;
+									//Chk_C4.visible = false;
+								}
+							}
+							if(Ac_Column[q].Id == 5)
+							{
+								if(Ac_Column[q].FieldName != "")
+								{
+									Lbl_C5Name.text = Ac_Column[q].FieldName;
+									if(String(Ac_Column[q].Mandatory) == "true")
+									{
+										Lbl_C5M.text = "*";
+									}
+									else
+									{
+										Lbl_C5M.text = "";
+									}
+									if (Ds_Objects.result.Tables.Table5.Rows.length > 0)
+									{
+										Hlp_Column5.dataProvider = null;
+										Hlp_Column5.fnClear();
+										Hlp_Column5.dataProvider = Ds_Objects.result.Tables.Table5.Rows as ArrayCollection;
+									}
+									else
+									{
+										Hlp_Column5.dataProvider = null;
+										Hlp_Column5.fnClear();
+									}
+									Lbl_C5Name.visible = true;
+									Lbl_C5M.visible = true;
+									Hlp_Column5.visible = true;
+									//Chk_C5.visible = true;
+									//Chk_C5.selected = false;
+								}
+								else
+								{
+									Lbl_C5Name.visible = false;
+									Lbl_C5M.visible = false;
+									Lbl_C5M.text = "";
+									Hlp_Column5.visible = false;
+									Hlp_Column5.fnClear();
+									//Chk_C5.visible = false;
+									//Chk_C5.selected = false;
+								}
+							}
+							if(Ac_Column[q].Id == 6)
+							{
+								if(Ac_Column[q].FieldName != "")
+								{
+									Lbl_C6Name.text = Ac_Column[q].FieldName;
+									if(String(Ac_Column[q].Mandatory) == "true")
+									{
+										Lbl_C6M.text = "*";
+									}
+									else
+									{
+										Lbl_C6M.text = "";
+									}
+									if (Ds_Objects.result.Tables.Table6.Rows.length > 0)
+									{
+										Hlp_Column6.dataProvider = null;																			
+										Hlp_Column6.dataProvider = Ds_Objects.result.Tables.Table6.Rows as ArrayCollection;
+									}
+									else
+									{
+										Hlp_Column6.dataProvider = null;
+									}
+									Lbl_C6Name.visible = true;
+									Lbl_C6M.visible = true;									
+									Hlp_Column6.visible = true;
+									Hlp_Column6.fnClear();
+									//Chk_C6.selected = false;
+									//Chk_C6.visible = true;
+								}
+								else
+								{
+									Lbl_C6Name.visible = false;
+									Lbl_C6M.visible = false;
+									Lbl_C6M.text = "";
+									Hlp_Column6.visible = false;
+									Hlp_Column6.fnClear();
+									//Chk_C6.selected = false;
+									//Chk_C6.visible = false;
+								}
+							}
+							if(Ac_Column[q].Id == 7)
+							{
+								if(Ac_Column[q].FieldName != "")
+								{
+									Lbl_C7Name.text = Ac_Column[q].FieldName;
+									if(String(Ac_Column[q].Mandatory) == "true")
+									{
+										Lbl_C7M.text = "*";
+									}
+									else
+									{
+										Lbl_C7M.text = "";
+									}
+									if (Ds_Objects.result.Tables.Table7.Rows.length > 0)
+									{
+										Hlp_Column7.dataProvider = null;
+										//Hlp_Column7.fnClear();
+										Hlp_Column7.dataProvider = Ds_Objects.result.Tables.Table7.Rows as ArrayCollection;
+									}
+									else
+									{
+										Hlp_Column7.dataProvider = null;
+										//Hlp_Column7.fnClear();
+									}
+									Lbl_C7Name.visible = true;
+									Lbl_C7M.visible = true;
+									Hlp_Column7.visible = true;									
+									Hlp_Column7.fnClear();
+									//Chk_C7.selected = false;
+									//Chk_C7.visible = true;
+								}
+								else
+								{
+									Lbl_C7Name.visible = false;
+									Lbl_C7M.visible = false;
+									Hlp_Column7.visible = false;
+									Lbl_C7M.text = "";									
+									Hlp_Column7.fnClear();
+									//Chk_C7.selected = false;
+									//Chk_C7.visible = false;
+								}
+							}
+							if(Ac_Column[q].Id == 8)
+							{
+								if(Ac_Column[q].FieldName != "")
+								{
+									Lbl_C8Name.text = Ac_Column[q].FieldName;
+									if(String(Ac_Column[q].Mandatory) == "true")
+									{
+										Lbl_C8M.text = "*";
+									}
+									else
+									{
+										Lbl_C8M.text = "";
+									}
+									if (Ds_Objects.result.Tables.Table8.Rows.length > 0)
+									{
+										Hlp_Column8.dataProvider = null;
+										//Hlp_Column8.fnClear();
+										Hlp_Column8.dataProvider = Ds_Objects.result.Tables.Table8.Rows as ArrayCollection;
+									}
+									else
+									{
+										Hlp_Column8.dataProvider = null;
+										//Hlp_Column8.fnClear();
+									}
+									Lbl_C8Name.visible = true;
+									Lbl_C8M.visible = true;									
+									Hlp_Column8.visible = true;
+									Hlp_Column8.fnClear();
+									//Chk_C8.selected = false;
+									//Chk_C8.visible = true;
+								}
+								else
+								{
+									Lbl_C8Name.visible = false;
+									Lbl_C8M.visible = false;
+									Lbl_C8M.text = "";
+									Hlp_Column8.visible = false;
+									Hlp_Column8.fnClear();
+									//Chk_C8.selected = false;
+									//Chk_C8.visible = false;
+								}
+							}
+							if(Ac_Column[q].Id == 9)
+							{
+								if(Ac_Column[q].FieldName != "")
+								{
+									Lbl_C9Name.text = Ac_Column[q].FieldName;
+									if(String(Ac_Column[q].Mandatory) == "true")
+									{
+										Lbl_C9M.text = "*";
+									}
+									else
+									{
+										Lbl_C9M.text = "";
+									}
+									if (Ds_Objects.result.Tables.Table9.Rows.length > 0)
+									{
+										Hlp_Column9.dataProvider = null;
+										Hlp_Column9.fnClear();
+										Hlp_Column9.dataProvider = Ds_Objects.result.Tables.Table9.Rows as ArrayCollection;
+									}
+									else
+									{
+										Hlp_Column9.dataProvider = null;
+										Hlp_Column9.fnClear();
+									}
+									Lbl_C9Name.visible = true;
+									Lbl_C9M.visible = true;									
+									Hlp_Column9.visible = true;
+									Hlp_Column9.fnClear();
+									//Chk_C9.selected = false;
+									//Chk_C9.visible = true;
+								}
+								else
+								{
+									Lbl_C9Name.visible = false;
+									Lbl_C9M.visible = false;
+									Lbl_C9M.text = "";
+									Hlp_Column9.visible = false;
+									Hlp_Column9.fnClear();
+									//Chk_C9.selected = false;
+									//Chk_C9.visible = false;
+								}
+							}
+							if(Ac_Column[q].Id == 10)
+							{
+								if(Ac_Column[q].FieldName != "")
+								{
+									Lbl_C10Name.text = Ac_Column[q].FieldName;
+									if(String(Ac_Column[q].Mandatory) == "true")
+									{
+										Lbl_C10M.text = "*";
+									}
+									else
+									{
+										Lbl_C10M.text = "";
+									}
+									if (Ds_Objects.result.Tables.Table10.Rows.length > 0)
+									{
+										Hlp_Column10.dataProvider = null;
+										Hlp_Column10.fnClear();
+										Hlp_Column10.dataProvider = Ds_Objects.result.Tables.Table10.Rows as ArrayCollection;
+									}
+									else
+									{
+										Hlp_Column10.dataProvider = null;
+										Hlp_Column10.fnClear();
+									}
+									Lbl_C10Name.visible = true;
+									Lbl_C10M.visible = true;									
+									Hlp_Column10.visible = true;
+									Hlp_Column10.fnClear();
+									//Chk_C10.visible = true;
+									//Chk_C10.selected = false;
+								}
+								else
+								{
+									Lbl_C10Name.visible = false;
+									Lbl_C10M.visible = false;
+									Lbl_C10M.text = "";
+									Hlp_Column10.visible = false;
+									Hlp_Column10.fnClear();
+									//Chk_C10.visible = false;
+									//Chk_C10.selected = false;
+								}
+							}
+							Hlp_Column1.text = Hlp_Client.text=Ds_Objects.result.Tables.Table11.Rows[0].Column1;
+							Hlp_Column2.text = Hlp_Client.text=Ds_Objects.result.Tables.Table11.Rows[0].Column2;
+							Hlp_Column3.text = Hlp_Client.text=Ds_Objects.result.Tables.Table11.Rows[0].Column3;
+							Hlp_Column4.text = Hlp_Client.text=Ds_Objects.result.Tables.Table11.Rows[0].Column4;
+							Hlp_Column5.text = Hlp_Client.text=Ds_Objects.result.Tables.Table11.Rows[0].Column5;
+							Hlp_Column6.text = Hlp_Client.text=Ds_Objects.result.Tables.Table11.Rows[0].Column6;
+							Hlp_Column7.text = Hlp_Client.text=Ds_Objects.result.Tables.Table11.Rows[0].Column7;
+							Hlp_Column8.text = Hlp_Client.text=Ds_Objects.result.Tables.Table11.Rows[0].Column8;
+							Hlp_Column9.text = Hlp_Client.text=Ds_Objects.result.Tables.Table11.Rows[0].Column9;
+							Hlp_Column10.text = Hlp_Client.text=Ds_Objects.result.Tables.Table11.Rows[0].Column10;
+						}
+						Pnl_CustomFields.visible = true;
+						Btn_BackTab3.enabled = false;
+						Btn_Backed.enabled = false;
+					}
+				}
+			}
 			
 			public function FnMailOk(event:CloseEvent):void
 			{
@@ -620,7 +1047,8 @@
 				var dew:ArrayCollection=new ArrayCollection();
 				Hlp_City.dataProvider=dew;Hlp_City.fnClear();CityId=0;
 				ClientBookerId=0;ClientBookerName="";Txt_BookerEmail.text="";Ddl_Booker.dataProvider=null;
-				Ddl_Booker.prompt="Please Select Booker";Chk_EmailtoGuest.selected=false;
+				Ddl_Booker.prompt="Please Select Booker";
+				Chk_EmailtoGuest.selected=true;
 				Grd_Property.dataProvider=null;Ddl_PropertyType.selectedItem="Property Type";
 				// tab 3
 				Ddl_Property.dataProvider=null;Ddl_Property.prompt="Please Select Property";
@@ -645,7 +1073,7 @@
 				Btn_Tab3.setStyle("backgroundColor","#c2c2c2");
 				Lbl_Tab3.setStyle("color","#ffffff");
 				// Help Loading
-				Id=0;
+				Id=0;Txt_ExtraCCemail.text = "";
 				FnHelp_PageLoad();FnHelp_Guest_Tmp();
 			}			
 			
@@ -660,6 +1088,14 @@
 					}
 					ErrStr = ErrStr + "*  State is Required.\n";
 				}
+				if((StateId != 0) && (Hlp_Stat.text == ""))
+				{
+					if(Flag == true)
+					{
+						Hlp_Stat._setFocus();Flag=false;
+					}
+					ErrStr = ErrStr + "*  State is Required.\n";
+				}
 				if(CityId == 0)
 				{
 					if(Flag == true)
@@ -667,7 +1103,15 @@
 						Hlp_City._setFocus();Flag=false;
 					}
 					ErrStr = ErrStr + "*  City is Required.\n";
-				}				
+				}
+				if((CityId != 0) && (Hlp_City.text == ""))
+				{
+					if(Flag == true)
+					{
+						Hlp_City._setFocus();Flag=false;
+					}
+					ErrStr = ErrStr + "*  City is Required.\n";
+				}
 				return ErrStr;
 			}
 						
@@ -812,7 +1256,7 @@
 					Ddl_Booker.dataProvider=sdfs;Ddl_Booker.prompt="Please Select Booker";
 					Txt_PropertyFilter.text="";Txt_LocalityFilter.text="";
 					ClientBookerId=0;ClientBookerName="";Txt_BookerEmail.text="";
-					Chk_EmailtoGuest.selected=false;
+					Chk_EmailtoGuest.selected=true;
 					var sdfsdsd:ArrayCollection=new ArrayCollection();
 					Grd_Property.dataProvider=sdfsdsd;
 					Txt_NewBooker.text="";Txt_NewBookerEmail.text="";
@@ -886,13 +1330,44 @@
 				{
 					Err = Err + "*  More than one Property is not Allowed.\n";
 				}
-				var Flagg:Boolean=true;
-				if((ClientBookerId == 0) && (Txt_NewBooker.text == "") && (Txt_NewBookerEmail.text == "") &&
-					(Chk_EmailtoGuest.selected == false))
+				if (ClientBookerId == 0)
+				{
+					if((Txt_NewBooker.text == "") && (Txt_NewBookerEmail.text == ""))
+					{
+						Err = Err + "*  Booker Name & Email is Required.\n";
+						Ddl_Booker.setFocus();
+					}
+					else
+					{
+						if(Txt_NewBooker.text == "")
+						{
+							Err = Err + "*  Booker Name is Required.\n";
+							Ddl_Booker.setFocus();
+						}
+						if(Txt_NewBookerEmail.text == "")
+						{
+							Err = Err + "*  Booker Email is Required.\n";
+							Ddl_Booker.setFocus();
+						}
+					}					
+				}
+				if(Chk_EmailtoGuest.selected == false)
+				{
+					Err = Err + "*  Email to Guest is Required.\n";
+					Chk_EmailtoGuest.setFocus();
+				}
+				/*var Flagg:Boolean=true;
+				if((ClientBookerId == 0) && (Txt_NewBooker.text == "") && (Txt_NewBookerEmail.text == "") && (Chk_EmailtoGuest.selected == false))
 				{
 					Err = Err + "*  Booker Email is Required.\n";
 					Ddl_Booker.setFocus();Flagg=false;			
 				}
+				if((ClientBookerId = 0) && (Txt_NewBooker.text == "") && (Txt_NewBookerEmail.text == "")
+					{
+						Err = Err + "*  Booker Email is Required.\n";
+						Ddl_Booker.setFocus();Flagg=false;			
+					}
+					
 				if(Flagg == true)
 				{
 					if(Chk_EmailtoGuest.selected == false)
@@ -947,7 +1422,7 @@
 							}
 						}
 					}
-				}
+				}*/
 				if(Err != "")
 				{
 					alignAlert(Alert.show(Err,"Requierd Field(s) !",Alert.OK,null,null,
@@ -982,6 +1457,7 @@
 					ClientBookerId=ClientBookerId;
 					ClientBookerEmail=Txt_BookerEmail.text;
 				}
+				Txt_ExtraCCemail.text = "";
 				var Ac_Hdr:ArrayCollection=new ArrayCollection
 					([{ClientId:ClientId,ClientName:Hlp_Client.text,Sales:Lbl_Sales.text,CRM:Lbl_CRM.text,
 						CheckInDate:Dt_ChkInDt.text,ExpectedChkInTime:ExpInTime,
@@ -991,7 +1467,7 @@
 						ClientBookerName:ClientBookerName,ClientBookerEmail:ClientBookerEmail,
 						EmailtoGuest:Chk_EmailtoGuest.selected,Note:"",
 						SpecialRequirements:"",Id:Id,Status:"Step2",AMPM:Ddl_AMPM.selectedItem,
-						BookingLevel:"Bed",ExtraCCEmail:""}]);
+						BookingLevel:"Bed",ExtraCCEmail:Txt_ExtraCCemail.text,HRPolicy:Chk_HRPolicy.selected}]);
 				var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
 				var GuestXml:String="";
 				GuestXml += "<ROOT>";
@@ -1069,10 +1545,13 @@
 				if(Ac[Index].Tick == 0)
 				{
 					Ac[Index].Tick = 1;
+					GuestId = Ac[Index].GuestId;
+					useWeb("BOOKING","CustomFields_CUSTOM",
+						[GlobalXml,'CustomFields','','','','',0,0,ClientId,0,0,Ac[Index].GuestId,0]);
 				}
 				else
 				{
-					Ac[Index].Tick = 0;
+					Ac[Index].Tick = 0;GuestId = 0;
 				}
 			}
 			
@@ -1245,7 +1724,10 @@
 								BookingPropertyId:BookingPropertyId,
 								BookingPropertyTableId:BookingPropertyTableId,
 								ServicePaymentMode:ServicePaymentMode,
-								TariffPaymentMode:TariffPaymentMode,Id:0,Name:Ac[j].Name});
+								TariffPaymentMode:TariffPaymentMode,Id:0,Name:Ac[j].Name,
+								Column1:Ac[j].Txt_C1,Column2:Ac[j].Txt_C2,Column3:Ac[j].Txt_C3,Column4:Ac[j].Txt_C4,
+								Column5:Ac[j].Txt_C5,Column6:Ac[j].Txt_C6,Column7:Ac[j].Txt_C7,Column8:Ac[j].Txt_C8,
+								Column9:Ac[j].Txt_C9,Column10:Ac[j].Txt_C10});
 						Tmp.removeItemAt(j);
 						j=0;Len=Ac.length;j=j-1;
 					}					
@@ -1272,6 +1754,24 @@
 				if(Ac_PtoG.length == 0)
 				{
 					Err = Err + "*  Guest is not added in cart.\n";
+				}
+				if(Txt_ExtraCCemail.text != "")
+				{
+					var ExtraCC:String = Txt_ExtraCCemail.text;
+					var ExtraCCmail:Array = ExtraCC.split(",");
+					var ExtraStr:String = "";
+					if(ExtraCCmail.length > 0)
+					{
+						for(var g:int = 0; g < ExtraCCmail.length; g++)
+						{
+							ErrStr = "";
+							EmailValidator.validate(ExtraCCmail[g]);
+							if(ErrStr != "")
+							{
+								Err += "*  Extra CC Email is Invalid.\n";
+							}
+						}
+					}
 				}
 				if(Err != "")
 				{
@@ -1341,7 +1841,7 @@
 						ClientBookerEmail:"",EmailtoGuest:Chk_EmailtoGuest.selected,Note:"",
 						SpecialRequirements:Txt_SpecialRequirements.text,
 						Id:Id,Status:"Direct Booked",AMPM:Ddl_AMPM.selectedItem,BookingLevel:"Bed",
-						ExtraCCEmail:""}]);
+						ExtraCCEmail:Txt_ExtraCCemail.text,HRPolicy:Chk_HRPolicy.selected}]);
 				var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
 				var Tmp1:ArrayCollection=new ArrayCollection();
 				var GuestXml:String="";
@@ -1413,7 +1913,23 @@
 					}
 					ErrStr = ErrStr + "* State is Required.\n";
 				}
+				if((StateId != 0) && (Hlp_Stat.text == ""))
+				{
+					if(Flag == true)
+					{
+						Hlp_Stat._setFocus();Flag=false;
+					}
+					ErrStr = ErrStr + "* State is Required.\n";
+				}
 				if(CityId == 0)
+				{
+					if(Flag == true)
+					{
+						Hlp_City._setFocus();Flag=false;
+					}
+					ErrStr = ErrStr + "* City is Required.\n";
+				}
+				if((CityId != 0) && (Hlp_City.text == ""))
 				{
 					if(Flag == true)
 					{
@@ -1648,6 +2164,119 @@
 				Grd_PropertyAssignedGst.dataProvider = Ac;				
 			}
 			
+			protected function Btn_PnlClose_click():void
+			{
+				Pnl_CustomFields.visible = false;
+				Btn_BackTab3.enabled = true;
+				Btn_Backed.enabled = true;
+			}
+			
+			protected function Btn_PnlSave_clickHandler():void
+			{
+				ErrStr = "";
+				if(Lbl_C1M.text == "*")
+				{
+					if(Hlp_Column1.text == "")
+					{
+						ErrStr += "* "+Lbl_C1Name.text+"  is Required.\n";
+					}
+				}
+				if(Lbl_C2M.text == "*")
+				{
+					if(Hlp_Column2.text == "")
+					{
+						ErrStr += "* "+Lbl_C2Name.text+"  is Required.\n";
+					}
+				}
+				if(Lbl_C3M.text == "*")
+				{
+					if(Hlp_Column3.text == "")
+					{
+						ErrStr += "* "+Lbl_C3Name.text+"  is Required.\n";
+					}
+				}
+				if(Lbl_C4M.text == "*")
+				{
+					if(Hlp_Column4.text == "")
+					{
+						ErrStr += "* "+Lbl_C4Name.text+"  is Required.\n";
+					}
+				}
+				if(Lbl_C5M.text == "*")
+				{
+					if(Hlp_Column5.text == "")
+					{
+						ErrStr += "* "+Lbl_C5Name.text+"  is Required.\n";
+					}
+				}
+				if(Lbl_C6M.text == "*")
+				{
+					if(Hlp_Column6.text == "")
+					{
+						ErrStr += "* "+Lbl_C6Name.text+"  is Required.\n";
+					}
+				}
+				if(Lbl_C7M.text == "*")
+				{
+					if(Hlp_Column7.text == "")
+					{
+						ErrStr += "* "+Lbl_C7Name.text+"  is Required.\n";
+					}
+				}
+				if(Lbl_C8M.text == "*")
+				{
+					if(Hlp_Column8.text == "")
+					{
+						ErrStr += "* "+Lbl_C8Name.text+"  is Required.\n";
+					}
+				}
+				if(Lbl_C9M.text == "*")
+				{
+					if(Hlp_Column9.text == "")
+					{
+						ErrStr += "* "+Lbl_C9Name.text+"  is Required.\n";
+					}
+				}
+				if(Lbl_C10M.text == "*")
+				{
+					if(Hlp_Column10.text == "")
+					{
+						ErrStr += "* "+Lbl_C10Name.text+"  is Required.\n";
+					}
+				}
+				if(ErrStr != "")
+				{
+					alignAlert(Alert.show(ErrStr,"Requierd Field(s) !",
+						Alert.OK,null,null,iconErrLarge,Alert.OK),10,"");
+					return;
+				}
+				
+				var ACC_Guest:ArrayCollection = new ArrayCollection();
+				ACC_Guest = Grd_GuestTab3.dataProvider as ArrayCollection;
+				var ACC_Guestlength:int = ACC_Guest.length;
+				Grd_GuestTab3.dataProvider = null;
+				for(var f:int = 0; f < ACC_Guestlength; f++)
+				{
+					if(GuestId == ACC_Guest[f].GuestId)
+					{
+						ACC_Guest[f].Txt_C1 = Hlp_Column1.text;
+						ACC_Guest[f].Txt_C2 = Hlp_Column2.text;
+						ACC_Guest[f].Txt_C3 = Hlp_Column3.text;
+						ACC_Guest[f].Txt_C4 = Hlp_Column4.text;
+						ACC_Guest[f].Txt_C5 = Hlp_Column5.text;
+						ACC_Guest[f].Txt_C6 = Hlp_Column6.text;
+						ACC_Guest[f].Txt_C7 = Hlp_Column7.text;
+						ACC_Guest[f].Txt_C8 = Hlp_Column8.text;
+						ACC_Guest[f].Txt_C9 = Hlp_Column9.text;
+						ACC_Guest[f].Txt_C10 = Hlp_Column10.text;
+						f = ACC_Guestlength;
+					}
+				}
+				Grd_GuestTab3.dataProvider = ACC_Guest;
+				Btn_BackTab3.enabled = true;
+				Btn_Backed.enabled = true;
+				Pnl_CustomFields.visible = false;
+			}
 		]]>
 	</fx:Script>
 	<fx:Declarations>
@@ -1728,7 +2357,7 @@
 						<s:CheckBox x="805.2" y="370.9" label="EMail to Guest" id="Chk_EmailtoGuest"
 									tabIndex="33"/>
 						<s:CheckBox x="689.2" y="13.9" label="HR Policy Override" id="Chk_HRPolicy"
-									tabIndex="28" visible="false"/>
+									tabIndex="28" visible="false" selected="false"/>
 						<mx:DataGrid id="Grd_Property" x="22.25" y="81" width="925" height="254"
 									 focusOut="Grd_Property_focusOutHandler(event)" editable="true"
 									 itemRollOut="deleteToolTip(event)"
@@ -1852,15 +2481,86 @@
 			</s:HGroup>
 			<s:BorderContainer x="10" y="50" width="970" height="470" depth="2" id="Bdr_Tab3"
 							   borderVisible="false" backgroundColor="#fbf9f9" visible="false">
+				<s:Panel id="Pnl_CustomFields" x="250" y="3" width="470" height="419" depth="1"
+						 title="Custom Fields" visible="false">
+					<s:Label x="447" y="-22" text="X" toolTip="Close" click="Btn_PnlClose_click()"/>
+					<WrbHelpComp:HelpText id="Hlp_Column1" x="245" y="11" width="200" height="20"
+										  depth="11" pxSetColumnsWidth="198" pxSetHeight="154"
+										  pxTabIndex="67"/>
+					<s:Label id="Lbl_C1M" x="225" y="19" color="Red" text="*"/>
+					<WrbHelpComp:HelpText x="245" y="43" width="200" height="20" id="Hlp_Column2"
+										  depth="10" pxSetColumnsWidth="198" pxSetHeight="154"
+										  pxTabIndex="68"/>
+					<WrbHelpComp:HelpText x="245" y="75" width="200" height="20" id="Hlp_Column3"
+										  depth="9" pxSetColumnsWidth="198" pxSetHeight="154"
+										  pxTabIndex="69"/>
+					<WrbHelpComp:HelpText x="245" y="107" width="200" height="20" id="Hlp_Column4"
+										  depth="8" pxSetColumnsWidth="198" pxSetHeight="154"
+										  pxTabIndex="70"/>
+					<WrbHelpComp:HelpText x="245" y="139" width="200" height="20" id="Hlp_Column5"
+										  depth="7" pxSetColumnsWidth="198" pxSetHeight="154"
+										  pxTabIndex="71"/>
+					<WrbHelpComp:HelpText x="245" y="171" width="200" height="20" id="Hlp_Column6"
+										  depth="6" pxSetColumnsWidth="198" pxSetHeight="154"
+										  pxTabIndex="72"/>
+					<WrbHelpComp:HelpText x="245" y="203" width="200" height="20" id="Hlp_Column7"
+										  depth="5" pxSetColumnsWidth="198" pxSetHeight="154"
+										  pxTabIndex="73"/>
+					<WrbHelpComp:HelpText x="245" y="234" width="200" height="20" id="Hlp_Column8"
+										  depth="4" pxSetColumnsWidth="198" pxSetHeight="154"
+										  pxTabIndex="74"/>
+					<WrbHelpComp:HelpText x="245" y="266" width="200" height="20" id="Hlp_Column9"
+										  depth="3" pxSetColumnsWidth="198" pxSetHeight="154"
+										  pxTabIndex="75"/>
+					<WrbHelpComp:HelpText x="245" y="298" width="200" height="20" id="Hlp_Column10"
+										  depth="2" pxSetColumnsWidth="198" pxSetHeight="154"
+										  pxTabIndex="76"/>
+					<s:Label id="Lbl_C2M" x="225" y="51" color="Red" text="*"/>
+					<s:Label id="Lbl_C3M" x="225" y="83" color="Red" text="*"/>
+					<s:Label id="Lbl_C4M" x="225" y="115" color="Red" text="*"/>
+					<s:Label id="Lbl_C5M" x="225" y="147" color="Red" text="*"/>
+					<s:Label id="Lbl_C6M" x="225" y="179" color="Red" text="*"/>
+					<s:Label id="Lbl_C7M" x="225" y="211" color="Red" text="*"/>
+					<s:Label id="Lbl_C8M" x="225" y="242" color="Red" text="*"/>
+					<s:Label id="Lbl_C9M" x="225" y="274" color="Red" text="*"/>
+					<s:Label id="Lbl_C10M" x="225" y="306" color="Red" text="*"/>
+					<s:Label id="Lbl_C1Name" x="14" y="15" width="200" height="12" text="Column1Name"/>
+					<s:Label id="Lbl_C2Name" x="14" y="47" width="200" height="12"
+							 text="Column2Name"/>
+					<s:Label id="Lbl_C3Name" x="14" y="79" width="200" height="12"
+							 text="Column3Name"/>
+					<s:Label id="Lbl_C4Name" x="14" y="111" width="200" height="12"
+							 text="Column4Name"/>
+					<s:Label id="Lbl_C5Name" x="14" y="143" width="200" height="12"
+							 text="Column5Name"/>
+					<s:Label id="Lbl_C6Name" x="14" y="175" width="200" height="12"
+							 text="Column6Name"/>
+					<s:Label id="Lbl_C7Name" x="14" y="207" width="200" height="12"
+							 text="Column7Name"/>
+					<s:Label id="Lbl_C8Name" x="14" y="238" width="200" height="12"
+							 text="Column8Name"/>
+					<s:Label id="Lbl_C9Name" x="14" y="270" width="200" height="12"
+							 text="Column9Name"/>
+					<s:Label id="Lbl_C10Name" x="14" y="302" width="200" height="12"
+							 text="Column10Name"/>
+					<s:HGroup x="9" y="337" width="449" height="32" horizontalAlign="center">
+						<WrbComp:Button_HB id="Btn_PnlSave" _Label="Add"
+										   click="Btn_PnlSave_clickHandler()"/>
+						<WrbComp:Button_HB id="Btn_PnlClose" _Label="Close" click="Btn_PnlClose_click()"/>
+					</s:HGroup>
+				</s:Panel>
 				<WrbComp:Button_HB id="Btn_BackTab3" x="12" y="433" _Label="Back"
 								   click="Btn_BackTab3_clickHandler(event)"/>
 				<WrbComp:Button_HB id="Btn_Backed" x="848" y="433" _Label="Confirm Booking"
 								   click="Btn_Backed_clickHandler(event)" width="110"/>
 				<WrbComp:Button_HB id="Btn_Add" x="443" y="185" _Label="Add to Cart"
 								   click="Btn_Add_clickHandler(event)" buttonMode="true"/>
-				<s:TextArea id="Txt_SpecialRequirements" x="380.85" y="431" width="315" height="36"
+				<s:TextArea id="Txt_SpecialRequirements" x="578.85" y="433" width="220" height="32"
 							maxChars="1000" tabIndex="47"/>
-				<mx:Label x="241.9" y="438.475" text="Special Requirements"/>
+				<s:TextArea id="Txt_ExtraCCemail" x="228.75" y="433" width="220" height="32"
+							maxChars="1000" tabIndex="47"/>
+				<mx:Label x="531.85" y="438.5" text="Note"/>
+				<mx:Label x="126.85" y="438.5" text="Extra CC Email"/>
 				<s:DropDownList id="Ddl_ServicePaymentMode" x="395" y="143" width="170" height="23"
 								change="Ddl_ServicePaymentMode_changeHandler(event)"
 								prompt="Service Payment Mode" tabIndex="46"/>
@@ -1908,6 +2608,16 @@
 						<mx:DataGridColumn width="0" dataField="Name" visible="false"/>
 						<mx:DataGridColumn width="0" dataField="GuestId" visible="false"/>
 						<mx:DataGridColumn width="0" dataField="Id" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Txt_C1" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Txt_C2" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Txt_C3" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Txt_C4" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Txt_C5" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Txt_C6" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Txt_C7" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Txt_C8" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Txt_C9" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Txt_C10" visible="false"/>
 					</mx:columns>
 				</mx:DataGrid>
 				<mx:DataGrid id="Grd_PropertyAssignedGst" x="12" y="232" width="946" height="182">
@@ -1939,7 +2649,17 @@
 						<mx:DataGridColumn width="80" dataField="TariffPaymentMode" editable="false"
 										   headerText="Tariff Mode"/>
 						<mx:DataGridColumn width="80" dataField="ServicePaymentMode" editable="false"
-										   headerText="Service Mode"/>						
+										   headerText="Service Mode"/>
+						<mx:DataGridColumn width="0" dataField="Column1" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Column2" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Column3" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Column4" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Column5" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Column6" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Column7" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Column8" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Column9" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="Column10" visible="false"/>
 					</mx:columns>
 				</mx:DataGrid>
 				<s:TextInput x="455" y="78.3" id="Txt_Tariff" height="23" width="80" textAlign="center"

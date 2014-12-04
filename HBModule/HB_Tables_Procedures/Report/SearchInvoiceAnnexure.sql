@@ -285,7 +285,7 @@ ORDER BY H.Id desc
 			JOIN WRBHBCity CC WITH(NOLOCK) ON CC.Id=P.CityId and cc.IsActive=1  
 			JOIN WRBHBClientManagement C WITH(NOLOCK) ON B.ClientId=C.Id AND C.IsActive=1 AND C.IsDeleted=0
 			--JOIN WRBHBMasterClientManagement MC WITH(NOLOCK) ON C.MasterClientId=MC.Id AND MC.IsActive=1 AND MC.IsDeleted=0
-			WHERE H.IsActive=1 AND H.IsDeleted=0 AND H.Flag=1  and h.Status='CheckOut'-- and Property='Ratnalayam'
+			WHERE H.IsActive=1 AND H.IsDeleted=0   and h.Status in('CheckOut','UnSettled')-- and Property='Ratnalayam'
 			 and	 InVoiceNo!='0' and  InVoiceNo!=''   and H.Id=@Chkid and H.id not in(Select ChkoutId from #Annuxer)
 			ORDER BY   H.id desc ;
 			

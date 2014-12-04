@@ -27,7 +27,7 @@ CREATE PROCEDURE [dbo].[SP_CheckOutServiceDtl_Update](
 @ChkOutSerAction BIT,@ChkOutSerInclude BIT,
 @ChkOutSerDate NVARCHAR(100),@ChkOutSerItem NVARCHAR(100),@ChkOutSerAmount DECIMAL(27,2),
 @ChkOutSerQuantity INT,@ChkOutSerNetAmount DECIMAL(27,2),
-@CreatedBy BIGINT,@Id INT)
+@CreatedBy BIGINT,@Id INT,@ServiceHdrId int)
 AS
 BEGIN
 UPDATE WRBHBCheckOutServiceDtls SET CheckOutServceHdrId=@CheckOutServceHdrId,ChkOutSerAction=@ChkOutSerAction,

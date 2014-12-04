@@ -1,6 +1,6 @@
 
 GO
-/****** Object:  StoredProcedure [dbo].[Sp_CheckoutIntermediate_Help]    Script Date: 11/07/2014 10:44:15 ******/
+/****** Object:  StoredProcedure [dbo].[Sp_CheckoutIntermediate_Help]    Script Date: 12/02/2014 09:17:54 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -187,6 +187,9 @@ BEGIN
 		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
 		h.BookingId,h.BedId,h.Type,h.BookingCode ,h.ChkInGuest,h.NewCheckInDate,d.ChkOutDt
 		
+		
+		
+		
 	-- Flag 0 Entry Bed	
 		
 		INSERT INTO #GUEST(GuestName,GuestId,StateId,CheckInHdrId,PropertyId,RoomId,ApartmentId,  
@@ -246,7 +249,7 @@ BEGIN
 		--CONVERT(date,d.ChkOutDt,103) between CONVERT(date,d.ChkInDt,103) AND 
 		--CONVERT(date,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) and   
 		h.Id  IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where isnull(IntermediateFlag,0) = 1 and  
-		IsActive = 0 and IsDeleted = 0 )
+		IsActive = 1 and IsDeleted = 0 and Status = 'UnSettled')
 		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
 		h.BookingId,h.BedId,h.Type,h.BookingCode ,h.ChkInGuest	,h.NewCheckInDate,d.ChkOutDt
 		
@@ -268,7 +271,7 @@ BEGIN
 		--CONVERT(date,d.ChkOutDt,103) between CONVERT(date,d.ChkInDt,103) AND 
 		--CONVERT(date,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) and   
 		h.Id  IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where isnull(IntermediateFlag,0) = 1 and  
-		IsActive = 0 and IsDeleted = 0 )
+		IsActive = 1 and IsDeleted = 0 and Status = 'UnSettled')
 		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
 		h.BookingId,h.BedId,h.Type,h.BookingCode ,h.ChkInGuest	,h.NewCheckInDate,d.ChkOutDt
 		
@@ -288,7 +291,7 @@ BEGIN
 		--CONVERT(date,d.ChkOutDt,103) between CONVERT(date,d.ChkInDt,103) AND 
 		--CONVERT(date,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) and   
 		h.Id  IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where isnull(IntermediateFlag,0) = 1 and  
-		IsActive = 0 and IsDeleted = 0 )
+		IsActive = 1 and IsDeleted = 0 and Status = 'UnSettled')
 		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
 		h.BookingId,h.BedId,h.Type,h.BookingCode,h.ChkInGuest,h.NewCheckInDate,d.ChkOutDt
 
@@ -462,9 +465,10 @@ If @BookingLevel = 'Apartment'
 		
 		SELECT DATEDIFF(day,CONVERT(date,BillFromDate,103), CONVERT(date,BillEndDate ,103) ) AS Days,  
 		Id--,ArrivalDate  
-		FROM WRBHBChechkOutHdr WHERE  Status = 'UnSettled' AND ChkInHdrId=@CheckInHdrId;
+		FROM WRBHBChechkOutHdr WHERE  Status = 'UnSettled' AND ChkInHdrId=@CheckInHdrId and IsActive=1 AND IsDeleted=0  ;
 		
-		SELECT IntermediateFlag FROM WRBHBChechkOutHdr where Status = 'UnSettled' AND ChkInHdrId=@CheckInHdrId;
+		SELECT IntermediateFlag FROM WRBHBChechkOutHdr where Status = 'UnSettled' AND ChkInHdrId=@CheckInHdrId
+		and IsActive=1 AND IsDeleted=0  ;
 		
 END
 ELSE

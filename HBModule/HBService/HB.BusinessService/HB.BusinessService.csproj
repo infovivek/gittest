@@ -141,6 +141,7 @@
     <Compile Include="BusinessService\ScreenMasterService.cs" />
     <Compile Include="BusinessService\SearchBookingGuestService.cs" />
     <Compile Include="BusinessService\SearchBookingService.cs" />
+    <Compile Include="BusinessService\SearchDetailServiceInvoiceService.cs" />
     <Compile Include="BusinessService\SearchInvoiceReportService.cs" />
     <Compile Include="BusinessService\SlabTaxService.cs" />
     <Compile Include="BusinessService\SnackKOTHistoryService.cs" />

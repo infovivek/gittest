@@ -88,7 +88,7 @@ IF ISNULL(@PrintInvoice,0) = '1'
 			END
 			ELSE
 				BEGIN
-				SELECT @InVoiceNo='HBE/1';
+				SELECT @InVoiceNo='EXT/1';
 			END
 	END
 	--ELSE
@@ -126,7 +126,7 @@ IF ISNULL(@PrintInvoice,0) = '1'
 			END
 			ELSE
 				BEGIN
-				SELECT @InVoiceNo='HBE/1';
+				SELECT @InVoiceNo='EXT/1';
 			END
 	END
 	--ELSE
@@ -164,7 +164,7 @@ IF ISNULL(@PrintInvoice,0) = '1'
 			END
 			ELSE
 				BEGIN
-				SELECT @InVoiceNo='HBE/1';
+				SELECT @InVoiceNo='EXT/1';
 			END
 	END
 	--ELSE
@@ -193,7 +193,7 @@ IF ISNULL(@PrintInvoice,0) = '1'
 			END
 			ELSE
 				BEGIN
-				SELECT @InVoiceNo='HBE/1';
+				SELECT @InVoiceNo='EXT/1';
 			END
 	END
 	--ELSE
@@ -215,7 +215,7 @@ IF ISNULL(@PrintInvoice,0) = '1'
 			END
 			ELSE
 				BEGIN
-				SELECT @InVoiceNo='HBE/1';
+				SELECT @InVoiceNo='EXT/1';
 			END
 	END
 	--ELSE
@@ -237,7 +237,7 @@ IF ISNULL(@PrintInvoice,0) = '1'
 			END
 			ELSE
 				BEGIN
-				SELECT @InVoiceNo='HBE/1';
+				SELECT @InVoiceNo='EXT/1';
 			END
 	END
 	--ELSE
@@ -265,7 +265,8 @@ END
 		BookingId,StateId,Direct ,
 		BTC,PropertyType,STAgreedAmount,LTAgreedAmount,STRackAmount,LTRackAmount,Status ,
 		CheckInDate,CheckOutDate ,InVoiceNo,Flag,PrintInvoice ,PaymentStatus,ServiceTaxPer,LuxuryTaxPer,ServiceEntryFlag,VATPer,
-		RestaurantSTPer,BusinessSupportST,ClientId,CityId,BillFromDate,BillEndDate,Intermediate,IntermediateFlag,PIInvoice)
+		RestaurantSTPer,BusinessSupportST,ClientId,CityId,BillFromDate,BillEndDate,Intermediate,IntermediateFlag,PIInvoice,
+		ServiceChargeChk,Preformainvoice)
 
 		VALUES
 		(@CheckOutNo,@GuestName,@Stay,@Type,@BookingLevel,@BillDate,
@@ -276,12 +277,13 @@ END
 		@ChkOutTariffReferance,@ChkOutTariffExtraType,
 		@CheckOutTariffExtraDays,@ChkOutTariffExtraAmount,@ChkInHdrId,
 		@CreatedBy,GETDATE(),@CreatedBy,
-		GETDATE(),0,0,NEWID(),@Name,@NoOfDays,
+		GETDATE(),1,0,NEWID(),@Name,@NoOfDays,
 		@RoomId,@CheckInType,@ApartmentNo,@BedNo,@BedId,@ApartmentId,
 		@PropertyId,@GuestId,@BookingId,@StateId,@Direct ,
 		@BTC,@PropertyType,@STAgreedAmount,@LTAgreedAmount,@STRackAmount,@LTRackAmount,@Status,
-		@CheckInDate,@CheckOutDate,@InVoiceNo,1,@PrintInvoice,'UnPaid',@STTaxPer,@LTTaxPer,0,
-		@VATPer,@RestaurantSTPer,@BusinessSupportST,@ClientId,@CityId,@BillFromDate,@BillEndDate,@Intermediate,1,@PIInvoice)
+		@CheckInDate,@CheckOutDate,@InVoiceNo,0,@PrintInvoice,'UnPaid',@STTaxPer,@LTTaxPer,0,
+		@VATPer,@RestaurantSTPer,@BusinessSupportST,@ClientId,@CityId,@BillFromDate,@BillEndDate,@Intermediate,
+		1,0,0,0)
 
 		SET @InsId=@@IDENTITY;
 		SELECT  Id ,RowId FROM WRBHBChechkOutHdr WHERE Id=@InsId;
@@ -293,6 +295,9 @@ END
 		--where BookingId=@BookingId and 
 		--RoomCaptured=(select RoomCaptured from WRBHBBookingPropertyAssingedGuest
 		--where BookingId=@BookingId and GuestId=@GuestId);
+		
+		UPDATE WRBHBCheckInHdr SET NewCheckInDate = CONVERT(DATE,@BillEndDate,103) ,ArrivalTime = '12:00:00',TimeType = 'PM'
+		WHERE GuestId = @GuestId AND BookingId =@BookingId 
 
 		IF @Direct = 'Direct'
 		BEGIN
@@ -322,7 +327,8 @@ END
 		BookingId,StateId,Direct ,
 		BTC,PropertyType,STAgreedAmount,LTAgreedAmount,STRackAmount,LTRackAmount,Status ,
 		CheckInDate,CheckOutDate ,InVoiceNo,Flag,PrintInvoice ,PaymentStatus,ServiceTaxPer,LuxuryTaxPer,ServiceEntryFlag,VATPer,
-		RestaurantSTPer,BusinessSupportST,ClientId,CityId,BillFromDate,BillEndDate,Intermediate,IntermediateFlag,PIInvoice)
+		RestaurantSTPer,BusinessSupportST,ClientId,CityId,BillFromDate,BillEndDate,Intermediate,IntermediateFlag,
+		PIInvoice,ServiceChargeChk,Preformainvoice)
 
 		VALUES
 		(@CheckOutNo,@GuestName,@Stay,@Type,@BookingLevel,@BillDate,
@@ -338,7 +344,7 @@ END
 		@PropertyId,@GuestId,@BookingId,@StateId,@Direct ,
 		@BTC,@PropertyType,@STAgreedAmount,@LTAgreedAmount,@STRackAmount,@LTRackAmount,@Status,
 		@CheckInDate,@CheckOutDate,@InVoiceNo,0,@PrintInvoice,'UnPaid',@STTaxPer,@LTTaxPer,0,
-		@VATPer,@RestaurantSTPer,@BusinessSupportST,@ClientId,@CityId,@BillFromDate,@BillEndDate,@Intermediate,0,0)
+		@VATPer,@RestaurantSTPer,@BusinessSupportST,@ClientId,@CityId,@BillFromDate,@BillEndDate,@Intermediate,0,0,0,0)
 
 		SET @InsId=@@IDENTITY;
 		SELECT  Id ,RowId FROM WRBHBChechkOutHdr WHERE Id=@InsId;

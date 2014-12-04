@@ -218,57 +218,57 @@ BEGIN
    @UpdateChkColumn9 = ISNULL(UpdateChkColumn9,0),
    @UpdateChkColumn10 = ISNULL(UpdateChkColumn10,0) FROM WRBHBClientColumns 
    WHERE ClientId = @CltId AND IsActive = 1 AND IsDeleted = 0;
-  END
- -- Update Columns
- IF @Column1 != '' AND @UpdateChkColumn1 = 1
-  BEGIN
-   UPDATE WRBHBClientManagementAddClientGuest SET Column1 = @Column1
-   WHERE Id = @GuestId;
-  END
- IF @Column2 != '' AND @UpdateChkColumn2 = 1
-  BEGIN
-   UPDATE WRBHBClientManagementAddClientGuest SET Column2 = @Column2
-   WHERE Id = @GuestId;
-  END
- IF @Column3 != '' AND @UpdateChkColumn3 = 1
-  BEGIN
-   UPDATE WRBHBClientManagementAddClientGuest SET Column3 = @Column3
-   WHERE Id = @GuestId;
-  END
- IF @Column4 != '' AND @UpdateChkColumn4 = 1
-  BEGIN
-   UPDATE WRBHBClientManagementAddClientGuest SET Column4 = @Column4
-   WHERE Id = @GuestId;
-  END
- IF @Column5 != '' AND @UpdateChkColumn5 = 1
-  BEGIN
-   UPDATE WRBHBClientManagementAddClientGuest SET Column5 = @Column5
-   WHERE Id = @GuestId;
-  END
- IF @Column6 != '' AND @UpdateChkColumn6 = 1
-  BEGIN
-   UPDATE WRBHBClientManagementAddClientGuest SET Column6 = @Column6
-   WHERE Id = @GuestId;
-  END
- IF @Column7 != '' AND @UpdateChkColumn7 = 1
-  BEGIN
-   UPDATE WRBHBClientManagementAddClientGuest SET Column7 = @Column7
-   WHERE Id = @GuestId;
-  END
- IF @Column8 != '' AND @UpdateChkColumn8 = 1
-  BEGIN
-   UPDATE WRBHBClientManagementAddClientGuest SET Column8 = @Column8
-   WHERE Id = @GuestId;
-  END
- IF @Column9 != '' AND @UpdateChkColumn9 = 1
-  BEGIN
-   UPDATE WRBHBClientManagementAddClientGuest SET Column9 = @Column9
-   WHERE Id = @GuestId;
-  END
- IF @Column10 != '' AND @UpdateChkColumn10 = 1
-  BEGIN
-   UPDATE WRBHBClientManagementAddClientGuest SET Column10 = @Column10
-   WHERE Id = @GuestId;
+   -- Update Columns
+   IF @Column1 != '' AND @UpdateChkColumn1 = 1
+    BEGIN
+     UPDATE WRBHBClientManagementAddClientGuest SET Column1 = @Column1
+     WHERE Id = @GuestId;
+    END
+   IF @Column2 != '' AND @UpdateChkColumn2 = 1
+    BEGIN
+     UPDATE WRBHBClientManagementAddClientGuest SET Column2 = @Column2
+     WHERE Id = @GuestId;
+    END
+   IF @Column3 != '' AND @UpdateChkColumn3 = 1
+    BEGIN
+     UPDATE WRBHBClientManagementAddClientGuest SET Column3 = @Column3
+     WHERE Id = @GuestId;
+    END
+   IF @Column4 != '' AND @UpdateChkColumn4 = 1
+    BEGIN
+     UPDATE WRBHBClientManagementAddClientGuest SET Column4 = @Column4
+     WHERE Id = @GuestId;
+    END
+   IF @Column5 != '' AND @UpdateChkColumn5 = 1
+    BEGIN
+     UPDATE WRBHBClientManagementAddClientGuest SET Column5 = @Column5
+     WHERE Id = @GuestId;
+    END
+   IF @Column6 != '' AND @UpdateChkColumn6 = 1
+    BEGIN
+     UPDATE WRBHBClientManagementAddClientGuest SET Column6 = @Column6
+     WHERE Id = @GuestId;
+    END
+   IF @Column7 != '' AND @UpdateChkColumn7 = 1
+    BEGIN
+     UPDATE WRBHBClientManagementAddClientGuest SET Column7 = @Column7
+     WHERE Id = @GuestId;
+    END
+   IF @Column8 != '' AND @UpdateChkColumn8 = 1
+    BEGIN
+     UPDATE WRBHBClientManagementAddClientGuest SET Column8 = @Column8
+     WHERE Id = @GuestId;
+    END
+   IF @Column9 != '' AND @UpdateChkColumn9 = 1
+    BEGIN
+     UPDATE WRBHBClientManagementAddClientGuest SET Column9 = @Column9
+     WHERE Id = @GuestId;
+    END
+   IF @Column10 != '' AND @UpdateChkColumn10 = 1
+    BEGIN
+     UPDATE WRBHBClientManagementAddClientGuest SET Column10 = @Column10
+     WHERE Id = @GuestId;
+    END
   END
  /*UPDATE WRBHBClientManagementAddClientGuest SET Column1 = @Column1,
  Column2 = @Column2,Column3 = @Column3,Column4 = @Column4,Column5 = @Column5,

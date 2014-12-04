@@ -28,7 +28,7 @@ CREATE PROCEDURE [dbo].[SP_CheckOutServiceDtl_Insert](
 @ChkOutSerDate NVARCHAR(100),@ChkOutSerItem NVARCHAR(100),
 @ChkOutSerAmount DECIMAL(27,2),@ProductId INT,@TypeService NVARCHAR(100),
 @ChkOutSerQuantity INT,@ChkOutSerNetAmount DECIMAL(27,2),
-@CreatedBy BIGINT,@Id BIGINT,@Quantity DECIMAL(27,2))
+@CreatedBy BIGINT,@Id BIGINT,@Quantity DECIMAL(27,2),@ServiceHdrId int)
 
 AS
 BEGIN
@@ -38,12 +38,12 @@ DECLARE @Id1 INT,@PropertyId BIGINT,@BookingId BIGINT,@GuestId BIGINT,@RoomId BI
 INSERT INTO WRBHBCheckOutServiceDtls(CheckOutServceHdrId,ChkOutSerAction,
 ChkOutSerInclude,ChkOutSerDate,ChkOutSerItem,ChkOutSerAmount,ChkOutSerQuantity
 ,ChkOutSerNetAmount,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId,
-ProductId,TypeService)
+ProductId,TypeService,ServiceHdrId)
 
 VALUES
 (@CheckOutServceHdrId,@ChkOutSerAction,@ChkOutSerInclude,@ChkOutSerDate,@ChkOutSerItem,
 @ChkOutSerAmount,@ChkOutSerQuantity,@ChkOutSerNetAmount,@CreatedBy,GETDATE(),@CreatedBy,
-GETDATE(),1,0,NEWID(),@ProductId,@TypeService)
+GETDATE(),1,0,NEWID(),@ProductId,@TypeService,@ServiceHdrId)
 
 
 SET @Id1=@@IDENTITY;
@@ -86,7 +86,7 @@ BEGIN
 	
 END
 
-UPDATE WRBHBKOTDtls SET ChkoutServiceFlag = 1 WHERE HdrDate = CONVERT(Date,@ChkOutSerDate,103) AND  
+UPDATE WRBHBKOTDtls SET CheckOutServiceFlag = 1 WHERE HdrDate = CONVERT(Date,@ChkOutSerDate,103) AND  
 CheckInId=@ChkInHdrId AND PropertyId = @PropertyId AND  IsActive =1 and IsDeleted =0
 UPDATE WRBHBNewKOTEntryHdr SET ChkoutServiceFlag = 1 WHERE Date = CONVERT(Date,@ChkOutSerDate,103) AND GuestId =@GuestId AND
 BookingId=@BookingId AND PropertyId=@PropertyId AND CheckInId=@ChkInHdrId AND IsActive =1 and IsDeleted =0
@@ -96,3 +96,8 @@ BookingId=@BookingId AND PropertyId=@PropertyId AND CheckInId=@ChkInHdrId AND Is
 
 END
 GO
+
+
+--alter table WRBHBCheckOutServiceDtls add ServiceHdrId Bigint
+--update WRBHBCheckOutServiceDtls set ServiceHdrId=0
+

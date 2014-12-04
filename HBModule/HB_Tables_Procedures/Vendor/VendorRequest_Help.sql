@@ -40,17 +40,61 @@ CREATE PROCEDURE [dbo].[Sp_VendorRequest_Help]
 	
 	----Date
 	--SELECT CONVERT(varchar(103),GETDATE(),103) as Date
-	
 END
  IF @Action='Property'
  BEGIN	
-	SELECT DISTINCT CategoryId ,VendorCategory  
-    FROM WRBHBVendor 
-    WHERE IsActive=1 AND IsDeleted=0 
+	DECLARE @PId Int,@Type NVARCHAR(100)
+	SET @PId=(SELECT PropertyId FROM WRBHBVendorRequestTemp WHERE PropertyId=@Id)
+	SET @Type=(SELECT Type FROM WRBHBVendorRequestTemp WHERE PropertyId=@Id)
+	SELECT ISNULL(@PId,0) AS PId
+	IF(@PId !=0)
+	BEGIN
+		IF(@Type='Room')
+		BEGIN
+			
+			SELECT CategoryId,Category,VendorId,VendorName,Service,Type,
+			(C.BlockName+'-'+B.ApartmentNo) AS ApartmentNo,ApartmentId,RoomId,CONVERT(NVARCHAR(100),Date,103) AS Date,Duedate	AS DueDate
+			FROM WRBHBVendorRequestTemp A
+			JOIN WRBHBPropertyApartment B ON A.ApartmentId=B.Id AND  B.IsActive=1 AND B.IsDeleted=0
+			JOIN WRBHBPropertyBlocks C ON B.BlockId=C.Id AND  C.IsActive=1 AND C.IsDeleted=0
+			WHERE A.PropertyId=@PId
+			
+			SELECT (C.BlockName+'-'+B.ApartmentNo+'-'+A.RoomNo+'-'+A.RoomType) AS RoomNo,D.ApartmentId,
+			D.Roomid As RoomId,D.Description,Filepath As FilePath,D.BillNo,D.Amount 
+			FROM WRBHBVendorRequestTempDtl D
+			JOIN WRBHBVendorRequestTemp H ON D.VendorRequestHdrId=H.Id AND H.IsActive=1 AND H.IsDeleted=0
+			JOIN WRBHBPropertyRooms A ON D.Roomid=A.Id AND A.IsActive=1 AND A.IsDeleted=0
+			JOIN WRBHBPropertyApartment B ON A.ApartmentId=B.Id AND  B.IsActive=1 AND B.IsDeleted=0
+			JOIN WRBHBPropertyBlocks C ON B.BlockId=C.Id AND  C.IsActive=1 AND C.IsDeleted=0
+			WHERE H.PropertyId=@PId
+		END
+		ELSE
+		BEGIN
+		
+			SELECT CategoryId,Category,VendorId,VendorName,Service,Type,
+			'' AS ApartmentNo,ApartmentId,RoomId,CONVERT(NVARCHAR(100),Date,103) AS Date,Duedate AS DueDate
+			FROM WRBHBVendorRequestTemp 			
+			WHERE PropertyId=@PId
+			
+			SELECT (C.BlockName+'-'+B.ApartmentNo) AS ApartmentNo,D.ApartmentId,D.Roomid,D.Description,
+			Filepath As FilePath,D.BillNo,D.Amount 
+			FROM WRBHBVendorRequestTempDtl D
+			JOIN WRBHBVendorRequestTemp H ON D.VendorRequestHdrId=H.Id AND H.IsActive=1 AND H.IsDeleted=0
+			JOIN WRBHBPropertyApartment B ON D.ApartmentId=B.Id AND  B.IsActive=1 AND B.IsDeleted=0
+			JOIN WRBHBPropertyBlocks C ON B.BlockId=C.Id AND  C.IsActive=1 AND C.IsDeleted=0
+			WHERE H.PropertyId=@PId
+		END
+	END
+	ELSE 
+	BEGIN
+		SELECT DISTINCT CategoryId ,VendorCategory  
+		FROM WRBHBVendor 
+		WHERE IsActive=1 AND IsDeleted=0 
+	END
  END 
  IF @Action='Category'
  BEGIN
-    SELECT Id,VendorName FROM WRBHBVendor
+	SELECT Id,VendorName FROM WRBHBVendor
   	WHERE CategoryId=@Id AND IsActive=1 AND IsDeleted=0
  END
  IF @Action='Vendor'

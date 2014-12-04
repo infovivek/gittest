@@ -31,5 +31,6 @@ namespace HB.Entity
         public string AMPM { get; set; }
         public string BookingLevel { get; set; }
         public string ExtraCCEmail { get; set; }
+        public bool HRPolicy { get; set; }
     }
 }

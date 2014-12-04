@@ -50,28 +50,12 @@ BEGIN
 		0 AS Id,ISNULL(H.PropertyId,0) as PropertyId,0 AS BreakfastVeg,
 		0 AS BreakfastNonVeg,0 AS LunchVeg,0 AS LunchNonVeg,0 AS DinnerVeg,0 AS DinnerNonVeg,H.Id
 		FROM WRBHBCheckInHdr H
+		JOIN WRBHBProperty P ON P.Id = H.PropertyId AND P.IsActive=1 AND P.IsDeleted=0
 		JOIN WRBHBBookingPropertyAssingedGuest D ON H.Id = D.CheckInHdrId AND D.IsActive=1 AND D.IsDeleted=0
 		WHERE H.PropertyId = @Id2 AND H.IsActive=1 AND H.IsDeleted=0 AND 
 		CONVERT(date,GETDATE(),103) BETWEEN D.ChkInDt AND D.ChkOutDt AND
-		H.Id NOT IN (SELECT ChkInHdrId FROM WRBHBChechkOutHdr) AND H.RoomNo !='0' AND H.RoomNo !='Standard' 
-		AND H.RoomNo !='Special over 30 days' AND H.RoomNo !='Special' 
-		AND H.RoomNo !='Group Stay' AND H.RoomNo !='Executive' AND H.RoomNo !='Superior'
+		D.CurrentStatus='CheckIn' AND P.Category IN('Internal Property','Managed G H') 
 	
-		INSERT INTO #Room(GuestName,BookingCode,Property,RoomType,BookingId,Id,PropertyId,BreakfastVeg,
-		BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg,CheckInId)
-		
-		SELECT DISTINCT H.ChkInGuest,H.BookingCode AS BookingCode,H.Property,H.RoomNo,ISNULL(H.BookingId,0) as BookingId,
-		0 AS Id,ISNULL(H.PropertyId,0) as PropertyId,0 AS BreakfastVeg,
-		0 AS BreakfastNonVeg,0 AS LunchVeg,0 AS LunchNonVeg,0 AS DinnerVeg,0 AS DinnerNonVeg,H.Id
-		FROM WRBHBCheckInHdr H
-		JOIN WRBHBBookingPropertyAssingedGuest D ON H.Id = D.CheckInHdrId AND D.IsActive=1 AND D.IsDeleted=0
-		WHERE H.PropertyId =@Id2  AND H.IsActive=1 AND H.IsDeleted=0 AND 
-		CONVERT(date,GETDATE(),103) BETWEEN D.ChkInDt AND D.ChkOutDt AND
-		H.Id IN (SELECT ChkInHdrId FROM WRBHBChechkOutHdr WHERE IsActive=1 AND IsDeleted=0 and isnull(IntermediateFlag,0) = 1) 
-		AND H.RoomNo !='0' AND H.RoomNo !='Standard' 
-		AND H.RoomNo !='Special over 30 days' AND H.RoomNo !='Special' 
-		AND H.RoomNo !='Group Stay' AND H.RoomNo !='Executive' AND H.RoomNo !='Superior'
-				
 		INSERT INTO #Room(GuestName,BookingCode,Property,RoomType,BookingId,Id,PropertyId,BreakfastVeg,
 		BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg,CheckInId)
 		
@@ -79,10 +63,12 @@ BEGIN
 		0 AS Id,ISNULL(H.PropertyId,0) as PropertyId,0 AS BreakfastVeg,
 		0 AS BreakfastNonVeg,0 AS LunchVeg,0 AS LunchNonVeg,0 AS DinnerVeg,0 AS DinnerNonVeg,H.Id
 		FROM WRBHBCheckInHdr H
-		JOIN WRBHBBedBookingPropertyAssingedGuest D ON H.BedId = D.BedId AND D.IsActive=1 AND D.IsDeleted=0
+		JOIN WRBHBProperty P ON P.Id = H.PropertyId AND P.IsActive=1 AND P.IsDeleted=0
+		JOIN WRBHBBedBookingPropertyAssingedGuest D ON H.GuestId=D.GuestId AND H.BookingId=D.BookingId AND
+		H.BedId = D.BedId AND D.IsActive=1 AND D.IsDeleted=0
 		WHERE H.PropertyId = @Id2 AND H.IsActive=1 AND H.IsDeleted=0 AND  
 		CONVERT(date,GETDATE(),103) BETWEEN D.ChkInDt AND D.ChkOutDt AND
-		H.Id NOT IN (SELECT ChkInHdrId FROM WRBHBChechkOutHdr)  
+		D.CurrentStatus='CheckIn' AND P.Category IN('Internal Property','Managed G H')  
 		
 			
 		INSERT INTO #Room(GuestName,BookingCode,Property,RoomType,BookingId,Id,PropertyId,BreakfastVeg,
@@ -92,10 +78,12 @@ BEGIN
 		0 AS Id,ISNULL(H.PropertyId,0) as PropertyId,0 AS BreakfastVeg,
 		0 AS BreakfastNonVeg,0 AS LunchVeg,0 AS LunchNonVeg,0 AS DinnerVeg,0 AS DinnerNonVeg,H.Id
 		FROM WRBHBCheckInHdr H
-		JOIN WRBHBApartmentBookingPropertyAssingedGuest D ON H.ApartmentId = D.ApartmentId AND D.IsActive=1 AND D.IsDeleted=0
+		JOIN WRBHBProperty P ON P.Id = H.PropertyId AND P.IsActive=1 AND P.IsDeleted=0
+		JOIN WRBHBApartmentBookingPropertyAssingedGuest D ON  H.GuestId=D.GuestId AND H.BookingId=D.BookingId 
+		AND D.ApartmentId = D.ApartmentId AND D.IsActive=1 AND D.IsDeleted=0
 		WHERE H.PropertyId = @Id2 AND H.IsActive=1 AND H.IsDeleted=0 AND 
 		CONVERT(date,GETDATE(),103) BETWEEN D.ChkInDt AND D.ChkOutDt AND
-		H.Id NOT IN (SELECT ChkInHdrId FROM WRBHBChechkOutHdr)
+		D.CurrentStatus='CheckIn' AND P.Category IN('Internal Property','Managed G H') 
 		
 		SELECT GuestName,BookingCode,Property,RoomType AS RoomNo,BookingId,Id,PropertyId,BreakfastVeg,
 		BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg,CheckInId FROM #Room 
@@ -135,27 +123,12 @@ BEGIN
 		0 AS Id,ISNULL(H.PropertyId,0) as PropertyId,0 AS BreakfastVeg,
 		0 AS BreakfastNonVeg,0 AS LunchVeg,0 AS LunchNonVeg,0 AS DinnerVeg,0 AS DinnerNonVeg,H.Id
 		FROM WRBHBCheckInHdr H
+		JOIN WRBHBProperty P ON P.Id = H.PropertyId AND P.IsActive=1 AND P.IsDeleted=0
 		JOIN WRBHBBookingPropertyAssingedGuest D ON H.Id = D.CheckInHdrId AND D.IsActive=1 AND D.IsDeleted=0
 		WHERE H.PropertyId = @Id2 AND H.IsActive=1 AND H.IsDeleted=0 AND 
-		CONVERT(date,@Str2,103) BETWEEN D.ChkInDt AND D.ChkOutDt AND
-		H.Id NOT IN (SELECT ChkInHdrId FROM WRBHBChechkOutHdr) AND H.RoomNo !='0' AND H.RoomNo !='Standard' AND H.RoomNo !='Special over 30 days' AND H.RoomNo !='Special' 
-		AND H.RoomNo !='Group Stay' AND H.RoomNo !='Executive' AND H.RoomNo !='Superior'
-		
-		INSERT INTO #Room(GuestName,BookingCode,Property,RoomType,BookingId,Id,PropertyId,BreakfastVeg,
-		BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg,CheckInId)
-		
-		SELECT DISTINCT H.ChkInGuest,H.BookingCode AS BookingCode,H.Property,H.RoomNo,ISNULL(H.BookingId,0) as BookingId,
-		0 AS Id,ISNULL(H.PropertyId,0) as PropertyId,0 AS BreakfastVeg,
-		0 AS BreakfastNonVeg,0 AS LunchVeg,0 AS LunchNonVeg,0 AS DinnerVeg,0 AS DinnerNonVeg,H.Id
-		FROM WRBHBCheckInHdr H
-		JOIN WRBHBBookingPropertyAssingedGuest D ON H.Id = D.CheckInHdrId AND D.IsActive=1 AND D.IsDeleted=0
-		WHERE H.PropertyId =@Id2  AND H.IsActive=1 AND H.IsDeleted=0 AND 
-		CONVERT(date,@Str2,103) BETWEEN D.ChkInDt AND D.ChkOutDt AND
-		H.Id IN (SELECT ChkInHdrId FROM WRBHBChechkOutHdr WHERE IsActive=1 AND IsDeleted=0 and isnull(IntermediateFlag,0) = 1) 
-		AND H.RoomNo !='0' AND H.RoomNo !='Standard' 
-		AND H.RoomNo !='Special over 30 days' AND H.RoomNo !='Special' 
-		AND H.RoomNo !='Group Stay' AND H.RoomNo !='Executive' AND H.RoomNo !='Superior'
-				
+		CONVERT(date,GETDATE(),103) BETWEEN D.ChkInDt AND D.ChkOutDt AND
+		D.CurrentStatus='CheckIn' AND P.Category IN('Internal Property','Managed G H') 
+	
 		INSERT INTO #Room(GuestName,BookingCode,Property,RoomType,BookingId,Id,PropertyId,BreakfastVeg,
 		BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg,CheckInId)
 		
@@ -163,10 +136,12 @@ BEGIN
 		0 AS Id,ISNULL(H.PropertyId,0) as PropertyId,0 AS BreakfastVeg,
 		0 AS BreakfastNonVeg,0 AS LunchVeg,0 AS LunchNonVeg,0 AS DinnerVeg,0 AS DinnerNonVeg,H.Id
 		FROM WRBHBCheckInHdr H
-		JOIN WRBHBBedBookingPropertyAssingedGuest D ON H.BedId = D.BedId AND D.IsActive=1 AND D.IsDeleted=0
-		WHERE H.PropertyId = @Id2 AND H.IsActive=1 AND H.IsDeleted=0 AND 
-		CONVERT(date,@Str2,103) BETWEEN D.ChkInDt AND D.ChkOutDt AND
-		H.Id NOT IN (SELECT ChkInHdrId FROM WRBHBChechkOutHdr)
+		JOIN WRBHBProperty P ON P.Id = H.PropertyId AND P.IsActive=1 AND P.IsDeleted=0
+		JOIN WRBHBBedBookingPropertyAssingedGuest D ON H.GuestId=D.GuestId AND H.BookingId=D.BookingId AND
+		H.BedId = D.BedId AND D.IsActive=1 AND D.IsDeleted=0
+		WHERE H.PropertyId = @Id2 AND H.IsActive=1 AND H.IsDeleted=0 AND  
+		CONVERT(date,GETDATE(),103) BETWEEN D.ChkInDt AND D.ChkOutDt AND
+		D.CurrentStatus='CheckIn' AND P.Category IN('Internal Property','Managed G H')  
 		
 			
 		INSERT INTO #Room(GuestName,BookingCode,Property,RoomType,BookingId,Id,PropertyId,BreakfastVeg,
@@ -176,11 +151,13 @@ BEGIN
 		0 AS Id,ISNULL(H.PropertyId,0) as PropertyId,0 AS BreakfastVeg,
 		0 AS BreakfastNonVeg,0 AS LunchVeg,0 AS LunchNonVeg,0 AS DinnerVeg,0 AS DinnerNonVeg,H.Id
 		FROM WRBHBCheckInHdr H
-		JOIN WRBHBApartmentBookingPropertyAssingedGuest D ON H.ApartmentId = D.ApartmentId AND D.IsActive=1 AND D.IsDeleted=0
+		JOIN WRBHBProperty P ON P.Id = H.PropertyId AND P.IsActive=1 AND P.IsDeleted=0
+		JOIN WRBHBApartmentBookingPropertyAssingedGuest D ON  H.GuestId=D.GuestId AND H.BookingId=D.BookingId 
+		AND D.ApartmentId = D.ApartmentId AND D.IsActive=1 AND D.IsDeleted=0
 		WHERE H.PropertyId = @Id2 AND H.IsActive=1 AND H.IsDeleted=0 AND 
-		CONVERT(date,@Str2,103) BETWEEN D.ChkInDt AND D.ChkOutDt AND
-		H.Id NOT IN (SELECT ChkInHdrId FROM WRBHBChechkOutHdr)
-		
+		CONVERT(date,GETDATE(),103) BETWEEN D.ChkInDt AND D.ChkOutDt AND
+		D.CurrentStatus='CheckIn' AND P.Category IN('Internal Property','Managed G H')
+				
 		SELECT GuestName,BookingCode,Property,RoomType AS RoomNo,BookingId,Id,PropertyId,BreakfastVeg,
 		BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg,CheckInId FROM #Room 
 		
@@ -202,27 +179,12 @@ BEGIN
 		0 AS Id,ISNULL(H.PropertyId,0) as PropertyId,0 AS BreakfastVeg,
 		0 AS BreakfastNonVeg,0 AS LunchVeg,0 AS LunchNonVeg,0 AS DinnerVeg,0 AS DinnerNonVeg,H.Id
 		FROM WRBHBCheckInHdr H
-		JOIN WRBHBBookingPropertyAssingedGuest D ON H.Id = D.CheckInHdrId  AND D.IsActive=1 AND D.IsDeleted=0
-		WHERE H.PropertyId = @Id2 AND H.IsActive=1 AND H.IsDeleted=0 AND 
-		CONVERT(date,@Str2,103) BETWEEN D.ChkInDt AND D.ChkOutDt AND
-		H.Id NOT IN (SELECT ChkInHdrId FROM WRBHBChechkOutHdr) AND H.RoomNo !='0'AND H.RoomNo !='Standard' AND H.RoomNo !='Special over 30 days' AND H.RoomNo !='Special' 
-		AND H.RoomNo !='Group Stay' AND H.RoomNo !='Executive' AND H.RoomNo !='Superior'
-		
-		INSERT INTO #Room(GuestName,BookingCode,Property,RoomType,BookingId,Id,PropertyId,BreakfastVeg,
-		BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg,CheckInId)
-		
-		SELECT DISTINCT H.ChkInGuest,H.BookingCode AS BookingCode,H.Property,H.RoomNo,ISNULL(H.BookingId,0) as BookingId,
-		0 AS Id,ISNULL(H.PropertyId,0) as PropertyId,0 AS BreakfastVeg,
-		0 AS BreakfastNonVeg,0 AS LunchVeg,0 AS LunchNonVeg,0 AS DinnerVeg,0 AS DinnerNonVeg,H.Id
-		FROM WRBHBCheckInHdr H
+		JOIN WRBHBProperty P ON P.Id = H.PropertyId AND P.IsActive=1 AND P.IsDeleted=0
 		JOIN WRBHBBookingPropertyAssingedGuest D ON H.Id = D.CheckInHdrId AND D.IsActive=1 AND D.IsDeleted=0
-		WHERE H.PropertyId =@Id2  AND H.IsActive=1 AND H.IsDeleted=0 AND 
-		CONVERT(date,@Str2,103) BETWEEN D.ChkInDt AND D.ChkOutDt AND
-		H.Id IN (SELECT ChkInHdrId FROM WRBHBChechkOutHdr WHERE IsActive=1 AND IsDeleted=0 and isnull(IntermediateFlag,0) = 1) 
-		AND H.RoomNo !='0' AND H.RoomNo !='Standard' 
-		AND H.RoomNo !='Special over 30 days' AND H.RoomNo !='Special' 
-		AND H.RoomNo !='Group Stay' AND H.RoomNo !='Executive' AND H.RoomNo !='Superior'
-				
+		WHERE H.PropertyId = @Id2 AND H.IsActive=1 AND H.IsDeleted=0 AND 
+		CONVERT(date,GETDATE(),103) BETWEEN D.ChkInDt AND D.ChkOutDt AND
+		D.CurrentStatus='CheckIn' AND P.Category IN('Internal Property','Managed G H') 
+	
 		INSERT INTO #Room(GuestName,BookingCode,Property,RoomType,BookingId,Id,PropertyId,BreakfastVeg,
 		BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg,CheckInId)
 		
@@ -230,22 +192,28 @@ BEGIN
 		0 AS Id,ISNULL(H.PropertyId,0) as PropertyId,0 AS BreakfastVeg,
 		0 AS BreakfastNonVeg,0 AS LunchVeg,0 AS LunchNonVeg,0 AS DinnerVeg,0 AS DinnerNonVeg,H.Id
 		FROM WRBHBCheckInHdr H
-		JOIN WRBHBBedBookingPropertyAssingedGuest D ON H.BedId = D.BedId AND D.IsActive=1 AND D.IsDeleted=0
-		WHERE H.PropertyId = @Id2 AND H.IsActive=1 AND H.IsDeleted=0 AND 
-		CONVERT(date,@Str2,103) BETWEEN D.ChkInDt AND D.ChkOutDt AND
-		H.Id NOT IN (SELECT ChkInHdrId FROM WRBHBChechkOutHdr) 
+		JOIN WRBHBProperty P ON P.Id = H.PropertyId AND P.IsActive=1 AND P.IsDeleted=0
+		JOIN WRBHBBedBookingPropertyAssingedGuest D ON H.GuestId=D.GuestId AND H.BookingId=D.BookingId AND
+		H.BedId = D.BedId AND D.IsActive=1 AND D.IsDeleted=0
+		WHERE H.PropertyId = @Id2 AND H.IsActive=1 AND H.IsDeleted=0 AND  
+		CONVERT(date,GETDATE(),103) BETWEEN D.ChkInDt AND D.ChkOutDt AND
+		D.CurrentStatus='CheckIn' AND P.Category IN('Internal Property','Managed G H')  
 		
 			
 		INSERT INTO #Room(GuestName,BookingCode,Property,RoomType,BookingId,Id,PropertyId,BreakfastVeg,
 		BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg,CheckInId)
+		
 		SELECT DISTINCT H.ChkInGuest,H.BookingCode AS BookingCode,H.Property,H.ApartmentType,ISNULL(H.BookingId,0) as BookingId,
 		0 AS Id,ISNULL(H.PropertyId,0) as PropertyId,0 AS BreakfastVeg,
 		0 AS BreakfastNonVeg,0 AS LunchVeg,0 AS LunchNonVeg,0 AS DinnerVeg,0 AS DinnerNonVeg,H.Id
 		FROM WRBHBCheckInHdr H
-		JOIN WRBHBApartmentBookingPropertyAssingedGuest D ON H.ApartmentId = D.ApartmentId AND D.IsActive=1 AND D.IsDeleted=0
+		JOIN WRBHBProperty P ON P.Id = H.PropertyId AND P.IsActive=1 AND P.IsDeleted=0
+		JOIN WRBHBApartmentBookingPropertyAssingedGuest D ON  H.GuestId=D.GuestId AND H.BookingId=D.BookingId 
+		AND D.ApartmentId = D.ApartmentId AND D.IsActive=1 AND D.IsDeleted=0
 		WHERE H.PropertyId = @Id2 AND H.IsActive=1 AND H.IsDeleted=0 AND 
-		CONVERT(date,@Str2,103) BETWEEN D.ChkInDt AND D.ChkOutDt AND
-		H.Id NOT IN (SELECT ChkInHdrId FROM WRBHBChechkOutHdr) 
+		CONVERT(date,GETDATE(),103) BETWEEN D.ChkInDt AND D.ChkOutDt AND
+		D.CurrentStatus='CheckIn' AND P.Category IN('Internal Property','Managed G H') 
+		
 		
 		SELECT GuestName,BookingCode,Property,RoomType AS RoomNo,BookingId,Id,PropertyId,BreakfastVeg,
 		BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg FROM #Room  

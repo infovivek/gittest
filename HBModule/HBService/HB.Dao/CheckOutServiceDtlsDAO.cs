@@ -15,7 +15,7 @@ namespace HB.Dao
     {
         string UserData;
         SqlCommand command = new SqlCommand();
-        public DataSet Save(string CheckOutServiceDtls, User user, int CheckOutServceHdrId)
+        public DataSet Save(string CheckOutServiceDtls, User user, int CheckOutServceHdrId,int CheckOutHdrRowId )
         {
             UserData = "   UserId : " + user.Id + ", UsreName : " + user.LoginUserName + ", ScreenName : " + user.ScreenName + ", SctId : " + user.SctId + ", BranchId : " + user.BranchId + "";
             CheckOutServiceDtls ChkOutSerDtl = new CheckOutServiceDtls();
@@ -86,6 +86,7 @@ namespace HB.Dao
                     command.Parameters.Add("@ChkOutSerNetAmount", SqlDbType.Decimal).Value = 0;
                     command.Parameters.Add("@Quantity", SqlDbType.Decimal).Value = ChkOutSerDtl.Quantity;
                     command.Parameters.Add("@CreatedBy", SqlDbType.BigInt).Value = user.Id;
+                    command.Parameters.Add("@ServiceHdrId", SqlDbType.Int).Value = CheckOutHdrRowId;
                     ds = new WrbErpConnection().ExecuteDataSet(command, "");
                 }
             }

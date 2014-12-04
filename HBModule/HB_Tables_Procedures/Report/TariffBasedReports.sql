@@ -133,9 +133,10 @@ INSERT INTO #TFFINALS( GuestName,GuestId,RoomId,Typess,ClientName,Property,Prope
 			BookingId,isnull(D.CheckOutHdrId,0),isnull(D.CheckInHdrId,0),TariffpaymentMode,D.CurrentStatus,'RoomLvl'Btypes
 			from WRBHBBooking H
 			JOIN WRBHBBookingPropertyAssingedGuest D ON H.Id=D.BookingId
-			WHERE d.RoomShiftingFlag=0  AND CurrentStatus !=('Canceled')
+			join WRBHBProperty P  on P.Id=d.BookingPropertyId and p.Category='Internal Property' and P.IsActive=1 and P.IsDeleted=0
+			WHERE d.RoomShiftingFlag=0  AND D.CurrentStatus !=('Canceled')
 			AND D.IsActive=1 and D.IsDeleted=0 AND TariffPaymentMode!='Bill to Client' 
-			and BookingPropertyId in(1,2,3,6,7,267)
+			--and BookingPropertyId in(1,2,3,6,7,267)
 			  --and month(CONVERT(DATE,D.ChkOutDt,103))=11 and d.BookingPropertyId=2 
 			GROUP BY  D.CheckOutHdrId ,D.FirstName,GuestId,RoomId,D.RoomType,ClientName,d.BookingPropertyId,d.ChkInDt,
 			Tariff,CheckOutDate,BookingId,D.CheckOutHdrId,D.CheckInHdrId,d.ChkInDt,Tariff,D.ChkOutDt,TariffpaymentMode,
@@ -151,7 +152,8 @@ INSERT INTO #TFFINALS( GuestName,GuestId,RoomId,Typess,ClientName,Property,Prope
 			BookingId,0,0,TariffpaymentMode,D.CurrentStatus,'BedLvl'Btypes
 			from WRBHBBooking H
 			JOIN WRBHBBedBookingPropertyAssingedGuest D ON H.Id=D.BookingId
-			WHERE    CurrentStatus !='Canceled' and BookingPropertyId in(1,2,3,6,7,267)
+			join WRBHBProperty P  on P.Id=d.BookingPropertyId and p.Category='Internal Property' and P.IsActive=1 and P.IsDeleted=0
+			WHERE    D.CurrentStatus !='Canceled' --and BookingPropertyId in(1,2,3,6,7,267)
 			AND D.IsActive=1 and D.IsDeleted=0 AND TariffPaymentMode!='Bill to Client'--and d.BookingPropertyId=2 
 			GROUP BY D.FirstName,GuestId,RoomId,D.BedType,ClientName,d.BookingPropertyId,d.ChkInDt,
 			Tariff,CheckOutDate,BookingId,d.ChkInDt,Tariff,D.ChkOutDt,TariffpaymentMode,D.CurrentStatus 
@@ -168,7 +170,8 @@ INSERT INTO #TFFINALS( GuestName,GuestId,RoomId,Typess,ClientName,Property,Prope
 			BookingId,0,0,TariffpaymentMode,D.CurrentStatus,'ApartLvl'Btypes
 			from WRBHBBooking H
 			JOIN WRBHBApartmentBookingPropertyAssingedGuest D ON H.Id=D.BookingId
-			WHERE    CurrentStatus !='Canceled' and BookingPropertyId in(1,2,3,6,7,267)
+			join WRBHBProperty P  on P.Id=d.BookingPropertyId and p.Category='Internal Property' and P.IsActive=1 and P.IsDeleted=0
+			WHERE    d.CurrentStatus !='Canceled' --and BookingPropertyId in(1,2,3,6,7,267)
 			AND D.IsActive=1 and D.IsDeleted=0 AND TariffPaymentMode!='Bill to Client'--and d.BookingPropertyId=2 
 			GROUP BY D.FirstName,GuestId,ApartmentId,D.ApartmentType,ClientName,d.BookingPropertyId,d.ChkInDt,
 			Tariff,CheckOutDate,BookingId,d.ChkInDt,Tariff,D.ChkOutDt,TariffpaymentMode,D.CurrentStatus
@@ -187,37 +190,42 @@ INSERT INTO #TFFINALS( GuestName,GuestId,RoomId,Typess,ClientName,Property,Prope
  
  
  
-INSERT INTO #TFFINALSs( RoomId,Typess,ClientName,Property,PropertyId,PropertyType,
+            INSERT INTO #TFFINALSs( RoomId,Typess,ClientName,Property,PropertyId,PropertyType,
 			TariffTotal,CheckOutDate,CheckInDate,TotalDays,Occupancy,BookingId,ChkoutId,ChkInHdrId,
 			TariffPaymentMode,CurrentStatus,Btypes) 
 					
- Select RoomId,Typess,ClientName,Property,PropertyId,PropertyType,
-			TariffTotal,CheckOutDate,CheckInDate,TotalDays,Occupancy,BookingId,ChkoutId,ChkInHdrId,
-			TariffPaymentMode,CurrentStatus,Btypes from #TFFINALS 
- where -- month(CONVERT(DATE,CheckOutDate,103))=11
-  Occupancy ='Single'-- and PropertyId=2
- group by RoomId,Typess,ClientName,Property,PropertyId,PropertyType,
-			TariffTotal,CheckOutDate,CheckInDate,TotalDays,Occupancy,BookingId,ChkoutId,ChkInHdrId,
-			TariffPaymentMode,CurrentStatus,Btypes
- order by BookingId 
- INSERT INTO #TFFINALSs( RoomId,Typess,ClientName,Property,PropertyId,PropertyType,
+				Select RoomId,Typess,ClientName,Property,PropertyId,PropertyType,
+				TariffTotal,CheckOutDate,CheckInDate,TotalDays,Occupancy,BookingId,ChkoutId,ChkInHdrId,
+				TariffPaymentMode,CurrentStatus,Btypes from #TFFINALS 
+				where -- month(CONVERT(DATE,CheckOutDate,103))=11
+				Occupancy ='Single'-- and PropertyId=2
+				group by RoomId,Typess,ClientName,Property,PropertyId,PropertyType,
+				TariffTotal,CheckOutDate,CheckInDate,TotalDays,Occupancy,BookingId,ChkoutId,ChkInHdrId,
+				TariffPaymentMode,CurrentStatus,Btypes
+				order by BookingId 
+            INSERT INTO #TFFINALSs( RoomId,Typess,ClientName,Property,PropertyId,PropertyType,
 			TariffTotal,CheckOutDate,CheckInDate,TotalDays,Occupancy,BookingId,ChkoutId,ChkInHdrId,
 			TariffPaymentMode,CurrentStatus,Btypes) 
-	  Select RoomId,Typess,ClientName,Property,PropertyId,PropertyType,
-			TariffTotal,CheckOutDate,CheckInDate,TotalDays,Occupancy,BookingId,ChkoutId,ChkInHdrId,
-			TariffPaymentMode,CurrentStatus,Btypes from #TFFINALS 
- where  --month(CONVERT(DATE,CheckOutDate,103))=11
-  Occupancy !='Single' --and PropertyId=2
- group by RoomId,Typess,ClientName,Property,PropertyId,PropertyType,
-			TariffTotal,CheckOutDate,CheckInDate,TotalDays,Occupancy,BookingId,ChkoutId,ChkInHdrId,
-			TariffPaymentMode,CurrentStatus,Btypes
- order by BookingId 
+			
+				Select RoomId,Typess,ClientName,Property,PropertyId,PropertyType,
+				TariffTotal,CheckOutDate,CheckInDate,TotalDays,Occupancy,BookingId,ChkoutId,ChkInHdrId,
+				TariffPaymentMode,CurrentStatus,Btypes from #TFFINALS 
+				where  --month(CONVERT(DATE,CheckOutDate,103))=11
+				Occupancy !='Single' --and PropertyId=2
+				group by RoomId,Typess,ClientName,Property,PropertyId,PropertyType,
+				TariffTotal,CheckOutDate,CheckInDate,TotalDays,Occupancy,BookingId,ChkoutId,ChkInHdrId,
+				TariffPaymentMode,CurrentStatus,Btypes
+				order by BookingId ;
 	 UPDATE #TFFINALSs SET TotalDays=1 WHERE ISNULL(TotalDays,0)=0
 		 
  	
- --Select * from #TFFINALSs  where PropertyId =2 AND BookingId=4681  
+  --Select * from #TFFINALSs    
    -- order by BookingId; 
- 
+ --	update #TFFINALSs set   CheckOutDate = CONVERT(nvarchar(100),GETDATE(),103) ,
+	--TotalDays= DateDiff(day,CONVERT(date,CheckInDate,103),CONVERT(Date,GETDATE(),103)) 
+	--where CurrentStatus in ('CheckIn') 
+	--and CONVERT(date,CheckOutDate,103) > CONVERT(Date,GETDATE(),103) 
+	
   Declare  @Count BIGINT ,@j int,@Tariff DECIMAL(27,2),@NoOfDays BIGINT;   
 	 Declare  @CheckOutNo NVARCHAR(100),@GuestName NVARCHAR(500),@GuestId BIGINT,@RoomId BIGINT;
      Declare  @Typess NVARCHAR(100),@ClientName NVARCHAR(200),@Property NVARCHAR(200),@PropertyId BIGINT;
@@ -263,8 +271,7 @@ INSERT INTO #TFFINALSs( RoomId,Typess,ClientName,Property,PropertyId,PropertyTyp
 			 END 
 			  
      END   
-    -- Select * from #TFFINAL where PropertyId=2  and MONTH(CONVERT(DATE,CheckOutDate,103))= 11
- --    order by BookingId;return;
+    
    --DROP TABLE #NDDCountForecast
      --DROP TABLE #NDDCountForecastNew
      --DROP TABLE #NDDCountForecastData
@@ -551,6 +558,12 @@ LEFT OUTER JOIN WRBHBPropertyAgreements PA WITH(NOLOCK) ON PA.IsActive=1 AND PA.
     update #ExternalForecastNew set NofDays=1   where NofDays=0;
     
     
+    
+ --update #ExternalForecastNew set   CheckOutDt = CONVERT(nvarchar(100),GETDATE(),103) ,
+	--NofDays= DateDiff(day,CONVERT(date,CheckInDt,103),CONVERT(Date,GETDATE(),103)) 
+	--where Type in ('CheckIn') 
+	--and CONVERT(date,CheckOutDt,103) > CONVERT(Date,GETDATE(),103)
+	
     --Select * from #ExternalForecastNew  
    -- return
     Declare @Tacinvoice int;Declare @Category nvarchar(100);
@@ -934,7 +947,85 @@ LEFT OUTER JOIN WRBHBPropertyAgreements PA WITH(NOLOCK) ON PA.IsActive=1 AND PA.
 		--  Return;
 		
  --	for second grid 
+  delete from  #TFFINAL where propertyType='Internal Property';
+ 
+ 
+ 
+           INSERT INTO #TFFINALSs( RoomId,Typess,ClientName,Property,PropertyId,PropertyType,
+			TariffTotal,CheckOutDate,CheckInDate,TotalDays,Occupancy,BookingId,ChkoutId,ChkInHdrId,
+			TariffPaymentMode,CurrentStatus,Btypes) 
+
+				Select RoomId,Typess,ClientName,Property,PropertyId,PropertyType,
+				TariffTotal,CheckOutDate,CheckInDate,TotalDays,Occupancy,BookingId,ChkoutId,ChkInHdrId,
+				TariffPaymentMode,CurrentStatus,Btypes from #TFFINALS 
+				where -- month(CONVERT(DATE,CheckOutDate,103))=11
+				Occupancy ='Single'  and PropertyType='Internal Property'
+				group by RoomId,Typess,ClientName,Property,PropertyId,PropertyType,
+				TariffTotal,CheckOutDate,CheckInDate,TotalDays,Occupancy,BookingId,ChkoutId,ChkInHdrId,
+				TariffPaymentMode,CurrentStatus,Btypes
+				order by BookingId 
+			
+			INSERT INTO #TFFINALSs( RoomId,Typess,ClientName,Property,PropertyId,PropertyType,
+			TariffTotal,CheckOutDate,CheckInDate,TotalDays,Occupancy,BookingId,ChkoutId,ChkInHdrId,
+			TariffPaymentMode,CurrentStatus,Btypes) 
+				Select RoomId,Typess,ClientName,Property,PropertyId,PropertyType,
+				TariffTotal,CheckOutDate,CheckInDate,TotalDays,Occupancy,BookingId,ChkoutId,ChkInHdrId,
+				TariffPaymentMode,CurrentStatus,Btypes from #TFFINALS 
+				where  --month(CONVERT(DATE,CheckOutDate,103))=11
+				Occupancy !='Single'  and PropertyType='Internal Property'--and PropertyId=2
+				group by RoomId,Typess,ClientName,Property,PropertyId,PropertyType,
+				TariffTotal,CheckOutDate,CheckInDate,TotalDays,Occupancy,BookingId,ChkoutId,ChkInHdrId,
+				TariffPaymentMode,CurrentStatus,Btypes
+				order by BookingId 
+	 UPDATE #TFFINALSs SET TotalDays=1 WHERE ISNULL(TotalDays,0)=0
+		 
+ 	
+    update #TFFINALSs set   CheckOutDate = CONVERT(nvarchar(100),GETDATE(),103) ,
+	TotalDays= DateDiff(day,CONVERT(date,CheckInDate,103),CONVERT(Date,GETDATE(),103)) 
+	where CurrentStatus in ('CheckIn') 
+	and CONVERT(date,CheckOutDate,103) > CONVERT(Date,GETDATE(),103) 
 	
+	  Delete #TFFINALSs where CurrentStatus='Booked'	 
+	 
+
+     SELECT TOP 1 @Tariff=TariffTotal ,
+    -- @NoOfDays=DATEDIFF(day,CAST(CheckInDate AS DATE),CAST(CheckOutDate AS DATE)),
+     @NoOfDays=TotalDays,--DATEDIFF(day, CONVERT(DATE,CheckInDate ,103), CONVERT(DATE,CheckOutDate,103)),
+     @CheckOutNo= 0,@GuestName=CurrentStatus,@GuestId=0,@RoomId=RoomId,
+     @Typess=Typess,@ClientName=ClientName,@Property=Property,@PropertyId=PropertyId,
+     @PropertyType=PropertyType,@CheckOutDate=CheckOutDate,@CheckInDate=CheckInDate,
+     @BookingId=BookingId,@ChkoutId=ChkoutId,@ChkInHdrId=ChkInHdrId,@TariffPaymentMode=TariffPaymentMode,
+     @PrintInvoice=0 ,@J=0,@TotalDays=TotalDays,@IDE=IDE   FROM #TFFINALSs 
+    --SELECT @NoOfDays;
+     WHILE (@NoOfDays>0)   
+     BEGIN         
+		INSERT INTO #TFFINAL(CheckOutNo,GuestName,GuestId,RoomId,Typess,ClientName,Property,PropertyId,PropertyType,
+		ChkOutTariffTotal,CheckOutDate,CheckInDate,BookingId,ChkoutId,ChkInHdrId,
+		TariffPaymentMode,PrintInvoice,TotalDays)
+		SELECT  @CheckOutNo,@GuestName,@GuestId,@RoomId,  @Typess,@ClientName,@Property,@PropertyId,  @PropertyType,
+		@Tariff, CONVERT(NVARCHAR,DATEADD(DAY,@J,CONVERT(DATE,@CheckInDate  ,103)),103),@CheckOutDate,--
+		--@CheckInDate,--CONVERT(NVARCHAR,DATEADD(DAY,@J,CAST(@CheckInDate AS DATE)),103)
+		 @BookingId,@ChkoutId,@ChkInHdrId,
+		@TariffPaymentMode, @PrintInvoice,1  
+			 SET @J=@J+1  
+			 SET @NoOfDays=@NoOfDays-1   
+		IF @NoOfDays=0  
+			 BEGIN    
+			 
+				 DELETE FROM #TFFINALSs WHERE IDE=@IDE  --CheckOutNo =@CheckOutNo
+					
+			     SELECT TOP 1 @Tariff=TariffTotal , 
+				 @NoOfDays= TotalDays,-- DATEDIFF(day, CONVERT(DATE,CheckInDate,103), CONVERT(DATE,CheckOutDate,103)),
+				 @CheckOutNo= 0,@GuestName=CurrentStatus,@GuestId=0,@RoomId=RoomId,
+				 @Typess=Typess,@ClientName=ClientName,@Property=Property,@PropertyId=PropertyId,
+				 @PropertyType=PropertyType,@CheckOutDate=CheckOutDate,
+				 @CheckInDate= CheckInDate,--CONVERT(NVARCHAR,DATEADD(DAY,@J,CAST(CheckInDate AS DATE)),103)  ,
+				 @BookingId=BookingId,@ChkoutId=ChkoutId,@ChkInHdrId=ChkInHdrId,@TariffPaymentMode=TariffPaymentMode,
+				 @PrintInvoice=0 ,@J=0 ,@IDE=IDE FROM #TFFINALSs 
+			 END 
+			  
+     END 
+     --For Net revenue Internal Above Done here
 	 ---For Externals
          CREATE TABLE #ExternalForecast(BookingId BIGINT,RoomId BIGINT,RoomName NVARCHAR(100),GuestName NVARCHAR(2000),
 	  CheckInDt NVARCHAR(100),CheckOutDt NVARCHAR(100),Type NVARCHAR(100),Occupancy NVARCHAR(100),
@@ -947,7 +1038,7 @@ LEFT OUTER JOIN WRBHBPropertyAgreements PA WITH(NOLOCK) ON PA.IsActive=1 AND PA.
 		 BookingLevel,Tariff,Category,ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,  
 		 PropertyId,TAC,TACPer,NofDays)   
 		 SELECT G.BookingId,RoomId,G.RoomType,FirstName,CONVERT(NVARCHAR,ChkInDt,103) ChkInDt,  
-		 CONVERT(NVARCHAR,ChkOutDt,103) ChkOutDt,'Booking',G.Occupancy,'Room',Tariff,Category,  
+		 CONVERT(NVARCHAR,ChkOutDt,103) ChkOutDt,G.CurrentStatus,G.Occupancy,'Room',Tariff,Category,  
 		 ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,P.Id,  
 		 ISNULL(PA.TAC,0),ISNULL(PA.TACPer,0)  ,
 		 DATEDIFF(day, CONVERT(DATE,g.ChkInDt,103), CONVERT(DATE,G.ChkOutDt,103)) NofDays 
@@ -959,8 +1050,8 @@ LEFT OUTER JOIN WRBHBPropertyAgreements PA WITH(NOLOCK) ON PA.IsActive=1 AND PA.
 		 JOIN WRBHBProperty P WITH(NOLOCK) ON G.BookingPropertyId= P.Id AND P.IsActive=1 AND P.IsDeleted=0 AND p.Category='External Property'  
 		 AND P.Category='External Property' 
 		 LEFT OUTER JOIN WRBHBPropertyAgreements PA WITH(NOLOCK) ON PA.IsActive=1 AND PA.PropertyId= P.Id AND PA.IsDeleted=0  
-		 WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  AND G.CurrentStatus IN ('Booked')  
-		 GROUP BY G.BookingId,RoomId,G.RoomType,FirstName,ChkInDt,ChkOutDt,G.Occupancy,Tariff,Category,  
+		 WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  AND G.CurrentStatus not IN ('Booked')  
+		 GROUP BY G.BookingId,RoomId,G.RoomType,FirstName,ChkInDt,ChkOutDt,G.Occupancy,Tariff,Category, G.CurrentStatus, 
 		 ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,P.Id,PA.TAC,PA.TACPer  
 	       
 	        --GET CHECKOUT DATE   
@@ -1025,7 +1116,7 @@ LEFT OUTER JOIN WRBHBPropertyAgreements PA WITH(NOLOCK) ON PA.IsActive=1 AND PA.
  where Convert(date,Ag.ChkInDt,103)>= CONVERT(date,'01/09/2014',103)
    
    
-     INSERT INTO #ExternalForecastNewTac(BookingId,PropertyAssGustId,RoomName,GuestName,CheckInDt,CheckOutDt,Type,Occupancy,  
+    INSERT INTO #ExternalForecastNewTac(BookingId,PropertyAssGustId,RoomName,GuestName,CheckInDt,CheckOutDt,Type,Occupancy,  
 	BookingLevel,Tariff,Category,ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,  
 	PropertyId,TAC,TACPer,NofDays)
 	SELECT BookingId,PropertyAssGustId,RoomName,GuestName,CheckInDt,CheckOutDt,Type,Occupancy,  
@@ -1049,8 +1140,23 @@ LEFT OUTER JOIN WRBHBPropertyAgreements PA WITH(NOLOCK) ON PA.IsActive=1 AND PA.
 		S.Type='CheckOut'
 	   --where PropertyId=456
 		-- Delete from #TFFINAL where PropertyType='External Property'; 
-     truncate table #TFFINAL;
-  --   return;
+    -- truncate table #TFFINAL;
+     
+     
+      update #ExternalForecastNewTac set   CheckOutDt = CONVERT(nvarchar(100),GETDATE(),103) ,
+	NofDays= DateDiff(day,CONVERT(date,CheckInDt,103),CONVERT(Date,GETDATE(),103)) 
+	where Type in ('CheckIn') 
+	and CONVERT(date,CheckOutDt,103) > CONVERT(Date,GETDATE(),103)
+	--Delete #TFFINAL where PropertyType in('External Property','MMT') a
+	 Delete #TFFINAL where   PropertyType in('External Property','MMT') 
+	-- Delete #TFFINAL where Typess  in ('Booking','CheckIn') and CONVERT(date,CheckOutDate,103) > CONVERT(Date,GETDATE(),103)
+ 
+	--select * from  #ExternalForecastNewTac   
+	--Select * from #ExternalForecastNewTac
+--	where Type in ('CheckIn') 
+--	and CONVERT(date,CheckOutDt,103) = CONVERT(Date,GETDATE(),103)
+	 -- Select * from #TFFINAL where PropertyType in('External Property','MMT')and MONTH(CONVERT(DATE,CheckOutDate,103))=12
+   --return;
    --  Select SingleTariff,SingleandMarkup,Markup,  
 		 --PropertyId,TAC,TACPer,NofDays from #ExternalForecast
     SELECT TOP 1 @Tariff=Tariff,@GuestId=PropertyAssGustId,@BookingId=BookingId,
@@ -1100,7 +1206,7 @@ LEFT OUTER JOIN WRBHBPropertyAgreements PA WITH(NOLOCK) ON PA.IsActive=1 AND PA.
              CheckInDate,CheckOutDate,TotalDays,CheckOutNo,GuestName,GuestId,ClientName,
              BookingId,ChkoutId,ChkInHdrId,TariffPaymentMode,PrintInvoice)
              
-	 Select 0 RoomId,@PropertyId,isnull((@SingleandMarkup-@SingleTariff),0)+@Markup,
+	 Select 0 RoomId,@PropertyId,isnull(@SingleandMarkup,0),--@SingleTariff),0)+@Markup,
 	@Category,''Property,@Typess ,
      @CheckOutDate,CONVERT(NVARCHAR,DATEADD(DAY,@j,CONVERT(DATE,@CheckInDate,103)),103),1,
      0 CheckOutNo,@GuestName,@GuestId,''ClientName,@BookingId,0 ChkoutId,0 ChkInHdrId,
@@ -1122,10 +1228,12 @@ LEFT OUTER JOIN WRBHBPropertyAgreements PA WITH(NOLOCK) ON PA.IsActive=1 AND PA.
          
     END  
     
-  --     Select * from #TFFINAL where   PropertyType='External Property' --and TariffPaymentMode='Direct'
-  -- and MONTH(CONVERT(DATE,CheckOutDate,103))= 11
-  --order by BookingId
-  --  return;
+    
+ Delete #TFFINAL where Typess  in ('Booking','CheckIn') and CONVERT(date,CheckOutDate,103) > CONVERT(Date,GETDATE(),103)
+   -- Select * from #TFFINAL where   PropertyType in('External Property','MMT') --and TariffPaymentMode='Direct'
+  -- and MONTH(CONVERT(DATE,CheckOutDate,103))=12
+  ----order by BookingId
+  --   return;
  
  	---Jan to december fo  2nd table
 				 
@@ -1255,45 +1363,66 @@ LEFT OUTER JOIN WRBHBPropertyAgreements PA WITH(NOLOCK) ON PA.IsActive=1 AND PA.
 
 		  -----final select for internal
 		INSERT INTO	#MonthWiseFinalNewNet( Property,PropertyType,PropertyId, 
-		Jan,FEb,Mar,Aprl,may,Jun,Jul,Aug,Sept,Oct,Nov,Decm)
+		Jan,FEb,Mar,Aprl,may,Jun,Jul,Aug,Sept,Oct,Nov,Decm,PrintInvoice)
 		select top 1 UPPER('Internal Property') Property,''PropertyType,''PropertyId, 
-		''Jan,''FEb,''Mar,''Aprl,''may,''Jun,''Jul,''Aug,''Sept,''Oct,''Nov,''Decm 
+		''Jan,''FEb,''Mar,''Aprl,''may,''Jun,''Jul,''Aug,''Sept,''Oct,''Nov,''Decm,5 
 		from #MonthWiseFinal 
 
 		INSERT INTO	#MonthWiseFinalNewNet( Property,PropertyType,PropertyId, 
-		Jan,FEb,Mar,Aprl,may,Jun,Jul,Aug,Sept,Oct,Nov,Decm)
+		Jan,FEb,Mar,Aprl,may,Jun,Jul,Aug,Sept,Oct,Nov,Decm,PrintInvoice)
 		select p.PropertyName ,p.Category,p.Id, 
 	    dbo.CommaSeprate(ISNULL(sum(Jan),0)), dbo.CommaSeprate(ISNULL(sum(FEb),0)),
 		dbo.CommaSeprate(ISNULL(sum(Mar),0)),dbo.CommaSeprate(ISNULL(sum(Aprl),0)),
 		dbo.CommaSeprate(ISNULL(sum(may),0)),dbo.CommaSeprate(ISNULL(sum(Jun),0)),
 		dbo.CommaSeprate(ISNULL(sum(Jul),0)),dbo.CommaSeprate(ISNULL(sum(Aug),0)),
 		dbo.CommaSeprate(ISNULL(sum(Sept),0)),dbo.CommaSeprate(ISNULL(sum(Oct),0)),
-		dbo.CommaSeprate(ISNULL(sum(Nov),0)),dbo.CommaSeprate(ISNULL(sum(Decm),0))  
-		from #MonthWiseFinalNET F
+		dbo.CommaSeprate(ISNULL(sum(Nov),0)),dbo.CommaSeprate(ISNULL(sum(Decm),0)),1  
+		from #MonthWiseNet F
 		join WRBHBProperty p on p.Id=f.PropertyId and p.IsActive=1 and p.IsDeleted=0 and p.Category='Internal Property'
 		where f.PropertyType='Internal Property' 
 		GROUP BY p.PropertyName,p.Category,p.Id 
 
 		INSERT INTO	#MonthWiseFinalNewNet( Property,PropertyType,PropertyId, 
-		Jan,FEb,Mar,Aprl,may,Jun,Jul,Aug,Sept,Oct,Nov,Decm)
+		Jan,FEb,Mar,Aprl,may,Jun,Jul,Aug,Sept,Oct,Nov,Decm,PrintInvoice)
 		select top 1 upper('Total Amount-Internal') Property,''PropertyType,''PropertyId, 
 		dbo.CommaSeprate(ISNULL(sum(Jan),0)), dbo.CommaSeprate(ISNULL(sum(FEb),0)),
 		dbo.CommaSeprate(ISNULL(sum(Mar),0)),dbo.CommaSeprate(ISNULL(sum(Aprl),0)),
 		dbo.CommaSeprate(ISNULL(sum(may),0)),dbo.CommaSeprate(ISNULL(sum(Jun),0)),
 		dbo.CommaSeprate(ISNULL(sum(Jul),0)),dbo.CommaSeprate(ISNULL(sum(Aug),0)),
 		dbo.CommaSeprate(ISNULL(sum(Sept),0)),dbo.CommaSeprate(ISNULL(sum(Oct),0)),
-		dbo.CommaSeprate(ISNULL(sum(Nov),0)),dbo.CommaSeprate(ISNULL(sum(Decm),0))  
-		from #MonthWiseFinalNET where PropertyType='Internal Property'
-
+		dbo.CommaSeprate(ISNULL(sum(Nov),0)),dbo.CommaSeprate(ISNULL(sum(Decm),0)),0  
+		from #MonthWiseNet where PropertyType='Internal Property'
+--Dummy for Internal propertyies Name 
+Declare @ShiftCount int;
+		 SET @ShiftCount=(SELECT COUNT(*) FROM #MonthWiseFinalNewNet)  
+		--Select  @ShiftCount
+  IF @ShiftCount<=2
+   begin
+  Delete #MonthWiseFinalNewNet where Property=UPPER('Internal Property'); 
+   
+   INSERT INTO	#MonthWiseFinalNewNet( Property,PropertyType,PropertyId, 
+		Jan,FEb,Mar,Aprl,may,Jun,Jul,Aug,Sept,Oct,Nov,Decm,PrintInvoice)
+		select p.PropertyName ,p.Category,p.Id, 
+	    dbo.CommaSeprate(ISNULL(sum(0),0)), dbo.CommaSeprate(ISNULL(sum(0),0)),
+		dbo.CommaSeprate(ISNULL(sum(0),0)),dbo.CommaSeprate(ISNULL(sum(0),0)),
+		dbo.CommaSeprate(ISNULL(sum(0),0)),dbo.CommaSeprate(ISNULL(sum(0),0)),
+		dbo.CommaSeprate(ISNULL(sum(0),0)),dbo.CommaSeprate(ISNULL(sum(0),0)),
+		dbo.CommaSeprate(ISNULL(sum(0),0)),dbo.CommaSeprate(ISNULL(sum(0),0)),
+		dbo.CommaSeprate(ISNULL(sum(0),0)),dbo.CommaSeprate(ISNULL(sum(0),0)) ,1 
+		from WRBHBProperty p where  p.IsActive=1 and p.IsDeleted=0 and p.Category='Internal Property' 
+		GROUP BY p.PropertyName,p.Category,p.Id 
+   end
+   
+		
 
        INSERT INTO	#GrandTotalAll( Property,PropertyType,PropertyId, 
 		Jan,FEb,Mar,Aprl,may,Jun,Jul,Aug,Sept,Oct,Nov,Decm)
 		select top 1 upper('Total Amount-Internal') Property,''PropertyType,''PropertyId, 
 		sum(Jan),sum(FEb),sum(Mar),sum(Aprl),sum(may),sum(Jun),
 	    sum(Jul),sum(Aug),sum(Sept),sum(Oct),sum(Nov),sum(Decm)   
-		from #MonthWiseFinalNET where PropertyType='Internal Property'
+		from #MonthWiseNet where PropertyType='Internal Property'
 	  -----final select for External
-	  
+  
 	   INSERT INTO	#MonthWiseFinalNewNet( Property,PropertyType,PropertyId, 
 		Jan,FEb,Mar,Aprl,may,Jun,Jul,Aug,Sept,Oct,Nov,Decm)
 		select top 1 '' Property,''PropertyType,''PropertyId, 
@@ -1304,8 +1433,10 @@ LEFT OUTER JOIN WRBHBPropertyAgreements PA WITH(NOLOCK) ON PA.IsActive=1 AND PA.
 		Jan,FEb,Mar,Aprl,may,Jun,Jul,Aug,Sept,Oct,Nov,Decm)
 		select top 1 UPPER('External Property') Property,''PropertyType,''PropertyId, 
 		''Jan,''FEb,''Mar,''Aprl,''may,''Jun,''Jul,''Aug,''Sept,''Oct,''Nov,''Decm 
-		from #MonthWiseFinal 
-		
+	--	from #MonthWiseFinal 
+	--Select * from #MonthWiseFinalNewNet
+	--order by PrintInvoice desc
+	--return;	
 		INSERT INTO	#MonthWiseFinalNewNet( Property,PropertyType,PropertyId, 
 		Jan,FEb,Mar,Aprl,may,Jun,Jul,Aug,Sept,Oct,Nov,Decm)
 		select top 1 'online' Property,''PropertyType,''PropertyId, 
@@ -1320,7 +1451,7 @@ LEFT OUTER JOIN WRBHBPropertyAgreements PA WITH(NOLOCK) ON PA.IsActive=1 AND PA.
 		dbo.CommaSeprate(ISNULL(sum(Jul),0)),dbo.CommaSeprate(ISNULL(sum(Aug),0)),
 		dbo.CommaSeprate(ISNULL(sum(Sept),0)),dbo.CommaSeprate(ISNULL(sum(Oct),0)),
 		dbo.CommaSeprate(ISNULL(sum(Nov),0)),dbo.CommaSeprate(ISNULL(sum(Decm),0))   
-		from #MonthWiseFinal 
+		from #MonthWiseNet 
 		WHERE PropertyType='External Property' and TariffPaymentMode='Bill To Company (BTC)'
 		INSERT INTO	#MonthWiseFinalNewNet( Property,PropertyType,PropertyId, 
 		Jan,FEb,Mar,Aprl,may,Jun,Jul,Aug,Sept,Oct,Nov,Decm)
@@ -1339,7 +1470,7 @@ LEFT OUTER JOIN WRBHBPropertyAgreements PA WITH(NOLOCK) ON PA.IsActive=1 AND PA.
 		select top 1 'BTC' Property,'BTC'PropertyType,''PropertyId, 
 		sum(Jan),sum(FEb),sum(Mar),sum(Aprl),sum(may),sum(Jun),
 	    sum(Jul),sum(Aug),sum(Sept),sum(Oct),sum(Nov),sum(Decm)  
-		from #MonthWiseFinal 
+		from #MonthWiseNet 
 		WHERE PropertyType='External Property' and TariffPaymentMode='Bill To Company (BTC)'
 	   INSERT INTO #MonthWiseFinalNewNetExtTotal( Property,PropertyType,PropertyId, 
 		Jan,FEb,Mar,Aprl,may,Jun,Jul,Aug,Sept,Oct,Nov,Decm)
@@ -1443,7 +1574,7 @@ LEFT OUTER JOIN WRBHBPropertyAgreements PA WITH(NOLOCK) ON PA.IsActive=1 AND PA.
 		from #MonthWiseFinal where PropertyType='MANAGED G H'
 	      Truncate table #MonthWiseGrandTotal;
  
-    INSERT INTO  #MonthWiseGrandTotal( Property,PropertyType,PropertyId, 
+      INSERT INTO  #MonthWiseGrandTotal( Property,PropertyType,PropertyId, 
 		  Jan,FEb,Mar,Aprl,may,Jun,Jul,Aug,Sept,Oct,Nov,Decm)
 		 select top 1 upper('Grand Total') Property,''PropertyType,''PropertyId,
 		 sum(Jan),sum(FEb),sum(Mar),sum(Aprl),sum(may),sum(Jun),
@@ -1477,7 +1608,7 @@ LEFT OUTER JOIN WRBHBPropertyAgreements PA WITH(NOLOCK) ON PA.IsActive=1 AND PA.
 		isnull(may,'')MAY,isnull(Jun,'')JUNE, ISNULL(JUL,'') JULY,
 		 ISNULL(AUG,'') AUG,
 		isnull(Sept,'')SEPT,isnull(Oct,'')OCT,isnull(Nov,'')NOV,isnull(Decm,'')DEC,0 as SNo 
-		from #MonthWiseFinalNewNet  
+		from #MonthWiseFinalNewNet  order by PrintInvoice desc
 		END
  END  
  

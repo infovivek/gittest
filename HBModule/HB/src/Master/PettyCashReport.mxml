@@ -517,7 +517,7 @@
 				hlp_Property.text="";PropertyId=0;Id=0;
 				UserId=0;Grd_Details.dataProvider=null;
 				Rbtn_First.selected=true;
-				Help();
+				Help();Txt_OpenBalance.text="";Txt_CloseBalance.text="";
 			}
 			
 		]]>

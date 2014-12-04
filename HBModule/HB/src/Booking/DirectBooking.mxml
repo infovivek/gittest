@@ -101,11 +101,12 @@
 				//var num:Number= (end.getUTCFullYear() - start.getUTCFullYear()) * 12 +(end.getUTCMonth() - start.getUTCMonth());								
 				//useWeb("BOOKING","Tab2_to_Tab3_Dtls_CUSTOM",[GlobalXml,'Tab2_to_Tab3_Dtls','','','','',0,0,0,0,0,26,0]);				
 				var ss:String=Global_AC[0].UsrId;				
-				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Room',5223]);//
+				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Room',6458]);//
 				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Bed',1528]);
 				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Apartment',2027]);
 				//useWeb("BookingMail","RecommendMail_CUSTOM",[GlobalXml,'Recommend',5809]);
-				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'MMT',5765]);				
+				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'MMT',5765]);
+				//useWeb("BookingMail","SendSMS_CUSTOM",[GlobalXml,'SMS',6452]);
 				//var ChkInDt:String="2014-11-29 12:00:00 PM";
 				//var ChkOutDt:String="2014-11-30 12:00:00 PM";
 				//CityId=2905;
@@ -1023,8 +1024,14 @@
 				}
 				if (Ds_Objects.currentTarget.description.toString() == "RecommendMail_CUSTOM")
 				{
-					alignAlert(Alert.show("Recommended Property Send Successfully.","Message !",Alert.OK, 
+					/*alignAlert(Alert.show("Recommended Property Send Successfully.","Message !",Alert.OK, 
+						null, null, iconTickLarge, Alert.OK),10,"");*/
+					alignAlert(Alert.show("Property Recommendation Sent Successfully","Message !",Alert.OK, 
 						null, null, iconTickLarge, Alert.OK),10,"");
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "SendSMS_CUSTOM")
+				{
+					
 				}
 				if (Ds_Objects.currentTarget.description.toString() == "SendMail_CUSTOM")
 				{
@@ -1033,7 +1040,7 @@
 						if(Ds_Objects.result.Tables.Table12.Rows[0].Str != "")
 						{
 							alignAlert(Alert.show("Invaild Email Address :  "+
-								Ds_Objects.result.Tables.Table11.Rows[0].Str+"  Please Validate and Click OK","Alert Message !",Alert.OK, 
+								Ds_Objects.result.Tables.Table12.Rows[0].Str+"  Please Validate and Click OK","Alert Message !",Alert.OK, 
 								null,FnMailOk, iconWarning, Alert.OK),10,"");						
 						}
 						else
@@ -2100,7 +2107,8 @@
 						ClientBookerName:ClientBookerName,ClientBookerEmail:ClientBookerEmail,
 						EmailtoGuest:Chk_EmailtoGuest.selected,Note:Txt_Note.text,
 						SpecialRequirements:"",Id:Id,Status:"RmdPty",AMPM:Ddl_AMPM.selectedItem,
-						BookingLevel:"Room",ExtraCCEmail:Txt_ExtraCCEmail.text}]);
+						BookingLevel:"Room",ExtraCCEmail:Txt_ExtraCCEmail.text,
+					    HRPolicy:Chk_HRPolicy.selected}]);
 				var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
 				var GuestXml:String="";
 				GuestXml += "<ROOT>";
@@ -2385,7 +2393,8 @@
 							   ClientBookerId:0,ClientBookerName:"",ClientBookerEmail:"",
 							   EmailtoGuest:Chk_EmailtoGuest.selected,Note:Txt_Note.text,
 							   SpecialRequirements:"",Id:Id,Status:"RmdPty",AMPM:Ddl_AMPM.selectedItem,
-							   BookingLevel:"Room",ExtraCCEmail:Txt_ExtraCCEmail.text}]);
+							   BookingLevel:"Room",ExtraCCEmail:Txt_ExtraCCEmail.text,
+							   HRPolicy:Chk_HRPolicy.selected}]);
 						var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
 						var Tmp1:ArrayCollection=new ArrayCollection();
 						var GuestXml:String="";
@@ -2459,14 +2468,36 @@
 						Err = Err + "*  More than one Property is not Allowed.\n";
 					}
 				}
-				var Flagg:Boolean=true;
-				if((ClientBookerId == 0) && (Txt_NewBooker.text == "") && (Txt_NewBookerEmail.text == "") &&
-					(Chk_EmailtoGuest.selected == false))
+				//var Flagg:Boolean=true;
+				//if((ClientBookerId == 0) && (Txt_NewBooker.text == "") && (Txt_NewBookerEmail.text == "") &&
+				//	(Chk_EmailtoGuest.selected == false))
+				if (ClientBookerId == 0)
 				{
-					Err = Err + "*  Booker Email is Required.\n";
-					Ddl_Booker.setFocus();Flagg=false;			
+					if((Txt_NewBooker.text == "") && (Txt_NewBookerEmail.text == ""))
+					{
+						Err = Err + "*  Booker Name & Email is Required.\n";
+						Ddl_Booker.setFocus();
+					}
+					else
+					{
+						if(Txt_NewBooker.text == "")
+						{
+							Err = Err + "*  Booker Name is Required.\n";
+							Ddl_Booker.setFocus();
+						}
+						if(Txt_NewBookerEmail.text == "")
+						{
+							Err = Err + "*  Booker Email is Required.\n";
+							Ddl_Booker.setFocus();
+						}
+					}					
 				}
-				if(Flagg == true)
+				if(Chk_EmailtoGuest.selected == false)
+				{
+					Err = Err + "*  Email to Guest is Required.\n";
+					Chk_EmailtoGuest.setFocus();
+				}
+				/*if(Flagg == true)
 				{
 					if(Chk_EmailtoGuest.selected == false)
 					{
@@ -2520,7 +2551,7 @@
 							}
 						}
 					}
-				}
+				}*/
 				if(Err != "")
 				{
 					alignAlert(Alert.show(Err,"Requierd Field(s) !",Alert.OK,null,null,
@@ -2723,7 +2754,8 @@
 						ClientBookerName:ClientBookerName,ClientBookerEmail:ClientBookerEmail,
 						EmailtoGuest:Chk_EmailtoGuest.selected,Note:Txt_Note.text,
 						SpecialRequirements:"",Id:Id,Status:"Step2",AMPM:Ddl_AMPM.selectedItem,
-						BookingLevel:"Room",ExtraCCEmail:Txt_ExtraCCEmail.text}]);
+						BookingLevel:"Room",ExtraCCEmail:Txt_ExtraCCEmail.text,
+						HRPolicy:Chk_HRPolicy.selected}]);
 				var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
 				var GuestXml:String="";
 				GuestXml += "<ROOT>";
@@ -3350,12 +3382,7 @@
 							    //
 								Column1:Ac[j].Txt_C1,Column2:Ac[j].Txt_C2,Column3:Ac[j].Txt_C3,Column4:Ac[j].Txt_C4,
 								Column5:Ac[j].Txt_C5,Column6:Ac[j].Txt_C6,Column7:Ac[j].Txt_C7,Column8:Ac[j].Txt_C8,
-								Column9:Ac[j].Txt_C9,Column10:Ac[j].Txt_C10,
-							    //
-								ChkColumn1:Ac[j].Chk_C1,ChkColumn2:Ac[j].Chk_C2,ChkColumn3:Ac[j].Chk_C3,
-								ChkColumn4:Ac[j].Chk_C4,ChkColumn5:Ac[j].Chk_C5,ChkColumn6:Ac[j].Chk_C6,
-								ChkColumn7:Ac[j].Chk_C7,ChkColumn8:Ac[j].Chk_C8,ChkColumn9:Ac[j].Chk_C9,
-								ChkColumn10:Ac[j].Chk_C10});
+								Column9:Ac[j].Txt_C9,Column10:Ac[j].Txt_C10});
 						Tmp.removeItemAt(j);
 						j = 0;
 						Len = Ac.length;
@@ -3490,7 +3517,7 @@
 						ClientBookerEmail:"",EmailtoGuest:Chk_EmailtoGuest.selected,Note:"",
 						SpecialRequirements:Txt_SpecialRequirements.text,
 						Id:Id,Status:Status,AMPM:Ddl_AMPM.selectedItem,BookingLevel:"Room",
-					    ExtraCCEmail:Txt_ExtraCCEmail.text}]);
+					    ExtraCCEmail:Txt_ExtraCCEmail.text,HRPolicy:Chk_HRPolicy.selected}]);
 				var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
 				var Tmp1:ArrayCollection=new ArrayCollection();
 				var GuestXml:String="";
@@ -3567,6 +3594,8 @@
 			protected function Btn_PropertyShow_clickHandler(event:MouseEvent):void
 			{
 				ErrStr="";Flag=true;
+				//FnOnselection_City();
+				//FnOnselection_State();
 				if(StateId == 0)
 				{
 					if(Flag == true)
@@ -3575,7 +3604,23 @@
 					}
 					ErrStr = ErrStr + "* State is Required.\n";
 				}
+				if((StateId != 0) && (Hlp_Stat.text == ""))
+				{
+					if(Flag == true)
+					{
+						Hlp_Stat._setFocus();Flag=false;
+					}
+					ErrStr = ErrStr + "* State is Required.\n";
+				}
 				if(CityId == 0)
+				{
+					if(Flag == true)
+					{
+						Hlp_City._setFocus();Flag=false;
+					}
+					ErrStr = ErrStr + "* City is Required.\n";
+				}
+				if((CityId != 0) && (Hlp_City.text == ""))
 				{
 					if(Flag == true)
 					{
@@ -4038,6 +4083,13 @@
 				Btn_Backed.enabled = true;
 				Pnl_CustomFields.visible = false;
 			}
+			
+			protected function Chk_HRPolicy_changeHandler():void
+			{
+				Grd_Property.dataProvider = null;
+				Grd_RecommendedProperty.dataProvider = null;
+			}
+			
 		]]>
 	</fx:Script>	
 	<s:VGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
@@ -4090,7 +4142,7 @@
 				<s:Scroller x="0" y="0" width="100%" height="468" verticalScrollPolicy="on">
 					<s:Group x="0" y="0" width="100%" height="100%" depth="2">						
 						<s:CheckBox x="683.2" y="15" label="HR Policy Override" id="Chk_HRPolicy"
-									tabIndex="28"/>
+									tabIndex="28" change="Chk_HRPolicy_changeHandler()"/>
 						<s:CheckBox x="779.2" y="35" label="MMT" id="Chk_MMT"
 									tabIndex="28"/>
 						<mx:DataGrid id="Grd_Property" x="22.25" y="81" width="925" height="278"
@@ -4455,16 +4507,6 @@
 						<mx:DataGridColumn width="0" dataField="Txt_C8" visible="false"/>
 						<mx:DataGridColumn width="0" dataField="Txt_C9" visible="false"/>
 						<mx:DataGridColumn width="0" dataField="Txt_C10" visible="false"/>
-						<mx:DataGridColumn width="0" dataField="Chk_C1" visible="false"/>
-						<mx:DataGridColumn width="0" dataField="Chk_C2" visible="false"/>
-						<mx:DataGridColumn width="0" dataField="Chk_C3" visible="false"/>
-						<mx:DataGridColumn width="0" dataField="Chk_C4" visible="false"/>
-						<mx:DataGridColumn width="0" dataField="Chk_C5" visible="false"/>
-						<mx:DataGridColumn width="0" dataField="Chk_C6" visible="false"/>
-						<mx:DataGridColumn width="0" dataField="Chk_C7" visible="false"/>
-						<mx:DataGridColumn width="0" dataField="Chk_C8" visible="false"/>
-						<mx:DataGridColumn width="0" dataField="Chk_C9" visible="false"/>
-						<mx:DataGridColumn width="0" dataField="Chk_C10" visible="false"/>
 					</mx:columns>
 				</mx:DataGrid>
 				<mx:DataGrid id="Grd_PropertyAssignedGuest" x="12" y="232" width="946" height="182"
@@ -4500,16 +4542,6 @@
 						<mx:DataGridColumn width="0" dataField="Column8" visible="false"/>
 						<mx:DataGridColumn width="0" dataField="Column9" visible="false"/>
 						<mx:DataGridColumn width="0" dataField="Column10" visible="false"/>
-						<mx:DataGridColumn width="0" dataField="ChkColumn1" visible="false"/>
-						<mx:DataGridColumn width="0" dataField="ChkColumn2" visible="false"/>
-						<mx:DataGridColumn width="0" dataField="ChkColumn3" visible="false"/>
-						<mx:DataGridColumn width="0" dataField="ChkColumn4" visible="false"/>
-						<mx:DataGridColumn width="0" dataField="ChkColumn5" visible="false"/>
-						<mx:DataGridColumn width="0" dataField="ChkColumn6" visible="false"/>
-						<mx:DataGridColumn width="0" dataField="ChkColumn7" visible="false"/>
-						<mx:DataGridColumn width="0" dataField="ChkColumn8" visible="false"/>
-						<mx:DataGridColumn width="0" dataField="ChkColumn9" visible="false"/>
-						<mx:DataGridColumn width="0" dataField="ChkColumn10" visible="false"/>
 					</mx:columns>
 				</mx:DataGrid>
 				<s:TextInput x="395" y="98.3" id="Txt_Tariff" height="23" width="80" textAlign="center"

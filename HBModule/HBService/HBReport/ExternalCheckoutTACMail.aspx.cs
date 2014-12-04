@@ -83,7 +83,7 @@ namespace HBReport
                 if (ds.Tables[0].Rows[0][11].ToString() != "0") // Mail 
                 {
                     string Valid = ""; string Err = "";
-                    string Email = "shiv@hummingbirdindia.com";
+                    string Email = "silam@hummingbirdindia.com";
               //      string Email = "shameem@warblerit.com";
                     Valid = EmailValidate(Email);
 
@@ -102,7 +102,7 @@ namespace HBReport
 
                         message.Bcc.Add(new System.Net.Mail.MailAddress("vivek@warblerit.com"));
                         message.Bcc.Add(new System.Net.Mail.MailAddress("shameem@warblerit.com"));
-                        message.Bcc.Add(new System.Net.Mail.MailAddress("silam@hummingbirdindia.com"));
+                    //    message.Bcc.Add(new System.Net.Mail.MailAddress("silam@hummingbirdindia.com"));
                         message.Bcc.Add(new System.Net.Mail.MailAddress("karthik@hummingbirdindia.com"));
                         message.Bcc.Add(new System.Net.Mail.MailAddress("usha@hummingbirdindia.com"));
 

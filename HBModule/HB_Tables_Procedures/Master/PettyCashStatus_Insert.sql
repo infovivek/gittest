@@ -57,7 +57,7 @@ BEGIN
 	SET @Bal=(SELECT Balance From WRBHBPettyCashStatusHdr
 	WHERE Id=@PettyCashStatusHdrId AND IsActive=1 AND IsDeleted=0)
 	
-	UPDATE WRBHBPettyCashStatus SET Balance=@Bal
+	UPDATE WRBHBPettyCashStatus SET Balance=@Bal,Status=@Status
 	WHERE PettyCashStatusHdrId=@PettyCashStatusHdrId AND IsActive=1 AND IsDeleted=0
 	
 	UPDATE WRBHBPettyCashHdr SET ClosingBalance=@Bal,ExpenseReport=1

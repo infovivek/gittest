@@ -565,8 +565,12 @@ IF @Action = 'AvaliableFromRoom'
   CREATE TABLE #AgedGst(Id BIGINT);  
   INSERT INTO #AgedGst(Id)  
   SELECT Id FROM WRBHBBookingPropertyAssingedGuest 
-  WHERE BookingId=@BookingId AND  
-  RoomId=@RoomId AND RoomCaptured=@Id1 AND ISNULL(RoomShiftingFlag,0)=0;  
+  WHERE BookingId=@BookingId AND IsActive = 1 AND IsDeleted = 0 AND 
+  RoomId = @RoomId AND RoomCaptured = @Id1 AND 
+  ISNULL(RoomShiftingFlag,0) = 0;  
+  --
+  --SELECT * FROM #AgedGst;
+  --SELECT @PropertyType1;RETURN;
   --  
   CREATE TABLE #TMPTABLE1(label NVARCHAR(100),RoomId BIGINT);
   IF @PropertyType1 = 'MGH'  
@@ -768,7 +772,9 @@ IF @Action = 'AvaliableFromRoom'
     B.IsActive=1 AND B.IsDeleted=0 AND   
     A.SellableApartmentType != 'HUB' AND  
     A.Status='Active' AND R.RoomStatus='Active' AND  
-    P.Id=@PropertyId1;  
+    P.Id=@PropertyId1;
+    --
+    --SELECT * FROM #Tmp_InternalRoom1;RETURN;  
 -- Property Booked Rooms Begin  
     CREATE TABLE #BookedRoomsInP1(RoomId BIGINT);  
     -- Dedicated Rooms  
@@ -793,6 +799,8 @@ IF @Action = 'AvaliableFromRoom'
     CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND  
     PG.Id NOT IN (SELECT Id FROM #AgedGst) AND  
     PG.BookingPropertyId=@PropertyId1 GROUP BY PG.RoomId;  
+    --
+    --SELECT * FROM #BookedRoomsInP1 where RoomId = 668;RETURN;
     --  
     INSERT INTO #BookedRoomsInP1(RoomId)   
     SELECT PG.RoomId FROM WRBHBBookingPropertyAssingedGuest PG  
@@ -801,6 +809,8 @@ IF @Action = 'AvaliableFromRoom'
     CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND  
     PG.Id NOT IN (SELECT Id FROM #AgedGst) AND  
     PG.BookingPropertyId=@PropertyId1 GROUP BY PG.RoomId;  
+    --
+    --SELECT * FROM #BookedRoomsInP1 where RoomId = 668;RETURN;
     --   
     INSERT INTO #BookedRoomsInP1(RoomId)   
     SELECT PG.RoomId FROM WRBHBBookingPropertyAssingedGuest PG  
@@ -812,6 +822,8 @@ IF @Action = 'AvaliableFromRoom'
     CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND  
     PG.Id NOT IN (SELECT Id FROM #AgedGst) AND  
     PG.BookingPropertyId=@PropertyId1 GROUP BY PG.RoomId;  
+    --
+    --SELECT * FROM #BookedRoomsInP1 where RoomId = 668;RETURN;
     --   
     INSERT INTO #BookedRoomsInP1(RoomId)  
     SELECT PG.RoomId FROM WRBHBBookingPropertyAssingedGuest PG  
@@ -911,12 +923,18 @@ IF @Action = 'AvaliableFromRoom'
     CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) >=  
     CAST(@ChkOutDt AS DATETIME) AND PG.BookingPropertyId=@PropertyId1  
     GROUP BY R.Id;  
+    --
+    --SELECT @RoomId;
     --  
-    --select * from #BookedRoomsInP;  
-    --select * from #Tmp_InternalRoom;return;  
+    --select * from #BookedRoomsInP1;  
+    --select * from #Tmp_InternalRoom1;return;
+    --
     INSERT INTO #TMPTABLE1(label,RoomId)  
     SELECT label,RoomId FROM #Tmp_InternalRoom1  
-    WHERE RoomId NOT IN (SELECT RoomId FROM #BookedRoomsInP1);  
+    WHERE RoomId NOT IN (SELECT RoomId FROM #BookedRoomsInP1);
+    --
+    --SELECT * FROM #TMPTABLE1;RETURN
+    --  
    END  
   -- Avaliable rooms  
   DECLARE @AvaRoomCnt INT;  

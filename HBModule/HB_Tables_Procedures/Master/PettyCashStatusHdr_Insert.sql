@@ -35,11 +35,11 @@ AS
 DECLARE @Identity int,@NewEntry bit,@ErrMsg NVARCHAR(MAX)
 BEGIN
 	SET @NewEntry=(SELECT NewEntry FROM WRBHBPettyCashStatusHdr
-	WHERE PropertyId=@PropertyId AND UserId=@UserId AND 
+	WHERE PropertyId=@PropertyId AND UserId=@UserId AND IsActive=1 AND IsDeleted=0 AND
 	Id=(SELECT MAX(Id) FROM WRBHBPettyCashStatusHdr WHERE UserId=@UserId AND
 	PropertyId=@PropertyId))
 	
-	IF(@NewEntry=1)
+	IF(@NewEntry=0)
 	BEGIN
 		SET @ErrMsg = 'PC Expense Report Can be submit after the Previous Expense Report Approval.';
 	    SELECT @ErrMsg;
@@ -49,9 +49,11 @@ BEGIN
 		INSERT INTO WRBHBPettyCashStatusHdr(PropertyId,UserId,Balance,IsActive,IsDeleted,Createdby,
 		Createddate,Modifiedby,Modifieddate,RowId,Flag,NewEntry)
 		VALUES(@PropertyId,@UserId,@Balance,1,0,@UserId,GETDATE(),@UserId,GETDATE(),NEWID(),1,0)
-	END
+	
 	SET  @Identity=@@IDENTITY
 	SELECT Id,RowId FROM WRBHBPettyCashStatusHdr WHERE Id=@Identity;
+	
+	END
 END
 
 

@@ -48,7 +48,7 @@ VALUES
 @MiscellaneousAmount,@OtherService)
 
 SET @Id1=@@IDENTITY;
-SELECT CheckOutHdrId as Id,RowId FROM WRBHBCheckOutServiceHdr WHERE Id=@Id1;
+SELECT CheckOutHdrId as Id,Id RowId FROM WRBHBCheckOutServiceHdr WHERE Id=@Id1;
 END
 GO
  

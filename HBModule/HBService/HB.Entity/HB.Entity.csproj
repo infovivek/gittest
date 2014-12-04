@@ -126,6 +126,7 @@
     <Compile Include="RoomShifting.cs" />
     <Compile Include="SearchBookingEntity.cs" />
     <Compile Include="SearchBookingGuestEntity.cs" />
+    <Compile Include="SearchDetailServiceInvoice.cs" />
     <Compile Include="SlabTaxEntity.cs" />
     <Compile Include="SSPCodeGenerationApartment.cs" />
     <Compile Include="SSPCodeGenerationRooms.cs" />

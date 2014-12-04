@@ -757,6 +757,13 @@ namespace HB.Dao
         public const String CheckInForecastReport_Help = "Sp_CheckInForecastReport_Help";
 
         public const String PendingUnsettled_Help = "Sp_PendingUnsettled_Help";
-       
+        public const string SearchDetailServiceInvoice = "SearchDetailServiceInvoice_Help";
+
+        public const string ExternalCheckoutService_Help = "Sp_ExternalCheckoutService_Help";
+
+        public const string ExtCheckOutTariff_Bill = "SP_ExtCheckOutTariff_Bill";
+        public const string ExtCheckOutService_Bill = "SP_ExtCheckOutService_Bill";
+        public const string ExtCheckOutConsolidate_Bill = "SP_ExtCheckOutConsolidate_Bill";
+
     }
 }

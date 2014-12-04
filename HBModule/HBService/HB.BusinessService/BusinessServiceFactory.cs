@@ -365,6 +365,9 @@ namespace HB.BusinessService
                 case "PendingUnsettledServiceReport":
                     _businessService = new PendingUnsettledServiceReport();
                     break;
+                case "SearchDetailServiceInvoice":
+                    _businessService = new SearchDetailServiceInvoiceService();
+                    break;
             }
             return _businessService;
         }

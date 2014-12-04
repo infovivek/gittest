@@ -21,6 +21,7 @@ namespace HB.Entity
         public string MiscellaneousRemarks { get; set; }
         public decimal MiscellaneousAmount { get; set; }
         
+        
     //    public string Status { get; set; }
         
     }

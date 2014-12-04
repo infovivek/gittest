@@ -43,7 +43,8 @@ CREATE PROCEDURE [dbo].[Sp_Booking_Insert](
 @SpecialRequirements NVARCHAR(1000),
 @Status NVARCHAR(100),
 @AMPM NVARCHAR(100),
-@BookingLevel NVARCHAR(100))
+@BookingLevel NVARCHAR(100),
+@HRPolicy BIT)
 AS
 BEGIN
  DECLARE @Cnt INT,@TrackingNo BIGINT,@BookingCode BIGINT;
@@ -133,14 +134,14 @@ BEGIN
  SpecialRequirements,BookingCode,CreatedBy,CreatedDate,ModifiedBy,
  ModifiedDate,IsActive,IsDeleted,RowId,Status,Sales,ClientBookerId,
  ClientBookerName,ClientBookerEmail,EmailtoGuest,Note,CRM,TrackingNo,
- AMPM,BookingLevel,PONo,CancelStatus,BookedDt,BookedUsrId)
+ AMPM,BookingLevel,PONo,CancelStatus,BookedDt,BookedUsrId,HRPolicy)
  VALUES(@ClientId,@GradeId,@StateId,@CityId,@ClientName,
  CONVERT(DATE,@CheckInDate,103),RTRIM(LTRIM(@ExpectedChkInTime)),
  CONVERT(DATE,@CheckOutDate,103),@GradeName,@StateName,@CityName,
  @SpecialRequirements,@BookingCode,@UsrId,GETDATE(),@UsrId,
  GETDATE(),1,0,NEWID(),@Status,@Sales,@ClientBookerId,
  @ClientBookerName,@ClientBookerEmail,@EmailtoGuest,@Note,@CRM,@TrackingNo,
- @AMPM,@BookingLevel,'','',GETDATE(),@UsrId);
+ @AMPM,@BookingLevel,'','',GETDATE(),@UsrId,@HRPolicy);
  SELECT Id,RowId,BookingCode,ExpectedChkInTime FROM WRBHBBooking 
  WHERE Id = @@IDENTITY; 
 -- Booking Insert End

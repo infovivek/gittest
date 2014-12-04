@@ -94,7 +94,7 @@ IF @Action = 'BookingDtls'
   AssignedGuestTableId,ClientId,CRMId,CRMName,PropertyId,MasterClientName,
   MasterClientId,BookingDate,TariffPaymentMode)
   SELECT B.BookingCode,C.ClientName,P.PropertyName,
-  CG.FirstName+' '+CG.LastName AS GuestName,
+  ISNULL(CG.FirstName,'')+' '+ISNULL(CG.LastName,'') AS GuestName,
   CONVERT(VARCHAR(100),RB.ChkInDt,103) AS CheckInDt,
   CONVERT(VARCHAR(100),RB.ChkOutDt,103) AS CheckOutDt,
   DATEDIFF(DAY,RB.ChkInDt,RB.ChkOutDt) AS StayDays,
@@ -122,7 +122,7 @@ IF @Action = 'BookingDtls'
   BookingId,GuestId,AssignedGuestTableId,ClientId,CRMId,CRMName,PropertyId,
   MasterClientName,MasterClientId,BookingDate,TariffPaymentMode)
   SELECT B.BookingCode,C.ClientName,P.HotalName,
-  CG.FirstName+' '+CG.LastName AS GuestName, 
+  ISNULL(CG.FirstName,'')+' '+ISNULL(CG.LastName,'') AS GuestName, 
   CONVERT(VARCHAR(100),RB.ChkInDt,103) AS CheckInDt,
   CONVERT(VARCHAR(100),RB.ChkOutDt,103) AS CheckOutDt,
   DATEDIFF(DAY,RB.ChkInDt,RB.ChkOutDt) AS StayDays,
@@ -198,6 +198,8 @@ IF @Action = 'BookingDtls'
   LEFT OUTER JOIN #SDD S WITH(NOLOCK)ON S.BookingId=B.BookingId
   WHERE B.BookingId=S.BookingId AND B.RoomCaptured=S.RoomCaptured AND
   IsActive=1 AND IsDeleted=0 AND B.RoomId=S.RoomId;
+  --
+  --SELECT * FROM #ASD;RETURN;
   -- MMT
   CREATE TABLE #ASDMMT(BookingId BIGINT,GuestId BIGINT,DividedTariff DECIMAL(27,2),
   RoomId BIGINT);
@@ -214,7 +216,7 @@ IF @Action = 'BookingDtls'
   BookingId,GuestId,AssignedGuestTableId,ClientId,CRMId,CRMName,PropertyId,
   MasterClientName,MasterClientId,BookingDate,TariffPaymentMode)
   SELECT B.BookingCode,C.ClientName,P.PropertyName,
-  CG.FirstName+' '+CG.LastName AS GuestName, 
+  ISNULL(CG.FirstName,'')+' '+ISNULL(CG.LastName,'') AS GuestName, 
   CONVERT(VARCHAR(100),MIN(RB.ChkInDt),103) AS CheckInDt,
   CONVERT(VARCHAR(100),MAX(RB.ChkOutDt),103) AS CheckOutDt,
   SUM(DATEDIFF(DAY,RB.ChkInDt,RB.ChkOutDt)) AS StayDays,
@@ -243,13 +245,15 @@ IF @Action = 'BookingDtls'
   CG.LastName,U.FirstName,U.LastName,A.DividedTariff,RB.CurrentStatus,
   B.BookingLevel,B.Id,RB.GuestId,C.Id,C.CRMId,U1.FirstName,U1.LastName,
   P.Id,MC.ClientName,MC.Id,RB.CreatedDate,RB.TariffPaymentMode;
+  --
+  --SELECT * FROM #FINAL;RETURN;
   -- MMT
   INSERT INTO #FINAL(BookingCode,ClientName,PropertyName,GuestName,
   CheckInDt,CheckOutDt,StayDays,UserName,Tariff,Status,BookingLevel,
   BookingId,GuestId,AssignedGuestTableId,ClientId,CRMId,CRMName,PropertyId,
   MasterClientName,MasterClientId,BookingDate,TariffPaymentMode)
   SELECT B.BookingCode,C.ClientName,P.HotalName,
-  CG.FirstName+' '+CG.LastName AS GuestName, 
+  ISNULL(CG.FirstName,'')+' '+ISNULL(CG.LastName,'') AS GuestName, 
   CONVERT(VARCHAR(100),MIN(RB.ChkInDt),103) AS CheckInDt,
   CONVERT(VARCHAR(100),MAX(RB.ChkOutDt),103) AS CheckOutDt,
   SUM(DATEDIFF(DAY,RB.ChkInDt,RB.ChkOutDt)) AS StayDays,
@@ -286,7 +290,7 @@ IF @Action = 'BookingDtls'
   BookingId,GuestId,AssignedGuestTableId,ClientId,CRMId,CRMName,PropertyId,
   MasterClientName,MasterClientId,BookingDate,TariffPaymentMode)
   SELECT B.BookingCode,C.ClientName,P.PropertyName,
-  CG.FirstName+' '+CG.LastName AS GuestName,
+  ISNULL(CG.FirstName,'')+' '+ISNULL(CG.LastName,'') AS GuestName,
   CONVERT(VARCHAR(100),BB.ChkInDt,103) AS CheckInDt,
   CONVERT(VARCHAR(100),BB.ChkOutDt,103) AS CheckOutDt,
   DATEDIFF(DAY,BB.ChkInDt,BB.ChkOutDt) AS StayDays,
@@ -318,7 +322,7 @@ IF @Action = 'BookingDtls'
   BookingId,GuestId,AssignedGuestTableId,ClientId,CRMId,CRMName,PropertyId,
   MasterClientName,MasterClientId,BookingDate,TariffPaymentMode)
   SELECT B.BookingCode,C.ClientName,P.PropertyName,
-  CG.FirstName+' '+CG.LastName AS GuestName,
+  ISNULL(CG.FirstName,'')+' '+ISNULL(CG.LastName,'') AS GuestName,
   CONVERT(VARCHAR(100),BB.ChkInDt,103) AS CheckInDt,
   CONVERT(VARCHAR(100),BB.ChkOutDt,103) AS CheckOutDt,
   DATEDIFF(DAY,BB.ChkInDt,BB.ChkOutDt) AS StayDays,
@@ -372,7 +376,7 @@ IF @Action = 'BookingDtls'
   BookingId,GuestId,AssignedGuestTableId,ClientId,CRMId,CRMName,PropertyId,
   MasterClientName,MasterClientId,BookingDate,TariffPaymentMode) 
   SELECT B.BookingCode,C.ClientName,P.PropertyName,
-  CG.FirstName+' '+CG.LastName AS GuestName, 
+  ISNULL(CG.FirstName,'')+' '+ISNULL(CG.LastName,'') AS GuestName, 
   CONVERT(VARCHAR(100),RB.ChkInDt,103) AS CheckInDt,
   CONVERT(VARCHAR(100),RB.ChkOutDt,103) AS CheckOutDt,
   DATEDIFF(DAY,RB.ChkInDt,RB.ChkOutDt) AS StayDays,
@@ -424,7 +428,7 @@ IF @Action = 'BookingDtls'
   BookingId,GuestId,AssignedGuestTableId,ClientId,CRMId,CRMName,PropertyId,
   MasterClientName,MasterClientId,BookingDate,TariffPaymentMode)
   SELECT B.BookingCode,C.ClientName,P.PropertyName,
-  CG.FirstName+' '+CG.LastName AS GuestName, 
+  ISNULL(CG.FirstName,'')+' '+ISNULL(CG.LastName,'') AS GuestName, 
   CONVERT(VARCHAR(100),RB.ChkInDt,103) AS CheckInDt,
   CONVERT(VARCHAR(100),RB.ChkOutDt,103) AS CheckOutDt,
   DATEDIFF(DAY,RB.ChkInDt,RB.ChkOutDt) AS StayDays,

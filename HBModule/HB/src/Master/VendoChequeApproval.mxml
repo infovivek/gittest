@@ -290,11 +290,11 @@
 			public function FnHistory(Event):void
 			{ 
 				//var Grid_AC:ArrayCollection=new ArrayCollection();
-				Id=Grd_Details.selectedItem.Id;
+				UserId=Grd_Details.selectedItem.RequestedUserId;
 				PropertyId=Grd_Details.selectedItem.PropertyId;
 				Roles=Grd_Details.selectedItem.RequestedOn;
 				Grd_History.dataProvider=null;
-				useWeb("VendorChequeApproval","HistoryLoad_CUSTOM",[GlobalXml,"History",Id,PropertyId,Roles]);
+				useWeb("VendorChequeApproval","HistoryLoad_CUSTOM",[GlobalXml,"History",UserId,PropertyId,Roles]);
 				bdr_History.visible=true;
 				Grd_Details.visible=false;
 				bdr_Scroll.visible=false;
@@ -500,7 +500,21 @@
 				ExternalInterface.call("changeDocumentTitle",txt_ImageName.text);
 				Brd_imageUpload.visible=false;
 			}
-			
+			protected function Chk_Selectall_changeHandler(event:Event):void
+			{
+				var TempArr:ArrayCollection=new ArrayCollection();
+				TempArr=Grd_Details.dataProvider as ArrayCollection;
+				if(TempArr!=null)
+				{
+					for(var i:int=0;i<TempArr.length;i++)
+					{
+						TempArr[i].Process=Chk_Selectall1.selected;
+						
+					}
+					Grd_Details.dataProvider=TempArr;
+				}				
+				
+			}
 		]]>
 	</fx:Script>
 	
@@ -662,12 +676,14 @@
 		</mx:DataGrid>
 		
 	</s:BorderContainer>
-	<s:BorderContainer x="39" y="120" width="950" height="320" id="bdr_Scroll" visible="true">
-		
-			<mx:DataGrid x="0" y="-1"  verticalAlign="middle" editable="true" visible="true"
-							 width="100%" height="321" tabIndex="4" id="Grd_Details">
+	<s:CheckBox x="230" y="90" label="Select All" id="Chk_Selectall1" change="Chk_Selectall_changeHandler(event)" />
+	<s:BorderContainer x="19" y="111" width="100%" height="325" id="bdr_Scroll" visible="true">
+	  <s:Scroller x="0" y="0" width="100%" height="339" id="Scr_Grid" visible="true">
+		<s:VGroup width="100%" height="100%">
+			<mx:DataGrid x="0" y="0"  verticalAlign="middle" editable="true" visible="true"
+							 width="100%" height="325" tabIndex="4" id="Grd_Details">
 					<mx:columns>
-						<mx:DataGridColumn dataField="Action" headerText="Action" width="50" editable="false"
+						<mx:DataGridColumn dataField="Approval History" headerText="Approval History" width="100" editable="false"
 										   visible="true">
 							<mx:itemRenderer >
 								<fx:Component>
@@ -678,7 +694,7 @@
 								</fx:Component>
 							</mx:itemRenderer>
 						</mx:DataGridColumn>
-						<mx:DataGridColumn dataField="History" headerText="History" width="50" 
+						<mx:DataGridColumn dataField=" View Report" headerText=" View Report" width="100" 
 										   editable="false" visible="true">
 							<mx:itemRenderer >
 								<fx:Component>
@@ -689,7 +705,7 @@
 								</fx:Component>
 							</mx:itemRenderer>
 						</mx:DataGridColumn>
-						<mx:DataGridColumn dataField="Process" headerText="Process" width="50" editable="false">
+						<mx:DataGridColumn dataField="Process" headerText="Process" width="100" editable="false">
 							<mx:itemRenderer >
 								<fx:Component>
 									<mx:HBox horizontalAlign="center" verticalAlign="middle">
@@ -700,20 +716,21 @@
 								</fx:Component>
 							</mx:itemRenderer>
 						</mx:DataGridColumn>
-						<mx:DataGridColumn dataField="RequestedOn" headerText="RequestedOn" width="75" editable="false" visible="true"/>
-						<mx:DataGridColumn dataField="Requestedby" headerText="Requestedby" width="100" editable="false"/>
+						<mx:DataGridColumn dataField="RequestedOn" headerText="Submitted On" width="100" editable="false" visible="true"/>
+						<mx:DataGridColumn dataField="Requestedby" headerText="Submitted By" width="100" editable="false"/>
 						<mx:DataGridColumn dataField="Property" headerText="Property" width="100" editable="false"/>
-						<mx:DataGridColumn dataField="RequestedAmount" headerText="RequestedAmount" width="120" editable="false"/>
+						<mx:DataGridColumn dataField="RequestedAmount" headerText="Requested Amount" width="120" editable="false"/>
 						<mx:DataGridColumn dataField="Status" headerText="Status" width="150" editable="false"/>
-						<mx:DataGridColumn dataField="Processedon" headerText="LastProcessedon" width="75" editable="false"/>
-						<mx:DataGridColumn dataField="Processedby" headerText="LastProcessedby" width="100" editable="false"/>
+						<mx:DataGridColumn dataField="Processedon" headerText="LastProcessed on" width="100" editable="false"/>
+						<mx:DataGridColumn dataField="Processedby" headerText="LastProcessed By" width="100" editable="false"/>
 						<mx:DataGridColumn dataField="UserId" headerText="UserId" width="10" editable="false" visible="false"/>
 						<mx:DataGridColumn dataField="RequestedUserId" headerText="RequestedUserId" width="10" editable="false" visible="false"/>
 						<mx:DataGridColumn dataField="Id" headerText="Id" width="10" editable="false" visible="false"/>
 						<mx:DataGridColumn dataField="PropertyId" headerText="PropertyId" width="10" editable="false" visible="false"/>
 					</mx:columns>
 				</mx:DataGrid>
-				
+			</s:VGroup>
+		</s:Scroller>
 		
 	</s:BorderContainer>
 </s:Application>

@@ -228,6 +228,7 @@ BEGIN
        from #ExpChkin F
        left join WRBHBCity C on c.Id=F.CityId
       where Convert(date,ExpDate,103)>= CONVERT(date,'01/09/2014',103) 
+      and PropertyName!='' and ClientName!=''
       group by BookedId,PropertyName,PropertyId,GuestName,BookingLevel,
       ExpDate,c.CityName ,CityId,ClientName,ClientId,BookingCode
       order by Convert(date,ExpDate,103)
@@ -518,7 +519,7 @@ CREATE TABLE #PROPWSE(PropertyName NVARCHAR(200),Code NVARCHAR(200),Category NVA
 		PC.ProcessedStatus AS ProcessedStatus,PC.Comments AS Comments,
 		CONVERT(NVARCHAR(100),PC.RequestedOn,103) AS RequestedOn,0 AS Process,
 		PC.RequestedAmount AS RequestedAmount,
-		CONVERT(NVARCHAR(100),GETDATE(),103) AS Processedon,(US.FirstName+' '+US.LastName) AS Processedby,
+		CONVERT(NVARCHAR(100),pc.LastProcessedon,103) AS Processedon,(US.FirstName+' '+US.LastName) AS Processedby,
 		PC.RequestedUserId AS RequestedUserId, PC.Id,
 		PC.PropertyId
 		From WRBHBPettyCashApprovalDtl PC

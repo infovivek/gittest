@@ -40,6 +40,17 @@ namespace HB.Dao
                 PtoG.ServicePaymentMode = document.SelectNodes("//GridXml")[i].Attributes["ServicePaymentMode"].Value;
                 PtoG.TariffPaymentMode = document.SelectNodes("//GridXml")[i].Attributes["TariffPaymentMode"].Value;
                 PtoG.Id = Convert.ToInt32(document.SelectNodes("//GridXml")[i].Attributes["Id"].Value);
+                //
+                PtoG.Column1 = document.SelectNodes("//GridXml")[i].Attributes["Column1"].Value;
+                PtoG.Column2 = document.SelectNodes("//GridXml")[i].Attributes["Column2"].Value;
+                PtoG.Column3 = document.SelectNodes("//GridXml")[i].Attributes["Column3"].Value;
+                PtoG.Column4 = document.SelectNodes("//GridXml")[i].Attributes["Column4"].Value;
+                PtoG.Column5 = document.SelectNodes("//GridXml")[i].Attributes["Column5"].Value;
+                PtoG.Column6 = document.SelectNodes("//GridXml")[i].Attributes["Column6"].Value;
+                PtoG.Column7 = document.SelectNodes("//GridXml")[i].Attributes["Column7"].Value;
+                PtoG.Column8 = document.SelectNodes("//GridXml")[i].Attributes["Column8"].Value;
+                PtoG.Column9 = document.SelectNodes("//GridXml")[i].Attributes["Column9"].Value;
+                PtoG.Column10 = document.SelectNodes("//GridXml")[i].Attributes["Column10"].Value;
                 command = new SqlCommand();
                 if (PtoG.Id != 0)
                 {
@@ -73,6 +84,17 @@ namespace HB.Dao
                 command.Parameters.Add("@UsrId", SqlDbType.BigInt).Value = user.Id;
                 command.Parameters.Add("@ServicePaymentMode", SqlDbType.NVarChar).Value = PtoG.ServicePaymentMode;
                 command.Parameters.Add("@TariffPaymentMode", SqlDbType.NVarChar).Value = PtoG.TariffPaymentMode;
+                //
+                command.Parameters.Add("@Column1", SqlDbType.NVarChar).Value = PtoG.Column1;
+                command.Parameters.Add("@Column2", SqlDbType.NVarChar).Value = PtoG.Column2;
+                command.Parameters.Add("@Column3", SqlDbType.NVarChar).Value = PtoG.Column3;
+                command.Parameters.Add("@Column4", SqlDbType.NVarChar).Value = PtoG.Column4;
+                command.Parameters.Add("@Column5", SqlDbType.NVarChar).Value = PtoG.Column5;
+                command.Parameters.Add("@Column6", SqlDbType.NVarChar).Value = PtoG.Column6;
+                command.Parameters.Add("@Column7", SqlDbType.NVarChar).Value = PtoG.Column7;
+                command.Parameters.Add("@Column8", SqlDbType.NVarChar).Value = PtoG.Column8;
+                command.Parameters.Add("@Column9", SqlDbType.NVarChar).Value = PtoG.Column9;
+                command.Parameters.Add("@Column10", SqlDbType.NVarChar).Value = PtoG.Column10;
                 ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
             }
             if (n == 0)

@@ -10,7 +10,7 @@ namespace HB.BO
 {
     public class VendorRequestDtlBO
     {
-        public DataSet Save(string VendorRequestHdr, User User, int VendorRequestHdrId, int TempSave)
+        public DataSet Save(string VendorRequestHdr, User User, int VendorRequestHdrId, string TempSave)
         {
             return new VendorRequestDtlDAO().Save(VendorRequestHdr, User, VendorRequestHdrId, TempSave);
         }

@@ -563,7 +563,7 @@ IF @Action = 'RoomBookingConfirmed'
     ServicePaymentMode,'NOTBTC',@AgreedTariff,@BelowTACcontent 
     FROM #PropertyMailBTCChecking;
    END
-  -- Dataset Table 11 eND 
+  -- Dataset Table 11 eND  
  END
 IF @Action = 'BedBookingConfirmed'
  BEGIN
@@ -981,28 +981,52 @@ IF @Action = 'MMTBookingConfirmed'
    END 
   -- DELETE API DATA END*/
  END
+IF @Action = 'BookingConfirmedSMS'
+ BEGIN
+  DECLARE @BookingLevel NVARCHAR(100) = '';
+  SET @BookingLevel = (SELECT BookingLevel FROM WRBHBBooking WHERE Id = @Id);
+  IF @BookingLevel = 'Room'
+   BEGIN
+    SELECT 'http://api.mVaayoo.com/mvaayooapi/MessageCompose?user=shiv@hummingbirdindia.com:HBsmsconf&senderID=HBCONF&receipientno='+ BG.MobileNo +'&msgtxt=Thank you for booking with HummingBird. Your booking no. '+CAST(B.BookingCode AS VARCHAR)+' at '+BP.PropertyName+','+B.CityName+' @ Rs.'+CAST(PAG.Tariff AS VARCHAR)+'/day. MOP for Stay is '+ PAG.TariffPaymentMode +'&state=4',
+    PAG.GuestId
+    FROM WRBHBBooking B
+    LEFT OUTER JOIN WRBHBBookingGuestDetails BG WITH(NOLOCK)ON
+    BG.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON
+    BP.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest PAG WITH(NOLOCK)ON
+    PAG.BookingId = B.Id AND PAG.BookingPropertyTableId = BP.Id AND
+    PAG.BookingPropertyId = BP.PropertyId AND PAG.GuestId = BG.GuestId
+    WHERE B.Id = @Id AND BG.MobileNo != '';
+   END
+  IF @BookingLevel = 'Apartment'
+   BEGIN
+    SELECT 'http://api.mVaayoo.com/mvaayooapi/MessageCompose?user=shiv@hummingbirdindia.com:HBsmsconf&senderID=HBCONF&receipientno='+ BG.MobileNo +'&msgtxt=Thank you for booking with HummingBird. Your booking no. '+CAST(B.BookingCode AS VARCHAR)+' at '+BP.PropertyName+','+B.CityName+' @ Rs.'+CAST(PAG.Tariff AS VARCHAR)+'/day. MOP for Stay is '+ PAG.TariffPaymentMode +'&state=4',
+    PAG.GuestId
+    FROM WRBHBBooking B
+    LEFT OUTER JOIN WRBHBBookingGuestDetails BG WITH(NOLOCK)ON
+    BG.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBApartmentBookingProperty BP WITH(NOLOCK)ON
+    BP.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBApartmentBookingPropertyAssingedGuest PAG WITH(NOLOCK)ON
+    PAG.BookingId = B.Id AND PAG.BookingPropertyTableId = BP.Id AND
+    PAG.BookingPropertyId = BP.PropertyId AND PAG.GuestId = BG.GuestId
+    WHERE B.Id = @Id AND BG.MobileNo != '';
+   END
+  IF @BookingLevel = 'Bed'
+   BEGIN
+    SELECT 'http://api.mVaayoo.com/mvaayooapi/MessageCompose?user=shiv@hummingbirdindia.com:HBsmsconf&senderID=HBCONF&receipientno='+ BG.MobileNo +'&msgtxt=Thank you for booking with HummingBird. Your booking no. '+CAST(B.BookingCode AS VARCHAR)+' at '+BP.PropertyName+','+B.CityName+' @ Rs.'+CAST(PAG.Tariff AS VARCHAR)+'/day. MOP for Stay is '+ PAG.TariffPaymentMode +'&state=4',
+    PAG.GuestId
+    FROM WRBHBBooking B
+    LEFT OUTER JOIN WRBHBBookingGuestDetails BG WITH(NOLOCK)ON
+    BG.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBBedBookingProperty BP WITH(NOLOCK)ON
+    BP.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBBedBookingPropertyAssingedGuest PAG WITH(NOLOCK)ON
+    PAG.BookingId = B.Id AND PAG.BookingPropertyTableId = BP.Id AND
+    PAG.BookingPropertyId = BP.PropertyId AND PAG.GuestId = BG.GuestId
+    WHERE B.Id = @Id AND BG.MobileNo != '';
+   END
+  --http://api.mVaayoo.com/mvaayooapi/MessageCompose?user=shiv@hummingbirdindia.com:HBsmsconf&senderID=HBCONF&receipientno=" + MobileNo + "&msgtxt=" + MsgTxt + "&state=4";
+ END
 END
--- Guest Name Combined in Double Occupancy Examples
-/*CREATE TABLE #FFF(BookingId BIGINT,RoomId BIGINT,ChkInDt NVARCHAR(100),
-ChkOutDt NVARCHAR(100),Tariff DECIMAL(27,2),Occupancy NVARCHAR(100),
-TariffPaymentMode NVARCHAR(100),ServicePaymentMode NVARCHAR(100));
-INSERT INTO #FFF(BookingId,RoomId,ChkInDt,ChkOutDt,Tariff,Occupancy,
-TariffPaymentMode,ServicePaymentMode)
-SELECT BG.BookingId,BG.RoomId,
-REPLACE(CONVERT(VARCHAR(11),BG.ChkInDt, 106), ' ', '-') +' / '+ 
-LEFT(BG.ExpectChkInTime, 5)+' '+BG.AMPM,
-REPLACE(CONVERT(VARCHAR(11), BG.ChkOutDt, 106), ' ', '-'),
-BG.Tariff,BG.Occupancy,BG.TariffPaymentMode,BG.ServicePaymentMode 
-FROM WRBHBBookingPropertyAssingedGuest BG
-WHERE BG.IsActive=1 AND BG.IsDeleted=0 AND BG.BookingId=51 
-GROUP BY BG.BookingId,BG.RoomId,BG.ChkInDt,BG.ExpectChkInTime,BG.AMPM,
-BG.ChkOutDt,BG.Tariff,BG.Occupancy,BG.TariffPaymentMode,
-BG.ServicePaymentMode;
-
-SELECT STUFF((SELECT ', ' + BA.FirstName+'  '+BA.LastName
-FROM WRBHBBookingPropertyAssingedGuest BA 
-WHERE BA.BookingId=B.BookingId AND BA.RoomId=B.RoomId
-FOR XML PATH('')),1,1,'') AS Name,B.ChkInDt,B.ChkOutDt,
-B.Tariff,B.Occupancy,B.TariffPaymentMode,B.ServicePaymentMode
-FROM #FFF AS B;*/
-	 

@@ -484,11 +484,9 @@ IF @Action = 'BookingCode'
  END
  IF @Action = 'BookingDelete'
  BEGIN
-		DECLARE @BookingLevel1 nvarchar(100); 	
+		DECLARE @BookingLevel1 nvarchar(100),@Cnt1 INT; 	
 		SELECT @BookingLevel1=BookingLevel FROM WRBHBBooking WHERE Id=@Id
-		UPDATE WRBHBBooking SET  ModifiedBy=@UserId,ModifiedDate=GETDATE(),
-		CancelStatus='Canceled',CancelRemarks=@Remarks		 
-		WHERE Id=@Id
+		
 		
 		IF @BookingLevel1='Room'
 		BEGIN
@@ -498,7 +496,10 @@ IF @Action = 'BookingCode'
 			UPDATE WRBHBBookingPropertyAssingedGuest SET IsDeleted=1 ,IsActive=0, 
 			ModifiedBy=@UserId,ModifiedDate=GETDATE(),CancelRemarks=@Remarks,
 			CancelModifiedFlag=0,CurrentStatus='Canceled'
-			WHERE BookingId=@Id; 
+			WHERE BookingId=@Id AND CurrentStatus NOT IN('CheckOut','CheckIn'); 
+			
+			SELECT @Cnt1=COUNT(*) FROM WRBHBBookingPropertyAssingedGuest
+			WHERE BookingId=@Id AND IsDeleted=0 AND IsActive=1
 		END
 		IF @BookingLevel1='Bed'
 		BEGIN
@@ -509,7 +510,10 @@ IF @Action = 'BookingCode'
 			IsActive=0, ModifiedBy=@UserId,ModifiedDate=GETDATE(),
 			CancelRemarks=@Remarks,CancelModifiedFlag=0,
 			CurrentStatus='Canceled'
-			WHERE  BookingId=@Id;   
+			WHERE  BookingId=@Id AND CurrentStatus NOT IN('CheckOut','CheckIn');   
+			
+			SELECT @Cnt1=COUNT(*) FROM WRBHBBedBookingPropertyAssingedGuest
+			WHERE BookingId=@Id AND IsDeleted=0 AND IsActive=1
 		END
 		IF @BookingLevel1='Apartment'
 		BEGIN
@@ -520,9 +524,23 @@ IF @Action = 'BookingCode'
 			IsActive=0, ModifiedBy=@UserId,ModifiedDate=GETDATE(),
 			CancelRemarks=@Remarks,CancelModifiedFlag=0,
 			CurrentStatus='Canceled'
-			WHERE BookingId=@Id; 
+			WHERE BookingId=@Id AND CurrentStatus NOT IN('CheckOut','CheckIn'); 
+			
+			SELECT @Cnt1=COUNT(*) FROM WRBHBApartmentBookingPropertyAssingedGuest
+			WHERE BookingId=@Id AND IsDeleted=0 AND IsActive=1
 		END
 		 
+		
+		IF @Cnt1=0
+		BEGIN
+			UPDATE WRBHBBooking SET  ModifiedBy=@UserId,ModifiedDate=GETDATE(),
+			CancelStatus='Canceled',CancelRemarks=@Remarks		 
+			WHERE Id=@Id
+		END
+		
+		
+		 
+		
 		--TABEL 0
 		SELECT B.BookingCode,U.Email,B.Status,b.CancelRemarks,B.ClientName,CONVERT(VARCHAR(12),B.CreatedDate,103) BookingDate,
 		BookingLevel,EmailtoGuest

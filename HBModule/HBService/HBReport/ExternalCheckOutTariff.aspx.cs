@@ -29,7 +29,7 @@ namespace HBReport
                 //var Id = asd[1].Split(',');
                 command = new SqlCommand();
                 ds = new DataSet();
-                command.CommandText = "SP_GuestCheckOutTariff_Bill";
+                command.CommandText = "SP_ExtCheckOutTariff_Bill";
                 command.CommandType = CommandType.StoredProcedure;
                 command.Parameters.Add("@Action", SqlDbType.NVarChar).Value = "PAGELOAD";
                 command.Parameters.Add("@Str1", SqlDbType.NVarChar).Value = "";

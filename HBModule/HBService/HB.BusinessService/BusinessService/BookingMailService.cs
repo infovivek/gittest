@@ -35,14 +35,27 @@ namespace HB.BusinessService.BusinessService
             if (data[1].ToString() == "Room")
             {
                 ds = new BookingRoomMailDAO().Mail(BookingId, user);
+                string dfd = ds.Tables["Table12"].Rows[0][0].ToString();
+                if (ds.Tables["Table12"].Rows[0][0].ToString() == "")
+                {
+                    DataSet ds1 = new SMSDAO().FnSMS(BookingId, user);
+                }
             }
             if (data[1].ToString() == "Bed")
             {
                 ds = new BedBookingMailDAO().Mail(BookingId, user);
+                if (ds.Tables["Table11"].Rows[0][0].ToString() == "")
+                {
+                    DataSet ds1 = new SMSDAO().FnSMS(BookingId, user);
+                }
             }
             if (data[1].ToString() == "Apartment")
             {
                 ds = new ApartmentBookingMailDAO().Mail(BookingId, user);
+                if (ds.Tables["Table11"].Rows[0][0].ToString() == "")
+                {
+                    DataSet ds1 = new SMSDAO().FnSMS(BookingId, user);
+                }
             }
             if (data[1].ToString() == "Recommend")
             {
@@ -51,10 +64,15 @@ namespace HB.BusinessService.BusinessService
             if (data[1].ToString() == "MMT")
             {
                 ds = new APIBookingMailDAO().Mail(BookingId, user);
+                DataSet ds1 = new SMSDAO().FnSMS(BookingId, user);
             }
             if (data[1].ToString() == "BookingCancelMMT")
             {
                 ds = new BookingCancelMMTDAO().FnCancel(data, user);
+            }
+            if (data[1].ToString() == "SMS")
+            {
+                ds = new SMSDAO().FnSMS(BookingId, user);
             }
             return ds;
         }

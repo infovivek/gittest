@@ -83,10 +83,50 @@
 				}
 				if (Ds_Objects.currentTarget.description.toString() == "Property_CUSTOM")
 				{
+					var Pid:int=0;
 					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
 					{
-						Ddl_Category.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;		
+						Pid=Ds_Objects.result.Tables.Table.Rows[0].PId	
 					}
+					if(Pid==0)
+					{
+						if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+						{
+							Ddl_Category.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;		
+						}
+					}
+					else
+					{
+						if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+						{
+						Ddl_Category.text=Ds_Objects.result.Tables.Table1.Rows[0].Category;
+						CategoryId=Ds_Objects.result.Tables.Table1.Rows[0].CategoryId;
+						VendorId=Ds_Objects.result.Tables.Table1.Rows[0].VendorId;
+						hlp_Vendor.text=Ds_Objects.result.Tables.Table1.Rows[0].VendorName;
+						hlp_service.text=Ds_Objects.result.Tables.Table1.Rows[0].Service;
+						hlp_Type.text=Ds_Objects.result.Tables.Table1.Rows[0].Type;
+						ApartmentId=Ds_Objects.result.Tables.Table1.Rows[0].ApartmentId;
+						hlp_apartment.text=Ds_Objects.result.Tables.Table1.Rows[0].ApartmentNo;
+						RoomId:Ds_Objects.result.Tables.Table1.Rows[0].RoomId;
+						dt_Date.text=Ds_Objects.result.Tables.Table1.Rows[0].Date;
+						dt_Duedate.text=Ds_Objects.result.Tables.Table1.Rows[0].DueDate;
+						}
+					if (Ds_Objects.result.Tables.Table2.Rows.length > 0)
+					{
+						if(hlp_Type.text=="Apartment")
+						{
+							Grd_Apartment.visible=true;
+							Grd_Apartment.dataProvider=Ds_Objects.result.Tables.Table2.Rows as ArrayCollection;
+						}
+						else
+						{
+							Grd_Room.visible=true;
+							Txt_Apart.visible=true;
+							hlp_apartment.visible=true;
+							Grd_Room.dataProvider=Ds_Objects.result.Tables.Table2.Rows as ArrayCollection;
+						}
+					}
+				  }
 				}
 				if (Ds_Objects.currentTarget.description.toString() == "Category_CUSTOM")
 				{
@@ -206,7 +246,7 @@
 				 }
 				 if(Type =="Property")
 				 {
-				 if(txt_ImageName.text="") 
+				 if(txt_ImageName.text=="") 
 				 {
 					 if(Flag==true)
 					 {
@@ -238,14 +278,14 @@
 			{
 			 if ((event.detail==Alert.YES)) 
 			  {
-					var arrcopy:ArrayCollection = new ArrayCollection
+				 var arrcopy:ArrayCollection = new ArrayCollection
 						([{ 
 							PropertyId:PropertyId,Property:hlp_Property.text,CategoryId:CategoryId,
 							Category:Category,VendorId:VendorId,VendorName:hlp_Vendor.text,
 							Service:hlp_service.text,Type:hlp_Type.text,ApartmentId:ApartmentId,
 							RoomId:RoomId,Date:dt_Date.text,Amount:Txt_Amount.text,BillNo:Txt_Billno.text,
 							Duedate:dt_Duedate.text,VendorBill:txt_ImageName.text,Des:Txt_Des.text,
-							Id:Id							
+							Id:Id,Temp:Chk_Temp.selected							
 						}])
 					
 					var HdrXml:String=""
@@ -354,8 +394,6 @@
 			public var Type:String="";
 			public function Ddl_Type_changeHandler():void
 			{
-				
-				
 				if(hlp_Type.selected())
 				{
 				    Type=hlp_Type.Select_Row.Type;
@@ -368,6 +406,7 @@
 						 hlp_apartment.visible=true;
 						 hlp_apartment.setFocus();
 						 Grd_Apartment.visible=true;
+						 Chk_Temp.visible=false;
 						}
 						else if(Type =="Room")
 						{
@@ -398,6 +437,7 @@
 						hlp_Room.visible=true;
 						hlp_Room.setFocus();
 						Grd_Room.visible=true;
+						Chk_Temp.visible=false;
 					}
 					else
 					{
@@ -632,10 +672,7 @@
 			{
 				FnClick_Btn_Browse();
 			}
-			public function FnTempSave():void
-			{
-				
-			}
+			
 		]]>
 	</fx:Script>
 	<s:VGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
@@ -647,6 +684,7 @@
 			</WrbHelpComp:HelpText>
 			<mx:HRule x="0" y="444" width="100%" strokeColor="#eb1c24"/>
 			<s:HGroup x="0" y="458" width="100%" height="50" horizontalAlign="center" verticalAlign="middle">
+				<s:CheckBox label=" Temporary" id="Chk_Temp" visible="false"/>
 				<WrbComp:Button_BB id="Sctrl_Approve" width="120" height="30" click="FnSave()"
 								   Lable_val="Send For Approval">
 				</WrbComp:Button_BB>
@@ -702,8 +740,7 @@
 			<WrbComp:Button_HB id="Btn_Browse" x="580" y="216" width="118" height="20" buttonMode="true"
 							   _Label="Bill Upload" click="FnClick_Btn_Browse()" depth="0" focusEnabled="false" visible="true"/>
 			
-			<WrbComp:Button_BB id="Sctrl_TempSave" x="80" y="400" width="120" height="30"
-							   click="FnTempSave()" Lable_val="Tempsave"/>
+			
 				
 			<mx:DataGrid id="Grd_Apartment" x="436" y="141"  editable="true" visible="false"
 						 width="475" height="225" >

@@ -96,7 +96,7 @@ DECLARE @CompanyName VARCHAR(100),@Address NVARCHAR(100),@PanCardNo VARCHAR(100)
 	'All cheque or demand drafts in payment of bills should be drawn in favor of Hummingbird Travel and stay pvt.ltd.
 	and should be crossed A/C PAYEE ONLY.' as Cheque,
 	'LATE PAYMENT : Interest @18% per annum will be charged on all outstanding bill after due date.' as Latepay ,
-	'PAN NO :'+@PanCardNo+'   |   '+'TIN : 29340489869'+'   |   '+'L Tax No : L00100571'+'  |  '
+	'PAN NO :'+@PanCardNo+'   |   '+'TIN : 29340489869'+'   |   '+'L Tax No :'+ t.LuxuryNo+'  |  '
 	 +'CIN No: U72900KA2005PTC035942' as TaxNo,
 	 'Service Tax Regn. No : AABCH5874RST001' as ServiceTaxNo,
 	'Taxable Category : Accommodation Service,Business Support Services and Restaurant Services' as Taxablename,
@@ -133,8 +133,10 @@ DECLARE @CompanyName VARCHAR(100),@Address NVARCHAR(100),@PanCardNo VARCHAR(100)
 	 left outer join WRBHBProperty p on d.PropertyId = p.Id and p.IsActive = 1 and p.IsDeleted = 0
 	 join WRBHBState s on s.Id=p.StateId
 	 join WRBHBCity c on c.Id=p.CityId 
+	 join WRBHBTaxMaster t on t.StateId=s.Id 
 	--join WRBHBBooking b on b.Id = d.BookingId
 	left outer join WRBHBCheckOutServiceHdr CS on h.Id = cs.CheckOutHdrId and CS.IsActive = 1 and cs.IsDeleted = 0
+	
 	where h.IsActive = 1 and h.IsDeleted = 0
 	--and CSDD.BillType ='Consolidated'
 	 and h.Id = @Id1
@@ -145,7 +147,7 @@ DECLARE @CompanyName VARCHAR(100),@Address NVARCHAR(100),@PanCardNo VARCHAR(100)
 	c.CityName,s.StateName,p.Postal,p.Phone,p.Email,	
     H.VATPer,h.RestaurantSTPer ,
     h.BusinessSupportST,h.ChkOutTariffST1 ,H.LuxuryTaxPer,H.ServiceTaxPer,h.ChkOutTariffExtraAmount,
-    h.InVoiceNo,h.NoOfDays,h.BillFromDate,h.BillEndDate,h.CreatedDate
+    h.InVoiceNo,h.NoOfDays,h.BillFromDate,h.BillEndDate,h.CreatedDate,t.LuxuryNo
     
     
     

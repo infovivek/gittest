@@ -57,6 +57,7 @@
     <Content Include="Account\Register.aspx" />
     <Content Include="ContractBill.aspx" />
     <Content Include="ContractBillDedicated.aspx" />
+    <Content Include="DetailedServiceinvoice.aspx" />
     <Content Include="ExternalCheckOutTAC.aspx" />
     <Content Include="ExternalCheckoutTACMail.aspx" />
     <Content Include="ExternalCheckOutTariff.aspx" />
@@ -90,6 +91,7 @@
     <Content Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
+    <Content Include="KOTVendorReport.aspx" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Account\ChangePassword.aspx.cs">
@@ -133,6 +135,13 @@
     </Compile>
     <Compile Include="ContractBillDedicated.aspx.designer.cs">
       <DependentUpon>ContractBillDedicated.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="DetailedServiceinvoice.aspx.cs">
+      <DependentUpon>DetailedServiceinvoice.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="DetailedServiceinvoice.aspx.designer.cs">
+      <DependentUpon>DetailedServiceinvoice.aspx</DependentUpon>
     </Compile>
     <Compile Include="ExternalCheckOutTAC.aspx.cs">
       <DependentUpon>ExternalCheckOutTAC.aspx</DependentUpon>
@@ -283,6 +292,13 @@
     <Compile Include="TACAnnuxpage1.aspx.designer.cs">
       <DependentUpon>TACAnnuxpage1.aspx</DependentUpon>
     </Compile>
+    <Compile Include="KOTVendorReport.aspx.cs">
+      <DependentUpon>KOTVendorReport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="KOTVendorReport.aspx.designer.cs">
+      <DependentUpon>KOTVendorReport.aspx</DependentUpon>
+    </Compile>
     <Compile Include="WrbErpConnection1.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -313,6 +329,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ContractBill.rdlc" />
+    <EmbeddedResource Include="DetailedServiceinvoice.rdlc" />
     <EmbeddedResource Include="GuestCheckOutTariff.rdlc" />
     <EmbeddedResource Include="GuestCheckOutservice.rdlc" />
     <EmbeddedResource Include="GuestCheckOutConsolidate.rdlc" />
@@ -330,6 +347,7 @@
     <EmbeddedResource Include="ExternalIntermediateCheckoutConsolidate.rdlc" />
     <EmbeddedResource Include="ExternalIntermediateTAC.rdlc" />
     <EmbeddedResource Include="ExternalCheckoutNewTACMail.rdlc" />
+    <EmbeddedResource Include="KOTVendorReport.rdlc" />
     <EmbeddedResource Include="TAC Annexure.rdlc" />
     <EmbeddedResource Include="TACAnnuxpage1.rdlc" />
   </ItemGroup>

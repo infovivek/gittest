@@ -13,10 +13,10 @@ namespace HB.Dao
     public class VendorRequestDtlDAO
     {
         String UserData;
-        public DataSet Save(string VendorRequestHdr, User Usr, int VendorRequestHdrId, int TempSave)
+        public DataSet Save(string VendorRequestHdr, User Usr, int VendorRequestHdrId, string TempSave)
         {
             DataSet ds = new DataSet();
-            DataTable dTable = new DataTable("ERRORTBL");
+            DataTable dTable = new DataTable("DBERRORTBL");
             dTable.Columns.Add("Exception");
             XmlDocument document = new XmlDocument();
             SqlCommand command = new SqlCommand();
@@ -92,7 +92,7 @@ namespace HB.Dao
                 }
                 command.CommandType = CommandType.StoredProcedure;
                 command.Parameters.Add("@VendorRequestHdrId", SqlDbType.Int).Value = VendorRequestHdrId;
-                command.Parameters.Add("@TempSave", SqlDbType.Int).Value = TempSave;
+                command.Parameters.Add("@TempSave", SqlDbType.NVarChar).Value = TempSave;
                 command.Parameters.Add("@ApartmentId", SqlDbType.Int).Value = VendorDtl.ApartmentId;
                 command.Parameters.Add("@RoomId", SqlDbType.Int).Value = VendorDtl.RoomId;
                 command.Parameters.Add("@Description", SqlDbType.NVarChar).Value = VendorDtl.Description;

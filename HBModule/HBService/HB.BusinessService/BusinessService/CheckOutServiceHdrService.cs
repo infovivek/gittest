@@ -28,9 +28,9 @@ namespace HB.BusinessService.BusinessService
                 else
                 {
                     Int32 CheckOutServceHdrId = Convert.ToInt32(ds.Tables[0].Rows[0][0].ToString());
-                    string CheckOutHdrRowId = ds.Tables[0].Rows[0][1].ToString();
+                    int CheckOutHdrRowId =  Convert.ToInt32(ds.Tables[0].Rows[0][1].ToString());
                     string CheckOutServiceDtls = data[2].ToString();
-                    DataSet ds1 = new CheckOutServiceDtlsBO().Save(CheckOutServiceDtls, user, CheckOutServceHdrId);
+                    DataSet ds1 = new CheckOutServiceDtlsBO().Save(CheckOutServiceDtls, user, CheckOutServceHdrId, CheckOutHdrRowId);
                     if (ds1.Tables["DBERRORTBL"].Rows.Count > 0)
                     {
                         dTable.Rows.Add(ds1.Tables["DBERRORTBL"].Rows[0][0].ToString());

@@ -49,7 +49,7 @@ If @Action ='Property'
 			join WRBHBProperty p on p.Id = h.PropertyId AND P.IsActive=1 AND P.IsDeleted=0
 			JOIN WRBHBBookingPropertyAssingedGuest B ON H.BookingId=B.BookingId AND B.IsActive=1 AND B.IsDeleted=0
 			WHERE H.PropertyId = @Id AND H.IsActive=1 AND H.IsDeleted=0 AND B.CurrentStatus='CheckIn'
-			AND p.Category = 'Internal Property' 
+			AND p.Category IN('Internal Property','Managed G H') 
 			
 			INSERT INTO #guest(Guestname,Category,RoomNo,BookingCode,ClientName,GuestId,PropertyId
 			,RoomId,BookingId,Id)
@@ -60,7 +60,7 @@ If @Action ='Property'
 			join WRBHBProperty p on p.Id = h.PropertyId AND P.IsActive=1 AND P.IsDeleted=0
 			JOIN WRBHBApartmentBookingPropertyAssingedGuest B ON H.BookingId=B.BookingId AND B.IsActive=1 AND B.IsDeleted=0
 			WHERE H.PropertyId = @Id AND H.IsActive=1 AND H.IsDeleted=0 AND B.CurrentStatus='CheckIn'
-			AND p.Category = 'Internal Property' 
+			AND p.Category IN('Internal Property','Managed G H')
 			
 			INSERT INTO #guest(Guestname,Category,RoomNo,BookingCode,ClientName,GuestId,PropertyId
 			,RoomId,BookingId,Id)
@@ -71,7 +71,7 @@ If @Action ='Property'
 			join WRBHBProperty p on p.Id = h.PropertyId AND P.IsActive=1 AND P.IsDeleted=0
 			JOIN WRBHBBedBookingPropertyAssingedGuest B ON H.BookingId=B.BookingId AND B.IsActive=1 AND B.IsDeleted=0
 			WHERE H.PropertyId = @Id AND H.IsActive=1 AND H.IsDeleted=0 AND B.CurrentStatus='CheckIn'
-			AND p.Category = 'Internal Property' 
+			AND p.Category IN('Internal Property','Managed G H') 
 				
 			SELECT Guestname AS GuestName,Category AS CategoryId,RoomNo AS RoomNoId,BookingCode AS BookingCodeId,ClientName
 			AS ClientNameId,GuestId,PropertyId,RoomId,BookingId,Id FROM #guest

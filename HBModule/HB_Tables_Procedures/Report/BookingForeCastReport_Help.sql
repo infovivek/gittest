@@ -145,7 +145,7 @@ INSERT INTO #TFFINALS( GuestName,GuestId,RoomId,Typess,ClientName,Property,Prope
 			BookingId,isnull(D.CheckOutHdrId ,0),isnull(D.CheckInHdrId,0),TariffpaymentMode,D.CurrentStatus,'RoomLvl'Btypes
 			from WRBHBBooking H
 			JOIN WRBHBBookingPropertyAssingedGuest D ON H.Id=D.BookingId
-			WHERE d.RoomShiftingFlag=0  AND CurrentStatus !=('Canceled')
+			WHERE d.RoomShiftingFlag=0  AND D.CurrentStatus !=('Canceled')
 			AND D.IsActive=1 and D.IsDeleted=0 AND TariffPaymentMode!='Bill to Client' 
 			and BookingPropertyId in(1,2,3,6,7,267)
 			  --and month(CONVERT(DATE,D.ChkOutDt,103))=11 and d.BookingPropertyId=2 
@@ -163,7 +163,7 @@ INSERT INTO #TFFINALS( GuestName,GuestId,RoomId,Typess,ClientName,Property,Prope
 			BookingId,0,0,TariffpaymentMode,D.CurrentStatus,'BedLvl'Btypes
 			from WRBHBBooking H
 			JOIN WRBHBBedBookingPropertyAssingedGuest D ON H.Id=D.BookingId
-			WHERE    CurrentStatus !='Canceled' and BookingPropertyId in(1,2,3,6,7,267)
+			WHERE    D.CurrentStatus !='Canceled' and BookingPropertyId in(1,2,3,6,7,267)
 			AND D.IsActive=1 and D.IsDeleted=0 AND TariffPaymentMode!='Bill to Client'--and d.BookingPropertyId=2 
 			GROUP BY D.FirstName,GuestId,RoomId,D.BedType,ClientName,d.BookingPropertyId,d.ChkInDt,
 			Tariff,CheckOutDate,BookingId,d.ChkInDt,Tariff,D.ChkOutDt,TariffpaymentMode,D.CurrentStatus 
@@ -180,7 +180,7 @@ INSERT INTO #TFFINALS( GuestName,GuestId,RoomId,Typess,ClientName,Property,Prope
 			BookingId,0,0,TariffpaymentMode,D.CurrentStatus,'ApartLvl'Btypes
 			from WRBHBBooking H
 			JOIN WRBHBApartmentBookingPropertyAssingedGuest D ON H.Id=D.BookingId
-			WHERE    CurrentStatus !='Canceled' and BookingPropertyId in(1,2,3,6,7,267)
+			WHERE    D.CurrentStatus !='Canceled' and BookingPropertyId in(1,2,3,6,7,267)
 			AND D.IsActive=1 and D.IsDeleted=0 AND TariffPaymentMode!='Bill to Client'--and d.BookingPropertyId=2 
 			GROUP BY D.FirstName,GuestId,ApartmentId,D.ApartmentType,ClientName,d.BookingPropertyId,d.ChkInDt,
 			Tariff,CheckOutDate,BookingId,d.ChkInDt,Tariff,D.ChkOutDt,TariffpaymentMode,D.CurrentStatus
