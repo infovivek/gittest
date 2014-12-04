@@ -262,16 +262,16 @@ BEGIN
 		CREATE TABLE #PettyCash(Id BIGINT IDENTITY(1,1)  NOT NULL PRIMARY KEY,
 		Date NVARCHAR(100),ExpenseHead NVARCHAR(100),Description NVARCHAR(100),
 		ApprovedAmount DECIMAL(27,2),PaidAmount DECIMAL(27,2),
-		Bill NVARCHAR(100),ExpenseId INT)
+		Bill NVARCHAR(1000),ExpenseId INT)
 		
 		INSERT INTO #PettyCash(Date,ExpenseHead,Description,ApprovedAmount,PaidAmount,Bill,ExpenseId)
+		
 		SELECT CONVERT(NVARCHAR,CAST(CONVERT(Date,U.CreatedDate,103) AS Date),110),
 		U.ExpenseHead,U.Description,U.Amount,U.Paid,U.BillLogo,U.Id
 		FROM WRBHBPettyCashStatus U 
 		JOIN WRBHBUser S ON U.UserId=S.Id AND S.IsActive=1 AND S.IsDeleted=0
 		WHERE U.UserId =@UserId AND U.PropertyId=@Id AND U.IsActive=1 AND U.IsDeleted=0
 		AND CONVERT(NVARCHAR,CAST(U.CreatedDate AS Date),103)=CONVERT(NVARCHAR(100),@Str,103) 
-		
 		
 		SELECT Id AS SNo,Date,ExpenseHead,Description,ApprovedAmount,PaidAmount,Bill,ExpenseId AS Id
 		FROM #PettyCash  
@@ -285,7 +285,7 @@ BEGIN
 		CREATE TABLE #PettyCash1(Id BIGINT IDENTITY(1,1)  NOT NULL PRIMARY KEY,
 		Date NVARCHAR(100),ExpenseHead NVARCHAR(100),Description NVARCHAR(100),
 		ApprovedAmount NVARCHAR(100),PaidAmount NVARCHAR(100),
-		Bill NVARCHAR(100))
+		Bill NVARCHAR(1000))
 		
 		INSERT INTO #PettyCash1(Date,ExpenseHead,Description,ApprovedAmount,PaidAmount,Bill)
 		SELECT '' AS Date,'UserName' AS ExpenseHead,(U.FirstName+''+U.LastName) AS Description,'Property' AS ApprovedAmount,
@@ -353,10 +353,11 @@ BEGIN
 		ISNULL(Bill,'')AS Bill
 		FROM #PettyCash1
 		
-		SELECT Balance AS OpeningBalance FROM WRBHBPettyCashStatusHdr
-		WHERE UserId =@UserId AND PropertyId=@Id AND IsActive=1 AND IsDeleted=0
-		AND CONVERT(NVARCHAR,CAST(CreatedDate AS Date),103)=CONVERT(NVARCHAR(100),@Str,103) AND Id=
-		(SELECT MAX(Id)  FROM WRBHBPettyCashStatus WHERE UserId=@UserId AND PropertyId=@Id)
+		SELECT DISTINCT D.OpeningBalance FROM WRBHBPettyCashHdr D
+		JOIN WRBHBPettyCashStatus H ON H.Status=CONVERT(NVARCHAR(100),D.Date,103) AND
+		H.UserId=D.UserId AND H.PropertyId=D.PropertyId AND D.IsActive=1 AND D.IsDeleted=0
+		WHERE H.UserId =@UserId AND H.PropertyId=@Id AND H.IsActive=1 AND H.IsDeleted=0
+		AND CONVERT(NVARCHAR,CAST(H.CreatedDate AS Date),103)=CONVERT(NVARCHAR(100),@Str,103) 
 		
 		SELECT DISTINCT Balance FROM WRBHBPettyCashStatusHdr
 		WHERE UserId =@UserId AND PropertyId=@Id AND IsActive=1 AND IsDeleted=0
@@ -382,22 +383,21 @@ BEGIN
 		INSERT INTO #PCNEW(Requestedby,RequestedOn,ExpenseHead,ExpenseItem,Description,Amount,
 		BillDate,BillStartDate,BillEndDate,Property)
 	
-		SELECT (U.FirstName+''+U.LastName) AS Requestedby,Convert(VARCHAR(100),PH.Date,105) 
-		AS RequestedOn,EG.ExpenseHead,PC.ExpenseHead AS ExpenseItem,PC.Description,ApprovedAmount AS Amount,
-		CONVERT(NVARCHAR,PS.BillDate,105),CONVERT(NVARCHAR,@Str,105) AS Startdate,
+		SELECT (U.FirstName+''+U.LastName) AS Requestedby,CONVERT(NVARCHAR,PC.Status,105) 
+		AS RequestedOn,EG.ExpenseHead,PC.ExpenseHead AS ExpenseItem,PC.Description,PC.Amount AS Amount,
+		CONVERT(NVARCHAR,PC.BillDate,105),CONVERT(NVARCHAR,@Str,105) AS Startdate,
 		CONVERT(NVARCHAR,@Str1,105) AS EndDate,P.PropertyName 
-		FROM WRBHBPettyCash PC  
-		JOIN WRBHBPettyCashHdr PH ON PC.PettyCashHdrId= PH.Id AND PH.IsActive=0 AND PH.IsDeleted=1
-		JOIN WRBHBPettyCashStatus PS ON PH.ClosingBalance=PS.Balance AND PS.IsActive=0 AND PS.IsDeleted=1
+		FROM WRBHBPettyCashStatus PC
 		JOIN WRBHBExpenseHeads EX ON PC.ExpenseHead=EX.HeaderName
 		JOIN WRBHBExpenseGroup EG ON EX.ExpenseGroupId=EG.Id
-		JOIN WRBHBUser U ON PH.UserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
-		JOIN WRBHBProperty P ON PH.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
+		JOIN WRBHBUser U ON PC.UserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
+		JOIN WRBHBProperty P ON PC.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
 		WHERE PC.IsActive=1 AND PC.IsDeleted=0 
-		AND	PH.Date BETWEEN CONVERT(date,@Str,103) AND CONVERT(date,@Str1,103)
-		GROUP BY U.FirstName,U.LastName,PH.Date,EG.ExpenseHead,PC.ExpenseHead,PC.Description,
-		ApprovedAmount,PS.BillDate,P.PropertyName
-		ORDER BY PH.Date
+		AND	CONVERT(date,PC.Status,103) BETWEEN CONVERT(date,@Str,103) AND CONVERT(date,@Str1,103)
+		GROUP BY U.FirstName,U.LastName,PC.Status,EG.ExpenseHead,PC.ExpenseHead,PC.Description,
+		PC.Amount,PC.BillDate,P.PropertyName
+		ORDER BY PC.Status ASC
+
 						
 		SELECT Id as SNo,Requestedby,RequestedOn,ExpenseHead,ExpenseItem,Description,Amount,
 		BillDate,BillStartDate,BillEndDate,Property	FROM #PCNEW 

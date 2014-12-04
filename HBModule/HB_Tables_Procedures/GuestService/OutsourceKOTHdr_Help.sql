@@ -22,10 +22,10 @@ BEGIN
 If @Action ='PageLoad'
 	BEGIN
 		SELECT DISTINCT (P.PropertyName+'-'+S.StateName) as Property, H.PropertyId AS PropertyId
-		FROM WRBHBCheckInHdr H
+		FROM WRBHBPropertyUsers H
 		JOIN WRBHBProperty P ON H.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0 
-		JOIN  WRBHBState S on H.StateId = S.Id
-		WHERE H.IsActive = 1 and H.IsDeleted = 0 AND  P.Category IN('Internal Property','Managed G H')
+		JOIN  WRBHBState S on P.StateId = S.Id
+		WHERE H.IsActive = 1 and H.IsDeleted = 0 AND H.UserId=@Id AND  P.Category IN('Internal Property','Managed G H')
 	END
 If @Action ='Property'
 	BEGIN

@@ -49,7 +49,7 @@ BEGIN
 	where Mode='Cheque' AND D.IsActive=1	AND D.IsDeleted=0 AND MONTH(D.DepositedDate) = MONTH(GETDATE())
 	
 	--BTC Deposits
-	SELECT Convert(NVARCHAR(100),DepositedDate,103) AS Date,P.PropertyName AS Property,D.Amount,D.Comments,BTCTo,BTCMode,D.Id
+	SELECT Convert(NVARCHAR(100),DepositedDate,103) AS Date,P.PropertyName AS Property,D.TotalAmount AS Amount,D.Comments,BTCTo,BTCMode,D.Id
 	FROM WRBHBDeposits D 
 	JOIN WRBHBUser U ON U.Id=D.DepositedBy
 	JOIN WRBHBProperty P ON D.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
@@ -77,7 +77,7 @@ BEGIN
 		WHERE D.Id=@Id and D.IsActive=1 and D.IsDeleted=0
 		
 		SELECT DISTINCT D.BillType,D.InvoiceNo,Amount Total,ChkOutHdrId,D.ClientId,CM.ClientName AS Client,Tick,
-		COH.CheckInDate AS CheckIn,COH.CheckOutDate AS CheckOut
+		COH.CheckInDate AS CheckIn,COH.CheckOutDate AS CheckOut,COH.GuestName
 		From WRBHBDepositsDlts D
 		JOIN WRBHBClientManagement CM ON D.ClientId=CM.Id AND CM.IsActive=1 AND CM.IsDeleted=0
 		JOIN WRBHBChechkOutHdr COH ON D.ChkOutHdrId=COH.Id AND COH.IsActive=1 AND COH.IsDeleted=0
@@ -88,7 +88,7 @@ BEGIN
 	BEGIN
 	DECLARE @CId INT
 	SET @CId=(SELECT ClientId FROM WRBHBDeposits WHERE Id=@Id)
-		if(@CId !=0)
+		IF(@CId !=0)
 		BEGIN
 			SELECT convert(nvarchar(100),DepositedDate,103) as Date,TotalAmount AS Amount,Comments as Remarks,BTCMode,BTCTo,DoneBy,
 			D.Id,P.PropertyName as Property,CM.ClientName FROM WRBHBDeposits D
@@ -105,7 +105,7 @@ BEGIN
 		END
 		
 		SELECT D.BillType,D.InvoiceNo,Amount Total,ChkOutHdrId,D.ClientId,Tick,CM.ClientName AS Client,
-		COH.CheckInDate AS CheckIn,COH.CheckOutDate AS CheckOut 
+		COH.CheckInDate AS CheckIn,COH.CheckOutDate AS CheckOut,COH.GuestName 
 		from WRBHBDepositsDlts D
 		JOIN WRBHBClientManagement CM ON D.ClientId=CM.Id AND CM.IsActive=1 AND CM.IsDeleted=0
 		JOIN WRBHBChechkOutHdr COH ON D.ChkOutHdrId=COH.Id AND COH.IsActive=1 AND COH.IsDeleted=0
@@ -122,56 +122,56 @@ BEGIN
 	BEGIN	
 			CREATE TABLE #TEMPCASH (BillType NVARCHAR(100),InvoiceNo NVARCHAR(100),Total DECIMAL(27,2),
 			ChkOutHdrId BIGINT,Mode NVARCHAR(100),ClientId BIGINT,Property NVARCHAR(100),PId BIGINT,
-			CheckIn NVARCHAR(100),CheckOut NVARCHAR(100))
+			CheckIn NVARCHAR(100),CheckOut NVARCHAR(100),GuestName NVARCHAR(100))
 			
 			INSERT INTO #TEMPCASH(BillType,InvoiceNo,Total,ChkOutHdrId,Mode,ClientId,Property,PId,
-			CheckIn,CheckOut)
+			CheckIn,CheckOut,GuestName)
 			
 			SELECT DISTINCT Payment AS BillType,COH.InVoiceNo,SUM(AmountPaid) AS Total,COH.Id AS ChkOutHdrId,'Cash',
 			CM.Id AS ClientId,COH.Property AS Property,COH.PropertyId AS PId,
-			CheckInDate,CheckOutDate
+			CheckInDate,CheckOutDate,COH.GuestName
 			FROM WRBHBChechkOutPaymentCash PC
 			JOIN WRBHBChechkOutHdr COH ON PC.ChkOutHdrId=COH.Id
 			JOIN WRBHBClientManagement CM ON COH.ClientName=CM.ClientName WHERE COH.PropertyId=@Id
 			GROUP BY Payment,COH.InVoiceNo,COH.Id,CM.Id,COH.Property,COH.PropertyId,
-			CheckInDate,CheckOutDate
+			CheckInDate,CheckOutDate,GuestName
 			
 			CREATE TABLE #TEMPCHEQUE (BillType NVARCHAR(100),InvoiceNo NVARCHAR(100),Total DECIMAL(27,2),
 			ChkOutHdrId BIGINT,Mode NVARCHAR(100),ClientId BIGINT,Property NVARCHAR(100),PId BIGINT,
-			CheckIn NVARCHAR(100),CheckOut NVARCHAR(100))
+			CheckIn NVARCHAR(100),CheckOut NVARCHAR(100),GuestName NVARCHAR(100))
 			
 			INSERT INTO #TEMPCASH(BillType,InvoiceNo,Total,ChkOutHdrId,Mode,ClientId,Property,PId,
-			CheckIn,CheckOut)
+			CheckIn,CheckOut,GuestName)
 			
 			SELECT DISTINCT Payment AS BillType,COH.InVoiceNo,SUM(AmountPaid) AS Total,COH.Id AS ChkOutHdrId,
 			'Cheque',CM.Id AS ClientId,COH.Property AS Property,COH.PropertyId AS PId,
-			CheckInDate,CheckOutDate
+			CheckInDate,CheckOutDate,COH.GuestName
 			FROM WRBHBChechkOutPaymentCheque PC
 			JOIN WRBHBChechkOutHdr COH ON PC.ChkOutHdrId=COH.Id
 			JOIN WRBHBClientManagement CM ON COH.ClientName=CM.ClientName WHERE COH.PropertyId=@Id
 			GROUP BY Payment,COH.InVoiceNo,COH.Id,CM.Id,COH.Property,COH.PropertyId,
-			CheckInDate,CheckOutDate
+			CheckInDate,CheckOutDate,GuestName
 
 			CREATE TABLE #TEMPBTC (BillType NVARCHAR(100),InvoiceNo NVARCHAR(100),Total DECIMAL(27,2),
 			ChkOutHdrId BIGINT,Mode NVARCHAR(100),ClientId BIGINT,Property NVARCHAR(100),PId BIGINT,
-			CheckIn NVARCHAR(100),CheckOut NVARCHAR(100))
+			CheckIn NVARCHAR(100),CheckOut NVARCHAR(100),GuestName NVARCHAR(100))
 			
 			INSERT INTO #TEMPBTC(BillType,InvoiceNo,Total,ChkOutHdrId,Mode,ClientId,Property,PId,
-			CheckIn,CheckOut)
+			CheckIn,CheckOut,GuestName)
 					
 			SELECT DISTINCT Payment AS BillType,COH.InVoiceNo,SUM(AmountPaid) AS Total,COH.Id AS ChkOutHdrId,
 			'BTC',CM.Id AS ClientId,COH.Property AS Property,COH.PropertyId AS PId,
-			CheckInDate,CheckOutDate
+			CheckInDate,CheckOutDate,COH.GuestName
 			FROM WRBHBChechkOutPaymentCompanyInvoice PC
 			JOIN WRBHBChechkOutHdr COH ON PC.ChkOutHdrId=COH.Id
 			JOIN WRBHBClientManagement CM ON COH.ClientName=CM.ClientName WHERE COH.PropertyId=@Id
 			GROUP BY Payment,COH.InVoiceNo,COH.Id,CM.Id,COH.Property,COH.PropertyId,
-			CheckInDate,CheckOutDate
+			CheckInDate,CheckOutDate,GuestName
 			
 		IF @Str='Cash'
 		BEGIN
 			SELECT 0 AS Tick,BillType,InvoiceNo,Total,ChkOutHdrId,ClientId,CheckIn,CheckOut,CM.ClientName AS Client,
-			CM.Id AS ClientId 
+			CM.Id AS ClientId,GuestName 
 			FROM #TEMPCASH T
 			JOIN WRBHBClientManagement CM ON T.ClientId=CM.Id AND CM.IsActive=1 AND CM.IsDeleted=0
 			WHERE Total!=0.00 AND InvoiceNo!=''	
@@ -183,7 +183,7 @@ BEGIN
 		IF @Str='Cheque'
 		BEGIN
 			SELECT 0 AS Tick,BillType,InvoiceNo,Total,ChkOutHdrId,CheckIn,CheckOut,CM.ClientName AS Client,
-			CM.Id AS ClientId  
+			CM.Id AS ClientId,GuestName   
 			FROM #TEMPCHEQUE T
 			JOIN WRBHBClientManagement CM ON T.ClientId=CM.Id AND CM.IsActive=1 AND CM.IsDeleted=0
 			WHERE Total!=0.00 AND InvoiceNo!=''
@@ -195,7 +195,7 @@ BEGIN
 		IF @Str='BTC'
 		BEGIN
 			SELECT 0 AS Tick,BillType,InvoiceNo,Total,ChkOutHdrId,CM.ClientName AS Client,TC.CheckIn,TC.CheckOut,
-			CM.Id AS ClientId 
+			CM.Id AS ClientId,GuestName  
 			FROM #TEMPBTC TC
 			JOIN WRBHBClientManagement CM ON TC.ClientId=CM.Id WHERE CM.IsActive=1 AND CM.IsDeleted=0
 			AND Total!=0.00 AND InvoiceNo!='' AND InVoiceNo NOT IN(SELECT InVoiceNo FROM WRBHBDepositsDlts)
@@ -211,19 +211,19 @@ BEGIN
 		
 			CREATE TABLE #TEMPBTCC (BillType NVARCHAR(100),InvoiceNo NVARCHAR(100),Total DECIMAL(27,2),
 			ChkOutHdrId BIGINT,Mode NVARCHAR(100),ClientId BIGINT,Property NVARCHAR(100),PId BIGINT,
-			CheckIn NVARCHAR(100),CheckOut NVARCHAR(100))
+			CheckIn NVARCHAR(100),CheckOut NVARCHAR(100),GuestName NVARCHAR(100))
 			
 			INSERT INTO #TEMPBTCC(BillType,InvoiceNo,Total,ChkOutHdrId,Mode,ClientId,Property,PId,
-			CheckIn,CheckOut)
+			CheckIn,CheckOut,GuestName)
 					
 			SELECT DISTINCT Payment AS BillType,COH.InVoiceNo,SUM(AmountPaid) AS Total,COH.Id AS ChkOutHdrId,
 			'BTC',CM.Id AS ClientId,COH.Property AS Property,COH.PropertyId AS PId,
-			CheckInDate,CheckOutDate
+			CheckInDate,CheckOutDate,COH.GuestName
 			FROM WRBHBChechkOutPaymentCompanyInvoice PC
 			JOIN WRBHBChechkOutHdr COH ON PC.ChkOutHdrId=COH.Id
 			JOIN WRBHBClientManagement CM ON COH.ClientName=CM.ClientName WHERE COH.PropertyId=@Id
 			GROUP BY Payment,COH.InVoiceNo,COH.Id,CM.Id,COH.Property,COH.PropertyId,
-			CheckInDate,CheckOutDate
+			CheckInDate,CheckOutDate,GuestName
 		
 		
 			SELECT BillType,InvoiceNo,Total,ChkOutHdrId,ClientId,CM.ClientName AS Client,CheckIn,CheckOut  

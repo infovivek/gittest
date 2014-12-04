@@ -57,7 +57,7 @@
 			}
 			public function Help():void
 			{				
-				useWeb("OutsourceKOTEntry","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0]);
+				useWeb("OutsourceKOTEntry","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",Global_AC[0].UsrId]);
 			}
 			//			public var TempProduct_AC:ArrayCollection = new ArrayCollection();
 			private function Custom_WebSer_Result (Ds_Objects:Object):void

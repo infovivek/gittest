@@ -52,6 +52,7 @@
 			public var uploadURL:URLRequest = new URLRequest();
 			public var Amount:String="",ImagePath:String="",ClientMgtId:int=0,CashAccountId:int=0,CashAccount:String="",CashChalan:String="";
 			public var Comments:String="",ChkAccountId:int=0,ChkAccount:String="",Mode:String="Cash",ClientName:String="";
+			public var Mode1:String="";
 			protected function PageLoad():void
 			{
 				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
@@ -103,7 +104,7 @@
 				}
 				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
 				{
-					var Mode1:String="";
+					
 					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
 					{
 						DId=Ds_Objects.result.Tables.Table.Rows[0].Id;
@@ -114,6 +115,8 @@
 						init();	
 						uploadFiles();
 					}	
+					else
+					{
 					if (Id == 0)
 					{
 						if(Mode1=="BTC")
@@ -135,7 +138,7 @@
 							CashCancel();
 						}	
 					}
-					
+				  }
 					
 				}
 				if (Ds_Objects.currentTarget.description.toString() == "ImageUpload_CUSTOM")
@@ -833,6 +836,7 @@
 				{
 					Brd_Cheque.visible=true;
 				}
+				Help();
 			}
 			protected function BTCCancel():void
 			{
@@ -852,6 +856,7 @@
 				hlp_ClientName.text="";
 				Drp_BTCMode.prompt="Select Mode";
 				Drp_BTCTo.prompt="Select To";
+				Help();
 			}
 			protected function Drp_CashAccount_changeHandler():void
 			{
@@ -967,6 +972,18 @@
 				Img_CompanyLogo.visible=false;
 				Img_CompanyLogo.source="http://sstage.in/Challan/"+resultsTxtField.text;
 				useWeb("Deposit","ImageUpload_CUSTOM",[GlobalXml,'IMAGEUPLOAD',"http://sstage.in/Challan/"+resultsTxtField.text,DId,0]);
+				if(Mode1=="Cash")
+				{
+					alignAlert(Alert.show("Cash Deposit Saved Successfully.","Message !",Alert.OK, 
+						null, null, iconTickLarge, Alert.OK),10,"");
+					CashCancel();
+				}
+				else if(Mode1=="Cheque")
+				{
+					alignAlert(Alert.show("Cheque Deposit Saved Successfully.","Message !",Alert.OK, 
+						null, null, iconTickLarge, Alert.OK),10,"");
+					CashCancel();
+				}	
 			}
 			
 			// called if there is an error detected by flash player browsing or uploading a file
@@ -1349,26 +1366,26 @@
 			<s:Button x="611" y="83" height="28" label="Clear" click="FnClear()"/>
 		</s:BorderContainer>
 	</s:HGroup>
-	<s:BorderContainer x="0" y="47" width="100%" height="100%" id="Brd_Cash_Panel" backgroundColor="#fbf9f9"
+	<s:BorderContainer x="0" y="45" width="100%" height="100%" id="Brd_Cash_Panel" backgroundColor="#fbf9f9"
 					   visible="false">
 		<s:Label id="lblNewCash" x="105" y="23" text="New Cash Deposit" color="red"/>
 		<s:Label x="105" y="94" text="Date Deposited"/>
 		<s:Label x="105" y="129" text="Amount Deposited"/>
-		<s:Label x="509" y="55" text="Deposited Account"/>
-		<s:Label x="509" y="94" text="Deposited Chalan"/>
-		<s:Label x="639" y="241" text="Comments"/>
+		<s:Label x="459" y="54" text="Deposited Account"/>
+		<s:Label x="459" y="93" text="Deposited Chalan"/>
+		<s:Label x="105" y="161" text="Comments"/>
 		<s:TextInput x="234" y="121" width="171" maxChars="10" id="txt_CashDepositAmount" restrict="0-9."/>
 		<s:Image x="612" y="311" width="100" height="100" id="Img_CashChalan"
 				 source="@Embed(source='../Assets/user.jpg')" visible="false"/>
-		<s:TextArea id="txt_CashComments" x="714" y="231" width="217" height="89" maxChars="2000"/>
+		<s:TextArea id="txt_CashComments" x="234" y="151" width="217" height="46" maxChars="2000"/>
 		<s:Button id="btn_SaveCash" x="370" y="417" height="32" label="Save" click="CashSave()"/>
 		<s:Button id="btn_CancelCash" x="506" y="417" height="32" label="Close"
 				  click="CashCancel()"/>
-		<s:DropDownList id="Drp_CashAccount" x="644" y="49" width="225" prompt="Select Deposited Account" 
+		<s:DropDownList id="Drp_CashAccount" x="594" y="48" width="225" prompt="Select Deposited Account" 
 						change="Drp_CashAccount_changeHandler()"></s:DropDownList>
 		<mx:DateField id="dt_CashDate" x="234" y="83" selectableRange="{{rangeEnd:new Date()}}" 
 					  formatString="DD/MM/YYYY"/>
-		<s:BorderContainer x="644" y="84" width="297" height="128" id="Brd_imageUpload" visible="true" borderVisible="true"
+		<s:BorderContainer x="594" y="83" width="297" height="128" id="Brd_imageUpload" visible="true" borderVisible="true"
 						   backgroundColor="#fbf9f9" cornerRadius="5">
 			<mx:Panel x="17" y="19" title="Image Uploader">
 				<mx:ControlBar>
@@ -1389,17 +1406,17 @@
 		</s:BorderContainer>
 		<s:Label x="215" y="122" text="*" color="red"/>
 		
-		<s:Label x="615" y="51" text="*" color="red"/>
+		<s:Label x="565" y="50" text="*" color="red"/>
 		<s:Label x="105" y="56" text="Property"/>
 		
-		<s:Label x="105" y="184" text="Invoice No's"/>
-		<s:Label x="105" y="349" text="Total Amount"/>
+		<s:Label x="105" y="234" text="Invoice No's"/>
+		<s:Label x="105" y="379" text="Total Amount"/>
 		<WrbHelpComp:HelpText id="hlp_Property" x="234" y="51" width="187" height="22" pxSetColumnsWidth="187,0" 
 							  onselection="{Ddl_Property_changeHandler()}"  pxTabIndex="1" depth="10">
 		</WrbHelpComp:HelpText>
-		<s:CheckBox x="241" y="155" label="Select All" id="Chk_Selectall" change="Chk_Selectall_changeHandler1(event)" />
-		<mx:DataGrid id="Grd_Invoice" x="234" y="177"  verticalAlign="middle" editable="true" 
-					 width="400" height="148" tabIndex="4">
+		<s:CheckBox x="241" y="205" label="Select All" id="Chk_Selectall" change="Chk_Selectall_changeHandler1(event)" />
+		<mx:DataGrid id="Grd_Invoice" x="234" y="227"  verticalAlign="middle" editable="true" 
+					 width="500" height="125" tabIndex="4">
 			<mx:columns>
 				<mx:DataGridColumn dataField="Tick" headerText="" width="25" editable="false" >
 					<mx:itemRenderer>
@@ -1411,24 +1428,25 @@
 						</fx:Component>
 					</mx:itemRenderer>
 				</mx:DataGridColumn>
-				<mx:DataGridColumn dataField="Client" width="50" visible="true" editable="false"/>
-				<mx:DataGridColumn dataField="InvoiceNo" headerText="Invoice No" width="70" editable="false" visible="true"/>
-				<mx:DataGridColumn dataField="CheckIn"  visible="true" width="75" editable="false"/>
-				<mx:DataGridColumn dataField="CheckOut"  visible="true" width="75" editable="false"/>
-				<mx:DataGridColumn dataField="Total" width="70" visible="true" editable="false"/>
+				<mx:DataGridColumn dataField="Client" width="100" visible="true" editable="false"/>
+				<mx:DataGridColumn dataField="GuestName" headerText="GuestName" width="100" editable="false" visible="true"/>
+				<mx:DataGridColumn dataField="InvoiceNo" headerText="Invoice No" width="80" editable="false" visible="true"/>
+				<mx:DataGridColumn dataField="CheckIn"  visible="true" width="60" editable="false"/>
+				<mx:DataGridColumn dataField="CheckOut"  visible="true" width="60" editable="false"/>
+				<mx:DataGridColumn dataField="Total" width="45" visible="true" editable="false"/>
 				<mx:DataGridColumn dataField="ChkOutHdrId" width="10" visible="false"/>
-				<mx:DataGridColumn dataField="BillType" width="50" visible="false"/>
+				<mx:DataGridColumn dataField="BillType" width="10" visible="false"/>
 				<mx:DataGridColumn dataField="ClientId" width="10" visible="false"/>
 				
 				
 				
 			</mx:columns>
 		</mx:DataGrid>
-		<s:TextInput id="txt_CashTotal" x="234" y="343" enabled="false" prompt="0.00"/>
-		<s:Label id="lblChqno" x="105" y="391" text="Cheque No"/>
-		<s:TextInput id="txt_ChkNo" x="234" y="383" prompt="Cheque Number"/>
+		<s:TextInput id="txt_CashTotal" x="234" y="373" enabled="false" prompt="0.00"/>
+		<s:Label id="lblChqno" x="375" y="379" text="Cheque No"/>
+		<s:TextInput id="txt_ChkNo" x="494" y="373" prompt="Cheque Number"/>
 		<s:Label x="160" y="51" text="*" color="red"/>
-		<s:Label x="209" y="179" text="*" color="red"/>
+		<s:Label x="209" y="229" text="*" color="red"/>
 	</s:BorderContainer>
 	<s:Image x="632" y="311" width="100" height="100" id="Img_CompanyLogo"
 			 source="@Embed(source='../Assets/user.jpg')" visible="false"/>
@@ -1473,52 +1491,52 @@
 	</s:HGroup>
 	<s:BorderContainer x="0" y="46" width="100%" height="100%" id="Brd_BTC_Panel" backgroundColor="#fbf9f9"
 					   visible="false">
-		<s:Label id="lblNewBTC" x="177" y="23" text="New BTC Deposit" color="red"/>
-		<s:Label x="179" y="150" text="Date Deposited"/>
+		<s:Label id="lblNewBTC" x="137" y="23" text="New BTC Deposit" color="red"/>
+		<s:Label x="139" y="150" text="Date Deposited"/>
 		<s:Label x="449" y="89" text="Amount Deposited" visible="false"/>
-		<s:Label x="559" y="55" text="To"/>
-		<s:Label x="560" y="95" height="11" text="Mode"/>
+		<s:Label x="609" y="55" text="To"/>
+		<s:Label x="610" y="95" height="11" text="Mode"/>
 		<s:DropDownList id="Drp_BTCMode" x="694" y="85" width="180" prompt="Select Mode" change="Drp_Mode_changeHandler(event)" >
 			<s:ArrayList>
 				<fx:String>Inperson</fx:String>
 				<fx:String>Courier</fx:String>
 			</s:ArrayList>
 		</s:DropDownList>
-		<s:Label x="178" y="103" text="Client"/>
-		<WrbHelpComp:HelpText id="hlp_ClientName" x="280" y="96" width="188" height="22" pxSetColumnsWidth="220,0"
+		<s:Label x="138" y="103" text="Client"/>
+		<WrbHelpComp:HelpText id="hlp_ClientName" x="233" y="96" width="188" height="22" pxSetColumnsWidth="220,0"
 							  onselection="{Ddl_Client_changeHandler()}"  pxTabIndex="1" depth="10"
 							  pxSetPrompt="Select Client" />
-		<s:Label x="559" y="161" text="Remarks"/>
+		<s:Label x="609" y="161" text="Remarks"/>
 		<s:TextInput x="584" y="81" width="171" maxChars="10" id="txt_BTCDepositAmount" restrict="0-9" visible="false"/>
 		<s:Image x="462" y="311" width="100" height="100" id="Img_BTCChalan"
 				 source="@Embed(source='../Assets/user.jpg')" visible="false"/>
 		<s:TextArea id="txt_BTCRemarks" x="694" y="161" width="171" height="89" maxChars="2000"/>
 		<s:Button id="btn_BTCSave" x="390" y="397" height="31" label="Save" click="CashSave()"/>
-		<s:Button id="btn_BTCClose" x="526" y="401" height="31" label="Close" click="BTCCancel()"/>
+		<s:Button id="btn_BTCClose" x="504" y="397" height="31" label="Close" click="BTCCancel()"/>
 		<s:DropDownList id="Drp_BTCTo" x="694" y="49" width="180" prompt="Select To" >
 			<s:ArrayList>
 				<fx:String>Commercial</fx:String>
 				<fx:String>Client</fx:String>
 			</s:ArrayList>
 		</s:DropDownList>
-		<mx:DateField id="dt_BTCDate" x="280" y="139" selectableRange="{{rangeEnd:new Date()}}"  
+		<mx:DateField id="dt_BTCDate" x="233" y="139" selectableRange="{{rangeEnd:new Date()}}"  
 					  formatString="DD/MM/YYYY"/>
 		<s:Label x="555" y="83" text="*" color="red" visible="false"/>
 		
 		<s:Label x="658" y="49" text="*" color="red"/>
-		<s:Label x="559" y="136" id="lblDoneBy" text="Done By" visible="true"/>
+		<s:Label x="609" y="136" id="lblDoneBy" text="Done By" visible="true"/>
 		<s:TextInput x="694" y="128" id="txt_DoneBy" width="171" visible="true" prompt="Done By" enabled="false"/>
 		
-		<s:Label x="178" y="60" text="Property"/>
+		<s:Label x="138" y="60" text="Property"/>
 		
-		<s:Label x="178" y="210" text="Invoice No's"/>
-		<s:Label x="178" y="379" text="Total Amount"/>
-		<WrbHelpComp:HelpText id="hlp_BTCProperty" x="280" y="55" width="187" height="22" pxSetColumnsWidth="187,0" 
+		<s:Label x="138" y="210" text="Invoice No's"/>
+		<s:Label x="138" y="379" text="Total Amount"/>
+		<WrbHelpComp:HelpText id="hlp_BTCProperty" x="233" y="55" width="187" height="22" pxSetColumnsWidth="187,0" 
 							  onselection="{Ddl_Property1_changeHandler()}"  pxTabIndex="1" depth="10">
 		</WrbHelpComp:HelpText>
-		<s:CheckBox x="286" y="165" label="Select All" id="Chk_Selectall1" change="Chk_Selectall_changeHandler(event)" />
-		<mx:DataGrid id="Grd_BTCInvoice" x="280" y="185"  verticalAlign="middle" editable="true" 
-					 width="400" height="178" tabIndex="4">
+		<s:CheckBox x="239" y="165" label="Select All" id="Chk_Selectall1" change="Chk_Selectall_changeHandler(event)" />
+		<mx:DataGrid id="Grd_BTCInvoice" x="231" y="185"  verticalAlign="middle" editable="true" 
+					 width="460" height="178" tabIndex="4">
 			<mx:columns>
 				<mx:DataGridColumn dataField="Tick" headerText="" width="25" editable="false">
 					<mx:itemRenderer>
@@ -1531,19 +1549,20 @@
 					</mx:itemRenderer>
 				</mx:DataGridColumn>
 				<mx:DataGridColumn dataField="Client" headerText="Client" width="100" visible="true" editable="false"/>
+				<mx:DataGridColumn dataField="GuestName" headerText="GuestName" width="80" editable="false" visible="true"/>
 				<mx:DataGridColumn dataField="InvoiceNo" headerText="Invoice No" width="60" editable="false" visible="true"/>
-				<mx:DataGridColumn dataField="CheckIn"  visible="true" width="75" editable="false"/>
-				<mx:DataGridColumn dataField="CheckOut"  visible="true" width="75" editable="false"/>
-				<mx:DataGridColumn dataField="BillType"  visible="false" width="70" />
+				<mx:DataGridColumn dataField="CheckIn"  visible="true" width="60" editable="false"/>
+				<mx:DataGridColumn dataField="CheckOut"  visible="true" width="60" editable="false"/>
+				<mx:DataGridColumn dataField="BillType"  visible="false" width="10" />
 				<mx:DataGridColumn dataField="ClientId"  visible="false" width="10"/>
 				<mx:DataGridColumn dataField="ChkOutHdrId" width="10" visible="false"/>
-				<mx:DataGridColumn dataField="Total" visible="true" editable="false" />
+				<mx:DataGridColumn dataField="Total" width="45"  visible="true" editable="false" />
 				
 			</mx:columns>
 		</mx:DataGrid>
-		<s:TextInput id="txt_BTCTotal" x="280" y="371" enabled="false"/>
+		<s:TextInput id="txt_BTCTotal" x="233" y="371" enabled="false"/>
 		<s:Label x="659" y="84" text="*" color="red"/>
-		<s:Label x="229" y="53" text="*" color="red"/>
-		<s:Label x="245" y="201" text="*" color="red"/>
+		<s:Label x="189" y="53" text="*" color="red"/>
+		<s:Label x="205" y="201" text="*" color="red"/>
 	</s:BorderContainer>
 </s:Application>
