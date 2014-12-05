@@ -4,7 +4,7 @@
 			   xmlns:mx="library://ns.adobe.com/flex/mx"
 			   xmlns:WrbComp="WrbComp.*"
 			   width="100%" height="100%" creationComplete="PageLoad()"
-			   pageTitle="SearchInvoice  Annexure">
+			   pageTitle="Search DetailService ">
 	<fx:Declarations>
 		<s:Animate id="fader"   duration="500"   repeatBehavior="reverse"   repeatCount="0">
 			<s:SimpleMotionPath property="alpha" valueFrom="1.0" valueTo="0.0" />
@@ -23,8 +23,8 @@
 			public static var Global_AC:ArrayCollection = new ArrayCollection();
 			public static var GlobalXml:String = ""; 
 			public var ErrorFlag:Boolean=true; 
-			public var Id:Number=0; 	public var Str_ChkOut:String="",Str_Serv:String="",Str_Settle:String="";
-			public var Str_ChkOut1:String="",Str_Serv1:String="",Str_Settle1:String="",Str_ChkOutTAC:String="";
+			public var Id:Number=0; 	public var  Str_Serv:String="",Str_Settle:String="";
+			public var Str_Serv1:String="",Str_Settle1:String="",Str_ChkOutTAC:String="";
 			protected function PageLoad():void
 			{
 				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
@@ -32,15 +32,10 @@
 				GlobalXml += "<ROOT>";
 				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
 				GlobalXml += "</ROOT>";
-				useWeb("SearchInvoiceReport","Report_CUSTOM",[GlobalXml,"Pageload",FromDate,ToDate,'','','',0,0,0]);
+				Type="Internal";
+				useWeb("SearchDetailServiceInvoice","Report_CUSTOM",[GlobalXml,"Pageload",FromDate,ToDate,'',Type,0,0]);
 				
-				//Str_ChkOut1   = "http://localhost:4171/TAC Annexure.aspx?"; //For Tac 
-				//Str_ChkOutTAC = "http://localhost:4171/TACAnnuxpage1.aspx?"; //For internel and Exterrnal
-				
-				Str_ChkOut1 ="http://sstage.in/HBReport/TAC Annexure.aspx?";//For Tac 
-				Str_ChkOutTAC="http://sstage.in/HBReport/TACAnnuxpage1.aspx?";  //For internel and Exterrnal
-				
-				
+				Str_ChkOutTAC   = "http://localhost:6236/DetailedServiceinvoice.aspx?"; //For Tac  
 				Modes.selectedValue=0
 			}
 			private function Custom_WebSer_Result (Ds_Objects:Object):void
@@ -79,15 +74,11 @@
 				
 				if(Modes.selectedValue==0)
 				{
-					Type="Internal Property"; 
+					Type="Internal"; 
 				}
 				else if(Modes.selectedValue==1)
 				{
-					Type="External Property"; 
-				}
-				else if(Modes.selectedValue==2)
-				{
-					Type="TAC"; 
+					Type="External"; 
 				}
 				else
 				{
@@ -123,7 +114,7 @@
 					{
 						Status='';
 					}
-					useWeb("SearchInvoiceReport","Report_CUSTOM",[GlobalXml,"Pageload",FromDate,ToDate,Type,InvoiceNum,'',0,0,0]);
+					useWeb("SearchDetailServiceInvoice","Report_CUSTOM",[GlobalXml,"Pageload",FromDate,ToDate,InvoiceNum,Type,0,0]);
 				} 
 			}
 			public var Ac1:ArrayCollection=new ArrayCollection(); 
@@ -156,62 +147,7 @@
 					Ac1[Index].selectRadio=true;
 				}
 			}
-			public function FnAction(Event):void
-			{  
-				FromDate="";ToDate="";
-				//brd_Popup_reset.visible=true; 
-				
-				var BillType:String=""; var PropertyCat:String="";
-				BillType=Grd_SearchInvoice.selectedItem.BillType;
-				change();
-				ChkoutId=Grd_SearchInvoice.selectedItem.ChkoutId;
-				PropertyCat=Grd_SearchInvoice.selectedItem.PropertyCat;
-				if(PropertyCat=="Internal Property")
-				{
-					if(BillType == "Tariff")
-					{
-						ExternalInterface.call("changeDocumentTitle",Str_ChkOut+ChkoutId);
-					}
-					if(BillType == "Service")
-					{
-						ExternalInterface.call("changeDocumentTitle",Str_Serv+ChkoutId);
-					}
-					if(BillType == "Consolidate")
-					{
-						ExternalInterface.call("changeDocumentTitle",Str_Settle+ChkoutId);
-					} 
-					if(BillType == "Consolidated")
-					{
-						ExternalInterface.call("changeDocumentTitle",Str_Settle+ChkoutId);
-					} 
-				}
-				if(PropertyCat=="External Property")
-				{
-					if(BillType == "Tariff")
-					{
-						ExternalInterface.call("changeDocumentTitle",Str_ChkOut1+ChkoutId);
-					}
-					if(BillType == "Service")
-					{
-						ExternalInterface.call("changeDocumentTitle",Str_Serv1+ChkoutId);
-					}
-					if(BillType == "Consolidate")
-					{
-						ExternalInterface.call("changeDocumentTitle",Str_Settle1+ChkoutId);
-					}
-					if(BillType == "Consolidated")
-					{
-						ExternalInterface.call("changeDocumentTitle",Str_Settle1+ChkoutId);
-					}
-				}
-				if(PropertyCat=="TAC")
-				{
-					if(BillType == "Tariff")
-					{
-						ExternalInterface.call("changeDocumentTitle",Str_ChkOutTAC+ChkoutId);
-					}	
-				}
-			} 
+			 
 			public var Type:String="";
 			protected function CourierChange()
 			{ 
@@ -219,15 +155,11 @@
 				ToDate=DT_To.text;
 				if(Modes.selectedValue==0)
 				{
-					Type="Internal Property";
+					Type="Internal";
 				}
 				if(Modes.selectedValue==1)
 				{
-					Type="External Property";
-				}
-				if(Modes.selectedValue==2)
-				{
-					Type="TAC";
+					Type="External";
 				}
 			}
 			public var FltNm:String="";
@@ -309,25 +241,13 @@
 			}
 			public var Ac2:ArrayCollection=new ArrayCollection();
 			public var ClientName:String="";
+			public var Property:String='';
 			public function TacSelect(Event):void
 			{ 
 				Ac2=Grd_SearchInvoice.dataProvider as  ArrayCollection;				
 				var Index:int=Grd_SearchInvoice.selectedIndex;
 				var Flag:Boolean=true;
-				
-				//				var Flag:Boolean=true;
-				//				var i:int=Ac2.length-1;
-				//				for( i ;i>=0;i--)
-				//				{
-				//					if(Ac2[i].selectRadio ==0)
-				//					{  
-				//						Ac2[i].selectRadio=false;
-				//					} 	
-				//					if(Ac2[i].selectRadio==true)
-				//					{
-				//						Ac2[i].selectRadio=false;
-				//					}
-				//				}	
+			 
 				if(Ac2[Index].selectRadio==1)
 				{
 					Ac2[Index].selectRadio=false;
@@ -341,15 +261,15 @@
 				
 				TotalBills(); 
 			}
-			public var Property:String='';
+			
 			public function TotalBills():void
 			{
 				var SelBills:ArrayCollection= new ArrayCollection();
 				SelBills=Grd_SearchInvoice.dataProvider as  ArrayCollection;
 				var ChkutIds:String = "";
 				var ChkutIds1:String = "";
-				if(Modes.selectedValue==2)
-				{
+//				if(Modes.selectedValue==2)
+//				{
 					for(var M:int=0;M<SelBills.length;M++)
 					{ 
 						if(SelBills[M].Property==Property)
@@ -360,25 +280,9 @@
 							}  
 						}
 						//ChkutIds1+=ChkutIds+',';  
-					}
-				}  
-				else
-				{
-					for(var M:int=0;M<SelBills.length;M++)
-					{ 
-						if(SelBills[M].ClientName==ClientName)
-						{
-							if(SelBills[M].selectRadio==true)
-							{
-								ChkutIds+= SelBills[M].ChkoutId+',';  
-							}  
-						}
-						//ChkutIds1+=ChkutIds+',';  
-					}
-				}
-				ChkoutId=ChkutIds;
-				//	ExternalInterface.call("changeDocumentTitle",Str_ChkOutTAC+ChkutIds);	 
-				//var Amttobe:Number =ChkoutId;
+					} 
+			   //}
+				ChkoutId=ChkutIds; 
 			}
 			protected function Print(event:MouseEvent):void
 			{
@@ -397,16 +301,7 @@
 					{
 						ExternalInterface.call("changeDocumentTitle",Str_ChkOutTAC+ChkoutId+'@'+Type);
 					}
-				}
-				if(Modes.selectedValue==2)
-				{
-					Type="Tac";
-					
-					if(ChkoutId!='')
-					{
-						ExternalInterface.call("changeDocumentTitle",Str_ChkOut1+ChkoutId+'@'+Type);
-					}
-				}
+				} 
 				if(Type=='')
 				{ 
 					Type="Internal"; 
@@ -474,9 +369,9 @@
 					<s:RadioButton label="External" groupName="Modes"  value="1"
 								   id="External" buttonMode="true"  />
 					<s:RadioButton label="TAC" groupName="Modes"  value="2"
-								   id="TAC" buttonMode="true"  />
+								   id="TAC" buttonMode="true"  visible="false" />
 				</s:HGroup>
-				<WrbComp:Button_HB  x="960" y="27" Lable_val="Print Invoice" id="btn_Print"  click="Print(event)"> 
+				<WrbComp:Button_HB  x="963" y="31" Lable_val="Print Invoice" id="btn_Print"  click="Print(event)"> 
 				</WrbComp:Button_HB>
 			</s:Group>
 		</s:HGroup>
@@ -496,14 +391,15 @@
 							</fx:Component>
 						</mx:itemRenderer>
 					</mx:DataGridColumn>
-					<mx:DataGridColumn dataField="CheckOutDate" headerText="ChkOutDt"    editable="false" width="100" textAlign="center"/>	
-					<mx:DataGridColumn dataField="CheckInDate" headerText="ChkInDt"  editable="false" width="100" textAlign="center"/>	
+					<mx:DataGridColumn dataField="CheckOutDate" headerText="ChkOutDt"    visible="false"/>	
+					<mx:DataGridColumn dataField="CheckInDate" headerText="ChkInDt"  visible="false"/>	
+					<mx:DataGridColumn dataField="Stay" headerText="Stay" width="150"/>
 					<mx:DataGridColumn dataField="GuestName"  editable="false" width="100" textAlign="center"/>	
-					<mx:DataGridColumn dataField="InvoiceNumber"  textAlign="center" visible="true" width="80" editable="false"/> 
+					<mx:DataGridColumn dataField="InVoiceNo"  textAlign="center" headerText="InvoiceNumber" width="80" editable="false"/> 
 					<mx:DataGridColumn dataField="Property"  headerText="Property" textAlign="center" visible="true" width="150" editable="false"/> 
 					<mx:DataGridColumn dataField="ClientName"  textAlign="center" visible="true" width="120" editable="false"/>
 					
-					<mx:DataGridColumn dataField="Amount"  width="80" editable="false" textAlign="right" visible="true"/> 
+					<mx:DataGridColumn dataField="Amount" visible="false"/> 
 					<mx:DataGridColumn dataField="BillType" editable="false" textAlign="center" visible="true" width="100"/>
 					<mx:DataGridColumn dataField="Amounts"  headerText="NetAmount" width="80" editable="false" textAlign="right" visible="true"/>
 					<mx:DataGridColumn dataField="Status"  editable="false" textAlign="center" visible="true" width="80"/> 

@@ -35,7 +35,7 @@ namespace HB.BusinessService.BusinessService
             if (data[1].ToString() == "Room")
             {
                 ds = new BookingRoomMailDAO().Mail(BookingId, user);
-                string dfd = ds.Tables["Table12"].Rows[0][0].ToString();
+                //string dfd = ds.Tables["Table12"].Rows[0][0].ToString();
                 if (ds.Tables["Table12"].Rows[0][0].ToString() == "")
                 {
                     DataSet ds1 = new SMSDAO().FnSMS(BookingId, user);
@@ -73,6 +73,10 @@ namespace HB.BusinessService.BusinessService
             if (data[1].ToString() == "SMS")
             {
                 ds = new SMSDAO().FnSMS(BookingId, user);
+            }
+            if (data[1].ToString() == "RoomResend")
+            {
+                ds = new BookingRoomResendMailDAO().Mail(BookingId, "", "");
             }
             return ds;
         }

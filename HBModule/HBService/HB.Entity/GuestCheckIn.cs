@@ -12,7 +12,7 @@ namespace HB.Entity
         //Header
         public int Id { get; set; }
         public int RoomId { get; set; }
-        public int PropertyId { get; set; }
+        public Int64 PropertyId { get; set; }
         public int StateId { get; set; }
         public int BookingId { get; set; }
         public int GuestId { get; set; }

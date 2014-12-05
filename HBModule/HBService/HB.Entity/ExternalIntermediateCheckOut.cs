@@ -45,7 +45,7 @@ namespace HB.Entity
         public string CheckInType { get; set; }
         public string ApartmentNo { get; set; }
         public string BedNo { get; set; }
-        public int PropertyId { get; set; }
+        public Int64 PropertyId { get; set; }
         public int BookingId { get; set; }
         public int GuestId { get; set; }
         public int StateId { get; set; }
@@ -93,7 +93,7 @@ namespace HB.Entity
         public int ChkInHdrId1 { get; set; }
         public int NoOfDays1 { get; set; }
         public int RoomId1 { get; set; }
-        public int PropertyId1 { get; set; }
+        public Int64 PropertyId1 { get; set; }
         public int BookingId1 { get; set; }
         public int GuestId1 { get; set; }
         public int StateId1 { get; set; }

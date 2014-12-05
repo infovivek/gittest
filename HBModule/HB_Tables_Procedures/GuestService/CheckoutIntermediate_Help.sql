@@ -1,6 +1,6 @@
 
 GO
-/****** Object:  StoredProcedure [dbo].[Sp_CheckoutIntermediate_Help]    Script Date: 12/02/2014 09:17:54 ******/
+/****** Object:  StoredProcedure [dbo].[Sp_CheckoutIntermediate_Help]    Script Date: 12/05/2014 11:51:21 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -292,6 +292,71 @@ BEGIN
 		--CONVERT(date,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) and   
 		h.Id  IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where isnull(IntermediateFlag,0) = 1 and  
 		IsActive = 1 and IsDeleted = 0 and Status = 'UnSettled')
+		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
+		h.BookingId,h.BedId,h.Type,h.BookingCode,h.ChkInGuest,h.NewCheckInDate,d.ChkOutDt
+
+
+
+-- Intermediate Flag 1 Entry Room
+		INSERT INTO #GUEST(GuestName,GuestId,StateId,CheckInHdrId,PropertyId,RoomId,ApartmentId,  
+		BookingId,BedId,Type,Flag,BookingCode,ChkInDT,ChkOutDT)
+		
+		SELECT  h.ChkInGuest,h.GuestId,h.StateId,h.Id AS CheckInHdrId,h.PropertyId,h.RoomId,h.ApartmentId,  
+		h.BookingId,h.BedId,h.Type as Level,0 as Flag,h.BookingCode  ,h.NewCheckInDate,d.ChkOutDt
+		From WRBHBCheckInHdr h
+		join WRBHBBookingPropertyAssingedGuest d on h.Id = d.CheckInHdrId and
+		h.BookingId = d.BookingId and h.GuestId = d.GuestId and
+		d.IsActive=1 and d.IsDeleted=0
+		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
+		PropertyType = 'Internal Property' and  
+		PropertyId = @PropertyId and  
+		isnull(d.RoomShiftingFlag,0)=0 and --d.CurrentStatus = 'CheckIn' and
+		--CONVERT(date,d.ChkOutDt,103) between CONVERT(date,d.ChkInDt,103) AND 
+		--CONVERT(date,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) and   
+		h.Id  IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where isnull(IntermediateFlag,0) = 1 and  
+		IsActive = 1 and IsDeleted = 0 and Status = 'CheckOut')
+		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
+		h.BookingId,h.BedId,h.Type,h.BookingCode ,h.ChkInGuest	,h.NewCheckInDate,d.ChkOutDt
+		
+-- Intermediate Flag 1 Entry Bed	
+		
+		INSERT INTO #GUEST(GuestName,GuestId,StateId,CheckInHdrId,PropertyId,RoomId,ApartmentId,  
+		BookingId,BedId,Type,Flag,BookingCode,ChkInDT,ChkOutDT)
+		
+		SELECT  h.ChkInGuest,h.GuestId,h.StateId,h.Id AS CheckInHdrId,h.PropertyId,h.RoomId,h.ApartmentId,  
+		h.BookingId,h.BedId,h.Type as Level,0 as Flag,h.BookingCode  ,h.NewCheckInDate,d.ChkOutDt
+		From WRBHBCheckInHdr h
+		join WRBHBBedBookingPropertyAssingedGuest d on h.BookingId = d.BookingId and
+		h.GuestId = d.GuestId  and
+		d.IsActive=1 and d.IsDeleted=0
+		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
+		PropertyType = 'Internal Property' and  
+		PropertyId = @PropertyId and  
+		--d.CurrentStatus = 'CheckIn' and
+		--CONVERT(date,d.ChkOutDt,103) between CONVERT(date,d.ChkInDt,103) AND 
+		--CONVERT(date,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) and   
+		h.Id  IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where isnull(IntermediateFlag,0) = 1 and  
+		IsActive = 1 and IsDeleted = 0 and Status = 'CheckOut')
+		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
+		h.BookingId,h.BedId,h.Type,h.BookingCode ,h.ChkInGuest	,h.NewCheckInDate,d.ChkOutDt
+		
+-- Intermediate Flag 1 Entry Apartment
+			
+		INSERT INTO #GUEST(GuestName,GuestId,StateId,CheckInHdrId,PropertyId,RoomId,ApartmentId,  
+		BookingId,BedId,Type,Flag,BookingCode,ChkInDT,ChkOutDT)
+		
+		SELECT h.ChkInGuest,h.GuestId,h.StateId,h.Id AS CheckInHdrId,h.PropertyId,h.RoomId,h.ApartmentId,  
+		h.BookingId,h.BedId,h.Type as Level,0 as Flag,h.BookingCode  ,h.NewCheckInDate,d.ChkOutDt
+		From WRBHBCheckInHdr h
+		join WRBHBApartmentBookingPropertyAssingedGuest d on h.BookingId = d.BookingId and
+		h.GuestId = d.GuestId and d.IsActive=1 and d.IsDeleted=0
+		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
+		PropertyType = 'Internal Property' and  
+		PropertyId = @PropertyId and -- d.CurrentStatus = 'CheckIn' and
+		--CONVERT(date,d.ChkOutDt,103) between CONVERT(date,d.ChkInDt,103) AND 
+		--CONVERT(date,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) and   
+		h.Id  IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where isnull(IntermediateFlag,0) = 1 and  
+		IsActive = 1 and IsDeleted = 0 and Status = 'CheckOut')
 		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
 		h.BookingId,h.BedId,h.Type,h.BookingCode,h.ChkInGuest,h.NewCheckInDate,d.ChkOutDt
 

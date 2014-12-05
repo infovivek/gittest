@@ -1409,7 +1409,8 @@
 						ClientBookerName:ClientBookerName,ClientBookerEmail:ClientBookerEmail,
 						EmailtoGuest:Chk_EmailtoGuest.selected,Note:"",
 						SpecialRequirements:"",Id:Id,Status:"Step2",AMPM:Ddl_AMPM.selectedItem,
-						BookingLevel:"Apartment",ExtraCCEmail:Txt_ExtraCCemail.text,HRPolicy:Chk_HRPolicy.selected}]);
+						BookingLevel:"Apartment",ExtraCCEmail:Txt_ExtraCCemail.text,HRPolicy:false,
+						HRPolicyOverrideRemarks:"",PropertyRefNo:""}]);
 				var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
 				var GuestXml:String="";
 				GuestXml += "<ROOT>";
@@ -1740,7 +1741,8 @@
 						ClientBookerEmail:"",EmailtoGuest:Chk_EmailtoGuest.selected,Note:"",
 						SpecialRequirements:Txt_SpecialRequirements.text,
 						Id:Id,Status:"Direct Booked",AMPM:Ddl_AMPM.selectedItem,
-						BookingLevel:"Apartment",ExtraCCEmail:Txt_ExtraCCemail.text,HRPolicy:Chk_HRPolicy.selected}]);
+						BookingLevel:"Apartment",ExtraCCEmail:Txt_ExtraCCemail.text,HRPolicy:Chk_HRPolicy.selected,
+						HRPolicyOverrideRemarks:"",PropertyRefNo:""}]);
 				var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
 				var Tmp1:ArrayCollection=new ArrayCollection();
 				var GuestXml:String="";

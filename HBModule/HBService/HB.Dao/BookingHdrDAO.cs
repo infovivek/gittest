@@ -51,6 +51,8 @@ namespace HB.Dao
             Book.BookingLevel = document.SelectSingleNode("HdrXml").Attributes["BookingLevel"].Value;
             Book.ExtraCCEmail = document.SelectSingleNode("HdrXml").Attributes["ExtraCCEmail"].Value;
             Book.HRPolicy = Convert.ToBoolean(document.SelectSingleNode("HdrXml").Attributes["HRPolicy"].Value);
+            Book.HRPolicyOverrideRemarks = document.SelectSingleNode("HdrXml").Attributes["HRPolicyOverrideRemarks"].Value;
+            Book.PropertyRefNo = document.SelectSingleNode("HdrXml").Attributes["PropertyRefNo"].Value;
             if (Book.Id != 0)
             {
                 command.CommandText = StoredProcedures.Booking_Update;
@@ -91,6 +93,8 @@ namespace HB.Dao
             command.Parameters.Add("@AMPM", SqlDbType.NVarChar).Value = Book.AMPM;
             command.Parameters.Add("@BookingLevel", SqlDbType.NVarChar).Value = Book.BookingLevel;
             command.Parameters.Add("@HRPolicy", SqlDbType.Bit).Value = Book.HRPolicy;
+            command.Parameters.Add("@HRPolicyOverrideRemarks", SqlDbType.NVarChar).Value = Book.HRPolicyOverrideRemarks;
+            command.Parameters.Add("@PropertyRefNo", SqlDbType.NVarChar).Value = Book.PropertyRefNo;
             ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
             return ds;
         }

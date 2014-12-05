@@ -41,8 +41,9 @@
 			public var Str_Image:String = "";
 			public var Id:int=0,ReservationId:int=0,TaxId:int=0,TariffId:int=0,DoubleAllowedPax:int=0,SuiteAllowedPax:int=0,BookingId:int=0;
 			public var Pax1:Number=0,Pax2:Number=0,Suite:Number=0,ExtraPax:Number=0,GuestId:int=0,CompanyId:int=0,ClientId:int=0,
-				RoomId:int=0,StateId:int=0,PropertyId:int=0,SSPId:int=0,ApartmentId:int=0,BedId:int=0,UserId:int=0,RefGuestId:int=0,
+				RoomId:int=0,StateId:int=0,SSPId:int=0,ApartmentId:int=0,BedId:int=0,UserId:int=0,RefGuestId:int=0,
 				CityId:int=0,ServiceCharge:int= 0;
+			public var  PropertyId:String="";
 			public var Cess:Number=0,HECess:Number=0,ServiceTax:Number=0,VAT:Number=0,Tariff:Number=0;
 			public var Luxuryabvper:Number=0,Luxurybelper:Number=0,LuxuryabvRs:Number=0,LuxurybelRs:Number=0;
 			public var ServiceTaxAmount:Number=0,ServiceTaxblwper:Number=0;
@@ -132,7 +133,7 @@
 			}
 			
 			public function Help():void
-			{				
+			{				df
 				
 				useWeb("GuestCheckIn","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,0,0,0,65]);
 		//		useWeb("GuestCheckIn","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,0,0,0,Global_AC[0].UsrId]);
@@ -1047,6 +1048,7 @@
 			
 			public function OnSelectionProperty():void
 			{
+				PropertyId="";
 				if(hlp_Property.selected())
 				{
 					//	Hlp_Reservation.dataProvider=null;
@@ -1085,7 +1087,7 @@
 				else
 				{
 					hlp_Property.text="";
-					PropertyId=0;
+					PropertyId="";
 				}
 				
 			}

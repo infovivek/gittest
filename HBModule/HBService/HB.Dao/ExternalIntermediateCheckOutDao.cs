@@ -162,7 +162,7 @@ namespace HB.Dao
             ExChkOut.CheckInType = doc.SelectSingleNode("HdrXml").Attributes["CheckInType"].Value;
             ExChkOut.BedNo = doc.SelectSingleNode("HdrXml").Attributes["BedNo"].Value;
             ExChkOut.ApartmentNo = doc.SelectSingleNode("HdrXml").Attributes["ApartmentNo"].Value;
-            ExChkOut.PropertyId = Convert.ToInt32(doc.SelectSingleNode("HdrXml").Attributes["PropertyId"].Value);
+            ExChkOut.PropertyId = Convert.ToInt64(doc.SelectSingleNode("HdrXml").Attributes["PropertyId"].Value);
             ExChkOut.BookingId = Convert.ToInt32(doc.SelectSingleNode("HdrXml").Attributes["BookingId"].Value);
             ExChkOut.GuestId = Convert.ToInt32(doc.SelectSingleNode("HdrXml").Attributes["GuestId"].Value);
             ExChkOut.StateId = Convert.ToInt32(doc.SelectSingleNode("HdrXml").Attributes["StateId"].Value);
@@ -295,7 +295,7 @@ namespace HB.Dao
             Cmd.Parameters.Add("@CheckInType", SqlDbType.NVarChar).Value = ExChkOut.CheckInType;
             Cmd.Parameters.Add("@ApartmentNo", SqlDbType.NVarChar).Value = ExChkOut.ApartmentNo;
             Cmd.Parameters.Add("@BedNo", SqlDbType.NVarChar).Value = ExChkOut.BedNo;
-            Cmd.Parameters.Add("@PropertyId", SqlDbType.Int).Value = ExChkOut.PropertyId;
+            Cmd.Parameters.Add("@PropertyId", SqlDbType.BigInt).Value = ExChkOut.PropertyId;
             Cmd.Parameters.Add("@BookingId", SqlDbType.Int).Value = ExChkOut.BookingId;
             Cmd.Parameters.Add("@GuestId", SqlDbType.Int).Value = ExChkOut.GuestId;
             Cmd.Parameters.Add("@StateId", SqlDbType.Int).Value = ExChkOut.StateId;
@@ -406,7 +406,7 @@ namespace HB.Dao
                                 ExChkOut.NoOfDays1 = Convert.ToInt32(document.SelectSingleNode("GrdXml").Attributes["NoOfDays"].Value);
                                 ExChkOut.RoomId1 = Convert.ToInt32(document.SelectSingleNode("GrdXml").Attributes["RoomId"].Value);
 
-                                ExChkOut.PropertyId1 = Convert.ToInt32(document.SelectSingleNode("GrdXml").Attributes["PropertyId"].Value);
+                                ExChkOut.PropertyId1 = Convert.ToInt64(document.SelectSingleNode("GrdXml").Attributes["PropertyId"].Value);
                                 ExChkOut.BookingId1 = Convert.ToInt32(document.SelectSingleNode("GrdXml").Attributes["BookingId"].Value);
                                 ExChkOut.GuestId1 = Convert.ToInt32(document.SelectSingleNode("GrdXml").Attributes["GuestId"].Value);
                                 ExChkOut.StateId1 = Convert.ToInt32(document.SelectSingleNode("GrdXml").Attributes["StateId"].Value);
@@ -500,7 +500,7 @@ namespace HB.Dao
                                 Cmd.Parameters.Add("@ChkInHdrId", SqlDbType.Int).Value = ExChkOut.ChkInHdrId1;
                                 Cmd.Parameters.Add("@NoOfDays", SqlDbType.Int).Value = ExChkOut.NoOfDays1;
                                 Cmd.Parameters.Add("@RoomId", SqlDbType.Int).Value = ExChkOut.RoomId1;
-                                Cmd.Parameters.Add("@PropertyId", SqlDbType.Int).Value = ExChkOut.PropertyId1;
+                                Cmd.Parameters.Add("@PropertyId", SqlDbType.BigInt).Value = ExChkOut.PropertyId1;
                                 Cmd.Parameters.Add("@BookingId", SqlDbType.Int).Value = ExChkOut.BookingId1;
                                 Cmd.Parameters.Add("@GuestId", SqlDbType.Int).Value = ExChkOut.GuestId1;
                                 Cmd.Parameters.Add("@StateId", SqlDbType.Int).Value = ExChkOut.StateId1;
@@ -667,7 +667,7 @@ namespace HB.Dao
             Cmd.Parameters.Add("@BillTo", SqlDbType.NVarChar).Value = data[4].ToString();
             Cmd.Parameters.Add("@CheckInHdrId", SqlDbType.Int).Value = Convert.ToInt32(data[5].ToString());
             Cmd.Parameters.Add("@StateId", SqlDbType.Int).Value = Convert.ToInt32(data[6].ToString());
-            Cmd.Parameters.Add("@PropertyId", SqlDbType.Int).Value = Convert.ToInt32(data[7].ToString());
+            Cmd.Parameters.Add("@PropertyId", SqlDbType.BigInt).Value = Convert.ToInt64(data[7].ToString());
             Cmd.Parameters.Add("@UserId", SqlDbType.Int).Value = Convert.ToInt32(data[8].ToString());
             return new WrbErpConnection().ExecuteDataSet(Cmd, UserData);
         }

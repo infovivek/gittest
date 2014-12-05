@@ -92,6 +92,7 @@
 				Tcl_Time.setTime=new Date("11/11/11,12:00:00");
 				Chk_MMT.selected=true;
 				Chk_MMT.visible=false;
+				Txt_HRPolicyOverrideRemarks.visible = false;
 				Btn_AdvancePaid.visible=false;
 				Hlp_Client.visible = true;
 				FnHelp_PageLoad();FnHelp_Title();
@@ -101,7 +102,8 @@
 				//var num:Number= (end.getUTCFullYear() - start.getUTCFullYear()) * 12 +(end.getUTCMonth() - start.getUTCMonth());								
 				//useWeb("BOOKING","Tab2_to_Tab3_Dtls_CUSTOM",[GlobalXml,'Tab2_to_Tab3_Dtls','','','','',0,0,0,0,0,26,0]);				
 				var ss:String=Global_AC[0].UsrId;				
-				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Room',6458]);//
+				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Room',6630]);
+				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,"RoomResend",6630]);				
 				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Bed',1528]);
 				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Apartment',2027]);
 				//useWeb("BookingMail","RecommendMail_CUSTOM",[GlobalXml,'Recommend',5809]);
@@ -1019,7 +1021,7 @@
 						Lbl_Tab2.setStyle("color","#ffffff");				
 						Btn_Tab3.setStyle("backgroundColor","#c2c2c2");
 						Lbl_Tab3.setStyle("color","#ffffff");
-						Hlp_Stat._setFocus();
+						Hlp_Stat._setFocus();						
 					}
 				}
 				if (Ds_Objects.currentTarget.description.toString() == "RecommendMail_CUSTOM")
@@ -1959,6 +1961,9 @@
 				Id=0;Chk_MMT.selected=true;
 				//
 				Txt_ExtraCCEmail.text = "";
+				Txt_HRPolicyOverrideRemarks.text = "";
+				Chk_HRPolicy.selected = false;
+				Txt_HRPolicyOverrideRemarks.visible = false;
 				FnHelp_PageLoad();FnHelp_Guest_Tmp();
 			}			
 			
@@ -2069,10 +2074,21 @@
 						}
 					}
 				}
+				if(Chk_HRPolicy.selected == true)
+				{
+					if(Txt_HRPolicyOverrideRemarks.text == "")
+					{
+						Err = Err + "*  HR Policy Override Remarks is Required.\n";
+					}					
+				}				
 				if(Err != "")
 				{
 					alignAlert(Alert.show(Err,"Requierd Field(s) !",Alert.OK,null,null,iconErrLarge,Alert.OK),10,"");
 					return;
+				}
+				if(Chk_HRPolicy.selected == false)
+				{
+					Txt_HRPolicyOverrideRemarks.text = "";
 				}
 				var Ac_Prpty:ArrayCollection=new ArrayCollection();
 				Ac_Prpty=Grd_Property.dataProvider as ArrayCollection;
@@ -2108,7 +2124,8 @@
 						EmailtoGuest:Chk_EmailtoGuest.selected,Note:Txt_Note.text,
 						SpecialRequirements:"",Id:Id,Status:"RmdPty",AMPM:Ddl_AMPM.selectedItem,
 						BookingLevel:"Room",ExtraCCEmail:Txt_ExtraCCEmail.text,
-					    HRPolicy:Chk_HRPolicy.selected}]);
+					    HRPolicy:Chk_HRPolicy.selected,HRPolicyOverrideRemarks:Txt_HRPolicyOverrideRemarks.text,
+						PropertyRefNo:Txt_PropertyRefNo.text}]);
 				var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
 				var GuestXml:String="";
 				GuestXml += "<ROOT>";
@@ -2324,6 +2341,7 @@
 				{
 					ExpInTime = Tcl_Time.getTime();
 				}
+				Chk_EmailtoGuest.selected = true;
 				if(Id == 0)
 				{
 					var ffd:ArrayCollection=new ArrayCollection();
@@ -2394,7 +2412,8 @@
 							   EmailtoGuest:Chk_EmailtoGuest.selected,Note:Txt_Note.text,
 							   SpecialRequirements:"",Id:Id,Status:"RmdPty",AMPM:Ddl_AMPM.selectedItem,
 							   BookingLevel:"Room",ExtraCCEmail:Txt_ExtraCCEmail.text,
-							   HRPolicy:Chk_HRPolicy.selected}]);
+							   HRPolicy:Chk_HRPolicy.selected,HRPolicyOverrideRemarks:Txt_HRPolicyOverrideRemarks.text,
+							   PropertyRefNo:Txt_PropertyRefNo.text}]);
 						var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
 						var Tmp1:ArrayCollection=new ArrayCollection();
 						var GuestXml:String="";
@@ -2423,8 +2442,7 @@
 						useWeb("BOOKING","RmdPty_GuestDtls_CUSTOM",[GlobalXml,'RmdPty_GuestDtls',
 							'','','','',0,0,0,0,0,Id,0]);
 					}
-				}
-				
+				}				
 			}
 			
 			protected function API_Tab2_to_Tab3():void
@@ -2552,11 +2570,22 @@
 						}
 					}
 				}*/
+				if(Chk_HRPolicy.selected == true)
+				{
+					if(Txt_HRPolicyOverrideRemarks.text == "")
+					{
+						Err = Err + "*  HR Policy Override Remarks is Required.\n";
+					}					
+				}
 				if(Err != "")
 				{
 					alignAlert(Alert.show(Err,"Requierd Field(s) !",Alert.OK,null,null,
 						iconErrLarge,Alert.OK),10,"");
 					return;
+				}
+				if(Chk_HRPolicy.selected == false)
+				{
+					Txt_HRPolicyOverrideRemarks.text = "";
 				}
 				var Ac_Prpty:ArrayCollection=new ArrayCollection();var len:int=0,i:int=0;
 				if(Cnt == 1)
@@ -2755,7 +2784,8 @@
 						EmailtoGuest:Chk_EmailtoGuest.selected,Note:Txt_Note.text,
 						SpecialRequirements:"",Id:Id,Status:"Step2",AMPM:Ddl_AMPM.selectedItem,
 						BookingLevel:"Room",ExtraCCEmail:Txt_ExtraCCEmail.text,
-						HRPolicy:Chk_HRPolicy.selected}]);
+						HRPolicy:Chk_HRPolicy.selected,HRPolicyOverrideRemarks:Txt_HRPolicyOverrideRemarks.text,
+						PropertyRefNo:Txt_PropertyRefNo.text}]);
 				var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
 				var GuestXml:String="";
 				GuestXml += "<ROOT>";
@@ -3473,6 +3503,17 @@
 						}
 					}
 				}
+				/*if(PropertyType == "ExP")
+				{
+					if(Txt_PropertyRefNo.text == "")
+					{
+						Err += "*  Reference No is Required.\n";
+					}					
+				}*/
+				/*if(PropertyType != "ExP")
+				{
+					Txt_PropertyRefNo.text = "";
+				}*/
 				if(Err != "")
 				{
 					alignAlert(Alert.show(Err,"Requierd Field(s) !",Alert.OK,null,null,iconErrLarge,Alert.OK),10,"");
@@ -3517,7 +3558,9 @@
 						ClientBookerEmail:"",EmailtoGuest:Chk_EmailtoGuest.selected,Note:"",
 						SpecialRequirements:Txt_SpecialRequirements.text,
 						Id:Id,Status:Status,AMPM:Ddl_AMPM.selectedItem,BookingLevel:"Room",
-					    ExtraCCEmail:Txt_ExtraCCEmail.text,HRPolicy:Chk_HRPolicy.selected}]);
+					    ExtraCCEmail:Txt_ExtraCCEmail.text,HRPolicy:Chk_HRPolicy.selected,
+						HRPolicyOverrideRemarks:Txt_HRPolicyOverrideRemarks.text,
+						PropertyRefNo:Txt_PropertyRefNo.text}]);
 				var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
 				var Tmp1:ArrayCollection=new ArrayCollection();
 				var GuestXml:String="";
@@ -4087,7 +4130,15 @@
 			protected function Chk_HRPolicy_changeHandler():void
 			{
 				Grd_Property.dataProvider = null;
-				Grd_RecommendedProperty.dataProvider = null;
+				Grd_RecommendedProperty.dataProvider = null;				
+				if(Chk_HRPolicy.selected == true)
+				{
+					Txt_HRPolicyOverrideRemarks.visible = true;					
+				}
+				else
+				{
+					Txt_HRPolicyOverrideRemarks.visible = false;
+				}
 			}
 			
 		]]>
@@ -4143,8 +4194,8 @@
 					<s:Group x="0" y="0" width="100%" height="100%" depth="2">						
 						<s:CheckBox x="683.2" y="15" label="HR Policy Override" id="Chk_HRPolicy"
 									tabIndex="28" change="Chk_HRPolicy_changeHandler()"/>
-						<s:CheckBox x="779.2" y="35" label="MMT" id="Chk_MMT"
-									tabIndex="28"/>
+						<s:CheckBox x="816.2" y="15" label="MMT" id="Chk_MMT"
+									tabIndex="28" selected="true"/>
 						<mx:DataGrid id="Grd_Property" x="22.25" y="81" width="925" height="278"
 									 editable="true" focusOut="Grd_FocusOutHandler(event)"
 									 focusEnabled="false"
@@ -4338,6 +4389,8 @@
 				<WrbComp:Button_HB id="Btn_PropertyShow" x="867.2001" y="8" width="80" buttonMode="true"
 								   _Label="Show" click="Btn_PropertyShow_clickHandler(event)"
 								   focusEnabled="false"/>
+						<s:TextArea x="637.2" y="49" width="310" height="25" prompt="HR Policy Override Remarks"
+									id="Txt_HRPolicyOverrideRemarks" maxChars="500"/>
 					</s:Group>
 				</s:Scroller>				
 			</s:BorderContainer>
@@ -4418,12 +4471,13 @@
 				<WrbComp:Button_HB id="Btn_AdvancePaid" x="283" y="185" _Label="Advance Paid"
 								   click="Btn_AdvancePaid_clickHandler(event)" buttonMode="true"
 								   width="100"/>
-				<s:TextArea id="Txt_SpecialRequirements" x="567.85" y="433" width="250" height="32"
+				<s:TextArea id="Txt_SpecialRequirements" x="465.8" y="433" width="200" height="32"
 							maxChars="1000" tabIndex="47"/>
-				<s:TextArea id="Txt_ExtraCCEmail" x="227.85" y="433" width="250" height="32"
+				<s:TextArea id="Txt_ExtraCCEmail" x="206.85" y="433" width="200" height="32"
 							maxChars="1000" tabIndex="47"/>
-				<mx:Label x="128.85" y="438.5" text="Extra CC Email"/>
-				<mx:Label x="522.9" y="438.5" text="Note"/>
+				<mx:Label x="108.85" y="438.5" text="Extra CC Email"/>
+				<mx:Label x="420.9" y="438.5" text="Note"/>
+				<mx:Label x="694.35004" y="418.5" text="Property Reference No"/>
 				<s:DropDownList id="Ddl_ServicePaymentMode" x="395" y="143" width="170" height="23"
 								change="Ddl_ServicePaymentMode_changeHandler(event)"
 								prompt="Service Payment Mode" tabIndex="46"/>
@@ -4509,7 +4563,7 @@
 						<mx:DataGridColumn width="0" dataField="Txt_C10" visible="false"/>
 					</mx:columns>
 				</mx:DataGrid>
-				<mx:DataGrid id="Grd_PropertyAssignedGuest" x="12" y="232" width="946" height="182"
+				<mx:DataGrid id="Grd_PropertyAssignedGuest" x="12" y="224" width="946" height="182"
 							 focusEnabled="false">
 					<mx:columns>
 						<mx:DataGridColumn width="0" dataField="EmpCode" visible="false"/>
@@ -4548,6 +4602,8 @@
 							 editable="false" focusEnabled="false"/>
 				<s:TextInput x="159" y="189.5" id="Txt_ClientAdvAmt" height="23" width="80" textAlign="center"
 							 editable="false" focusEnabled="false"/>
+				<s:TextInput x="685" y="441.9" id="Txt_PropertyRefNo" height="23" width="150"
+							 focusEnabled="false" maxChars="100"/>
 				<s:Panel id="Pnl_CustomFields" x="250" y="3" width="470" height="419" depth="1"
 						 title="Custom Fields" visible="false">
 					<s:Label x="447" y="-22" text="X" toolTip="Close" click="Btn_PnlClose_click()"/>

@@ -49,10 +49,12 @@ IF @GradeId = 0
     SET @Cnt=(SELECT COUNT(*) FROM WRBHBGradeMaster 
     WHERE Grade=@Grade AND IsDeleted=0 AND IsActive=1 AND 
     ClientId=@ClientId);
+    --select @Cnt,@ClientId;return;
     IF @Cnt != 0
      BEGIN
-      SET @GradeId=(SELECT Id FROM WRBHBGradeMaster WHERE IsDeleted=0 AND 
-      IsActive=1 AND ClientId=@ClientId AND Grade=@Grade);
+      SET @GradeId=(SELECT TOP 1 Id FROM WRBHBGradeMaster WHERE IsDeleted=0 AND 
+      IsActive=1 AND ClientId=@ClientId AND Grade=@Grade
+      ORDER BY Id DESC);
      END
     ELSE
      BEGIN

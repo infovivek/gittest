@@ -32,5 +32,7 @@ namespace HB.Entity
         public string BookingLevel { get; set; }
         public string ExtraCCEmail { get; set; }
         public bool HRPolicy { get; set; }
+        public string HRPolicyOverrideRemarks { get; set; }
+        public string PropertyRefNo { get; set; }
     }
 }

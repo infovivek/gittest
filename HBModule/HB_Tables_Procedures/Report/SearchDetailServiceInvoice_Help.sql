@@ -84,7 +84,7 @@ IF @Str1=''
 			--cK.ServiceTaxPer,CK.LuxuryTaxPer,CK.C
 			FROM WRBHBChechkOutHdr CK
 			join WRBHBCheckOutServiceHdr SH WITH(NOLOCK) on  Ck.Id=sh.CheckOutHdrId and sh.IsActive=1 and sh.IsDeleted=0
-			--join WRBHBCheckOutServiceDtls SD WITH(NOLOCK) on SH.CheckOutHdrId=SD.CheckOutServceHdrId and sd.IsActive=1 and sd.IsDeleted=0
+			 join WRBHBCheckOutServiceDtls SD WITH(NOLOCK) on SH.Id=SD.ServiceHdrId and sd.IsActive=1 and sd.IsDeleted=0
 			where isnull(Sh.ChkOutServiceNetAmount,0)!=0 --and isnull(sd.ChkOutSerAmount,0)!=0 
 			and Ck.IsActive=1 and ck.IsDeleted=0 and ck.InVoiceNo !=''
 			 --and ck.ChkInHdrId in(2242)
@@ -149,7 +149,7 @@ CREATE TABLE #FinalService(ServiceItem NVARCHAR(100),Amount DECIMAL(27,2),
 			from WRBHBCheckInHdr where id=@Chkid   order by Id desc )
 			Set @BillTo =(convert(nvarchar(100),getdate(),103));
 			--Select * from WRBHBTaxMaster
-			
+			--Select @Chkid,@Guestid,@CityId,@CityName,@Property,@StateId,@BillFrom
 			Set @CessPercent='2.00';
 			Set @HECessPercent='1.00';
 			set @VATPer=(Select top 1  VATPer from WRBHBChechkOutHdr where ChkInHdrId=@Chkid )
@@ -157,61 +157,64 @@ CREATE TABLE #FinalService(ServiceItem NVARCHAR(100),Amount DECIMAL(27,2),
 			insert into #ServiceDtails1(CheckOutNo,GuestName,Amounts,InvoiceNumber,
             Stay,CheckInDate,CheckOutDate,BillDate,ClientName,ClientId,Property,PropertyId,
             ChkoutId,PropertyCat,Status,BillType,ChkInHdrId,GuestId,BookingId,
-            --ChkOutSerDate,ServiceItem,ChkOutSerAmount,Quantity,ProductId,
+            ChkOutSerDate,ServiceItem,ChkOutSerAmount,Quantity,ProductId,
             Cess,ST,Hcess,OtherService,MiscellaneousAmount,	ChkOutServiceVat)
  
 			Select Ck.CheckOutNo,Ck.GuestName,(Sh.ChkOutServiceNetAmount) Amounts,ck.InVoiceNo InvoiceNumber,
 			Stay,ck.CheckInDate,ck.CheckOutDate,ck.BillDate,ck.ClientName,ck.ClientId,ck.Property,ck.PropertyId,
 			Ck.Id ChkoutId,CK.PropertyType PropertyCat,ck.Status Status,'Service' as BillType,
 			Ck.ChkInHdrId as ChkInHdrId,Ck.GuestId,0 BookingId,
-			--Sd.ChkOutSerDate,sd.ChkOutSerItem ServiceItem,Sd.ChkOutSerAmount,1,sd.ProductId,
+			Sd.ChkOutSerDate,sd.ChkOutSerItem ServiceItem,Sd.ChkOutSerAmount,1,sd.ProductId,
 			SH.CESS,SH.ChkOutServiceST,SH.HECess,SH.OtherService,sH.MiscellaneousAmount,sH.ChkOutServiceVat
 			FROM WRBHBChechkOutHdr CK
 			join WRBHBCheckOutServiceHdr SH WITH(NOLOCK) on  Ck.Id=sh.CheckOutHdrId and sh.IsActive=1 and sh.IsDeleted=0
-			-- join WRBHBCheckOutServiceDtls SD WITH(NOLOCK) on SH.CheckOutHdrId=SD.CheckOutServceHdrId and sd.IsActive=1 and sd.IsDeleted=0
+			 join WRBHBCheckOutServiceDtls SD WITH(NOLOCK) on SH.Id=SD.ServiceHdrId and sd.IsActive=1 and sd.IsDeleted=0
 			where isnull(Sh.ChkOutServiceNetAmount,0)!=0-- and isnull(sd.ChkOutSerAmount,0)!=0 
 			and Ck.IsActive=1 and ck.IsDeleted=0 and ck.InVoiceNo !=''
-			  and ck.ChkInHdrId in(@Chkid)
+			 and ck.ChkInHdrId in(@Chkid)
 			 --and ck.GuestName like '%Pon%'-- Ck.Id=1508-- and Sd.ChkOutSerItem='Tea/Coffee'
 			group by Ck.CheckOutNo,Ck.GuestName,--Sh.ChkOutServiceNetAmount ,
 			Stay,ck.CheckInDate,ck.CheckOutDate,ck.BillDate,ck.ClientName,ck.ClientId,--Sd.Id ,
 			ck.Property,ck.PropertyId, Ck.Id, CK.PropertyType ,ck.InVoiceNo,ck.Status,
-			Ck.ChkInHdrId ,Ck.GuestId, --Sd.ChkOutSerDate,ChkOutSerItem,Sd.ChkOutSerAmount,sd.ProductId,
+			Ck.ChkInHdrId ,Ck.GuestId, Sd.ChkOutSerDate,ChkOutSerItem,Sd.ChkOutSerAmount,sd.ProductId,
 			SH.CESS,SH.ChkOutServiceST,SH.HECess,SH.OtherService,sH.MiscellaneousAmount,sH.ChkOutServiceVat,
 			Sh.ChkOutServiceNetAmount
 			order by Ck.Id Desc
 			
 			
-			insert into #ServiceDtails1(CheckOutNo,GuestName,InvoiceNumber,
-            BillDate,ClientId,Property,PropertyId,
-            ChkoutId,Status,ChkInHdrId,GuestId,ChkOutSerDate,
-            ServiceItem,ChkOutSerAmount,ProductId)
+			--insert into #ServiceDtails1(CheckOutNo,GuestName,InvoiceNumber,
+   --         BillDate,ClientId,Property,PropertyId,
+   --         ChkoutId,Status,ChkInHdrId,GuestId,ChkOutSerDate,
+   --         ServiceItem,ChkOutSerAmount,ProductId)
  
-			Select Ck.CheckOutNo,Ck.GuestName,ck.InVoiceNo InvoiceNumber,
-			ck.BillDate,ck.ClientId,ck.Property,ck.PropertyId,
-			Ck.Id ChkoutId,ck.Status Status,
-			Ck.ChkInHdrId as ChkInHdrId,Ck.GuestId,
-			Sd.ChkOutSerDate,sd.ChkOutSerItem ServiceItem,Sum(Sd.ChkOutSerAmount),sd.ProductId 
-			FROM WRBHBChechkOutHdr CK
-		 	 join WRBHBCheckOutServiceDtls SD WITH(NOLOCK) on Ck.Id=SD.CheckOutServceHdrId and sd.IsActive=1 and sd.IsDeleted=0
-			where isnull(sd.ChkOutSerAmount,0)!=0 
-			and Ck.IsActive=1 and ck.IsDeleted=0 and ck.InVoiceNo !=''
-			  and ck.ChkInHdrId in(2242)
-			group by Ck.CheckOutNo,Ck.GuestName,ck.InVoiceNo ,
-			ck.BillDate,ck.ClientId,ck.Property,ck.PropertyId,
-			Ck.Id,ck.Status ,
-			Ck.ChkInHdrId ,Ck.GuestId,
-			Sd.ChkOutSerDate,sd.ChkOutSerItem,sd.ProductId
-			order by Ck.Id Desc
-			
+			--Select Ck.CheckOutNo,Ck.GuestName,ck.InVoiceNo InvoiceNumber,
+			--ck.BillDate,ck.ClientId,ck.Property,ck.PropertyId,
+			--Ck.Id ChkoutId,ck.Status Status,
+			--Ck.ChkInHdrId as ChkInHdrId,Ck.GuestId,
+			--Sd.ChkOutSerDate,sd.ChkOutSerItem ServiceItem,Sum(Sd.ChkOutSerAmount),sd.ProductId 
+			--FROM WRBHBChechkOutHdr CK
+		 --	 join WRBHBCheckOutServiceDtls SD WITH(NOLOCK) on Ck.Id=SD.CheckOutServceHdrId and sd.IsActive=1 and sd.IsDeleted=0
+			--where isnull(sd.ChkOutSerAmount,0)!=0 
+			--and Ck.IsActive=1 and ck.IsDeleted=0 and ck.InVoiceNo !=''
+			--  and ck.ChkInHdrId in(@Chkid)
+			--group by Ck.CheckOutNo,Ck.GuestName,ck.InVoiceNo ,
+			--ck.BillDate,ck.ClientId,ck.Property,ck.PropertyId,
+			--Ck.Id,ck.Status ,
+			--Ck.ChkInHdrId ,Ck.GuestId,
+			--Sd.ChkOutSerDate,sd.ChkOutSerItem,sd.ProductId
+			--order by Ck.Id Desc
+			--Select * from #ServiceDtails1
 			--sELECT * FROM WRBHBCheckOutServiceHdr WHERE Id= 1767
  
 INSERT INTO #FinalService(ServiceItem,Amount,ProductId,TypeService) 
 exec Sp_CheckoutService1_Help @Action='ProductLoad',@Str1=@Chkid,@CheckInHdrId=@Guestid,
       @StateId=@StateId ,@BillFrom=@BillFrom ,@BillTo= @BillTo ;
 
---exec Sp_CheckoutService_Help @Action='ProductLoad',@Str1=2298,@CheckInHdrId=30212,@StateId=21 ,@BillFrom='17/11/2014' ,@BillTo='26/11/2014'
-
+--INSERT INTO #FinalService(ServiceItem,Amount,ProductId,TypeService)
+--exec Sp_CheckoutService1_Help @Action='ProductLoad',@Str1=2323,@CheckInHdrId=44639,
+--@StateId=21 ,@BillFrom='18/11/2014' ,@BillTo='01/12/2014'
+ --Select * from	#FinalService
+--Select * from #ServiceDtails1
 			dELETE FROM #SepratebyComma WHERE CheckoutId=@Chkid ;
 			  Set @Cnt=(SELECT COUNT(*) FROM #SepratebyComma)
 		End	 
@@ -231,11 +234,12 @@ exec Sp_CheckoutService1_Help @Action='ProductLoad',@Str1=@Chkid,@CheckInHdrId=@
              d.ProductId ,Cess,ST,Hcess,OtherService,MiscellaneousAmount,ChkOutServiceVat
              from #ServiceDtails1 h
              join #FinalService d on h.ProductId=d.ProductId 
+             where ChkOutSerAmount!=0
              group by CheckOutNo,GuestName,Amounts,InvoiceNumber,BillDate,ClientName,ClientId,
              Property,PropertyId,ChkInHdrId,PropertyCat,Status,BillType,ChkInHdrId,GuestId,--BookingId,
              CheckInDate,CheckOutDate,CheckInDate,h.ServiceItem,h.ServiceItem,d.ProductId,d.Amount,--,ChkOutSerAmount--,Quantity
              Cess,ST,Hcess,OtherService,MiscellaneousAmount,ChkOutServiceVat
-          -- select * from #ServiceDtails2
+          -- select * from #ServiceDtails1
            dECLARE @TAX DECIMAL(27,2),@TOT DECIMAL(27,2),@NETAMT DECIMAL(27,2),@vAT dECIMAL(27,2)
           SET @TOT=(SELECT SUM(ChkOutSerAmount)FROM  #ServiceDtails1 )
          SET @TAX=(SELECT TOP 1 ( Cess+ST+Hcess+OtherService) FROM  #ServiceDtails1)
@@ -257,7 +261,7 @@ exec Sp_CheckoutService1_Help @Action='ProductLoad',@Str1=@Chkid,@CheckInHdrId=@
              CheckInDate ChkinDT,CheckOutDate as ChkoutDT, CheckInDate as ArrivalDate,
               ServiceItem as BillDate,ServiceItem as Product,ChkOutSerAmount as Price,Quantity as Quantity,ProductId,
               Cess,ST AS SerivceTax,Hcess,rOUND(@NETAMT,0) AS NetAmount,@vAT AS Vat,
-              @CityName AS Propcity,@Property as Propertyaddress,@CessPercent CessPercent,@HECessPercent  HECessPercent,
+              @CityName AS City,@Property as Propertyaddress,@CessPercent CessPercent,@HECessPercent  HECessPercent,
                       @VATPer as  VATPer,@STPercent as STPercent,
 			 'Regd Office : No. 122, Amarjyothi Layout, Domlur, Bangalore - 560071'+'.'+'www.hummingbirdindia.com'  AS CompanyAddress,
 			 ''+@PanCardNo+'   |   '+'TIN : 29340489869'+'   |   '+'L Tax No : L00100571'+'  |  ' +'CIN No: U72900KA2005PTC035942' as TaxNo,

@@ -16,8 +16,8 @@ namespace HB.Dao
     {
         SqlCommand command = new SqlCommand();
         DataSet ds = new DataSet();
-        string Err;
-        string UserData;
+        string Err = "";
+        string UserData = "";
         public DataSet Mail(int BookingId, string Email, string UsrEmail)
         {
             User user = new Entity.User();
@@ -72,45 +72,82 @@ namespace HB.Dao
                         "<th align=\"left\" width=\"50%\" style=\"padding: 10px 0px 10px 10px;\">" +
                         "<img src=" + Imagelocation + " width=\"200px\" height=\"52px\" alt=" + ds.Tables[6].Rows[0][1].ToString() + ">" +              //Image Name Change
                         "</th><th width=\"50%\"></th></tr></table>";
-            string SecondRow =
-                " <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" align=\"center\">" +
-                " <tr style=\"position:relative; background-color:#fff; font-size:11px;\">" +
-                " <td width=\"400\" style=\" padding-bottom:1px;\">" +
-                " <p style=\"font-weight:bold; color:orange;\">Booking confirmation details" +
-                " <span style=\"color:#000; background-color:#ffcc00; padding:5px;\">Booking # : " + ds.Tables[2].Rows[0][2].ToString() + " </span></p>" + //Reservation
-                " <p style=\"margin:0px;\">Booked by : <span>" + ds.Tables[2].Rows[0][3].ToString() + "</span></p>" +             //Name                    
-                " <p style=\"margin:0px;\">Reservation Date : <span>" + ds.Tables[2].Rows[0][7].ToString() + "</span></p>" + //Date
-                " <p style=\"margin:0px;\">Company Name : <span>" + ds.Tables[2].Rows[0][1].ToString() + "</span></p>" + //company name
-                " </td><td width=\"200\"><p style=\"margin:0px;\"></p>" +
-                " <p style=\"margin-top:0px;\"> <span style=\"color:orange; font-size:12px;\"></span></p>" +
-                " </td></tr><tr><td width=\"100%\" style=\"margin-bottom:\">" +
-                " <p style=\"color:orange; font-weight:bold; font-size:14px;\"> Guest Details</p>" +
-                " </td> </tr></table>";
-            string GuestDetailsTable1 =
-                " <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" align=\"center\">" +
-                " <tr style=\"font-size:11px; font-weight:normal;\">" +
-                " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Guest Name</p></th>" +
-                " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Check-In Date / Expected Time</p></th>" +
-                " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Check-Out Date</p></th>" +
-                " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Tariff / Room / Day</p></th>" +
-                " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Occupancy</p></th>" +
-                " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Payment Mode<br>for Tariff</p></th>" +
-                " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Payment Mode<br>for Service</p></th>" +
-                " </tr>";
-            for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+            string SecondRow = " <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #ffffff solid 1px\">" +
+                        " <tr><td style=\"width: 65%;\">" +
+                        " <p style=\"font-weight:bold; color:orange;\">Booking confirmation details" +
+                        " <span style=\"color:#000; background-color:#ffcc00; padding:5px;\">Booking # : " + ds.Tables[2].Rows[0][2].ToString() + " </span></p>" + //Reservation
+                        " <p style=\"margin:0px;\">Booked by : <span>" + ds.Tables[2].Rows[0][3].ToString() + "</span></p><br>" + //Date
+                        " <p style=\"margin:0px;\">Reservation Date : <span>" + ds.Tables[2].Rows[0][7].ToString() + "</span></p><br>" + //Date
+                        " <p style=\"margin:0px;\">Company Name : <span>" + ds.Tables[2].Rows[0][1].ToString() + "</span></p>" + //company name
+                        " </td>" +
+                        " <td>" +
+                        " <p style=\"padding:5px 5px 5px 5px; font-size:13px; color:#000; font-weight:bold; background-color:#ffcc00;\">Please refer your name and " + ds.Tables[4].Rows[0][9].ToString() + " at the time of check-In</p>" +
+                        " </td></tr>" +
+                        " <tr><td>" +
+                        " <p style=\"color:orange; font-weight:bold; font-size:14px;\"> Guest Details :</p>" +
+                        " </td></tr>" +
+                        " </table>";                       
+            string GuestDetailsTable1 = "";
+            string typeofpty = ds.Tables[4].Rows[0][8].ToString();
+            // MGH,DdP,
+            if ((typeofpty == "MGH") || (typeofpty == "DdP"))
             {
-                GuestDetailsTable1 +=
-                "<tr style=\"font-size:11px; font-weight:normal;\">" +
-                " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][0].ToString() + "</p></td>" +
-                " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][1].ToString() + "</p></td>" +
-                " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][2].ToString() + "</p></td>" +
-                " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">INR " + ds.Tables[0].Rows[i][3].ToString() + "/-</p></td>" +
-                " <th style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][4].ToString() + "</p></th>" +
-                " <th style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][5].ToString() + "</p></th>" +
-                " <th style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][6].ToString() + "</p></th>" +
-                " </tr>";
+                GuestDetailsTable1 =
+                    " <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" align=\"center\">" +
+                    " <tr style=\"font-size:11px; font-weight:normal;\">" +
+                    " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:120px;\"><p>Guest Name</p></th>" +
+                    " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p>Check-In Date / Expected Time</p></th>" +
+                    " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p>Check-Out Date</p></th>" +
+                    " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p>Tariff / Room / Day</p></th>" +
+                    " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p>Occupancy</p></th>" +
+                    " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p>Payment Mode<br>for Tariff</p></th>" +
+                    " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #ccc; width:80px;\"><p>Payment Mode<br>for Service</p></th>" +
+                    " </tr>";
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    GuestDetailsTable1 +=
+                    "<tr style=\"font-size:11px; font-weight:normal;\">" +
+                    " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:120px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][0].ToString() + "</p></td>" +
+                    " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][1].ToString() + "</p></td>" +
+                    " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][2].ToString() + "</p></td>" +
+                    " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p style=\"text-align:center;\">INR " + ds.Tables[0].Rows[i][3].ToString() + "/-</p></td>" +
+                    " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][4].ToString() + "</p></td>" +
+                    " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][5].ToString() + "</p></td>" +
+                    " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #ccc; width:80px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][6].ToString() + "</p></td>" +
+                    " </tr>";
+                }
+                GuestDetailsTable1 += "</table>";
             }
-            GuestDetailsTable1 += "</table>";
+            else
+            {
+                GuestDetailsTable1 =
+                    " <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" align=\"center\">" +
+                    " <tr style=\"font-size:11px; font-weight:normal;\">" +
+                    " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:120px;\"><p>Guest Name</p></th>" +
+                    " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p>Check-In Date / Expected Time</p></th>" +
+                    " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p>Check-Out Date</p></th>" +
+                    " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p>Room Type</p></th>" +
+                    " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p>Tariff / Room / Day</p></th>" +
+                    " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p>Occupancy</p></th>" +
+                    " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p>Payment Mode<br>for Tariff</p></th>" +
+                    " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #ccc; width:80px;\"><p>Payment Mode<br>for Service</p></th>" +
+                    " </tr>";
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    GuestDetailsTable1 +=
+                    "<tr style=\"font-size:11px; font-weight:normal;\">" +
+                    " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:120px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][0].ToString() + "</p></td>" +
+                    " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][1].ToString() + "</p></td>" +
+                    " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][2].ToString() + "</p></td>" +
+                    " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p style=\"text-align:center;\">" + ds.Tables[4].Rows[0][12].ToString() + "</p></td>" +
+                    " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p style=\"text-align:center;\">INR " + ds.Tables[0].Rows[i][3].ToString() + "/-</p></td>" +
+                    " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][4].ToString() + "</p></td>" +
+                    " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][5].ToString() + "</p></td>" +
+                    " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #ccc; width:80px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][6].ToString() + "</p></td>" +
+                    " </tr>";
+                }
+                GuestDetailsTable1 += "</table>";
+            }
             string Note = "";
             string CheckInPolicy = "";
             string CheckOutPolicy = "";
@@ -155,9 +192,9 @@ namespace HB.Dao
                 Taxes = ds.Tables[4].Rows[0][7].ToString();
             }
             string AddressDtls =
-                "<p style=\"margin-top:5px;\">" +
-                " <span style=\"color:#f54d02; font-weight:bold\">Tax :</span> " + Taxes + "" +
-                " </p>"+
+                "<p style=\"margin-top:10px; margin-left:5px; font-size:11px;\">" +
+                " <span style=\"color:#f54d02; font-weight:bold; font-size:11px;\">Tax :</span> " + Taxes + "" +
+                " </p>" +
                 " <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
                 " <tr style=\"font-size:11px; background-color:#eee;\">" +
                 " <td width=\"100%\" style=\"padding:12px 5px;\">" +
@@ -234,22 +271,6 @@ namespace HB.Dao
                     " </td><td width=\"200\" style=\"padding:10px; margin-bottom:20px; border-bottom:1px solid #ccc;\"> " +
                     " <p> Name:" + UserName + " </p> <p> Email :" + " " + EmailId + " </p><p> Phone: " + PhoneNo + "</p></td>" +
                     " </tr></table>";
-            //string Disclaimer = "This message (including attachment if any) is confidential and may be privileged. Before opening attachments please check them for viruses and defects. HummingBird Travel & Stay Private Limited (HummingBird) will not be responsible for any viruses or defects or any forwarded attachments emanating either from within HummingBird or outside. If you have received this message by mistake please notify the sender by return e-mail and delete this message from your system. Any unauthorized use or dissemination of this message in whole or in part is strictly prohibited. Please note that e-mails are susceptible to change and HummingBird shall not be liable for any improper, untimely or incomplete transmission.";
-            /*string FooterDtls =
-                    " <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
-                    " <tr style=\"font-size:11px; font-weight:normal;\">" +
-                    " <th width=\"50%\" style=\"background-color:#eee; padding:5px 0px; border-right:1px solid #ccc;\"><p style=\"text-align:center; padding-left:10px;\">Security Policy</p></th>" +
-                    " <th width=\"50%\" style=\"background-color:#eee; padding:5px 0px;\"><p style=\"text-align:center; padding-left:10px;\">Cancellation / No Show / Early Departure Policy</p></th>" +
-                    " </tr><tr style=\"font-size:11px; font-weight:normal;\">" +
-                    " <td width=\"200\" style=\"padding:10px; border-right:1px solid #ccc; margin-bottom:20px; border-bottom:1px solid #ccc;\">" +
-                    " <ol type=\"A\" style=\"font-weight: bold;\"><li><span>A picture of the guest will be taken through webcam for records.</span></li>" +
-                    " <li><span>The guest's mobile number and official e-mail address needs to be provided.</span></li>" +
-                    " <li><span>Government Photo ID proof such as driving license, passport, voter ID card etc. needs to be produced. (Kindly confirm whether PAN CARD is accepted)</span></li>" +
-                    " <li><span>A company business card or company ID card needs to be produced.</span></li></ol>" +
-                    " </td><td width=\"200\" style=\"padding:10px; margin-bottom:20px; border-bottom:1px solid #ccc;\"><ol type=\"A\" style=\"font-weight: bold;\"><li><span>Cancellation of booking to be confirmed through Email.</span></li><li><span>Mail to be sent to stay@staysimplyfied.com and mention the booking ID no. </span></li>" +
-                    " <li><span>100% refund will be made if cancellation request is sent 48 (forty eight) hours prior to the check-in date and NIL amount will be refunded if cancellation request sent beyond 48 (forty eight) hours to check-in date.</span></li>" +
-                    " <li><span>1 day tariff will be charged for No-show without intimation.</span></li></td></ol>" +
-                    " </tr></table><br>";*/
             string FooterDtls =
                     " <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
                     " <tr style=\"font-size:11px; font-weight:normal;\">" +
@@ -260,15 +281,15 @@ namespace HB.Dao
                     " " + ds.Tables[4].Rows[0][5].ToString() + "" +
                     " </td><td width=\"200\" style=\"padding:10px; margin-bottom:20px; border-bottom:1px solid #ccc;\">" +
                     " " + ds.Tables[4].Rows[0][6].ToString() + "</td>" +
-                    " </tr></table><br>";
+                    " </tr></table><br>";            
             message.Body = Imagebody + SecondRow + GuestDetailsTable1 + AddressDtls + QRCode + FooterDtls;
             message.IsBodyHtml = true;
-            // SMTP Email email:
+            // SMTP Email email: 
             System.Net.Mail.SmtpClient smtp = new System.Net.Mail.SmtpClient();
             smtp.EnableSsl = true;
-            smtp.Host = "email-smtp.us-west-2.amazonaws.com";
             smtp.Port = 587;
-            smtp.Credentials = new System.Net.NetworkCredential("AKIAIIVF5D5D3CJAX7SQ", "ApmuZkd+L8tissEga8kac3quhhwohEi5CB+dYD36KTq3");
+            //smtp.Host = "smtp.gmail.com";smtp.Credentials = new System.Net.NetworkCredential("stay@staysimplyfied.com", "stay1234");
+            smtp.Host = "email-smtp.us-west-2.amazonaws.com"; smtp.Credentials = new System.Net.NetworkCredential("AKIAIIVF5D5D3CJAX7SQ", "ApmuZkd+L8tissEga8kac3quhhwohEi5CB+dYD36KTq3");
             Err = "";
             try
             {

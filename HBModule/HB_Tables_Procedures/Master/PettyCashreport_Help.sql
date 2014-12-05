@@ -51,9 +51,11 @@ BEGIN
 		JOIN WRBHBPettyCashStatus U ON PC.Id=U.PettyCashStatusHdrId  AND PC.IsActive=1 AND PC.IsDeleted=0
 		JOIN WRBHBUser S ON U.UserId=S.Id AND S.IsActive=1 AND S.IsDeleted=0
 		JOIN WRBHBProperty P ON U.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
-		WHERE  U.IsActive=1 AND U.IsDeleted=0 AND (day(Convert(datetime,PC.CreatedDate,103)-1) / 15) + 1=1
+		WHERE  U.IsActive=1 AND U.IsDeleted=0 
+		AND MONTH(CONVERT (date,PC.CreatedDate,103))=MONTH(Convert(date,GETDATE(),103))
 		group by S.FirstName,S.LastName,P.PropertyName,PC.CreatedDate,PC.PropertyId,PC.UserId
-		
+
+
 END
 IF @Action='UserLoad'
 BEGIN

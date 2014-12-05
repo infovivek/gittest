@@ -79,7 +79,7 @@ namespace HB.Dao
             ChkIn.RoomNo =doc.SelectSingleNode("HdrXml").Attributes["RoomNo"].Value;
             ChkIn.StateId = Convert.ToInt32(doc.SelectSingleNode("HdrXml").Attributes["StateId"].Value);
             ChkIn.Tariff = Convert.ToDecimal(doc.SelectSingleNode("HdrXml").Attributes["Tariff"].Value);
-            ChkIn.PropertyId = Convert.ToInt32(doc.SelectSingleNode("HdrXml").Attributes["PropertyId"].Value);
+            ChkIn.PropertyId = Convert.ToInt64(doc.SelectSingleNode("HdrXml").Attributes["PropertyId"].Value);
             ChkIn.TimeType = doc.SelectSingleNode("HdrXml").Attributes["TimeType"].Value;
             ChkIn.Occupancy = doc.SelectSingleNode("HdrXml").Attributes["Occupancy"].Value;
             ChkIn.RackTariffSingle = Convert.ToDecimal(doc.SelectSingleNode("HdrXml").Attributes["RackTariffSingle"].Value);
@@ -161,7 +161,7 @@ namespace HB.Dao
             command.Parameters.Add("@RoomNo", SqlDbType.NVarChar).Value = ChkIn.RoomNo;
             command.Parameters.Add("@RoomId", SqlDbType.BigInt).Value = ChkIn.RoomId;
             command.Parameters.Add("@StateId", SqlDbType.Int).Value = ChkIn.StateId;
-            command.Parameters.Add("@PropertyId", SqlDbType.Int).Value = ChkIn.PropertyId;
+            command.Parameters.Add("@PropertyId", SqlDbType.BigInt).Value = ChkIn.PropertyId;
             command.Parameters.Add("@Tariff", SqlDbType.Decimal).Value = ChkIn.Tariff;
             command.Parameters.Add("@ChkinAdvance", SqlDbType.Decimal).Value = ChkIn.ChkinAdvance;
             command.Parameters.Add("@TimeType", SqlDbType.NVarChar).Value = ChkIn.TimeType;
@@ -224,7 +224,7 @@ namespace HB.Dao
             command.Parameters.Add("@ClientId", SqlDbType.BigInt).Value = Convert.ToInt32(data[4].ToString());
             command.Parameters.Add("@RoomId", SqlDbType.BigInt).Value = Convert.ToInt32(data[5].ToString());
             command.Parameters.Add("@GuestId", SqlDbType.BigInt).Value = Convert.ToInt32(data[6].ToString());
-            command.Parameters.Add("@PropertyId", SqlDbType.BigInt).Value = Convert.ToInt32(data[7].ToString());
+            command.Parameters.Add("@PropertyId", SqlDbType.BigInt).Value = Convert.ToInt64(data[7].ToString());
             command.Parameters.Add("@SSPId", SqlDbType.BigInt).Value = Convert.ToInt32(data[8].ToString());
             command.Parameters.Add("@UserId", SqlDbType.BigInt).Value = Convert.ToInt32(data[9].ToString());
         //    command.Parameters.Add("@Roles", SqlDbType.NVarChar).Value = Convert.ToInt32(data[10].ToString());

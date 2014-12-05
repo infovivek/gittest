@@ -76,7 +76,7 @@
 			
 			protected function Btn_Show_clickHandler(event:MouseEvent):void
 			{
-				Btn_Show.setFocus();
+				Dt_FromDt.setFocus();
 				useWeb("ApartmentBooking","BookingDtls_CUSTOM",[GlobalXml,'BookingDtls',
 					Dt_FromDt.text,Dt_ToDt.text,'','',0,0,ClientId,0,0,0,0]);
 			}			
@@ -178,7 +178,7 @@
 					else
 					{
 						Dt_ToDt.selectedDate = new Date(ToDt);
-					}				
+					}
 				}
 			}
 			
@@ -194,6 +194,12 @@
 					Hlp_ClientName.fnClear();ClientId=0;					
 				}
 				Dt_FromDt.setFocus();
+			}
+			
+			protected function linkbutton1_clickHandler(event:MouseEvent):void
+			{
+				Hlp_ClientName.fnClear();ClientId=0;
+				//Grd_BookingDtls.dataProvider=null;
 			}
 			
 		]]>
@@ -230,7 +236,7 @@
 					<mx:DataGridColumn dataField="BookingDate"/>					
 				</mx:columns>
 			</mx:DataGrid>			
-			<WrbHelpComp:HelpText id="Hlp_ClientName" x="66" y="17.5" width="200" height="23"
+			<WrbHelpComp:HelpText id="Hlp_ClientName" x="56" y="17.5" width="200" height="23"
 								  onselection="{FnOnselection_Client()}" pxSetColumnsWidth="198,0"/>
 			<mx:Label x="10" y="18.5" text="Client"/>
 			<s:Image x="958" y="13" buttonMode="true" source="@Embed(source='../Assets/Warning2.png')"
@@ -240,11 +246,12 @@
 							   click="Btn_ExporttoExcel_clickHandler(event)"/>
 			<WrbComp:Button_BB id="Btn_Show" x="711" y="13" _Label="Show"
 							   click="Btn_Show_clickHandler(event)"/>
-			<mx:DateField id="Dt_ToDt" x="574" y="17.5" formatString="DD/MM/YYYY"/>
-			<mx:Label x="511" y="18.5" text="To Date"/>
-			<mx:DateField id="Dt_FromDt" x="376" y="17.5" change="Dt_FromDt_changeHandler(event)"
+			<mx:DateField id="Dt_ToDt" x="596" y="17.5" formatString="DD/MM/YYYY"/>
+			<mx:Label x="533" y="18.5" text="To Date"/>
+			<mx:DateField id="Dt_FromDt" x="426" y="17.5" change="Dt_FromDt_changeHandler(event)"
 						  formatString="DD/MM/YYYY"/>
-			<mx:Label x="298" y="18.5" text="From Date"/>
+			<mx:Label x="348" y="18.5" text="From Date"/>
+			<mx:LinkButton x="264" y="18.5" label="Clear" click="linkbutton1_clickHandler(event)" toolTip="Client Clear"/>
 		</s:BorderContainer>
 	</s:VGroup>
 </s:Application>
