@@ -99,6 +99,8 @@
 						return;
 					}
 				}
+				FromDate=DT_From.text;
+				ToDate=DT_To.text;
 				if(ErrorFlag==true)
 				{	 	
 					useWeb("PendingCkinReport","Reports_CUSTOM",[GlobalXml,"Pageload",FromDate,ToDate,Type,'',0,0]);
@@ -162,25 +164,30 @@
 						//BookedId,PropertyName,PropertyId,FirstName,BookingLevel,
 						//ExpDate,C.CityName,CityId,,ClientId,BookingCode,Category
 						sheet.setCell(0,3,Type+"PendingCheckin Report");
-						sheet.setCell(1,0,'Property Name');
+						sheet.setCell(1,0,'Guest Name');
 						sheet.setCell(1,1,'ClientName');
-						sheet.setCell(1,2,'BookingLevel');
-						sheet.setCell(1,3,'CheckinDate');
-						sheet.setCell(1,4,'CityName'); 
-						sheet.setCell(1,5,'BookingCode');
-						//sheet.setCell(1,6,'');
-						//sheet.setCell(1,7,'');
+						sheet.setCell(1,2,'Property Name ');
+						sheet.setCell(1,3,'Location');
+						sheet.setCell(1,4,'CheckinDate'); 
+						sheet.setCell(1,5,'CheckOutDate');
+						sheet.setCell(1,6,'No Of Days');
+						sheet.setCell(1,7,'MOP');
+						sheet.setCell(1,8,'Property Email');
+						sheet.setCell(1,9,'Contact Number');
+						//sheet.setCell(1,10,'');
 						
 						for(var i:int=0;i<arrExportResult.length;i++)
 						{
-							sheet.setCell(i+2, 0, arrExportResult[i].ClientName);
-							sheet.setCell(i+2, 1, arrExportResult[i].PropertyName);
-							sheet.setCell(i+2, 2, arrExportResult[i].BookingLevel);
-							sheet.setCell(i+2, 3, arrExportResult[i].ExpDate);
-							sheet.setCell(i+2, 4, arrExportResult[i].CityName);
-							sheet.setCell(i+2, 5, arrExportResult[i].BookingCode);
-							//sheet.setCell(i+2, 7, arrExportResult[i].);
-							//sheet.setCell(i+2, 8, arrExportResult[i].); 
+							sheet.setCell(i+2, 0, arrExportResult[i].FirstName);
+							sheet.setCell(i+2, 1, arrExportResult[i].ClientName);
+							sheet.setCell(i+2, 2, arrExportResult[i].PropertyName);
+							sheet.setCell(i+2, 3, arrExportResult[i].CityName);
+							sheet.setCell(i+2, 4, arrExportResult[i].CheckinDate);
+							sheet.setCell(i+2, 5, arrExportResult[i].CheckOutDate);
+							sheet.setCell(i+2, 7, arrExportResult[i].NoOfdays);
+							sheet.setCell(i+2, 8, arrExportResult[i].MOP); 
+							sheet.setCell(i+2, 8, arrExportResult[i].Propertyemail);
+							sheet.setCell(i+2, 9, arrExportResult[i].ContactNum); 
 						}			 
 						
 						Grd_ListClient1.dataProvider = arrExportResult;
@@ -243,9 +250,9 @@
 		<s:HGroup x="0" y="0" width="100%" height="90" horizontalAlign="center" verticalAlign="middle">
 			<s:Group x="132" y="5" width="100%" height="80">
 				<mx:DateField id="DT_From" x="148" y="6" width="90" formatString="DD/MM/YYYY"  tabIndex="1"  
-							  yearNavigationEnabled="true" selectableRange="{{rangeEnd: new Date()}}" visible="false" />
+							  yearNavigationEnabled="true" selectableRange="{{rangeEnd: new Date()}}"  />
 				<mx:DateField id="DT_To" x="148" y="46" width="90" formatString="DD/MM/YYYY"
-							  tabIndex="2" yearNavigationEnabled="true"   visible="false"  />
+							  tabIndex="2" yearNavigationEnabled="true"      />
 				
 				<s:Image x="831" y="20" source="assets/a1.png" toolTip="Search" click="btn_Search_clickHandler()" tabIndex="5"/>
 				<s:Image x="900" y="20" click="Clear()" source="assets/dust_bin1.png" toolTip="Clear"/>
@@ -255,6 +262,8 @@
 				<mx:Label id="Lbl_Vendor0" x="222" y="42" width="13" text="*" color="red" fontSize="16"/-->
 				<mx:Label   x="342" y="2" width="13" text="*" color="red" fontSize="16"/>
 				<s:Label   x="293" y="14" text="Category"/>
+				<s:Label   x="53" y="14" text="From Date"/>
+				<s:Label   x="53" y="52" text="To Date"/>
 				<s:Label x="293" y="45" height="29" text="Filter by &#xd;Property"/>
 				<s:TextInput id="txtProperty" x="366" y="44" width="141" height="25"
 							 change="filterss('PropertyName')" prompt="Property Name"/>
@@ -278,13 +287,18 @@
 			<mx:DataGrid id="Grd_ListClient1" depth="100" x="10" y="48" width="100%" height="402" tabIndex="10"
 						 borderStyle="outset"> 
 				<mx:columns>		 	
-					<mx:DataGridColumn dataField="ClientName" width="200"  textAlign="left"/> 
-					<mx:DataGridColumn dataField="PropertyName" width="250"  textAlign="left"/> 
-					<mx:DataGridColumn dataField="CityName"   textAlign="left" visible="false"/> 
-					<mx:DataGridColumn dataField="FirstName" width="190"   headerText="Guest Name" textAlign="left"/>	
-					<mx:DataGridColumn dataField="BookingLevel" width="115"  headerText="BookingLevel"  textAlign="left" />
-					<mx:DataGridColumn dataField="ExpDate" width="91" headerText="CheckinDate"  textAlign="center"/>
-					<mx:DataGridColumn dataField="BookingCode" width="91" headerText="Booking Code"  textAlign="left"/>
+					<mx:DataGridColumn dataField="FirstName" width="140"   headerText="Guest Name" textAlign="left"/>	
+					<mx:DataGridColumn dataField="ClientName" width="150"  textAlign="left"/> 
+					<mx:DataGridColumn dataField="PropertyName" width="150"  textAlign="left"/> 
+					<mx:DataGridColumn dataField="CityName"   width="100" textAlign="left"  /> 
+					<mx:DataGridColumn dataField="CheckinDate" width="81" headerText="CheckinDate"  textAlign="center"/>
+					<mx:DataGridColumn dataField="CheckOutDate" width="81" headerText="CheckOutDate"  textAlign="center"/>
+					<mx:DataGridColumn dataField="NoOfdays" width="51"   textAlign="left"  />
+					<mx:DataGridColumn dataField="MOP"  width="120" textAlign="left"  />
+					<mx:DataGridColumn dataField="Propertyemail"   width="100" textAlign="left"  />
+					<mx:DataGridColumn dataField="ContactNum"  headerText="Contact Number" width="100" textAlign="left" />
+					<mx:DataGridColumn dataField="BookingLevel" visible="false" /> 
+					<mx:DataGridColumn dataField="BookingCode" visible="false"/>
 					
 				</mx:columns>
 			</mx:DataGrid> 

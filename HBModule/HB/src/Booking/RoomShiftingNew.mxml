@@ -10,6 +10,7 @@
 			import flash.text.engine.TypographicCase;
 			
 			import mx.events.CalendarLayoutChangeEvent;
+			import mx.events.CloseEvent;
 			import mx.events.FlexEvent;
 			
 			import spark.events.IndexChangeEvent;
@@ -22,7 +23,7 @@
 			public var Dt1:String = "",Dt2:String = "",Dt3:String = "",Dt4:String = "";
 			public var MailSts:String = "";
 			public var TariffPM:String = "",ServicePM:String = "";
-			public var OldTariffPM:String = "",OldServicePM:String = "";
+			public var OldTariffPM:String = "",OldServicePM:String = "",UsrId:int = 0,MOPCount:int = 0;
 			
 			protected function application1_creationCompleteHandler(event:FlexEvent):void
 			{
@@ -34,8 +35,11 @@
 				Chk_Email.selected = true;				
 				Rdb_Stay.selected = true;
 				Rdb_Shift.selected = false;
-				RadioGroup_changeHandler();
+				//RadioGroup_changeHandler();
+				FnHelp_PageLoad();
 				//Dt_ChkInDt.selectedDate = new Date("29/10/2014","DD/MM/YYYY");
+				//UsrId = Global_AC[0].UsrId;
+				UsrId = 21;
 			}
 			
 			protected function FnHelp_PageLoad():void
@@ -47,6 +51,8 @@
 					Ddl_Room.visible = true;
 					Lbl_ToRoomMandatory.visible = true;
 					Lbl_ToRoom.visible = true;
+					Lbl_NewCheckInDate.text = "From Date";
+					Lbl_NewCheckOutDate.text = "To Date";
 				}
 				else
 				{
@@ -54,7 +60,9 @@
 					Btn_Avaliable.visible = false;
 					Ddl_Room.visible = false;
 					Lbl_ToRoomMandatory.visible = false;
-					Lbl_ToRoom.visible = false;					
+					Lbl_ToRoom.visible = false;
+					Lbl_NewCheckInDate.text = "New CheckIn Date";
+					Lbl_NewCheckOutDate.text = "New CheckOut Date";
 				}
 			}
 			
@@ -72,19 +80,36 @@
 					Dt_ChkInDtExists.selectedDate = new Date();
 					Dt_ChkOutDtExists.selectedDate = new Date();
 					Dt_ChkInDt.selectedDate = new Date();
-					Dt_ChkOutDt.selectedDate = new Date();					
+					Dt_ChkOutDt.selectedDate = new Date();
+					MOPCount = 0;
 					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
 					{
-						Dt_ChkInDtExists.selectedDate = new Date(Ds_Objects.result.Tables.Table.Rows[0].ChkInDt);
-						Dt_ChkOutDtExists.selectedDate = new Date(Ds_Objects.result.Tables.Table.Rows[0].ChkOutDt);
+						Dt_ChkInDtExists.selectedDate = new Date(Ds_Objects.result.Tables.Table.Rows[0].EChkInDt);
+						Dt_ChkOutDtExists.selectedDate = new Date(Ds_Objects.result.Tables.Table.Rows[0].EChkOutDt);
 						Dt_ChkInDt.selectableRange = 
 							{rangeStart:new Date(Ds_Objects.result.Tables.Table.Rows[0].ChkInDtStart),
 								rangeEnd:new Date(Ds_Objects.result.Tables.Table.Rows[0].ChkInDtEnd)};
-						Dt_ChkInDt.selectedDate = new Date(Ds_Objects.result.Tables.Table.Rows[0].ChkInDtStart);
+						if(Ds_Objects.result.Tables.Table.Rows[0].Flag == "No")
+						{
+							Dt_ChkInDt.selectedDate = new Date(Ds_Objects.result.Tables.Table.Rows[0].ChkInDtStart);
+						}
+						else
+						{
+							Dt_ChkInDt.selectedDate = new Date(Ds_Objects.result.Tables.Table.Rows[0].AChkInDt);
+						}						
 						Dt_ChkOutDt.selectableRange = 
 							{rangeStart:new Date(Ds_Objects.result.Tables.Table.Rows[0].ChkOutDtStart)};
-						Dt_ChkOutDt.selectedDate = new Date(Ds_Objects.result.Tables.Table.Rows[0].ChkOutDtStart);
-					}					
+						if(Ds_Objects.result.Tables.Table.Rows[0].Flag == "No")
+						{
+							Dt_ChkOutDt.selectedDate = new Date(Ds_Objects.result.Tables.Table.Rows[0].ChkOutDtStart);
+						}
+						else
+						{
+							Dt_ChkOutDt.selectedDate = new Date(Ds_Objects.result.Tables.Table.Rows[0].AChkOutDt);
+						}
+						Txt_Status.text = Ds_Objects.result.Tables.Table.Rows[0].CurrentStatus;
+						MOPCount = Ds_Objects.result.Tables.Table.Rows[0].MOPCount;
+					}		
 					if (Ds_Objects.result.Tables.Table2.Rows.length > 0)
 					{
 						Ddl_ServicePM.dataProvider = Ds_Objects.result.Tables.Table2.Rows as ArrayCollection;
@@ -102,8 +127,8 @@
 					}
 					if(Rdb_Shift.selected == true)
 					{
-						Dt_ChkOutDt.styleName="DisabledDateField";
-						Dt_ChkOutDt.enabled = false;
+						//Dt_ChkOutDt.styleName="DisabledDateField";
+						//Dt_ChkOutDt.enabled = false;
 						Dt_ChkInDt.styleName = "";
 						Dt_ChkInDt.enabled = true;
 						/*if(Txt_Status.text == "CheckIn")
@@ -250,12 +275,12 @@
 					if(Rdb_Shift.selected == true)
 					{
 						useWeb("RoomShifting","DtLoad_CUSTOM",
-							[GlobalXml,'DateLoad','Shift','','','',BookingId,FromRoomId,RoomCaptured,0]);
+							[GlobalXml,'DateLoad','Shift','','','',BookingId,FromRoomId,RoomCaptured,UsrId]);
 					}
 					else
 					{
 						useWeb("RoomShifting","DtLoad_CUSTOM",
-							[GlobalXml,'DateLoad','Stay','','','',BookingId,FromRoomId,RoomCaptured,0]);
+							[GlobalXml,'DateLoad','Stay','','','',BookingId,FromRoomId,RoomCaptured,UsrId]);
 					}
 					
 				}
@@ -487,7 +512,13 @@
 						alignAlert(Alert.show("*  To Room is Required.\n","Required Field(s) !",
 							Alert.OK,null,null,iconErrLarge,Alert.OK),10,"");
 						return;
-					}					
+					}
+					if(ToRoomId == FromRoomId)
+					{
+						alignAlert(Alert.show("*  Go to Stay Modification Process.\n","Required Field(s) !",
+							Alert.OK,null,null,iconErrLarge,Alert.OK),10,"");
+						return;
+					}
 					Type = "Shift";					
 					var Ac_Hdr:ArrayCollection=new ArrayCollection
 						([{BookingId:BookingId,FromRoomId:FromRoomId,ChkInDt:Dt_ChkInDt.text,
@@ -504,7 +535,9 @@
 					{
 						Dt1 = Dt_ChkOutDtExists.text;
 						Dt2 = Dt_ChkOutDt.text;
-						if((Dt1 != Dt2) || (TariffPM != OldTariffPM) || (ServicePM != OldServicePM))
+						if((Dt1 != Dt2) || (TariffPM != OldTariffPM) || (ServicePM != OldServicePM) ||
+						(Dt_ChkInDt.text != Dt_ChkInDtExists.text))
+						//if((Dt1 != Dt2) || (TariffPM != OldTariffPM) || (ServicePM != OldServicePM))
 						{
 							var FDt:String = Dt_ChkInDt.text;					
 							var FY:String = FDt.substr(6,10);
@@ -645,12 +678,66 @@
 			
 			protected function Ddl_TariffPM_changeHandler(event:IndexChangeEvent):void
 			{
-				TariffPM = Ddl_TariffPM.selectedItem.label;
+				if(OldTariffPM != "Bill to Company (BTC)")
+				{
+					if((Ddl_TariffPM.selectedItem.label == "Bill to Company (BTC)") && (MOPCount == 0))
+					{
+						alignAlert(Alert.show("*  Access Denied.\n","Alert Message !",
+							Alert.OK,null,FnTariffPMOk,iconWarning,Alert.OK),10,"");						
+					}
+					else
+					{
+						TariffPM = Ddl_TariffPM.selectedItem.label;
+					}
+				}
+				else
+				{
+					TariffPM = Ddl_TariffPM.selectedItem.label;
+				}
+			}
+			
+			public function FnTariffPMOk(event:CloseEvent):void
+			{
+				if(event.detail == Alert.OK)
+				{
+					var Ac_TariffPM:ArrayCollection = new ArrayCollection();
+					Ac_TariffPM = Ddl_TariffPM.dataProvider as ArrayCollection;
+					Ddl_TariffPM.dataProvider = null;
+					Ddl_TariffPM.prompt = OldTariffPM;
+					Ddl_TariffPM.dataProvider = Ac_TariffPM;
+				}
 			}
 			
 			protected function Ddl_ServicePM_changeHandler(event:IndexChangeEvent):void
 			{
-				ServicePM = Ddl_ServicePM.selectedItem.label;
+				if(OldServicePM != "Bill to Company (BTC)")
+				{
+					if((Ddl_ServicePM.selectedItem.label == "Bill to Company (BTC)") && (MOPCount == 0))
+					{
+						alignAlert(Alert.show("*  Access Denied.\n","Alert Message !",
+							Alert.OK,null,FnServicePMOk,iconWarning,Alert.OK),10,"");						
+					}
+					else
+					{
+						ServicePM = Ddl_ServicePM.selectedItem.label;
+					}
+				}
+				else
+				{
+					ServicePM = Ddl_ServicePM.selectedItem.label;
+				}
+			}
+			
+			public function FnServicePMOk(event:CloseEvent):void
+			{
+				if(event.detail == Alert.OK)
+				{
+					var Ac_ServicePM:ArrayCollection = new ArrayCollection();
+					Ac_ServicePM = Ddl_ServicePM.dataProvider as ArrayCollection;
+					Ddl_ServicePM.dataProvider = null;
+					Ddl_ServicePM.prompt = OldServicePM;
+					Ddl_ServicePM.dataProvider = Ac_ServicePM;
+				}
 			}
 			
 			protected function RadioGroup_changeHandler():void
@@ -663,6 +750,8 @@
 					Lbl_ToRoomMandatory.visible = true;
 					Lbl_ToRoom.visible = true;
 					Chk_Email.visible = false;
+					Lbl_NewCheckInDate.text = "From Date";
+					Lbl_NewCheckOutDate.text = "To Date";
 				}
 				else
 				{
@@ -672,10 +761,11 @@
 					Lbl_ToRoomMandatory.visible = false;
 					Lbl_ToRoom.visible = false;
 					Chk_Email.visible = true;
+					Lbl_NewCheckInDate.text = "New CheckIn Date";
+					Lbl_NewCheckOutDate.text = "New CheckOut Date";
 				}
 				FnClearRdbChanged();
-			}
-			
+			}			
 		]]>
 	</fx:Script>
 	<fx:Declarations>
@@ -706,10 +796,10 @@
 						   borderVisible="false">
 			<mx:Label x="127" y="31" text="Booking Code" fontWeight="bold"/>
 			<mx:Label x="478.5" y="86" text="Guest" fontWeight="bold"/>
-			<mx:Label x="127" y="271" text="CheckIn Date" fontWeight="bold"/>
-			<mx:Label x="238.5" y="249" text="Old" fontWeight="bold"/>
-			<mx:Label x="238.5" y="302" text="New" fontWeight="bold"/>
-			<mx:Label x="478.5" y="271" text="CheckOut Date" fontWeight="bold"/>
+			<mx:Label x="127" y="249" text="Old CheckIn Date" fontWeight="bold"/>
+			<mx:Label x="127" y="302" text="New CheckIn Date" fontWeight="bold" id="Lbl_NewCheckInDate"/>
+			<mx:Label x="478.5" y="249" text="Old CheckOut Date" fontWeight="bold"/>
+			<mx:Label x="478.5" y="302" text="New CheckOut Date" fontWeight="bold" id="Lbl_NewCheckOutDate"/>
 			<mx:Label x="243" y="419" text="To Room" fontWeight="bold" id="Lbl_ToRoom"/>
 			<WrbHelpComp:HelpText id="Hlp_BookingCode" x="238.5" y="30" width="200" height="23"
 								  depth="1" onselection="{FnOnselection_Booking()}"
@@ -731,14 +821,14 @@
 							change="Ddl_Room_changeHandler(event)" prompt="Please Select Room"/>
 			<WrbComp:Button_HB id="Btn_Avaliable" x="415.5" y="356" _Label="Show"
 							   click="Btn_Avaliable_clickHandler(event)"/>
-			<mx:DateField x="291" y="301" id="Dt_ChkInDt" formatString="DD/MM/YYYY"
+			<mx:DateField x="293.5" y="301" id="Dt_ChkInDt" formatString="DD/MM/YYYY"
 						  change="Dt_ChkInDt_changeHandler(event)" enabled="true" tabIndex="2"/>
 			<!--styleName="DisabledDateField" focusEnabled="false"/-->
-			<mx:DateField x="583" y="301" id="Dt_ChkOutDt" formatString="DD/MM/YYYY"
+			<mx:DateField x="638" y="301" id="Dt_ChkOutDt" formatString="DD/MM/YYYY"
 						  change="Dt_ChkOutDt_changeHandler(event)" tabIndex="3"/>
-			<mx:DateField x="291" y="248" id="Dt_ChkInDtExists" formatString="DD/MM/YYYY"
+			<mx:DateField x="293.5" y="248" id="Dt_ChkInDtExists" formatString="DD/MM/YYYY"
 						  styleName="DisabledDateField" enabled="false"/>
-			<mx:DateField x="583" y="248" id="Dt_ChkOutDtExists" formatString="DD/MM/YYYY"
+			<mx:DateField x="638" y="248" id="Dt_ChkOutDtExists" formatString="DD/MM/YYYY"
 						  styleName="DisabledDateField" enabled="false"/>
 			<s:HGroup x="127" y="471" width="656" height="35" horizontalAlign="center" verticalAlign="middle">
 				<WrbComp:Button_HB _Label="Save" click="FnSave()"/>

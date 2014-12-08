@@ -26,15 +26,21 @@ namespace HBReport
             {
                 string domainName = Request.Url.AbsoluteUri;
                 string[] Id = domainName.Split('?');
-                //var Id = asd[1].Split(',');
+          //      string PropertyType1 = "";
+
+                var asd = Id[1].Split('?');
+                var asd1 = Id[2].Split(' ');
+                
+
+         //       var Name = Id[1].Split('@');
                 command = new SqlCommand();
                 ds = new DataSet();
                 command.CommandText = "SP_ExtCheckOutTariff_Bill";
                 command.CommandType = CommandType.StoredProcedure;
                 command.Parameters.Add("@Action", SqlDbType.NVarChar).Value = "PAGELOAD";
                 command.Parameters.Add("@Str1", SqlDbType.NVarChar).Value = "";
-                command.Parameters.Add("@Str2", SqlDbType.NVarChar).Value = "";
-                command.Parameters.Add("@Id1", SqlDbType.Int).Value = Convert.ToInt32(Id[1]);
+                command.Parameters.Add("@Str2", SqlDbType.NVarChar).Value = asd1[0];
+                command.Parameters.Add("@Id1", SqlDbType.Int).Value = asd[0];//Convert.ToInt32(asd[1]);
                 command.Parameters.Add("@Id2", SqlDbType.Int).Value = 0;
                 ds = new WrbErpConnection1().ExecuteDataSet(command, "");
                 string sDataSourceName = "DataSet1";

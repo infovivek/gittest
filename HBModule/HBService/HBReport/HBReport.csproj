@@ -71,6 +71,7 @@
     <Content Include="GuestCheckOutService1.aspx" />
     <Content Include="GuestCheckOutTariff.aspx" />
     <Content Include="ImportExcel.aspx" />
+    <Content Include="ImportRating.aspx" />
     <Content Include="IntermediateCheckoutConsolidate.aspx" />
     <Content Include="IntermediateCheckoutService.aspx" />
     <Content Include="IntermediateCheckoutTariff.aspx" />
@@ -241,6 +242,13 @@
     </Compile>
     <Compile Include="ImportExcel.aspx.designer.cs">
       <DependentUpon>ImportExcel.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="ImportRating.aspx.cs">
+      <DependentUpon>ImportRating.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ImportRating.aspx.designer.cs">
+      <DependentUpon>ImportRating.aspx</DependentUpon>
     </Compile>
     <Compile Include="IntermediateCheckoutConsolidate.aspx.cs">
       <DependentUpon>IntermediateCheckoutConsolidate.aspx</DependentUpon>

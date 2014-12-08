@@ -9,8 +9,14 @@ GO
 -- ===============================================================================
 -- Author:Sakthi
 -- Create date:2-Jun-2014
--- Description:	BOOKING
+-- Description:	Room Shifting Help
 -- =================================================================================
+/*********************************************************************************************************
+'Name			Date			Description of Changes
+********************************************************************************************************	
+Sakthi          3rd & 4th Dec   Process alterations - rework
+********************************************************************************************************
+*/
 CREATE PROCEDURE [dbo].[SP_RoomShifting_Help](@Action NVARCHAR(100),  
 @Str1 NVARCHAR(100),@BookingLevel NVARCHAR(100),@ChkInDt NVARCHAR(100),  
 @ChkOutDt NVARCHAR(100),@BookingId BIGINT,@RoomId BIGINT,@Id1 BIGINT,  
@@ -62,6 +68,7 @@ IF @Action = 'BookingLoad'
     BookingLevelId NVARCHAR(100),CurrentStatus NVARCHAR(100),
     Guest NVARCHAR(100),PropertyName NVARCHAR(100),RoomId BIGINT,
     RoomCapturedId INT,RoomNoId NVARCHAR(100));
+    -- Booked
     INSERT INTO #TMP2(BookingCode,BookingId,BookingLevelId,CurrentStatus,
     Guest,PropertyName,RoomId,RoomCapturedId,RoomNoId)
     SELECT T.BookingCode,T.BookingId,T.BookingLevelId,T.CurrentStatus,
@@ -70,6 +77,7 @@ IF @Action = 'BookingLoad'
     WHERE T.PropertyType IN ('InP','MGH','DdP') AND T.CurrentStatus = 'Booked'
     GROUP BY T.Guest,T.BookingCode,T.BookingId,T.RoomId,T.RoomCapturedId,
     T.BookingLevelId,T.PropertyName,T.RoomType,T.CurrentStatus;
+    -- Check In
     INSERT INTO #TMP2(BookingCode,BookingId,BookingLevelId,CurrentStatus,
     Guest,PropertyName,RoomId,RoomCapturedId,RoomNoId)
     SELECT T.BookingCode,T.BookingId,T.BookingLevelId,T.CurrentStatus,
@@ -78,7 +86,7 @@ IF @Action = 'BookingLoad'
     WHERE T.PropertyType IN ('InP','MGH','DdP') AND T.CurrentStatus = 'CheckIn' 
     AND T.BookingId IN (SELECT BG.BookingId 
     FROM WRBHBBookingPropertyAssingedGuest BG WHERE BG.IsActive = 1 AND 
-    BG.IsDeleted = 0 AND BG.ChkOutDt >= CONVERT(DATE,GETDATE(),103))
+    BG.IsDeleted = 0 /*AND BG.ChkOutDt >= CONVERT(DATE,GETDATE(),103)*/)
     GROUP BY T.Guest,T.BookingCode,T.BookingId,T.RoomId,T.RoomCapturedId,
     T.BookingLevelId,T.PropertyName,T.RoomType,T.CurrentStatus;
     SELECT BookingCode,BookingId,BookingLevelId,CurrentStatus,
@@ -109,6 +117,7 @@ IF @Action = 'DateLoad'
   BG.RoomCaptured = @Id1 ORDER BY BG.Id DESC;
   DECLARE @EChkInDt DATE,@EChkOutDt DATE,@ChkInDtStart DATE;
   DECLARE @ChkInDtEnd DATE,@ChkOutDtStart DATE;
+  DECLARE @AChkInDt DATE,@AChkOutDt DATE,@Flag NVARCHAR(100);
   -- Get CheckIn & CheckOut Date
   IF @Str1 = 'Shift'
    BEGIN
@@ -119,24 +128,40 @@ IF @Action = 'DateLoad'
       WHERE IsActive = 1 AND IsDeleted = 0 AND BookingId = @BookingId AND  
       RoomCaptured = @Id1;
       SELECT @ChkInDtStart = MIN(ChkInDt),
-      @ChkInDtEnd = DATEADD(DAY,-1,MAX(ChkOutDt)),
-      @ChkOutDtStart = MAX(ChkOutDt)
+      --@ChkInDtEnd = DATEADD(DAY,-1,MAX(ChkOutDt)),
+      @ChkInDtEnd = MAX(ChkOutDt),
+      --@ChkOutDtStart = MAX(ChkOutDt)
+      @ChkOutDtStart = DATEADD(DAY,1,MIN(ChkInDt))
       FROM WRBHBBookingPropertyAssingedGuest  
       WHERE IsActive = 1 AND IsDeleted = 0 AND BookingId = @BookingId AND  
       RoomCaptured = @Id1 AND ISNULL(RoomShiftingFlag,0) = 0;
+      SET @AChkInDt = @ChkInDtStart;
+      SET @AChkOutDt = @ChkOutDtStart;
+      SET @Flag = 'Yes';
      END
     IF @CurrentStatus = 'Booked'
      BEGIN
-      SELECT @EChkInDt = MIN(ChkInDt),@EChkOutDt = MAX(ChkOutDt)
+      /*SELECT @EChkInDt = MIN(ChkInDt),@EChkOutDt = MAX(ChkOutDt)
       FROM WRBHBBookingPropertyAssingedGuest  
       WHERE IsActive = 1 AND IsDeleted = 0 AND BookingId = @BookingId AND  
       RoomCaptured = @Id1;
       SELECT @ChkInDtStart = MIN(ChkInDt),
-      @ChkInDtEnd = DATEADD(DAY,-1,MAX(ChkOutDt)),
+      --@ChkInDtEnd = DATEADD(DAY,-1,MAX(ChkOutDt)),
+      @ChkInDtEnd = MAX(ChkOutDt),
       @ChkOutDtStart = MAX(ChkOutDt)
       FROM WRBHBBookingPropertyAssingedGuest  
       WHERE IsActive = 1 AND IsDeleted = 0 AND BookingId = @BookingId AND  
-      RoomCaptured = @Id1 AND ISNULL(RoomShiftingFlag,0) = 0;
+      RoomCaptured = @Id1 AND ISNULL(RoomShiftingFlag,0) = 0;*/
+      SELECT @EChkInDt = MIN(ChkInDt),@EChkOutDt = MAX(ChkOutDt)
+      FROM WRBHBBookingPropertyAssingedGuest  
+      WHERE IsActive = 1 AND IsDeleted = 0 AND BookingId = @BookingId AND  
+      RoomCaptured = @Id1;
+      SELECT @ChkInDtStart = CONVERT(DATE,DATEADD(YEAR,-1,GETDATE()),103),
+      @ChkInDtEnd = CONVERT(DATE,DATEADD(YEAR,1,GETDATE()),103),      
+      @AChkInDt = CONVERT(DATE,GETDATE(),103),
+      @AChkOutDt = CONVERT(DATE,DATEADD(DAY,1,GETDATE()),103);
+      SET @ChkOutDtStart = CONVERT(DATE,DATEADD(DAY,1,@ChkInDtStart),103);
+      SET @Flag = 'Yes';
      END
    END  
   IF @Str1 = 'Stay'
@@ -147,7 +172,12 @@ IF @Action = 'DateLoad'
       FROM WRBHBBookingPropertyAssingedGuest  
       WHERE IsActive = 1 AND IsDeleted = 0 AND BookingId = @BookingId AND  
       RoomCaptured = @Id1;
-      SELECT @ChkInDtStart = 
+      SELECT @ChkInDtStart = CONVERT(DATE,DATEADD(YEAR,-1,GETDATE()),103),
+      @ChkInDtEnd = CONVERT(DATE,DATEADD(YEAR,1,GETDATE()),103),
+      @ChkOutDtStart = CONVERT(DATE,DATEADD(DAY,1,@ChkInDtStart),103),
+      @AChkInDt = CONVERT(DATE,GETDATE(),103),
+      @AChkOutDt = CONVERT(DATE,DATEADD(DAY,1,GETDATE()),103);
+      /*SELECT @ChkInDtStart = 
       (CASE WHEN MIN(ChkInDt) < CONVERT(DATE,GETDATE(),103) THEN MIN(ChkInDt)
       ELSE CONVERT(DATE,GETDATE(),103) END),
       @ChkInDtEnd = CONVERT(DATE,DATEADD(YEAR,1,GETDATE()),103)
@@ -157,7 +187,8 @@ IF @Action = 'DateLoad'
       SELECT @ChkOutDtStart = CONVERT(DATE,DATEADD(DAY,1,@ChkInDtStart),103)
       FROM WRBHBBookingPropertyAssingedGuest  
       WHERE IsActive = 1 AND IsDeleted = 0 AND BookingId = @BookingId AND  
-      RoomCaptured = @Id1 AND ISNULL(RoomShiftingFlag,0) = 0;
+      RoomCaptured = @Id1 AND ISNULL(RoomShiftingFlag,0) = 0;*/
+      SET @Flag = 'Yes';
      END
     IF /*@PtyType IN ('InP','MGH','DdP') AND */@CurrentStatus = 'CheckIn'
      BEGIN    
@@ -171,11 +202,23 @@ IF @Action = 'DateLoad'
       FROM WRBHBBookingPropertyAssingedGuest  
       WHERE IsActive = 1 AND IsDeleted = 0 AND BookingId = @BookingId AND  
       RoomCaptured = @Id1 AND ISNULL(RoomShiftingFlag,0) = 0;
+      SET @AChkInDt = '';SET @AChkOutDt = '';
+      SET @Flag = 'No';
      END
    END
-  SELECT @EChkInDt AS ChkInDt,@EChkOutDt AS ChkOutDt,
+  --
+  DECLARE @MOPCount INT;
+  SELECT @MOPCount = COUNT(*) FROM WRBHBUserRoles UR
+  LEFT OUTER JOIN WRBHBRoles R WITH(NOLOCK)ON R.Id = UR.RolesId
+  WHERE UR.IsActive = 1 AND UR.IsDeleted = 0 AND
+  R.IsActive = 1 AND R.IsDeleted = 0 AND 
+  UR.RolesId IN (2,14,21,23) AND UR.UserId = @Id2;
+  --
+  SELECT @EChkInDt AS EChkInDt,@EChkOutDt AS EChkOutDt,
   @ChkInDtStart AS ChkInDtStart,@ChkInDtEnd AS ChkInDtEnd,
-  @ChkOutDtStart AS ChkOutDtStart;
+  @ChkOutDtStart AS ChkOutDtStart,@Flag AS Flag,
+  @AChkInDt AS AChkInDt,@AChkOutDt AS AChkOutDt,
+  @CurrentStatus AS CurrentStatus,@MOPCount AS MOPCount;
   -- Get Payment Modes & Property Type    
   SELECT TOP 1 BP.PropertyType,BG.TariffPaymentMode,  
   BG.ServicePaymentMode FROM WRBHBBookingProperty BP  
@@ -197,8 +240,12 @@ IF @Action = 'DateLoad'
   ELSE  
    BEGIN  
     INSERT INTO #PAYMENT(label) SELECT 'Direct';  
+   END
+  IF @PtyType = 'CPP'
+   BEGIN
+    INSERT INTO #PAYMENT(label) SELECT 'Bill to Client';
    END  
-  SELECT * FROM #PAYMENT;    
+  SELECT label FROM #PAYMENT ORDER BY label ASC;    
  END  
 IF @Action = 'AvaliableRooms'  
  BEGIN  

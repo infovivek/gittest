@@ -56,7 +56,7 @@ GuestImage,SingleMarkupAmount,DoubleMarkupAmount,ClientId,CityId,ServiceCharge,
 NewCheckInDate,NewCheckoutDate,
 ModifiedBy,CreatedDate,ModifiedDate,IsActive,IsDeleted,RowId)
 
-VALUES(@RoomId,@PropertyId,@BookingId,@StateId,@GuestId,@RefGuestId,@ChkInGuest,
+VALUES(@RoomId,CAST((@PropertyId) AS NVARCHAR(100)),@BookingId,@StateId,@GuestId,@RefGuestId,@ChkInGuest,
 @CheckInNo,convert(date,@ArrivalDate,103),@ArrivalTime,
 CONVERT(date,@ChkoutDate,103),@RoomNo,@GuestName,@ClientName,@Property,
 @MobileNo,@EmailId,@Designation,@Nationality,@IdProof,@ChkinAdvance,@Tariff,

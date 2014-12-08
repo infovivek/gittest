@@ -23,7 +23,7 @@ IF @Id<>0
 BEGIN
 SET @ResId=(SELECT BookingId FROM WRBHBCheckInHdr WHERE Id=@Id);
 -- HEADER
-SELECT RoomId,PropertyId,BookingId,
+SELECT RoomId,CAST((PropertyId) AS NVARCHAR(100)) as PropertyId,BookingId,
 StateId,GuestId,RefGuestId,ChkInGuest,CheckInNo,convert(nvarchar(100),ArrivalDate,103) as ArrivalDate,ArrivalTime,
 convert(nvarchar(100),ChkoutDate,103) as ChkoutDate,RoomNo,GuestName,ClientName,Property,MobileNo,
 EmailId,Designation,Nationality,IdProof,ChkinAdvance,Tariff,

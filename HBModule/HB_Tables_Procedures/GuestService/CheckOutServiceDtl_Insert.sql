@@ -40,6 +40,8 @@ ChkOutSerInclude,ChkOutSerDate,ChkOutSerItem,ChkOutSerAmount,ChkOutSerQuantity
 ,ChkOutSerNetAmount,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId,
 ProductId,TypeService,ServiceHdrId)
 
+
+
 VALUES
 (@CheckOutServceHdrId,@ChkOutSerAction,@ChkOutSerInclude,@ChkOutSerDate,@ChkOutSerItem,
 @ChkOutSerAmount,@ChkOutSerQuantity,@ChkOutSerNetAmount,@CreatedBy,GETDATE(),@CreatedBy,
@@ -49,7 +51,7 @@ GETDATE(),1,0,NEWID(),@ProductId,@TypeService,@ServiceHdrId)
 SET @Id1=@@IDENTITY;
 SELECT Id,RowId FROM WRBHBCheckOutServiceDtls WHERE Id=@Id1;
 
-SELECT  @PropertyId=PropertyId,@BookingId=BookingId,@GuestId=GuestId,@RoomId=RoomId,@GuestName=GuestName ,
+SELECT  @PropertyId=CAST((PropertyId) AS NVARCHAR(100)),@BookingId=BookingId,@GuestId=GuestId,@RoomId=RoomId,@GuestName=GuestName ,
 @ChkInHdrId=ChkInHdrId
 FROM WRBHBChechkOutHdr WHERE Id=@CheckOutServceHdrId
 IF @TypeService='Food And Beverages'
@@ -60,7 +62,7 @@ BEGIN
 		BookingCode,ClientName,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId,TotalAmount,
 		BookingId,RoomId,CheckInId)
 
-		VALUES(@PropertyId,'',CONVERT(Date,@ChkOutSerDate,103),@GuestName,@GuestId,'','',
+		VALUES(CAST((@PropertyId) AS NVARCHAR(100)),'',CONVERT(Date,@ChkOutSerDate,103),@GuestName,@GuestId,'','',
 		'','',@CreatedBy,GETDATE(),@CreatedBy,GETDATE(),1,0,NEWID(),0,
 		@BookingId,@RoomId,0)
 		

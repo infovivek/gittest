@@ -99,27 +99,16 @@ namespace HB.Dao
                             string PropertyMail = ds.Tables[9].Rows[i][0].ToString();
                             var PtyMail = PropertyMail.Split(',');
                             int cnt = PtyMail.Length;
-                            if (cnt == 1)
+                            for (int j = 0; j < cnt; j++)
                             {
                                 System.Text.RegularExpressions.Match match =
-                                        Regex.Match(PtyMail[0].ToString(), pattern, RegexOptions.IgnoreCase);
+                                    Regex.Match(PtyMail[0].ToString(), pattern, RegexOptions.IgnoreCase);
                                 if (match.Success == true)
                                 {
-                                    message.To.Add(new System.Net.Mail.MailAddress(PtyMail[0].ToString()));
+                                    //string sdsdf3 = PtyMail[j].ToString();
+                                    message.To.Add(new System.Net.Mail.MailAddress(PtyMail[j].ToString()));
                                 }
-                            }
-                            else
-                            {
-                                for (int j = 0; j < cnt; j++)
-                                {
-                                    System.Text.RegularExpressions.Match match =
-                                        Regex.Match(PtyMail[0].ToString(), pattern, RegexOptions.IgnoreCase);
-                                    if (match.Success == true)
-                                    {
-                                        message.To.Add(new System.Net.Mail.MailAddress(PtyMail[j].ToString()));
-                                    }
-                                }
-                            }                           
+                            }                                                       
                         }
                     }
                     else

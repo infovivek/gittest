@@ -140,7 +140,7 @@ BEGIN
 			ChkOutHdrId BIGINT,Mode NVARCHAR(100),ClientId BIGINT,Property NVARCHAR(100),PId BIGINT,
 			CheckIn NVARCHAR(100),CheckOut NVARCHAR(100),GuestName NVARCHAR(100))
 			
-			INSERT INTO #TEMPCASH(BillType,InvoiceNo,Total,ChkOutHdrId,Mode,ClientId,Property,PId,
+			INSERT INTO #TEMPCHEQUE(BillType,InvoiceNo,Total,ChkOutHdrId,Mode,ClientId,Property,PId,
 			CheckIn,CheckOut,GuestName)
 			
 			SELECT DISTINCT Payment AS BillType,COH.InVoiceNo,SUM(AmountPaid) AS Total,COH.Id AS ChkOutHdrId,

@@ -451,6 +451,8 @@ namespace HBReport {
             
             private global::System.Data.DataColumn columnLocation;
             
+            private global::System.Data.DataColumn columnAmtWords;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public DataTable1DataTable() {
@@ -1174,6 +1176,14 @@ namespace HBReport {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn AmtWordsColumn {
+                get {
+                    return this.columnAmtWords;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -1295,7 +1305,8 @@ namespace HBReport {
                         string Bank, 
                         string AccountNo, 
                         string Category, 
-                        string Location) {
+                        string Location, 
+                        string AmtWords) {
                 DataTable1Row rowDataTable1Row = ((DataTable1Row)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         CheckoutNo,
@@ -1383,7 +1394,8 @@ namespace HBReport {
                         Bank,
                         AccountNo,
                         Category,
-                        Location};
+                        Location,
+                        AmtWords};
                 rowDataTable1Row.ItemArray = columnValuesArray;
                 this.Rows.Add(rowDataTable1Row);
                 return rowDataTable1Row;
@@ -1492,6 +1504,7 @@ namespace HBReport {
                 this.columnAccountNo = base.Columns["AccountNo"];
                 this.columnCategory = base.Columns["Category"];
                 this.columnLocation = base.Columns["Location"];
+                this.columnAmtWords = base.Columns["AmtWords"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -1673,6 +1686,8 @@ namespace HBReport {
                 base.Columns.Add(this.columnCategory);
                 this.columnLocation = new global::System.Data.DataColumn("Location", typeof(string), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnLocation);
+                this.columnAmtWords = new global::System.Data.DataColumn("AmtWords", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnAmtWords);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -3191,6 +3206,22 @@ namespace HBReport {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public string AmtWords {
+                get {
+                    try {
+                        return ((string)(this[this.tableDataTable1.AmtWordsColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'AmtWords\' in table \'DataTable1\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableDataTable1.AmtWordsColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public bool IsCheckoutNoNull() {
                 return this.IsNull(this.tableDataTable1.CheckoutNoColumn);
             }
@@ -4219,6 +4250,18 @@ namespace HBReport {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public void SetLocationNull() {
                 this[this.tableDataTable1.LocationColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsAmtWordsNull() {
+                return this.IsNull(this.tableDataTable1.AmtWordsColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetAmtWordsNull() {
+                this[this.tableDataTable1.AmtWordsColumn] = global::System.Convert.DBNull;
             }
         }
         

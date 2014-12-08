@@ -92,6 +92,8 @@
 						return;
 					}
 				}
+				FromDate=DT_From.text;
+				ToDate=DT_To.text;
 				if(DT_To.text !='')
 				{
 					if(DT_From.text =='')
@@ -172,12 +174,12 @@
 						sheet.setCell(1,5,'Booking ID');
 						sheet.setCell(1,6,'Check-In Date');
 						sheet.setCell(1,7,'Check-Out Date');
-						//sheet.setCell(1,8,'Last Bill Date');
-						sheet.setCell(1,8,'Tariff');
-						sheet.setCell(1,9,'Discount');
-						sheet.setCell(1,10,'No Of Days'); 
+						sheet.setCell(1,8,'LastBill Date');
+						sheet.setCell(1,9,'Tariff');
+						sheet.setCell(1,10,'Discount');
+						sheet.setCell(1,11,'No Of Days'); 
 						//sheet.setCell(1,11,'Net Amount');
-						sheet.setCell(1,11,'Total');
+						sheet.setCell(1,12,'Total');
 						//sheet.setCell(1,7,'');
 						
 						for(var i:int=0;i<arrExportResult.length;i++)
@@ -190,11 +192,11 @@
 							sheet.setCell(i+2, 5, arrExportResult[i].BookingCode);
 							sheet.setCell(i+2, 6, arrExportResult[i].CheckInDate);
 							sheet.setCell(i+2, 7, arrExportResult[i].CheckOutDate);
-							//sheet.setCell(i+2, 8, arrExportResult[i].CheckOutDate);
-							sheet.setCell(i+2, 8, arrExportResult[i].Tariff);
-							sheet.setCell(i+2, 9, arrExportResult[i].Discount);
-							sheet.setCell(i+2, 10, arrExportResult[i].NoOfDays);
-							sheet.setCell(i+2, 11, arrExportResult[i].ChkOutTariffNetAmount);
+							sheet.setCell(i+2, 8, arrExportResult[i].LastBillDate);
+							sheet.setCell(i+2, 9, arrExportResult[i].Tariff);
+							sheet.setCell(i+2, 10, arrExportResult[i].Discount);
+							sheet.setCell(i+2, 11, arrExportResult[i].NoOfDays);
+							sheet.setCell(i+2, 12, arrExportResult[i].ChkOutTariffNetAmount);
 							//sheet.setCell(i+2, 11, arrExportResult[i].ChkOutTariffNetAmount);
 							//sheet.setCell(i+2, 8, arrExportResult[i].); 
 						}			 
@@ -258,10 +260,10 @@
 	<s:BorderContainer x="0" y="30" width="100%" height="84" borderVisible="false" backgroundColor="#f4efef" depth="10">
 		<s:HGroup x="0" y="0" width="100%" height="90" horizontalAlign="center" verticalAlign="middle">
 			<s:Group x="132" y="5" width="100%" height="80">
-				<mx:DateField id="DT_From" x="148" y="6" width="90" formatString="DD/MM/YYYY"  tabIndex="1"  
-							  yearNavigationEnabled="true" selectableRange="{{rangeEnd: new Date()}}" visible="false" />
-				<mx:DateField id="DT_To" x="148" y="46" width="90" formatString="DD/MM/YYYY"
-							  tabIndex="2" yearNavigationEnabled="true"   visible="false"  />
+				<mx:DateField id="DT_From" x="138" y="6" width="90" formatString="DD/MM/YYYY"  tabIndex="1"  
+							  yearNavigationEnabled="true" selectableRange="{{rangeEnd: new Date()}}"   />
+				<mx:DateField id="DT_To" x="138" y="46" width="90" formatString="DD/MM/YYYY"
+							  tabIndex="2" yearNavigationEnabled="true"    />
 				
 				<s:Image x="751" y="20" source="assets/a1.png" toolTip="Search" click="btn_Search_clickHandler()" tabIndex="5"/>
 				<s:Image x="820" y="20" click="Clear()" source="assets/dust_bin1.png" toolTip="Clear"/>
@@ -269,12 +271,12 @@
 				</WrbComp:Button_HB> 
 				<!--mx:Label id="Lbl_Vendor1" x="223" y="2" width="13" text="*" color="red" fontSize="16"/>
 				<mx:Label id="Lbl_Vendor0" x="222" y="42" width="13" text="*" color="red" fontSize="16"/-->
-				<mx:Label   x="262" y="2" width="13" text="*" color="red" fontSize="16"/>
-				<s:Label   x="213" y="14" text="Category"/>
-				<s:Label x="173" y="45" height="29" text="Filter by &#xd;Property"/>
-				<s:TextInput id="txtProperty" x="246" y="44" width="141" height="25"
+				<mx:Label   x="342" y="2" width="13" text="*" color="red" fontSize="16"/>
+				<s:Label   x="293" y="14" text="Category"/>
+				<s:Label x="253" y="45" height="29" text="Filter by &#xd;Property"/>
+				<s:TextInput id="txtProperty" x="326" y="44" width="141" height="25"
 							 change="filterss('PropertyName')" prompt="Property Name"/>
-				<s:HGroup x="287" y="6" width="260" horizontalAlign="center" verticalAlign="middle" gap="17"  id="type">
+				<s:HGroup x="367" y="6" width="260" horizontalAlign="center" verticalAlign="middle" gap="17"  id="type">
 					<s:RadioButton label="Internal" groupName="Modes" value="0"
 								   id="Internal" buttonMode="true"  />
 					<s:RadioButton label="External" groupName="Modes"  value="1"
@@ -282,9 +284,11 @@
 					<s:RadioButton label="Managed GH" groupName="Modes"  value="2"
 								   id="Managed" buttonMode="true"   />
 				</s:HGroup>
-				<s:Label x="414" y="44" height="29" text="Filter by &#xd;CheckOutNo"/>
-				<s:TextInput id="txtCheckOutNo" x="526" y="44" width="109" height="25"
+				<s:Label x="494" y="44" height="29" text="Filter by &#xd;CheckOutNo"/>
+				<s:TextInput id="txtCheckOutNo" x="606" y="44" width="109" height="25"
 							 change="filter('CheckOutNo')" prompt="CheckOutNo" restrict="0-9" maxChars="6"/>
+				<s:Label   x="53" y="14" text="From Date"/>
+				<s:Label   x="53" y="52" text="To Date"/>
 			</s:Group>
 		</s:HGroup>
 	</s:BorderContainer>
@@ -302,6 +306,7 @@
 					<mx:DataGridColumn dataField="BookingCode" width="150"  headerText="B.Code"  textAlign="center"/> 
 					<mx:DataGridColumn dataField="CheckInDate" width="190"    textAlign="left"/> 
 					<mx:DataGridColumn dataField="CheckOutDate" width="150" /> 
+					<mx:DataGridColumn dataField="LastBillDate" width="150" />
 					<mx:DataGridColumn dataField="Tariff" width="150" />
 					<mx:DataGridColumn dataField="Discount" width="150" />
 					<mx:DataGridColumn dataField="NoOfDays" width="150" /> 

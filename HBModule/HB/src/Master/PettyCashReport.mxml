@@ -90,8 +90,18 @@
 					{	
 						Grd_Details.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
 					}
+					if (Ds_Objects.result.Tables.Table2.Rows.length > 0)
+					{	
+						hlp_User.dataProvider=Ds_Objects.result.Tables.Table2.Rows as ArrayCollection;
+					}
 				}
-				
+				if (Ds_Objects.currentTarget.description.toString() == "USERLOAD_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						hlp_User.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+				}
 				if (Ds_Objects.currentTarget.description.toString() == "Gridload_CUSTOM")
 				{
 					Grd_Details.dataProvider=null;
@@ -353,7 +363,19 @@
 					hlp_Property.text="";
 				}
 			}
-				
+			public function Ddl_User_changeHandler():void
+			{
+				if(hlp_User.selected())
+				{
+					UserName=hlp_User.Select_Row.UserName;
+					UserId=hlp_User.Select_Row.Id;
+					hlp_User.text=UserName;
+				}
+				else
+				{
+					hlp_User.text="";
+				}
+			}	
 			protected function search():void
 			{
 				Grd_Details.dataProvider=null;
@@ -382,7 +404,19 @@
 				}
 				var MFromDate:String = '01'+'/'+String(b)+'/'+String(c);
 				var Status:String=drp_status.selectedItem;
-				if(PropertyId !=0)
+				if((PropertyId !=0)&&(UserId !=0))
+				{
+					if(Rbtn_First.selected==true)
+					{
+						useWeb("PettyCashReport","Gridload_CUSTOM",[GlobalXml,"GRIDLOAD",PropertyId,UserId,"First",MFromDate,Status]);
+					}
+					else if(Rbtn_Second.selected==true)
+					{
+						useWeb("PettyCashReport","Gridload_CUSTOM",[GlobalXml,"GRIDLOAD",PropertyId,UserId,"Second",MFromDate,Status]);
+					}
+					Grd_Details.visible=true;
+				}
+				else if((PropertyId !=0)&&(UserId ==0))
 				{
 					if(Rbtn_First.selected==true)
 					{
@@ -391,6 +425,18 @@
 					else if(Rbtn_Second.selected==true)
 					{
 						useWeb("PettyCashReport","Gridload_CUSTOM",[GlobalXml,"GRIDLOAD",PropertyId,0,"Second",MFromDate,Status]);
+					}
+					Grd_Details.visible=true;
+				}
+				else if((PropertyId ==0)&&(UserId !=0))
+				{
+					if(Rbtn_First.selected==true)
+					{
+						useWeb("PettyCashReport","Gridload_CUSTOM",[GlobalXml,"GRIDLOAD",0,UserId,"First",MFromDate,Status]);
+					}
+					else if(Rbtn_Second.selected==true)
+					{
+						useWeb("PettyCashReport","Gridload_CUSTOM",[GlobalXml,"GRIDLOAD",0,UserId,"Second",MFromDate,Status]);
 					}
 					Grd_Details.visible=true;
 				}
@@ -516,6 +562,7 @@
 				hlp_Property.dataProvider=null;
 				hlp_Property.text="";PropertyId=0;Id=0;
 				UserId=0;Grd_Details.dataProvider=null;
+				hlp_User.text="";
 				Rbtn_First.selected=true;
 				Help();Txt_OpenBalance.text="";Txt_CloseBalance.text="";
 			}
@@ -525,11 +572,12 @@
 	<s:VGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
 		<s:BorderContainer x="12" y="1" width="100%" height="522" backgroundColor="#fbf9f9"
 						   borderVisible="false">
-			<s:Label x="93" y="49" text="Property"/>
-			<s:Label x="93" y="89" text="Status"/>
-			<s:DropDownList x="145" y="79" width="261" height="24" id="drp_status"
-							selectedItem="Submitted">
+			<s:Label x="43" y="49" text="Property"/>
+			<s:Label x="43" y="89" text="Status"/>
+			<s:DropDownList x="95" y="79" width="261" height="24" id="drp_status"
+							selectedItem="Select a Status">
 				<s:ArrayList>
+					<fx:String>Select a Status</fx:String>
 					<fx:String>Submitted</fx:String>
 					<fx:String>Approved by reporting authority</fx:String>
 					<fx:String>Report Approved by Ops Head</fx:String>
@@ -537,24 +585,24 @@
 					
 				</s:ArrayList>
 			</s:DropDownList>
-			<WrbHelpComp:HelpText id="hlp_Property" x="146" y="43" width="261" height="22" pxSetColumnsWidth="0,218" 
+			<WrbHelpComp:HelpText id="hlp_Property" x="96" y="43" width="261" height="22" pxSetColumnsWidth="0,218" 
 								  onselection="{Ddl_Property_changeHandler()}"  pxTabIndex="1" depth="10">
 			</WrbHelpComp:HelpText>
-			<mx:DateChooser id="dt_Date1" visible="true" x="453" y="35" height="31"
+			<mx:DateChooser id="dt_Date1" visible="true" x="383" y="78" height="31"
 							focusEnabled="false" selectedDate="{new Date()}" 
 							yearNavigationEnabled="true" selectableRange="{{rangeEnd: new Date()}}" />
-			<s:BorderContainer x="454" y="68" width="183" height="21" backgroundColor="#fbf9f9"
+			<s:BorderContainer x="384" y="111" width="183" height="21" backgroundColor="#fbf9f9"
 							   borderVisible="false" depth="4">
 				</s:BorderContainer>
 				
 			
-			<s:BorderContainer id="brd_Rbtn_Deposite" x="455" y="87" width="230" height="34" 
+			<s:BorderContainer id="brd_Rbtn_Deposite" x="605" y="87" width="230" height="34" 
 							   borderVisible="false" visible="true" >
 				<s:RadioButton id="Rbtn_First" x="8" y="0" label="First Fortnight" />
 				<s:RadioButton id="Rbtn_Second" x="109" y="0" label="Second Fortnight"/>
 			</s:BorderContainer>
 			<mx:Label x="83" y="9" text="Petty Cash Expense Report" color="red"/>
-			<mx:DataGrid x="13" y="128"  verticalAlign="middle" editable="true" visible="true"
+			<mx:DataGrid x="3" y="138"  verticalAlign="middle" editable="true" visible="true"
 						 width="975" height="344" tabIndex="4" id="Grd_Details" >
 				<mx:columns>
 					<mx:DataGridColumn dataField="DetailView" headerText="StatusDetail" width="75" editable="false"
@@ -705,8 +753,12 @@
 				<mx:TextInput x="653" y="361" id="Txt_CloseBalance" editable="false"/>
 			</s:BorderContainer>
 			<!--s:Button x="525" y="480" width="58" label="Print" click="doPrint()" visible="false"/-->
-			<WrbComp:Button_BB x="725" y="35" height="23" click="search()" Lable_val="Filter">
+			<WrbComp:Button_BB x="745" y="39" height="23" click="search()" Lable_val="Filter">
 			</WrbComp:Button_BB>
+			<s:Label x="389" y="48" text="RequestedBy"/>
+			<WrbHelpComp:HelpText id="hlp_User" x="470" y="41" width="261" height="22" pxSetColumnsWidth="0,218" 
+								  onselection="{Ddl_User_changeHandler()}"  pxTabIndex="1" depth="10">
+			</WrbHelpComp:HelpText>
 		</s:BorderContainer>
 		
 	</s:VGroup>

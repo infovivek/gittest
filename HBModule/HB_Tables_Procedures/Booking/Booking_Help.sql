@@ -58,8 +58,9 @@ IF @Action = 'Tab1_Next'
   -- client BOOKER DTLS
   SELECT FirstName AS label,Email,Id 
   FROM WRBHBClientManagementAddNewClient
-  WHERE IsDeleted=0 AND IsActive=1 AND ContactType='Booker' AND
-  CltmgntId=@ClientId AND ISNULL(FirstName,'') != '';
+  WHERE IsDeleted = 0 AND IsActive = 1 AND ContactType = 'Booker' AND
+  CltmgntId = @ClientId AND ISNULL(FirstName,'') != ''
+  ORDER BY FirstName ASC;
   /*CREATE TABLE #Mail(label NVARCHAR(100),Email NVARCHAR(100),Id INT);
   INSERT INTO #Mail(label,Email,Id)
   SELECT 'Shiv','shiv@hummingbirdindia.com',1;  

@@ -62,7 +62,7 @@ CREATE PROCEDURE dbo.[SP_VendorChequeApprovalHdr_Help]
 		
 		INSERT INTO #Request(Requestedby,RequestedOn,RequestedAmount,PropertyName,Status,Process,Processedon,
 		Processedby,Id,RequestedUserId,PropertyId,UserId)
-		
+		 
 		SELECT (U.FirstName+' '+U.LastName) AS Requestedby,CONVERT(NVARCHAR(100),VC.Date,103) AS RequestedOn,
 		SUM(VD.Amount) AS RequestAmount,P.PropertyName,'Waiting For Operation Manager Approval' AS Status,0 AS Process,
 		CONVERT(NVARCHAR(100),GETDATE(),103) AS Processedon,'Process' AS Processedby,
@@ -224,9 +224,10 @@ END
        
           
 		DECLARE @VId INT 
-		SET @VId =(SELECT DISTINCT VendorRequestHdrId From WRBHBVendorRequestDtl VD
+		SET @VId =(SELECT TOP 1 VendorRequestHdrId From WRBHBVendorRequestDtl VD
 		JOIN WRBHBVendorRequest VR ON VR.Id=VD.VendorRequestHdrId AND VR.IsActive=1 AND VR.IsDeleted=0
-		WHERE PropertyId=@CreatedById AND Date=CONVERT(Date,@Str,103))
+		WHERE PropertyId=@CreatedById AND Date=CONVERT(Date,@Str,103)ORDER BY VendorRequestHdrId)
+		
 		IF ISNULL(@VId,0) !=0
 		BEGIN
 		    SELECT CONVERT(NVARCHAR(100),GETDATE(),103) AS BillDate,

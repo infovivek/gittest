@@ -15,8 +15,9 @@ Reviewed By	: <Reviewed By (Leave it blank)>
 /*******************************************************************************************************
 *				AMENDMENT BLOCK
 ********************************************************************************************************
-'Name			Date			Signature			Description of Changes
+'Name			Date			Description of Changes
 ********************************************************************************************************	
+Sakthi          3rd & 4th Dec   Process alterations - rework
 *******************************************************************************************************
 */
 CREATE PROCEDURE [dbo].[SP_RoomShifting_Insert](@BookingId BIGINT,  
@@ -29,11 +30,11 @@ AS
 BEGIN  
 IF @BookingLevel = 'Room'  
  BEGIN  
-  -- UPDATE PAYMENT MODE  
+  -- UPDATE PAYMENT MODE & Expected checkin time  
   UPDATE WRBHBBookingPropertyAssingedGuest SET TariffPaymentMode = @TariffMode,  
-  ServicePaymentMode = @ServiceMode WHERE BookingId = @BookingId AND  
-  RoomCaptured = @RoomCaptured;
-  --  
+  ServicePaymentMode = @ServiceMode WHERE BookingId = @BookingId AND 
+  IsActive = 1 AND IsDeleted = 0 AND RoomCaptured = @RoomCaptured;
+  -- get PropertyType  
   DECLARE @PropertyType NVARCHAR(100) = '';  
   SELECT TOP 1 @PropertyType = BP.PropertyType FROM WRBHBBookingProperty BP  
   LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON  
@@ -51,7 +52,7 @@ IF @BookingLevel = 'Room'
       WHERE IsActive = 1 AND IsDeleted = 0 AND RoomShiftingFlag = 0 AND
       RoomCaptured = @RoomCaptured AND RoomId = @FromRoomId AND
       BookingId=@BookingId;
-      --
+      -- new insert
       INSERT INTO WRBHBBookingPropertyAssingedGuest(BookingId,EmpCode,
       FirstName,LastName,GuestId,Occupancy,RoomType,Tariff,RoomId,
       BookingPropertyId,BookingPropertyTableId,CreatedBy,CreatedDate,
@@ -89,67 +90,68 @@ IF @BookingLevel = 'Room'
 	  WHERE IsActive = 1 AND IsDeleted = 0 AND RoomShiftingFlag = 0 AND
 	  RoomCaptured = @RoomCaptured AND RoomId = @FromRoomId AND
 	  BookingId = @BookingId;
-	  --
-	  --IF @FromRoomId != @ToRoomId BEGIN
-	  INSERT INTO WRBHBBookingPropertyAssingedGuest(BookingId,EmpCode,
-	  FirstName,LastName,GuestId,Occupancy,RoomType,Tariff,RoomId,
-	  BookingPropertyId,BookingPropertyTableId,CreatedBy,CreatedDate,
-	  ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId,SSPId,ServicePaymentMode,
-	  TariffPaymentMode,ChkInDt,ChkOutDt,ExpectChkInTime,AMPM,RoomCaptured,
-	  ApartmentId,RackSingle,RackDouble,RackTriple,PtyChkInTime,PtyChkInAMPM,
-	  PtyChkOutTime,PtyChkOutAMPM,PtyGraceTime,LTonAgreed,LTonRack,STonAgreed,
-	  STonRack,CurrentStatus,CheckInHdrId,RoomShiftingFlag,Title,Column1,Column2,
-	  Column3,Column4,Column5,Column6,Column7,Column8,Column9,Column10)
-	  SELECT BookingId,EmpCode,FirstName,LastName,GuestId,Occupancy,@ToRoomNo,
-	  Tariff,@ToRoomId,BookingPropertyId,BookingPropertyTableId,CreatedBy,
-	  CreatedDate,@UsrId,GETDATE(),1,0,NEWID(),SSPId,ServicePaymentMode,
-	  TariffPaymentMode,CONVERT(DATE,@ChkInDt,103),
-	  CONVERT(DATE,@ChkOutDt,103),'12:00:00','PM',RoomCaptured,ApartmentId,
-	  RackSingle,RackDouble,RackTriple,PtyChkInTime,PtyChkInAMPM,PtyChkOutTime,
-	  PtyChkOutAMPM,PtyGraceTime,LTonAgreed,LTonRack,STonAgreed,STonRack,
-	  CurrentStatus,CheckInHdrId,0,Title,Column1,Column2,Column3,Column4,Column5,
-	  Column6,Column7,Column8,Column9,Column10
-	  FROM WRBHBBookingPropertyAssingedGuest
-	  WHERE Id IN (SELECT Id FROM #AssignedGuestTableId);
-	  -- Update existing entry
-	  UPDATE WRBHBBookingPropertyAssingedGuest SET ModifiedBy = @UsrId,
-	  ModifiedDate = GETDATE(),RoomShiftingFlag = 1,
-	  CancelRemarks = 'Room Shifting'+','+@ChkInDt+','+@ChkOutDt+','+
-	  @TariffMode+','+@ServiceMode+','+CAST(@FromRoomId AS VARCHAR)+','+
-	  CAST(@ToRoomId AS VARCHAR),ChkOutDt = CONVERT(DATE,@ChkInDt,103)
-	  WHERE Id IN (SELECT Id FROM #AssignedGuestTableId);
-	  /*END
+	  -- from room Id & to room Id not same
+	  IF @FromRoomId != @ToRoomId 
+	   BEGIN
+	    INSERT INTO WRBHBBookingPropertyAssingedGuest(BookingId,EmpCode,
+	    FirstName,LastName,GuestId,Occupancy,RoomType,Tariff,RoomId,
+	    BookingPropertyId,BookingPropertyTableId,CreatedBy,CreatedDate,
+	    ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId,SSPId,ServicePaymentMode,
+	    TariffPaymentMode,ChkInDt,ChkOutDt,ExpectChkInTime,AMPM,RoomCaptured,
+	    ApartmentId,RackSingle,RackDouble,RackTriple,PtyChkInTime,PtyChkInAMPM,
+	    PtyChkOutTime,PtyChkOutAMPM,PtyGraceTime,LTonAgreed,LTonRack,STonAgreed,
+	    STonRack,CurrentStatus,CheckInHdrId,RoomShiftingFlag,Title,Column1,Column2,
+	    Column3,Column4,Column5,Column6,Column7,Column8,Column9,Column10)
+	    SELECT BookingId,EmpCode,FirstName,LastName,GuestId,Occupancy,@ToRoomNo,
+	    Tariff,@ToRoomId,BookingPropertyId,BookingPropertyTableId,CreatedBy,
+	    CreatedDate,@UsrId,GETDATE(),1,0,NEWID(),SSPId,ServicePaymentMode,
+	    TariffPaymentMode,CONVERT(DATE,@ChkInDt,103),
+	    CONVERT(DATE,@ChkOutDt,103),ExpectChkInTime,AMPM,RoomCaptured,ApartmentId,
+	    RackSingle,RackDouble,RackTriple,PtyChkInTime,PtyChkInAMPM,PtyChkOutTime,
+	    PtyChkOutAMPM,PtyGraceTime,LTonAgreed,LTonRack,STonAgreed,STonRack,
+	    CurrentStatus,CheckInHdrId,0,Title,Column1,Column2,Column3,Column4,Column5,
+	    Column6,Column7,Column8,Column9,Column10
+	    FROM WRBHBBookingPropertyAssingedGuest
+	    WHERE Id IN (SELECT Id FROM #AssignedGuestTableId);
+	    -- Update existing entry
+	    UPDATE WRBHBBookingPropertyAssingedGuest SET ModifiedBy = @UsrId,
+	    ModifiedDate = GETDATE(),RoomShiftingFlag = 1,
+	    CancelRemarks = 'Room Shifting'+','+@ChkInDt+','+@ChkOutDt+','+
+	    @TariffMode+','+@ServiceMode+','+CAST(@FromRoomId AS VARCHAR)+','+
+	    CAST(@ToRoomId AS VARCHAR),ChkOutDt = CONVERT(DATE,@ChkInDt,103)
+	    WHERE Id IN (SELECT Id FROM #AssignedGuestTableId);
+	   END
 	  IF @FromRoomId = @ToRoomId
-	  BEGIN
-	  INSERT INTO WRBHBBookingPropertyAssingedGuest(BookingId,EmpCode,
-	  FirstName,LastName,GuestId,Occupancy,RoomType,Tariff,RoomId,
-	  BookingPropertyId,BookingPropertyTableId,CreatedBy,CreatedDate,
-	  ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId,SSPId,ServicePaymentMode,
-	  TariffPaymentMode,ChkInDt,ChkOutDt,ExpectChkInTime,AMPM,RoomCaptured,
-	  ApartmentId,RackSingle,RackDouble,RackTriple,PtyChkInTime,PtyChkInAMPM,
-	  PtyChkOutTime,PtyChkOutAMPM,PtyGraceTime,LTonAgreed,LTonRack,STonAgreed,
-	  STonRack,CurrentStatus,CheckInHdrId,RoomShiftingFlag,Title,Column1,Column2,
-	  Column3,Column4,Column5,Column6,Column7,Column8,Column9,Column10)
-	  SELECT BookingId,EmpCode,FirstName,LastName,GuestId,Occupancy,@ToRoomNo,
-	  Tariff,@ToRoomId,BookingPropertyId,BookingPropertyTableId,CreatedBy,
-	  CreatedDate,@UsrId,GETDATE(),1,0,NEWID(),SSPId,ServicePaymentMode,
-	  TariffPaymentMode,ChkInDt,
-	  CONVERT(DATE,@ChkOutDt,103),'12:00:00','PM',RoomCaptured,ApartmentId,
-	  RackSingle,RackDouble,RackTriple,PtyChkInTime,PtyChkInAMPM,PtyChkOutTime,
-	  PtyChkOutAMPM,PtyGraceTime,LTonAgreed,LTonRack,STonAgreed,STonRack,
-	  CurrentStatus,CheckInHdrId,0,Title,Column1,Column2,Column3,Column4,Column5,
-	  Column6,Column7,Column8,Column9,Column10
-	  FROM WRBHBBookingPropertyAssingedGuest
-	  WHERE Id IN (SELECT Id FROM #AssignedGuestTableId);
-	  -- Update existing entry
-	  UPDATE WRBHBBookingPropertyAssingedGuest SET ModifiedBy = @UsrId,
-	  ModifiedDate = GETDATE(),RoomShiftingFlag = 1,IsActive = 0,
-	  IsDeleted = 1,
-	  CancelRemarks = 'Room Shifting'+','+@ChkInDt+','+@ChkOutDt+','+
-	  @TariffMode+','+@ServiceMode+','+CAST(@FromRoomId AS VARCHAR)+','+
-	  CAST(@ToRoomId AS VARCHAR),ChkOutDt = CONVERT(DATE,@ChkInDt,103)
-	  WHERE Id IN (SELECT Id FROM #AssignedGuestTableId);
-	  END*/  
+	   BEGIN
+	    INSERT INTO WRBHBBookingPropertyAssingedGuest(BookingId,EmpCode,
+	    FirstName,LastName,GuestId,Occupancy,RoomType,Tariff,RoomId,
+	    BookingPropertyId,BookingPropertyTableId,CreatedBy,CreatedDate,
+	    ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId,SSPId,ServicePaymentMode,
+	    TariffPaymentMode,ChkInDt,ChkOutDt,ExpectChkInTime,AMPM,RoomCaptured,
+	    ApartmentId,RackSingle,RackDouble,RackTriple,PtyChkInTime,PtyChkInAMPM,
+	    PtyChkOutTime,PtyChkOutAMPM,PtyGraceTime,LTonAgreed,LTonRack,STonAgreed,
+	    STonRack,CurrentStatus,CheckInHdrId,RoomShiftingFlag,Title,Column1,Column2,
+	    Column3,Column4,Column5,Column6,Column7,Column8,Column9,Column10)
+	    SELECT BookingId,EmpCode,FirstName,LastName,GuestId,Occupancy,@ToRoomNo,
+	    Tariff,@ToRoomId,BookingPropertyId,BookingPropertyTableId,CreatedBy,
+	    CreatedDate,@UsrId,GETDATE(),1,0,NEWID(),SSPId,ServicePaymentMode,
+	    TariffPaymentMode,ChkInDt,
+	    CONVERT(DATE,@ChkOutDt,103),ExpectChkInTime,AMPM,RoomCaptured,ApartmentId,
+	    RackSingle,RackDouble,RackTriple,PtyChkInTime,PtyChkInAMPM,PtyChkOutTime,
+	    PtyChkOutAMPM,PtyGraceTime,LTonAgreed,LTonRack,STonAgreed,STonRack,
+	    CurrentStatus,CheckInHdrId,0,Title,Column1,Column2,Column3,Column4,Column5,
+	    Column6,Column7,Column8,Column9,Column10
+	    FROM WRBHBBookingPropertyAssingedGuest
+	    WHERE Id IN (SELECT Id FROM #AssignedGuestTableId);
+	    -- Update existing entry
+	    UPDATE WRBHBBookingPropertyAssingedGuest SET ModifiedBy = @UsrId,
+	    ModifiedDate = GETDATE(),RoomShiftingFlag = 1,IsActive = 0,
+	    IsDeleted = 1,
+	    CancelRemarks = 'Room Shifting'+','+@ChkInDt+','+@ChkOutDt+','+
+	    @TariffMode+','+@ServiceMode+','+CAST(@FromRoomId AS VARCHAR)+','+
+	    CAST(@ToRoomId AS VARCHAR),ChkOutDt = CONVERT(DATE,@ChkInDt,103)
+	    WHERE Id IN (SELECT Id FROM #AssignedGuestTableId);
+	   END 
 	  --
 	  CREATE TABLE #TMPPP(Id BIGINT, DayCnt INT);
 	  INSERT INTO #TMPPP(Id, DayCnt)
@@ -165,14 +167,16 @@ IF @BookingLevel = 'Room'
 	  FROM WRBHBBookingPropertyAssingedGuest
 	  WHERE IsActive = 1 AND IsDeleted = 0 AND BookingId = @BookingId AND
 	  RoomCaptured = @RoomCaptured AND RoomShiftingFlag = 0;
-	 END	  
+	 END
     END
   IF @Type = 'Stay'
    BEGIN
-    IF @PropertyType != ''
+    DECLARE @EChkInDt DATE,@EChkOutDt DATE;
+    DECLARE @NowChkInDt DATE,@NowChkOutDt DATE;
+    --IF @PropertyType != ''
+    IF @CurrentStatus = 'Booked'    
      BEGIN
       --
-      DECLARE @EChkInDt DATE,@EChkOutDt DATE;
       SELECT @EChkInDt = MIN(ChkInDt),@EChkOutDt = MAX(ChkOutDt)      
       FROM WRBHBBookingPropertyAssingedGuest  
       WHERE IsActive = 1 AND IsDeleted = 0 AND BookingId = @BookingId AND  
@@ -213,12 +217,60 @@ IF @BookingLevel = 'Room'
       CAST(@ToRoomId AS VARCHAR),RoomShiftingFlag = 1
       WHERE Id IN (SELECT Id FROM #AssignedGuestTableId);
       --
-      DECLARE @NowChkInDt DATE,@NowChkOutDt DATE;
       SELECT @NowChkInDt = MIN(ChkInDt),@NowChkOutDt = MAX(ChkOutDt)      
       FROM WRBHBBookingPropertyAssingedGuest  
       WHERE IsActive = 1 AND IsDeleted = 0 AND BookingId = @BookingId AND  
       RoomCaptured = @RoomCaptured;  
      END
+    IF @CurrentStatus = 'CheckIn'    
+     BEGIN
+      --
+      SELECT @EChkInDt = MIN(ChkInDt),@EChkOutDt = MAX(ChkOutDt)      
+      FROM WRBHBBookingPropertyAssingedGuest  
+      WHERE IsActive = 1 AND IsDeleted = 0 AND BookingId = @BookingId AND  
+      RoomCaptured = @RoomCaptured;  
+      -- Get Booking Property Assinged Guest Table Id
+      INSERT INTO #AssignedGuestTableId(Id)
+      SELECT Id FROM WRBHBBookingPropertyAssingedGuest
+      WHERE IsActive = 1 AND IsDeleted = 0 AND RoomShiftingFlag = 0 AND
+      RoomCaptured = @RoomCaptured AND RoomId = @FromRoomId AND
+      BookingId = @BookingId;
+      --
+      INSERT INTO WRBHBBookingPropertyAssingedGuest(BookingId,EmpCode,
+      FirstName,LastName,GuestId,Occupancy,RoomType,Tariff,RoomId,
+      BookingPropertyId,BookingPropertyTableId,CreatedBy,CreatedDate,
+      ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId,SSPId,
+      ServicePaymentMode,TariffPaymentMode,ChkInDt,ChkOutDt,ExpectChkInTime,
+      AMPM,RoomCaptured,ApartmentId,RackSingle,RackDouble,RackTriple,
+      PtyChkInTime,PtyChkInAMPM,PtyChkOutTime,PtyChkOutAMPM,PtyGraceTime,
+      LTonAgreed,LTonRack,STonAgreed,STonRack,CurrentStatus,CheckInHdrId,
+      RoomShiftingFlag,Title,Column1,Column2,Column3,Column4,Column5,
+      Column6,Column7,Column8,Column9,Column10)
+      SELECT BookingId,EmpCode,FirstName,LastName,GuestId,Occupancy,
+      RoomType,Tariff,RoomId,BookingPropertyId,BookingPropertyTableId,
+      CreatedBy,CreatedDate,@UsrId,GETDATE(),1,0,NEWID(),SSPId,
+      ServicePaymentMode,TariffPaymentMode,
+      CONVERT(DATE,@ChkInDt,103),CONVERT(DATE,@ChkOutDt,103),ExpectChkInTime,AMPM,
+      RoomCaptured,ApartmentId,RackSingle,RackDouble,RackTriple,
+      PtyChkInTime,PtyChkInAMPM,PtyChkOutTime,PtyChkOutAMPM,PtyGraceTime,
+      LTonAgreed,LTonRack,STonAgreed,STonRack,CurrentStatus,CheckInHdrId,0,Title,
+      Column1,Column2,Column3,Column4,Column5,Column6,Column7,Column8,Column9,
+      Column10 FROM WRBHBBookingPropertyAssingedGuest
+      WHERE Id IN (SELECT Id FROM #AssignedGuestTableId);
+      -- Update existing entry
+      UPDATE WRBHBBookingPropertyAssingedGuest SET IsActive = 0,IsDeleted = 1,
+      ModifiedBy = @UsrId,ModifiedDate = GETDATE(),
+      CancelRemarks = 'Stay'+','+@ChkInDt+','+@ChkOutDt+','+
+      @TariffMode+','+@ServiceMode+','+CAST(@FromRoomId AS VARCHAR)+','+
+      CAST(@ToRoomId AS VARCHAR),RoomShiftingFlag = 1
+      WHERE Id IN (SELECT Id FROM #AssignedGuestTableId);
+      --
+      SELECT @NowChkInDt = MIN(ChkInDt),@NowChkOutDt = MAX(ChkOutDt)      
+      FROM WRBHBBookingPropertyAssingedGuest  
+      WHERE IsActive = 1 AND IsDeleted = 0 AND BookingId = @BookingId AND  
+      RoomCaptured = @RoomCaptured;  
+     END
+    -- modification mail data 
     -- Dataset TABLE 0
     SELECT B.BookingCode,U.Email,B.Status,B.CancelRemarks,B.ClientName,
     U.UserName,U.MobileNumber,
