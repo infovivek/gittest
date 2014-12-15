@@ -76,7 +76,7 @@
 			}
 			public function Help():void
 			{
-				useWeb("PettyCashReport","PAGELOAD_CUSTOM",[GlobalXml,'PAGELOAD',0,0,'','','']);//32]);
+				useWeb("PettyCashReport","PAGELOAD_CUSTOM",[GlobalXml,'PAGELOAD',0,Global_AC[0].UsrId,'','','']);//32]);
 			}
 			private function Custom_WebSer_Result (Ds_Objects:Object):void
 			{
@@ -153,7 +153,8 @@
 						TotAmt+=Number(Ac_Tmp[i].ApprovedAmount);
 						TotPaid+=Number(Ac_Tmp[i].PaidAmount);
 					}
-					var VG:Number=TotAmt;
+					var OB:Number=Number(Txt_OpenBalance.text);
+					var VG:Number=TotAmt+OB;
 					lbl_Amount.text=VG.toString();
 					var VNG:Number=TotPaid;
 					lbl_Paid.text=VNG.toString();
@@ -200,6 +201,7 @@
 				bdr_History.visible=false;
 				Grd_History.dataProvider=null;
 				Grd_Details.visible=true;
+				Clear();
 			}
 			public function FnClosetariff_clickHandler1(event):void
 			{
@@ -208,6 +210,7 @@
 				Grd_SpendHistory.dataProvider=null
 				Grd_History.dataProvider=null;
 				Grd_Details.visible=true;
+				Clear();
 			}
 //			public function doPrint():void 
 //			{
@@ -561,10 +564,12 @@
 			{
 				hlp_Property.dataProvider=null;
 				hlp_Property.text="";PropertyId=0;Id=0;
-				UserId=0;Grd_Details.dataProvider=null;
+				UserId=0;
 				hlp_User.text="";
 				Rbtn_First.selected=true;
 				Help();Txt_OpenBalance.text="";Txt_CloseBalance.text="";
+				dt_Date1.selectedDate=new Date();
+				drp_status.selectedItem="Select a Status";
 			}
 			
 		]]>
@@ -747,9 +752,9 @@
 				<mx:Label x="557" y="67" text="OpeningBalance" id="lbl_CloseBalance"/>
 				<mx:TextInput x="659" y="65" id="Txt_OpenBalance" editable="false"/>
 				<mx:Label x="551" y="363" text="ClosingBalance" id="lbl_CloseBalance0"/>
-				<mx:Label id="lbl_Amount" x="491" y="333" width="82" text=""/>
+				<mx:Label id="lbl_Amount" x="482" y="333" width="101" text=""/>
 				<mx:Label id="lbl_Paid" x="618" y="333" width="91" text=""/>
-				<mx:Label x="347" y="333" text="Total Amount" />
+				<mx:Label x="257" y="333" text="Total Amount and OPeningBalance" />
 				<mx:TextInput x="653" y="361" id="Txt_CloseBalance" editable="false"/>
 			</s:BorderContainer>
 			<!--s:Button x="525" y="480" width="58" label="Print" click="doPrint()" visible="false"/-->

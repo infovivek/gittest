@@ -23,29 +23,40 @@ Reviewed By	: <Reviewed By (Leave it blank)>
 
 CREATE PROCEDURE Sp_ContractClientPref_Detail_Update
 (
-@HeaderId			BIGINT,
-@PropertyName       Nvarchar(100),
-@PropertyId			BigInt,
-@RoomType			NVARCHAR(100),
-@RoomId				BIGINT,
-@TariffSingle		DECIMAL(27, 2),
-@TariffDouble		DECIMAL(27, 2),
+@HeaderId		BIGINT,
+@PropertyName		NVARCHAR(100),
+@PropertyId		BIGINT,
+@RoomType		NVARCHAR(100),
+@RoomId			BIGINT,
+@TariffSingle	DECIMAL(27, 2),
+@TariffDouble	DECIMAL(27, 2),
 @TariffTriple       DECIMAL(27, 2),
+@LTariffSingle	DECIMAL(27, 2),
+@LTariffDouble	DECIMAL(27, 2),
+@LTariffTriple       DECIMAL(27, 2),
 @Facility			Nvarchar(100),
-@TaxInclusive		BIT,
-@TaxPercentage		DECIMAL(27, 2),
-@CreatedBy			BIGINT,
-@Id					BIGINT,
+@TaxInclusive	BIT,
+@TaxPercentage	DECIMAL(27, 2),
+@LTAgreed	DECIMAL(27, 2),
+@LTRack	DECIMAL(27, 2),
+@STAgreed	DECIMAL(27, 2),
+@CreatedBy		BIGINT,
 @ContactPhone 	NVARCHAR(100),
 @ContactName 	NVARCHAR(100),
-@Email				NVARCHAR(100)
+@Email		 	NVARCHAR(100),
+@Id				INT
 )
 AS
 BEGIN
-UPDATE WRBHBContractClientPref_Details SET HeaderId=@HeaderId,PropertyName=@PropertyName,PropertyId=@PropertyId,RoomType=@RoomType,RoomId=@RoomId,TariffSingle=@TariffSingle,
-		TariffDouble=@TariffDouble,TariffTriple=@TariffTriple,Facility=@Facility,TaxInclusive=@TaxInclusive,TaxPercentage=@TaxPercentage,
-			ModifiedBy=@CreatedBy,ModifiedDate=GETDATE(),Email=@Email,ContactPhone=@ContactPhone,ContactName=@ContactName where Id=@Id;
-			
+	UPDATE WRBHBContractClientPref_Details SET HeaderId=@HeaderId,PropertyName=@PropertyName,PropertyId=@PropertyId,
+	RoomType=@RoomType,RoomId=@RoomId,TariffSingle=@TariffSingle,TariffDouble=@TariffDouble,TariffTriple=@TariffTriple,
+	RTariffSingle=@LTariffSingle,RTariffDouble=@LTariffDouble,RTariffTriple=@LTariffTriple,
+	Facility=@Facility,TaxInclusive=@TaxInclusive,TaxPercentage=@TaxPercentage,
+	LTAgreed=@LTAgreed,LTRack=@LTRack,STAgreed=@STAgreed,ModifiedBy=@CreatedBy,
+	ModifiedDate=GETDATE(),Email=@Email,ContactPhone=@ContactPhone,ContactName=@ContactName where Id=@Id;
+				
 	select Id,RowId From WRBHBContractClientPref_Details
 	where Id=@Id;
 END
+
+

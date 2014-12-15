@@ -61,16 +61,16 @@ CREATE PROCEDURE dbo.[SP_SnackKOTHistory_Help]
         INSERT INTO #Guest(BookingId,Date,Type,Name,Apartment,Amount,Status,GuestId)
 	    	         
 	    SELECT DISTINCT CH.BookingId,CONVERT(NVARCHAR,KH.Date,105) ,'Guest' AS Type,KH.GuestName,CH.RoomNo,
-	    SUM(CAST(ISNULL(KD.Amount,0)as DECIMAL(27,2))) AS Amount,'Raised' as Status,
+	    (CAST(ISNULL(KD.Amount,0)as DECIMAL(27,2))) AS Amount,'Raised' as Status,
 	    KH.GuestId
 		FROM WRBHBNewKOTEntryHdr KH
 		JOIN WRBHBNewKOTEntryDtl KD ON KH.Id=KD.NewKOTEntryHdrId AND KD.IsActive=1 AND KD.IsDeleted=0
-		JOIN WRBHBCheckInHdr CH ON KH.GuestId=CH.GuestId AND CH.IsActive=1 AND CH.IsDeleted=0
+		JOIN WRBHBCheckInHdr CH ON KH.GuestId=CH.GuestId AND KH.CheckInId=CH.Id
+		AND CH.IsActive=1 AND CH.IsDeleted=0
 		WHERE KH.PropertyId=@PropertyId  AND KH.IsActive=1 And KH.IsDeleted=0
 		AND KH.Date BETWEEN CONVERT(Date,@Str1 ,103)
-		AND CONVERT(Date,@Str2,103)
-		group by CH.BookingId,KH.Date,KH.GuestName,CH.RoomNo,KH.GuestId
-		 
+		AND CONVERT(Date,@Str2,103) AND ISNULL(KH.ChkoutServiceFlag,0)=0
+				 
 		END	
   	
        SELECT  Date AS Date,Type,
@@ -98,25 +98,28 @@ CREATE PROCEDURE dbo.[SP_SnackKOTHistory_Help]
 	JOIN WRBHBProperty P ON S.Id=P.StateId AND P.IsActive=1 AND P.IsDeleted=0
 	WHERE P.Id=@PropertyId AND T.IsActive=1 AND T.IsDeleted=0
 	
+	
 		
 	CREATE TABLE #Service(ServiceItem NVARCHAR(100),Quantity INT,Price DECIMAL(27,2),Amount DECIMAL(27,2),
 	PropertyId INT)
 	INSERT INTO #Service(ServiceItem,Quantity,Price,Amount,PropertyId)
 	
 	SELECT ServiceItem,SUM(Quantity) AS Quantity,Price,SUM(Quantity)*(Price) AS Amount,H.PropertyId
-	FROM WRBHBNewKOTEntryDtl D
-	JOIN WRBHBNewKOTEntryHdr H ON D.NewKOTEntryHdrId=H.Id AND H.IsActive = 1 AND H.IsDeleted=0
-	WHERE H.GuestId =@GuestId  AND H.PropertyId=@PropertyId AND Price !=0
-	AND H.BookingId=@BookingId 
+	FROM  WRBHBNewKOTEntryHdr H
+	JOIN WRBHBNewKOTEntryDtl D ON H.Id=D.NewKOTEntryHdrId AND D.IsActive = 1 AND D.IsDeleted=0
+	WHERE H.GuestId =@GuestId  AND H.PropertyId=@PropertyId AND Price !=0 
+	AND ISNULL(H.ChkoutServiceFlag,0)=0 AND H.IsActive=1 AND H.IsDeleted=0
+	AND H.BookingId=@BookingId AND H.Date=@Str2
 	group by  ServiceItem,Price,PropertyId
 	
 	INSERT INTO #Service(ServiceItem,Quantity,Price,Amount,PropertyId)
 	
 	SELECT ServiceItem,SUM(Quantity) AS Quantity,Price,Amount AS Amount,H.PropertyId
-	FROM WRBHBNewKOTEntryDtl D
-	JOIN WRBHBNewKOTEntryHdr H ON D.NewKOTEntryHdrId=H.Id AND H.IsActive = 1 AND H.IsDeleted=0
-	WHERE H.GuestId =@GuestId  AND H.PropertyId=@PropertyId
-	AND H.BookingId=@BookingId  AND Price =0
+	FROM  WRBHBNewKOTEntryHdr H
+	JOIN WRBHBNewKOTEntryDtl D  ON D.NewKOTEntryHdrId=H.Id AND H.IsActive = 1 AND H.IsDeleted=0
+	WHERE H.GuestId =@GuestId  AND H.PropertyId=@PropertyId 
+	AND ISNULL(H.ChkoutServiceFlag,0)=0  AND H.IsActive=1 AND H.IsDeleted=0
+	AND H.BookingId=@BookingId  AND Price =0 AND H.Date=@Str2
 	group by  ServiceItem,Price,PropertyId,Amount
 	
 	CREATE TABLE #Calc(TotalAmount DECIMAL(27,2),ServiceTax DECIMAL(27,2),
@@ -129,10 +132,10 @@ CREATE PROCEDURE dbo.[SP_SnackKOTHistory_Help]
 	JOIN #TaxAmount T ON S.PropertyId=T.PropertyId
 	group by T.ServiceTax,T.VAT,T.Cess,T.HECess,S.PropertyId
 	
+	
 	DECLARE @CompanyName VARCHAR(100),@Address NVARCHAR(100),@Date NVARCHAR(100);
 	SET @CompanyName=(SELECT LegalCompanyName FROM WRBHBCompanyMaster)
 	SET @Address=(SELECT Address FROM WRBHBCompanyMaster)
-	
 	
 	SELECT DISTINCT H.GuestName as Name,--CONVERT(NVARCHAR,H.Date,105) AS ArrivalDate,
 	H.RoomNo,CH.BookingId,H.ClientName,CONVERT(NVARCHAR,CH.ArrivalDate,103) AS ChkInDt,
@@ -143,12 +146,12 @@ CREATE PROCEDURE dbo.[SP_SnackKOTHistory_Help]
 	@CompanyName AS CompanyName,@Address As CompanyAddress
 	FROM WRBHBNewKOTEntryDtl D
 	JOIN WRBHBNewKOTEntryHdr H ON D.NewKOTEntryHdrId=H.Id AND H.IsActive = 1 AND H.IsDeleted=0
-	JOIN WRBHBCheckInHdr CH ON H.GuestId=CH.GuestId AND CH.IsActive=1 AND CH.IsDeleted=0
+	JOIN WRBHBCheckInHdr CH ON H.GuestId=CH.GuestId AND H.CheckInId=CH.Id AND CH.IsActive=1 AND CH.IsDeleted=0
 	JOIN WRBHBProperty P ON H.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
 	JOIN #Service S ON P.Id=S.PropertyId
 	JOIN #Calc    C ON S.PropertyId=C.PropertyId
 	WHERE D.IsActive=1 AND D.IsDeleted = 0 AND  H.GuestId =@GuestId  AND H.PropertyId=@PropertyId
-	AND CH.BookingId=@BookingId
+	AND CH.BookingId=@BookingId AND H.Date=@Str2
 	
 	END
  END

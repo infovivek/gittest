@@ -28,6 +28,7 @@ namespace HBReport
                 string[] PropertyId = domainName.Split('?');
                 string[] GuestId = domainName.Split('?');
                 string[] BookingId = domainName.Split('?');
+                string[] From = domainName.Split('?');
                 //var Id = asd[1].Split(',');
                 command = new SqlCommand();
                 ds = new DataSet();
@@ -36,10 +37,11 @@ namespace HBReport
                 command.Parameters.Add("@Action", SqlDbType.NVarChar).Value = "Print";
                 command.Parameters.Add("@PropertyId", SqlDbType.Int).Value = Convert.ToInt32(PropertyId[1]); 
                 command.Parameters.Add("@Str1", SqlDbType.NVarChar).Value = "";
-                command.Parameters.Add("@Str2", SqlDbType.NVarChar).Value = "";
+                command.Parameters.Add("@Str2", SqlDbType.NVarChar).Value = From[4];
                 command.Parameters.Add("@GuestId", SqlDbType.Int).Value = Convert.ToInt32(GuestId[2]);
                 command.Parameters.Add("@BookingId", SqlDbType.Int).Value = Convert.ToInt32(BookingId[3]);
                 ds = new WrbErpConnection1().ExecuteDataSet(command, "");
+                
                 string sDataSourceName = "DataSet1";
                 ReportDataSource rds = new ReportDataSource(sDataSourceName, ds.Tables[0]);
                 ReportViewer1.LocalReport.DataSources.Clear();

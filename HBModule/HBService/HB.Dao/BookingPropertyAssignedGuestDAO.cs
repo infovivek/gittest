@@ -68,6 +68,8 @@ namespace HB.Dao
                 PtoG.Column9 = document.SelectNodes("//GridXml")[i].Attributes["Column9"].Value;
                 PtoG.Column10 = document.SelectNodes("//GridXml")[i].Attributes["Column10"].Value;
                 //
+                PtoG.BTCFilePath = document.SelectNodes("//GridXml")[i].Attributes["BTCFilePath"].Value;
+                //
                 /*PtoG.ChkColumn1 = Convert.ToBoolean(document.SelectNodes("//GridXml")[i].Attributes["ChkColumn1"].Value);
                 PtoG.ChkColumn2 = Convert.ToBoolean(document.SelectNodes("//GridXml")[i].Attributes["ChkColumn2"].Value);
                 PtoG.ChkColumn3 = Convert.ToBoolean(document.SelectNodes("//GridXml")[i].Attributes["ChkColumn3"].Value);
@@ -118,6 +120,9 @@ namespace HB.Dao
                 command.Parameters.Add("@Column8", SqlDbType.NVarChar).Value = PtoG.Column8;
                 command.Parameters.Add("@Column9", SqlDbType.NVarChar).Value = PtoG.Column9;
                 command.Parameters.Add("@Column10", SqlDbType.NVarChar).Value = PtoG.Column10;
+                //
+                command.Parameters.Add("@BTCFilePath", SqlDbType.NVarChar).Value = PtoG.BTCFilePath;
+                //
                 /*command.Parameters.Add("@ChkColumn1", SqlDbType.Bit).Value = PtoG.ChkColumn1;
                 command.Parameters.Add("@ChkColumn2", SqlDbType.Bit).Value = PtoG.ChkColumn2;
                 command.Parameters.Add("@ChkColumn3", SqlDbType.Bit).Value = PtoG.ChkColumn3;

@@ -12,7 +12,8 @@
     <form id="form1" runat="server">
     <div style="margin-left: 480px">
     
-        <asp:Button ID="Button1" runat="server" Text="Print" onclick="Button1_Click" />
+        <asp:Button ID="Button1" runat="server" Text="PDF" onclick="Button1_Click" 
+            style="font-weight: 700" />
     
     </div>
     <div>
@@ -22,7 +23,8 @@
             Width="100%" Font-Names="Verdana" Font-Size="8pt" 
             InteractiveDeviceInfos="(Collection)" WaitMessageFont-Names="Verdana" 
             WaitMessageFont-Size="14pt" ProcessingMode="Local"
-            PromptAreaCollapsed="true" SizeToReportContent="true">
+            PromptAreaCollapsed="true" SizeToReportContent="true" 
+            ShowExportControls="False" >
             <LocalReport ReportPath="GuestCheckOutConsolidate1.rdlc">
                 <DataSources>
                     <rsweb:ReportDataSource DataSourceId="ObjectDataSource1" Name="DataSet1" />

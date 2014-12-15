@@ -11,7 +11,8 @@
 <body>
     <form id="form1" runat="server">
     <div style="margin-left: 440px">
-     <asp:Button ID="Button1" runat="server" Text="Print" onclick="Button1_Click" />
+     <asp:Button ID="Button1" runat="server" Text="PDF" onclick="Button1_Click" 
+            style="font-weight: 700" />
     
     </div>
     <div align ="center">
@@ -20,7 +21,7 @@
             Width="100%" Font-Names="Verdana" Font-Size="8pt" 
             InteractiveDeviceInfos="(Collection)" WaitMessageFont-Names="Verdana" 
             WaitMessageFont-Size="14pt" AsyncRendering="False" SizeToReportContent="True"
-            PromptAreaCollapsed="True">
+            PromptAreaCollapsed="True" ShowExportControls="False">
              <LocalReport ReportPath="TAC Annexure.rdlc">
                 <DataSources>
                     <rsweb:ReportDataSource DataSourceId="ObjectDataSource1" Name="DataSet1" />

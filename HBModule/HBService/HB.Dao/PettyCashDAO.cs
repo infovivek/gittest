@@ -31,7 +31,7 @@ namespace HB.Dao
                 Petty.Description = document.SelectNodes("//HdrXml")[i].Attributes["Description"].Value;
                 Petty.ExpenseHead = document.SelectNodes("//HdrXml")[i].Attributes["ExpenseHead"].Value;
                 Petty.Amount = Convert.ToDecimal(document.SelectNodes("//HdrXml")[i].Attributes["Amount"].Value);
-
+                Petty.ExpenseHeadId = Convert.ToInt32(document.SelectNodes("//HdrXml")[i].Attributes["ExpenseHeadId"].Value);
                 command = new SqlCommand();
                 if (Petty.Id != 0)
                 {
@@ -53,6 +53,7 @@ namespace HB.Dao
                 command.Parameters.Add("@PettyCashHdrId", SqlDbType.NVarChar).Value = PettyCashHdrId;
                 command.Parameters.Add("@Description", SqlDbType.NVarChar).Value = Petty.Description;
                 command.Parameters.Add("@ExpenseHead", SqlDbType.NVarChar).Value = Petty.ExpenseHead;
+                command.Parameters.Add("@ExpenseHeadId", SqlDbType.Int).Value = Petty.ExpenseHeadId;
                 command.Parameters.Add("@Amount", SqlDbType.Decimal).Value = Petty.Amount;
                 command.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = user.Id;
                 command.Parameters.Add("@Status", SqlDbType.NVarChar).Value = "Submitted";

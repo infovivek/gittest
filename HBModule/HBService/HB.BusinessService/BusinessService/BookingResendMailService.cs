@@ -24,7 +24,7 @@ namespace HB.BusinessService.BusinessService
                 int BookingId = Convert.ToInt32(data[2]);
                 if (data[1].ToString() == "Room")
                 {
-                    ds1 = new BookingRoomResendMailDAO().Mail(BookingId, data[3], data[4]);
+                    ds1 = new BookingRoomResendMailDAO().Mail(BookingId, data[3], data[4], user);
                     if (ds1.Tables["Table12"].Rows[0][0].ToString() != "")
                     {
                         dTable.Rows.Add(ds1.Tables["Table12"].Rows[0][0].ToString());
@@ -32,7 +32,7 @@ namespace HB.BusinessService.BusinessService
                 }
                 if (data[1].ToString() == "Apartment")
                 {
-                    ds1 = new ApartmentBookingResendMailDAO().Mail(BookingId, data[3], data[4]);
+                    ds1 = new ApartmentBookingResendMailDAO().Mail(BookingId, data[3], data[4], user);
                     if (ds1.Tables["Table11"].Rows[0][0].ToString() != "")
                     {
                         dTable.Rows.Add(ds1.Tables["Table11"].Rows[0][0].ToString());
@@ -40,7 +40,7 @@ namespace HB.BusinessService.BusinessService
                 }
                 if (data[1].ToString() == "Bed")
                 {
-                    ds1 = new BedBookingesendMailDAO().Mail(BookingId, data[3], data[4]);
+                    ds1 = new BedBookingesendMailDAO().Mail(BookingId, data[3], data[4], user);
                     if (ds1.Tables["Table11"].Rows[0][0].ToString() != "")
                     {
                         dTable.Rows.Add(ds1.Tables["Table11"].Rows[0][0].ToString());

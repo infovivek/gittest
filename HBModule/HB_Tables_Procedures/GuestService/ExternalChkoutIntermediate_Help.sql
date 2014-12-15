@@ -19,7 +19,7 @@ ALTER PROCEDURE [dbo].[Sp_ExternalChkoutIntermediate_Help]
 @CheckInHdrId INT=NULL,
 --@Tariff DECIMAL(27,2)=NULL,
 @StateId INT=NULL,
-@PropertyId INT=NULL,
+@PropertyId BIGINT=NULL,
 @UserId INT=NULL
 )
 AS
@@ -43,7 +43,7 @@ IF @Action='PageLoad'
 	
 	
 	-- Room Level Property booked and direct booked (External Property)
-	    CREATE TABLE #Prop (ZId int,PropertyName NVARCHAR(100))
+	    CREATE TABLE #Prop (ZId BIGINT,PropertyName NVARCHAR(100))
 	    INSERT INTO #Prop(ZId,PropertyName)
 	    
 		SELECT DISTINCT P.Id As PropertyId,(P.PropertyName+','+C.CityName+','+S.StateName) as PropertyName
@@ -67,13 +67,31 @@ IF @Action='PageLoad'
 		
 		and PU.UserId=@UserId 
 		
-		SELECT ZId,PropertyName from #Prop GROUP BY ZId,PropertyName
-		SELECT count(*) AS PropertyCount,ZId,PropertyName FROM #Prop GROUP BY ZId,PropertyName 
+		INSERT INTO #Prop(ZId,PropertyName)
+	    
+	    SELECT S.HotalId AS PropertyId,(S.HotalName+','+C.CityName+','+st.StateName) AS PropertyName
+		FROM WRBHBBooking H
+		JOIN WRBHBBookingPropertyAssingedGuest AG WITH(NOLOCK) ON H.Id= AG.BookingId AND AG.IsActive = 1 and AG.IsDeleted = 0
+		JOIN WRBHBStaticHotels S WITH(NOLOCK) ON Ag.BookingPropertyId = S.HotalId AND s.IsActive=1 AND s.IsDeleted=0
+		JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON H.Id=BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0 
+		JOIN wrbhbcity C ON C.Id = H.cityId AND C.IsActive = 1
+		JOIN wrbhbstate st ON st.Id = C.StateId AND st.IsActive = 1 
+		WHERE H.IsActive = 1 AND H.IsDeleted = 0 AND
+		H.Status IN('Booked','Direct Booked')  
+		AND H.Cancelstatus !='Canceled' AND BP.PropertyType='MMT' 
+		GROUP BY S.HotalId,S.HotalName,C.CityName,st.StateName
+		
+		
+		
+		
+		SELECT CAST((ZId) AS NVARCHAR(100)) AS ZId,PropertyName from #Prop GROUP BY ZId,PropertyName
+		SELECT count(*) AS PropertyCount,CAST((ZId) AS NVARCHAR(100)) AS ZId,PropertyName FROM #Prop
+		GROUP BY ZId,PropertyName 
  		
  		 
  		 -- Item Load
     
-       CREATE TABLE #Service(Item NVARCHAR(100),PerQuantityprice DECIMAL(27,2),Id INT,TypeService NVARCHAR(100))  
+		CREATE TABLE #Service(Item NVARCHAR(100),PerQuantityprice DECIMAL(27,2),Id INT,TypeService NVARCHAR(100))  
 		INSERT INTO #Service(Item,PerQuantityprice,Id,TypeService)  
 		SELECT (ProductName) as Item,PerQuantityprice,Id,TypeService  
 		FROM WRBHBContarctProductMaster    
@@ -102,7 +120,7 @@ BEGIN
 	--	AND Id  IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where isnull(Flag,0) = 0 and  
 	--	IsActive = 1 and IsDeleted = 0 )
 		CREATE TABLE #GUEST(GuestName NVARCHAR(100),GuestId INT,StateId INT,CheckInHdrId INT,  
-		PropertyId INT,RoomId INT,ApartmentId INT,BookingId INT,BedId INT,Type NVARCHAR(100),Flag int,
+		PropertyId BIGINT,RoomId INT,ApartmentId INT,BookingId INT,BedId INT,Type NVARCHAR(100),Flag int,
 		BookingCode nvarchar(100),ChkInDT nvarchar(100),ChkOutDT nvarchar(100))  
 		
 		INSERT INTO #GUEST(GuestName,GuestId,StateId,CheckInHdrId,PropertyId,RoomId,ApartmentId,  
@@ -115,13 +133,13 @@ BEGIN
 		h.BookingId = d.BookingId and h.GuestId = d.GuestId and
 		d.IsActive=1 and d.IsDeleted=0
 		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
-		h.PropertyType in ('External Property' , 'Managed G H') and  
+		h.PropertyType in ('External Property' , 'Managed G H','MMT') and  
 		h.PropertyId = @PropertyId and  d.CurrentStatus = 'CheckIn' and 
 		-- CONVERT(nvarchar(100),ChkoutDate,103) = CONVERT(nvarchar(100),GETDATE(),103) and  
 		h.Id  IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where IsActive = 1 and IsDeleted = 0 
 		and ISNULL(IntermediateFlag,0)=1 and ISNULL(Flag,0)=1  )  OR
 		h.Id   in (Select ChkInHdrId FRom WRBHBExternalChechkOutTAC where IsActive = 1 and IsDeleted = 0 
-		and ISNULL(IntermediateFlag,0)=1 and ISNULL(Flag,0)=1)
+		and ISNULL(IntermediateFlag,0)=1 and ISNULL(Flag,0)=1 and PropertyId=@PropertyId)
 		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
 		h.BookingId,h.BedId,h.Type,h.BookingCode ,h.ChkInGuest,h.NewCheckInDate,d.ChkOutDt
 		
@@ -135,7 +153,7 @@ BEGIN
 		h.BookingId = d.BookingId and h.GuestId = d.GuestId and
 		d.IsActive=1 and d.IsDeleted=0
 		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
-		h.PropertyType in ('External Property' , 'Managed G H') and  
+		h.PropertyType in ('External Property' , 'Managed G H','MMT') and  
 		h.PropertyId = @PropertyId and   d.CurrentStatus = 'CheckIn' and 
 		-- CONVERT(nvarchar(100),ChkoutDate,103) = CONVERT(nvarchar(100),GETDATE(),103) and  
 		h.Id NOT IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where IsActive = 1 and IsDeleted = 0  )  and
@@ -153,14 +171,14 @@ BEGIN
 		h.BookingId = d.BookingId and h.GuestId = d.GuestId and
 		d.IsActive=1 and d.IsDeleted=0
 		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
-		h.PropertyType in ('External Property','Managed G H') and  
+		h.PropertyType in ('External Property','Managed G H','MMT') and  
 		h.PropertyId = @PropertyId and   --d.CurrentStatus = 'CheckIn' and 
 		-- CONVERT(nvarchar(100),ChkoutDate,103) = CONVERT(nvarchar(100),GETDATE(),103) and  
 		h.Id  IN (Select ChkInHdrId FROM WRBHBChechkOutHdr where isnull(Flag,0) = 0 and  
 		IsActive = 1 and IsDeleted = 0 ) 
 		
 		and h.Id  not IN (Select ChkInHdrId FRom WRBHBExternalChechkOutTAC where isnull(Flag,0) = 1 and  
-		IsActive = 1 and IsDeleted = 0 ) 
+		IsActive = 1 and IsDeleted = 0  ) 
 		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
 		h.BookingId,h.BedId,h.Type,h.BookingCode ,h.ChkInGuest,h.NewCheckInDate,d.ChkOutDt
 		
@@ -174,7 +192,7 @@ BEGIN
 		h.BookingId = d.BookingId and h.GuestId = d.GuestId and
 		d.IsActive=1 and d.IsDeleted=0
 		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
-		h.PropertyType in ('External Property','Managed G H') and  
+		h.PropertyType in ('External Property','Managed G H','MMT') and  
 		h.PropertyId = @PropertyId and   d.CurrentStatus = 'CheckIn' and 
 		-- CONVERT(nvarchar(100),ChkoutDate,103) = CONVERT(nvarchar(100),GETDATE(),103) and  
 		h.Id  IN (Select ChkInHdrId FROM WRBHBChechkOutHdr where isnull(IntermediateFlag,0) = 1 and  
@@ -204,8 +222,8 @@ BEGIN
 		--group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
 		--h.BookingId,h.BedId,h.Type,h.BookingCode ,h.ChkInGuest,h.NewCheckInDate,d.ChkOutDt
 		
-		SELECT  GuestName,GuestId,StateId, CheckInHdrId,PropertyId,RoomId,ApartmentId,  
-		BookingId,BedId,Type as Level,BookingCode ,ChkInDT as CheckInDate,ChkOutDT as CheckOutDate 
+		SELECT  GuestName,GuestId,StateId, CheckInHdrId,CAST((PropertyId) AS NVARCHAR(100)) AS  PropertyId,
+		RoomId,ApartmentId,BookingId,BedId,Type as Level,BookingCode ,ChkInDT as CheckInDate,ChkOutDT as CheckOutDate 
 		FROM #GUEST 
 		group by GuestName,GuestId,StateId, CheckInHdrId,PropertyId,RoomId,ApartmentId,  
 		BookingId,BedId,Type ,BookingCode ,ChkInDT,ChkOutDT
@@ -245,7 +263,7 @@ BEGIN
 		h.PropertyId = d.BookingPropertyId
 		AND h.IsActive = 1 and
 		h.IsDeleted = 0
-		WHERE d.GuestId  = @GuestId and d.BookingId = @BookingId --and d.IsActive = 1 and d.IsDeleted = 0
+		WHERE d.GuestId  = @GuestId and d.BookingId = @BookingId and d.IsActive = 1 and d.IsDeleted = 0
 		--group by d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,h.TACPer,d.Tariff,d.ChkInDt,d.ChkOutDt
 		ORDER BY d.Id DESC;
 	END
@@ -295,6 +313,9 @@ BEGIN
 	FROM WRBHBChechkOutHdr WHERE  Status = 'UnSettled' AND ChkInHdrId=@CheckInHdrId;
 	
 	SELECT IntermediateFlag FROM WRBHBChechkOutHdr where Status = 'UnSettled' AND ChkInHdrId=@CheckInHdrId;
+	
+	
+	
 END
 ELSE
 BEGIN
@@ -318,7 +339,7 @@ BEGIN
 		h.PropertyId = d.BookingPropertyId
 		AND h.IsActive = 1 and
 		h.IsDeleted = 0
-		where d.GuestId  = @GuestId and d.BookingId = @BookingId --and d.IsActive = 1 and d.IsDeleted = 0
+		where d.GuestId  = @GuestId and d.BookingId = @BookingId and d.IsActive = 1 and d.IsDeleted = 0
 		--group by d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,h.TACPer,d.Tariff,d.ChkInDt,d.ChkOutDt
 		order by d.Id desc;
 	END
@@ -378,7 +399,8 @@ BEGIN
 	BEGIN  
 	
 			CREATE TABLE #LEVEL1(ChkInDate NVARCHAR(100),ChkOutDate NVARCHAR(100),
-			TariffPaymentMode NVARCHAR(100),ServicePaymentMode NVARCHAR(100),TAC nvarchar(100),TACPer decimal(27,2))
+			TariffPaymentMode NVARCHAR(100),ServicePaymentMode NVARCHAR(100),TAC nvarchar(100),TACPer decimal(27,2),
+			STAgreed Decimal(27,2),LTAgreed Decimal(27,2),STRack decimal(27,2),LTRack decimal(27,2))
 			--DECLARE @BookingId BIGINT,@GuestId BIGINT,@BookingLevel nvarchar(100);
 			SET @BookingId=(SELECT BookingId FROM WRBHBCheckInHdr where Id = @CheckInHdrId and IsActive = 1 and IsDeleted =0)
 			SET @GuestId=(SELECT GuestId from WRBHBCheckInHdr where Id = @CheckInHdrId and IsActive = 1 and IsDeleted =0)
@@ -386,48 +408,61 @@ BEGIN
 --select @GuestId ,@BookingId
 		IF @BookingLevel = 'Room' 
 		BEGIN
-			INSERT INTO #LEVEL1(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode,TAC,TACPer)
+			INSERT INTO #LEVEL1(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode,TAC,TACPer,
+			STAgreed,LTAgreed,STRack,LTRack)
 			SELECT top 1 CONVERT(NVARCHAR(100),(d.ChkInDt),103),CONVERT(NVARCHAR(100),(d.ChkOutDt),103),
-			d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,isnull((d.Tariff*h.TACPer/100),0)
+			d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,isnull((d.Tariff*h.TACPer/100),0),
+			d.LTonAgreed,d.LTonRack,d.STonAgreed,d.STonRack
 			FROM  WRBHBBookingProperty h 
 			JOIN WRBHBBookingPropertyAssingedGuest d on h.BookingId= d.BookingId and
 			h.PropertyId = d.BookingPropertyId
 			AND h.IsActive = 1 and
 			h.IsDeleted = 0
-			where d.GuestId  = @GuestId and d.BookingId = @BookingId --and d.IsActive = 1 and d.IsDeleted = 0
+			where d.GuestId  = @GuestId and d.BookingId = @BookingId and d.IsActive = 1 and d.IsDeleted = 0
 			--group by d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,h.TACPer,d.Tariff
 			order by d.Id desc;
 		END
 	
 			DECLARE @ChkInDate1 nvarchar(100),@ChkOutDate1 nvarchar(100),@TariffPaymentMode1 nvarchar(100),
-			@ServicePaymentMode1 nvarchar(100),@TAC1 nvarchar(100),@TACPer1 nvarchar(100);
+			@ServicePaymentMode1 nvarchar(100),@TAC1 nvarchar(100),@TACPer1 nvarchar(100),
+			@STAgreed Decimal(27,2),@LTAgreed Decimal(27,2),@STRack decimal(27,2),@LTRack decimal(27,2);
 			SET @ChkInDate1 =( SELECT ChkInDate FROM #LEVEL1)	
 			SET @ChkOutDate1 =( SELECT ChkOutDate FROM #LEVEL1)
 			SET @TariffPaymentMode1 =(SELECT TariffPaymentMode FROM #LEVEL1)
 			SET @ServicePaymentMode1 =(SELECT ServicePaymentMode FROM #LEVEL1)
 			SET @TAC1=(SELECT TAC from #LEVEL1)
 			SET @TACPer1=(SELECT TACPer from #LEVEL1)
+			SET @STAgreed=(SELECT STAgreed FROM #LEVEL1)
+			SET @LTAgreed=(SELECT LTAgreed FROM #LEVEL1)
+			SET @STRack=(SELECT STRack FROM #LEVEL1)
+			SET @LTRack=(SELECT LTRack FROM #LEVEL1)
+			
+			
+			
 			
 -- this is chkin and chkout date after comes selected bill date		
 			
 			CREATE TABLE #LEVEL2(ChkInDate NVARCHAR(100),ChkOutDate NVARCHAR(100),
-			TariffPaymentMode NVARCHAR(100),ServicePaymentMode NVARCHAR(100),TAC nvarchar(100),TACPer decimal(27,2))
+			TariffPaymentMode NVARCHAR(100),ServicePaymentMode NVARCHAR(100),TAC NVARCHAR(100),TACPer DECIMAL(27,2),
+			STAgreed DECIMAL(27,2),LTAgreed DECIMAL(27,2),STRack DECIMAL(27,2),LTRack DECIMAL(27,2))
 			--DECLARE @BookingId BIGINT,@GuestId BIGINT,@BookingLevel nvarchar(100);
-			SET @BookingId=(SELECT BookingId FROM WRBHBCheckInHdr where Id = @CheckInHdrId and IsActive = 1 and IsDeleted =0)
-			SET @GuestId=(SELECT GuestId from WRBHBCheckInHdr where Id = @CheckInHdrId and IsActive = 1 and IsDeleted =0)
-			SET @BookingLevel=(SELECT Type from WRBHBCheckInHdr where Id = @CheckInHdrId and IsActive = 1 and IsDeleted =0)
+			SET @BookingId=(SELECT BookingId FROM WRBHBCheckInHdr WHERE Id = @CheckInHdrId AND IsActive = 1 AND IsDeleted =0)
+			SET @GuestId=(SELECT GuestId FROM WRBHBCheckInHdr WHERE Id = @CheckInHdrId AND IsActive = 1 AND IsDeleted =0)
+			SET @BookingLevel=(SELECT Type FROM WRBHBCheckInHdr WHERE Id = @CheckInHdrId AND IsActive = 1 AND IsDeleted =0)
 --select @GuestId ,@BookingId
 		IF @BookingLevel = 'Room' 
 		BEGIN
-			INSERT INTO #LEVEL2(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode,TAC,TACPer)
+			INSERT INTO #LEVEL2(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode,TAC,TACPer,
+			STAgreed,LTAgreed,STRack,LTRack)
 			SELECT @BillFrom,@BillTo,
-			d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,isnull((d.Tariff*h.TACPer/100),0)
+			d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,isnull((d.Tariff*h.TACPer/100),0),
+			d.LTonAgreed,d.LTonRack,d.STonAgreed,d.STonRack
 			FROM  WRBHBBookingProperty h 
 			JOIN WRBHBBookingPropertyAssingedGuest d on h.BookingId= d.BookingId and
 			h.PropertyId = d.BookingPropertyId
 			AND h.IsActive = 1 and
 			h.IsDeleted = 0
-			where d.GuestId  = @GuestId and d.BookingId = @BookingId --and d.IsActive = 1 and d.IsDeleted = 0
+			where d.GuestId  = @GuestId and d.BookingId = @BookingId and d.IsActive = 1 and d.IsDeleted = 0
 			--group by d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,h.TACPer,d.Tariff
 			--order by d.Id desc;
 		END
@@ -440,6 +475,10 @@ BEGIN
 			SET @ServicePaymentMode =(SELECT ServicePaymentMode FROM #LEVEL2)
 			SET @TAC=(SELECT TAC from #LEVEL2)
 			SET @TACPer=(SELECT TACPer from #LEVEL2)
+			SET @STAgreed=(SELECT STAgreed FROM #LEVEL2)
+			SET @LTAgreed=(SELECT LTAgreed FROM #LEVEL2)
+			SET @STRack=(SELECT STRack FROM #LEVEL2)
+			SET @LTRack=(SELECT LTRack FROM #LEVEL2)
 			
 			SELECT @NewCheckInDate=convert(nvarchar(100),Cast(NewCheckInDate as DATE),103)	FROM WRBHBCheckInHdr  
 		    WHERE IsActive = 1 and IsDeleted = 0 and Id =@CheckInHdrId
@@ -547,10 +586,12 @@ BEGIN
 	-- select * from #ServiceTax;
 	---return;
 	--select * from #ExTariff
+	
+	
 			DECLARE @Tariff DECIMAL(27,2),@RackTariffSingle DECIMAL(27,2),@RackTariffDouble DECIMAL(27,2),@Dt1 DateTime ,@prtyId BIGINT,
 			@chktime NVARCHAR(100),@TimeType NVARCHAR(100),@chkouttime NVARCHAR(100);
-			DECLARE @DateDiff int,@i int,@HR NVARCHAR(100),@MIN INT,@OutPutSEC INT,@OutPutHour INT,
-			@NoOfDays INT,@STAgreed DECIMAL(27,2),@LTAgreed DECIMAL(27,2),@STRack DECIMAL(27,2),@LTRack DECIMAL(27,2),
+			DECLARE @DateDiff int,@i int,@HR NVARCHAR(100),@MIN INT,@OutPutSEC INT,@OutPutHour INT,@NoOfDays INT,
+			--@STAgreed DECIMAL(27,2),@LTAgreed DECIMAL(27,2),@STRack DECIMAL(27,2),@LTRack DECIMAL(27,2),
 			@SingleMarkupAmount DECIMAL(27,2),@DoubleMarkupAmount DECIMAL(27,2);
 		
 		
@@ -748,6 +789,16 @@ BEGIN
 				FROM #ServiceTax2 h
 				join #ExTariff d on h.DATE = d.Date
 				WHERE Occupancy ='Double'
+				--(RACK TARIFF Triple)
+				INSERT INTO #FINALTAX(Tariff,STAgreed,LTAgreed,STRack,LTRack,Occupancy,ServiceTax,Amount,
+				BusinessSupportST,BST,NetAmountTAC,ST)
+				SELECT Tariff,ISNULL((Tariff*STAgreed)/100,0),ISNULL((Tariff*LTAgreed)/100,0),ISNULL((RackTariffDouble*LTRack)/100,0),
+				ISNULL((RackTariffDouble*STRack)/100,0),Occupancy,ISNULL((Tariff*h.ServiceTax)/100,0),'0.00' as Amount,'0.00' as BusinessSupportST,
+				'0.00' as BST,ISNULL(d.DoubleMarkupAmount,0) as NetAmountTAC,h.ServiceTax
+				FROM #ServiceTax2 h
+				join #ExTariff d on h.DATE = d.Date
+				WHERE Occupancy ='Triple'
+				
 				set @TAC=1
 			END
 			ELSE
@@ -770,6 +821,17 @@ BEGIN
 				FROM #ServiceTax2 h
 				join #ExTariff d on h.DATE = d.Date
 				WHERE Occupancy ='Double'
+				
+				
+				--(RACK TARIFF Triple)
+				INSERT INTO #FINALTAX(Tariff,STAgreed,LTAgreed,STRack,LTRack,Occupancy,ServiceTax,Amount,
+				BusinessSupportST,BST,NetAmountTAC,ST)
+				SELECT Tariff,ISNULL((Tariff*STAgreed)/100,0),ISNULL((Tariff*LTAgreed)/100,0),ISNULL((RackTariffDouble*LTRack)/100,0),
+				ISNULL((RackTariffDouble*STRack)/100,0),Occupancy,ISNULL((Tariff*h.ServiceTax)/100,0),'0.00' as Amount,'0.00' as BusinessSupportST,
+				'0.00' as BST,ISNULL(d.DoubleMarkupAmount,0) as NetAmountTAC,h.ServiceTax
+				FROM #ServiceTax2 h
+				join #ExTariff d on h.DATE = d.Date
+				WHERE Occupancy ='Triple'
 			--set @TAC=1
 			END
 		END
@@ -845,6 +907,8 @@ BEGIN
 				FROM #ServiceTax2 h
 				join #ExTariff d on h.DATE = d.Date
 				WHERE Occupancy ='Double' AND ISNULL(h.ServiceTax,0)!=0
+				
+				
 		
 		END
 		ELSE
@@ -1142,6 +1206,7 @@ BEGIN
 	 else-- for checkout done with flag 0  
  begin  
  
+ 
 		SELECT Property,Stay,ChkOutTariffAdays  AS Tariff,  
 		CONVERT(NVARCHAR(100),CheckOutDate,103) AS ChkoutDate,CONVERT(NVARCHAR(100),CheckInDate,103) AS CheckInDate  
 		FROM WRBHBChechkOutHdr WHERE  Id=@CID and  IsActive=1 and IsDeleted=0 and Flag=0  
@@ -1393,7 +1458,10 @@ BEGIN
 		SELECT DISTINCT ISNULL( ROUND((@TARIFAMT+@SERVICEAMT),0),0) AS ConsolidateAmount 
 		--FROM #Tariffs  
 		--WHERE ROUND((@TARIFAMT+@SERVICEAMT),0)!=0  
-		SELECT 1 AS UnPaid;    
+		--SELECT 1 AS Paid;    
+		
+		SELECT COUNT(*) AS UnPaid FROM  #Tariffs  WHERE PaymentStatus = 'UnPaid'  
+		
 		
 		END  
 	 END 	
@@ -1698,13 +1766,17 @@ IF @Action='ConUpdate'
 If @Action='TariffIntermediate'  
 BEGIN
 	
-    DECLARE @CheckOutId2 BIGINT;
+    DECLARE @CheckOutId2 BIGINT,@CheckOutId22 BIGINT;
     DECLARE @IntemediateChkoutDt NVARCHAR(100),@PayeeName NVARCHAR(100),@Address NVARCHAR(4000),
 	@Consolidated BIT,@CreatedBy BIGINT
-    SET @CheckOutId2 =  (SELECT TOP 1 Id  FROM WRBHBChechkOutHdr WHERE ChkInHdrId=@CheckInHdrId order by Id desc) 
-    SET @CheckOutId2 =  (SELECT TOP 1 Id  FROM WRBHBExternalChechkOutTAC WHERE ChkInHdrId=@CheckInHdrId order by Id desc) 
+    SET @CheckOutId2 =  (SELECT TOP 1 Id  FROM WRBHBChechkOutHdr WHERE ChkInHdrId=@CheckInHdrId 
+    and IsActive= 1 and IsDeleted = 0  order by Id desc) 
+    SET @CheckOutId22 =  (SELECT TOP 1 Id  FROM WRBHBExternalChechkOutTAC WHERE ChkInHdrId=@CheckInHdrId 
+    and IsActive= 1 and IsDeleted = 0  order by Id desc) 
     SET @IntemediateChkoutDt = (SELECT TOP 1 CONVERT(DATE,BillEndDate,103)  FROM WRBHBChechkOutHdr
      WHERE ChkInHdrId=@CheckInHdrId order by Id desc)
+     
+     
     SET @PayeeName =(select top 1 GuestName from WRBHBChechkOutHdr where ChkInHdrId=@CheckInHdrId order by Id desc)
   --  SET @Consolidated = 
     
@@ -1715,8 +1787,8 @@ BEGIN
 	UPDATE WRBHBChechkOutHdr SET PaymentStatus = 'Paid' ,Flag = 1,Status='CheckOut' ,IsActive = 1 
 	WHERE Id = @CheckOutId2 
 	
-	UPDATE WRBHBExternalChechkOutTAC SET PaymentStatus = 'Paid' ,Flag = 1 ,IsActive = 1 
-	WHERE Id = @CheckOutId2 
+	UPDATE WRBHBExternalChechkOutTAC SET PaymentStatus = 'Paid' ,Status='CheckOut',Flag = 1 ,IsActive = 1 
+	WHERE Id = @CheckOutId22 
 	
 	UPDATE WRBHBCheckOutServiceHdr SET PaymentStatus = 'Paid'  ,IsActive = 1  
 	WHERE CheckOutHdrId = @CheckOutId2

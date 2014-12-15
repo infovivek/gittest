@@ -5,20 +5,19 @@ using System.Text;
 using System.Data;
 using System.Data.SqlClient;
 using HB.Entity;
-using System.Text.RegularExpressions;
 
 namespace HB.Dao
 {
-    public class APIBookingMailDAO
+    public class APIBookingResendMailDAO
     {
         SqlCommand command = new SqlCommand();
         DataSet ds = new DataSet();
         string UserData;
-        public DataSet Mail(int BookingId, User user)
+        public DataSet Mail(int BookingId, string Email, string UsrEmail, User user)
         {
-            UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + 
-                       ", ScreenName:'" + user.ScreenName + "', SctId:" + user.SctId + 
-                       ", Service : BookingRoomMailDAO : Help, " + ", ProcName:'" + StoredProcedures.BookingDtls_Help;            
+            UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName +
+                       ", ScreenName:'" + user.ScreenName + "', SctId:" + user.SctId +
+                       ", Service : APIBookingResendMailDAO : Help, " + ", ProcName:'" + StoredProcedures.BookingDtls_Help;
             System.Net.Mail.MailMessage message = new System.Net.Mail.MailMessage();
             try
             {
@@ -29,7 +28,7 @@ namespace HB.Dao
                 command.Parameters.Add("@Action", SqlDbType.NVarChar).Value = "MMTBookingConfirmed";
                 command.Parameters.Add("@Str", SqlDbType.NVarChar).Value = "";
                 command.Parameters.Add("@Id", SqlDbType.BigInt).Value = BookingId;
-                ds = new WrbErpConnection().ExecuteDataSet(command, UserData);               
+                ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
                 if (ds.Tables[5].Rows.Count > 0)
                 {
                     message.From = new System.Net.Mail.MailAddress("homestay@uniglobeatb.co.in", "", System.Text.Encoding.UTF8);
@@ -66,16 +65,16 @@ namespace HB.Dao
                 // Extra CC email from Front end
                 if (ds.Tables[2].Rows[0][9].ToString() != "")
                 {
-                        string ExtraCC = ds.Tables[2].Rows[0][9].ToString();
-                        var ExtraCCEmail = ExtraCC.Split(',');
-                        int cnt = ExtraCCEmail.Length;
-                        for (int i = 0; i < cnt; i++)
+                    string ExtraCC = ds.Tables[2].Rows[0][9].ToString();
+                    var ExtraCCEmail = ExtraCC.Split(',');
+                    int cnt = ExtraCCEmail.Length;
+                    for (int i = 0; i < cnt; i++)
+                    {
+                        if (ExtraCCEmail[i].ToString() != "")
                         {
-                            if (ExtraCCEmail[i].ToString() != "")
-                            {
-                                message.CC.Add(new System.Net.Mail.MailAddress(ExtraCCEmail[i].ToString()));
-                            }
+                            message.CC.Add(new System.Net.Mail.MailAddress(ExtraCCEmail[i].ToString()));
                         }
+                    }
                 }
                 if (ds.Tables[2].Rows[0][4].ToString() != "")
                 {
@@ -156,7 +155,7 @@ namespace HB.Dao
                     CheckOutPolicy = "12 PM";
                 }
                 //
-                string Note = "";               
+                string Note = "";
                 if (ds.Tables[1].Rows[0][6].ToString() == "MMT") { Note = " - NA - "; } else { Note = " - NA - "; }
                 //
                 string SplReq = "";
@@ -166,7 +165,7 @@ namespace HB.Dao
                 string AddressDtls =
                     "<p style=\"margin-top:10px; margin-left:5px; font-size:11px;\">" +
                     " <span style=\"color:#f54d02; font-weight:bold; font-size:11px;\">Tax :</span> " + ds.Tables[3].Rows[0][1].ToString() + "" +
-                    " </p>"+
+                    " </p>" +
                     " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
                     " <tr style=\"font-size:11px; background-color:#eee;\">" +
                     " <td width=\"800px\" style=\"padding:12px 5px;\">" +
@@ -193,7 +192,7 @@ namespace HB.Dao
                     " </p></td></tr></table>";
                 string UserName = "";
                 string EmailId = "";
-                string PhoneNo = "";                
+                string PhoneNo = "";
                 string QRCode =
                         " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
                         " <tr style=\"font-size:11px; font-weight:normal;\">" +
@@ -225,7 +224,7 @@ namespace HB.Dao
                 message.IsBodyHtml = true;
                 // SMTP Email email: 
                 System.Net.Mail.SmtpClient smtp = new System.Net.Mail.SmtpClient();
-                smtp.EnableSsl = true;                
+                smtp.EnableSsl = true;
                 smtp.Port = 587;
                 //smtp.Host = "smtp.gmail.com";
                 //smtp.Credentials = new System.Net.NetworkCredential("stay@staysimplyfied.com", "stay1234");
@@ -236,7 +235,7 @@ namespace HB.Dao
             catch (Exception ex)
             {
                 CreateLogFiles log = new CreateLogFiles();
-                log.ErrorLog(ex.Message + " --> Room Level Booking MMT Confirmation Mail --> " + message.Subject);
+                log.ErrorLog(ex.Message + " --> Room Level Booking MMT Resend Confirmation Mail --> " + message.Subject);
             }
             return ds;
         }

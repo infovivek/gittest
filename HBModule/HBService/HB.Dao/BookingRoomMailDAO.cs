@@ -229,17 +229,17 @@ namespace HB.Dao
             string Imagelocation = "";
             Imagelocation = ds.Tables[6].Rows[0][0].ToString();
             string Imagebody =
-                        " <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" align=\"center\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #cccdcf solid 1px\">" +
+                        " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #cccdcf solid 1px\">" +
                         "<tr><td>" +
-                        "<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" align=\"center\">" +
+                        "<table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\">" +
                         "<tr> " +
                         "<th align=\"left\" width=\"50%\" style=\"padding: 10px 0px 10px 10px;\">" +
                         "<img src=" + Imagelocation + " width=\"200px\" height=\"52px\" alt=" + ds.Tables[6].Rows[0][1].ToString() + ">" +              //Image Name Change
                         "</th><th width=\"50%\"></th></tr></table>";
             /*string Imagebody =
-                " <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" align=\"center\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #cccdcf solid 1px\">" +
-                " <tr><td><table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" align=\"center\">" +
-                " <tr><td width=\"100%\" align=\"left\" style=\"padding: 10px 0px 10px 10px;\"> " +
+                " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #cccdcf solid 1px\">" +
+                " <tr><td><table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\">" +
+                " <tr><td width=\"800px\" align=\"left\" style=\"padding: 10px 0px 10px 10px;\"> " +
                 " <img src=" + Imagelocation + " width=\"250px\" height=\"70px\" alt=" + ds.Tables[6].Rows[0][1].ToString() + ">" +
                 " </td></tr></table>";*/
             string SecondRow = " <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #ffffff solid 1px\">" +
@@ -285,7 +285,7 @@ namespace HB.Dao
                             " <p style=\"margin:0px;\">Company Name : <span>" + ds.Tables[2].Rows[0][1].ToString() + "</span></p>" + //company name
                             " </td><td width=\"400px\"><p style=\"padding:25px 25px 25px 25px; font-size:13px; color:#000; font-weight:bold; background-color:#ffcc00;\">Please refer your name and reference number - " + ds.Tables[4].Rows[0][9].ToString() + " at the time of check-In</p>" +
                             " <p style=\"margin-top:0px;\"> <span style=\"color:orange; font-size:12px;\"></span></p>" +
-                            " </td></tr><tr><td width=\"100%\" style=\"margin-bottom:\">" +
+                            " </td></tr><tr><td width=\"800px\" style=\"margin-bottom:\">" +
                             " <p style=\"color:orange; font-weight:bold; font-size:14px;\"> Guest Details :</p>" +
                             " </td> </tr></table>";
            
@@ -305,7 +305,7 @@ namespace HB.Dao
                         " </table>";                
             }*/
             /*string SecondRow =
-                " <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" align=\"center\">" +
+                " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\">" +
                 " <tr style=\"position:relative; background-color:#fff; font-size:11px;\">" +
                 " <td width=\"400\" style=\" padding-bottom:1px;\">" +
                 " <p style=\"font-weight:bold; color:orange;\">Booking confirmation details" +
@@ -315,7 +315,7 @@ namespace HB.Dao
                 " <p style=\"margin:0px;\">Company Name : <span>" + ds.Tables[2].Rows[0][1].ToString() + "</span></p>" + //company name
                 " </td><td width=\"200\"><p style=\"margin:0px;\"></p>" +
                 " <p style=\"margin-top:0px;\"> <span style=\"color:orange; font-size:12px;\"></span></p>" +
-                " </td></tr><tr><td width=\"100%\" style=\"margin-bottom:\">" +
+                " </td></tr><tr><td width=\"800px\" style=\"margin-bottom:\">" +
                 " <p style=\"color:orange; font-weight:bold; font-size:14px;\"> Guest Details</p>" +
                 " </td> </tr></table>";*/
             string GuestDetailsTable1 = "";
@@ -324,7 +324,7 @@ namespace HB.Dao
             if ((typeofpty == "MGH") || (typeofpty == "DdP"))
             {
                 GuestDetailsTable1 =
-                    " <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" align=\"center\">" +
+                    " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\">" +
                     " <tr style=\"font-size:11px; font-weight:normal;\">" +
                     " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:120px;\"><p>Guest Name</p></th>" +
                     " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p>Check-In Date / Expected Time</p></th>" +
@@ -352,7 +352,7 @@ namespace HB.Dao
             else
             {
                 GuestDetailsTable1 =
-                    " <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" align=\"center\">" +
+                    " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\">" +
                     " <tr style=\"font-size:11px; font-weight:normal;\">" +
                     " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:120px;\"><p>Guest Name</p></th>" +
                     " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p>Check-In Date / Expected Time</p></th>" +
@@ -426,9 +426,9 @@ namespace HB.Dao
                 "<p style=\"margin-top:10px; margin-left:5px; font-size:11px;\">" +
                 " <span style=\"color:#f54d02; font-weight:bold; font-size:11px;\">Tax :</span> " + Taxes + "" +
                 " </p>"+
-                " <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
+                " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
                 " <tr style=\"font-size:11px; background-color:#eee;\">" +
-                " <td width=\"100%\" style=\"padding:12px 5px;\">" +
+                " <td width=\"800px\" style=\"padding:12px 5px;\">" +
                 " <p style=\"color:orange; font-weight:bold; margin:0px; font-size:14px;\"> Contact Details</p>" +
                     " <p style=\"margin-top:20px;\">" +
                 " <span style=\"color:#f54d02; font-weight:bold\">Property Name : </span> " + ds.Tables[1].Rows[0][5].ToString() + "  <br>" +
@@ -487,7 +487,7 @@ namespace HB.Dao
                 }
             }
             string QRCode =
-                    " <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
+                    " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
                     " <tr style=\"font-size:11px; font-weight:normal;\">" +
                     " <th width=\"50%\" style=\"background-color:#eee; padding:5px 0px; border-right:1px solid #ccc;\"><p style=\"text-align:center; padding-left:10px;\">QR Code</p></th>" +
                     " <th width=\"50%\" style=\"background-color:#eee; padding:5px 0px;\"><p style=\"text-align:center; padding-left:10px;\">Contact for any issues and feedbacks</p></th>" +
@@ -504,7 +504,7 @@ namespace HB.Dao
                     " </tr></table>";
             //string Disclaimer = "This message (including attachment if any) is confidential and may be privileged. Before opening attachments please check them for viruses and defects. HummingBird Travel & Stay Private Limited (HummingBird) will not be responsible for any viruses or defects or any forwarded attachments emanating either from within HummingBird or outside. If you have received this message by mistake please notify the sender by return e-mail and delete this message from your system. Any unauthorized use or dissemination of this message in whole or in part is strictly prohibited. Please note that e-mails are susceptible to change and HummingBird shall not be liable for any improper, untimely or incomplete transmission.";
             /*string FooterDtls =
-                    " <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
+                    " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
                     " <tr style=\"font-size:11px; font-weight:normal;\">" +
                     " <th width=\"50%\" style=\"background-color:#eee; padding:5px 0px; border-right:1px solid #ccc;\"><p style=\"text-align:center; padding-left:10px;\">Security Policy</p></th>" +
                     " <th width=\"50%\" style=\"background-color:#eee; padding:5px 0px;\"><p style=\"text-align:center; padding-left:10px;\">Cancellation / No Show / Early Departure Policy</p></th>" +
@@ -515,11 +515,11 @@ namespace HB.Dao
                     " <li><span>Government Photo ID proof such as driving license, passport, voter ID card etc. needs to be produced. (Kindly confirm whether PAN CARD is accepted)</span></li>" +
                     " <li><span>A company business card or company ID card needs to be produced.</span></li></ol>" +
                     " </td><td width=\"200\" style=\"padding:10px; margin-bottom:20px; border-bottom:1px solid #ccc;\"><ol type=\"A\" style=\"font-weight: bold;\"><li><span>Cancellation of booking to be confirmed through Email.</span></li><li><span>Mail to be sent to stay@staysimplyfied.com and mention the booking ID no. </span></li>" +
-                    " <li><span>100% refund will be made if cancellation request is sent 48 (forty eight) hours prior to the check-in date and NIL amount will be refunded if cancellation request sent beyond 48 (forty eight) hours to check-in date.</span></li>" +
+                    " <li><span>800px refund will be made if cancellation request is sent 48 (forty eight) hours prior to the check-in date and NIL amount will be refunded if cancellation request sent beyond 48 (forty eight) hours to check-in date.</span></li>" +
                     " <li><span>1 day tariff will be charged for No-show without intimation.</span></li></td></ol>" +
                     " </tr></table><br>";*/
             string FooterDtls =
-                    " <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
+                    " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
                     " <tr style=\"font-size:11px; font-weight:normal;\">" +
                     " <th width=\"50%\" style=\"background-color:#eee; padding:5px 0px; border-right:1px solid #ccc;\"><p style=\"text-align:center; padding-left:10px;\">Security Policy</p></th>" +
                     " <th width=\"50%\" style=\"background-color:#eee; padding:5px 0px;\"><p style=\"text-align:center; padding-left:10px;\">Cancellation / No Show / Early Departure Policy</p></th>" +
@@ -686,17 +686,17 @@ namespace HB.Dao
                     Imagelocation1 = ds.Tables[4].Rows[0][10].ToString();
                     Imagealt = ds.Tables[4].Rows[0][11].ToString();
                     string Imagebody1 =
-                        " <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" align=\"center\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #cccdcf solid 1px\">" +
+                        " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #cccdcf solid 1px\">" +
                         "<tr><td>" +
-                        "<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" align=\"center\">" +
+                        "<table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\">" +
                         "<tr> " +
                         "<th align=\"left\" width=\"50%\" style=\"padding: 10px 0px 10px 10px;\">" +
                         "<img src=" + Imagelocation + " width=\"200px\" height=\"52px\" alt=" + Imagealt + ">" +              //Image Name Change
                         "</th><th width=\"50%\"></th></tr></table>";
                     /*string Imagebody1 =
-                        " <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" align=\"center\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #cccdcf solid 1px\">" +
-                        " <tr><td><table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" align=\"center\">" +
-                        " <tr><td width=\"100%\" align=\"left\" style=\"padding: 10px 0px 10px 10px;\"> " +
+                        " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #cccdcf solid 1px\">" +
+                        " <tr><td><table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\">" +
+                        " <tr><td width=\"800px\" align=\"left\" style=\"padding: 10px 0px 10px 10px;\"> " +
                         " <img src=" + Imagelocation1 + " width=\"250px\" height=\"70px\" alt=" + ds.Tables[6].Rows[0][3].ToString() + ">" +
                         " </td></tr></table>";*/
                     string SecondRow1 = " <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"left\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #ffffff solid 1px\">" +
@@ -714,7 +714,7 @@ namespace HB.Dao
                     /*if (ds.Tables[4].Rows[0][8].ToString() == "ExP")
                     {
                         SecondRow1 =
-                            " <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" align=\"center\">" +
+                            " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\">" +
                             " <tr style=\"position:relative; background-color:#fff; font-size:11px;\">" +
                             " <td width=\"400\" style=\" padding-bottom:1px;\">" +
                             " <p style=\"font-weight:bold; color:orange;\">Booking confirmation details" +
@@ -724,7 +724,7 @@ namespace HB.Dao
                             " <p style=\"margin:0px;\">Company Name : <span>" + ds.Tables[2].Rows[0][1].ToString() + "</span></p>" + //company name
                             " </td><td width=\"300\"><p style=\"padding:25px 25px 25px 25px; font-size:13px; color:#000; font-weight:bold; background-color:#ffcc00;\">Please refer your name and reference number - " + ds.Tables[4].Rows[0][9].ToString() + " at the time of check-In</p>" +
                             " <p style=\"margin-top:0px;\"> <span style=\"color:orange; font-size:12px;\"></span></p>" +
-                            " </td></tr><tr><td width=\"100%\" style=\"margin-bottom:\">" +
+                            " </td></tr><tr><td width=\"800px\" style=\"margin-bottom:\">" +
                             " <p style=\"color:orange; font-weight:bold; font-size:14px;\"> Guest Details :</p>" +
                             " </td> </tr></table>";
 
@@ -763,7 +763,7 @@ namespace HB.Dao
                     if ((typeofpty == "MGH") || (typeofpty == "DdP"))
                     {
                         GuestDetailsTable11 =
-                            " <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" align=\"center\">" +
+                            " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\">" +
                             " <tr style=\"font-size:11px; font-weight:normal;\">" +
                             " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:120px;\"><p>Guest Name</p></th>" +
                             " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p>Check-In Date / Expected Time</p></th>" +
@@ -791,7 +791,7 @@ namespace HB.Dao
                     else
                     {
                         GuestDetailsTable11 =
-                            " <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" align=\"center\">" +
+                            " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\">" +
                             " <tr style=\"font-size:11px; font-weight:normal;\">" +
                             " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:120px;\"><p>Guest Name</p></th>" +
                             " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p>Check-In Date / Expected Time</p></th>" +
@@ -837,9 +837,9 @@ namespace HB.Dao
                         if (Stng != "")
                         {
                             AddressDtls1 =
-                                " <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
+                                " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
                                 " <tr style=\"font-size:11px; background-color:#eee;\">" +
-                                " <td width=\"100%\" style=\"padding:12px 5px;\">" +
+                                " <td width=\"800px\" style=\"padding:12px 5px;\">" +
                                 " <p style=\"color:orange; font-weight:bold; margin:0px; font-size:14px;\"> Agreed Tariff & TAC (Per day / Room Night) :</p>" +
                                 " <p style=\"margin-top:5px; margin-left:25px\">" + Stng + "</p>" +
                                 " <p style=\"color:orange; font-weight:bold; margin:0px; font-size:0px;\"> Agreed Tariff & TAC :</p>" +
@@ -853,9 +853,9 @@ namespace HB.Dao
                         if (Stng == "")
                         {
                             AddressDtls1 =
-                                " <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
+                                " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
                                 " <tr style=\"font-size:11px; background-color:#eee;\">" +
-                                " <td width=\"100%\" style=\"padding:12px 5px;\">" +                                
+                                " <td width=\"800px\" style=\"padding:12px 5px;\">" +                                
                                 " <p style=\"color:orange; font-weight:bold; margin:0px; font-size:14px;\"> Guest Contact Details :</p>" +
                                 " <p style=\"margin-top:5px; margin-left:25px\">" + MobileNo + "</p>" +
                                 " <p style=\"color:orange; font-weight:bold; margin:0px; font-size:14px;\"> Special Request :</p>" +
@@ -881,9 +881,9 @@ namespace HB.Dao
                             log.ErrorLog(ex.Message + " --> Room Level Booking Confirmation Property Mail --> "+message1.Subject+"P D F Attachment");
                         }
                         AddressDtls1 =
-                                " <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
+                                " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
                                 " <tr style=\"font-size:11px; background-color:#eee;\">" +
-                                " <td width=\"100%\" style=\"padding:12px 5px;\">" +
+                                " <td width=\"800px\" style=\"padding:12px 5px;\">" +
                                 " <p style=\"color:orange; font-weight:bold; margin:0px; font-size:14px;\"> Guest Contact Details :</p>" +
                                 "<p style=\"margin-top:5px; margin-left:25px\">" + MobileNo + "</p>" +
                                 " <p style=\"color:orange; font-weight:bold; margin:0px; font-size:14px;\"> Special Request :</p>" +
@@ -891,7 +891,7 @@ namespace HB.Dao
                                 "</td></tr>" +
                             // first line
                                 " <tr style=\"font-size:11px;\">" +
-                                "<td width=\"100%\" style=\"padding:12px 5px;\">" +
+                                "<td width=\"800px\" style=\"padding:12px 5px;\">" +
                                 "<p style=\"color:orange; font-weight:bold; margin:0px; font-size:14px;\"> Note :</p>" +
                                 "<ul><li>Kindly send us a confirmation e-mail immediately to stay@hummingbirdindia.com on receipt of this booking request followed by a confirmation voucher. Arrange to send the confirmation voucher within 5 minutes on receipt of this mail. Do not delay in sending the confirmation mail/voucher, as the booking may get cancelled.</li>" +
                             // 2nd line
@@ -910,7 +910,7 @@ namespace HB.Dao
                     }
                     //string Disclaimer1 = "This message (including attachment if any) is confidential and may be privileged. Before opening attachments please check them for viruses and defects. HummingBird Travel & Stay Private Limited (HummingBird) will not be responsible for any viruses or defects or any forwarded attachments emanating either from within HummingBird or outside. If you have received this message by mistake please notify the sender by return e-mail and delete this message from your system. Any unauthorized use or dissemination of this message in whole or in part is strictly prohibited. Please note that e-mails are susceptible to change and HummingBird shall not be liable for any improper, untimely or incomplete transmission.";
                     /*string FooterDtls1 =
-                            " <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
+                            " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
                             " <tr style=\"font-size:11px; font-weight:normal;\">" +
                             " <th width=\"50%\" style=\"background-color:#eee; padding:5px 0px; border-right:1px solid #ccc;\"><p style=\"text-align:center; padding-left:10px;\">Security Policy</p></th>" +
                             " <th width=\"50%\" style=\"background-color:#eee; padding:5px 0px;\"><p style=\"text-align:center; padding-left:10px;\">Cancellation / No Show / Early Departure Policy</p></th>" +
@@ -921,11 +921,11 @@ namespace HB.Dao
                             " <li><span>Government Photo ID proof such as driving license, passport, voter ID card etc. needs to be produced. (Kindly confirm whether PAN CARD is accepted)</span></li>" +
                             " <li><span>A company business card or company ID card needs to be produced.</span></li></ol>" +
                             " </td><td width=\"200\" style=\"padding:10px; margin-bottom:20px; border-bottom:1px solid #ccc;\"><ol type=\"A\" style=\"font-weight: bold;\"><li><span>Cancellation of booking to be confirmed through Email.</span></li><li><span> Mail to be sent to stay@staysimplyfied.com and mention the booking ID no.</span></li>" +
-                            " <li><span>100% refund will be made if cancellation request is sent 48 (forty eight) hours prior to the check-in date and NIL amount will be refunded if cancellation request sent beyond 48 (forty eight) hours to check-in date.</span></li>" +
+                            " <li><span>800px refund will be made if cancellation request is sent 48 (forty eight) hours prior to the check-in date and NIL amount will be refunded if cancellation request sent beyond 48 (forty eight) hours to check-in date.</span></li>" +
                             " <li><span>1 day tariff will be charged for No-show without intimation.</span></li></td></ol>" +
                             " </tr></table><br>";*/
                     string FooterDtls1 =
-                            " <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
+                            " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
                             " <tr style=\"font-size:11px; font-weight:normal;\">" +
                             " <th width=\"50%\" style=\"background-color:#eee; padding:5px 0px; border-right:1px solid #ccc;\"><p style=\"text-align:center; padding-left:10px;\">Security Policy</p></th>" +
                             " <th width=\"50%\" style=\"background-color:#eee; padding:5px 0px;\"><p style=\"text-align:center; padding-left:10px;\">Cancellation / No Show / Early Departure Policy</p></th>" +

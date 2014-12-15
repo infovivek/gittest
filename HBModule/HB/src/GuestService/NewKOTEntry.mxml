@@ -125,7 +125,7 @@
 					
 					if (Id == 0)
 					{
-						alignAlert(Alert.show("Service Added Successfully.","Message !",Alert.OK| Alert.NO,
+						alignAlert(Alert.show("Service Added Successfully.","Message !",Alert.OK,
 							null, null,	iconTickLarge, Alert.OK),10,"");
 					}
 					else
@@ -273,36 +273,29 @@
 					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
 					return;					
 				}
-				var Flag:Boolean=true;
-				HdrAC=new ArrayCollection();
-				DtlsAC=new ArrayCollection();
-				if(Chk_user.selected !=true)
-				{
-				var arrHdr:ArrayCollection=new ArrayCollection
-					([{
-						PropertyName:hlp_Property.text,Date:dt_Date.text,PropertyId:NewPropertyId,
-						GuestName:hlp_Guest.text,GuestId:GuestId,GetType:GetType,RoomNo:lbl_RoomNo.text,
-						BookingCode:Txt_BookingCode.text,ClientName:Txt_ClientName.text,TotalAmount:Txt_TotalAmount.text,
-						BookingId:BookingId,RoomId:RoomId,CheckInId:CheckInId,
-						Id:Id
-						
-					}]);
-				var HdrXml:String = ObjToXmlStr_Comm(arrHdr,"HdrXml");
-				var KOT:ArrayCollection= new  ArrayCollection();
-				var ServiceXml:String="";
-				ServiceXml += "<ROOT>";
-				ServiceXml += ObjToXmlStr_Comm(Grd_Details.dataProvider as ArrayCollection,"ServiceXml")
-				ServiceXml += "</ROOT>";
-				HdrAC=arrHdr;
-				DtlsAC=Grd_Details as ArrayCollection;
-				useWeb("NewKOTEntry","Save_CUSTOM",[GlobalXml,HdrXml,ServiceXml]);
-				}
 				else
 				{
+					alignAlert(Alert.show(" Do you want to save the Snack KOT?","Warning",Alert.YES | Alert.NO, null,
+						FnSave1, iconWarning, Alert.NO),10,"");
+				}
+			}
+			protected function FnSave1(event:CloseEvent):void
+			{
+				if ((event.detail==Alert.YES)) 
+				{
+					var Flag:Boolean=true;
+					HdrAC=new ArrayCollection();
+					DtlsAC=new ArrayCollection();
+					if(Chk_user.selected !=true)
+					{
 					var arrHdr:ArrayCollection=new ArrayCollection
 						([{
-							PropertyName:hlp_Property.text,Date:dt_Date.text,PropertyId:PropertyId,TotalAmount:Txt_TotalAmount.text,
-							UserName:hlp_User.text,UserId:UserId,GetType:GetType,Id:Id
+							PropertyName:hlp_Property.text,Date:dt_Date.text,PropertyId:NewPropertyId,
+							GuestName:hlp_Guest.text,GuestId:GuestId,GetType:GetType,RoomNo:lbl_RoomNo.text,
+							BookingCode:Txt_BookingCode.text,ClientName:Txt_ClientName.text,TotalAmount:Txt_TotalAmount.text,
+							BookingId:BookingId,RoomId:RoomId,CheckInId:CheckInId,
+							Id:Id
+							
 						}]);
 					var HdrXml:String = ObjToXmlStr_Comm(arrHdr,"HdrXml");
 					var KOT:ArrayCollection= new  ArrayCollection();
@@ -312,9 +305,26 @@
 					ServiceXml += "</ROOT>";
 					HdrAC=arrHdr;
 					DtlsAC=Grd_Details as ArrayCollection;
-					useWeb("NewKOTUserEntry","Save_CUSTOM",[GlobalXml,HdrXml,ServiceXml]);
+					useWeb("NewKOTEntry","Save_CUSTOM",[GlobalXml,HdrXml,ServiceXml]);
 				}
-					
+				else
+				{
+						var arrHdr:ArrayCollection=new ArrayCollection
+							([{
+								PropertyName:hlp_Property.text,Date:dt_Date.text,PropertyId:PropertyId,TotalAmount:Txt_TotalAmount.text,
+								UserName:hlp_User.text,UserId:UserId,GetType:GetType,Id:Id
+							}]);
+						var HdrXml:String = ObjToXmlStr_Comm(arrHdr,"HdrXml");
+						var KOT:ArrayCollection= new  ArrayCollection();
+						var ServiceXml:String="";
+						ServiceXml += "<ROOT>";
+						ServiceXml += ObjToXmlStr_Comm(Grd_Details.dataProvider as ArrayCollection,"ServiceXml")
+						ServiceXml += "</ROOT>";
+						HdrAC=arrHdr;
+						DtlsAC=Grd_Details as ArrayCollection;
+						useWeb("NewKOTUserEntry","Save_CUSTOM",[GlobalXml,HdrXml,ServiceXml]);
+				}
+			  }
 			}
 			protected function FnClr():void
 			{

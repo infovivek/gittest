@@ -10,8 +10,9 @@
 </head>
 <body>
     <form id="form1" runat="server">
-    <div style="margin-left: 400px">
-        <asp:Button ID="Button1" runat="server" Text="Print" onclick="Button1_Click" />
+    <div style="margin-left: 421px">
+        <asp:Button ID="Button1" runat="server" Text="PDF" onclick="Button1_Click" 
+            style="font-weight: 700" Width="59px" />
     </div>
     <div>
     </div>
@@ -20,7 +21,8 @@
             Width="100%" Font-Names="Verdana" Font-Size="8pt" 
             InteractiveDeviceInfos="(Collection)" WaitMessageFont-Names="Verdana" 
             WaitMessageFont-Size="14pt" SizeToReportContent="True"
-            PromptAreaCollapsed="True" AsyncRendering="False">
+            PromptAreaCollapsed="True" AsyncRendering="False" 
+           ShowExportControls="False">
             <LocalReport ReportPath="ContractBill.rdlc">
                 <DataSources>
                     <rsweb:ReportDataSource DataSourceId="ObjectDataSource1" Name="DataSet1" />

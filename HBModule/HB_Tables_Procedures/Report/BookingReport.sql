@@ -20,7 +20,810 @@ SET NOCOUNT ON
 SET ANSI_WARNINGS OFF
 IF @Action = 'BookingDtls'
  BEGIN
-  CREATE TABLE #FINAL(BookingCode INT,ClientName NVARCHAR(100),
+  CREATE TABLE #TMP(BookingCode BIGINT,BookingId BIGINT,
+  MasterClientName NVARCHAR(100),ClientName NVARCHAR(100),ClientId BIGINT,
+  CRMName NVARCHAR(100),PropertyName NVARCHAR(100),PropertyType NVARCHAR(100),
+  PropertyId BIGINT,CityName NVARCHAR(100),CityId BIGINT,
+  GuestName NVARCHAR(100),GuestId BIGINT,ChkInDt DATE,ChkOutDt DATE,
+  Tariff DECIMAL(27,2),TariffPaymentMode NVARCHAR(100),RoomCaptured BIGINT,
+  CurrentStatus NVARCHAR(100),BookerName NVARCHAR(100),BookedDt DATE,
+  Column1 NVARCHAR(100),Column2 NVARCHAR(100),Column3 NVARCHAR(100),
+  Column4 NVARCHAR(100),Column5 NVARCHAR(100),Column6 NVARCHAR(100),
+  Column7 NVARCHAR(100),Column8 NVARCHAR(100),Column9 NVARCHAR(100),
+  Column10 NVARCHAR(100),BookingLevel NVARCHAR(100));
+  --
+  CREATE TABLE #TariffDivision(RoomCapturedCnt INT,RoomCaptured BIGINT,
+  BookingId BIGINT,GuestId BIGINT,Tariff DECIMAL(27,2),
+  DividedTariff DECIMAL(27,2));
+  --
+  CREATE TABLE #Result(BookingCode BIGINT,BookingId BIGINT,
+  MasterClientName NVARCHAR(100),ClientName NVARCHAR(100),ClientId BIGINT,
+  CRMName NVARCHAR(100),PropertyName NVARCHAR(100),PropertyType NVARCHAR(100),
+  PropertyId BIGINT,CityName NVARCHAR(100),CityId BIGINT,
+  GuestName NVARCHAR(100),GuestId BIGINT,ChkInDt DATE,ChkOutDt DATE,
+  Tariff DECIMAL(27,2),StayDays INT,TotTarif DECIMAL(27,2),
+  TariffPaymentMode NVARCHAR(100),RoomCaptured BIGINT,
+  CurrentStatus NVARCHAR(100),BookerName NVARCHAR(100),BookedDt DATE,
+  Column1 NVARCHAR(100),Column2 NVARCHAR(100),Column3 NVARCHAR(100),
+  Column4 NVARCHAR(100),Column5 NVARCHAR(100),Column6 NVARCHAR(100),
+  Column7 NVARCHAR(100),Column8 NVARCHAR(100),Column9 NVARCHAR(100),
+  Column10 NVARCHAR(100),BookingLevel NVARCHAR(100),SNo BIGINT IDENTITY(1,1));
+  IF @ClientId = 0
+   BEGIN
+    -- Property & Contract - CheckOut,Booked & CheckIn - Room
+    INSERT INTO #TMP(BookingCode,BookingId,MasterClientName,ClientName,ClientId,
+    CRMName,PropertyName,PropertyType,PropertyId,CityName,CityId,GuestName,
+    GuestId,ChkInDt,ChkOutDt,Tariff,TariffPaymentMode,RoomCaptured,CurrentStatus,
+    BookerName,BookedDt,Column1,Column2,Column3,Column4,Column5,Column6,
+    Column7,Column8,Column9,Column10,BookingLevel)
+    SELECT B.BookingCode,B.Id,ISNULL(MC.ClientName,C.ClientName),C.ClientName,
+    B.ClientId,U.FirstName,P.PropertyName,BP.PropertyType,BP.PropertyId,
+    Cty.CityName,B.CityId,CCG.FirstName+' '+CCG.LastName,BG.GuestId,
+    MIN(BG.ChkInDt),MAX(BG.ChkOutDt),BG.Tariff,BG.TariffPaymentMode,
+    BG.RoomCaptured,BG.CurrentStatus,U1.UserName,CONVERT(DATE,B.BookedDt,103),
+    ISNULL(BG.Column1,''),ISNULL(BG.Column2,''),ISNULL(BG.Column3,''),
+    ISNULL(BG.Column4,''),ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),
+    ISNULL(BG.Column7,''),ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),
+    ISNULL(BG.Column10,''),B.BookingLevel FROM WRBHBBooking B
+    LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON
+    BP.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
+    BG.BookingId = B.Id AND BG.BookingPropertyTableId = BP.Id AND
+    BG.BookingPropertyId = BP.PropertyId
+    LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id = B.ClientId
+    LEFT OUTER JOIN WRBHBMasterClientManagement MC WITH(NOLOCK)ON
+    MC.Id = C.MasterClientId
+    LEFT OUTER JOIN WRBHBUser U WITH(NOLOCK)ON U.Id = C.CRMId
+    LEFT OUTER JOIN WRBHBCity Cty WITH(NOLOCK)ON Cty.Id = B.CityId
+    LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CCG WITH(NOLOCK)ON
+    CCG.CltmgntId = B.ClientId AND CCG.Id = BG.GuestId
+    LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id = BG.BookingPropertyId
+    LEFT OUTER JOIN WRBHBUser U1 WITH(NOLOCK)ON U1.Id = B.BookedUsrId
+    WHERE B.BookingLevel = 'Room' AND BP.GetType IN ('Property','Contract') AND
+    BG.IsActive = 1 AND BG.IsDeleted = 0 AND B.BookingCode != 0 AND 
+    BG.CurrentStatus IN ('CheckOut','Booked','CheckIn') AND
+    CONVERT(DATE,B.BookedDt,103) BETWEEN
+    CONVERT(DATE,@StartDt,103) AND CONVERT(DATE,@EndDt,103)   
+    GROUP BY B.BookingCode,B.Id,MC.ClientName,C.ClientName,B.ClientId,U.FirstName,
+    P.PropertyName,BP.PropertyType,BP.PropertyId,Cty.CityName,B.CityId,
+    CCG.FirstName,CCG.LastName,BG.GuestId,BG.Tariff,BG.TariffPaymentMode,
+    BG.RoomCaptured,BG.CurrentStatus,U1.UserName,B.BookedDt,
+    ISNULL(BG.Column1,''),ISNULL(BG.Column2,''),ISNULL(BG.Column3,''),
+    ISNULL(BG.Column4,''),ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),
+    ISNULL(BG.Column7,''),ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),
+    ISNULL(BG.Column10,''),B.BookingLevel;
+    -- Property & Contract - Canceled & No Show - Room
+    INSERT INTO #TMP(BookingCode,BookingId,MasterClientName,ClientName,ClientId,
+    CRMName,PropertyName,PropertyType,PropertyId,CityName,CityId,GuestName,
+    GuestId,ChkInDt,ChkOutDt,Tariff,TariffPaymentMode,RoomCaptured,CurrentStatus,
+    BookerName,BookedDt,Column1,Column2,Column3,Column4,Column5,Column6,
+    Column7,Column8,Column9,Column10,BookingLevel)
+    SELECT B.BookingCode,B.Id,ISNULL(MC.ClientName,C.ClientName),C.ClientName,
+    B.ClientId,U.FirstName,P.PropertyName,BP.PropertyType,BP.PropertyId,
+    Cty.CityName,B.CityId,CCG.FirstName+' '+CCG.LastName,BG.GuestId,
+    MIN(BG.ChkInDt),MAX(BG.ChkOutDt),BG.Tariff,BG.TariffPaymentMode,
+    BG.RoomCaptured,BG.CurrentStatus,U1.UserName,CONVERT(DATE,B.BookedDt,103),
+    ISNULL(BG.Column1,''),ISNULL(BG.Column2,''),ISNULL(BG.Column3,''),
+    ISNULL(BG.Column4,''),ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),
+    ISNULL(BG.Column7,''),ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),
+    ISNULL(BG.Column10,''),B.BookingLevel FROM WRBHBBooking B
+    LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON
+    BP.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
+    BG.BookingId = B.Id AND BG.BookingPropertyTableId = BP.Id AND
+    BG.BookingPropertyId = BP.PropertyId
+    LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id = B.ClientId
+    LEFT OUTER JOIN WRBHBMasterClientManagement MC WITH(NOLOCK)ON
+    MC.Id = C.MasterClientId
+    LEFT OUTER JOIN WRBHBUser U WITH(NOLOCK)ON U.Id = C.CRMId
+    LEFT OUTER JOIN WRBHBCity Cty WITH(NOLOCK)ON Cty.Id = B.CityId
+    LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CCG WITH(NOLOCK)ON
+    CCG.CltmgntId = B.ClientId AND CCG.Id = BG.GuestId
+    LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id = BG.BookingPropertyId
+    LEFT OUTER JOIN WRBHBUser U1 WITH(NOLOCK)ON U1.Id = B.BookedUsrId
+    WHERE B.BookingLevel = 'Room' AND BP.GetType IN ('Property','Contract') AND
+    BG.RoomShiftingFlag = 0 AND BG.CurrentStatus IN ('Canceled','No Show') AND
+    CONVERT(DATE,B.BookedDt,103) BETWEEN
+    CONVERT(DATE,@StartDt,103) AND CONVERT(DATE,@EndDt,103) AND
+    B.BookingCode != 0
+    GROUP BY B.BookingCode,B.Id,MC.ClientName,C.ClientName,B.ClientId,U.FirstName,
+    P.PropertyName,BP.PropertyType,BP.PropertyId,Cty.CityName,B.CityId,
+    CCG.FirstName,CCG.LastName,BG.GuestId,BG.Tariff,BG.TariffPaymentMode,
+    BG.RoomCaptured,BG.CurrentStatus,U1.UserName,B.BookedDt,
+    ISNULL(BG.Column1,''),ISNULL(BG.Column2,''),ISNULL(BG.Column3,''),
+    ISNULL(BG.Column4,''),ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),
+    ISNULL(BG.Column7,''),ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),
+    ISNULL(BG.Column10,''),B.BookingLevel;
+    -- Property & Contract - CheckOut,Booked & CheckIn - Bed
+    INSERT INTO #TMP(BookingCode,BookingId,MasterClientName,ClientName,ClientId,
+    CRMName,PropertyName,PropertyType,PropertyId,CityName,CityId,GuestName,
+    GuestId,ChkInDt,ChkOutDt,Tariff,TariffPaymentMode,RoomCaptured,CurrentStatus,
+    BookerName,BookedDt,Column1,Column2,Column3,Column4,Column5,Column6,
+    Column7,Column8,Column9,Column10,BookingLevel)
+    SELECT B.BookingCode,B.Id,ISNULL(MC.ClientName,C.ClientName),C.ClientName,
+    B.ClientId,U.FirstName,P.PropertyName,BP.PropertyType,BP.PropertyId,
+    Cty.CityName,B.CityId,CCG.FirstName+' '+CCG.LastName,BG.GuestId,
+    MIN(BG.ChkInDt),MAX(BG.ChkOutDt),BG.Tariff,BG.TariffPaymentMode,BG.Id,
+    BG.CurrentStatus,U1.UserName,CONVERT(DATE,B.BookedDt,103),
+    ISNULL(BG.Column1,''),ISNULL(BG.Column2,''),ISNULL(BG.Column3,''),
+    ISNULL(BG.Column4,''),ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),
+    ISNULL(BG.Column7,''),ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),
+    ISNULL(BG.Column10,''),B.BookingLevel FROM WRBHBBooking B
+    LEFT OUTER JOIN WRBHBBedBookingProperty BP WITH(NOLOCK)ON
+    BP.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBBedBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
+    BG.BookingId = B.Id AND BG.BookingPropertyTableId = BP.Id AND
+    BG.BookingPropertyId = BP.PropertyId
+    LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id = B.ClientId
+    LEFT OUTER JOIN WRBHBMasterClientManagement MC WITH(NOLOCK)ON
+    MC.Id = C.MasterClientId
+    LEFT OUTER JOIN WRBHBUser U WITH(NOLOCK)ON U.Id = C.CRMId
+    LEFT OUTER JOIN WRBHBCity Cty WITH(NOLOCK)ON Cty.Id = B.CityId
+    LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CCG WITH(NOLOCK)ON
+    CCG.CltmgntId = B.ClientId AND CCG.Id = BG.GuestId
+    LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id = BG.BookingPropertyId
+    LEFT OUTER JOIN WRBHBUser U1 WITH(NOLOCK)ON U1.Id = B.BookedUsrId
+    WHERE B.BookingLevel = 'Bed' AND BP.GetType IN ('Property','Contract') AND
+    BG.IsActive = 1 AND BG.IsDeleted = 0 AND B.BookingCode != 0 AND 
+    BG.CurrentStatus IN ('CheckOut','Booked','CheckIn') AND
+    CONVERT(DATE,B.BookedDt,103) BETWEEN
+    CONVERT(DATE,@StartDt,103) AND CONVERT(DATE,@EndDt,103)
+    GROUP BY B.BookingCode,B.Id,MC.ClientName,C.ClientName,B.ClientId,U.FirstName,
+    P.PropertyName,BP.PropertyType,BP.PropertyId,Cty.CityName,B.CityId,
+    CCG.FirstName,CCG.LastName,BG.GuestId,BG.Tariff,BG.TariffPaymentMode,
+    BG.Id,BG.CurrentStatus,U1.UserName,B.BookedDt,ISNULL(BG.Column1,''),
+    ISNULL(BG.Column2,''),ISNULL(BG.Column3,''),ISNULL(BG.Column4,''),
+    ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),ISNULL(BG.Column7,''),
+    ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),ISNULL(BG.Column10,''),
+    B.BookingLevel;
+    -- Property & Contract - Canceled & No Show - Bed
+    INSERT INTO #TMP(BookingCode,BookingId,MasterClientName,ClientName,ClientId,
+    CRMName,PropertyName,PropertyType,PropertyId,CityName,CityId,GuestName,
+    GuestId,ChkInDt,ChkOutDt,Tariff,TariffPaymentMode,RoomCaptured,CurrentStatus,
+    BookerName,BookedDt,Column1,Column2,Column3,Column4,Column5,Column6,
+    Column7,Column8,Column9,Column10,BookingLevel)
+    SELECT B.BookingCode,B.Id,ISNULL(MC.ClientName,C.ClientName),C.ClientName,
+    B.ClientId,U.FirstName,P.PropertyName,BP.PropertyType,BP.PropertyId,
+    Cty.CityName,B.CityId,CCG.FirstName+' '+CCG.LastName,BG.GuestId,
+    MIN(BG.ChkInDt),MAX(BG.ChkOutDt),BG.Tariff,BG.TariffPaymentMode,BG.Id,
+    BG.CurrentStatus,U1.UserName,CONVERT(DATE,B.BookedDt,103),
+    ISNULL(BG.Column1,''),ISNULL(BG.Column2,''),ISNULL(BG.Column3,''),
+    ISNULL(BG.Column4,''),ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),
+    ISNULL(BG.Column7,''),ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),
+    ISNULL(BG.Column10,''),B.BookingLevel FROM WRBHBBooking B
+    LEFT OUTER JOIN WRBHBBedBookingProperty BP WITH(NOLOCK)ON
+    BP.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBBedBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
+    BG.BookingId = B.Id AND BG.BookingPropertyTableId = BP.Id AND
+    BG.BookingPropertyId = BP.PropertyId
+    LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id = B.ClientId
+    LEFT OUTER JOIN WRBHBMasterClientManagement MC WITH(NOLOCK)ON
+    MC.Id = C.MasterClientId
+    LEFT OUTER JOIN WRBHBUser U WITH(NOLOCK)ON U.Id = C.CRMId
+    LEFT OUTER JOIN WRBHBCity Cty WITH(NOLOCK)ON Cty.Id = B.CityId
+    LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CCG WITH(NOLOCK)ON
+    CCG.CltmgntId = B.ClientId AND CCG.Id = BG.GuestId
+    LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id = BG.BookingPropertyId
+    LEFT OUTER JOIN WRBHBUser U1 WITH(NOLOCK)ON U1.Id = B.BookedUsrId
+    WHERE B.BookingLevel = 'Bed' AND BP.GetType IN ('Property','Contract') AND
+    ISNULL(BG.RoomShiftingFlag,0) = 0 AND B.BookingCode != 0 AND 
+    BG.CurrentStatus IN ('Canceled','No Show') AND
+    CONVERT(DATE,B.BookedDt,103) BETWEEN
+    CONVERT(DATE,@StartDt,103) AND CONVERT(DATE,@EndDt,103)   
+    GROUP BY B.BookingCode,B.Id,MC.ClientName,C.ClientName,B.ClientId,U.FirstName,
+    P.PropertyName,BP.PropertyType,BP.PropertyId,Cty.CityName,B.CityId,
+    CCG.FirstName,CCG.LastName,BG.GuestId,BG.Tariff,BG.TariffPaymentMode,
+    BG.Id,BG.CurrentStatus,U1.UserName,B.BookedDt,
+    ISNULL(BG.Column1,''),ISNULL(BG.Column2,''),ISNULL(BG.Column3,''),
+    ISNULL(BG.Column4,''),ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),
+    ISNULL(BG.Column7,''),ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),
+    ISNULL(BG.Column10,''),B.BookingLevel;
+    -- Property & Contract - CheckOut,Booked & CheckIn - Apartment
+    INSERT INTO #TMP(BookingCode,BookingId,MasterClientName,ClientName,ClientId,
+    CRMName,PropertyName,PropertyType,PropertyId,CityName,CityId,GuestName,
+    GuestId,ChkInDt,ChkOutDt,Tariff,TariffPaymentMode,RoomCaptured,CurrentStatus,
+    BookerName,BookedDt,Column1,Column2,Column3,Column4,Column5,Column6,
+    Column7,Column8,Column9,Column10,BookingLevel)
+    SELECT B.BookingCode,B.Id,ISNULL(MC.ClientName,C.ClientName),C.ClientName,
+    B.ClientId,U.FirstName,P.PropertyName,BP.PropertyType,BP.PropertyId,
+    Cty.CityName,B.CityId,CCG.FirstName+' '+CCG.LastName,BG.GuestId,
+    MIN(BG.ChkInDt),MAX(BG.ChkOutDt),BG.Tariff,BG.TariffPaymentMode,
+    BG.ApartmentId,BG.CurrentStatus,U1.UserName,CONVERT(DATE,B.BookedDt,103),
+    ISNULL(BG.Column1,''),ISNULL(BG.Column2,''),ISNULL(BG.Column3,''),
+    ISNULL(BG.Column4,''),ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),
+    ISNULL(BG.Column7,''),ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),
+    ISNULL(BG.Column10,''),B.BookingLevel FROM WRBHBBooking B
+    LEFT OUTER JOIN WRBHBApartmentBookingProperty BP WITH(NOLOCK)ON
+    BP.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBApartmentBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
+    BG.BookingId = B.Id AND BG.BookingPropertyTableId = BP.Id AND
+    BG.BookingPropertyId = BP.PropertyId
+    LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id = B.ClientId
+    LEFT OUTER JOIN WRBHBMasterClientManagement MC WITH(NOLOCK)ON
+    MC.Id = C.MasterClientId
+    LEFT OUTER JOIN WRBHBUser U WITH(NOLOCK)ON U.Id = C.CRMId
+    LEFT OUTER JOIN WRBHBCity Cty WITH(NOLOCK)ON Cty.Id = B.CityId
+    LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CCG WITH(NOLOCK)ON
+    CCG.CltmgntId = B.ClientId AND CCG.Id = BG.GuestId
+    LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id = BG.BookingPropertyId
+    LEFT OUTER JOIN WRBHBUser U1 WITH(NOLOCK)ON U1.Id = B.BookedUsrId
+    WHERE B.BookingLevel = 'Apartment' AND BP.GetType IN ('Property','Contract') AND
+    BG.IsActive = 1 AND BG.IsDeleted = 0 AND B.BookingCode != 0 AND 
+    BG.CurrentStatus IN ('CheckOut','Booked','CheckIn') AND
+    CONVERT(DATE,B.BookedDt,103) BETWEEN
+    CONVERT(DATE,@StartDt,103) AND CONVERT(DATE,@EndDt,103)   
+    GROUP BY B.BookingCode,B.Id,MC.ClientName,C.ClientName,B.ClientId,U.FirstName,
+    P.PropertyName,BP.PropertyType,BP.PropertyId,Cty.CityName,B.CityId,
+    CCG.FirstName,CCG.LastName,BG.GuestId,BG.Tariff,BG.TariffPaymentMode,
+    BG.ApartmentId,BG.CurrentStatus,U1.UserName,B.BookedDt,
+    ISNULL(BG.Column1,''),ISNULL(BG.Column2,''),ISNULL(BG.Column3,''),
+    ISNULL(BG.Column4,''),ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),
+    ISNULL(BG.Column7,''),ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),
+    ISNULL(BG.Column10,''),B.BookingLevel;
+    -- Property & Contract - Canceled & No Show - Apartment
+    INSERT INTO #TMP(BookingCode,BookingId,MasterClientName,ClientName,ClientId,
+    CRMName,PropertyName,PropertyType,PropertyId,CityName,CityId,GuestName,
+    GuestId,ChkInDt,ChkOutDt,Tariff,TariffPaymentMode,RoomCaptured,CurrentStatus,
+    BookerName,BookedDt,Column1,Column2,Column3,Column4,Column5,Column6,
+    Column7,Column8,Column9,Column10,BookingLevel)
+    SELECT B.BookingCode,B.Id,ISNULL(MC.ClientName,C.ClientName),C.ClientName,
+    B.ClientId,U.FirstName,P.PropertyName,BP.PropertyType,BP.PropertyId,
+    Cty.CityName,B.CityId,CCG.FirstName+' '+CCG.LastName,BG.GuestId,
+    MIN(BG.ChkInDt),MAX(BG.ChkOutDt),BG.Tariff,BG.TariffPaymentMode,
+    BG.ApartmentId,BG.CurrentStatus,U1.UserName,CONVERT(DATE,B.BookedDt,103),
+    ISNULL(BG.Column1,''),ISNULL(BG.Column2,''),ISNULL(BG.Column3,''),
+    ISNULL(BG.Column4,''),ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),
+    ISNULL(BG.Column7,''),ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),
+    ISNULL(BG.Column10,''),B.BookingLevel FROM WRBHBBooking B
+    LEFT OUTER JOIN WRBHBApartmentBookingProperty BP WITH(NOLOCK)ON
+    BP.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBApartmentBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
+    BG.BookingId = B.Id AND BG.BookingPropertyTableId = BP.Id AND
+    BG.BookingPropertyId = BP.PropertyId
+    LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id = B.ClientId
+    LEFT OUTER JOIN WRBHBMasterClientManagement MC WITH(NOLOCK)ON
+    MC.Id = C.MasterClientId
+    LEFT OUTER JOIN WRBHBUser U WITH(NOLOCK)ON U.Id = C.CRMId
+    LEFT OUTER JOIN WRBHBCity Cty WITH(NOLOCK)ON Cty.Id = B.CityId
+    LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CCG WITH(NOLOCK)ON
+    CCG.CltmgntId = B.ClientId AND CCG.Id = BG.GuestId
+    LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id = BG.BookingPropertyId
+    LEFT OUTER JOIN WRBHBUser U1 WITH(NOLOCK)ON U1.Id = B.BookedUsrId
+    WHERE B.BookingLevel = 'Apartment' AND 
+    BP.GetType IN ('Property','Contract') AND
+    ISNULL(BG.RoomShiftingFlag,0) = 0 AND B.BookingCode != 0 AND 
+    BG.CurrentStatus IN ('Canceled','No Show') AND
+    CONVERT(DATE,B.BookedDt,103) BETWEEN
+    CONVERT(DATE,@StartDt,103) AND CONVERT(DATE,@EndDt,103)
+    GROUP BY B.BookingCode,B.Id,MC.ClientName,C.ClientName,B.ClientId,U.FirstName,
+    P.PropertyName,BP.PropertyType,BP.PropertyId,Cty.CityName,B.CityId,
+    CCG.FirstName,CCG.LastName,BG.GuestId,BG.Tariff,BG.TariffPaymentMode,
+    BG.ApartmentId,BG.CurrentStatus,U1.UserName,B.BookedDt,
+    ISNULL(BG.Column1,''),ISNULL(BG.Column2,''),ISNULL(BG.Column3,''),
+    ISNULL(BG.Column4,''),ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),
+    ISNULL(BG.Column7,''),ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),
+    ISNULL(BG.Column10,''),B.BookingLevel;
+    -- API - CheckOut,Booked & CheckIn - Room
+    INSERT INTO #TMP(BookingCode,BookingId,MasterClientName,ClientName,ClientId,
+    CRMName,PropertyName,PropertyType,PropertyId,CityName,CityId,GuestName,
+    GuestId,ChkInDt,ChkOutDt,Tariff,TariffPaymentMode,RoomCaptured,CurrentStatus,
+    BookerName,BookedDt,Column1,Column2,Column3,Column4,Column5,Column6,
+    Column7,Column8,Column9,Column10,BookingLevel)
+    SELECT B.BookingCode,B.Id,ISNULL(MC.ClientName,C.ClientName),C.ClientName,
+    B.ClientId,U.FirstName,P.HotalName,BP.PropertyType,BP.PropertyId,
+    Cty.CityName,B.CityId,CCG.FirstName+' '+CCG.LastName,BG.GuestId,
+    MIN(BG.ChkInDt),MAX(BG.ChkOutDt),BG.Tariff,BG.TariffPaymentMode,
+    BG.RoomCaptured,BG.CurrentStatus,U1.UserName,
+    CONVERT(DATE,B.BookedDt,103),ISNULL(BG.Column1,''),
+    ISNULL(BG.Column2,''),ISNULL(BG.Column3,''),ISNULL(BG.Column4,''),
+    ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),ISNULL(BG.Column7,''),
+    ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),ISNULL(BG.Column10,''),
+    B.BookingLevel FROM WRBHBBooking B
+    LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON
+    BP.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
+    BG.BookingId = B.Id AND BG.BookingPropertyTableId = BP.Id AND
+    BG.BookingPropertyId = BP.PropertyId
+    LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id = B.ClientId
+    LEFT OUTER JOIN WRBHBMasterClientManagement MC WITH(NOLOCK)ON
+    MC.Id = C.MasterClientId
+    LEFT OUTER JOIN WRBHBUser U WITH(NOLOCK)ON U.Id = C.CRMId
+    LEFT OUTER JOIN WRBHBCity Cty WITH(NOLOCK)ON Cty.Id = B.CityId
+    LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CCG WITH(NOLOCK)ON
+    CCG.CltmgntId = B.ClientId AND CCG.Id = BG.GuestId
+    LEFT OUTER JOIN WRBHBStaticHotels P WITH(NOLOCK)ON 
+    P.HotalId = BG.BookingPropertyId
+    LEFT OUTER JOIN WRBHBUser U1 WITH(NOLOCK)ON U1.Id = B.BookedUsrId
+    WHERE B.BookingLevel = 'Room' AND BP.GetType IN ('API') AND
+    BG.IsActive = 1 AND BG.IsDeleted = 0 AND B.BookingCode != 0 AND 
+    BG.CurrentStatus IN ('CheckOut','Booked','CheckIn') AND
+    CONVERT(DATE,B.BookedDt,103) BETWEEN
+    CONVERT(DATE,@StartDt,103) AND CONVERT(DATE,@EndDt,103)
+    GROUP BY B.BookingCode,B.Id,MC.ClientName,C.ClientName,B.ClientId,U.FirstName,
+    P.HotalName,BP.PropertyType,BP.PropertyId,Cty.CityName,B.CityId,
+    CCG.FirstName,CCG.LastName,BG.GuestId,BG.Tariff,BG.TariffPaymentMode,
+    BG.RoomCaptured,BG.CurrentStatus,U1.UserName,B.BookedDt,
+    ISNULL(BG.Column1,''),ISNULL(BG.Column2,''),ISNULL(BG.Column3,''),
+    ISNULL(BG.Column4,''),ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),
+    ISNULL(BG.Column7,''),ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),
+    ISNULL(BG.Column10,''),B.BookingLevel;
+    -- API - Canceled & No Show - Room
+    INSERT INTO #TMP(BookingCode,BookingId,MasterClientName,ClientName,ClientId,
+    CRMName,PropertyName,PropertyType,PropertyId,CityName,CityId,GuestName,
+    GuestId,ChkInDt,ChkOutDt,Tariff,TariffPaymentMode,RoomCaptured,CurrentStatus,
+    BookerName,BookedDt,Column1,Column2,Column3,Column4,Column5,Column6,
+    Column7,Column8,Column9,Column10,BookingLevel)
+    SELECT B.BookingCode,B.Id,ISNULL(MC.ClientName,C.ClientName),C.ClientName,
+    B.ClientId,U.FirstName,P.HotalName,BP.PropertyType,BP.PropertyId,
+    Cty.CityName,B.CityId,CCG.FirstName+' '+CCG.LastName,BG.GuestId,
+    MIN(BG.ChkInDt),MAX(BG.ChkOutDt),BG.Tariff,BG.TariffPaymentMode,
+    BG.RoomCaptured,BG.CurrentStatus,U1.UserName,CONVERT(DATE,B.BookedDt,103),
+    ISNULL(BG.Column1,''),ISNULL(BG.Column2,''),ISNULL(BG.Column3,''),
+    ISNULL(BG.Column4,''),ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),
+    ISNULL(BG.Column7,''),ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),
+    ISNULL(BG.Column10,''),B.BookingLevel FROM WRBHBBooking B
+    LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON
+    BP.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
+    BG.BookingId = B.Id AND BG.BookingPropertyTableId = BP.Id AND
+    BG.BookingPropertyId = BP.PropertyId
+    LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id = B.ClientId
+    LEFT OUTER JOIN WRBHBMasterClientManagement MC WITH(NOLOCK)ON
+    MC.Id = C.MasterClientId
+    LEFT OUTER JOIN WRBHBUser U WITH(NOLOCK)ON U.Id = C.CRMId
+    LEFT OUTER JOIN WRBHBCity Cty WITH(NOLOCK)ON Cty.Id = B.CityId
+    LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CCG WITH(NOLOCK)ON
+    CCG.CltmgntId = B.ClientId AND CCG.Id = BG.GuestId
+    LEFT OUTER JOIN WRBHBStaticHotels P WITH(NOLOCK)ON 
+    P.HotalId = BG.BookingPropertyId
+    LEFT OUTER JOIN WRBHBUser U1 WITH(NOLOCK)ON U1.Id = B.BookedUsrId
+    WHERE B.BookingLevel = 'Room' AND BP.GetType IN ('API') AND
+    BG.RoomShiftingFlag = 0 AND BG.CurrentStatus IN ('Canceled','No Show') AND
+    CONVERT(DATE,B.BookedDt,103) BETWEEN
+    CONVERT(DATE,@StartDt,103) AND CONVERT(DATE,@EndDt,103) AND
+    B.BookingCode != 0
+    GROUP BY B.BookingCode,B.Id,MC.ClientName,C.ClientName,B.ClientId,U.FirstName,
+    P.HotalName,BP.PropertyType,BP.PropertyId,Cty.CityName,B.CityId,
+    CCG.FirstName,CCG.LastName,BG.GuestId,BG.Tariff,BG.TariffPaymentMode,
+    BG.RoomCaptured,BG.CurrentStatus,U1.UserName,B.BookedDt,ISNULL(BG.Column1,''),
+    ISNULL(BG.Column2,''),ISNULL(BG.Column3,''),ISNULL(BG.Column4,''),
+    ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),ISNULL(BG.Column7,''),
+    ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),ISNULL(BG.Column10,''),
+    B.BookingLevel;
+    -- Tariff Division
+    INSERT INTO #TariffDivision(RoomCapturedCnt,RoomCaptured,BookingId,GuestId,
+    Tariff,DividedTariff)
+    SELECT COUNT(RoomCaptured),RoomCaptured,BookingId,GuestId,Tariff,
+    ROUND(Tariff / CAST(COUNT(RoomCaptured) AS INT),0)
+    FROM #TMP GROUP BY RoomCaptured,BookingId,GuestId,Tariff;
+    --
+    --SELECT COUNT(*) FROM #TMP;
+    --SELECT COUNT(*) FROM #TariffDivision;
+    -- Result
+    INSERT INTO #Result(BookingCode,BookingId,MasterClientName,ClientName,ClientId,
+    CRMName,PropertyName,PropertyType,PropertyId,CityName,CityId,GuestName,
+    GuestId,ChkInDt,ChkOutDt,Tariff,StayDays,TotTarif,TariffPaymentMode,
+    RoomCaptured,CurrentStatus,BookerName,BookedDt,Column1,Column2,Column3,
+    Column4,Column5,Column6,Column7,Column8,Column9,Column10,BookingLevel)
+    SELECT T.BookingCode,T1.BookingId,T.MasterClientName,T.ClientName,T.ClientId,
+    T.CRMName,T.PropertyName,CASE
+    WHEN T.PropertyType = 'ExP' THEN 'External'
+    WHEN T.PropertyType = 'InP' THEN 'Internal'
+    WHEN T.PropertyType = 'MGH' THEN 'G H'
+    WHEN T.PropertyType = 'CPP' THEN 'C P P'
+    WHEN T.PropertyType = 'DdP' THEN 'Dedicated'
+    WHEN T.PropertyType = 'MMT' THEN 'M M T' END AS PropertyType,
+    T.PropertyId,T.CityName,T.CityId,T.GuestName,T1.GuestId,T.ChkInDt,T.ChkOutDt,
+    T1.DividedTariff,DATEDIFF(DAY,T.ChkInDt,T.ChkOutDt) AS StayDays,
+    T1.DividedTariff * DATEDIFF(DAY,T.ChkInDt,T.ChkOutDt) AS TotTarif,
+    T.TariffPaymentMode,T1.RoomCaptured,T.CurrentStatus,T.BookerName,
+    T.BookedDt,T.Column1,T.Column2,T.Column3,T.Column4,T.Column5,T.Column6,
+    T.Column7,T.Column8,T.Column9,T.Column10,T.BookingLevel FROM #TMP T
+    LEFT OUTER JOIN #TariffDivision T1 WITH(NOLOCK)ON 
+    T.BookingId = T1.BookingId AND T.GuestId = T1.GuestId AND
+    T.RoomCaptured = T1.RoomCaptured
+    GROUP BY T.BookingCode,T1.BookingId,T.MasterClientName,T.ClientName,T.ClientId,
+    T.CRMName,T.PropertyName,T.PropertyType,T.PropertyId,T.CityName,T.CityId,
+    T.GuestName,T1.GuestId,T.ChkInDt,T.ChkOutDt,T1.DividedTariff,
+    T.TariffPaymentMode,T1.RoomCaptured,T.CurrentStatus,T.BookerName,
+    T.BookedDt,T.Column1,T.Column2,T.Column3,T.Column4,T.Column5,T.Column6,
+    T.Column7,T.Column8,T.Column9,T.Column10,T.BookingLevel;
+   END
+  ELSE
+   BEGIN
+    -- Property & Contract - CheckOut,Booked & CheckIn - Room
+    INSERT INTO #TMP(BookingCode,BookingId,MasterClientName,ClientName,ClientId,
+    CRMName,PropertyName,PropertyType,PropertyId,CityName,CityId,GuestName,
+    GuestId,ChkInDt,ChkOutDt,Tariff,TariffPaymentMode,RoomCaptured,CurrentStatus,
+    BookerName,BookedDt,Column1,Column2,Column3,Column4,Column5,Column6,
+    Column7,Column8,Column9,Column10,BookingLevel)
+    SELECT B.BookingCode,B.Id,ISNULL(MC.ClientName,C.ClientName),C.ClientName,
+    B.ClientId,U.FirstName,P.PropertyName,BP.PropertyType,BP.PropertyId,
+    Cty.CityName,B.CityId,CCG.FirstName+' '+CCG.LastName,BG.GuestId,
+    MIN(BG.ChkInDt),MAX(BG.ChkOutDt),BG.Tariff,BG.TariffPaymentMode,
+    BG.RoomCaptured,BG.CurrentStatus,U1.UserName,CONVERT(DATE,B.BookedDt,103),
+    ISNULL(BG.Column1,''),ISNULL(BG.Column2,''),ISNULL(BG.Column3,''),
+    ISNULL(BG.Column4,''),ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),
+    ISNULL(BG.Column7,''),ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),
+    ISNULL(BG.Column10,''),B.BookingLevel FROM WRBHBBooking B
+    LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON
+    BP.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
+    BG.BookingId = B.Id AND BG.BookingPropertyTableId = BP.Id AND
+    BG.BookingPropertyId = BP.PropertyId
+    LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id = B.ClientId
+    LEFT OUTER JOIN WRBHBMasterClientManagement MC WITH(NOLOCK)ON
+    MC.Id = C.MasterClientId
+    LEFT OUTER JOIN WRBHBUser U WITH(NOLOCK)ON U.Id = C.CRMId
+    LEFT OUTER JOIN WRBHBCity Cty WITH(NOLOCK)ON Cty.Id = B.CityId
+    LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CCG WITH(NOLOCK)ON
+    CCG.CltmgntId = B.ClientId AND CCG.Id = BG.GuestId
+    LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id = BG.BookingPropertyId
+    LEFT OUTER JOIN WRBHBUser U1 WITH(NOLOCK)ON U1.Id = B.BookedUsrId
+    WHERE B.BookingLevel = 'Room' AND BP.GetType IN ('Property','Contract') AND
+    BG.IsActive = 1 AND BG.IsDeleted = 0 AND B.BookingCode != 0 AND 
+    BG.CurrentStatus IN ('CheckOut','Booked','CheckIn') AND
+    CONVERT(DATE,B.BookedDt,103) BETWEEN CONVERT(DATE,@StartDt,103) AND 
+    CONVERT(DATE,@EndDt,103) AND B.ClientId = @ClientId
+    GROUP BY B.BookingCode,B.Id,MC.ClientName,C.ClientName,B.ClientId,U.FirstName,
+    P.PropertyName,BP.PropertyType,BP.PropertyId,Cty.CityName,B.CityId,
+    CCG.FirstName,CCG.LastName,BG.GuestId,BG.Tariff,BG.TariffPaymentMode,
+    BG.RoomCaptured,BG.CurrentStatus,U1.UserName,B.BookedDt,
+    ISNULL(BG.Column1,''),ISNULL(BG.Column2,''),ISNULL(BG.Column3,''),
+    ISNULL(BG.Column4,''),ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),
+    ISNULL(BG.Column7,''),ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),
+    ISNULL(BG.Column10,''),B.BookingLevel;
+    -- Property & Contract - Canceled & No Show - Room
+    INSERT INTO #TMP(BookingCode,BookingId,MasterClientName,ClientName,ClientId,
+    CRMName,PropertyName,PropertyType,PropertyId,CityName,CityId,GuestName,
+    GuestId,ChkInDt,ChkOutDt,Tariff,TariffPaymentMode,RoomCaptured,CurrentStatus,
+    BookerName,BookedDt,Column1,Column2,Column3,Column4,Column5,Column6,
+    Column7,Column8,Column9,Column10,BookingLevel)
+    SELECT B.BookingCode,B.Id,ISNULL(MC.ClientName,C.ClientName),C.ClientName,
+    B.ClientId,U.FirstName,P.PropertyName,BP.PropertyType,BP.PropertyId,
+    Cty.CityName,B.CityId,CCG.FirstName+' '+CCG.LastName,BG.GuestId,
+    MIN(BG.ChkInDt),MAX(BG.ChkOutDt),BG.Tariff,BG.TariffPaymentMode,
+    BG.RoomCaptured,BG.CurrentStatus,U1.UserName,CONVERT(DATE,B.BookedDt,103),
+    ISNULL(BG.Column1,''),ISNULL(BG.Column2,''),ISNULL(BG.Column3,''),
+    ISNULL(BG.Column4,''),ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),
+    ISNULL(BG.Column7,''),ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),
+    ISNULL(BG.Column10,''),B.BookingLevel FROM WRBHBBooking B
+    LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON
+    BP.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
+    BG.BookingId = B.Id AND BG.BookingPropertyTableId = BP.Id AND
+    BG.BookingPropertyId = BP.PropertyId
+    LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id = B.ClientId
+    LEFT OUTER JOIN WRBHBMasterClientManagement MC WITH(NOLOCK)ON
+    MC.Id = C.MasterClientId
+    LEFT OUTER JOIN WRBHBUser U WITH(NOLOCK)ON U.Id = C.CRMId
+    LEFT OUTER JOIN WRBHBCity Cty WITH(NOLOCK)ON Cty.Id = B.CityId
+    LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CCG WITH(NOLOCK)ON
+    CCG.CltmgntId = B.ClientId AND CCG.Id = BG.GuestId
+    LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id = BG.BookingPropertyId
+    LEFT OUTER JOIN WRBHBUser U1 WITH(NOLOCK)ON U1.Id = B.BookedUsrId
+    WHERE B.BookingLevel = 'Room' AND BP.GetType IN ('Property','Contract') AND
+    BG.RoomShiftingFlag = 0 AND BG.CurrentStatus IN ('Canceled','No Show') AND
+    CONVERT(DATE,B.BookedDt,103) BETWEEN CONVERT(DATE,@StartDt,103) AND 
+    CONVERT(DATE,@EndDt,103) AND B.BookingCode != 0 AND B.ClientId = @ClientId
+    GROUP BY B.BookingCode,B.Id,MC.ClientName,C.ClientName,B.ClientId,U.FirstName,
+    P.PropertyName,BP.PropertyType,BP.PropertyId,Cty.CityName,B.CityId,
+    CCG.FirstName,CCG.LastName,BG.GuestId,BG.Tariff,BG.TariffPaymentMode,
+    BG.RoomCaptured,BG.CurrentStatus,U1.UserName,B.BookedDt,
+    ISNULL(BG.Column1,''),ISNULL(BG.Column2,''),ISNULL(BG.Column3,''),
+    ISNULL(BG.Column4,''),ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),
+    ISNULL(BG.Column7,''),ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),
+    ISNULL(BG.Column10,''),B.BookingLevel;
+    -- Property & Contract - CheckOut,Booked & CheckIn - Bed
+    INSERT INTO #TMP(BookingCode,BookingId,MasterClientName,ClientName,ClientId,
+    CRMName,PropertyName,PropertyType,PropertyId,CityName,CityId,GuestName,
+    GuestId,ChkInDt,ChkOutDt,Tariff,TariffPaymentMode,RoomCaptured,CurrentStatus,
+    BookerName,BookedDt,Column1,Column2,Column3,Column4,Column5,Column6,
+    Column7,Column8,Column9,Column10,BookingLevel)
+    SELECT B.BookingCode,B.Id,ISNULL(MC.ClientName,C.ClientName),C.ClientName,
+    B.ClientId,U.FirstName,P.PropertyName,BP.PropertyType,BP.PropertyId,
+    Cty.CityName,B.CityId,CCG.FirstName+' '+CCG.LastName,BG.GuestId,
+    MIN(BG.ChkInDt),MAX(BG.ChkOutDt),BG.Tariff,BG.TariffPaymentMode,BG.Id,
+    BG.CurrentStatus,U1.UserName,CONVERT(DATE,B.BookedDt,103),
+    ISNULL(BG.Column1,''),ISNULL(BG.Column2,''),ISNULL(BG.Column3,''),
+    ISNULL(BG.Column4,''),ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),
+    ISNULL(BG.Column7,''),ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),
+    ISNULL(BG.Column10,''),B.BookingLevel FROM WRBHBBooking B
+    LEFT OUTER JOIN WRBHBBedBookingProperty BP WITH(NOLOCK)ON
+    BP.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBBedBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
+    BG.BookingId = B.Id AND BG.BookingPropertyTableId = BP.Id AND
+    BG.BookingPropertyId = BP.PropertyId
+    LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id = B.ClientId
+    LEFT OUTER JOIN WRBHBMasterClientManagement MC WITH(NOLOCK)ON
+    MC.Id = C.MasterClientId
+    LEFT OUTER JOIN WRBHBUser U WITH(NOLOCK)ON U.Id = C.CRMId
+    LEFT OUTER JOIN WRBHBCity Cty WITH(NOLOCK)ON Cty.Id = B.CityId
+    LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CCG WITH(NOLOCK)ON
+    CCG.CltmgntId = B.ClientId AND CCG.Id = BG.GuestId
+    LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id = BG.BookingPropertyId
+    LEFT OUTER JOIN WRBHBUser U1 WITH(NOLOCK)ON U1.Id = B.BookedUsrId
+    WHERE B.BookingLevel = 'Bed' AND BP.GetType IN ('Property','Contract') AND
+    BG.IsActive = 1 AND BG.IsDeleted = 0 AND B.BookingCode != 0 AND 
+    BG.CurrentStatus IN ('CheckOut','Booked','CheckIn') AND
+    CONVERT(DATE,B.BookedDt,103) BETWEEN CONVERT(DATE,@StartDt,103) AND 
+    CONVERT(DATE,@EndDt,103) AND B.ClientId = @ClientId
+    GROUP BY B.BookingCode,B.Id,MC.ClientName,C.ClientName,B.ClientId,U.FirstName,
+    P.PropertyName,BP.PropertyType,BP.PropertyId,Cty.CityName,B.CityId,
+    CCG.FirstName,CCG.LastName,BG.GuestId,BG.Tariff,BG.TariffPaymentMode,
+    BG.Id,BG.CurrentStatus,U1.UserName,B.BookedDt,ISNULL(BG.Column1,''),
+    ISNULL(BG.Column2,''),ISNULL(BG.Column3,''),ISNULL(BG.Column4,''),
+    ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),ISNULL(BG.Column7,''),
+    ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),ISNULL(BG.Column10,''),
+    B.BookingLevel;
+    -- Property & Contract - Canceled & No Show - Bed
+    INSERT INTO #TMP(BookingCode,BookingId,MasterClientName,ClientName,ClientId,
+    CRMName,PropertyName,PropertyType,PropertyId,CityName,CityId,GuestName,
+    GuestId,ChkInDt,ChkOutDt,Tariff,TariffPaymentMode,RoomCaptured,CurrentStatus,
+    BookerName,BookedDt,Column1,Column2,Column3,Column4,Column5,Column6,
+    Column7,Column8,Column9,Column10,BookingLevel)
+    SELECT B.BookingCode,B.Id,ISNULL(MC.ClientName,C.ClientName),C.ClientName,
+    B.ClientId,U.FirstName,P.PropertyName,BP.PropertyType,BP.PropertyId,
+    Cty.CityName,B.CityId,CCG.FirstName+' '+CCG.LastName,BG.GuestId,
+    MIN(BG.ChkInDt),MAX(BG.ChkOutDt),BG.Tariff,BG.TariffPaymentMode,BG.Id,
+    BG.CurrentStatus,U1.UserName,CONVERT(DATE,B.BookedDt,103),
+    ISNULL(BG.Column1,''),ISNULL(BG.Column2,''),ISNULL(BG.Column3,''),
+    ISNULL(BG.Column4,''),ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),
+    ISNULL(BG.Column7,''),ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),
+    ISNULL(BG.Column10,''),B.BookingLevel FROM WRBHBBooking B
+    LEFT OUTER JOIN WRBHBBedBookingProperty BP WITH(NOLOCK)ON
+    BP.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBBedBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
+    BG.BookingId = B.Id AND BG.BookingPropertyTableId = BP.Id AND
+    BG.BookingPropertyId = BP.PropertyId
+    LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id = B.ClientId
+    LEFT OUTER JOIN WRBHBMasterClientManagement MC WITH(NOLOCK)ON
+    MC.Id = C.MasterClientId
+    LEFT OUTER JOIN WRBHBUser U WITH(NOLOCK)ON U.Id = C.CRMId
+    LEFT OUTER JOIN WRBHBCity Cty WITH(NOLOCK)ON Cty.Id = B.CityId
+    LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CCG WITH(NOLOCK)ON
+    CCG.CltmgntId = B.ClientId AND CCG.Id = BG.GuestId
+    LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id = BG.BookingPropertyId
+    LEFT OUTER JOIN WRBHBUser U1 WITH(NOLOCK)ON U1.Id = B.BookedUsrId
+    WHERE B.BookingLevel = 'Bed' AND BP.GetType IN ('Property','Contract') AND
+    ISNULL(BG.RoomShiftingFlag,0) = 0 AND B.BookingCode != 0 AND 
+    BG.CurrentStatus IN ('Canceled','No Show') AND 
+    CONVERT(DATE,B.BookedDt,103) BETWEEN CONVERT(DATE,@StartDt,103) AND 
+    CONVERT(DATE,@EndDt,103) AND B.ClientId = @ClientId
+    GROUP BY B.BookingCode,B.Id,MC.ClientName,C.ClientName,B.ClientId,U.FirstName,
+    P.PropertyName,BP.PropertyType,BP.PropertyId,Cty.CityName,B.CityId,
+    CCG.FirstName,CCG.LastName,BG.GuestId,BG.Tariff,BG.TariffPaymentMode,
+    BG.Id,BG.CurrentStatus,U1.UserName,B.BookedDt,
+    ISNULL(BG.Column1,''),ISNULL(BG.Column2,''),ISNULL(BG.Column3,''),
+    ISNULL(BG.Column4,''),ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),
+    ISNULL(BG.Column7,''),ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),
+    ISNULL(BG.Column10,''),B.BookingLevel;
+    -- Property & Contract - CheckOut,Booked & CheckIn - Apartment
+    INSERT INTO #TMP(BookingCode,BookingId,MasterClientName,ClientName,ClientId,
+    CRMName,PropertyName,PropertyType,PropertyId,CityName,CityId,GuestName,
+    GuestId,ChkInDt,ChkOutDt,Tariff,TariffPaymentMode,RoomCaptured,CurrentStatus,
+    BookerName,BookedDt,Column1,Column2,Column3,Column4,Column5,Column6,
+    Column7,Column8,Column9,Column10,BookingLevel)
+    SELECT B.BookingCode,B.Id,ISNULL(MC.ClientName,C.ClientName),C.ClientName,
+    B.ClientId,U.FirstName,P.PropertyName,BP.PropertyType,BP.PropertyId,
+    Cty.CityName,B.CityId,CCG.FirstName+' '+CCG.LastName,BG.GuestId,
+    MIN(BG.ChkInDt),MAX(BG.ChkOutDt),BG.Tariff,BG.TariffPaymentMode,
+    BG.ApartmentId,BG.CurrentStatus,U1.UserName,CONVERT(DATE,B.BookedDt,103),
+    ISNULL(BG.Column1,''),ISNULL(BG.Column2,''),ISNULL(BG.Column3,''),
+    ISNULL(BG.Column4,''),ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),
+    ISNULL(BG.Column7,''),ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),
+    ISNULL(BG.Column10,''),B.BookingLevel FROM WRBHBBooking B
+    LEFT OUTER JOIN WRBHBApartmentBookingProperty BP WITH(NOLOCK)ON
+    BP.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBApartmentBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
+    BG.BookingId = B.Id AND BG.BookingPropertyTableId = BP.Id AND
+    BG.BookingPropertyId = BP.PropertyId
+    LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id = B.ClientId
+    LEFT OUTER JOIN WRBHBMasterClientManagement MC WITH(NOLOCK)ON
+    MC.Id = C.MasterClientId
+    LEFT OUTER JOIN WRBHBUser U WITH(NOLOCK)ON U.Id = C.CRMId
+    LEFT OUTER JOIN WRBHBCity Cty WITH(NOLOCK)ON Cty.Id = B.CityId
+    LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CCG WITH(NOLOCK)ON
+    CCG.CltmgntId = B.ClientId AND CCG.Id = BG.GuestId
+    LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id = BG.BookingPropertyId
+    LEFT OUTER JOIN WRBHBUser U1 WITH(NOLOCK)ON U1.Id = B.BookedUsrId
+    WHERE B.BookingLevel = 'Apartment' AND BP.GetType IN ('Property','Contract') AND
+    BG.IsActive = 1 AND BG.IsDeleted = 0 AND B.BookingCode != 0 AND 
+    BG.CurrentStatus IN ('CheckOut','Booked','CheckIn') AND
+    CONVERT(DATE,B.BookedDt,103) BETWEEN CONVERT(DATE,@StartDt,103) AND 
+    CONVERT(DATE,@EndDt,103) AND B.ClientId = @ClientId
+    GROUP BY B.BookingCode,B.Id,MC.ClientName,C.ClientName,B.ClientId,U.FirstName,
+    P.PropertyName,BP.PropertyType,BP.PropertyId,Cty.CityName,B.CityId,
+    CCG.FirstName,CCG.LastName,BG.GuestId,BG.Tariff,BG.TariffPaymentMode,
+    BG.ApartmentId,BG.CurrentStatus,U1.UserName,B.BookedDt,
+    ISNULL(BG.Column1,''),ISNULL(BG.Column2,''),ISNULL(BG.Column3,''),
+    ISNULL(BG.Column4,''),ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),
+    ISNULL(BG.Column7,''),ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),
+    ISNULL(BG.Column10,''),B.BookingLevel;
+    -- Property & Contract - Canceled & No Show - Apartment
+    INSERT INTO #TMP(BookingCode,BookingId,MasterClientName,ClientName,ClientId,
+    CRMName,PropertyName,PropertyType,PropertyId,CityName,CityId,GuestName,
+    GuestId,ChkInDt,ChkOutDt,Tariff,TariffPaymentMode,RoomCaptured,CurrentStatus,
+    BookerName,BookedDt,Column1,Column2,Column3,Column4,Column5,Column6,
+    Column7,Column8,Column9,Column10,BookingLevel)
+    SELECT B.BookingCode,B.Id,ISNULL(MC.ClientName,C.ClientName),C.ClientName,
+    B.ClientId,U.FirstName,P.PropertyName,BP.PropertyType,BP.PropertyId,
+    Cty.CityName,B.CityId,CCG.FirstName+' '+CCG.LastName,BG.GuestId,
+    MIN(BG.ChkInDt),MAX(BG.ChkOutDt),BG.Tariff,BG.TariffPaymentMode,
+    BG.ApartmentId,BG.CurrentStatus,U1.UserName,CONVERT(DATE,B.BookedDt,103),
+    ISNULL(BG.Column1,''),ISNULL(BG.Column2,''),ISNULL(BG.Column3,''),
+    ISNULL(BG.Column4,''),ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),
+    ISNULL(BG.Column7,''),ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),
+    ISNULL(BG.Column10,''),B.BookingLevel FROM WRBHBBooking B
+    LEFT OUTER JOIN WRBHBApartmentBookingProperty BP WITH(NOLOCK)ON
+    BP.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBApartmentBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
+    BG.BookingId = B.Id AND BG.BookingPropertyTableId = BP.Id AND
+    BG.BookingPropertyId = BP.PropertyId
+    LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id = B.ClientId
+    LEFT OUTER JOIN WRBHBMasterClientManagement MC WITH(NOLOCK)ON
+    MC.Id = C.MasterClientId
+    LEFT OUTER JOIN WRBHBUser U WITH(NOLOCK)ON U.Id = C.CRMId
+    LEFT OUTER JOIN WRBHBCity Cty WITH(NOLOCK)ON Cty.Id = B.CityId
+    LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CCG WITH(NOLOCK)ON
+    CCG.CltmgntId = B.ClientId AND CCG.Id = BG.GuestId
+    LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id = BG.BookingPropertyId
+    LEFT OUTER JOIN WRBHBUser U1 WITH(NOLOCK)ON U1.Id = B.BookedUsrId
+    WHERE B.BookingLevel = 'Apartment' AND 
+    BP.GetType IN ('Property','Contract') AND
+    ISNULL(BG.RoomShiftingFlag,0) = 0 AND B.BookingCode != 0 AND 
+    BG.CurrentStatus IN ('Canceled','No Show') AND
+    CONVERT(DATE,B.BookedDt,103) BETWEEN CONVERT(DATE,@StartDt,103) AND 
+    CONVERT(DATE,@EndDt,103) AND B.ClientId = @ClientId
+    GROUP BY B.BookingCode,B.Id,MC.ClientName,C.ClientName,B.ClientId,U.FirstName,
+    P.PropertyName,BP.PropertyType,BP.PropertyId,Cty.CityName,B.CityId,
+    CCG.FirstName,CCG.LastName,BG.GuestId,BG.Tariff,BG.TariffPaymentMode,
+    BG.ApartmentId,BG.CurrentStatus,U1.UserName,B.BookedDt,
+    ISNULL(BG.Column1,''),ISNULL(BG.Column2,''),ISNULL(BG.Column3,''),
+    ISNULL(BG.Column4,''),ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),
+    ISNULL(BG.Column7,''),ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),
+    ISNULL(BG.Column10,''),B.BookingLevel;
+    -- API - CheckOut,Booked & CheckIn - Room
+    INSERT INTO #TMP(BookingCode,BookingId,MasterClientName,ClientName,ClientId,
+    CRMName,PropertyName,PropertyType,PropertyId,CityName,CityId,GuestName,
+    GuestId,ChkInDt,ChkOutDt,Tariff,TariffPaymentMode,RoomCaptured,CurrentStatus,
+    BookerName,BookedDt,Column1,Column2,Column3,Column4,Column5,Column6,
+    Column7,Column8,Column9,Column10,BookingLevel)
+    SELECT B.BookingCode,B.Id,ISNULL(MC.ClientName,C.ClientName),C.ClientName,
+    B.ClientId,U.FirstName,P.HotalName,BP.PropertyType,BP.PropertyId,
+    Cty.CityName,B.CityId,CCG.FirstName+' '+CCG.LastName,BG.GuestId,
+    MIN(BG.ChkInDt),MAX(BG.ChkOutDt),BG.Tariff,BG.TariffPaymentMode,
+    BG.RoomCaptured,BG.CurrentStatus,U1.UserName,
+    CONVERT(DATE,B.BookedDt,103),ISNULL(BG.Column1,''),
+    ISNULL(BG.Column2,''),ISNULL(BG.Column3,''),ISNULL(BG.Column4,''),
+    ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),ISNULL(BG.Column7,''),
+    ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),ISNULL(BG.Column10,''),
+    B.BookingLevel FROM WRBHBBooking B
+    LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON
+    BP.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
+    BG.BookingId = B.Id AND BG.BookingPropertyTableId = BP.Id AND
+    BG.BookingPropertyId = BP.PropertyId
+    LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id = B.ClientId
+    LEFT OUTER JOIN WRBHBMasterClientManagement MC WITH(NOLOCK)ON
+    MC.Id = C.MasterClientId
+    LEFT OUTER JOIN WRBHBUser U WITH(NOLOCK)ON U.Id = C.CRMId
+    LEFT OUTER JOIN WRBHBCity Cty WITH(NOLOCK)ON Cty.Id = B.CityId
+    LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CCG WITH(NOLOCK)ON
+    CCG.CltmgntId = B.ClientId AND CCG.Id = BG.GuestId
+    LEFT OUTER JOIN WRBHBStaticHotels P WITH(NOLOCK)ON 
+    P.HotalId = BG.BookingPropertyId
+    LEFT OUTER JOIN WRBHBUser U1 WITH(NOLOCK)ON U1.Id = B.BookedUsrId
+    WHERE B.BookingLevel = 'Room' AND BP.GetType IN ('API') AND
+    BG.IsActive = 1 AND BG.IsDeleted = 0 AND B.BookingCode != 0 AND 
+    BG.CurrentStatus IN ('CheckOut','Booked','CheckIn') AND
+    CONVERT(DATE,B.BookedDt,103) BETWEEN CONVERT(DATE,@StartDt,103) AND 
+    CONVERT(DATE,@EndDt,103) AND B.ClientId = @ClientId
+    GROUP BY B.BookingCode,B.Id,MC.ClientName,C.ClientName,B.ClientId,U.FirstName,
+    P.HotalName,BP.PropertyType,BP.PropertyId,Cty.CityName,B.CityId,
+    CCG.FirstName,CCG.LastName,BG.GuestId,BG.Tariff,BG.TariffPaymentMode,
+    BG.RoomCaptured,BG.CurrentStatus,U1.UserName,B.BookedDt,
+    ISNULL(BG.Column1,''),ISNULL(BG.Column2,''),ISNULL(BG.Column3,''),
+    ISNULL(BG.Column4,''),ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),
+    ISNULL(BG.Column7,''),ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),
+    ISNULL(BG.Column10,''),B.BookingLevel;
+    -- API - Canceled & No Show - Room
+    INSERT INTO #TMP(BookingCode,BookingId,MasterClientName,ClientName,ClientId,
+    CRMName,PropertyName,PropertyType,PropertyId,CityName,CityId,GuestName,
+    GuestId,ChkInDt,ChkOutDt,Tariff,TariffPaymentMode,RoomCaptured,CurrentStatus,
+    BookerName,BookedDt,Column1,Column2,Column3,Column4,Column5,Column6,
+    Column7,Column8,Column9,Column10,BookingLevel)
+    SELECT B.BookingCode,B.Id,ISNULL(MC.ClientName,C.ClientName),C.ClientName,
+    B.ClientId,U.FirstName,P.HotalName,BP.PropertyType,BP.PropertyId,
+    Cty.CityName,B.CityId,CCG.FirstName+' '+CCG.LastName,BG.GuestId,
+    MIN(BG.ChkInDt),MAX(BG.ChkOutDt),BG.Tariff,BG.TariffPaymentMode,
+    BG.RoomCaptured,BG.CurrentStatus,U1.UserName,CONVERT(DATE,B.BookedDt,103),
+    ISNULL(BG.Column1,''),ISNULL(BG.Column2,''),ISNULL(BG.Column3,''),
+    ISNULL(BG.Column4,''),ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),
+    ISNULL(BG.Column7,''),ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),
+    ISNULL(BG.Column10,''),B.BookingLevel FROM WRBHBBooking B
+    LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON
+    BP.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
+    BG.BookingId = B.Id AND BG.BookingPropertyTableId = BP.Id AND
+    BG.BookingPropertyId = BP.PropertyId
+    LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id = B.ClientId
+    LEFT OUTER JOIN WRBHBMasterClientManagement MC WITH(NOLOCK)ON
+    MC.Id = C.MasterClientId
+    LEFT OUTER JOIN WRBHBUser U WITH(NOLOCK)ON U.Id = C.CRMId
+    LEFT OUTER JOIN WRBHBCity Cty WITH(NOLOCK)ON Cty.Id = B.CityId
+    LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CCG WITH(NOLOCK)ON
+    CCG.CltmgntId = B.ClientId AND CCG.Id = BG.GuestId
+    LEFT OUTER JOIN WRBHBStaticHotels P WITH(NOLOCK)ON 
+    P.HotalId = BG.BookingPropertyId
+    LEFT OUTER JOIN WRBHBUser U1 WITH(NOLOCK)ON U1.Id = B.BookedUsrId
+    WHERE B.BookingLevel = 'Room' AND BP.GetType IN ('API') AND
+    BG.RoomShiftingFlag = 0 AND BG.CurrentStatus IN ('Canceled','No Show') AND
+    CONVERT(DATE,B.BookedDt,103) BETWEEN CONVERT(DATE,@StartDt,103) AND 
+    CONVERT(DATE,@EndDt,103) AND B.BookingCode != 0 AND B.ClientId = @ClientId
+    GROUP BY B.BookingCode,B.Id,MC.ClientName,C.ClientName,B.ClientId,U.FirstName,
+    P.HotalName,BP.PropertyType,BP.PropertyId,Cty.CityName,B.CityId,
+    CCG.FirstName,CCG.LastName,BG.GuestId,BG.Tariff,BG.TariffPaymentMode,
+    BG.RoomCaptured,BG.CurrentStatus,U1.UserName,B.BookedDt,ISNULL(BG.Column1,''),
+    ISNULL(BG.Column2,''),ISNULL(BG.Column3,''),ISNULL(BG.Column4,''),
+    ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),ISNULL(BG.Column7,''),
+    ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),ISNULL(BG.Column10,''),
+    B.BookingLevel;
+    -- Tariff Division
+    INSERT INTO #TariffDivision(RoomCapturedCnt,RoomCaptured,BookingId,GuestId,
+    Tariff,DividedTariff)
+    SELECT COUNT(RoomCaptured),RoomCaptured,BookingId,GuestId,Tariff,
+    ROUND(Tariff / CAST(COUNT(RoomCaptured) AS INT),0)
+    FROM #TMP GROUP BY RoomCaptured,BookingId,GuestId,Tariff;
+    --
+    --SELECT COUNT(*) FROM #TMP;
+    --SELECT COUNT(*) FROM #TariffDivision;
+    -- Result
+    INSERT INTO #Result(BookingCode,BookingId,MasterClientName,ClientName,ClientId,
+    CRMName,PropertyName,PropertyType,PropertyId,CityName,CityId,GuestName,
+    GuestId,ChkInDt,ChkOutDt,Tariff,StayDays,TotTarif,TariffPaymentMode,
+    RoomCaptured,CurrentStatus,BookerName,BookedDt,Column1,Column2,Column3,
+    Column4,Column5,Column6,Column7,Column8,Column9,Column10,BookingLevel)
+    SELECT T.BookingCode,T1.BookingId,T.MasterClientName,T.ClientName,T.ClientId,
+    T.CRMName,T.PropertyName,CASE
+    WHEN T.PropertyType = 'ExP' THEN 'External'
+    WHEN T.PropertyType = 'InP' THEN 'Internal'
+    WHEN T.PropertyType = 'MGH' THEN 'G H'
+    WHEN T.PropertyType = 'CPP' THEN 'C P P'
+    WHEN T.PropertyType = 'DdP' THEN 'Dedicated'
+    WHEN T.PropertyType = 'MMT' THEN 'M M T' END AS PropertyType,
+    T.PropertyId,T.CityName,T.CityId,T.GuestName,T1.GuestId,T.ChkInDt,T.ChkOutDt,
+    T1.DividedTariff,DATEDIFF(DAY,T.ChkInDt,T.ChkOutDt) AS StayDays,
+    T1.DividedTariff * DATEDIFF(DAY,T.ChkInDt,T.ChkOutDt) AS TotTarif,
+    T.TariffPaymentMode,T1.RoomCaptured,T.CurrentStatus,T.BookerName,
+    T.BookedDt,T.Column1,T.Column2,T.Column3,T.Column4,T.Column5,T.Column6,
+    T.Column7,T.Column8,T.Column9,T.Column10,T.BookingLevel FROM #TMP T
+    LEFT OUTER JOIN #TariffDivision T1 WITH(NOLOCK)ON 
+    T.BookingId = T1.BookingId AND T.GuestId = T1.GuestId AND
+    T.RoomCaptured = T1.RoomCaptured
+    GROUP BY T.BookingCode,T1.BookingId,T.MasterClientName,T.ClientName,T.ClientId,
+    T.CRMName,T.PropertyName,T.PropertyType,T.PropertyId,T.CityName,T.CityId,
+    T.GuestName,T1.GuestId,T.ChkInDt,T.ChkOutDt,T1.DividedTariff,
+    T.TariffPaymentMode,T1.RoomCaptured,T.CurrentStatus,T.BookerName,
+    T.BookedDt,T.Column1,T.Column2,T.Column3,T.Column4,T.Column5,T.Column6,
+    T.Column7,T.Column8,T.Column9,T.Column10,T.BookingLevel;
+   END
+  SELECT SNo AS SNo,BookingCode AS BookingCode,BookingId,
+  MasterClientName AS MasterClientName,ClientName AS ClientName,ClientId,
+  CRMName AS CRMName,PropertyName AS PropertyName,
+  PropertyType AS PropertyCategory,PropertyId,CityName AS City,CityId,
+  ISNULL(GuestName,'') AS GuestName,GuestId,
+  CONVERT(VARCHAR(100),ChkInDt,103) AS CheckInDt,
+  CONVERT(VARCHAR(100),ChkOutDt,103) AS CheckOutDt,Tariff AS Tariff,
+  StayDays AS StayDays,TotTarif AS TotalTariff,
+  TariffPaymentMode AS TariffPaymentMode,RoomCaptured,CurrentStatus AS Status,
+  BookerName AS UserName,CONVERT(VARCHAR(100),BookedDt,103) AS BookingDate,
+  Column1,Column2,Column3,Column4,Column5,Column6,Column7,Column8,Column9,Column10,
+  BookingLevel AS BookingLevel FROM #Result
+  ORDER BY BookingCode,RoomCaptured;
+ END
+END
+/*  CREATE TABLE #FINAL(BookingCode INT,ClientName NVARCHAR(100),
   PropertyName NVARCHAR(100),GuestName NVARCHAR(100),CheckInDt NVARCHAR(100),
   CheckOutDt NVARCHAR(100),StayDays INT,UserName NVARCHAR(100),
   Tariff DECIMAL(27,2),Status NVARCHAR(100),BookingLevel NVARCHAR(100),
@@ -33,10 +836,10 @@ IF @Action = 'BookingDtls'
   -- Property
   CREATE TABLE #Tbl1(RoomCapturedCnt INT,RoomCaptured INT,BookingId BIGINT,
   DividedTariff DECIMAL(27,2),Tariff DECIMAL(27,2));
-  INSERT INTO #Tbl1(RoomCapturedCnt,RoomCaptured,BookingId,DividedTariff,
-  Tariff)  
+  --INSERT INTO #Tbl1(RoomCapturedCnt,RoomCaptured,BookingId,DividedTariff,Tariff)  
   SELECT COUNT(BG.RoomCaptured),BG.RoomCaptured,B.Id,
-  ROUND(BG.Tariff/CAST(COUNT(BG.RoomCaptured) AS INT),0),BG.Tariff
+  ROUND(BG.Tariff/CAST(COUNT(BG.RoomCaptured) AS INT),0),BG.Tariff,
+  BG.GuestId
   FROM WRBHBBooking B
   LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON
   BP.BookingId = B.Id
@@ -47,7 +850,10 @@ IF @Action = 'BookingDtls'
   CONVERT(DATE,BG.CreatedDate,103) BETWEEN
   CONVERT(DATE,@StartDt,103) AND CONVERT(DATE,@EndDt,103) AND
   BP.GetType IN ('Property','Contract') 
-  GROUP BY B.Id,BG.RoomCaptured,BG.Tariff;
+  GROUP BY B.Id,BG.RoomCaptured,BG.Tariff,BG.GuestId;
+  --
+  --SELECT * FROM #Tbl1 ORDER BY BookingId ASC;
+  return;
   -- MMT
   CREATE TABLE #Tbl1MMT(RoomCapturedCnt INT,RoomCaptured INT,BookingId BIGINT,
   DividedTariff DECIMAL(27,2),Tariff DECIMAL(27,2));
@@ -67,8 +873,8 @@ IF @Action = 'BookingDtls'
   BP.PropertyType IN ('MMT')
   GROUP BY B.Id,BG.RoomCaptured,BG.Tariff;
   --
-  --SELECT * FROM #Tbl1 ORDER BY BookingId ASC;
-  --SELECT * FROM #Tbl1MMT ORDER BY BookingId ASC;RETURN; 
+  SELECT * FROM #Tbl1 ORDER BY BookingId ASC;
+  SELECT * FROM #Tbl1MMT ORDER BY BookingId ASC;RETURN; 
   -- Get Canceled & No Show Booking Guest Id & Tariff
   -- PROPERTY 
   CREATE TABLE #Tbl2(BookingId BIGINT,GuestId BIGINT,DividedTariff DECIMAL(27,2));
@@ -577,7 +1383,7 @@ IF @Action = 'BookingDtls'
   LEFT OUTER JOIN #CategoryCity C WITH(NOLOCK)ON T.BookingId = C.BookingId 
   WHERE ISNULL(UserName,'') NOT IN ('VivekAdmonk','VivekAdmonk');
  END
-END  
+END*/  
 /*IF @Action = 'Load'  
  BEGIN
   -- Room Level Booking: Occupancy - Single

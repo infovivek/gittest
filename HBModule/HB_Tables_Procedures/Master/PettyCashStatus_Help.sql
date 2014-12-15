@@ -105,7 +105,7 @@ BEGIN
 		BillDate,BillNo)
 		
 		SELECT ExpenseHead,Description,CONVERT(NVARCHAR,PC.Date,103) AS Status,ApprovedAmount,0 AS Paid,
-		0 AS Id,TotalAmount,P.Id AS ExpenseId,'' AS FilePath,'' As BillDate,'' AS BillNo
+		0 AS Id,TotalAmount,P.ExpenseHeadId AS ExpenseId,'' AS FilePath,'' As BillDate,'' AS BillNo
 		FROM WRBHBPettyCash	P
 		JOIN WRBHBPettyCashHdr PC ON P.PettyCashHdrId=PC.Id AND PC.IsActive=1 AND PC.IsDeleted=0
 		WHERE P.IsActive=1 AND P.IsDeleted=0 AND PC.PropertyId=@Id AND PC.UserId=@UserId
@@ -114,7 +114,7 @@ BEGIN
 		INSERT INTO #Final(ExpenseHead,Description,Status,Amount,Paid,Id,TotalAmount,ExpenseId,FilePath,
 		BillDate,BillNo)
 		SELECT ExpenseHead,Description,Status,Amount,Paid,
-		P.Id,Amount,P.Id AS ExpenseId,BillLogo AS FilePath,BillDate,BillNo
+		P.Id,Amount,P.ExpenseId AS ExpenseId,BillLogo AS FilePath,BillDate,BillNo
 		FROM WRBHBPettyCashStatus	P
 		JOIN WRBHBPettyCashStatusHdr PC ON P.PettyCashStatusHdrId=PC.Id AND PC.IsActive=1 AND PC.IsDeleted=0
 		WHERE P.IsActive=1 AND P.IsDeleted=0 AND PC.PropertyId=@Id AND PC.UserId=@UserId

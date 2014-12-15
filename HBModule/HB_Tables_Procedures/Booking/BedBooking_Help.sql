@@ -289,6 +289,34 @@ IF @Action = 'BedLevel_Property'
   -- Delete From Agreed Tariff Zero in ND Property
   DELETE FROM #BED1 WHERE GetType='Contract' AND 
   PropertyType='InP' AND Tariff=0;
+  -- Managed Guest House
+  INSERT INTO #BED1(PropertyId,BlockId,ApartmentId,RoomId,BedId,Tariff,
+  GetType,PropertyType,DiscountModePer,DiscountModeRS,
+  DiscountAllowed)  
+  SELECT P.Id,B.Id,A.Id,R.Id,B.Id,B.BedRackTarrif,'Contract','MGH',0,0,0 
+  FROM WRBHBProperty P
+  LEFT OUTER JOIN WRBHBPropertyBlocks PB WITH(NOLOCK)ON PB.PropertyId = P.Id
+  LEFT OUTER JOIN WRBHBPropertyApartment A WITH(NOLOCK)ON A.PropertyId = P.Id
+  AND A.BlockId = PB.Id
+  LEFT OUTER JOIN WRBHBPropertyRooms R WITH(NOLOCK)ON R.PropertyId = P.Id AND 
+  R.ApartmentId = A.Id AND R.PropertyId = P.Id AND R.BlockId = PB.Id
+  LEFT OUTER JOIN WRBHBPropertyRoomBeds B WITH(NOLOCK)ON B.RoomId = R.Id
+  LEFT OUTER JOIN WRBHBContractManagementTariffAppartment D WITH(NOLOCK)ON 
+  D.PropertyId = P.Id
+  LEFT OUTER JOIN WRBHBContractManagement H WITH(NOLOCK)ON H.Id = D.ContractId
+  WHERE P.IsActive = 1 AND P.IsDeleted = 0 AND D.IsActive = 1 AND 
+  D.IsDeleted = 0 AND H.IsActive = 1 AND H.IsDeleted=0 AND 
+  H.ContractType = ' Managed Contracts ' AND R.IsActive = 1 AND 
+  R.IsDeleted = 0 AND H.ClientId = @ClientId AND P.CityId = @CityId AND 
+  P.Category = 'Managed G H' AND A.IsActive = 1 AND A.IsDeleted = 0 AND 
+  A.Status = 'Active' AND R.RoomStatus = 'Active' AND 
+  A.SellableApartmentType != 'HUB' AND B.IsActive = 1 AND B.IsDeleted = 0 AND
+  R.Id NOT IN (SELECT RoomId FROM #ExstsDdpRoom) AND
+  B.Id NOT IN (SELECT BedId FROM #ExstsInPBed) AND
+  R.Id NOT IN (SELECT RoomId FROM #ExsInPRoom) AND
+  A.Id NOT IN (SELECT ApartmentId FROM #ExstsInPApartment) AND
+  A.Id NOT IN (SELECT ApartmentId FROM #ExstsApartment)
+  GROUP BY P.Id,B.Id,A.Id,R.Id,B.Id,B.BedRackTarrif;
   -- FINAL SELECT
   SELECT P.PropertyName,B.PropertyId,B.GetType,B.PropertyType,B.Tariff,
   P.Phone,P.Email,L.Locality AS Locality,P.LocalityId,0 AS Tick,1 AS Chk,
@@ -314,12 +342,15 @@ IF @Action = 'BedLevel_Property'
  END
 IF @Action = 'BedLevel_Tab2_to_Tab3_Dtls'
  BEGIN
+  DECLARE @PTYPE NVARCHAR(100);
   SET @ClientId=(SELECT ClientId FROM WRBHBBooking WHERE Id=@Id1);
   SET @CityId=(SELECT CityId FROM WRBHBBooking WHERE Id=@Id1);
   SET @PropertyId=(SELECT TOP 1 PropertyId FROM WRBHBBedBookingProperty 
   WHERE BookingId=@Id1);
   DECLARE @Tariff DECIMAL(27,2);
   SET @Tariff=(SELECT TOP 1 DiscountTariff FROM WRBHBBedBookingProperty 
+  WHERE BookingId=@Id1);
+  SET @PTYPE=(SELECT TOP 1 PropertyType FROM WRBHBBedBookingProperty 
   WHERE BookingId=@Id1);
   -- DEDICATED ROOMS
   CREATE TABLE #ExistsDdpRoom(RoomId BIGINT);
@@ -484,28 +515,56 @@ IF @Action = 'BedLevel_Tab2_to_Tab3_Dtls'
   SELECT TOP 1 PropertyType+' - '+PropertyName AS label,PropertyId,Id,
   PropertyType FROM WRBHBBedBookingProperty WHERE BookingId=@Id1;
   -- Beds Avaliable in Property
-  SELECT PB.BlockName+' - '+A.ApartmentNo+' - '+R.RoomNo+' - '+
-  CAST(B.BedNO AS VARCHAR) AS label,R.Id AS RoomId,B.Id AS BedId,
-  @Tariff AS Tariff FROM WRBHBProperty P
-  LEFT OUTER JOIN WRBHBPropertyBlocks PB WITH(NOLOCK)ON PB.PropertyId=P.Id
-  LEFT OUTER JOIN WRBHBPropertyApartment A WITH(NOLOCK)ON
-  A.PropertyId=P.Id AND A.BlockId=PB.Id
-  LEFT OUTER JOIN WRBHBPropertyRooms R WITH(NOLOCK)ON 
-  R.PropertyId=P.Id AND R.ApartmentId=A.Id
-  LEFT OUTER JOIN WRBHBPropertyRoomBeds B WITH(NOLOCK)ON 
-  B.RoomId=R.Id
-  WHERE P.IsActive=1 AND P.IsDeleted=0 AND PB.IsActive=1 AND 
-  PB.IsDeleted=0 AND A.IsActive=1 AND A.IsDeleted=0 AND 
-  A.SellableApartmentType != 'HUB' AND A.Status='Active' AND 
-  R.IsActive=1 AND R.IsDeleted=0 AND R.RoomStatus='Active' AND
-  B.IsActive=1 AND B.IsDeleted=0 AND P.Category='Internal Property' AND   
-  P.CityId=@CityId AND P.Id=@PropertyId AND
-  R.Id NOT IN (SELECT RoomId FROM #ExistsDdpRoom) AND
-  B.Id NOT IN (SELECT BedId FROM #ExistsInPBed) AND
-  R.Id NOT IN (SELECT RoomId FROM #ExInPRoom) AND
-  A.Id NOT IN (SELECT ApartmentId FROM #ExInPApartment) AND
-  A.Id NOT IN (SELECT ApartmentId FROM #ExistsDdpApartment)
-  ORDER BY PB.BlockName,A.ApartmentNo,R.RoomNo,B.Id;
+  IF @PTYPE = 'InP'
+   BEGIN
+    SELECT PB.BlockName+' - '+A.ApartmentNo+' - '+R.RoomNo+' - '+
+    CAST(B.BedNO AS VARCHAR) AS label,R.Id AS RoomId,B.Id AS BedId,
+    @Tariff AS Tariff FROM WRBHBProperty P
+    LEFT OUTER JOIN WRBHBPropertyBlocks PB WITH(NOLOCK)ON PB.PropertyId=P.Id
+    LEFT OUTER JOIN WRBHBPropertyApartment A WITH(NOLOCK)ON
+    A.PropertyId=P.Id AND A.BlockId=PB.Id
+    LEFT OUTER JOIN WRBHBPropertyRooms R WITH(NOLOCK)ON 
+    R.PropertyId=P.Id AND R.ApartmentId=A.Id
+    LEFT OUTER JOIN WRBHBPropertyRoomBeds B WITH(NOLOCK)ON 
+    B.RoomId=R.Id
+    WHERE P.IsActive=1 AND P.IsDeleted=0 AND PB.IsActive=1 AND 
+    PB.IsDeleted=0 AND A.IsActive=1 AND A.IsDeleted=0 AND 
+    A.SellableApartmentType != 'HUB' AND A.Status='Active' AND 
+    R.IsActive=1 AND R.IsDeleted=0 AND R.RoomStatus='Active' AND
+    B.IsActive=1 AND B.IsDeleted=0 AND P.Category='Internal Property' AND   
+    P.CityId=@CityId AND P.Id=@PropertyId AND
+    R.Id NOT IN (SELECT RoomId FROM #ExistsDdpRoom) AND
+    B.Id NOT IN (SELECT BedId FROM #ExistsInPBed) AND
+    R.Id NOT IN (SELECT RoomId FROM #ExInPRoom) AND
+    A.Id NOT IN (SELECT ApartmentId FROM #ExInPApartment) AND
+    A.Id NOT IN (SELECT ApartmentId FROM #ExistsDdpApartment)
+    ORDER BY PB.BlockName,A.ApartmentNo,R.RoomNo,B.Id;
+  END
+  IF @PTYPE = 'MGH'
+   BEGIN
+    SELECT PB.BlockName+' - '+A.ApartmentNo+' - '+R.RoomNo+' - '+
+    CAST(B.BedNO AS VARCHAR) AS label,R.Id AS RoomId,B.Id AS BedId,
+    @Tariff AS Tariff FROM WRBHBProperty P
+    LEFT OUTER JOIN WRBHBPropertyBlocks PB WITH(NOLOCK)ON PB.PropertyId=P.Id
+    LEFT OUTER JOIN WRBHBPropertyApartment A WITH(NOLOCK)ON
+    A.PropertyId=P.Id AND A.BlockId=PB.Id
+    LEFT OUTER JOIN WRBHBPropertyRooms R WITH(NOLOCK)ON 
+    R.PropertyId=P.Id AND R.ApartmentId=A.Id
+    LEFT OUTER JOIN WRBHBPropertyRoomBeds B WITH(NOLOCK)ON 
+    B.RoomId=R.Id
+    WHERE P.IsActive=1 AND P.IsDeleted=0 AND PB.IsActive=1 AND 
+    PB.IsDeleted=0 AND A.IsActive=1 AND A.IsDeleted=0 AND 
+    A.SellableApartmentType != 'HUB' AND A.Status='Active' AND 
+    R.IsActive=1 AND R.IsDeleted=0 AND R.RoomStatus='Active' AND
+    B.IsActive=1 AND B.IsDeleted=0 AND P.Category='Managed G H' AND   
+    P.CityId=@CityId AND P.Id=@PropertyId AND
+    R.Id NOT IN (SELECT RoomId FROM #ExistsDdpRoom) AND
+    B.Id NOT IN (SELECT BedId FROM #ExistsInPBed) AND
+    R.Id NOT IN (SELECT RoomId FROM #ExInPRoom) AND
+    A.Id NOT IN (SELECT ApartmentId FROM #ExInPApartment) AND
+    A.Id NOT IN (SELECT ApartmentId FROM #ExistsDdpApartment)
+    ORDER BY PB.BlockName,A.ApartmentNo,R.RoomNo,B.Id;
+   END
   -- Booking Guest Tab 3
   SELECT GuestId,EmpCode,FirstName,LastName,0 AS Tick,1 AS Chk,
   FirstName+'  '+LastName AS Name

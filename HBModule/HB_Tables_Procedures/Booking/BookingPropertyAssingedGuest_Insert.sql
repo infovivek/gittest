@@ -47,7 +47,8 @@ CREATE PROCEDURE [dbo].[SP_BookingPropertyAssingedGuest_Insert](
 @Column7 NVARCHAR(100),
 @Column8 NVARCHAR(100),
 @Column9 NVARCHAR(100),
-@Column10 NVARCHAR(100))
+@Column10 NVARCHAR(100),
+@BTCFilePath NVARCHAR(500))
 AS
 BEGIN
  IF @SSPId != 0
@@ -183,7 +184,7 @@ BEGIN
  PtyChkInTime,PtyChkInAMPM,PtyChkOutTime,PtyChkOutAMPM,PtyGraceTime,
  LTonAgreed,LTonRack,STonAgreed,STonRack,CurrentStatus,RoomShiftingFlag,
  Title,Column1,Column2,Column3,Column4,Column5,Column6,Column7,Column8,
- Column9,Column10/*,ChkColumn1,ChkColumn2,ChkColumn3,ChkColumn4,ChkColumn5,
+ Column9,Column10,BTCFilePath/*,ChkColumn1,ChkColumn2,ChkColumn3,ChkColumn4,ChkColumn5,
  ChkColumn6,ChkColumn7,ChkColumn8,ChkColumn9,ChkColumn10*/)
  VALUES(@BookingId,@EmpCode,@FirstName,@LastName,@GuestId,@Occupancy,
  @RoomType,@Tariff,@RoomId,@BookingPropertyId,@BookingPropertyTableId,
@@ -193,7 +194,7 @@ BEGIN
  @RackTriple,@PtyChkInTime,@PtyChkInAMPM,@PtyChkOutTime,@PtyChkOutAMPM,
  @PtyGraceTime,@LTAgreed,@LTRack,@STAgreed,@STRack,'Booked',0,@Title,
  @Column1,@Column2,@Column3,@Column4,@Column5,@Column6,@Column7,@Column8,
- @Column9,@Column10/*,@ChkColumn1,@ChkColumn2,@ChkColumn3,@ChkColumn4,
+ @Column9,@Column10,@BTCFilePath/*,@ChkColumn1,@ChkColumn2,@ChkColumn3,@ChkColumn4,
  @ChkColumn5,@ChkColumn6,@ChkColumn7,@ChkColumn8,@ChkColumn9,@ChkColumn10*/);
  SELECT Id,RowId FROM WRBHBBookingPropertyAssingedGuest 
  WHERE Id=@@IDENTITY;

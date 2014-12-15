@@ -61,6 +61,31 @@ namespace HBReport
         
         }
 
+        //protected void ReportViewer_OnLoad(object sender, EventArgs e)
+        //{
+        //    string exportOption = "Excel";
+        //    //exportOption[0] = ;
+        //    //exportOption[1] = "Word";           
+        //    string exportOption1 = "Word";
+        //    // string exportOption = "PDF";
+        //    RenderingExtension extension = ReportViewer1.LocalReport.ListRenderingExtensions().ToList().
+        //        Find(x => x.Name.Equals(exportOption, StringComparison.CurrentCultureIgnoreCase));
+        //    if (extension != null)
+        //    {
+        //        System.Reflection.FieldInfo fieldInfo = extension.GetType().GetField("m_isVisible", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        //        fieldInfo.SetValue(extension, false);
+        //    }
+
+        //    RenderingExtension extension1 = ReportViewer1.LocalReport.ListRenderingExtensions().ToList().
+        //       Find(x => x.Name.Equals(exportOption1, StringComparison.CurrentCultureIgnoreCase));
+        //    if (extension != null)
+        //    {
+        //        System.Reflection.FieldInfo fieldInfo = extension1.GetType().GetField("m_isVisible", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        //        fieldInfo.SetValue(extension1, false);
+        //    }
+
+        //}
+
         protected void Button1_Click(object sender, EventArgs e)
         {
             Warning[] warnings;

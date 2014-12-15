@@ -58,10 +58,10 @@ namespace HBReport
                 ReportParameter paramLogo = new ReportParameter();
 
                 paramLogo.Name = "Path";
-
-                //paramLogo.Values.Add(@"D:\Project\HR_Service\WrbHRPrint\Images\Logo.png");
+                paramLogo.Values.Add(@"D:\Backend\flex_bin\assets\Logo.jpg");
+          //      paramLogo.Values.Add(@"D:\Project\HR_Service\WrbHRPrint\Images\Logo.png");
                 // string var = ConfigurationManager.ConnectionStrings["Images"].ToString();
-                paramLogo.Values.Add(@"http://sstage.in/Company_Images/HummingBird_Travel__0_0_HB_Logo.png_HB_Logo.png");
+            //    paramLogo.Values.Add(@"http://sstage.in/Company_Images/HummingBird_Travel__0_0_HB_Logo.png_HB_Logo.png");
                 ReportViewer1.LocalReport.SetParameters(paramLogo);
              //   Byte[] mybytes = report.Render("WORD");
               //  Byte[] mybytes = ReportViewer1.LocalReport.Render("PDF");// for exporting to PDF
@@ -127,6 +127,32 @@ namespace HBReport
 
         }
 
+        //protected void ReportViewer_OnLoad(object sender, EventArgs e)
+        //{
+        //    string exportOption = "Excel";
+        //    //exportOption[0] = ;
+        //    //exportOption[1] = "Word";           
+        //    string exportOption1 = "Word";
+        //    // string exportOption = "PDF";
+        //    RenderingExtension extension = ReportViewer1.LocalReport.ListRenderingExtensions().ToList().
+        //        Find(x => x.Name.Equals(exportOption, StringComparison.CurrentCultureIgnoreCase));
+        //    if (extension != null)
+        //    {
+        //        System.Reflection.FieldInfo fieldInfo = extension.GetType().GetField("m_isVisible", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        //        fieldInfo.SetValue(extension, false);
+        //    }
+
+        //    RenderingExtension extension1 = ReportViewer1.LocalReport.ListRenderingExtensions().ToList().
+        //       Find(x => x.Name.Equals(exportOption1, StringComparison.CurrentCultureIgnoreCase));
+        //    if (extension != null)
+        //    {
+        //        System.Reflection.FieldInfo fieldInfo = extension1.GetType().GetField("m_isVisible", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        //        fieldInfo.SetValue(extension1, false);
+        //    }
+
+        //}
+
+       
         private String EmailValidate(String EmailId)
         {
             string pattern = null;

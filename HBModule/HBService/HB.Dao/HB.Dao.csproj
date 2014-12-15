@@ -66,6 +66,7 @@
     <Compile Include="ApartmentDAO.cs" />
     <Compile Include="APIAvailabilityExistingDataDAO.cs" />
     <Compile Include="APIBookingMailDAO.cs" />
+    <Compile Include="APIBookingResendMailDAO.cs" />
     <Compile Include="APICreateReservationDAO.cs" />
     <Compile Include="APIDynamicDAO.cs" />
     <Compile Include="APIStaticDataDAO.cs" />

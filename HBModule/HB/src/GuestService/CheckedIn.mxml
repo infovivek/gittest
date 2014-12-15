@@ -133,7 +133,7 @@
 			}
 			
 			public function Help():void
-			{				df
+			{				
 				
 				useWeb("GuestCheckIn","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,0,0,0,65]);
 		//		useWeb("GuestCheckIn","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,0,0,0,Global_AC[0].UsrId]);

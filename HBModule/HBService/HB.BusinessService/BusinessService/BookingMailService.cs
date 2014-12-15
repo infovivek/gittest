@@ -76,7 +76,7 @@ namespace HB.BusinessService.BusinessService
             }
             if (data[1].ToString() == "RoomResend")
             {
-                ds = new BookingRoomResendMailDAO().Mail(BookingId, "", "");
+                ds = new BookingRoomResendMailDAO().Mail(BookingId, "", "", user);
             }
             return ds;
         }

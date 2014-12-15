@@ -172,7 +172,7 @@
 					
 					if (Id == 0)
 					{
-						alignAlert(Alert.show("Service Added Successfully.","Message !",Alert.OK| Alert.NO,
+						alignAlert(Alert.show("Service Added Successfully.","Message !",Alert.OK,
 							null, null,	iconTickLarge, Alert.OK),10,"");
 					}
 					else
@@ -327,6 +327,16 @@
 					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
 					return;					
 				}
+				else
+				{
+					alignAlert(Alert.show(" Do you want to save the Outsourced Staff KOT?","Warning",Alert.YES | Alert.NO, null,
+						FnSave1, iconWarning, Alert.NO),10,"");
+				}
+			}
+			protected function FnSave1(event:CloseEvent):void
+			{
+				if ((event.detail==Alert.YES)) 
+				{
 				var Flag:Boolean=true;
 				var arrHdr:ArrayCollection=new ArrayCollection
 					([{
@@ -342,7 +352,7 @@
 				ServiceXml += "</ROOT>";
 				useWeb("OutsourceKOTEntry","Save_CUSTOM",[GlobalXml,HdrXml,ServiceXml]);
 				
-				
+				}
 			}
 			protected function FnClr():void
 			{

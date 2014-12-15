@@ -75,7 +75,7 @@ IF @BookingLevel = 'Room'
       Column10 FROM WRBHBBookingPropertyAssingedGuest
       WHERE Id IN (SELECT Id FROM #AssignedGuestTableId);
       -- Update existing entry
-      UPDATE WRBHBBookingPropertyAssingedGuest SET IsActive = 0,IsDeleted = 1,
+      UPDATE WRBHBBookingPropertyAssingedGuest SET IsActive = 0,IsDeleted = 0,
       ModifiedBy = @UsrId,ModifiedDate = GETDATE(),
       CancelRemarks = 'Room Shifting'+','+@ChkInDt+','+@ChkOutDt+','+
       @TariffMode+','+@ServiceMode+','+CAST(@FromRoomId AS VARCHAR)+','+
@@ -146,7 +146,7 @@ IF @BookingLevel = 'Room'
 	    -- Update existing entry
 	    UPDATE WRBHBBookingPropertyAssingedGuest SET ModifiedBy = @UsrId,
 	    ModifiedDate = GETDATE(),RoomShiftingFlag = 1,IsActive = 0,
-	    IsDeleted = 1,
+	    IsDeleted = 0,
 	    CancelRemarks = 'Room Shifting'+','+@ChkInDt+','+@ChkOutDt+','+
 	    @TariffMode+','+@ServiceMode+','+CAST(@FromRoomId AS VARCHAR)+','+
 	    CAST(@ToRoomId AS VARCHAR),ChkOutDt = CONVERT(DATE,@ChkInDt,103)
@@ -160,7 +160,7 @@ IF @BookingLevel = 'Room'
 	  WHERE IsActive = 1 AND IsDeleted = 0 AND RoomCaptured = @RoomCaptured AND
 	  BookingId = @BookingId;
 	  --
-	  UPDATE WRBHBBookingPropertyAssingedGuest SET IsActive = 0,IsDeleted = 1
+	  UPDATE WRBHBBookingPropertyAssingedGuest SET IsActive = 0,IsDeleted = 0
 	  WHERE Id IN (SELECT Id FROM #TMPPP WHERE DayCnt <= 0);
 	  --
 	  SELECT ChkInDt,ChkOutDt,Id,RoomShiftingFlag 
@@ -210,7 +210,7 @@ IF @BookingLevel = 'Room'
       Column10 FROM WRBHBBookingPropertyAssingedGuest
       WHERE Id IN (SELECT Id FROM #AssignedGuestTableId);
       -- Update existing entry
-      UPDATE WRBHBBookingPropertyAssingedGuest SET IsActive = 0,IsDeleted = 1,
+      UPDATE WRBHBBookingPropertyAssingedGuest SET IsActive = 0,IsDeleted = 0,
       ModifiedBy = @UsrId,ModifiedDate = GETDATE(),
       CancelRemarks = 'Stay'+','+@ChkInDt+','+@ChkOutDt+','+
       @TariffMode+','+@ServiceMode+','+CAST(@FromRoomId AS VARCHAR)+','+
@@ -258,7 +258,7 @@ IF @BookingLevel = 'Room'
       Column10 FROM WRBHBBookingPropertyAssingedGuest
       WHERE Id IN (SELECT Id FROM #AssignedGuestTableId);
       -- Update existing entry
-      UPDATE WRBHBBookingPropertyAssingedGuest SET IsActive = 0,IsDeleted = 1,
+      UPDATE WRBHBBookingPropertyAssingedGuest SET IsActive = 0,IsDeleted = 0,
       ModifiedBy = @UsrId,ModifiedDate = GETDATE(),
       CancelRemarks = 'Stay'+','+@ChkInDt+','+@ChkOutDt+','+
       @TariffMode+','+@ServiceMode+','+CAST(@FromRoomId AS VARCHAR)+','+

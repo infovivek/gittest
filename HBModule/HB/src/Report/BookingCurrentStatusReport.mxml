@@ -88,7 +88,7 @@
 					var arrExportResult:ArrayCollection = Grd_BookingDtls.dataProvider as ArrayCollection;
 					var xlsFile:ExcelFile = new ExcelFile();
 					var sheet:Sheet = new Sheet();					
-					sheet.resize(arrExportResult.length+1,19);					
+					sheet.resize(arrExportResult.length+1,29);					
 					sheet.setCell(0,0,'SNo');
 					sheet.setCell(0,1,'BookingCode');
 					sheet.setCell(0,2,'MasterClientName');
@@ -107,7 +107,17 @@
 					sheet.setCell(0,15,'Tariff Payment Mode');					
 					sheet.setCell(0,16,'Status');
 					sheet.setCell(0,17,'UserName');
-					sheet.setCell(0,18,'BookingDate');					
+					sheet.setCell(0,18,'BookingDate');
+					sheet.setCell(0,19,'Column1');
+					sheet.setCell(0,20,'Column2');
+					sheet.setCell(0,21,'Column3');
+					sheet.setCell(0,22,'Column4');
+					sheet.setCell(0,23,'Column5');
+					sheet.setCell(0,24,'Column6');
+					sheet.setCell(0,25,'Column7');
+					sheet.setCell(0,26,'Column8');
+					sheet.setCell(0,27,'Column9');
+					sheet.setCell(0,28,'Column10');
 					for(var i:int = 0; i < arrExportResult.length; i++)
 					{
 						sheet.setCell(i+1, 0, arrExportResult[i].SNo);
@@ -129,6 +139,16 @@
 						sheet.setCell(i+1, 16, arrExportResult[i].Status);
 						sheet.setCell(i+1, 17, arrExportResult[i].UserName);
 						sheet.setCell(i+1, 18, arrExportResult[i].BookingDate);
+						sheet.setCell(i+1, 19, arrExportResult[i].Column1);
+						sheet.setCell(i+1, 20, arrExportResult[i].Column2);
+						sheet.setCell(i+1, 21, arrExportResult[i].Column3);
+						sheet.setCell(i+1, 22, arrExportResult[i].Column4);
+						sheet.setCell(i+1, 23, arrExportResult[i].Column5);
+						sheet.setCell(i+1, 24, arrExportResult[i].Column6);
+						sheet.setCell(i+1, 25, arrExportResult[i].Column7);
+						sheet.setCell(i+1, 26, arrExportResult[i].Column8);
+						sheet.setCell(i+1, 27, arrExportResult[i].Column9);
+						sheet.setCell(i+1, 28, arrExportResult[i].Column10);
 					}
 					xlsFile.sheets.addItem(sheet);      
 					var bytes:ByteArray = xlsFile.saveToByteArray();
@@ -211,7 +231,7 @@
 	<fx:Script source = "..\\Common\\Functions.as"/>
 	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
 	<s:VGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
-		<s:BorderContainer width="1000" height="100%" backgroundColor="#fbf9f9" borderVisible="false">
+		<s:BorderContainer width="100%" height="100%" backgroundColor="#fbf9f9" borderVisible="false">
 			<mx:DataGrid id="Grd_BookingDtls" x="0" y="53" width="100%" height="100%"
 						 horizontalScrollPolicy="off">
 				<mx:columns>
@@ -233,7 +253,17 @@
 					<mx:DataGridColumn dataField="TariffPaymentMode"/>					
 					<mx:DataGridColumn dataField="Status"/>
 					<mx:DataGridColumn dataField="UserName"/>
-					<mx:DataGridColumn dataField="BookingDate"/>					
+					<mx:DataGridColumn dataField="BookingDate"/>
+					<mx:DataGridColumn dataField="Column1"/>
+					<mx:DataGridColumn dataField="Column2"/>
+					<mx:DataGridColumn dataField="Column3"/>
+					<mx:DataGridColumn dataField="Column4"/>
+					<mx:DataGridColumn dataField="Column5"/>
+					<mx:DataGridColumn dataField="Column6"/>
+					<mx:DataGridColumn dataField="Column7"/>
+					<mx:DataGridColumn dataField="Column8"/>
+					<mx:DataGridColumn dataField="Column9"/>
+					<mx:DataGridColumn dataField="Column10"/>
 				</mx:columns>
 			</mx:DataGrid>			
 			<WrbHelpComp:HelpText id="Hlp_ClientName" x="56" y="17.5" width="200" height="23"

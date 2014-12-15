@@ -13,8 +13,8 @@
     
     <div>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    <asp:Button ID="Button1" runat="server" Text="Print" onclick="Button1_Click" 
-            Width="72px" />
+    <asp:Button ID="Button1" runat="server" Text="PDF" onclick="Button1_Click" 
+            Width="72px" style="font-weight: 700" />
     </div>
     <div align="center">
         <rsweb:ReportViewer ID="ReportViewer1" runat="server" Height="100%" 
@@ -22,7 +22,7 @@
             WaitMessageFont-Size="14pt" 
             PromptAreaCollapsed="True" AsyncRendering="False" 
             SizeToReportContent="True" Font-Names="Verdana" Font-Size="8pt" 
-            InteractiveDeviceInfos="(Collection)">
+            InteractiveDeviceInfos="(Collection)" ShowExportControls="False" >
             <LocalReport ReportPath="GuestCheckOutConsolidate.rdlc">
                 <DataSources>
                     <rsweb:ReportDataSource DataSourceId="ObjectDataSource1" Name="DataSet1" />

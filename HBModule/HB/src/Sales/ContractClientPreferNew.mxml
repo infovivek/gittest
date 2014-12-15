@@ -455,33 +455,37 @@
 			}
 		]]>
 	</fx:Script> 
-	<s:VGroup x="0" y="0" width="100%" height="500" gap="5" horizontalAlign="center" verticalAlign="middle">
+	<s:VGroup x="0" y="10" width="100%" height="530" gap="5" horizontalAlign="center" >
 		<s:BorderContainer y="2" width="100%" height="417" backgroundColor="#fbf9f9"
 						   borderVisible="false"> 
 			<s:Label x="29" y="17" text="Client Information" color="Red"/>
 			
-			<s:Label x="329" y="60" text="Client Name"/>
-			<s:Label x="399" y="56" text="*" color="red"/> 
-			<WrbHelpComp:HelpText id="Hlp_ClientName" x="421" y="55" width="200" height="20" pxTabIndex="1"
+			<s:Label x="309" y="30" text="Client Name"/>
+			<s:Label x="379" y="26" text="*" color="red"/> 
+			<WrbHelpComp:HelpText id="Hlp_ClientName" x="401" y="25" width="200" height="20" pxTabIndex="1"
 								  onselection="{ClientData()}" pxSetColumnsWidth="200,-1" depth="10">
 			</WrbHelpComp:HelpText>
 			
 			<mx:HRule x="0" y="417" width="100%" strokeColor="#eb1c24"/>
-			
-			<WrbComp:ProDGrid1 x="20" y="96" height="288" id="Grd_ClientDtls"
-							   _ColDataField="Property~RoomType~TariffSingle~TariffDouble~TariffTriple~Facility~Inclusive~Tax~ContactName~ContactPhone~ContactEmail~PropertyId~RoomId~Id"
-							   _ColHdrText="Property~Room Type~Single Tariff~Double Tariff~Triple Tariff~Facility~Inclusive~Tax~Name~Phone~Email~PropertyId~RoomId~Id"
-							   _ColType="hlp~hlp~ntxt~ntxt~ntxt~txt~Chk~txt~txt~txt~txt~txt~txt~txt"
-							   _colVisible="1~1~1~1~1~1~1~1~1~1~1~0~0~0"
-							   _ColWidth="180~80~80~80~80~75~75~75~75~75~75~0~0~0"
-							   _editable="1~1~1~1~1~1~1~1~1~1~1~0~0~0"
+			<s:Scroller x="0" y="69" width="100%" height="311" id="Scr_Grid" visible="true">
+				<s:VGroup width="100%" height="100%">
+			    <WrbComp:ProDGrid1 x="20" y="96" width="1418" height="288" id="Grd_ClientDtls"
+							   _ColDataField="Property~RoomType~ATariffSingle~ATariffDouble~ATariffTriple~RTariffSingle~RTariffDouble~RTariffTriple~Facility~Inclusive~Tax~LTAgreed~LTRack~STAgreed~ContactName~ContactPhone~ContactEmail~PropertyId~RoomId~Id"
+							   _ColHdrText="Property~Room Type~Single Agreed~Double Agreed~Triple Agreed~Single Rack~Double Rack~Triple Rack~Facility~Inclusive~Tax~LTAgreed~LTRack~STAgreed~Name~Phone~Email~PropertyId~RoomId~Id"
+							   _ColType="hlp~hlp~ntxt~ntxt~ntxt~ntxt~ntxt~ntxt~txt~Chk~txt~ntxt~ntxt~ntxt~txt~txt~txt~txt~txt~txt"
+							   _colVisible="1~1~1~1~1~1~1~1~1~1~1~1~1~1~1~1~1~0~0~0"
+							   _ColWidth="180~80~80~80~80~80~80~80~75~75~75~75~75~75~75~75~75~75~0~0~0"
+							   _editable="1~1~1~1~1~1~1~1~1~1~1~1~1~1~1~1~1~0~0~0"
 							   _HeaderTxtLbl="true" 
-							   _required="0~0~0~0~0~0~0~0~0~0~0~0~0~0"
+							   _required="0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0"
 							   _spltChar="~"
 							   _tabIndex="2"
-							   _visibleColNos="11"
+							   _visibleColNos="17"
 							   _DuplChk="false" 
 							   _getHlpTxtData="getHlpData(event)" ID="ClientDetails"/> 
+				</s:VGroup>
+			</s:Scroller>
+					
 			<mx:DataGrid id="Grd_Status1" x="65" y="102" editable="true" width="843" height="309" visible="false">
 				<mx:columns>
 					<mx:DataGridColumn dataField="ClientId" headerText="ClientId" width="200" textAlign="left" editable="false"/>
@@ -505,7 +509,7 @@
 			<mx:Label x="225" y="388" text="&lt;"/>
 			<s:Button x="480" y="389" label="Export" id="btn_Excel" click="ExportExcel(event)"/>
 		</s:BorderContainer>
-		<s:HGroup y="505" width="100%" height="41" horizontalAlign="center">
+		<s:HGroup y="600" width="100%" height="41" horizontalAlign="center">
 			<WrbComp:SaveControl id="Save_PettyCash" docSave="SCtrl_SaveHandler()" docClear="SCtrl_ClearHandler()"
 								 doSearch="SCtrl_SearchHandler()" docRefresh="SCtrl_RefreshHandler()"/>
 		</s:HGroup>

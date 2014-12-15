@@ -32,9 +32,15 @@ CREATE PROCEDURE Sp_ContractClientPref_Detail_Insert
 @TariffSingle	DECIMAL(27, 2),
 @TariffDouble	DECIMAL(27, 2),
 @TariffTriple       DECIMAL(27, 2),
+@LTariffSingle	DECIMAL(27, 2),
+@LTariffDouble	DECIMAL(27, 2),
+@LTariffTriple       DECIMAL(27, 2),
 @Facility			Nvarchar(100),
 @TaxInclusive	BIT,
 @TaxPercentage	DECIMAL(27, 2),
+@LTAgreed	DECIMAL(27, 2),
+@LTRack	DECIMAL(27, 2),
+@STAgreed	DECIMAL(27, 2),
 @CreatedBy		BIGINT,
 @ContactPhone 	NVARCHAR(100),
 @ContactName 	NVARCHAR(100),
@@ -47,13 +53,16 @@ DECLARE @Identity int
 UPDATE WRBHBContractClientPref_Details SET IsActive=0,IsDeleted=1
 		WHERE HeaderId=@HeaderId AND PropertyId=@PropertyId  
 
-INSERT INTO WRBHBContractClientPref_Details (HeaderId,PropertyName,PropertyId,RoomType,RoomId,TariffSingle,TariffDouble,
-TariffTriple,Facility,TaxInclusive,TaxPercentage,
-			CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId,Email,ContactPhone,ContactName)
-VALUES (@HeaderId,@PropertyName,@PropertyId,@RoomType,@RoomId,@TariffSingle,@TariffDouble,
-@TariffTriple,@Facility,@TaxInclusive,@TaxPercentage,@CreatedBy,GETDATE(),@CreatedBy,
-		GETDATE(),1,0,NEWID(),@Email,@ContactPhone,@ContactName)		
+	INSERT INTO WRBHBContractClientPref_Details(HeaderId,PropertyName,PropertyId,RoomType,RoomId,TariffSingle,
+	TariffDouble,TariffTriple,RTariffSingle,RTariffDouble,RTariffTriple,Facility,TaxInclusive,TaxPercentage,
+	LTAgreed,LTRack,STAgreed,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId,Email,ContactPhone,ContactName)
+	VALUES (@HeaderId,@PropertyName,@PropertyId,@RoomType,@RoomId,@TariffSingle,@TariffDouble,
+	@TariffTriple,@LTariffSingle,@LTariffDouble,@LTariffTriple,@Facility,@TaxInclusive,@TaxPercentage,
+	@LTAgreed,@LTRack,@STAgreed,@CreatedBy,GETDATE(),@CreatedBy,GETDATE(),1,0,NEWID(),@Email,
+	@ContactPhone,@ContactName)		
 		
 SET  @Identity=@@IDENTITY
 SELECT Id,RowId FROM WRBHBContractClientPref_Details WHERE Id=@Identity;	
 END
+
+

@@ -35,7 +35,7 @@ namespace HBReport
                 DbDataReader dr = command.ExecuteReader();
                 // SQL Server Connection String
                 //string sqlConnectionString = ConfigurationManager.ConnectionStrings["HB"].ToString();
-                string sqlConnectionString = @"Data Source=WARBLERS-AE164B;Initial Catalog=HB14NOV;User ID=sa;Password=sa123";
+                string sqlConnectionString = @"Data Source=WARBLERS-AE164B;Initial Catalog=HBDEC10;User ID=sa;Password=sa123";
                 // Bulk Copy to SQL Server 
                 SqlBulkCopy bulkInsert = new SqlBulkCopy(sqlConnectionString);
                 bulkInsert.DestinationTableName = "WRBHBPropertyRating";

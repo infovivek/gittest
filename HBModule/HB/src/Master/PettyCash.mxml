@@ -230,7 +230,7 @@
 				if(event.currentTarget.ID == "hlpExpenseHead")
 				{	
 					Grd_PettyCash1._setValuetoCtrl("hlpExpenseHead",event.currentTarget.selectedRow.ExpenseHead);
-					Grd_PettyCash1._setValuetoCtrl("txtExpenseHeaderId",event.currentTarget.selectedRow.ExpenseHeaderId) 
+					Grd_PettyCash1._setValuetoCtrl("txtExpenseHeadId",event.currentTarget.selectedRow.ExpenseHeadId) 
 					var Pettyidhlp=(event.currentTarget.selectedRow.ExpenseHeadId);
 					event.currentTarget.selectedRow = null;
 				}
@@ -261,8 +261,8 @@
 						  formatString="DD/MM/YYYY" selectableRange="{{rangeEnd:new Date()}}" enabled="false"/>
 			<WrbComp:ProDGrid1 id="Grd_PettyCash1" x="187" y="165" width="616" height="275"
 							   _borderVisible="true"  _getHlpTxtData="getHlpData(event)"  
-							   _ColDataField="ExpenseHead~Description~Amount~ExpenseHeaderId~Id"
-							   _ColHdrText="ExpenseHead~Description~Amount~ExpenseHeaderId~Id"
+							   _ColDataField="ExpenseHead~Description~Amount~ExpenseHeadId~Id"
+							   _ColHdrText="ExpenseHead~Description~Amount~ExpenseHeadId~Id"
 							   _ColType="hlp~txt~ntxt~txt~txt"
 							   _colVisible="1~1~1~0~0"
 							   _ColWidth="200~400~100~0~0" 

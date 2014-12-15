@@ -114,10 +114,9 @@ BEGIN
 		SELECT DISTINCT KD.ServiceItem+'-'+'Staff',KD.ItemId,(KD.Quantity),VC.Cost,KD.Price,
 	    (KD.Quantity)*(0) AS Revenue,2 
 		FROM WRBHBVendorCost VC 
-		JOIN WRBHBMapVendor MP ON VC.VendorId=MP.VendorId AND MP.IsActive=1 AND MP.IsDeleted=0
-		JOIN WRBHBNewKOTUserEntryHdr KH ON MP.PropertyId=KH.PropertyId AND KH.IsActive=1 AND KH.IsDeleted=0
 		JOIN WRBHBNewKOTUserEntryDtl KD ON vc.ItemId=KD.ItemId AND KD.IsActive=1 AND KD.IsDeleted=0
-	    WHERE VC.IsActive=1 AND VC.IsDeleted=0 AND  VC.VendorId=@VendorId and KH.PropertyId=@PropertyId
+		JOIN WRBHBNewKOTUserEntryHdr KH ON KD.NewKOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
+		WHERE VC.IsActive=1 AND VC.IsDeleted=0 AND  VC.VendorId=@VendorId and KH.PropertyId=@PropertyId
 	    AND CONVERT(NVARCHAR,KH.Date,103) BETWEEN  CONVERT(date,@Str,103) AND  CONVERT(date,@Str1,103)
 	    group by KD.ServiceItem,KD.ItemId,VC.Cost,KD.Price ,KD.Quantity
 	     
@@ -290,6 +289,18 @@ BEGIN
 	    group by ServiceItem,ItemId,Cost,Flag	
 	    Order by Flag ASC  
 	   
+	  
+	    CREATE TABLE #Final1(ServiceItem NVARCHAR(100),ItemId NVARCHAR(100),Quantity DECIMAL(27,0),
+	    VendorRate DECIMAL(27,2),TotalCost DECIMAL(27,2),Revenue DECIMAL(27,2),Flag int) 
+		
+	    INSERT INTO #Final1(ServiceItem,ItemId,Quantity,VendorRate,TotalCost,Revenue,Flag)
+	    SELECT 'Total' AS ServiceItem,'' AS ItemId,SUM(Quantity) AS Quantity,SUM(Cost) AS Cost,
+	    Quantity*Cost AS Total,
+	    SUM(Revenue) AS Revenue,3 FROM #Cost
+	    group by Quantity,Cost
+	    
+	    
+	    
 	    CREATE TABLE #Final(ServiceItem NVARCHAR(100),ItemId NVARCHAR(100),Quantity NVARCHAR(100),VendorRate NVARCHAR(100),
 		TotalCost NVARCHAR(100),Revenue NVARCHAR(100),Flag int) 
 	    
@@ -303,14 +314,14 @@ BEGIN
 	    INSERT INTO #Final(ServiceItem,ItemId,Quantity,VendorRate,TotalCost,Revenue,Flag)
 	    SELECT '' AS ServiceItem,'' AS ItemId,'' AS Quantity,'' AS Cost,'' AS Total,
 	    '' AS Revenue,2 
-	    
+	
 	    INSERT INTO #Final(ServiceItem,ItemId,Quantity,VendorRate,TotalCost,Revenue,Flag)
-	    SELECT 'Total' AS ServiceItem,'' AS ItemId,SUM(Quantity) AS Quantity,SUM(Cost) AS Cost,SUM(Quantity)*Cost AS Total,
-	    SUM(Revenue) AS Revenue,3 FROM #Cost
-	    group by Cost
+	    SELECT 'Total' AS ServiceItem,'' AS ItemId,SUM(Quantity) AS Quantity,SUM(VendorRate) AS Cost,
+	    SUM(TotalCost) AS Total,SUM(Revenue) AS Revenue,3 FROM #Final1
+	   
 	   	     
-	    
-	    SELECT ServiceItem,Quantity,VendorRate,TotalCost,Revenue FROM #Final
+	    SELECT ServiceItem,Quantity,VendorRate,TotalCost,Revenue 
+	    FROM #Final
 		
 	    
 	  END 
@@ -565,7 +576,15 @@ BEGIN
 	    group by ServiceItem,ItemId,Cost,Flag	
 	    Order by Flag ASC  
 	   
-	  
+		CREATE TABLE #Final2(ServiceItem NVARCHAR(100),ItemId NVARCHAR(100),Quantity DECIMAL(27,0),
+	    VendorRate DECIMAL(27,2),TotalCost DECIMAL(27,2),Revenue DECIMAL(27,2),Flag int) 
+		
+	    INSERT INTO #Final2(ServiceItem,ItemId,Quantity,VendorRate,TotalCost,Revenue,Flag)
+	    SELECT 'Total' AS ServiceItem,'' AS ItemId,SUM(Quantity) AS Quantity,SUM(Cost) AS Cost,
+	    Quantity*Cost AS Total,
+	    SUM(Revenue) AS Revenue,3 FROM #Costs
+	    group by Quantity,Cost
+		
 		CREATE TABLE #Finals(ServiceItem NVARCHAR(100),ItemId NVARCHAR(100),Quantity NVARCHAR(100),VendorRate NVARCHAR(100),
 		TotalCost NVARCHAR(100),Revenue NVARCHAR(100),Flag int) 
 	    
@@ -580,9 +599,9 @@ BEGIN
 	    '' AS Revenue,2 
 	    
 	    INSERT INTO #Finals(ServiceItem,ItemId,Quantity,VendorRate,TotalCost,Revenue,Flag)
-	    SELECT 'Total' AS ServiceItem,'' AS ItemId,SUM(Quantity) AS Quantity,SUM(Cost) AS Cost,SUM(Quantity)*Cost AS Total,
-	    SUM(Revenue) AS Revenue,3 FROM #Costs
-	    group by Cost
+	    SELECT 'Total' AS ServiceItem,'' AS ItemId,SUM(Quantity) AS Quantity,SUM(Cost) AS Cost,
+	    SUM(TotalCost) AS Total,SUM(Revenue) AS Revenue,3 FROM #Final2
+	    
 	   	    
 	    
 	    SELECT ServiceItem,Quantity,VendorRate,TotalCost,Revenue FROM #Finals

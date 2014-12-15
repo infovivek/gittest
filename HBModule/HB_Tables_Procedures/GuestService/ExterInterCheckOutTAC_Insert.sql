@@ -25,7 +25,7 @@ ALTER PROCEDURE [dbo].[SP_ExterInterCheckOutTAC_Insert](@ChkOutHdrId int,
 @ChkOutTariffCess DECIMAL(27,2),@ChkOutTariffHECess DECIMAL(27,2),@ChkOutTariffNetAmount DECIMAL(27,2),
 @ChkOutTariffReferance NVARCHAR(100),@CreatedBy BIGINT,
 @ChkInHdrId INT,@NoOfDays INT,@RoomId INT,
-@PropertyId int,@GuestId int,@BookingId int,@StateId int,@Direct nvarchar(100),
+@PropertyId BIGINT,@GuestId int,@BookingId int,@StateId int,@Direct nvarchar(100),
 @PropertyType nvarchar(100),@Status nvarchar(100),@CheckOutDate nvarchar(100),
 @CheckInDate nvarchar(100),@MarkUpAmount decimal(27,2),@BusinessSupportST decimal(27,2),
 @Rate decimal(27,2),@TotalBusinessSupportST decimal(27,2),@TACAmount decimal(27,2),
@@ -53,15 +53,15 @@ BEGIN
 	set @TACInvoiceNo='COM/01';
 	END
 END
-ELSE
-BEGIN
-	set @TACInvoiceNo=0;
-END
+
 	
 	
 IF @Intermediate = 'Intermediate'
 BEGIN
-		-- INSERT
+
+IF @PropertyType = 'External Property'
+BEGIN
+	-- INSERT
 		INSERT INTO WRBHBExternalChechkOutTAC(ChkOutHdrId,TACInvoiceNo,TACInvoiceFile,GuestName,
 		BillDate,ClientName,Property,ChkOutTariffTotal,ChkOutTariffCess,
 		ChkOutTariffHECess,ChkOutTariffNetAmount,ChkInHdrId,
@@ -93,10 +93,50 @@ BEGIN
 		--RoomCaptured=(SELECT TOP 1 RoomCaptured FROM WRBHBBookingPropertyAssingedGuest
 		--WHERE BookingId=@BookingId and GuestId=@GuestId
 		--ORDER BY Id ASC);
+
 END
 ELSE
 BEGIN
-		-- INSERT
+	-- INSERT
+		INSERT INTO WRBHBExternalChechkOutTAC(ChkOutHdrId,TACInvoiceNo,TACInvoiceFile,GuestName,
+		BillDate,ClientName,Property,ChkOutTariffTotal,ChkOutTariffCess,
+		ChkOutTariffHECess,ChkOutTariffNetAmount,ChkInHdrId,
+		CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId,NoOfDays,
+		RoomId,PropertyId,GuestId,BookingId,StateId,Direct ,
+		PropertyType,Status ,CheckInDate,CheckOutDate ,MarkUpAmount,BusinessSupportST,Rate,
+		TotalBusinessSupportST,TACAmount,PaymentStatus,Flag,
+		BillFromDate,BillEndDate,Intermediate,IntermediateFlag)
+		values(@ChkOutHdrId,@TACInvoiceNo,@TACInvoiceFile,@GuestName,@BillDate,@ClientName,
+		@Property,@ChkOutTariffTotal,@ChkOutTariffCess,
+		@ChkOutTariffHECess,@ChkOutTariffNetAmount,@ChkInHdrId,@CreatedBy,GETDATE(),@CreatedBy,
+		GETDATE(),1,0,NEWID(),@NoOfDays,
+		@RoomId,@PropertyId,@GuestId,@BookingId,@StateId,@Direct ,
+		@PropertyType,@Status,@CheckInDate,@CheckOutDate,@MarkUpAmount,@BusinessSupportST,@Rate,
+		@TotalBusinessSupportST,@TACAmount,'UnPaid',0,@BillFromDate,@BillEndDate,@Intermediate,1)
+
+		SET @InsId=@@IDENTITY;
+		SELECT  Id ,RowId ,DATENAME(WEEKDAY, GETDATE())+','+CONVERT(VARCHAR(12), GETDATE(), 107),
+		CONVERT(VARCHAR(12),CreatedDate,103) BookingDate,TACInvoiceNo FROM WRBHBExternalChechkOutTAC WHERE Id=@InsId;
+
+
+		UPDATE WRBHBExternalChechkOutTAC SET IntermediateFlag = 1 WHERE Id = @InsId;
+
+		UPDATE WRBHBCheckInHdr SET NewCheckInDate = convert(date,@BillEndDate ,103)
+		WHERE Id = @ChkInHdrId 
+		--UPDATE WRBHBBookingPropertyAssingedGuest SET CurrentStatus = 'CheckOut' ,
+		--CheckOutHdrId = @InsId
+		--WHERE BookingId=@BookingId and 
+		--RoomCaptured=(SELECT TOP 1 RoomCaptured FROM WRBHBBookingPropertyAssingedGuest
+		--WHERE BookingId=@BookingId and GuestId=@GuestId
+		--ORDER BY Id ASC);
+END
+		
+END
+ELSE
+BEGIN
+IF @PropertyType = 'External Property'
+BEGIN
+	-- INSERT
 		INSERT INTO WRBHBExternalChechkOutTAC(ChkOutHdrId,TACInvoiceNo,TACInvoiceFile,GuestName,
 		BillDate,ClientName,Property,ChkOutTariffTotal,ChkOutTariffCess,
 		ChkOutTariffHECess,ChkOutTariffNetAmount,ChkInHdrId,
@@ -125,6 +165,40 @@ BEGIN
 		RoomCaptured=(SELECT TOP 1 RoomCaptured FROM WRBHBBookingPropertyAssingedGuest
 		WHERE BookingId=@BookingId and GuestId=@GuestId
 		ORDER BY Id ASC);
+END
+ELSE
+BEGIN
+	-- INSERT
+		INSERT INTO WRBHBExternalChechkOutTAC(ChkOutHdrId,TACInvoiceNo,TACInvoiceFile,GuestName,
+		BillDate,ClientName,Property,ChkOutTariffTotal,ChkOutTariffCess,
+		ChkOutTariffHECess,ChkOutTariffNetAmount,ChkInHdrId,
+		CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId,NoOfDays,
+		RoomId,PropertyId,GuestId,BookingId,StateId,Direct ,
+		PropertyType,Status ,CheckInDate,CheckOutDate ,MarkUpAmount,BusinessSupportST,Rate,
+		TotalBusinessSupportST,TACAmount,PaymentStatus,Flag,BillFromDate,BillEndDate,Intermediate,IntermediateFlag)
+		values(@ChkOutHdrId,@TACInvoiceNo,@TACInvoiceFile,@GuestName,@BillDate,@ClientName,
+		@Property,@ChkOutTariffTotal,@ChkOutTariffCess,
+		@ChkOutTariffHECess,@ChkOutTariffNetAmount,@ChkInHdrId,@CreatedBy,GETDATE(),@CreatedBy,
+		GETDATE(),1,0,NEWID(),@NoOfDays,
+		@RoomId,@PropertyId,@GuestId,@BookingId,@StateId,@Direct ,
+		@PropertyType,@Status,@CheckInDate,@CheckOutDate,@MarkUpAmount,@BusinessSupportST,@Rate,
+		@TotalBusinessSupportST,@TACAmount,'UnPaid',0,@BillFromDate,@BillEndDate,@Intermediate,0)
+
+		SET @InsId=@@IDENTITY;
+		SELECT  Id ,RowId ,DATENAME(WEEKDAY, GETDATE())+','+CONVERT(VARCHAR(12), GETDATE(), 107),
+		CONVERT(VARCHAR(12),CreatedDate,103) BookingDate,TACInvoiceNo FROM WRBHBExternalChechkOutTAC WHERE Id=@InsId;
+
+
+
+
+		UPDATE WRBHBBookingPropertyAssingedGuest SET CurrentStatus = 'CheckOut' ,
+		CheckOutHdrId = @InsId
+		WHERE BookingId=@BookingId and 
+		RoomCaptured=(SELECT TOP 1 RoomCaptured FROM WRBHBBookingPropertyAssingedGuest
+		WHERE BookingId=@BookingId and GuestId=@GuestId
+		ORDER BY Id ASC);
+END
+		
 END
 
 

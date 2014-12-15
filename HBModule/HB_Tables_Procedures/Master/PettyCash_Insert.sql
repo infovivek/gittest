@@ -25,6 +25,7 @@ CREATE PROCEDURE [dbo].[Sp_PettyCash_Insert]
 @PettyCashHdrId INT,
 @Description	NVARCHAR(max),
 @ExpenseHead	NVARCHAR(100),
+@ExpenseHeadId		INT,
 @Amount			DECIMAL(27,1),
 @Status			NVARCHAR(100),
 @CreatedBy		INT
@@ -34,9 +35,9 @@ BEGIN
 DECLARE @Identity int
 BEGIN 
 	INSERT INTO	WRBHBPettyCash (PettyCashHdrId,Description,ExpenseHead,Amount,IsActive,IsDeleted,CreatedBy,CreatedDate,ModifiedBy,
-			ModifiedDate,RowId,Status,Remark,ApprovedAmount)
+			ModifiedDate,RowId,Status,Remark,ApprovedAmount,ExpenseHeadId)
 	VALUES (@PettyCashHdrId,@Description,@ExpenseHead,@Amount,1,0,@CreatedBy,GETDATE(),@CreatedBy,GETDATE(),
-			NEWID(),@Status,0,@Amount)
+			NEWID(),@Status,0,@Amount,@ExpenseHeadId)
 	
 	SET  @Identity=@@IDENTITY
 	SELECT Id,Rowid FROM WRBHBPettyCash WHERE Id=@Identity;

@@ -33,7 +33,7 @@ CREATE PROCEDURE [dbo].Sp_PettyCashHdr_Help
  BEGIN
  IF @Action='PAGELOAD'
  BEGIN
- 	SELECT Id,HeaderName as ExpenseHead FROM WRBHBExpenseHeads 
+ 	SELECT Id AS ExpenseHeadId,HeaderName as ExpenseHead FROM WRBHBExpenseHeads 
  	WHERE Status='Active'
  
  --PROPERTY
@@ -49,7 +49,7 @@ CREATE PROCEDURE [dbo].Sp_PettyCashHdr_Help
       
  END
  IF @Action='PETTYLOAD'
- BEGIN
+ BEGIN                              
 		SELECT ClosingBalance FROM WRBHBPettyCashHdr 
 		WHERE PropertyId=@Id AND UserId=@UserId AND 
 		Id = (SELECT MAX(Id)  FROM WRBHBPettyCashHdr WHERE UserId=@UserId AND PropertyId=@Id)

@@ -152,8 +152,8 @@
 			protected function Help():void
 			{				
 				
-	//			useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId,0]);
-			 	useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65,0]);
+				useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId,0]);
+	//		 	useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65,0]);
 				Txt_ServiceBillAmt.editable=false;
 				Txt_ServiceVat.editable=false;
 				Txt_SerivceTax.editable=false;
@@ -2232,7 +2232,7 @@
 								
 								Laundry_serviceHECess=HCS.replace(",","");
 								
-								var Tmp:Number=Number(Laundry_ServiceBillAmt)+Number(Laundry_ServiceVat)+Number(Laundry_SerivceTax)+
+								var Tmp:Number=Number(Laundry_ServiceBillAmt)+Number(0)+Number(Laundry_SerivceTax)+
 									Number(Laundry_ServiceEcess)+Number(Laundry_serviceHECess)+Number(Laundry_BST);
 								
 								Laundry_ServiceNetAmount=NF_Two.format(Math.round(Tmp));	
@@ -2731,7 +2731,9 @@
 						
 						var Net:Number=Number(Laundry_ServiceBillAmt);
 						
-						var TT:String=NF_Two.format(Net*VAT/100);
+			//			var TT:String=NF_Two.format(Net*VAT/100);
+						
+						var TT:String=NF_Two.format(0);
 						
 						Laundry_ServiceVat=TT.replace(",","");
 						
@@ -2753,7 +2755,7 @@
 						
 						Laundry_serviceHECess=HCS.replace(",","");
 						
-						var Tmp:Number=Number(Laundry_ServiceBillAmt)+Number(Laundry_ServiceVat)+Number(0)+
+						var Tmp:Number=Number(Laundry_ServiceBillAmt)+Number(0)+Number(0)+
 							Number(Laundry_ServiceEcess)+Number(Laundry_serviceHECess)+Number(Laundry_BST);
 						
 						Laundry_ServiceNetAmount=NF_Two.format(Math.round(Tmp));	
@@ -4483,7 +4485,7 @@
 					
 					var Net:Number=Number(Laundry_ServiceBillAmt);
 					
-					var TT:String=NF_Two.format(Net*VAT/100);
+					var TT:String=NF_Two.format(0);
 					
 					Laundry_ServiceVat=TT.replace(",","");
 					
@@ -4505,7 +4507,7 @@
 					
 					Laundry_serviceHECess=HCS.replace(",","");
 					
-					var Tmp:Number=Number(Laundry_ServiceBillAmt)+Number(Laundry_ServiceVat)+Number(Laundry_SerivceTax)+
+					var Tmp:Number=Number(Laundry_ServiceBillAmt)+Number(0)+Number(Laundry_SerivceTax)+
 						Number(Laundry_ServiceEcess)+Number(Laundry_serviceHECess)+Number(Laundry_BST);
 					
 					Laundry_ServiceNetAmount=NF_Two.format(Math.round(Tmp));	
@@ -7275,6 +7277,7 @@
 					if(Number(Txt_ConsolidatePayment.text)>Number(Txt_ConsolidateLoad.text))
 					{
 						Txt_ConsolidatePayment.text="";
+						Txt_ConsolidateOutStanding.text="";
 						alignAlert(Alert.show("Process Halted ! Excess Amount deducted",
 							"Message !",Alert.OK, null, null,iconWarning, Alert.OK),10,"");
 						
@@ -8027,8 +8030,11 @@
 					{
 						var BillFrom:String="";
 						var BillTo:String="";
+						var BillTo2:String="";
 						BillFrom=DT_BillFromDate.text;
 						BillTo=DT_BillTo.text;
+						BillTo2=ExpChkoutDT;
+						
 						
 						var BillTo=DT_BillTo.text;	
 						//var TodayDate:String=TodayDate;
@@ -8040,13 +8046,19 @@
 						var D1:String=BillTo1.substr(0,2);
 						var M1:String=BillTo1.substr(3,2);
 						var Y1:String=BillTo1.substr(6,10);
-						var RangeMiddle:String=Y+'/'+M+'/'+D;
+						var D2:String=BillTo2.substr(0,2);
+						var M2:String=BillTo2.substr(3,2);
+						var Y2:String=BillTo2.substr(6,10);
+						var D3:String=BillFrom.substr(0,2);
+						var M3:String=BillFrom.substr(3,2);
+						var Y3:String=BillFrom.substr(6,10);
+						var RangeMiddle:String=Y3+'/'+M3+'/'+D3;
 						var RangeEnd:String=Y1+'/'+M1+'/'+D1;
 						var RangeStart:String=Y+'/'+M+'/'+D;
 						//					var BillTo1 = 
 						//						{rangeStart:new Date(RangeStart),rangeEnd:new Date(RangeEnd)};
 						//					BillTo1=new Date(RangeEnd);
-						if(RangeStart == RangeEnd)
+						if(RangeMiddle  == RangeStart)
 						{
 							alignAlert(Alert.show("Can't be Process Intermediate for Checkout Date","Alert Message !",
 								Alert.OK,null,null,iconWarning,Alert.OK),10,"");
@@ -8137,11 +8149,11 @@
 					var D:String=BillF.substr(0,2);
 					var M:String=BillF.substr(3,2);
 					var Y:String=BillF.substr(6,10);
-					var D1:String=BillTo.substr(0,2);
-					var M1:String=BillTo.substr(3,2);
-					var Y1:String=BillTo.substr(6,10);
+					var D1:String=BillTo1.substr(0,2);
+					var M1:String=BillTo1.substr(3,2);
+					var Y1:String=BillTo1.substr(6,10);
 					var RangeMiddle:String=Y+'/'+M+'/'+D;
-					var RangeEnd:String=Y1+'/'+M1+'/'+String(Number(D1)+1);
+					var RangeEnd:String=Y1+'/'+M1+'/'+D1;
 					var RangeStart:String=Y+'/'+M+'/'+D;
 					DT_BillTo.selectableRange = 
 						{rangeStart:new Date(RangeStart),rangeEnd:new Date(RangeEnd)};
@@ -8151,7 +8163,7 @@
 				
 				
 				// TODO Auto-generated method stub
-				DT_BillFromDate.enabled=true;
+				DT_BillFromDate.enabled=false;
 				DT_BillTo.enabled=true;
 				
 				//Sctrl.enabled=false;

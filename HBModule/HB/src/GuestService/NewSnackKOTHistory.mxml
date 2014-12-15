@@ -57,8 +57,8 @@
 				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
 				GlobalXml += "</ROOT>";
 				useWeb("SnackKOTHistory","PAGELOAD_CUSTOM",[GlobalXml,'PAGELOAD',0,'','',0,0]);
-				//Str_KOT="http://localhost:49364/NewSnackKOTEntry.aspx?";
-				Str_KOT="http://sstage.in/HBReport/NewSnackKOTEntry.aspx?";
+				Str_KOT="http://localhost:6236/NewSnackKOTEntry.aspx?";
+				//Str_KOT="http://sstage.in/HBReport/NewSnackKOTEntry.aspx?";
 			}
 			private function Custom_WebSer_Result (Ds_Objects:Object):void
 			{
@@ -179,7 +179,8 @@
 			{ 
 				GuestId=Grd_Status.selectedItem.GuestId;
 				BookingId=Grd_Status.selectedItem.BookingId;
-				ExternalInterface.call("changeDocumentTitle",Str_KOT+PropertyId+"?"+GuestId+"?"+BookingId);
+				var From=Grd_Status.selectedItem.Date;
+				ExternalInterface.call("changeDocumentTitle",Str_KOT+PropertyId+"?"+GuestId+"?"+BookingId+"?"+From);
 				
 			}
 						

@@ -39,7 +39,7 @@ CREATE PROCEDURE dbo.[SP_PCHistoryReport_Help]
 		FROM WRBHBPropertyUsers  PU 
 		JOIN WRBHBProperty P ON PU.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
 		LEFT OUTER JOIN WRBHBPettyCashApprovalHdr PC on P.Id=Pc.PropertyId AND PC.IsActive=1 AND PC.IsDeleted=0
-		WHERE PU.UserId=65	AND PU.IsActive=1 AND PU.IsDeleted=0 
+		WHERE PU.UserId=@UserId	AND PU.IsActive=1 AND PU.IsDeleted=0 
 		AND P.Category IN('Internal Property','Managed G H')
 	
     	--table gridload
@@ -52,9 +52,10 @@ CREATE PROCEDURE dbo.[SP_PCHistoryReport_Help]
 		PC.PropertyId
 		From WRBHBPettyCashApprovalDtl PC
 		JOIN WRBHBProperty P ON PC.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
+		JOIN WRBHBPropertyUsers PU ON P.Id=PU.PropertyId AND PU.IsActive=1 AND PU.IsDeleted=0
 		JOIN WRBHBUser U ON  PC.RequestedUserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
 		JOIN WRBHBUser US ON PC.UserId=US.Id AND US.IsActive=1 AND US.IsDeleted=0
-		WHERE PC.IsActive=1 AND PC.IsDeleted=0
+		WHERE PC.IsActive=1 AND PC.IsDeleted=0 AND PU.UserId=@UserId
 		
 		
 		

@@ -102,7 +102,8 @@ IF @Action='PageLoad'
 	 'TIN : 29340489869' as Tin,'Taxable Category : Accommodation Service,Business Support Services and Restaurant Services' as Taxablename,  
 	 'Service Tax Regn. No : AABCH5874RST001' as ServiceTaxNo,'Luxury Tax @ '+CAST(H.LuxuryTaxPer AS NVARCHAR)+'%' LTPer,
 	 'Service Tax @ '+CAST(H.ServiceTaxPer AS NVARCHAR)+'%' STPer,
-	 'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),h.CreatedDate,103) as InVoicedate
+	 'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),h.CreatedDate,103) as InVoicedate,
+	 'Rupees : '+dbo.fn_NtoWord(ROUND(h.ChkOutTariffNetAmount,0),'','') AS AmtWords
 	   
 	 from WRBHBChechkOutHdr h  
 	 join WRBHBCheckInHdr d on h.ChkInHdrId = d.Id  

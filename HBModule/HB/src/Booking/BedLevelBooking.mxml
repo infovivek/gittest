@@ -1652,7 +1652,7 @@
 				{
 					Err = Err + "*  Bed Type is Required.\n";
 				}
-				if(Number(Txt_Tariff.text) == 0)
+				if((Number(Txt_Tariff.text) == 0) && (PropertyType == "InP"))
 				{
 					Err = Err + "*  Tariff is Required.\n";
 				}
@@ -1796,7 +1796,7 @@
 			
 			private function PressYes(event:CloseEvent):void 
 			{
-				if (event.detail==Alert.YES) 
+				if (event.detail == Alert.YES) 
 				{
 					//FnSave_Tab3_BedValidation();
 					FnSave_Tab3();

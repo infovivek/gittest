@@ -244,20 +244,90 @@
 					}
 					ErrStr=ErrStr+"*  Requested On is Required.\n";
 				 }
+				err();
+				err1();
 				 if(Type =="Property")
 				 {
-				 if(txt_ImageName.text=="") 
-				 {
-					 if(Flag==true)
+					 if(txt_ImageName.text=="") 
 					 {
-						 Brd_imageUpload.visible=true;
-						 Flag=false;
+						 if(Flag==true)
+						 {
+							 Brd_imageUpload.visible=true;
+							 Flag=false;
+						 }
+						 ErrStr=ErrStr+"*  Bill is Required.\n";
 					 }
-					 ErrStr=ErrStr+"*  Bill is Required.\n";
 				 }
+				 else if(Type =="Apartment")
+				 {
+					 if(hlp_apartment.text=="") 
+					 {
+						 if(Flag==true)
+						 {
+							 Brd_imageUpload.visible=true;
+							 Flag=false;
+						 }
+						 ErrStr=ErrStr+"*  Bill is Required.\n";
+					 }
+				 }
+				 else if(Type =="Room")
+				 {
+					 if(hlp_Room.text=="") 
+					 {
+						 if(Flag==true)
+						 {
+							 Brd_imageUpload.visible=true;
+							 Flag=false;
+						 }
+						 ErrStr=ErrStr+"*  Bill is Required.\n";
+					 }
 				 }
 				return ErrStr;
-			}	
+			}
+			public function err():void
+			{
+				var Grid_AC1:ArrayCollection=new ArrayCollection();
+				var SaveFlag:Boolean=true;	
+				if(Grd_Apartment.dataProvider !=null)
+				{ 
+					Grid_AC1=Grd_Apartment.dataProvider as ArrayCollection;
+					var i:int=0;
+					for( i ;i<Grid_AC1.length;i++)
+					{
+						if(Grid_AC1[i].Amount !=0)
+						{ 
+							if(Grid_AC1[i].FilePath =="")
+							{  
+								var Err:String="";
+								Err=Grid_AC1[i].ApartmentNo+" Bill is Required.\n";
+								ErrStr=ErrStr+Err;
+							} 
+						}
+					}
+				}
+			}
+			public function err1():void
+			{
+				var Grid_AC1:ArrayCollection=new ArrayCollection();
+				var SaveFlag:Boolean=true;	
+				if(Grd_Room.dataProvider !=null)
+				{ 
+					Grid_AC1=Grd_Room.dataProvider as ArrayCollection;
+					var i:int=0;
+					for( i ;i<Grid_AC1.length;i++)
+					{
+						if(Grid_AC1[i].Amount !=0)
+						{ 
+							if(Grid_AC1[i].FilePath =="")
+							{  
+								var Err:String="";
+								Err=Grid_AC1[i].RoomNo+" Bill is Required.\n";
+								ErrStr=ErrStr+Err;
+							} 
+						}
+					}
+				}
+			}
 			protected function FnSave():void
 			{
 				ErrStr="";
@@ -481,19 +551,36 @@
 				var sId:int=0
 				if(Type =="Apartment")
 				{
-					str=Grd_Apartment.selectedItem.ApartmentNo;
-					sId=Grd_Apartment.selectedItem.ApartmentId;
+					if(hlp_apartment.text =="")
+					{
+						str=Grd_Apartment.selectedItem.ApartmentNo;
+						sId=Grd_Apartment.selectedItem.ApartmentId;
+					}
+					else
+					{
+						str=hlp_Vendor.text;
+						sId=VendorId;
+					}
 				}
 				else if(Type =="Room")
 				{
-					str=Grd_Room.selectedItem.RoomNo;
-					sId=Grd_Room.selectedItem.RoomId;
+					if(hlp_apartment.text =="")
+					{
+						str=Grd_Room.selectedItem.RoomNo;
+						sId=Grd_Room.selectedItem.RoomId;
+					}
+					else 
+					{
+						str=hlp_Vendor.text;
+						sId=VendorId;
+					}
 				}
 				else if(Type =="Property")
 				{
 					str=hlp_Vendor.text;
 					sId=VendorId;
 				}
+							
 				ImageFormat=FilePath.text;				
 				uploadURL.url = "http://sstage.in/VendorBill.php?id="+str+"&pid="+sId+"&imgcount="+ImageCount+"&imgformat="+ImageFormat;
 				uploadURL.method = "POST"; // OR "POST" as you need it

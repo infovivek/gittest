@@ -51,6 +51,7 @@
 				
 				
 				Str_ChkOutTAC="http://sstage.in/HBReport/ExternalCheckoutTAC.aspx?";
+				Modes.selectedValue=0;
 			}
 			private function Custom_WebSer_Result (Ds_Objects:Object):void
 			{ 
@@ -83,10 +84,10 @@
 			public var 	FromDate:String="",ToDate:String="",ChkoutId:String="",Status:String="";
 			public function Clear():void
 			{
-				DT_From.text="";DT_To.text="";txtInvoiceNumbr.text=""; 
+				DT_From.text="";DT_To.text="";txtInvoiceNumbr.text=""; 	 
 				//	Txt_TransID.text="";Txt_Date.text="";Txt_TransID.text="";
 				FromDate="";ToDate="";ChkoutId="";Status="";Type="";InvoiceNum="";
-				PageLoad();Internal.selected=false;External.selected=false;TAC.selected=false;
+				PageLoad();Internal.selected=true;External.selected=false;TAC.selected=false;
 				Change("Lbl_TDT");Changes("Lbl_FDT");txtGuestName.text="";
 			}  
 			public var InvoiceNum:String="";
@@ -255,17 +256,20 @@
 				if(Modes.selectedValue==0)
 				{
 					Type="Internal Property";
-					//		useWeb("SearchInvoiceReport","Report_CUSTOM",[GlobalXml,"Pageload",FromDate,ToDate,Type,'','',0,0,0]);
+					txtGuestName.text="";txtInvoiceNumbr.text=""; txtProperty.text="";
+					useWeb("SearchInvoiceReport","Report_CUSTOM",[GlobalXml,"Pageload",FromDate,ToDate,Type,'','',0,0,0]);
 				}
 				if(Modes.selectedValue==1)
 				{
 					Type="External Property";
-					//	useWeb("SearchInvoiceReport","Report_CUSTOM",[GlobalXml,"Pageload",FromDate,ToDate,Type,'','',0,0,0]);
+					txtGuestName.text="";txtInvoiceNumbr.text=""; txtProperty.text="";
+						useWeb("SearchInvoiceReport","Report_CUSTOM",[GlobalXml,"Pageload",FromDate,ToDate,Type,'','',0,0,0]);
 				}
 				if(Modes.selectedValue==2)
 				{
 					Type="TAC";
-					//	useWeb("SearchInvoiceReport","Report_CUSTOM",[GlobalXml,"Pageload",FromDate,ToDate,Type,'','',0,0,0]);
+					txtGuestName.text="";txtInvoiceNumbr.text=""; txtProperty.text="";
+						useWeb("SearchInvoiceReport","Report_CUSTOM",[GlobalXml,"Pageload",FromDate,ToDate,Type,'','',0,0,0]);
 				}
 			}
 			public var FltNm:String="";

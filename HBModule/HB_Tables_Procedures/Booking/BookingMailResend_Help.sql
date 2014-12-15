@@ -40,7 +40,7 @@ IF @Action = 'BookingLoad'
   B.ClientId,BG.BookingPropertyId 
   FROM WRBHBBooking B
   LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON 
-  BP.BookingId=B.Id AND BP.PropertyType != 'MMT'
+  BP.BookingId=B.Id --AND BP.PropertyType != 'MMT'
   LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG
   WITH(NOLOCK)ON BG.BookingId=B.Id AND BG.BookingPropertyId=BP.PropertyId
   WHERE B.IsActive=1 AND B.IsDeleted=0 AND BG.IsActive=1 AND 
