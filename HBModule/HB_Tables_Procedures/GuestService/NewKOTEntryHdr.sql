@@ -46,8 +46,10 @@ If @Action ='Property'
 			H.ClientName,ISNULL(H.GuestId,0) as GuestId,ISNULL(H.PropertyId,0) as PropertyId,H.RoomId,
 			H.BookingId,H.Id 
 			FROM WRBHBCheckInHdr H
+			JOIN WRBHBBookingPropertyAssingedGuest B ON H.Id = B.CheckInHdrId 
+			AND H.BookingId=B.BookingId  AND H.GuestId=B.GuestId
+			AND B.IsActive=1 AND B.IsDeleted=0
 			join WRBHBProperty p on p.Id = h.PropertyId AND P.IsActive=1 AND P.IsDeleted=0
-			JOIN WRBHBBookingPropertyAssingedGuest B ON H.BookingId=B.BookingId AND B.IsActive=1 AND B.IsDeleted=0
 			WHERE H.PropertyId = @Id AND H.IsActive=1 AND H.IsDeleted=0 AND B.CurrentStatus='CheckIn'
 			AND p.Category IN('Internal Property','Managed G H') 
 			
@@ -58,7 +60,9 @@ If @Action ='Property'
 			H.BookingId,H.Id 
 			FROM WRBHBCheckInHdr H
 			join WRBHBProperty p on p.Id = h.PropertyId AND P.IsActive=1 AND P.IsDeleted=0
-			JOIN WRBHBApartmentBookingPropertyAssingedGuest B ON H.BookingId=B.BookingId AND B.IsActive=1 AND B.IsDeleted=0
+			JOIN WRBHBApartmentBookingPropertyAssingedGuest B ON H.ApartmentId = B.ApartmentId 
+			AND H.BookingId=B.BookingId 
+			AND H.GuestId=B.GuestId	AND B.IsActive=1 AND B.IsDeleted=0
 			WHERE H.PropertyId = @Id AND H.IsActive=1 AND H.IsDeleted=0 AND B.CurrentStatus='CheckIn'
 			AND p.Category IN('Internal Property','Managed G H')
 			
@@ -69,7 +73,8 @@ If @Action ='Property'
 			H.BookingId,H.Id 
 			FROM WRBHBCheckInHdr H
 			join WRBHBProperty p on p.Id = h.PropertyId AND P.IsActive=1 AND P.IsDeleted=0
-			JOIN WRBHBBedBookingPropertyAssingedGuest B ON H.BookingId=B.BookingId AND B.IsActive=1 AND B.IsDeleted=0
+			JOIN WRBHBBedBookingPropertyAssingedGuest B ON H.BedId = B.BedId  AND H.BookingId=B.BookingId  
+			AND H.GuestId=B.GuestId AND B.IsActive=1 AND B.IsDeleted=0
 			WHERE H.PropertyId = @Id AND H.IsActive=1 AND H.IsDeleted=0 AND B.CurrentStatus='CheckIn'
 			AND p.Category IN('Internal Property','Managed G H') 
 				

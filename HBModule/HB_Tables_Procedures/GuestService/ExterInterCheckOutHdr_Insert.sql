@@ -491,11 +491,30 @@ IF ISNULL(@PrintInvoice,0) = '1'
 				SELECT @InVoiceNo='EXT/1';
 			END
 	END
-	--ELSE
-	--BEGIN
-	--	set @InVoiceNo='0';
-	--END
+ END
+IF @PropertyType ='CPP'
+BEGIN
+	IF @BTC = 'Bill to Company (BTC)'  
+	BEGIN
+		IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
+		WHERE PropertyType ='External Property' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
+		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(InVoiceNo,'') != '')
+			BEGIN
+			
+				SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
+				CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
+				FROM WRBHBChechkOutHdr
+				WHERE PropertyType ='CPP' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
+				YEAR(CreatedDate)=YEAR(GETDATE()) AND InvoiceNo!='' and  InvoiceNo!='0'
+				ORDER BY Id DESC;
+			END
+			ELSE
+				BEGIN
+				SELECT @InVoiceNo='EXT/1';
+			END
+	END
 END
+
 IF @PropertyType ='Managed G H'
 BEGIN
 
@@ -623,7 +642,7 @@ IF ISNULL(@PrintInvoice,0) = '1'
 				SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
 				CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE PropertyType ='External Property' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
+				WHERE PropertyType ='MMT' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
 				YEAR(CreatedDate)=YEAR(GETDATE()) AND InvoiceNo!='' and PrintInvoice = 1 and InvoiceNo!='0'
 				ORDER BY Id DESC;
 			END
@@ -645,7 +664,7 @@ IF ISNULL(@PrintInvoice,0) = '1'
 				SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
 				CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE PropertyType ='External Property' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
+				WHERE PropertyType ='MMT' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
 				YEAR(CreatedDate)=YEAR(GETDATE()) AND InvoiceNo!='' and  InvoiceNo!='0'
 				ORDER BY Id DESC;
 			END
@@ -667,7 +686,7 @@ IF ISNULL(@PrintInvoice,0) = '1'
 				SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
 				CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE PropertyType ='External Property' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
+				WHERE PropertyType ='MMT' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
 				YEAR(CreatedDate)=YEAR(GETDATE()) AND InvoiceNo!='' and  InvoiceNo!='0'
 				ORDER BY Id DESC;
 			END
@@ -790,9 +809,12 @@ END
 		UPDATE WRBHBBookingPropertyAssingedGuest SET CurrentStatus = 'CheckOut' ,
 		CheckOutHdrId = (SELECT Id  FROM WRBHBChechkOutHdr WHERE Id=@InsId)
 		where BookingId=@BookingId and 
-		RoomCaptured=(select RoomCaptured from WRBHBBookingPropertyAssingedGuest
+		RoomCaptured=(select top 1 RoomCaptured from WRBHBBookingPropertyAssingedGuest
 		where BookingId=@BookingId and GuestId=@GuestId);
-
+		
+		 
+		
+ 
 		IF @Direct = 'Direct'
 		BEGIN
 			UPDATE WRBHBChechkOutHdr set PaymentStatus = 'Paid'  ,Flag = 1

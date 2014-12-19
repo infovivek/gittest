@@ -764,6 +764,7 @@ namespace HB.Dao
         public const string ExtCheckOutTariff_Bill = "SP_ExtCheckOutTariff_Bill";
         public const string ExtCheckOutService_Bill = "SP_ExtCheckOutService_Bill";
         public const string ExtCheckOutConsolidate_Bill = "SP_ExtCheckOutConsolidate_Bill";
-
+        //
+        public const string BookingConfirmation_Help = "SP_BookingConfirmation_Help";
     }
 }

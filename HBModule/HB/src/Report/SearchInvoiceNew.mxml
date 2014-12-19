@@ -223,19 +223,19 @@
 				{
 					if(BillType == "Tariff")
 					{
-						ExternalInterface.call("changeDocumentTitle",Str_ChkOut1+ChkoutId);
+						ExternalInterface.call("changeDocumentTitle",Str_ChkOut1+ChkoutId+'?'+PropertyCat);
 					}
 					if(BillType == "Service")
 					{
-						ExternalInterface.call("changeDocumentTitle",Str_Serv1+ChkoutId);
+						ExternalInterface.call("changeDocumentTitle",Str_Serv1+ChkoutId+'?'+PropertyCat);
 					}
 					if(BillType == "Consolidate")
 					{
-						ExternalInterface.call("changeDocumentTitle",Str_Settle1+ChkoutId);
+						ExternalInterface.call("changeDocumentTitle",Str_Settle1+ChkoutId+'?'+PropertyCat);
 					}
 					if(BillType == "Consolidated")
 					{
-						ExternalInterface.call("changeDocumentTitle",Str_Settle1+ChkoutId);
+						ExternalInterface.call("changeDocumentTitle",Str_Settle1+ChkoutId+'?'+PropertyCat);
 					}
 				}
 				if(PropertyCat=="TAC")

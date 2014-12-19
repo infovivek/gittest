@@ -97,24 +97,28 @@ IF @Action='PageLoad'
 	Email NVARCHAR(MAX),CompanyName NVARCHAR(MAX),logo NVARCHAR(MAX),ChkinDT NVARCHAR(MAX),ChkoutDT NVARCHAR(MAX),
 	CompanyAddress NVARCHAR(MAX),Address NVARCHAR(MAX),Invoice NVARCHAR(MAX),Cheque NVARCHAR(MAX),TaxNo NVARCHAR(MAX),
 	Latepay NVARCHAR(MAX),Tin NVARCHAR(100),Taxablename NVARCHAR(MAX),ServiceTaxNo NVARCHAR(MAX),LTPer NVARCHAR(MAX),
-	STPer NVARCHAR(MAX),CINNo NVARCHAR(MAX), InVoicedate NVARCHAR(MAX),AmtWords NVARCHAR(MAX)) 
+	STPer NVARCHAR(MAX),CINNo NVARCHAR(MAX), InVoicedate NVARCHAR(MAX),AmtWords NVARCHAR(MAX),
+	LTAgreed DECIMAL(27,2),LTRack DECIMAL(27,2),STAgreed DECIMAL(27,2),STRack DECIMAL(27,2)) 
 --'External Property'
 	INSERT INTO #Prop1(GuestName ,Name,Stay ,Type,BookingLevel ,BillDate ,ClientName ,CheckOutNo,InVoiceNo ,
 	TotalTariff ,LuxuryTax ,NetAmount ,SerivceNet ,SerivceTax ,Cess ,NoOfDays ,HCess ,ServiceCharge ,
 	ExtraMatress ,ArrivalDate ,Tariff ,Propertyaddress ,Propcity ,CityName ,StateName , Postal ,Phone ,
 	Email ,CompanyName ,logo ,ChkinDT ,ChkoutDT ,CompanyAddress ,Address ,Invoice ,Cheque ,TaxNo ,
 	Latepay ,Tin ,Taxablename ,ServiceTaxNo ,LTPer ,STPer,
-	CINNo , InVoicedate,AmtWords )   
+	CINNo , InVoicedate,AmtWords, LTAgreed,LTRack,STAgreed,STRack)   
      
     
     
 	SELECT h.GuestName as GuestName,h.Name,h.Stay,h.Type,d.Type as BookingLevel,convert(nvarchar(100),h.CheckOutDate,103) as BillDate,  
 	h.ClientName,h.CheckOutNo,h.InVoiceNo,  
-	h.ChkOutTariffTotal as TotalTariff,h.ChkOutTariffLT as LuxuryTax,round(h.ChkOutTariffNetAmount,0) as NetAmount,  
+	(ISNULL(h.ChkOutTariffTotal,0)) as TotalTariff,
+	h.ChkOutTariffLT as LuxuryTax,round(h.ChkOutTariffNetAmount,0) as NetAmount,  
 	h.ChkOutTariffST1 as SerivceNet,h.ChkOutTariffST3 as SerivceTax,h.ChkOutTariffCess as Cess,h.NoOfDays,  
 	h.ChkOutTariffHECess as HCess,h.ChkOutTariffSC as ServiceCharge,h.ChkOutTariffExtraAmount as ExtraMatress,
 	convert(nvarchar(100),d.ArrivalDate,103)as ArrivalDate,  
-	round(d.Tariff,0) Tariff,(p.PropertyName+','+p.Propertaddress) as Propertyaddress,(c.CityName+','+  
+	(round(h.ChkOutTariffTotal,0)/h.NoOfDays) AS Tariff,
+	--+(h.LTAgreedAmount/h.NoOfDays)+(h.LTRackAmount/h.NoOfDays)+(h.STAgreedAmount/h.NoOfDays)+(h.STRackAmount/h.NoOfDays)) Tariff,
+	(p.PropertyName+','+p.Propertaddress) as Propertyaddress,(c.CityName+','+  
 	s.StateName+','+p.Postal) as Propcity,c.CityName,s.StateName,p.Postal,  
 	p.Phone,p.Email,@CompanyName as CompanyName,@LOGO AS logo,  
 	CONVERT(nvarchar(100),h.BillFromDate,103) ChkinDT,CONVERT(nvarchar(100),h.BillEndDate,103) as ChkoutDT,
@@ -129,7 +133,8 @@ IF @Action='PageLoad'
 	'Service Tax Regn. No : AABCH5874RST001' as ServiceTaxNo,'Luxury Tax @ '+CAST(H.LuxuryTaxPer AS NVARCHAR)+'%' LTPer,
 	'Service Tax @ '+CAST(H.ServiceTaxPer AS NVARCHAR)+'%' STPer,
 	'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),h.CreatedDate,103) as InVoicedate,
-	'Rupees : '+dbo.fn_NtoWord(ROUND(h.ChkOutTariffNetAmount,0),'','') AS AmtWords
+	'Rupees : '+dbo.fn_NtoWord(ROUND(h.ChkOutTariffNetAmount,0),'','') AS AmtWords,
+	h.LTAgreedAmount,h.LTRackAmount,h.STAgreedAmount,h.STRackAmount
 
 	from WRBHBChechkOutHdr h  
 	join WRBHBCheckInHdr d on h.ChkInHdrId = d.Id  
@@ -139,7 +144,7 @@ IF @Action='PageLoad'
 	join WRBHBBooking b on b.Id = d.BookingId 	
 	-- join WRBHBTaxMaster t on t.StateId=s.Id   
 	where h.IsActive = 1 and h.IsDeleted = 0 
-	and   h.Id = @Id1  AND h.PropertyType = 'External Property'
+	and   h.Id = @Id1  AND h.PropertyType IN('External Property','CPP')
 	
 	
 -- 	'Managed G H'
@@ -148,7 +153,7 @@ IF @Action='PageLoad'
 	ExtraMatress ,ArrivalDate ,Tariff ,Propertyaddress ,Propcity ,CityName ,StateName , Postal ,Phone ,
 	Email ,CompanyName ,logo ,ChkinDT ,ChkoutDT ,CompanyAddress ,Address ,Invoice ,Cheque ,TaxNo ,
 	Latepay ,Tin ,Taxablename ,ServiceTaxNo ,LTPer ,STPer,
-	CINNo , InVoicedate ,AmtWords)   
+	CINNo , InVoicedate ,AmtWords, LTAgreed,LTRack,STAgreed,STRack)   
      
     
     
@@ -173,7 +178,8 @@ IF @Action='PageLoad'
 	'Service Tax Regn. No : AABCH5874RST001' as ServiceTaxNo,'Luxury Tax @ '+CAST(H.LuxuryTaxPer AS NVARCHAR)+'%' LTPer,
 	'Service Tax @ '+CAST(H.ServiceTaxPer AS NVARCHAR)+'%' STPer,
 	'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),h.CreatedDate,103) as InVoicedate,
-	'Rupees : '+dbo.fn_NtoWord(ROUND(h.ChkOutTariffNetAmount,0),'','') AS AmtWords
+	'Rupees : '+dbo.fn_NtoWord(ROUND(h.ChkOutTariffNetAmount,0),'','') AS AmtWords,
+	h.LTAgreedAmount,h.LTRackAmount,h.STAgreedAmount,h.STRackAmount
 
 	from WRBHBChechkOutHdr h  
 	join WRBHBCheckInHdr d on h.ChkInHdrId = d.Id  
@@ -192,7 +198,7 @@ IF @Action='PageLoad'
 	ExtraMatress ,ArrivalDate ,Tariff ,Propertyaddress ,Propcity ,CityName ,StateName , Postal ,Phone ,
 	Email ,CompanyName ,logo ,ChkinDT ,ChkoutDT ,CompanyAddress ,Address ,Invoice ,Cheque ,TaxNo ,
 	Latepay ,Tin ,Taxablename ,ServiceTaxNo ,LTPer ,STPer,
-	CINNo , InVoicedate,AmtWords ) 
+	CINNo , InVoicedate,AmtWords , LTAgreed,LTRack,STAgreed,STRack) 
 	
 	
 	select h.GuestName as GuestName,h.Name,h.Stay,h.Type,d.Type as BookingLevel,convert(nvarchar(100),h.CheckOutDate,103) as BillDate,  
@@ -216,7 +222,8 @@ IF @Action='PageLoad'
 	 'Service Tax Regn. No : AABCH5874RST001' as ServiceTaxNo,'Luxury Tax @ '+CAST(H.LuxuryTaxPer AS NVARCHAR)+'%' LTPer,
 	 'Service Tax @ '+CAST(H.ServiceTaxPer AS NVARCHAR)+'%' STPer,
 	 'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),h.CreatedDate,103) as InVoicedate,
-	 'Rupees : '+dbo.fn_NtoWord(ROUND(h.ChkOutTariffNetAmount,0),'','') AS AmtWords
+	 'Rupees : '+dbo.fn_NtoWord(ROUND(h.ChkOutTariffNetAmount,0),'','') AS AmtWords,
+	 h.LTAgreedAmount,h.LTRackAmount,h.STAgreedAmount,h.STRackAmount
 	   
 	 from WRBHBChechkOutHdr h  
 	 join WRBHBCheckInHdr d on h.ChkInHdrId = d.Id  
@@ -235,13 +242,13 @@ IF @Action='PageLoad'
 	ExtraMatress ,ArrivalDate ,Tariff ,Propertyaddress ,Propcity ,CityName ,StateName , Postal ,Phone ,
 	Email ,CompanyName ,logo ,ChkinDT ,ChkoutDT ,CompanyAddress ,Address ,Invoice ,Cheque ,TaxNo ,
 	Latepay ,Tin ,Taxablename ,ServiceTaxNo ,LTPer ,STPer,
-	CINNo , InVoicedate,AmtWords from #Prop1 
+	CINNo , InVoicedate,AmtWords, LTAgreed,LTRack,STAgreed,STRack from #Prop1 
 	GROUP BY GuestName ,Name,Stay ,Type,BookingLevel ,BillDate ,ClientName ,CheckOutNo,InVoiceNo ,
 	TotalTariff ,LuxuryTax ,NetAmount ,SerivceNet ,SerivceTax ,Cess ,NoOfDays ,HCess ,ServiceCharge ,
 	ExtraMatress ,ArrivalDate ,Tariff ,Propertyaddress ,Propcity ,CityName ,StateName , Postal ,Phone ,
 	Email ,CompanyName ,logo ,ChkinDT ,ChkoutDT ,CompanyAddress ,Address ,Invoice ,Cheque ,TaxNo ,
 	Latepay ,Tin ,Taxablename ,ServiceTaxNo ,LTPer ,STPer,
-	CINNo , InVoicedate,AmtWords
+	CINNo , InVoicedate,AmtWords, LTAgreed,LTRack,STAgreed,STRack
 	
 	
 	

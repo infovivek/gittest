@@ -53,6 +53,7 @@
     <Compile Include="BusinessService\BookingCancelService.cs" />
     <Compile Include="BusinessService\BookingDtlsService.cs" />
     <Compile Include="BusinessService\BookingMailService.cs" />
+    <Compile Include="BusinessService\BookingPaymentEmailService.cs" />
     <Compile Include="BusinessService\BookingResendMailService.cs" />
     <Compile Include="BusinessService\BookingService.cs" />
     <Compile Include="BusinessService\BTCPaymentService.cs" />

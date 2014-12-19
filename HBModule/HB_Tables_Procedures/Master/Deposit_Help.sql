@@ -178,7 +178,8 @@ BEGIN
 			FROM #TEMPCASH T
 			JOIN WRBHBClientManagement CM ON T.ClientId=CM.Id AND CM.IsActive=1 AND CM.IsDeleted=0
 			WHERE Total!=0.00 AND InvoiceNo!=''	
-			AND InVoiceNo NOT IN(SELECT InVoiceNo FROM WRBHBDepositsDlts WHERE IsActive=1)
+			AND InVoiceNo NOT IN(SELECT InVoiceNo FROM WRBHBDepositsDlts WHERE IsActive=1
+			AND T.BillType = BillType)
 			
 			SELECT DISTINCT ClientId AS ZId,CM.ClientName AS Client FROM #TEMPCASH TC
 			JOIN WRBHBClientManagement CM ON TC.ClientId=CM.Id WHERE CM.IsActive=1 AND CM.IsDeleted=0
@@ -190,7 +191,8 @@ BEGIN
 			FROM #TEMPCHEQUE T
 			JOIN WRBHBClientManagement CM ON T.ClientId=CM.Id AND CM.IsActive=1 AND CM.IsDeleted=0
 			WHERE Total!=0.00 AND InvoiceNo!=''
-			AND InVoiceNo NOT IN(SELECT InVoiceNo FROM WRBHBDepositsDlts WHERE IsActive=1)
+			AND InVoiceNo NOT IN(SELECT InVoiceNo FROM WRBHBDepositsDlts WHERE T.BillType = BillType
+			AND IsActive=1)
 			
 			SELECT DISTINCT ClientId AS ZId,CM.ClientName AS Client FROM #TEMPCHEQUE TCQ
 			JOIN WRBHBClientManagement CM ON TCQ.ClientId=CM.Id WHERE CM.IsActive=1 AND CM.IsDeleted=0
@@ -201,7 +203,9 @@ BEGIN
 			CM.Id AS ClientId,GuestName  
 			FROM #TEMPBTC TC
 			JOIN WRBHBClientManagement CM ON TC.ClientId=CM.Id WHERE CM.IsActive=1 AND CM.IsDeleted=0
-			AND Total!=0.00 AND InvoiceNo!='' AND InVoiceNo NOT IN(SELECT InVoiceNo FROM WRBHBDepositsDlts)
+			AND Total!=0.00 AND InvoiceNo!='' AND 
+			InVoiceNo NOT IN(SELECT InVoiceNo FROM WRBHBDepositsDlts WHERE TC.BillType = BillType
+			AND IsActive=1)
 			
 			SELECT DISTINCT ClientId AS ZId,CM.ClientName AS Client FROM #TEMPBTC TB
 			JOIN WRBHBClientManagement CM ON TB.ClientId=CM.Id WHERE CM.IsActive=1 AND CM.IsDeleted=0
@@ -234,7 +238,7 @@ BEGIN
 			JOIN WRBHBClientManagement CM ON TC.ClientId=CM.Id AND CM.IsActive=1 AND CM.IsDeleted=0			
 			WHERE ClientId=@Id2 AND 
 			Total!=0.00 AND InvoiceNo!='' AND InVoiceNo NOT IN(SELECT InVoiceNo FROM WRBHBDepositsDlts 
-			WHERE IsActive=1)
+			WHERE IsActive=1 AND TC.BillType = BillType)
 		END	
 	END
 END

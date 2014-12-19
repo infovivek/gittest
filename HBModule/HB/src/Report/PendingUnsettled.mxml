@@ -6,6 +6,13 @@
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 		<s:RadioButtonGroup id="Modes"  change="CourierChange()"/> 
+		<s:Animate id="fader"   duration="500"   repeatBehavior="reverse"   repeatCount="0">
+			<s:SimpleMotionPath property="alpha" valueFrom="1.0" valueTo="0.0" />
+		</s:Animate>
+		
+		<s:Animate id="fader1"  duration="0"  repeatBehavior="reverse"  repeatCount="0">
+			<s:SimpleMotionPath property="alpha" valueFrom="1.0" valueTo="0.0" />
+		</s:Animate>
 	</fx:Declarations>
 	<fx:Style source="..\\Common\\ApplicationCSS.css" />
 	<fx:Script source="..\\Common\\CommonScript.as" />
@@ -60,9 +67,32 @@
 				}
 			}
 			public var 	FromDate:String="",ToDate:String="",ChkoutId:String="",Status:String="";
+			public var ErrStr:String="",Flag:Boolean=true;
 			protected function btn_Search_clickHandler():void
 			{
-				// TODO Auto-generated method stub
+				// TODO Auto-generated method stub 
+				var ErrStr:String="",Flag:Boolean=true;
+				if(DT_From.text=="")
+				{
+					if(Flag == true)
+					{
+						DT_From.setFocus();Flag=false;
+					}
+					ErrStr=ErrStr+"* From Date is Required.\n";;	
+				}
+				if(DT_To.text=="")
+				{
+					if(Flag == true)
+					{
+						DT_To.setFocus();Flag=false;
+					}
+					ErrStr=ErrStr+"* ToDate  is Required.\n";;	
+				}
+				if(ErrStr !="")
+				{
+					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10,"");
+					return;
+				} 
 				ErrorFlag=true;  
 				if(Modes.selectedValue==0)
 				{
@@ -134,6 +164,7 @@
 				DT_From.text="";DT_To.text=""; txtCheckOutNo.text="";txtProperty.text="";
 				FromDate="";ToDate="";ChkoutId="";Status="";Type="";InvoiceNum="";
 				PageLoad();Internal.selected=true;External.selected=false;Managed.selected=false; 
+				Change("Lbl_TDT");Changes("Lbl_FDT");
 			}  
 			protected function CourierChange()
 			{
@@ -255,15 +286,47 @@
 				}				
 				return Itm;		
 			}
+			public function Change(LabelName:String):void
+			{
+				
+				//fader1.target=this[LabelName];				
+				//fader1.play();					
+				//this[LabelName].setStyle("color","#565454");
+				if(DT_From.selectedDate)
+				{
+					var asd:String = DT_From.text;										
+					var Y:String = asd.substr(6,10);
+					var M:String = asd.substr(3,2);
+					var D:String = asd.substr(0,2);
+					var RangeStart:String = Y+'/'+M+'/'+D;
+					DT_To.selectableRange = {rangeStart:new Date(RangeStart)};
+					DT_To.selectedDate = new Date(RangeStart);
+					
+					DT_To.selectableRange = {rangeStart:new Date(RangeStart)};
+					DT_To.selectedDate = new Date(RangeStart);
+					DT_To.setFocus();
+				}
+			}
+			public function Changes(LabelName:String):void
+			{
+				
+				//fader1.target=this[LabelName];				
+				//fader1.play();					
+				//this[LabelName].setStyle("color","#565454");
+				if((DT_To.selectedDate==DT_From.selectedDate)&&(DT_To.text=="")&&(DT_From.text==""))
+				{ 
+					DT_To.text=="";
+				}
+			}
 		]]>
 	</fx:Script>
 	<s:BorderContainer x="0" y="30" width="100%" height="84" borderVisible="false" backgroundColor="#f4efef" depth="10">
 		<s:HGroup x="0" y="0" width="100%" height="90" horizontalAlign="center" verticalAlign="middle">
 			<s:Group x="132" y="5" width="100%" height="80">
 				<mx:DateField id="DT_From" x="138" y="6" width="90" formatString="DD/MM/YYYY"  tabIndex="1"  
-							  yearNavigationEnabled="true" selectableRange="{{rangeEnd: new Date()}}"   />
+							  yearNavigationEnabled="true" selectableRange="{{rangeEnd: new Date()}}"  change="Change('Lbl_FDT')"   />
 				<mx:DateField id="DT_To" x="138" y="46" width="90" formatString="DD/MM/YYYY"
-							  tabIndex="2" yearNavigationEnabled="true"    />
+							  tabIndex="2" yearNavigationEnabled="true"  change="Changes('Lbl_TDT')" />
 				
 				<s:Image x="751" y="20" source="assets/a1.png" toolTip="Search" click="btn_Search_clickHandler()" tabIndex="5"/>
 				<s:Image x="820" y="20" click="Clear()" source="assets/dust_bin1.png" toolTip="Clear"/>
@@ -272,6 +335,8 @@
 				<!--mx:Label id="Lbl_Vendor1" x="223" y="2" width="13" text="*" color="red" fontSize="16"/>
 				<mx:Label id="Lbl_Vendor0" x="222" y="42" width="13" text="*" color="red" fontSize="16"/-->
 				<mx:Label   x="342" y="2" width="13" text="*" color="red" fontSize="16"/>
+				<mx:Label   x="112" y="2" width="13" text="*" color="red" fontSize="16"/>
+				<mx:Label   x="99" y="42" width="13" text="*" color="red" fontSize="16"/>
 				<s:Label   x="293" y="14" text="Category"/>
 				<s:Label x="253" y="45" height="29" text="Filter by &#xd;Property"/>
 				<s:TextInput id="txtProperty" x="326" y="44" width="141" height="25"

@@ -64,17 +64,18 @@ IF @Action ='PropertyAndCity'
 CREATE TABLE #TFFINAL(CheckOutNo NVARCHAR(100),GuestName NVARCHAR(500),GuestId BIGINT,RoomId BIGINT,
 Typess NVARCHAR(100),ClientName NVARCHAR(200),Property NVARCHAR(200),PropertyId BIGINT,PropertyType NVARCHAR(100),
 ChkOutTariffTotal DECIMAL(27,2),CheckOutDate NVARCHAR(50),BookingId BIGINT,ChkoutId BIGINT,ChkInHdrId BIGINT ,
-TariffPaymentMode NVARCHAR(100),PrintInvoice bit,CheckInDate  NVARCHAR(100),TotalDays Bigint )
+TariffPaymentMode NVARCHAR(100),PrintInvoice bit,CheckInDate  NVARCHAR(100),TotalDays Bigint,Markupamount Decimal(27,2) )
   
 CREATE TABLE #MonthWise(CheckOutNo NVARCHAR(100),GuestName NVARCHAR(500),GuestId BIGINT,RoomId BIGINT,
 Typess NVARCHAR(100),ClientName NVARCHAR(200),Property NVARCHAR(200),PropertyId BIGINT,PropertyType NVARCHAR(100),
 ChkOutTariffTotal DECIMAL(27,2),CheckOutDate NVARCHAR(50),BookingId BIGINT,ChkoutId BIGINT,ChkInHdrId BIGINT ,TariffPaymentMode NVARCHAR(100), 
 Tariff DECIMAL(27,2),Dedicat DECIMAL(27,2),Direct DECIMAL(27,2),Btc DECIMAL(27,2),Onlin DECIMAL(27,2),
-Gtv DECIMAL(27,2),Total DECIMAL(27,2),PrintInvoice bit)
+Gtv DECIMAL(27,2),Total DECIMAL(27,2),PrintInvoice bit,Markupamount decimal(27,2))
  
 CREATE TABLE #MonthWiseFinal( Property NVARCHAR(200),PropertyId BIGINT,PropertyType NVARCHAR(100), 
 Tariff DECIMAL(27,2),Dedicat DECIMAL(27,2),Direct DECIMAL(27,2),Btc DECIMAL(27,2),Onlin DECIMAL(27,2),
-Gtv DECIMAL(27,2),Total DECIMAL(27,2),TariffPaymentMode nvarchar(100),PrintInvoice bit,Bookingid Bigint,CityId Bigint)
+Gtv DECIMAL(27,2),Total DECIMAL(27,2),TariffPaymentMode nvarchar(100),PrintInvoice bit,Bookingid Bigint,
+CityId Bigint,GtvAmount Decimal(27,2))
 
 CREATE TABLE #MonthWiseFinal1( Property NVARCHAR(200),PropertyId BIGINT,PropertyType NVARCHAR(100), 
 Tariff DECIMAL(27,2),Dedicat DECIMAL(27,2),Direct DECIMAL(27,2),Btc DECIMAL(27,2),Onlin DECIMAL(27,2),
@@ -203,12 +204,12 @@ INSERT INTO #TFFINALSs( RoomId,Typess,ClientName,Property,PropertyId,PropertyTyp
 			TariffTotal,CheckOutDate,CheckInDate,TotalDays,Occupancy,BookingId,ChkoutId,ChkInHdrId,
 			TariffPaymentMode,CurrentStatus,Btypes) 
 					
- Select RoomId,Typess,ClientName,Property,PropertyId,PropertyType,
+ Select 0 RoomId,''Typess,ClientName,Property,PropertyId,PropertyType,
 			TariffTotal,CheckOutDate,CheckInDate,TotalDays,Occupancy,BookingId,ChkoutId,ChkInHdrId,
 			TariffPaymentMode,CurrentStatus,Btypes from #TFFINALS 
  where -- month(CONVERT(DATE,CheckOutDate,103))=11
   Occupancy ='Single'-- and PropertyId=2
- group by RoomId,Typess,ClientName,Property,PropertyId,PropertyType,
+ group by  ClientName,Property,PropertyId,PropertyType,
 			TariffTotal,CheckOutDate,CheckInDate,TotalDays,Occupancy,BookingId,ChkoutId,ChkInHdrId,
 			TariffPaymentMode,CurrentStatus,Btypes
  order by BookingId 
@@ -250,12 +251,12 @@ INSERT INTO #TFFINALSs( RoomId,Typess,ClientName,Property,PropertyId,PropertyTyp
      BEGIN         
 		INSERT INTO #TFFINAL(CheckOutNo,GuestName,GuestId,RoomId,Typess,ClientName,Property,PropertyId,PropertyType,
 		ChkOutTariffTotal,CheckOutDate,CheckInDate,BookingId,ChkoutId,ChkInHdrId,
-		TariffPaymentMode,PrintInvoice,TotalDays)
+		TariffPaymentMode,PrintInvoice,TotalDays,Markupamount)
 		SELECT  @CheckOutNo,@GuestName,@GuestId,@RoomId, @Typess,@ClientName,@Property,@PropertyId,@PropertyType,
 		@Tariff, CONVERT(NVARCHAR,DATEADD(DAY,@J,CONVERT(DATE,@CheckInDate  ,103)),103),@CheckOutDate,--
 		--@CheckInDate,--CONVERT(NVARCHAR,DATEADD(DAY,@J,CAST(@CheckInDate AS DATE)),103)
 		 @BookingId,@ChkoutId,@ChkInHdrId,
-		@TariffPaymentMode, @PrintInvoice,1  
+		@TariffPaymentMode, @PrintInvoice,1  ,0
 			 SET @J=@J+1  
 			 SET @NoOfDays=@NoOfDays-1   
 		IF @NoOfDays=0  
@@ -321,7 +322,7 @@ INSERT INTO #TFFINALSs( RoomId,Typess,ClientName,Property,PropertyId,PropertyTyp
    JOIN dbo.WRBHBContractManagement C WITH(NOLOCK) ON C.Id=CR.ContractId AND   
    LTRIM(ContractType)IN(LTRIM(' Managed Contracts '))   
    AND C.IsActive=1 AND C.IsDeleted=0  
-   WHERE  CR.IsActive=1 AND CR.IsDeleted=0 AND CR.PropertyId!=0  
+   WHERE  CR.IsActive=1 AND CR.IsDeleted=0 AND CR.PropertyId!=0   and Tariff>100
    
    INSERT INTO #NDDCountForecast(RoomId,PropertyId,ApartmentId,Tariff,PropertyType,PropertyName,
    Type,StartDate,EndDate,MonthDiff)  
@@ -342,13 +343,13 @@ INSERT INTO #TFFINALSs( RoomId,Typess,ClientName,Property,PropertyId,PropertyTyp
      INSERT INTO #TFFINAL(RoomId,PropertyId,ChkOutTariffTotal,PropertyType,Property, Typess,
      CheckInDate,CheckOutDate,TotalDays,
      CheckOutNo,GuestName,GuestId,ClientName,BookingId,ChkoutId,ChkInHdrId,
-		TariffPaymentMode,PrintInvoice)
+		TariffPaymentMode,PrintInvoice,Markupamount)
 		
 		   SELECT  @RoomId,@PropertyId,@Tariff,'Managed G H',@Property,@Typess,
            CONVERT(NVARCHAR(100),@CheckOutDate,103),
            CONVERT(NVARCHAR,DATEADD(MONTH,@J,CAST(@CheckInDate AS DATE)),103),1,
            0 CheckOutNo,0 GuestName,0 GuestId,0 ClientName,
-           0 BookingId,0 ChkoutId,0 ChkInHdrId,0 TariffPaymentMode,0 PrintInvoice
+           0 BookingId,0 ChkoutId,0 ChkInHdrId,0 TariffPaymentMode,0 PrintInvoice,0
 			 SET @J=@J+1  
 			 SET @TotalDays=@TotalDays-1   
 		IF @TotalDays=0  
@@ -386,13 +387,13 @@ INSERT INTO #TFFINALSs( RoomId,Typess,ClientName,Property,PropertyId,PropertyTyp
      INSERT INTO #TFFINAL(RoomId,PropertyId,ChkOutTariffTotal,PropertyType,Property, Typess,
      CheckInDate,CheckOutDate,TotalDays,
      CheckOutNo,GuestName,GuestId,ClientName,BookingId,ChkoutId,ChkInHdrId,
-		TariffPaymentMode,PrintInvoice)
+		TariffPaymentMode,PrintInvoice,Markupamount)
 		
 		   SELECT  @RoomId,@PropertyId,@Tariff,'Managed G H',@Property,@Typess,
            CONVERT(NVARCHAR(100),@CheckOutDate,103),
            CONVERT(NVARCHAR,DATEADD(DAY,@J,CAST(@CheckInDate AS DATE)),103),1,
            0 CheckOutNo,0 GuestName,0 GuestId,0 ClientName,
-           0 BookingId,0 ChkoutId,0 ChkInHdrId,0 TariffPaymentMode,0 PrintInvoice
+           0 BookingId,0 ChkoutId,0 ChkInHdrId,0 TariffPaymentMode,0 PrintInvoice,0
 			 SET @J=@J+1  
 			 SET @TotalDays=@TotalDays-1   
 		IF @TotalDays=0  
@@ -427,7 +428,7 @@ INSERT INTO #TFFINALSs( RoomId,Typess,ClientName,Property,PropertyId,PropertyTyp
 		 PropertyId,TAC,TACPer,NofDays)   
 		 SELECT G.BookingId,RoomId,G.RoomType,FirstName,CONVERT(NVARCHAR,ChkInDt,103) ChkInDt,  
 		 CONVERT(NVARCHAR,ChkOutDt,103) ChkOutDt,'Booking',G.Occupancy,'Room',Tariff,Category,  
-		 ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,P.Id,  
+		 ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,SingleandMarkup1-SingleTariff,P.Id,  
 		 ISNULL(PA.TAC,0),ISNULL(PA.TACPer,0)  ,
 		 DATEDIFF(day, CONVERT(DATE,g.ChkInDt,103), CONVERT(DATE,G.ChkOutDt,103)) NofDays 
 		 FROM WRBHBBooking B  
@@ -436,11 +437,11 @@ INSERT INTO #TFFINALSs( RoomId,Typess,ClientName,Property,PropertyId,PropertyTyp
 		 JOIN dbo.WRBHBBookingProperty BP WITH(NOLOCK)ON B.Id=BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0  
 		 AND BP.Id=G.BookingPropertyTableId AND PropertyType!='CPP'       
 		 JOIN WRBHBProperty P WITH(NOLOCK) ON G.BookingPropertyId= P.Id AND P.IsActive=1 AND P.IsDeleted=0 AND p.Category='External Property'  
-		 AND P.Category='External Property' 
+		 AND P.Category='External Property'  -- and PropertyId=752
 		 LEFT OUTER JOIN WRBHBPropertyAgreements PA WITH(NOLOCK) ON PA.IsActive=1 AND PA.PropertyId= P.Id AND PA.IsDeleted=0  
 		 WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  AND G.CurrentStatus IN ('Booked')  
 		 GROUP BY G.BookingId,RoomId,G.RoomType,FirstName,ChkInDt,ChkOutDt,G.Occupancy,Tariff,Category,  
-		 ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,P.Id,PA.TAC,PA.TACPer  
+		 ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,SingleandMarkup1,P.Id,PA.TAC,PA.TACPer  
 	       
 	        --GET CHECKOUT DATE   
 		 INSERT INTO #ExternalForecasts(BookingId,PropertyAssGustId,RoomName,GuestName,CheckInDt,CheckOutDt,Type,Occupancy,  
@@ -448,7 +449,7 @@ INSERT INTO #TFFINALSs( RoomId,Typess,ClientName,Property,PropertyId,PropertyTyp
 		 PropertyId,TAC,TACPer,NofDays)  
 		 SELECT G.BookingId,RoomId,G.RoomType,FirstName,CONVERT(NVARCHAR,ChkInDt,103) ChkInDt,  
 		 CONVERT(NVARCHAR,ChkOutDt,103) ChkOutDt,G.CurrentStatus,G.Occupancy,'Room',Tariff,Category,  
-		 ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,P.Id,  
+		 ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,SingleandMarkup1-SingleTariff,P.Id,  
 		 ISNULL(PA.TAC,0),ISNULL(PA.TACPer,0),
 		 DATEDIFF(day, CONVERT(DATE,ChkInDt,103), CONVERT(DATE,ChkOutDt,103))    
 		 FROM WRBHBBooking B     
@@ -463,7 +464,7 @@ INSERT INTO #TFFINALSs( RoomId,Typess,ClientName,Property,PropertyId,PropertyTyp
 		 AND G.CurrentStatus IN ('CheckOut')  		  
 		-- AND B.Id NOT IN(SELECT BookingId FROM #ExternalForecast) 
 		 GROUP BY G.BookingId,RoomId,G.RoomType,FirstName,ChkInDt,ChkOutDt,G.Occupancy,Tariff,Category,  
-		 ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,P.Id,PA.TAC,PA.TACPer,
+		 ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,SingleandMarkup1,P.Id,PA.TAC,PA.TACPer,
 		 G.CurrentStatus
  --GET DATA FROM CHECKIN TABLE 
 		 INSERT INTO #ExternalForecasts(BookingId,PropertyAssGustId,RoomName,GuestName,CheckInDt,CheckOutDt,Type,Occupancy,  
@@ -471,7 +472,7 @@ INSERT INTO #TFFINALSs( RoomId,Typess,ClientName,Property,PropertyId,PropertyTyp
 		 PropertyId,TAC,TACPer,NofDays)   
 		 SELECT G.BookingId,RoomId,G.RoomType,FirstName,CONVERT(NVARCHAR,ChkInDt,103) ChkInDt,  
 		 CONVERT(NVARCHAR,ChkOutDt,103) ChkOutDt,G.CurrentStatus,G.Occupancy,'Room',Tariff,Category,  
-		 ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,P.Id,  
+		 ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,SingleandMarkup1-SingleTariff,P.Id,  
 		 ISNULL(PA.TAC,0),ISNULL(PA.TACPer,0),
 		 DATEDIFF(day, CONVERT(DATE,ChkInDt,103), CONVERT(DATE,ChkOutDt,103))   
 		 FROM WRBHBBooking B     
@@ -486,7 +487,7 @@ INSERT INTO #TFFINALSs( RoomId,Typess,ClientName,Property,PropertyId,PropertyTyp
 		 AND G.CurrentStatus IN ('CheckIn')  		  
 		 --AND B.Id NOT IN(SELECT BookingId FROM #ExternalForecast) 
 		 GROUP BY G.BookingId,RoomId,G.RoomType,FirstName,ChkInDt,ChkOutDt,G.Occupancy,Tariff,Category,  
-		 ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,P.Id,PA.TAC,PA.TACPer,
+		 ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,SingleandMarkup1,P.Id,PA.TAC,PA.TACPer,
 		 G.CurrentStatus
 	--oly for cpp  below select Working	 
 		 INSERT INTO #ExternalForecasts(BookingId,PropertyAssGustId,RoomName,GuestName,CheckInDt,CheckOutDt,Type,Occupancy,  
@@ -494,7 +495,7 @@ INSERT INTO #TFFINALSs( RoomId,Typess,ClientName,Property,PropertyId,PropertyTyp
 		 PropertyId,TAC,TACPer)   
 		 SELECT G.BookingId,RoomId,G.RoomType,FirstName,CONVERT(NVARCHAR,ChkInDt,103) ChkInDt,  
 		 CONVERT(NVARCHAR,ChkOutDt,103) ChkOutDt,G.CurrentStatus,G.Occupancy,'Room',Tariff,Category,  
-		 ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,P.Id,  
+		 ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,SingleandMarkup1-SingleTariff,P.Id,  
 		 ISNULL(PA.TAC,0),ISNULL(PA.TACPer,0)--,G.CurrentStatus  
 		 FROM WRBHBBooking B  
 		 JOIN WRBHBBookingPropertyAssingedGuest G WITH(NOLOCK) ON B.Id =G.BookingId     
@@ -507,7 +508,7 @@ INSERT INTO #TFFINALSs( RoomId,Typess,ClientName,Property,PropertyId,PropertyTyp
 		 WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled' 
 		-- AND B.Id NOT IN(SELECT BookingId FROM #ExternalForecasts)  
 		 GROUP BY G.BookingId,RoomId,G.RoomType,FirstName,ChkInDt,ChkOutDt,G.Occupancy,Tariff,Category,  
-		 ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,P.Id,PA.TAC,PA.TACPer,G.CurrentStatus   
+		 ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,SingleandMarkup1,P.Id,PA.TAC,PA.TACPer,G.CurrentStatus   
 	       
 	     INSERT INTO #ExternalForecasts(BookingId,PropertyAssGustId,RoomName,GuestName,CheckInDt,CheckOutDt,Type,Occupancy,  
 		 BookingLevel,Tariff,Category,ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,  
@@ -545,6 +546,9 @@ truncate table #ExternalForecastNew;
 	BookingLevel,Tariff,Category,ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,  
 	PropertyId,TAC,TACPer,isnull(NofDays,0) FROM #ExternalForecasts
 	WHERE Occupancy='Single'
+	group by BookingId,PropertyAssGustId,RoomName,GuestName,CheckInDt,CheckOutDt,Type,Occupancy,  
+	BookingLevel,Tariff,Category,ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,  
+	PropertyId,TAC,TACPer,NofDays
 	
 	INSERT INTO #ExternalForecastNew(BookingId,PropertyAssGustId,RoomName,GuestName,CheckInDt,CheckOutDt,Type,Occupancy,  
 	BookingLevel,Tariff,Category,ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,  
@@ -561,26 +565,27 @@ truncate table #ExternalForecastNew;
 	 update #ExternalForecastNew set NofDays=1   where NofDays=0;
 	
 	 
-	-- Select * from #ExternalForecastNew where category = 'MMT'  
-	----     order by BookingId;return;
+	  --Select * from #ExternalForecastNew where category ='External Property'
+	  --and PropertyId=752 
+	  --s    order by BookingId;return;
 	     
-    Declare @Tacinvoice int;Declare @Category nvarchar(100);
+    Declare @Tacinvoice int;Declare @Category nvarchar(100),@Markup Decimal(27,2),@SingleTariff Decimal(27,2);
     SELECT TOP 1 @Tariff=Tariff,@GuestId=PropertyAssGustId,@BookingId=BookingId,
     @NoOfDays= isnull(NofDays,0),@Typess=Type,@GuestName=BookingLevel,@Category=Category,
     @CheckInDate=CheckInDt,@CheckOutDate=CheckOutDt,@PropertyId=PropertyId,@TAC=TACPer,
-    @TariffPaymentMode=TariffPaymentMode,@j=0,@IDE=IDE ,@Tacinvoice=TAC
+    @TariffPaymentMode=TariffPaymentMode,@j=0,@IDE=IDE ,@Tacinvoice=TAC,@Markup=Markup,@SingleTariff=SingleTariff
     FROM #ExternalForecastNew 
       --Select @NoOfDays
     WHILE (@NoOfDays>=1)  
     BEGIN       
 		    INSERT INTO #TFFINAL(RoomId,PropertyId,ChkOutTariffTotal,PropertyType,Property,Typess,
              CheckInDate,CheckOutDate,TotalDays,CheckOutNo,GuestName,GuestId,ClientName,
-            BookingId,ChkoutId,ChkInHdrId,TariffPaymentMode,PrintInvoice)
+            BookingId,ChkoutId,ChkInHdrId,TariffPaymentMode,PrintInvoice,Markupamount)
              
-	 Select 0 RoomId,@PropertyId,@Tariff,@Category,''Property,@Typess ,
+	 Select 0 RoomId,@PropertyId,@SingleTariff,@Category,''Property,@Typess ,
 	 @CheckOutDate,CONVERT(NVARCHAR,DATEADD(DAY,@j,CONVERT(DATE,@CheckInDate,103)),103),1,
      0 CheckOutNo,@GuestName,@GuestId,''ClientName,@BookingId,0 ChkoutId,0 ChkInHdrId,
-	 @TariffPaymentMode,@Tacinvoice  --from #ExternalForecast WHERE TAC=1 
+	 @TariffPaymentMode,@Tacinvoice,@Markup  --from #ExternalForecast WHERE TAC=1 
 	      
 		SET @j=@j+1  
 		SET @NoOfDays=isnull(@NoOfDays,0)-1
@@ -591,19 +596,23 @@ truncate table #ExternalForecastNew;
 			SELECT TOP 1 @Tariff=Tariff,@GuestId=PropertyAssGustId,@BookingId=BookingId,
 			@NoOfDays= isnull(NofDays,0),@Typess=Type,@GuestName=BookingLevel,@Category=Category,
 			@CheckInDate=CheckInDt,@CheckOutDate=CheckOutDt,@PropertyId=PropertyId,@TAC=TACPer,
-			@TariffPaymentMode=TariffPaymentMode,@j=0,@IDE=IDE  ,@Tacinvoice=TAC
+			@TariffPaymentMode=TariffPaymentMode,@j=0,@IDE=IDE  ,@Tacinvoice=TAC,@Markup=Markup,
+			@SingleTariff=SingleTariff
 			FROM #ExternalForecastNew  
 		END    
     END  
     --Select * from  #TFFINAL where PropertyType like '%MMT%' 
   --return;
- --Tariff		 
+ --Tariff	
+  Update #TFFINAL Set Markupamount=0 
+	where PropertyType='External Property' and TariffPaymentMode='Bill to Company (BTC)'	
+		 
 		INSERT INTO	#MonthWise( CheckOutNo,GuestName,GuestId,RoomId,Typess,ClientName,Property,
 		PropertyId,PropertyType,ChkOutTariffTotal,CheckOutDate,BookingId,ChkoutId,ChkInHdrId,
-		TariffPaymentMode,Tariff,Dedicat,Direct,Btc,Onlin,Gtv,Total,PrintInvoice) 
+		TariffPaymentMode,Tariff,Dedicat,Direct,Btc,Onlin,Gtv,Total,PrintInvoice,Markupamount) 
 			SELECT CheckOutNo,GuestName,GuestId,RoomId,Typess,ClientName,Property,
 			PropertyId,PropertyType,ChkOutTariffTotal,CheckOutDate,BookingId,ChkoutId,ChkInHdrId,
-			TariffPaymentMode,ChkOutTariffTotal,0 Dedicat,0 Direct,0 Btc,0 Onlin,0 Gtv,0 Total,PrintInvoice
+			TariffPaymentMode,ChkOutTariffTotal,0 Dedicat,0 Direct,0 Btc,0 Onlin,0 Gtv,0 Total,PrintInvoice,Markupamount
 			FROM #TFFINAL  WHERE
 			month(CONVERT(DATE,CheckOutDate,103))=month(CONVERT(DATE,@Pram3,103))
              AND YEAR(CONVERT(DATE,CheckOutDate,103))=Year(CONVERT(DATE,@Pram3,103))
@@ -611,24 +620,25 @@ truncate table #ExternalForecastNew;
 		--	AND YEAR(CONVERT(DATE,CheckOutDate,103))=2014
   
  
---Select * from  #TFFINAL   
- --order by BookingId 
--- Return;
+ --Select * from  #TFFINAL  where PropertyType='External property'  
+ --  order by BookingId desc
+   
+  -- Return;
 	INSERT INTO	#MonthWiseFinal( Property,PropertyType,PropertyId, 
-	Tariff,TariffPaymentMode,Dedicat,Direct,Btc,Onlin,Gtv,Total,PrintInvoice,Bookingid,CityId)
+	Tariff,TariffPaymentMode,Dedicat,Direct,Btc,Onlin,Gtv,Total,PrintInvoice,Bookingid,CityId,GtvAmount)
 	SELECT p.PropertyName,p.Category,p.Id,
 	0  ,''TariffPaymentMode,0 Dedicat,0 Direct,sum(Tariff) Btc,0 Onlin, 0 Gtv,sum(Tariff) Total,
-	''PrintInvoice,f.Bookingid,P.CityId
+	''PrintInvoice,f.Bookingid,P.CityId,0
 	from #MonthWise F
 	left outer join WRBHBProperty p on f.PropertyId=p.Id and p.IsActive=1 and p.IsDeleted=0 and p.Category='Internal Property'
 	where f.PropertyType='Internal Property' and ChkOutTariffTotal!=0  and TariffPaymentMode='Bill to Company (BTC)'  
 	GROUP BY p.PropertyName,p.Category,p.Id  ,f.Bookingid,p.CityId
 	
 	INSERT INTO	#MonthWiseFinal( Property,PropertyType,PropertyId, 
-	Tariff,TariffPaymentMode,Dedicat,Direct,Btc,Onlin,Gtv,Total,PrintInvoice,Bookingid,CityId)
+	Tariff,TariffPaymentMode,Dedicat,Direct,Btc,Onlin,Gtv,Total,PrintInvoice,Bookingid,CityId,GtvAmount)
 	SELECT p.PropertyName,p.Category,p.Id,
 	0  ,''TariffPaymentMode,0 Dedicat,sum(Tariff) Direct,0 Btc,0 Onlin, 0 Gtv,sum(Tariff) Total,
-	''PrintInvoice,f.Bookingid,P.CityId
+	''PrintInvoice,f.Bookingid,P.CityId,0
 	from #MonthWise F
 	left outer join WRBHBProperty p on p.Id=f.PropertyId and p.IsActive=1 and p.IsDeleted=0 and p.Category='Internal Property'
 	where f.PropertyType='Internal Property' and ChkOutTariffTotal!=0 and TariffPaymentMode='Direct' 
@@ -649,20 +659,20 @@ truncate table #ExternalForecastNew;
 	 
 	 
 		INSERT INTO	#MonthWiseFinal( Property,PropertyType,PropertyId, 
-		Tariff,TariffPaymentMode,Dedicat,Direct,Btc,Onlin,Gtv,Total,PrintInvoice,Bookingid,CityId)
+		Tariff,TariffPaymentMode,Dedicat,Direct,Btc,Onlin,Gtv,Total,PrintInvoice,Bookingid,CityId,GtvAmount)
 			Select p.Property,P.PropertyType,P.PropertyId, 
 			0  ,''TariffPaymentMode,0 Dedicat,0 Direct,sum(P.Tariff) Btc,0 Onlin, 0 Gtv,sum(P.Tariff) Total,
-			''PrintInvoice,P.Bookingid,0--PP.CityId 
+			''PrintInvoice,P.Bookingid,0,0--PP.CityId 
 			from #MonthWise  p 
 			where P.PropertyType in ('External Property') and P.ChkOutTariffTotal!=0 and TariffPaymentMode='Bill to Company (BTC)' 
 			group by  p.Property,P.PropertyType,TariffPaymentMode,P.PropertyId,P.Bookingid 
 			order by P.PropertyId
 	 
 		INSERT INTO	#MonthWiseFinal( Property,PropertyType,PropertyId, 
-		Tariff,TariffPaymentMode,Dedicat,Direct,Btc,Onlin,Gtv,Total,PrintInvoice,Bookingid,CityId)
+		Tariff,TariffPaymentMode,Dedicat,Direct,Btc,Onlin,Gtv,Total,PrintInvoice,Bookingid,CityId,GtvAmount)
 			Select p.Property,P.PropertyType,P.PropertyId, 
 			0  ,''TariffPaymentMode,0 Dedicat,0 Direct,sum(P.Tariff) Btc,0 Onlin, 0 Gtv,sum(P.Tariff) Total,
-			''PrintInvoice,P.Bookingid,0--PP.CityId 
+			''PrintInvoice,P.Bookingid,0,0--PP.CityId 
 			from #MonthWise  p 
 			where P.PropertyType in ('MMT') and P.ChkOutTariffTotal!=0 and TariffPaymentMode='Bill to Company (BTC)' 
 			group by  p.Property,P.PropertyType,TariffPaymentMode,P.PropertyId,P.Bookingid 
@@ -670,10 +680,10 @@ truncate table #ExternalForecastNew;
 
 	
 		INSERT INTO	#MonthWiseFinal( Property,PropertyType,PropertyId, 
-		Tariff,TariffPaymentMode,Dedicat,Direct,Btc,Onlin,Gtv,Total,PrintInvoice,Bookingid,CityId)
+		Tariff,TariffPaymentMode,Dedicat,Direct,Btc,Onlin,Gtv,Total,PrintInvoice,Bookingid,CityId,GtvAmount)
 		Select  p.Property,P.PropertyType, P.PropertyId,
-			0  ,''TariffPaymentMode,0 Dedicat,Sum(P.ChkOutTariffTotal)  Direct,0 Btc,0 Onlin, 0 Gtv,Sum(P.ChkOutTariffTotal) Total,
-			''PrintInvoice,p.BookingId,0--p.CityId
+			0  ,''TariffPaymentMode,0 Dedicat, SUM(Markupamount)  Direct,0 Btc,0 Onlin, SUM(0) Gtv,Sum(P.ChkOutTariffTotal) Total,
+			''PrintInvoice,p.BookingId,0,SUM(P.ChkOutTariffTotal)-SUM(Markupamount)--p.CityId
 			from #MonthWise  p
 			where P.PropertyType='External Property' and P.ChkOutTariffTotal!=0 and TariffPaymentMode='Direct' 
 			group by   p.Property,P.PropertyType,TariffPaymentMode,P.PropertyId,p.BookingId--,Pp.CityId
@@ -691,11 +701,11 @@ truncate table #ExternalForecastNew;
 	 
 	
 	INSERT INTO	#MonthWiseFinal( Property,PropertyType,PropertyId, 
-	Tariff,TariffPaymentMode,Dedicat,Direct,Btc,Onlin,Gtv,Total,PrintInvoice,Bookingid,CityId)
+	Tariff,TariffPaymentMode,Dedicat,Direct,Btc,Onlin,Gtv,Total,PrintInvoice,Bookingid,CityId,GtvAmount)
 	
 	SELECT Property PropertyName,m.PropertyType PropertyType,m.PropertyId,
 	0  ,''TariffPaymentMode,sum(Tariff) Dedicat,0 Direct,0 Btc,0 Onlin, 0 Gtv,sum(Tariff) Total,
-	PrintInvoice,m.Bookingid,P.CityId
+	PrintInvoice,m.Bookingid,P.CityId,0
 	FROM #MonthWise m
 	join WRBHBProperty P on m.PropertyId=p.Id and p.IsActive=1
 	JOIN WRBHBCity C WITH(NOLOCK) ON C.Id=P.CityId AND C.IsActive=1 AND C.IsDeleted=0  
@@ -703,16 +713,16 @@ truncate table #ExternalForecastNew;
 	group by Property,m.PropertyId,m.PropertyType,PrintInvoice,m.Bookingid,P.CityId
 	order by m.PropertyId
 	 
-	 --Select * from #MonthWiseFinal  
-	 -- Return	
+	 --Select * from #MonthWiseFinal   where PropertyType='External Property'
+	 --Return	
 	
 	 
-	If(@Pram5='All Properties')
+	If(@Pram5='All Properties') 
 	Begin
 		Insert into #Temp1Final(CityName,PropertyName,DD,Direct,BTC,Online,TOTAL,GTV,Category,Pid,OrderData,CityId)
 		Select C.CityName CityName, Property PropertyName ,
 		Sum(Dedicat) DD,Sum(Direct) Direct,Sum(Btc) BTC,
-		0 Online,Sum(Direct+Btc+Dedicat) Total,Sum(Direct+Btc+Dedicat) GTV,m.PropertyType,m.PropertyId,'A',m.CityId
+		SUM(0) Online,Sum(Direct+Btc+Dedicat) Total,Sum(GtvAmount+Direct+Btc+Dedicat) GTV,m.PropertyType,m.PropertyId,'A',m.CityId
 		from #MonthWiseFinal m
 	 	JOIN WRBHBCity C WITH(NOLOCK) ON C.Id=m.CityId AND C.IsActive=1 AND C.IsDeleted=0 
 		group by  Property,m.PropertyId,m.PropertyType,C.CityName,m.CityId
@@ -720,35 +730,83 @@ truncate table #ExternalForecastNew;
 		Insert into #Temp1Final(CityName,PropertyName,DD,Direct,BTC,Online,TOTAL,GTV,Category,Pid,OrderData,CityId)
 		Select ''CityName, Property PropertyName ,
 		Sum(Dedicat) DD,Sum(Direct) Direct,Sum(Btc) BTC,
-		0 Online,Sum(Direct+Btc+Dedicat) Total,Sum(Direct+Btc+Dedicat) GTV,m.PropertyType,0 Id,'A',m.CityId
+		SUM(0) Online,Sum(Direct+Btc+Dedicat) Total,Sum(GtvAmount+Direct+Btc+Dedicat) GTV,m.PropertyType,0 Id,'A',m.CityId
 		from #MonthWiseFinal m
 		where  m.PropertyId=0 --and p.IsActive=1
 		--JOIN WRBHBCity C WITH(NOLOCK) ON C.Id=P.CityId AND C.IsActive=1 AND C.IsDeleted=0 
 		group by  Property,m.PropertyType,m.CityId--,C.CityName
 		order by m.PropertyType
 	End
-	Else
+	if(@Pram5='External Property') 
 	Begin
 		Insert into #Temp1Final(CityName,PropertyName,DD,Direct,BTC,Online,TOTAL,GTV,Category,Pid,OrderData,CityId)
 		Select C.CityName CityName, Property PropertyName ,
 		Sum(Dedicat) DD,Sum(Direct) Direct,Sum(Btc) BTC,
-		0 Online,Sum(Direct+Btc+Dedicat) Total,Sum(Direct+Btc+Dedicat) GTV,m.PropertyType,m.PropertyId,'A',m.CityId
+		SUM(Onlin) Online,Sum(Direct+Btc+Dedicat) Total,Sum(GtvAmount+Btc+Dedicat) GTV,m.PropertyType,m.PropertyId,'A',m.CityId
 		from #MonthWiseFinal m
 		JOIN WRBHBCity C WITH(NOLOCK) ON C.Id=m.CityId AND C.IsActive=1 AND C.IsDeleted=0 
-		where m.PropertyType=@Pram5
+		where m.PropertyType='External Property'
+		group by  Property,m.PropertyId,m.PropertyType,C.CityName,m.CityId
+		order by m.PropertyType
+		
+		Insert into #Temp1Final(CityName,PropertyName,DD,Direct,BTC,Online,TOTAL,GTV,Category,Pid,OrderData,CityId)
+		Select ''CityName, Property PropertyName ,
+		Sum(Dedicat) DD,Sum(Gtv) Direct,Sum(Btc) BTC,
+		SUM(Onlin) Online,Sum(Gtv+Btc+Dedicat) Total,Sum(Direct+Btc+Dedicat) GTV,m.PropertyType,0 Id,'A',m.CityId
+		from #MonthWiseFinal m
+		where  m.PropertyId=0 --and p.IsActive=1
+		--JOIN WRBHBCity C WITH(NOLOCK) ON C.Id=P.CityId AND C.IsActive=1 AND C.IsDeleted=0 
+		group by  Property,m.PropertyType,m.CityId--,C.CityName
+		order by m.PropertyType
+	End
+	if(@Pram5='Internal Property')  
+	Begin
+		Insert into #Temp1Final(CityName,PropertyName,DD,Direct,BTC,Online,TOTAL,GTV,Category,Pid,OrderData,CityId)
+		Select C.CityName CityName, Property PropertyName ,
+		Sum(Dedicat) DD,Sum(Direct) Direct,Sum(Btc) BTC,
+		SUM(Onlin) Online,Sum(Direct+Btc+Dedicat) Total,Sum(Direct+Btc+Dedicat) GTV,m.PropertyType,m.PropertyId,'A',m.CityId
+		from #MonthWiseFinal m
+		JOIN WRBHBCity C WITH(NOLOCK) ON C.Id=m.CityId AND C.IsActive=1 AND C.IsDeleted=0 
+		where m.PropertyType='Internal Property'
 		group by  Property,m.PropertyId,m.PropertyType,C.CityName,m.CityId
 		order by m.PropertyType
 		
 		Insert into #Temp1Final(CityName,PropertyName,DD,Direct,BTC,Online,TOTAL,GTV,Category,Pid,OrderData,CityId)
 		Select ''CityName, Property PropertyName ,
 		Sum(Dedicat) DD,Sum(Direct) Direct,Sum(Btc) BTC,
-		0 Online,Sum(Direct+Btc+Dedicat) Total,Sum(Direct+Btc+Dedicat) GTV,m.PropertyType,0 Id,'A',m.CityId
+		SUM(Onlin) Online,Sum(Direct+Btc+Dedicat) Total,Sum(Direct+Btc+Dedicat) GTV,m.PropertyType,0 Id,'A',m.CityId
 		from #MonthWiseFinal m
 		where  m.PropertyId=0 --and p.IsActive=1
 		--JOIN WRBHBCity C WITH(NOLOCK) ON C.Id=P.CityId AND C.IsActive=1 AND C.IsDeleted=0 
 		group by  Property,m.PropertyType,m.CityId--,C.CityName
 		order by m.PropertyType
 	End
+	
+	if(@Pram5='Managed G H')  
+	Begin
+		Insert into #Temp1Final(CityName,PropertyName,DD,Direct,BTC,Online,TOTAL,GTV,Category,Pid,OrderData,CityId)
+		Select C.CityName CityName, Property PropertyName ,
+		Sum(Dedicat) DD,Sum(Direct) Direct,Sum(Btc) BTC,
+		SUM(Onlin) Online,Sum(Direct+Btc+Dedicat) Total,Sum(Direct+Btc+Dedicat) GTV,m.PropertyType,m.PropertyId,'A',m.CityId
+		from #MonthWiseFinal m
+		JOIN WRBHBCity C WITH(NOLOCK) ON C.Id=m.CityId AND C.IsActive=1 AND C.IsDeleted=0 
+		where m.PropertyType='Managed G H'
+		group by  Property,m.PropertyId,m.PropertyType,C.CityName,m.CityId
+		order by m.PropertyType
+		
+		Insert into #Temp1Final(CityName,PropertyName,DD,Direct,BTC,Online,TOTAL,GTV,Category,Pid,OrderData,CityId)
+		Select ''CityName, Property PropertyName ,
+		Sum(Dedicat) DD,Sum(Direct) Direct,Sum(Btc) BTC,
+		SUM(Onlin) Online,Sum(Direct+Btc+Dedicat) Total,Sum(Direct+Btc+Dedicat) GTV,m.PropertyType,0 Id,'A',m.CityId
+		from #MonthWiseFinal m
+		where  m.PropertyId=0 --and p.IsActive=1
+		--JOIN WRBHBCity C WITH(NOLOCK) ON C.Id=P.CityId AND C.IsActive=1 AND C.IsDeleted=0 
+		group by  Property,m.PropertyType,m.CityId--,C.CityName
+		order by m.PropertyType
+	End
+	
+	 --Select * from #Temp1Final  
+	 --Return	
 	if(@Pram1=0)
 	Begin
 		Insert into #Temp1Finals(CityName,PropertyName,DD,Direct,BTC,Online,TOTAL,GTV,Category,Pid,OrderData)

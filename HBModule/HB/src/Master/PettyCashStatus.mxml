@@ -31,6 +31,8 @@
 			import mx.events.ListEvent;
 			import mx.graphics.codec.PNGEncoder;
 			
+			import org.hamcrest.mxml.object.Null;
+			
 			import spark.events.IndexChangeEvent;
 			import spark.events.TextOperationEvent;
 			import spark.primitives.Path;
@@ -85,7 +87,16 @@
 				}
 				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
 				{
-					
+//					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+//					{
+//						TypeServiceId=Ds_Objects.result.Tables.Table.Rows[0].NewEntry;		
+//					}
+//					if(TypeServiceId ==0)
+//					{
+//						alignAlert(Alert.show("PC Expense Report Can be submit after the Previous Expense Report Approval.","Message !",Alert.OK, null, null, 
+//							iconTickLarge, Alert.OK),10,"");
+//					}
+					//else
 					if (AddMode == true)
 					{
 						alignAlert(Alert.show("PC Expense Report Submitted Successfully.","Message !",Alert.OK, null, null, iconTickLarge, Alert.OK),10,"");
@@ -101,6 +112,10 @@
 					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
 					{
 						Grd_Status.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+					if(Grd_Status.dataProvider==null)
+					{
+						btn_Skip.visible=true;
 					}
 				}
 				if (Ds_Objects.currentTarget.description.toString() == "Actionload_CUSTOM")
@@ -141,7 +156,22 @@
 						Txt_desupload.text=Ds_Objects.result.Tables.Table.Rows[0].Description;
 					}
 				}
-			
+			if (Ds_Objects.currentTarget.description.toString() == "SkipActionload_CUSTOM")
+			{
+				if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+				{
+					Txt_OpenBalance.text=Ds_Objects.result.Tables.Table.Rows[0].ClosingBalance;
+				}
+				var OB:Number=Number(Txt_OpenBalance.text);
+				var Total:int=0;
+				var TA:String=NF_Two.format(Total+OB);
+				lbl_Total.text=TA.replace(",","");
+				if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+				{
+					hlp_Expense.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+				}
+				
+			}
 			if (Ds_Objects.currentTarget.description.toString() == "Statusload_CUSTOM")
 			{
 				if (Ds_Objects.result.Tables.Table.Rows.length > 0)
@@ -291,6 +321,8 @@
 				Txt_amt.text="";
 				lbl_PaidTotal.text="";
 				lbl_Total.text="";HId=0;
+				Grd_Status.visible=true;
+				btn_Skip.visible=false;
 			}
 			public function FnAction(Event):void
 			{ 
@@ -339,56 +371,102 @@
 				else
 				{
 				ErrStr1="";
-				var TempProduct_AC:ArrayCollection=new ArrayCollection();
-				var TempCreate_AC:ArrayCollection=new ArrayCollection();
-				var Total:int=0;
-				TempProduct_AC=Grd_User.dataProvider as ArrayCollection
-				if(TempProduct_AC.length==0)
+				if(Grd_User.dataProvider !=null)
 				{
-					var TempCreate_AC:ArrayCollection=new ArrayCollection
-						([{
-							ExpenseHead:hlp_Expense.text,
-							Description:Txt_des.text,
-							Paid:Txt_amt.text								
-						}]);
-					TempProduct_AC.addItem(TempCreate_AC[0])
+					var TempProduct_AC:ArrayCollection=new ArrayCollection();
+					var TempCreate_AC:ArrayCollection=new ArrayCollection();
+					var Total:int=0;
+					TempProduct_AC=Grd_User.dataProvider as ArrayCollection
+					if(TempProduct_AC.length==0)
+					{
+						var TempCreate_AC:ArrayCollection=new ArrayCollection
+							([{
+								ExpenseHead:hlp_Expense.text,
+								Description:Txt_des.text,
+								Paid:Txt_amt.text								
+							}]);
+						TempProduct_AC.addItem(TempCreate_AC[0])
+					}
+					else
+					{
+						var TempCreate_AC:ArrayCollection=new ArrayCollection
+							([{
+								ExpenseHead:hlp_Expense.text,
+								Description:Txt_des.text,
+								Amount:0,
+								Status:"",
+								Paid:Txt_amt.text,
+								BillNo:"",
+								ExpenseId:ExpenseId1,
+								FilePath:"",
+								Id:0
+							}]);
+						TempProduct_AC.addItemAt(TempCreate_AC[0],TempProduct_AC.length)
+					}
+					Totalamt=0;
+					for(var i:int=0;i<TempProduct_AC.length;i++)
+					{
+						Totalamt+=Number(TempProduct_AC[i].Paid);
+					}
+					var TAmt:String=NF_Two.format(Totalamt);
+					lbl_PaidTotal.text=TAmt.replace(",","");;
+					var TotalPaidAmount:String=NF_Two.format(lbl_PaidTotal.text);
+					var total:Number=Math.round(Number(lbl_Total.text));
+					if(Totalamt<=total)
+					{
+						
+					}
+					else
+					{
+						
+						TempProduct_AC.removeItemAt(TempProduct_AC.length-1);
+						lbl_PaidTotal.text=NF_Two.format(Number(TotalPaidAmount)-Number(Txt_amt.text));					
+						alignAlert(Alert.show("Paid Amount Should Not be Greater than RequestedAmount","!",Alert.OK,this,null,iconErrLarge),10,"");
+						return;
+					}
 				}
 				else
 				{
-					var TempCreate_AC:ArrayCollection=new ArrayCollection
-						([{
-							ExpenseHead:hlp_Expense.text,
-							Description:Txt_des.text,
-							Amount:0,
-							Status:"",
-							Paid:Txt_amt.text,
-							BillNo:"",
-							ExpenseId:ExpenseId1,
-							FilePath:"",
-							Id:0
-						}]);
-					TempProduct_AC.addItemAt(TempCreate_AC[0],TempProduct_AC.length)
-				}
-				Totalamt=0;
-				for(var i:int=0;i<TempProduct_AC.length;i++)
-				{
-					Totalamt+=Number(TempProduct_AC[i].Paid);
-				}
-				var TAmt:String=NF_Two.format(Totalamt);
-				lbl_PaidTotal.text=TAmt.replace(",","");;
-				var TotalPaidAmount:String=NF_Two.format(lbl_PaidTotal.text);
-				var total:Number=Math.round(Number(lbl_Total.text));
-				if(Totalamt<=total)
-				{
+					var TempProduct_AC:ArrayCollection=new ArrayCollection();
+					var TempCreate_AC:ArrayCollection=new ArrayCollection();
+					var Total:int=0;
+					//TempProduct_AC=Grd_User.dataProvider as ArrayCollection
 					
-				}
-				else
-				{
+						var TempCreate_AC:ArrayCollection=new ArrayCollection
+								([{
+									ExpenseHead:hlp_Expense.text,
+									Description:Txt_des.text,
+									Amount:0,
+									Status:"",
+									Paid:Txt_amt.text,
+									BillNo:"",
+									ExpenseId:ExpenseId1,
+									FilePath:"",
+									Id:0
+								}]);
+							TempProduct_AC.addItem(TempCreate_AC[0])
 					
-					TempProduct_AC.removeItemAt(TempProduct_AC.length-1);
-					lbl_PaidTotal.text=NF_Two.format(Number(TotalPaidAmount)-Number(Txt_amt.text));					
-					alignAlert(Alert.show("Paid Amount Should Not be Greater than RequestedAmount","!",Alert.OK,this,null,iconErrLarge),10,"");
-					return;
+					Totalamt=0;
+					for(var i:int=0;i<TempProduct_AC.length;i++)
+					{
+						Totalamt+=Number(TempProduct_AC[i].Paid);
+					}
+					var TAmt:String=NF_Two.format(Totalamt);
+					lbl_PaidTotal.text=TAmt.replace(",","");;
+					var TotalPaidAmount:String=NF_Two.format(lbl_PaidTotal.text);
+					var total:Number=Math.round(Number(lbl_Total.text));
+					if(Totalamt<=total)
+					{
+						
+					}
+					else
+					{
+						
+						TempProduct_AC.removeItemAt(TempProduct_AC.length-1);
+						lbl_PaidTotal.text=NF_Two.format(Number(TotalPaidAmount)-Number(Txt_amt.text));					
+						alignAlert(Alert.show("Paid Amount Should Not be Greater than RequestedAmount","!",Alert.OK,this,null,iconErrLarge),10,"");
+						return;
+					}
 				}
 				Grd_User.dataProvider=TempProduct_AC;	
 				hlp_Expense.text="";
@@ -424,13 +502,23 @@
 					Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
 				}
 			}
+			public function Skipfuction():void
+			{
+				bdr_Action1.visible=false;
+				Grd_User.visible=false;
+				Grd_Status.visible=false;
+				useWeb("PettyCashStatus","SkipActionload_CUSTOM",[GlobalXml,"SkipAction",'',PropertyId,Global_AC[0].UsrId,0]);
+				bdr_Action.visible=true;
+				Grd_User.visible=true;
+				//Grd_User1.dataProvider=null;
+			}
 			public function FnClose_clickHandler1(event):void
 			{
 				bdr_Action1.visible=false;
 				Grd_User.visible=false;
 				Grd_Status.visible=true;
 				bdr_Action.visible=false;
-				Grd_User1.dataProvider=null;
+				Grd_User1.visible=true;
 			}
 			public function PaidAmount():void
 			{
@@ -739,11 +827,11 @@
 			
 			<!--s:DropDownList id="Ddl_Client" x="272" y="48" width="356" height="23" tabIndex="1"
 			prompt="Please Select Client" change="Ddl_Client_changeHandler(event)"/-->
-			<WrbHelpComp:HelpText id="hlp_property" x="418" y="55" width="280" height="28" depth="1000"
+			<WrbHelpComp:HelpText id="hlp_property" x="358" y="55" width="280" height="28" depth="1000"
 								  onselection="{OnSelectionGuestname()}" pxSetColumnsWidth="280,0"
 								  pxSetHeight="183">
 			</WrbHelpComp:HelpText>
-			<mx:Label x="347" y="56" text="Property"/>
+			<mx:Label x="287" y="56" text="Property"/>
 			<mx:Label x="261" y="30" text="PettyCash Recieved Status" color="red"/>
 			<mx:HRule x="0" y="425" width="100%" strokeColor="#eb1c24"/>
 			<s:BorderContainer x="73" y="8" width="853" height="449" id="bdr_Action" visible="false" 
@@ -898,6 +986,7 @@
 				
 				<WrbComp:Button_HB x="339" y="177" height="32" _Label="Close" click="{Brd_imageUpload.visible=false;}"/>
 						</s:BorderContainer>
+			<s:Button x="648" y="58" width="221" label="Skip To Action" visible="false" id="btn_Skip" click="Skipfuction()"/>
 		</s:BorderContainer>
 	</s:VGroup>	
 </s:Application>

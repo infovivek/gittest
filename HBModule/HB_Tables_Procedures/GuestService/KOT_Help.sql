@@ -80,7 +80,7 @@ BEGIN
 		FROM WRBHBCheckInHdr H
 		JOIN WRBHBProperty P ON P.Id = H.PropertyId AND P.IsActive=1 AND P.IsDeleted=0
 		JOIN WRBHBApartmentBookingPropertyAssingedGuest D ON  H.GuestId=D.GuestId AND H.BookingId=D.BookingId 
-		AND D.ApartmentId = D.ApartmentId AND D.IsActive=1 AND D.IsDeleted=0
+		AND H.ApartmentId = D.ApartmentId AND D.IsActive=1 AND D.IsDeleted=0
 		WHERE H.PropertyId = @Id2 AND H.IsActive=1 AND H.IsDeleted=0 AND 
 		CONVERT(date,GETDATE(),103) BETWEEN D.ChkInDt AND D.ChkOutDt AND
 		D.CurrentStatus='CheckIn' AND P.Category IN('Internal Property','Managed G H') 

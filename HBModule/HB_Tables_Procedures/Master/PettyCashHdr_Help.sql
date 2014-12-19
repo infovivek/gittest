@@ -50,9 +50,9 @@ CREATE PROCEDURE [dbo].Sp_PettyCashHdr_Help
  END
  IF @Action='PETTYLOAD'
  BEGIN                              
-		SELECT ClosingBalance FROM WRBHBPettyCashHdr 
+		SELECT Balance AS ClosingBalance FROM WRBHBPettyCashStatusHdr 
 		WHERE PropertyId=@Id AND UserId=@UserId AND 
-		Id = (SELECT MAX(Id)  FROM WRBHBPettyCashHdr WHERE UserId=@UserId AND PropertyId=@Id)
+		Id = (SELECT MAX(Id)  FROM WRBHBPettyCashStatusHdr WHERE UserId=@UserId AND PropertyId=@Id)
  END
  END
  

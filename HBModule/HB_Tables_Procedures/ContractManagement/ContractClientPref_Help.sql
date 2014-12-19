@@ -56,19 +56,24 @@ CREATE PROCEDURE Sp_ContractClientPref_Help
 	JOIN WRBHBClientManagement CM ON CP.ClientId=CM.Id AND CM.IsActive=1 AND CM.IsDeleted=0
 	WHERE CP.Id=@HeaderId AND CP.IsActive=1 AND CP.IsDeleted=0;
     
-    SELECT HeaderId,P.PropertyName as Property,PropertyId,RoomType,RoomId,TariffSingle AS ATariffSingle,
-    TariffDouble ATariffDouble,
-    TariffTriple AS ATariffTriple,RTariffSingle,RTariffDouble,RTariffTriple,Facility,TaxInclusive as Inclusive ,
-    TaxPercentage as Tax,LTAgreed,LTRack,STAgreed,Isnull(C.Email,'') as ContactEmail,
+    SELECT HeaderId,P.PropertyName as Property,PropertyId,RoomType,RoomId,Isnull(TariffSingle,0) AS ATariffSingle,
+    Isnull(TariffDouble,0) ATariffDouble,
+    Isnull(TariffTriple,0) AS ATariffTriple,Isnull(RTariffSingle,0) AS RTariffSingle,
+    Isnull(RTariffDouble,0) AS RTariffDouble,Isnull(RTariffTriple,0) AS RTariffTriple,
+    Facility,TaxInclusive as Inclusive ,TaxPercentage as Tax,Isnull(LTAgreed,0) AS LTAgreed,
+    Isnull(LTRack,0) AS LTRack,Isnull(STAgreed,0) AS STAgreed,Isnull(C.Email,'') as ContactEmail,
     Isnull (ContactName,'') as ContactName,Isnull (ContactPhone,'') as ContactPhone,C.Id
 	FROM WRBHBContractClientPref_Details C
 	JOIN WRBHBProperty P ON C.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0 
 	WHERE HeaderId=@HeaderId AND C.IsActive=1 AND C.IsDeleted=0 ORDER BY P.PropertyName
  
 	
-	SELECT HeaderId AS ClientId,P.PropertyName as Property,RoomType,TariffSingle AS ATariffSingle,TariffDouble ATariffDouble,
-    TariffTriple AS ATariffTriple,RTariffSingle,RTariffDouble,RTariffTriple,Facility,TaxInclusive as Inclusive ,
-    TaxPercentage as Tax,LTAgreed,LTRack,STAgreed,
+	SELECT HeaderId AS ClientId,P.PropertyName as Property,RoomType,Isnull(TariffSingle,0) AS ATariffSingle,
+    Isnull(TariffDouble,0) ATariffDouble,
+    Isnull(TariffTriple,0) AS ATariffTriple,Isnull(RTariffSingle,0) AS RTariffSingle,
+    Isnull(RTariffDouble,0) AS RTariffDouble,Isnull(RTariffTriple,0) AS RTariffTriple,
+    Facility,TaxInclusive as Inclusive ,TaxPercentage as Tax,Isnull(LTAgreed,0) AS LTAgreed,
+    Isnull(LTRack,0) AS LTRack,Isnull(STAgreed,0) AS STAgreed,
     Isnull(C.Email,'') as ContactEmail,Isnull (ContactName,'') as ContactName,
     Isnull (ContactPhone,'') as ContactPhone
 	FROM WRBHBContractClientPref_Details C

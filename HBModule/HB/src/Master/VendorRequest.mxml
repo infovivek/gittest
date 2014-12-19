@@ -260,7 +260,7 @@
 				 }
 				 else if(Type =="Apartment")
 				 {
-					 if(hlp_apartment.text=="") 
+					 if(hlp_apartment.text!="") 
 					 {
 						 if(Flag==true)
 						 {
@@ -272,7 +272,7 @@
 				 }
 				 else if(Type =="Room")
 				 {
-					 if(hlp_Room.text=="") 
+					 if(hlp_Room.text!="") 
 					 {
 						 if(Flag==true)
 						 {

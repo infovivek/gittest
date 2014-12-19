@@ -175,7 +175,7 @@ IF @Action='PageLoad'
 	join WRBHBBooking b on b.Id = d.BookingId	
 --	join WRBHBTaxMaster t on t.StateId=s.Id   
 	where h.IsActive = 1 and h.IsDeleted = 0 and CS.CheckOutHdrId =  @Id1 
-	AND h.PropertyType = 'External Property'
+	AND h.PropertyType IN ('External Property','CPP')
 	group by h.GuestName ,h.Name,h.Stay,h.Type,h.BookingLevel,
 	BillDate,h.ClientName,h.Id,	h.ChkOutTariffTotal ,h.ChkOutTariffLT ,h.ChkOutTariffNetAmount,
 	h.ChkOutTariffST2 ,h.ChkOutTariffST3 ,h.ChkOutTariffCess ,

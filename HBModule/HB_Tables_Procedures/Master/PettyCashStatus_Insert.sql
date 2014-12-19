@@ -62,8 +62,8 @@ BEGIN
 	
 	DECLARE @PDate NVARCHAR(100)
 	SET @PDate=(SELECT TOP 1 Status FROM WRBHBPettyCashStatus
-	WHERE PettyCashStatusHdrId=@PettyCashStatusHdrId AND IsActive=1 AND IsDeleted=0 
-	ORDER BY Status ASC)
+	WHERE PettyCashStatusHdrId=@PettyCashStatusHdrId AND IsActive=1 AND IsDeleted=0) 
+	
 	 
 	UPDATE WRBHBPettyCashStatus SET Status=@PDate
 	WHERE PettyCashStatusHdrId=@PettyCashStatusHdrId AND IsActive=1 AND IsDeleted=0

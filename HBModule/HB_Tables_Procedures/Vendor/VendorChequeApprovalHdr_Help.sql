@@ -60,6 +60,7 @@ CREATE PROCEDURE dbo.[SP_VendorChequeApprovalHdr_Help]
 		AND PU.UserType IN('Resident Managers','Assistant Resident Managers','Operations Managers',
 		'Ops Head','Finance')	
 		
+		
 		INSERT INTO #Request(Requestedby,RequestedOn,RequestedAmount,PropertyName,Status,Process,Processedon,
 		Processedby,Id,RequestedUserId,PropertyId,UserId)
 		 
@@ -166,9 +167,9 @@ END
 		AND PU.UserType IN('Resident Managers','Assistant Resident Managers','Operations Managers',
 		'Ops Head','Finance')
 		GROUP BY U.FirstName,U.LastName,P.PropertyName,VC.Date,VC.UserId,VC.PropertyId
-		END
-		ELSE
-		BEGIN
+	END
+	ELSE 
+	BEGIN
 		INSERT INTO #Request1(Requestedby,RequestedOn,
 		RequestedAmount,PropertyName,Status,Process,Processedby,Processedon,Id,RequestedUserId,PropertyId,UserId)
 		SELECT  DISTINCT (U.FirstName+' '+U.LastName) AS Requestedby,
@@ -230,7 +231,7 @@ END
 		
 		IF ISNULL(@VId,0) !=0
 		BEGIN
-		    SELECT CONVERT(NVARCHAR(100),GETDATE(),103) AS BillDate,
+		    SELECT CONVERT(NVARCHAR(100),VR.Date,103) AS BillDate,
 			VR.Service AS ExpenseHead,VR.VendorName AS VendorName,
 			P.PropertyName AS Property,VR.Duedate AS DueDate,VR.Type,'Cheque' AS PaymentMode,VD.BillNo,
 			VD.Amount AS RequestedAmount,VR.UserId,
@@ -241,18 +242,18 @@ END
 			WHERE VR.PropertyId=@CreatedById AND VR.IsActive=1 AND VR.IsDeleted=0 AND VR.Partial=0 AND
 			VR.Date=CONVERT(Date,@Str,103)
 			group by VR.Service,VR.VendorName,P.PropertyName,VR.Duedate ,VR.Type,VD.BillNo,VD.Amount,
-			VR.UserId,VR.PropertyId,VR.Id
+			VR.UserId,VR.PropertyId,VR.Id,VR.Date
 				
-			SELECT DISTINCT(U.FirstName+' '+U.LastName) AS Requestedby,CONVERT(NVARCHAR(100),GETDATE(),103) AS
+			SELECT DISTINCT(U.FirstName+' '+U.LastName) AS Requestedby,CONVERT(NVARCHAR(100),VR.Date,103) AS
 			RequestedOn
 			FROM WRBHBVendorRequest VR
 			JOIN WRBHBUser U ON VR.UserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
-			WHERE VR.PropertyId=@CreatedById AND U.IsActive=1 AND U.IsDeleted=0 
+			WHERE VR.PropertyId=@CreatedById AND VR.Date=CONVERT(Date,@Str,103)AND U.IsActive=1 AND U.IsDeleted=0 
 	       	        
 			INSERT INTO #Final(BillDate,ExpenseHead,VendorName,Property,Duedate,Type,PaymentMode,BillNo,RequestedAmount,
 			UserId,PropertyId,Id)
 	        
-			SELECT CONVERT(NVARCHAR(100),GETDATE(),103) AS BillDate,
+			SELECT CONVERT(NVARCHAR(100),VR.Date,103) AS BillDate,
 			VR.Service AS ExpenseHead,VR.VendorName AS VendorName,
 			P.PropertyName AS Property,VR.Duedate,VR.Type,'Cheque' AS PaymentMode,VD.BillNo,VD.Amount AS RequestedAmount,VR.UserId,
 			VR.PropertyId,VR.Id
@@ -262,7 +263,7 @@ END
 			WHERE VR.PropertyId=@CreatedById AND VR.IsActive=1 AND VR.IsDeleted=0 AND VR.Partial=0
 			AND VR.Date=CONVERT(Date,@Str,103)
 			group by VR.Service,VR.VendorName,P.PropertyName,VR.Duedate,VR.Type,VD.Amount,
-			VD.BillNo,VR.UserId,VR.PropertyId,VR.Id
+			VD.BillNo,VR.UserId,VR.PropertyId,VR.Id,VR.Date
 			
 			INSERT INTO #Final(BillDate,ExpenseHead,VendorName,Property,Duedate,Type,PaymentMode,BillNo,RequestedAmount,
 			UserId,PropertyId,Id)
@@ -300,7 +301,7 @@ END
 		END
 		ELSE
 		BEGIN
-			SELECT CONVERT(NVARCHAR(100),GETDATE(),103) AS BillDate,
+			SELECT CONVERT(NVARCHAR(100),VR.Date,103) AS BillDate,
 			VR.Service AS ExpenseHead,VR.VendorName AS VendorName,
 			P.PropertyName AS Property,VR.Duedate AS DueDate,VR.Type,'Cheque' AS PaymentMode,VR.BillNo,
 			VR.Amount AS RequestedAmount,VR.UserId,
@@ -310,18 +311,18 @@ END
 			WHERE VR.PropertyId=@CreatedById AND VR.IsActive=1 AND VR.IsDeleted=0 AND VR.Partial=0 AND
 			VR.Date=CONVERT(Date,@Str,103)
 			group by VR.Service,VR.VendorName,P.PropertyName,VR.Duedate ,VR.Type,VR.BillNo,VR.Amount,
-			VR.UserId,VR.PropertyId,VR.Id
+			VR.UserId,VR.PropertyId,VR.Id,VR.Date
 				
-			SELECT DISTINCT(U.FirstName+' '+U.LastName) AS Requestedby,CONVERT(NVARCHAR(100),GETDATE(),103) AS
+			SELECT DISTINCT(U.FirstName+' '+U.LastName) AS Requestedby,CONVERT(NVARCHAR(100),VR.Date,103) AS
 			RequestedOn
 			FROM WRBHBVendorRequest VR
 			JOIN WRBHBUser U ON VR.UserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
-			WHERE VR.PropertyId=@CreatedById AND U.IsActive=1 AND U.IsDeleted=0 
+			WHERE VR.PropertyId=@CreatedById AND VR.Date=CONVERT(Date,@Str,103)AND U.IsActive=1 AND U.IsDeleted=0 
 	       
 			INSERT INTO #Final(BillDate,ExpenseHead,VendorName,Property,Duedate,Type,PaymentMode,BillNo,RequestedAmount,
 			UserId,PropertyId,Id)
 	        
-			SELECT CONVERT(NVARCHAR(100),GETDATE(),103) AS BillDate,
+			SELECT CONVERT(NVARCHAR(100),VR.Date,103) AS BillDate,
 			VR.Service AS ExpenseHead,VR.VendorName AS VendorName,
 			P.PropertyName AS Property,VR.Duedate,VR.Type,'Cheque' AS PaymentMode,VR.BillNo,VR.Amount AS RequestedAmount,VR.UserId,
 			VR.PropertyId,VR.Id
@@ -329,7 +330,8 @@ END
 			JOIN WRBHBProperty P ON VR.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
 			WHERE VR.PropertyId=@CreatedById AND VR.IsActive=1 AND VR.IsDeleted=0 AND VR.Partial=0
 			AND VR.Date=CONVERT(Date,@Str,103)
-			group by VR.Service,VR.VendorName,P.PropertyName,VR.Duedate,VR.Amount,VR.Type,VR.BillNo,VR.UserId,VR.PropertyId,VR.Id
+			group by VR.Service,VR.VendorName,P.PropertyName,VR.Duedate,VR.Amount,VR.Type,VR.BillNo,
+			VR.UserId,VR.PropertyId,VR.Id,VR.Date
 			
 			INSERT INTO #Final(BillDate,ExpenseHead,VendorName,Property,Duedate,Type,PaymentMode,BillNo,RequestedAmount,
 			UserId,PropertyId,Id)

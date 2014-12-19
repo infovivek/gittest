@@ -310,7 +310,7 @@ BEGIN
 		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
 		PropertyType = 'Internal Property' and  
 		PropertyId = @PropertyId and  
-		isnull(d.RoomShiftingFlag,0)=0 and --d.CurrentStatus = 'CheckIn' and
+		isnull(d.RoomShiftingFlag,0)=0 and d.CurrentStatus = 'CheckIn' and
 		--CONVERT(date,d.ChkOutDt,103) between CONVERT(date,d.ChkInDt,103) AND 
 		--CONVERT(date,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) and   
 		h.Id  IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where isnull(IntermediateFlag,0) = 1 and  
@@ -332,7 +332,7 @@ BEGIN
 		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
 		PropertyType = 'Internal Property' and  
 		PropertyId = @PropertyId and  
-		--d.CurrentStatus = 'CheckIn' and
+		d.CurrentStatus = 'CheckIn' and
 		--CONVERT(date,d.ChkOutDt,103) between CONVERT(date,d.ChkInDt,103) AND 
 		--CONVERT(date,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) and   
 		h.Id  IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where isnull(IntermediateFlag,0) = 1 and  
@@ -352,7 +352,7 @@ BEGIN
 		h.GuestId = d.GuestId and d.IsActive=1 and d.IsDeleted=0
 		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
 		PropertyType = 'Internal Property' and  
-		PropertyId = @PropertyId and -- d.CurrentStatus = 'CheckIn' and
+		PropertyId = @PropertyId and  d.CurrentStatus = 'CheckIn' and
 		--CONVERT(date,d.ChkOutDt,103) between CONVERT(date,d.ChkInDt,103) AND 
 		--CONVERT(date,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) and   
 		h.Id  IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where isnull(IntermediateFlag,0) = 1 and  
@@ -1552,6 +1552,9 @@ If @BookingLevel = 'Apartment'
 END
 ELSE
 BEGIN
+
+
+
 	SELECT Property,Stay,ChkOutTariffAdays  AS Tariff,  
 		CONVERT(NVARCHAR(100),CheckOutDate,103) AS ChkoutDate,CONVERT(NVARCHAR(100),CheckInDate,103) AS CheckInDate  
 		FROM WRBHBChechkOutHdr WHERE  Id=@CID --and  IsActive=1 and IsDeleted=0 
@@ -1628,10 +1631,10 @@ BEGIN
 		SELECT COUNT(d.CheckOutHdrId) as Id2 from WRBHBChechkOutHdr h  
 		join WRBHBCheckOutServiceHdr d on h.Id = d.CheckOutHdrId   
 		where h.ChkInHdrId= @CheckInHdrId and h.  
-		IsActive=1 and h.IsDeleted=0  
+		IsActive=1 and h.IsDeleted=0 AND Flag=0   
 		SELECT Id from WRBHBChechkOutHdr   
 		where Id=@CID --and IsActive=1 and IsDeleted=0 
-		and Flag=0  
+		AND Flag=0  
 		 
 		select 1 as Tariff;--this is doubt value 
 		 

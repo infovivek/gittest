@@ -368,6 +368,9 @@ namespace HB.BusinessService
                 case "SearchDetailServiceInvoice":
                     _businessService = new SearchDetailServiceInvoiceService();
                     break;
+                case "BookingPayment":
+                    _businessService = new BookingPaymentEmailService();
+                    break;                    
             }
             return _businessService;
         }

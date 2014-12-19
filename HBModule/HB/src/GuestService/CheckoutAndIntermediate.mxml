@@ -86,9 +86,9 @@
 				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
 				GlobalXml += "</ROOT>";
 				// Rdlc Print
-//				Str_ChkOut="http://localhost:6236/GuestCheckOutTariff.aspx?";
-//				Str_Serv="http://localhost:6236/GuestCheckOutService.aspx?";
-//				Str_Settle="http://localhost:6236/GuestCheckOutConsolidate.aspx?";
+				Str_ChkOut="http://localhost:6236/GuestCheckOutTariff.aspx?";
+				Str_Serv="http://localhost:6236/GuestCheckOutService.aspx?";
+				Str_Settle="http://localhost:6236/GuestCheckOutConsolidate.aspx?";
 //				
 //				Str_InChkTar="http://localhost:6236/IntermediateCheckoutTariff.aspx?";
 //				Str_InChkSer="http://localhost:6236/IntermediateCheckoutService.aspx?";
@@ -104,9 +104,9 @@
 //				Str_InChkSett="http://warsoft.in/HBReport/IntermediateCheckoutConsolidate.aspx?";
 				
 				
-				Str_ChkOut="http://sstage.in/HBReport/GuestCheckOutTariff.aspx?";
-				Str_Serv="http://sstage.in/HBReport/GuestCheckOutService.aspx?";
-				Str_Settle="http://sstage.in/HBReport/GuestCheckOutConsolidate.aspx?";
+//				Str_ChkOut="http://sstage.in/HBReport/GuestCheckOutTariff.aspx?";
+//				Str_Serv="http://sstage.in/HBReport/GuestCheckOutService.aspx?";
+//				Str_Settle="http://sstage.in/HBReport/GuestCheckOutConsolidate.aspx?";
 				
 				Str_InChkTar="http://sstage.in/HBReport/IntermediateCheckoutTariff.aspx?";
 				Str_InChkSer="http://sstage.in/HBReport/IntermediateCheckoutService.aspx?";
@@ -152,8 +152,8 @@
 			protected function Help():void
 			{				
 				
-				useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId,0]);
-	//		 	useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65,0]);
+	//			useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId,0]);
+			 	useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65,0]);
 				Txt_ServiceBillAmt.editable=false;
 				Txt_ServiceVat.editable=false;
 				Txt_SerivceTax.editable=false;
@@ -660,7 +660,12 @@
 						}
 						else
 						{
-							bdr_Tariff.visible =false;
+//							var BillFrom:String="";
+//							var BillTo:String="";
+//							BillFrom=DT_BillFromDate.text;
+//							BillTo=DT_BillTo.text;
+//							useWeb("CheckOutServiceHdr","TariffLoad_CUSTOM",[GlobalXml,"ProductLoad",CheckInHdrId,GuestId,StateId,BillFrom,BillTo,0]);
+//							bdr_Tariff.visible =false;
 							bdr_Tariff.enabled =false;
 							btn_Service.enabled =true;
 							bdr_Service.visible =true;

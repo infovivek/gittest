@@ -11,10 +11,12 @@
 			
 			import mx.events.CalendarLayoutChangeEvent;
 			import mx.events.FlexEvent;
+			import mx.rpc.events.HeaderEvent;
 			public static var Global_AC:ArrayCollection = new ArrayCollection();
 			public static var GlobalXml:String = "";
 			public var ClientId:int=0,RangeEnd:String="";
-			
+			public var Column19:String="",Column20:String="",Column21:String="",Column22:String="",Column23:String="";
+			public var Column24:String="",Column25:String="",Column26:String="",Column27:String="",Column28:String="";
 			protected function PageLoad():void
 			{
 				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
@@ -71,14 +73,42 @@
 					{
 						Grd_BookingDtls.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
 					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Column19=Ds_Objects.result.Tables.Table1.Rows[0].Column1;
+						Column20=Ds_Objects.result.Tables.Table1.Rows[0].Column2;
+						Column21=Ds_Objects.result.Tables.Table1.Rows[0].Column3;
+						Column22=Ds_Objects.result.Tables.Table1.Rows[0].Column4;
+						Column23=Ds_Objects.result.Tables.Table1.Rows[0].Column5;
+						Column24=Ds_Objects.result.Tables.Table1.Rows[0].Column6;
+						Column25=Ds_Objects.result.Tables.Table1.Rows[0].Column7;
+						Column26=Ds_Objects.result.Tables.Table1.Rows[0].Column8;
+						Column27=Ds_Objects.result.Tables.Table1.Rows[0].Column9;
+						Column28=Ds_Objects.result.Tables.Table1.Rows[0].Column10;
+					}
+					var Ac:ArrayCollection = new ArrayCollection();
+					Ac = Grd_BookingDtls.dataProvider as ArrayCollection;
+					for(var i:int = 19; i < 29; i++)
+					{
+					 (Grd_BookingDtls.columns[i] as DataGridColumn).headerText =this["Column"+i] 
+					}
+					
 				}
 			}
 			
 			protected function Btn_Show_clickHandler(event:MouseEvent):void
 			{
+				if(ClientId !=0)
+				{
 				Dt_FromDt.setFocus();
 				useWeb("ApartmentBooking","BookingDtls_CUSTOM",[GlobalXml,'BookingDtls',
 					Dt_FromDt.text,Dt_ToDt.text,'','',0,0,ClientId,0,0,0,0]);
+				}
+				else
+				{
+					alignAlert(Alert.show("Client Details is Required.","Alert Message !",
+					Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+				}
 			}			
 
 			protected function Btn_ExporttoExcel_clickHandler(event:MouseEvent):void
@@ -108,16 +138,16 @@
 					sheet.setCell(0,16,'Status');
 					sheet.setCell(0,17,'UserName');
 					sheet.setCell(0,18,'BookingDate');
-					sheet.setCell(0,19,'Column1');
-					sheet.setCell(0,20,'Column2');
-					sheet.setCell(0,21,'Column3');
-					sheet.setCell(0,22,'Column4');
-					sheet.setCell(0,23,'Column5');
-					sheet.setCell(0,24,'Column6');
-					sheet.setCell(0,25,'Column7');
-					sheet.setCell(0,26,'Column8');
-					sheet.setCell(0,27,'Column9');
-					sheet.setCell(0,28,'Column10');
+					sheet.setCell(0,19,Grd_BookingDtls.columns[19].headerText);
+					sheet.setCell(0,20,Grd_BookingDtls.columns[20].headerText);
+					sheet.setCell(0,21,Grd_BookingDtls.columns[21].headerText);
+					sheet.setCell(0,22,Grd_BookingDtls.columns[22].headerText);
+					sheet.setCell(0,23,Grd_BookingDtls.columns[23].headerText);
+					sheet.setCell(0,24,Grd_BookingDtls.columns[24].headerText);
+					sheet.setCell(0,25,Grd_BookingDtls.columns[25].headerText);
+					sheet.setCell(0,26,Grd_BookingDtls.columns[26].headerText);
+					sheet.setCell(0,27,Grd_BookingDtls.columns[27].headerText);
+					sheet.setCell(0,28,Grd_BookingDtls.columns[28].headerText);
 					for(var i:int = 0; i < arrExportResult.length; i++)
 					{
 						sheet.setCell(i+1, 0, arrExportResult[i].SNo);

@@ -998,8 +998,8 @@ IF @Action = 'MMTBookingConfirmed'
   SET @CancelationPolicy = '<ul><li> Email to <a href="mailto:stay@staysimplyfied.com" target="_blank">stay@staysimplyfied.com</a> and mention the booking ID no.</li><li>Cancellation less than 48 hrs &nbsp;&ndash; NIL. More than 48 hrs. &ndash; 100% refund.</li><li>1 day tariff will be charged for no-show without intimation.</li></ul>';
   END
   -- dataset table 1
-  SELECT SH.HotalName,SH.Line1+', '+SH.Line2+', '+SH.Area+', '+SH.State+', '+
-  SH.Pincode AS Propertaddress,SH.Phone,dbo.TRIM(SH.Description),
+  SELECT SH.HotalName,SH.Line1+', '+SH.Line2+', '+SH.Area+', '+SH.City+', '+
+  SH.State+', '+SH.Pincode AS Propertaddress,SH.Phone,dbo.TRIM(SH.Description),
   ISNULL(SH.CheckInTime,'') CheckInType,
   ISNULL(SH.CheckOutTime,'') AS CheckOutType,'MMT' AS Category,
   @SecurityPolicy,@CancelationPolicy

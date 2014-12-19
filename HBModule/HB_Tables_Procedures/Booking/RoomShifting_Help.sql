@@ -46,7 +46,7 @@ IF @Action = 'BookingLoad'
   BP.IsDeleted=0 AND BG.IsActive=1 AND BG.IsDeleted=0 AND  
   BG.CurrentStatus IN ('CheckIn','Booked') AND B.BookingLevel = 'Room' AND 
   BP.PropertyType IN ('InP','MGH','DdP','ExP','CPP') AND
-  ISNULL(RoomShiftingFlag,0) = 0;
+  ISNULL(RoomShiftingFlag,0) = 0 AND B.BookingCode != 0;
   -- Get Guest in CheckIn & Booked Booking
   CREATE TABLE #TMP1(Guest NVARCHAR(100),BookingCode INT,BookingId INT,  
   RoomId INT,RoomCapturedId INT,BookingLevelId NVARCHAR(100),  
@@ -136,7 +136,7 @@ IF @Action = 'DateLoad'
       WHERE IsActive = 1 AND IsDeleted = 0 AND BookingId = @BookingId AND  
       RoomCaptured = @Id1 AND ISNULL(RoomShiftingFlag,0) = 0;
       SET @AChkInDt = @ChkInDtStart;
-      SET @AChkOutDt = @ChkOutDtStart;
+      SET @AChkOutDt = @ChkInDtEnd;
       SET @Flag = 'Yes';
      END
     IF @CurrentStatus = 'Booked'
@@ -157,10 +157,11 @@ IF @Action = 'DateLoad'
       WHERE IsActive = 1 AND IsDeleted = 0 AND BookingId = @BookingId AND  
       RoomCaptured = @Id1;
       SELECT @ChkInDtStart = CONVERT(DATE,DATEADD(YEAR,-1,GETDATE()),103),
-      @ChkInDtEnd = CONVERT(DATE,DATEADD(YEAR,1,GETDATE()),103),      
-      @AChkInDt = CONVERT(DATE,GETDATE(),103),
-      @AChkOutDt = CONVERT(DATE,DATEADD(DAY,1,GETDATE()),103);
-      SET @ChkOutDtStart = CONVERT(DATE,DATEADD(DAY,1,@ChkInDtStart),103);
+      @ChkInDtEnd = CONVERT(DATE,DATEADD(YEAR,1,GETDATE()),103),
+      @AChkInDt = @EChkInDt,@AChkOutDt = @EChkOutDt,      
+      --@AChkInDt = CONVERT(DATE,GETDATE(),103),
+      --@AChkOutDt = CONVERT(DATE,DATEADD(DAY,1,GETDATE()),103);
+      @ChkOutDtStart = CONVERT(DATE,DATEADD(DAY,1,@ChkInDtStart),103);
       SET @Flag = 'Yes';
      END
    END  
@@ -175,8 +176,9 @@ IF @Action = 'DateLoad'
       SELECT @ChkInDtStart = CONVERT(DATE,DATEADD(YEAR,-1,GETDATE()),103),
       @ChkInDtEnd = CONVERT(DATE,DATEADD(YEAR,1,GETDATE()),103),
       @ChkOutDtStart = CONVERT(DATE,DATEADD(DAY,1,@ChkInDtStart),103),
-      @AChkInDt = CONVERT(DATE,GETDATE(),103),
-      @AChkOutDt = CONVERT(DATE,DATEADD(DAY,1,GETDATE()),103);
+      @AChkInDt = @EChkInDt,@AChkOutDt = @EChkOutDt;
+      --@AChkInDt = CONVERT(DATE,GETDATE(),103),
+      --@AChkOutDt = CONVERT(DATE,DATEADD(DAY,1,GETDATE()),103);
       /*SELECT @ChkInDtStart = 
       (CASE WHEN MIN(ChkInDt) < CONVERT(DATE,GETDATE(),103) THEN MIN(ChkInDt)
       ELSE CONVERT(DATE,GETDATE(),103) END),
@@ -202,8 +204,8 @@ IF @Action = 'DateLoad'
       FROM WRBHBBookingPropertyAssingedGuest  
       WHERE IsActive = 1 AND IsDeleted = 0 AND BookingId = @BookingId AND  
       RoomCaptured = @Id1 AND ISNULL(RoomShiftingFlag,0) = 0;
-      SET @AChkInDt = '';SET @AChkOutDt = '';
-      SET @Flag = 'No';
+      SET @AChkInDt = @EChkInDt;SET @AChkOutDt = @EChkOutDt;
+      SET @Flag = 'Yes';
      END
    END
   --

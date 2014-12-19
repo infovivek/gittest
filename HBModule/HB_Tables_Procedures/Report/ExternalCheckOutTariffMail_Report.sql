@@ -48,12 +48,12 @@ IF @Action='PageLoad'
 	WHERE H.Id=@ClientId
 	
 	
-	select distinct h.GuestName as GuestName,h.Name,h.Stay,h.Type,d.Type as BookingLevel,
+	SELECT DISTINCT h.GuestName as GuestName,h.Name,h.Stay,h.Type,d.Type as BookingLevel,
 	'Check Out :'+convert(nvarchar(100),CONVERT(nvarchar(100),h.CheckOutDate,103),110) as BillDate,  
 	 h.ClientName,h.CheckOutNo,T.TACInvoiceNo InVoiceNo,  
 	 T.Rate as Tariff,T.MarkUpAmount as TotalTariff,round(T.TACAmount,0) as NetAmount,  
 	 T.TotalBusinessSupportST as SerivceTax,T.ChkOutTariffCess as Cess,T.NoOfDays,  
-	 t.ChkOutTariffHECess as HCess,
+	 T.ChkOutTariffHECess as HCess,
 	 'Check In :'+convert(nvarchar(100),h.CheckInDate,103) as ArrivalDate,  
 	 (p.Propertaddress) as Propertyaddress,(c.CityName+','+  
 	 s.StateName+','+p.Postal) as Propcity,c.CityName as City,s.StateName as State,p.Postal,  
@@ -73,7 +73,8 @@ IF @Action='PageLoad'
 	 'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),CONVERT(nvarchar(100),GETDATE(),103),110) as InVoicedate,
 	 'Rupees : '+dbo.fn_NtoWord(ROUND(T.TACAmount,0),'','') AS Invoice,'HDFC BANK' as Bank,'17552560000226' as AccountNo,
 	 'HDFC0001755' as IFSCCode,@PanCardNo as PanCardNo,
-	 'Business Support Service' as Category,p.Localityarea as Location
+	 'Business Support Service' as Category,p.Localityarea as Location,
+	 (ISNULL(T.TotalBusinessSupportST,0)+ISNULL(T.ChkOutTariffCess,0)+ISNULL(T.ChkOutTariffHECess,0)) AS ST
 	   
 	 from WRBHBChechkOutHdr h  
 	 join WRBHBExternalChechkOutTAC T on h.Id = T.ChkOutHdrId

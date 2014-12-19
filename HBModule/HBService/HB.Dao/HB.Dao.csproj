@@ -82,6 +82,7 @@
     <Compile Include="BookingGuestDetailsDAO.cs" />
     <Compile Include="BookingHdrDAO.cs" />
     <Compile Include="BookingMailResendDAO.cs" />
+    <Compile Include="BookingPaymentEmailDAO.cs" />
     <Compile Include="BookingPropertyAssignedGuestDAO.cs" />
     <Compile Include="BookingPropertyDAO.cs" />
     <Compile Include="BookingRecommendPropertyMailDAO.cs" />

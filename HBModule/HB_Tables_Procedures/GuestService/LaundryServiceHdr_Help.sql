@@ -43,7 +43,7 @@ If @Action ='Property'
 			H.BookingId,H.Id 
 			FROM WRBHBCheckInHdr H
 			join WRBHBProperty p on p.Id = h.PropertyId AND P.IsActive=1 AND P.IsDeleted=0
-			JOIN WRBHBBookingPropertyAssingedGuest B ON H.BookingId=B.BookingId AND B.IsActive=1 AND B.IsDeleted=0
+			JOIN WRBHBBookingPropertyAssingedGuest B ON H.Id = B.CheckInHdrId AND H.BookingId=B.BookingId AND B.IsActive=1 AND B.IsDeleted=0
 			WHERE H.PropertyId = @Id AND H.IsActive=1 AND H.IsDeleted=0 AND B.CurrentStatus='CheckIn'
 			AND p.Category IN('Internal Property','Managed G H') --AND 
 	--		 H.Id NOT IN(SELECT ChkInHdrId FROM WRBHBChechkOutHdr where IsActive = 1 and IsDeleted = 0)
@@ -55,7 +55,8 @@ If @Action ='Property'
 			H.BookingId,H.Id 
 			FROM WRBHBCheckInHdr H
 			join WRBHBProperty p on p.Id = h.PropertyId AND P.IsActive=1 AND P.IsDeleted=0
-			JOIN WRBHBApartmentBookingPropertyAssingedGuest B ON H.BookingId=B.BookingId AND B.IsActive=1 AND B.IsDeleted=0
+			JOIN WRBHBApartmentBookingPropertyAssingedGuest B ON H.ApartmentId = B.ApartmentId 
+			AND H.GuestId=B.GuestId AND H.BookingId=B.BookingId AND B.IsActive=1 AND B.IsDeleted=0
 			WHERE H.PropertyId = @Id AND H.IsActive=1 AND H.IsDeleted=0 AND B.CurrentStatus='CheckIn'
 			AND p.Category IN('Internal Property','Managed G H')-- AND 
 	--		 H.Id NOT IN(SELECT ChkInHdrId FROM WRBHBChechkOutHdr where IsActive = 1 and IsDeleted = 0 )
@@ -67,7 +68,8 @@ If @Action ='Property'
 			H.BookingId,H.Id 
 			FROM WRBHBCheckInHdr H
 			join WRBHBProperty p on p.Id = h.PropertyId AND P.IsActive=1 AND P.IsDeleted=0
-			JOIN WRBHBBedBookingPropertyAssingedGuest B ON H.BookingId=B.BookingId AND B.IsActive=1 AND B.IsDeleted=0
+			JOIN WRBHBBedBookingPropertyAssingedGuest B ON H.BedId = B.BedId  
+			AND H.GuestId=B.GuestId AND H.BookingId=B.BookingId AND B.IsActive=1 AND B.IsDeleted=0
 			WHERE H.PropertyId = @Id AND H.IsActive=1 AND H.IsDeleted=0 AND B.CurrentStatus='CheckIn'
 			AND p.Category IN('Internal Property','Managed G H')-- AND 
 		--	 H.Id NOT IN(SELECT ChkInHdrId FROM WRBHBChechkOutHdr where IsActive = 1 and IsDeleted = 0)

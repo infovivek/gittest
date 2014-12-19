@@ -21,7 +21,7 @@ Name			Date			Signature			Description of Changes
 CREATE PROCEDURE [dbo].[SP_ExtCheckOutConsolidate_Bill]
 (@Action NVARCHAR(100)=NULL,
 @Str1 NVARCHAR(100)=NULL,
-@Str2 INT=NULL,
+@Str2 NVARCHAR(100)=NULL,
 @Id1 INT=NULL,
 @Id2 INT=NULL
 )
@@ -92,7 +92,8 @@ IF @Action='PageLoad'
 	Laundry DECIMAL(27,2),Service DECIMAL(27,2) ,Miscellaneous  DECIMAL(27,2),MiscellaneousRemarks  NVARCHAR(MAX),
 	ServiceFB NVARCHAR(MAX),ServiceOT NVARCHAR(MAX),OtherService DECIMAL(27,2),ChkOutServiceST  DECIMAL(27,2),
 	CessService  DECIMAL(27,2),HECess1 DECIMAL(27,2),ExtraMatress  DECIMAL(27,2),CINNo NVARCHAR(MAX),
-	InVoicedate NVARCHAR(MAX),AmtWords NVARCHAR(MAX))
+	InVoicedate NVARCHAR(MAX),AmtWords NVARCHAR(MAX),
+	LTAgreed DECIMAL(27,2),LTRack DECIMAL(27,2),STAgreed DECIMAL(27,2),STRack DECIMAL(27,2))
 	
 	INSERT INTO #Prop3(GuestName ,Name ,Stay ,Type ,
 	BookingLevel ,BillDate ,ClientName ,NoOfDays , InVoiceNo ,
@@ -104,12 +105,14 @@ IF @Action='PageLoad'
 	ServiceTaxNo ,Taxablename ,BillAmount ,Address ,LTPer ,STPer ,VATPer ,Food ,
 	Laundry ,Service  ,Miscellaneous ,MiscellaneousRemarks  ,
 	ServiceFB ,ServiceOT ,OtherService ,ChkOutServiceST ,CessService ,HECess1 ,ExtraMatress ,CINNo ,
-	InVoicedate,AmtWords )
+	InVoicedate,AmtWords,LTAgreed,LTRack,STAgreed,STRack) 
 	
     select h.GuestName as GuestName,h.Name,h.Stay,h.Type,h.BookingLevel,
     convert(nvarchar(100),h.BillDate,103) as BillDate,h.ClientName,h.NoOfDays,h.InVoiceNo,
 	isnull(h.ChkOutTariffNetAmount,0) as ChkOutTariffNetAmount,
-	h.ChkOutTariffTotal as TotalTariff,sum(cs.ChkOutServiceAmtl) as ServiceAmount,
+	(ISNULL(h.ChkOutTariffTotal,0)) as TotalTariff,
+	--(ISNULL(h.ChkOutTariffTotal,0)+ISNULL(h.LTAgreedAmount,0)+ISNULL(LTRackAmount,0)+ISNULL(STAgreedAmount,0)+ISNULL(STRackAmount,0)) as TotalTariff,
+	sum(cs.ChkOutServiceAmtl) as ServiceAmount,
 	h.ChkOutTariffLT as LuxuryTax,
 	isnull(h.ChkOutTariffST1,0) as SerivceNet,
 	(isnull(h.ChkOutTariffST2,0)+sum(isnull(cs.ChkOutServiceST,0))) as ServiTarFood,
@@ -118,7 +121,9 @@ IF @Action='PageLoad'
 	(h.ChkOutTariffCess+sum(cs.Cess)) as Cess,
 	(h.ChkOutTariffHECess+sum(cs.HECess)) as HCess,--CSDD.BillAmount,
 	convert(nvarchar(100),h.CheckInDate,103) as ArrivalDate,
-	ROUND (d.Tariff,0) Tariff,(p.PropertyName+','+p.Propertaddress) as Propertyaddress,(c.CityName+','+
+	(round(h.ChkOutTariffTotal,0)/h.NoOfDays) AS Tariff,
+	--(round(d.Tariff,0)+(h.LTAgreedAmount/h.NoOfDays)+(h.LTRackAmount/h.NoOfDays)+(h.STAgreedAmount/h.NoOfDays)+(h.STRackAmount/h.NoOfDays)) Tariff,
+	(p.PropertyName+','+p.Propertaddress) as Propertyaddress,(c.CityName+','+
 	s.StateName+','+p.Postal) as Propcity,c.CityName,s.StateName,p.Postal,
 	p.Phone,p.Email,
 	sum(cs.ChkOutServiceLT) ChkOutServiceLT,sum(cs.ChkOutServiceST) as ServiceTax,
@@ -153,7 +158,8 @@ IF @Action='PageLoad'
     sum(CS.ChkOutServiceST) ChkOutServiceST,sum(CS.Cess) CessService,
     sum(CS.HECess) HECess,h.ChkOutTariffExtraAmount ExtraMatress,
     'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),h.CreatedDate,103) as InVoicedate,
-    'Rupees : '+dbo.fn_NtoWord(round((isnull(h.ChkOutTariffNetAmount+sum(CS.ChkOutServiceNetAmount),0)),0),'','') AS AmtWords
+    'Rupees : '+dbo.fn_NtoWord(round((isnull(h.ChkOutTariffNetAmount+sum(CS.ChkOutServiceNetAmount),0)),0),'','') AS AmtWords,
+    h.LTAgreedAmount,h.LTRackAmount,h.STAgreedAmount,h.STRackAmount
     
 	--CSDD.BillAmount
 	
@@ -175,7 +181,7 @@ IF @Action='PageLoad'
 	
 	where h.IsActive = 1 and h.IsDeleted = 0
 	--and CSDD.BillType ='Consolidated'
-	 and h.Id = @Id1 and  h.PropertyType = 'External Property'
+	 and h.Id = @Id1 and  h.PropertyType IN ('External Property','CPP')
 	group by h.GuestName ,h.Name,h.Stay,h.Type,h.BookingLevel,
 	BillDate,h.ClientName,h.Id,	h.ChkOutTariffTotal ,h.ChkOutTariffLT ,h.ChkOutTariffNetAmount,
 	h.ChkOutTariffST2 ,h.ChkOutTariffST3 ,h.ChkOutTariffCess ,
@@ -183,7 +189,8 @@ IF @Action='PageLoad'
 	c.CityName,s.StateName,p.Postal,p.Phone,p.Email,	
     H.VATPer,h.RestaurantSTPer ,
     h.BusinessSupportST,h.ChkOutTariffST1 ,H.LuxuryTaxPer,H.ServiceTaxPer,h.ChkOutTariffExtraAmount,
-    h.InVoiceNo,h.NoOfDays,h.BillFromDate,h.BillEndDate,h.CreatedDate--,t.LuxuryNo
+    h.InVoiceNo,h.NoOfDays,h.BillFromDate,h.BillEndDate,h.CreatedDate,h.LTAgreedAmount,
+    h.LTRackAmount,h.STAgreedAmount,h.STRackAmount--,t.LuxuryNo
     
 -- MGH
 	INSERT INTO #Prop3(GuestName ,Name ,Stay ,Type ,
@@ -196,7 +203,7 @@ IF @Action='PageLoad'
 	ServiceTaxNo ,Taxablename ,BillAmount ,Address ,LTPer ,STPer ,VATPer ,Food ,
 	Laundry ,Service  ,Miscellaneous ,MiscellaneousRemarks  ,
 	ServiceFB ,ServiceOT ,OtherService ,ChkOutServiceST ,CessService ,HECess1 ,ExtraMatress ,CINNo ,
-	InVoicedate ,AmtWords)
+	InVoicedate ,AmtWords, LTAgreed,LTRack,STAgreed,STRack)   
 	
     select h.GuestName as GuestName,h.Name,h.Stay,h.Type,h.BookingLevel,
     convert(nvarchar(100),h.BillDate,103) as BillDate,h.ClientName,h.NoOfDays,h.InVoiceNo,
@@ -245,7 +252,9 @@ IF @Action='PageLoad'
     sum(CS.ChkOutServiceST) ChkOutServiceST,sum(CS.Cess) CessService,
     sum(CS.HECess) HECess,h.ChkOutTariffExtraAmount ExtraMatress,
     'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),h.CreatedDate,103) as InVoicedate,
-    'Rupees : '+dbo.fn_NtoWord(round((isnull(h.ChkOutTariffNetAmount+sum(CS.ChkOutServiceNetAmount),0)),0),'','') AS AmtWords
+    'Rupees : '+dbo.fn_NtoWord(round((isnull(h.ChkOutTariffNetAmount+sum(CS.ChkOutServiceNetAmount),0)),0),'','') AS AmtWords,
+    h.LTAgreedAmount,h.LTRackAmount,h.STAgreedAmount,h.STRackAmount
+    
     
 	--CSDD.BillAmount
 	
@@ -275,7 +284,8 @@ IF @Action='PageLoad'
 	c.CityName,s.StateName,p.Postal,p.Phone,p.Email,	
     H.VATPer,h.RestaurantSTPer ,
     h.BusinessSupportST,h.ChkOutTariffST1 ,H.LuxuryTaxPer,H.ServiceTaxPer,h.ChkOutTariffExtraAmount,
-    h.InVoiceNo,h.NoOfDays,h.BillFromDate,h.BillEndDate,h.CreatedDate--,t.LuxuryNo
+    h.InVoiceNo,h.NoOfDays,h.BillFromDate,h.BillEndDate,h.CreatedDate,
+    h.LTAgreedAmount,h.LTRackAmount,h.STAgreedAmount,h.STRackAmount--,t.LuxuryNo
 
 -- MMT    
     
@@ -289,7 +299,7 @@ IF @Action='PageLoad'
 	ServiceTaxNo ,Taxablename ,BillAmount ,Address ,LTPer ,STPer ,VATPer ,Food ,
 	Laundry ,Service  ,Miscellaneous ,MiscellaneousRemarks  ,
 	ServiceFB ,ServiceOT ,OtherService ,ChkOutServiceST ,CessService ,HECess1 ,ExtraMatress ,CINNo ,
-	InVoicedate ,AmtWords)
+	InVoicedate ,AmtWords, LTAgreed,LTRack,STAgreed,STRack)   
 	
     select h.GuestName as GuestName,h.Name,h.Stay,h.Type,h.BookingLevel,
     convert(nvarchar(100),h.BillDate,103) as BillDate,h.ClientName,h.NoOfDays,h.InVoiceNo,
@@ -338,7 +348,9 @@ IF @Action='PageLoad'
     sum(CS.ChkOutServiceST) ChkOutServiceST,sum(CS.Cess) CessService,
     sum(CS.HECess) HECess,h.ChkOutTariffExtraAmount ExtraMatress,
     'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),h.CreatedDate,103) as InVoicedate,
-    'Rupees : '+dbo.fn_NtoWord(round((isnull(h.ChkOutTariffNetAmount+sum(CS.ChkOutServiceNetAmount),0)),0),'','') AS AmtWords
+    'Rupees : '+dbo.fn_NtoWord(round((isnull(h.ChkOutTariffNetAmount+sum(CS.ChkOutServiceNetAmount),0)),0),'','') AS AmtWords,
+    h.LTAgreedAmount,h.LTRackAmount,h.STAgreedAmount,h.STRackAmount
+    
     
 	--CSDD.BillAmount
 	
@@ -368,7 +380,8 @@ IF @Action='PageLoad'
 	c.CityName,s.StateName,p.Pincode,p.Phone,p.Email,	
     H.VATPer,h.RestaurantSTPer ,
     h.BusinessSupportST,h.ChkOutTariffST1 ,H.LuxuryTaxPer,H.ServiceTaxPer,h.ChkOutTariffExtraAmount,
-    h.InVoiceNo,h.NoOfDays,h.BillFromDate,h.BillEndDate,h.CreatedDate--,t.LuxuryNo    
+    h.InVoiceNo,h.NoOfDays,h.BillFromDate,h.BillEndDate,h.CreatedDate,
+    h.LTAgreedAmount,h.LTRackAmount,h.STAgreedAmount,h.STRackAmount--,t.LuxuryNo    
     
     
     SELECT GuestName ,Name ,Stay ,Type ,
@@ -381,7 +394,7 @@ IF @Action='PageLoad'
 	ServiceTaxNo ,Taxablename ,BillAmount ,Address ,LTPer ,STPer ,VATPer ,Food ,
 	Laundry ,Service  ,Miscellaneous ,MiscellaneousRemarks  ,
 	ServiceFB ,ServiceOT ,OtherService ,ChkOutServiceST ,CessService ,HECess1 ,ExtraMatress ,CINNo ,
-	InVoicedate,AmtWords FROM #Prop3
+	InVoicedate,AmtWords , LTAgreed,LTRack,STAgreed,STRack   FROM #Prop3
     group by GuestName ,Name ,Stay ,Type ,
 	BookingLevel ,BillDate ,ClientName ,NoOfDays , InVoiceNo ,
 	ChkOutTariffNetAmount ,TotalTariff ,ServiceAmount ,	LuxuryTax ,SerivceNet ,ServiTarFood , 
@@ -392,7 +405,7 @@ IF @Action='PageLoad'
 	ServiceTaxNo ,Taxablename ,BillAmount ,Address ,LTPer ,STPer ,VATPer ,Food ,
 	Laundry ,Service  ,Miscellaneous ,MiscellaneousRemarks  ,
 	ServiceFB ,ServiceOT ,OtherService ,ChkOutServiceST ,CessService ,HECess1 ,ExtraMatress ,CINNo ,
-	InVoicedate,AmtWords
+	InVoicedate,AmtWords, LTAgreed,LTRack,STAgreed,STRack
     
 	END
 	
@@ -403,3 +416,4 @@ END
 --select * from WRBHBCheckOutServiceDtls
 
 -- exec SP_GuestCheckOutConsolidate_Bill @Action=N'PAGELOAD',@Str1=N'',@Str2=N'',@Id1=25,@Id2=0
+--exec SP_ExtCheckOutConsolidate_Bill @Action=N'PAGELOAD',@Str1=N'',@Str2=N'External Property',@Id1=2572,@Id2=0

@@ -223,7 +223,7 @@
 						Txt_Bed.text=Ds_Objects.result.Tables.Table.Rows[0].BedType;
 						Txt_PropertyType.text=Ds_Objects.result.Tables.Table.Rows[0].PropertyType;
 						
-						if((Txt_PropertyType.text == "Managed G H")||(Txt_PropertyType.text == "MMT"))
+						if((Txt_PropertyType.text == "Managed G H")||(Txt_PropertyType.text == "MMT")||(Txt_PropertyType.text == "CPP"))
 						{
 							Checkout.selected =true;
 							Intermediate.selected=false;
@@ -310,7 +310,7 @@
 						var RB1:Boolean = RB == Ds_Objects.result.Tables.Table3.Rows[0].TariffPaymentMode;
 						new_TariffPaymentMode=Ds_Objects.result.Tables.Table3.Rows[0].TariffPaymentMode;
 						
-						if(Txt_PropertyType.text == 'External Property')
+						if((Txt_PropertyType.text == 'External Property')||(Txt_PropertyType.text== 'CPP'))
 						{
 							if(RB1!="")
 							{
@@ -542,7 +542,7 @@
 									DT_BillTo.enabled=true;
 								}
 							}
-							if((Txt_PropertyType.text == 'Managed G H')||(Txt_PropertyType.text == 'MMT'))
+							if((Txt_PropertyType.text == 'Managed G H')||(Txt_PropertyType.text == 'MMT')||(Txt_PropertyType.text == "CPP"))
 							{
 								if(Checkout.selected=true)
 								{
@@ -616,7 +616,7 @@
 						//		var RB:String = "true";
 						var RB1:Boolean = RB == Ds_Objects.result.Tables.Table3.Rows[0].TariffPaymentMode;
 						
-						if(Txt_PropertyType.text == 'External Property')
+						if((Txt_PropertyType.text == 'External Property')||(Txt_PropertyType.text == "CPP"))
 						{
 							if(RB1!="")
 							{
@@ -889,7 +889,7 @@
 					
 					if(Ds_Objects.result.Tables.Table7.Rows.length > 0)
 					{
-						if(Txt_PropertyType.text == "External Property") // direct doesn't come 
+						if((Txt_PropertyType.text == "External Property")||(Txt_PropertyType.text == "CPP")) // direct doesn't come 
 						{
 							if(Mode1 == "Bill to Company (BTC)1")
 							{
@@ -3463,7 +3463,7 @@
 									FnClear1();
 									btn_Service_clickHandler();
 								}
-								if(Txt_PropertyType.text == 'External Property')
+								if((Txt_PropertyType.text == 'External Property')||(Txt_PropertyType.text == 'CPP'))
 								{
 									PrintChkOutId=0;
 									if (Ds_Objects.result.Tables.Table.Rows.length > 0)
@@ -3534,7 +3534,7 @@
 									FnClear1();
 									btn_Service_clickHandler();
 								}
-								if(Txt_PropertyType.text == 'External Property')
+								if((Txt_PropertyType.text == 'External Property')||(Txt_PropertyType.text == 'CPP'))
 								{
 									PrintChkOutId=0;
 									PropertyType1="";
@@ -5626,7 +5626,7 @@
 			
 			protected function FnSave():void
 			{
-				if(Txt_PropertyType.text == 'External Property')
+				if((Txt_PropertyType.text == 'External Property')||(Txt_PropertyType.text == 'CPP'))
 				{
 					if(Checkout.selected == true)
 					{
@@ -6170,7 +6170,7 @@
 			
 			public function FnUpdate1(event:CloseEvent):void
 			{
-				if(Txt_PropertyType.text== 'External Property')
+				if((Txt_PropertyType.text== 'External Property')||(Txt_PropertyType.text == 'CPP'))
 				{
 					if(Checkout.selected==true)
 					{
@@ -6484,7 +6484,7 @@
 					}
 				}
 				
-				else
+				else // MGH AND MMT
 				{
 					if(Checkout.selected==true)
 					{

@@ -821,6 +821,15 @@ IF @Action = 'BookingDtls'
   Column1,Column2,Column3,Column4,Column5,Column6,Column7,Column8,Column9,Column10,
   BookingLevel AS BookingLevel FROM #Result
   ORDER BY BookingCode,RoomCaptured;
+  
+ ---For dynamic change header 
+  SELECT ISNULL(Column1,'') Column1,ISNULL(Column2,'') Column2,ISNULL(Column3,'') Column3,
+  ISNULL(Column4,'') Column4,ISNULL(Column5,'') Column5,ISNULL(Column6,'') Column6,
+  ISNULL(Column7,'') Column7,ISNULL(Column8,'') Column8,ISNULL(Column9,'') Column9,ISNULL(Column10,'') Column10
+  FROM WRBHBClientColumns 
+  WHERE ClientId=@ClientId AND IsActive=1 AND IsDeleted=0
+  
+  
  END
 END
 /*  CREATE TABLE #FINAL(BookingCode INT,ClientName NVARCHAR(100),

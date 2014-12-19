@@ -75,13 +75,13 @@ CREATE PROCEDURE dbo.[SP_PCExpenseApproval_Help]
 		'Waiting For Operation Manager Approval' AS ProcessedStatus,'Processing' AS Comments,
 		CONVERT(NVARCHAR,CAST(H.ModifiedDate AS Date),103) AS RequestedOn,0 AS Process,
 		(PC.Amount) AS ApprovedAmount,(PC.Paid) AS ExpenseAmount,
-		CONVERT(NVARCHAR(100),GETDATE(),103) AS Processedon,PC.Status AS Date,PH.OpeningBalance,
+		CONVERT(NVARCHAR(100),GETDATE(),103) AS Processedon,PC.Status AS Date,PH.ClosingBalance,
 		(U.FirstName+' '+U.LastName) AS Processedby,
 		PC.UserId AS RequestedUserId, 0 AS Id,PC.PropertyId,PC.Id AS PCId
 		From WRBHBPettyCashStatus PC
 		JOIN WRBHBPettyCashStatusHdr H ON PC.PettyCashStatusHdrId=H.Id AND H.IsActive=1 AND H.IsDeleted=0
 		JOIN WRBHBPettyCashHdr PH ON H.UserId=PH.UserId AND H.PropertyId=PH.PropertyId 
-		AND PC.Status=CONVERT(NVARCHAR(100),PH.Date,103)
+		AND PH.Id = (SELECT MAX(Id)  FROM WRBHBPettyCashHdr WHERE UserId=PH.UserId AND PropertyId=PH.PropertyId)
 		JOIN WRBHBProperty P ON PC.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
 		JOIN WRBHBPropertyUsers PU ON P.Id=PU.PropertyId AND PU.IsActive=1 AND PU.IsDeleted=0
 		JOIN WRBHBUser U ON  PC.UserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
@@ -103,6 +103,12 @@ END
  IF @Action='History'
  BEGIN
         --table1
+        CREATE TABLE #History(Requestedby NVARCHAR(100),PCAccount NVARCHAR(100),RequestedOn NVARCHAR(100),
+        Closingbalance DECIMAL(27,2),Amount DECIMAL(27,2),OpeningBalance DECIMAL(27,2),PropertyId INT,UserId INT)
+        
+        INSERT #History(Requestedby,PCAccount,RequestedOn,Closingbalance,Amount,OpeningBalance,
+        PropertyId,UserId)
+        
         SELECT DISTINCT (U.FirstName+' '+U.LastName) AS Requestedby,P.PropertyName AS PCAccount,
 		CONVERT(NVARCHAR,CAST(PC.CreatedDate AS Date),103) AS RequestedOn,PH.ClosingBalance AS Closingbalance,
 		SUM(PC.Amount) AS Amount,PH.OpeningBalance,PC.PropertyId,PC.UserId
@@ -115,6 +121,26 @@ END
 		AND CONVERT(NVARCHAR,CAST(PC.CreatedDate AS Date),103)=CONVERT(NVARCHAR,@Str,103)
 		group by  U.FirstName,U.LastName,P.PropertyName,CONVERT(NVARCHAR,CAST(PC.CreatedDate AS Date),103),
 		PH.ClosingBalance,PC.UserId,PC.PropertyId,PH.OpeningBalance
+		
+		INSERT #History(Requestedby,PCAccount,RequestedOn,Closingbalance,Amount,OpeningBalance,
+        PropertyId,UserId)
+        
+        SELECT DISTINCT (U.FirstName+' '+U.LastName) AS Requestedby,P.PropertyName AS PCAccount,
+		CONVERT(NVARCHAR,CAST(PC.CreatedDate AS Date),103) AS RequestedOn,PH.Balance AS Closingbalance,
+		SUM(PC.Amount) AS Amount,PH.Balance+SUM(PC.Paid) AS OpeningBalance,PC.PropertyId,PC.UserId
+		From WRBHBPettyCashStatus PC
+		JOIN WRBHBPettyCashStatusHdr PH ON PC.PettyCashStatusHdrId=PH.Id AND PH.IsActive=1 AND PC.IsDeleted=0
+		JOIN WRBHBProperty P ON PC.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
+		JOIN WRBHBUser U ON  PC.UserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
+		WHERE PC.UserId=@UserId AND PC.PropertyId=@PropertyId AND PC.IsActive=1 AND PC.IsDeleted=0
+		AND PC.Status =''
+		AND CONVERT(NVARCHAR,CAST(PC.CreatedDate AS Date),103)=CONVERT(NVARCHAR,@Str,103)
+		group by  U.FirstName,U.LastName,P.PropertyName,CONVERT(NVARCHAR,CAST(PC.CreatedDate AS Date),103),
+		PH.Balance,PC.UserId,PC.PropertyId,PH.Balance
+		
+		SELECT Requestedby,PCAccount,RequestedOn,Closingbalance,Amount,OpeningBalance,
+        PropertyId,UserId FROM #History
+		
 		--table2
 		Select  DISTINCT 
 		CONVERT(NVARCHAR(100),PC.CreatedDate,103) AS RequestedOn,

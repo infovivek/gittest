@@ -186,20 +186,41 @@ BEGIN
 		 order by H.Id desc 
 	
 	--MMT	 
-	 --INSERT INTO #ExpChkin(BookedId,PropertyName,PropertyId,GuestName,BookingLevel,ExpDate,CityName,CityId,ClientName,ClientId,
-  --   BookingCode,Category,CheckOutDate,NoOfdays,MOP,Propertyemail,ContactNum) 
+	 INSERT INTO #ExpChkin(BookedId,PropertyName,PropertyId,GuestName,BookingLevel,ExpDate,CityName,CityId,ClientName,ClientId,
+     BookingCode,Category,CheckOutDate,NoOfdays,MOP,Propertyemail,ContactNum) 
      
-  --        Select Distinct  Ag.BookingId,Bp.Properrty S.HotalName,Ag.BookingPropertyId,ag.FirstName,'Room',Ag.ChkInDt,s.City,
-		--	DateDiff(day,Ag.ChkInDt,Ag.ChkOutDt) as nodays 
-		--	from wrbhbbooking C
-		--	join  WRBHBBookingPropertyAssingedGuest AG WITH(NOLOCK) ON C.Id= AG.BookingId AND AG.IsActive = 1 and AG.IsDeleted = 0
-		--	join WRBHBStaticHotels S   WITH(NOLOCK) ON Ag.BookingPropertyId = S.HotalId and s.IsActive=1 and s.IsDeleted=0
-		--	JOIN dbo.WRBHBBookingProperty BP WITH(NOLOCK)ON C.Id=BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0  
-		--	and  PropertyType='MMT' 
-		--	LEFT OUTER JOIN WRBHBPropertyAgreements PA WITH(NOLOCK) ON PA.IsActive=1 AND PA.PropertyId=bp.PropertyId AND PA.IsDeleted=0  
-		--	where Convert(date,Ag.ChkInDt,103)>= CONVERT(date,'01/09/2014',103)
-		--	Group by  
-			
+          Select Distinct  Ag.BookingId,Bp.PropertyName ,Ag.BookingPropertyId,ag.FirstName,'Room',Convert(nvarchar(100),Ag.ChkInDt,103),
+          s.City,c.CityId,c.ClientName,c.ClientId,c.BookingCode,'External Property',convert(nvarchar(100),Ag.ChkOutDt,103),
+			DateDiff(day,Ag.ChkInDt,Ag.ChkOutDt) as nodays ,Ag.TariffPaymentMode,bp.Email,s.Phone
+			from wrbhbbooking C
+			join  WRBHBBookingPropertyAssingedGuest AG WITH(NOLOCK) ON C.Id= AG.BookingId AND AG.IsActive = 1 and AG.IsDeleted = 0
+			join WRBHBStaticHotels S   WITH(NOLOCK) ON Ag.BookingPropertyId = S.HotalId and s.IsActive=1 and s.IsDeleted=0
+			JOIN dbo.WRBHBBookingProperty BP WITH(NOLOCK)ON C.Id=BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0  
+			and  PropertyType='MMT' 
+			LEFT OUTER JOIN WRBHBPropertyAgreements PA WITH(NOLOCK) ON PA.IsActive=1 AND PA.PropertyId=bp.PropertyId AND PA.IsDeleted=0  
+			where Convert(date,Ag.ChkInDt,103)>= CONVERT(date,'01/09/2014',103)
+			 and  CONVERT(date,ag.ChkInDt,103) <= CONVERT(date,GETDATE(),103) 
+			group by  Ag.BookingId,Bp.PropertyName ,Ag.BookingPropertyId,ag.FirstName,Ag.ChkInDt,s.City,c.CityId,c.ClientName,
+            c.ClientId,c.BookingCode,bp.PropertyType,Ag.ChkOutDt,Ag.TariffPaymentMode,bp.Email,s.Phone
+			 
+			--MMT	 
+	 INSERT INTO #ExpChkin(BookedId,PropertyName,PropertyId,GuestName,BookingLevel,ExpDate,CityName,CityId,ClientName,ClientId,
+     BookingCode,Category,CheckOutDate,NoOfdays,MOP,Propertyemail,ContactNum) 
+     
+          Select Distinct  Ag.BookingId,Bp.PropertyName ,Ag.BookingPropertyId,ag.FirstName,'Room',Convert(nvarchar(100),Ag.ChkInDt,103),
+          s.City,c.CityId,c.ClientName,c.ClientId,c.BookingCode,'External Property',convert(nvarchar(100),Ag.ChkOutDt,103),
+			DateDiff(day,Ag.ChkInDt,Ag.ChkOutDt) as nodays ,Ag.TariffPaymentMode,bp.Email,s.Phone
+			from wrbhbbooking C
+			join  WRBHBBookingPropertyAssingedGuest AG WITH(NOLOCK) ON C.Id= AG.BookingId AND AG.IsActive = 1 and AG.IsDeleted = 0
+			join WRBHBStaticHotels S   WITH(NOLOCK) ON Ag.BookingPropertyId = S.HotalId and s.IsActive=1 and s.IsDeleted=0
+			JOIN dbo.WRBHBBookingProperty BP WITH(NOLOCK)ON C.Id=BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0  
+			and  PropertyType='MMT' 
+			LEFT OUTER JOIN WRBHBPropertyAgreements PA WITH(NOLOCK) ON PA.IsActive=1 AND PA.PropertyId=bp.PropertyId AND PA.IsDeleted=0  
+			where   Ag.ChkInDt  BETWEEN CONVERT(date,GETDATE(),103) AND  
+		    CONVERT(NVARCHAR,DATEADD(DAY,7,CONVERT(DATE,GETDATE(),103))) 
+			group by  Ag.BookingId,Bp.PropertyName ,Ag.BookingPropertyId,ag.FirstName,Ag.ChkInDt,s.City,c.CityId,c.ClientName,
+            c.ClientId,c.BookingCode,bp.PropertyType,Ag.ChkOutDt,Ag.TariffPaymentMode,bp.Email,s.Phone
+			 
 		 
 		 --  Select Distinct C.id,Ag.guestid,Ag.RoomType,ag.FirstName,convert(nvarchar(100),Ag.ChkInDt,103) CheckinDate,
 			--convert(nvarchar(100),Ag.ChkOutDt,103),'CheckIn' CurrentStatus,AG.Occupancy,'Room',Tariff,'MMT'Category,
@@ -217,7 +238,13 @@ BEGIN
 			--AG.Occupancy,Tariff,ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,s.HotalId ,
 			--ISNULL(PA.TAC,0),ISNULL(PA.TACPer,0),Bp.PropertyId
 			
-    --#GRID VALUES 1 FOR TABLE0 
+    --#GRID VALUES 1 FOR TABLE0
+    
+    UPDATE  #ExpChkin  
+    SET ClientName=C.CLIENTNAME
+    FROM #ExpChkin CC
+    JOIN  WRBHBCLIENTMANAGEMENT C ON C.Id=cc.ClientId and c.isactive=1
+    delete #ExpChkin where clientId=0;
     If(@Str1='Internal Property')
     BEGIN
     	INSERT INTO #ExpChkinDate(BookedId,PropertyName,PropertyId,GuestName,BookingLevel,ExpDate,CityName,CityId,ClientName,ClientId,
@@ -305,4 +332,4 @@ BEGIN
       End
       
       
-     --exec Sp_PendingChkinReport_Help @Action=N'Pageload',@FromDt=N'',@ToDt=N'',@Str1=N'',@Str2=N'', @Id1=0,@Id2=0, @UserId=65;
+     --exec Sp_PendingChkinReport_Help @Action=N'Pageload',@FromDt=N'',@ToDt=N'',@Str1=N'External Property',@Str2=N'', @Id1=0,@Id2=0, @UserId=65;

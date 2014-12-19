@@ -105,7 +105,7 @@ BEGIN
 		BillDate,BillNo)
 		
 		SELECT ExpenseHead,Description,CONVERT(NVARCHAR,PC.Date,103) AS Status,ApprovedAmount,0 AS Paid,
-		0 AS Id,TotalAmount,P.ExpenseHeadId AS ExpenseId,'' AS FilePath,'' As BillDate,'' AS BillNo
+		0 AS Id,TotalAmount,P.Id AS ExpenseId,'' AS FilePath,'' As BillDate,'' AS BillNo
 		FROM WRBHBPettyCash	P
 		JOIN WRBHBPettyCashHdr PC ON P.PettyCashHdrId=PC.Id AND PC.IsActive=1 AND PC.IsDeleted=0
 		WHERE P.IsActive=1 AND P.IsDeleted=0 AND PC.PropertyId=@Id AND PC.UserId=@UserId
@@ -128,8 +128,9 @@ BEGIN
 		SELECT HeaderName AS ExpenseHead,Id AS ExpenseId FROM WRBHBExpenseHeads
 		Where Status='Active'
 		
-		SELECT OpeningBalance AS ClosingBalance FROM WRBHBPettyCashHdr 
-		WHERE UserId=@UserId AND PropertyId=@Id AND CONVERT(date,Date,103)=CONVERT(date,@Str,103)
+		SELECT Balance AS ClosingBalance FROM WRBHBPettyCashStatusHdr 
+		WHERE UserId=@UserId AND PropertyId=@Id AND
+		Id=(SELECT MAX(Id) FROM WRBHBPettyCashStatusHdr WHERE UserId=@UserId AND PropertyId=@Id)
 		AND IsActive=1 AND IsDeleted=0
 		
 		SELECT Id AS HId FROM WRBHBPettyCashStatusHdr
@@ -162,6 +163,17 @@ BEGIN
 	IF @Action='IMAGEUPLOAD'
 	BEGIN
 		UPDATE WRBHBPettyCashStatus SET BillLogo=@Str WHERE Id=@Id
+		
+	END
+	IF @Action='SkipAction'
+	BEGIN
+		SELECT Balance AS ClosingBalance FROM WRBHBPettyCashStatusHdr 
+		WHERE UserId=@UserId AND PropertyId=@Id AND
+		Id=(SELECT MAX(Id) FROM WRBHBPettyCashStatusHdr WHERE UserId=@UserId AND PropertyId=@Id)
+		AND IsActive=1 AND IsDeleted=0
+		
+		SELECT HeaderName AS ExpenseHead,Id AS ExpenseId FROM WRBHBExpenseHeads
+		Where Status='Active'
 		
 	END
 END
