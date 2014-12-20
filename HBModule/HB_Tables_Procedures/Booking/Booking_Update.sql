@@ -49,18 +49,20 @@ CREATE PROCEDURE [dbo].[Sp_Booking_Update](
 @ExtraCCEmail NVARCHAR(1000),
 @HRPolicy BIT,
 @HRPolicyOverrideRemarks NVARCHAR(500),
-@PropertyRefNo NVARCHAR(100))
+@PropertyRefNo NVARCHAR(100),
+@PaymentFlag BIT)
 AS
 BEGIN   
  UPDATE WRBHBBooking SET CheckInDate = CONVERT(DATE,@CheckInDate,103),
  CheckOutDate = CONVERT(DATE,@CheckOutDate,103),
- ExpectedChkInTime = @ExpectedChkInTime,--BookingCode=@BookingCode,
- SpecialRequirements = @SpecialRequirements,Status = @Status,AMPM = @AMPM,
- BookedDt = GETDATE(),BookedUsrId = @UsrId,
- ExtraCCEmail = @ExtraCCEmail,EmailtoGuest = 1,
- PropertyRefNo = @PropertyRefNo
- WHERE Id=@Id;
- SELECT Id,RowId,BookingCode FROM WRBHBBooking WHERE Id=@Id;
- --select * from wrbhbbooking where Id=@Id;
+ ExpectedChkInTime = @ExpectedChkInTime,Status = @Status,AMPM = @AMPM,
+ SpecialRequirements = @SpecialRequirements,BookedDt = GETDATE(),
+ BookedUsrId = @UsrId,ExtraCCEmail = @ExtraCCEmail,EmailtoGuest = 1,
+ PropertyRefNo = @PropertyRefNo,PaymentFlag = @PaymentFlag WHERE Id = @Id;
+ SELECT Id,RowId,BookingCode FROM WRBHBBooking WHERE Id = @Id;
+ IF @PaymentFlag = 0
+  BEGIN
+   UPDATE WRBHBBooking SET Status = 'Payment' WHERE Id = @Id;
+  END
 END
 GO

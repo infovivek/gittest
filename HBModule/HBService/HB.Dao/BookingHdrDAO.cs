@@ -52,12 +52,14 @@ namespace HB.Dao
             Book.ExtraCCEmail = document.SelectSingleNode("HdrXml").Attributes["ExtraCCEmail"].Value;
             Book.HRPolicy = Convert.ToBoolean(document.SelectSingleNode("HdrXml").Attributes["HRPolicy"].Value);
             Book.HRPolicyOverrideRemarks = document.SelectSingleNode("HdrXml").Attributes["HRPolicyOverrideRemarks"].Value;
-            Book.PropertyRefNo = document.SelectSingleNode("HdrXml").Attributes["PropertyRefNo"].Value;
+            Book.PropertyRefNo = document.SelectSingleNode("HdrXml").Attributes["PropertyRefNo"].Value;            
             if (Book.Id != 0)
             {
                 command.CommandText = StoredProcedures.Booking_Update;
+                Book.PaymentFlag = Convert.ToBoolean(document.SelectSingleNode("HdrXml").Attributes["PaymentFlag"].Value);
                 command.Parameters.Add("@Id", SqlDbType.BigInt).Value = Book.Id;
                 command.Parameters.Add("@ExtraCCEmail", SqlDbType.NVarChar).Value = Book.ExtraCCEmail;
+                command.Parameters.Add("@PaymentFlag", SqlDbType.Bit).Value = Book.PaymentFlag;
                 UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
              "', SctId:" + user.SctId + ", Service : BookingHdrDAO : Update, " + ", ProcName:'" + StoredProcedures.Booking_Update; 
             }

@@ -34,5 +34,6 @@ namespace HB.Entity
         public bool HRPolicy { get; set; }
         public string HRPolicyOverrideRemarks { get; set; }
         public string PropertyRefNo { get; set; }
+        public bool PaymentFlag { get; set; }
     }
 }

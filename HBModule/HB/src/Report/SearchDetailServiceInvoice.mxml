@@ -35,7 +35,8 @@
 				Type="Internal";
 				useWeb("SearchDetailServiceInvoice","Report_CUSTOM",[GlobalXml,"Pageload",FromDate,ToDate,'',Type,0,0]);
 				
-				Str_ChkOutTAC   = "http://localhost:6236/DetailedServiceinvoice.aspx?"; //For Tac  
+				//Str_ChkOutTAC   = "http://localhost:6236/DetailedServiceinvoice.aspx?"; //For Tac
+				Str_ChkOutTAC="http://sstage.in/HBReport/DetailedServiceinvoice.aspx?";
 				Modes.selectedValue=0
 			}
 			private function Custom_WebSer_Result (Ds_Objects:Object):void
@@ -156,10 +157,12 @@
 				if(Modes.selectedValue==0)
 				{
 					Type="Internal";
+					btn_Search_clickHandler();
 				}
 				if(Modes.selectedValue==1)
 				{
 					Type="External";
+					btn_Search_clickHandler();
 				}
 			}
 			public var FltNm:String="";
@@ -180,7 +183,7 @@
 				if(txtInvoiceNumbr.text!="")
 				{
 					var searchString:String = txtInvoiceNumbr.text.toLowerCase();
-					var itemName:String = (item.InvoiceNumber as String).toLowerCase();
+					var itemName:String = (item.InVoiceNo as String).toLowerCase();
 					Itm=itemName.indexOf(searchString) > -1;
 				}				
 				return Itm;		
@@ -241,23 +244,51 @@
 			}
 			public var Ac2:ArrayCollection=new ArrayCollection();
 			public var ClientName:String="";
-			public var Property:String='';
+			public var Property:String='',GuestId:int=0,GuestName:String="";
 			public function TacSelect(Event):void
 			{ 
 				Ac2=Grd_SearchInvoice.dataProvider as  ArrayCollection;				
 				var Index:int=Grd_SearchInvoice.selectedIndex;
 				var Flag:Boolean=true;
 			 
-				if(Ac2[Index].selectRadio==1)
+//				if(Ac2[Index].selectRadio==1)
+//				{
+//					Ac2[Index].selectRadio=false;
+//				}
+//				else if(Ac2[Index].selectRadio==0)
+//				{
+//					Ac2[Index].selectRadio=true;
+//					ClientName=Ac2[Index].ClientName;
+//					Property=Ac2[Index].Property;
+//					GuestId=Ac2[Index].GuestId;
+//					GuestName=Ac2[Index].GuestName;
+//				} 
+				
+				var i:int=Ac2.length-1;
+				for( i ;i>=0;i--)
 				{
-					Ac2[Index].selectRadio=false;
-				}
-				else if(Ac2[Index].selectRadio==0)
+					if(Ac2[i].selectRadio ==0)
+					{  
+						Ac2[i].selectRadio=false;
+					} 	
+					if(Ac2[i].selectRadio==true)
+					{
+						Ac2[i].selectRadio=false;
+					}
+				}	
+				var Index:int=Grd_SearchInvoice.selectedIndex;
+				if(Ac2[Index].selectRadio==false)
 				{
 					Ac2[Index].selectRadio=true;
 					ClientName=Ac2[Index].ClientName;
 					Property=Ac2[Index].Property;
-				} 
+					GuestId=Ac2[Index].GuestId;
+					GuestName=Ac2[Index].GuestName;
+				}
+				if(Ac2[Index].selectRadio==0)
+				{
+					//	Ac[Index].Bankchecks=true;
+				}
 				
 				TotalBills(); 
 			}
@@ -283,8 +314,9 @@
 					} 
 			   //}
 				ChkoutId=ChkutIds; 
+				Print();
 			}
-			protected function Print(event:MouseEvent):void
+			protected function Print():void
 			{
 				if(Modes.selectedValue==0)
 				{
@@ -356,7 +388,7 @@
 				<s:Label x="273" y="45" height="29" text="Filter by &#xd;InvoiceNumber"/>
 				<s:Label   x="273" y="14" text="Status"/>
 				<s:TextInput id="txtInvoiceNumbr" x="376" y="44" width="109" height="25"
-							 change="filter('InvoiceNumber')" prompt="InvoiceNumber"/>
+							 change="filter('InVoiceNo')" prompt="InvoiceNumber"/>
 				<s:Label x="575" y="45" height="29" text="Filter by &#xd;Property"/>
 				<s:TextInput id="txtProperty" x="680" y="44" width="109" height="25"
 							 change="filterss('Property')" prompt="Property Name"/>
@@ -371,7 +403,7 @@
 					<s:RadioButton label="TAC" groupName="Modes"  value="2"
 								   id="TAC" buttonMode="true"  visible="false" />
 				</s:HGroup>
-				<WrbComp:Button_HB  x="963" y="31" Lable_val="Print Invoice" id="btn_Print"  click="Print(event)"> 
+				<WrbComp:Button_HB  x="963" y="31" Lable_val="Print Invoice" id="btn_Print"  click="Print()" visible="false"> 
 				</WrbComp:Button_HB>
 			</s:Group>
 		</s:HGroup>
@@ -386,7 +418,7 @@
 						<mx:itemRenderer >
 							<fx:Component>
 								<mx:HBox horizontalAlign="center" verticalAlign="middle"> 
-									<mx:CheckBox selected="{data.selectRadio}" change="outerDocument.TacSelect(event);"/>
+									<mx:RadioButton  selected="{data.selectRadio}" change="outerDocument.TacSelect(event);"/>
 								</mx:HBox> 	
 							</fx:Component>
 						</mx:itemRenderer>

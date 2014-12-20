@@ -10,7 +10,7 @@
 </head>
 <body>
     <form id="form1" runat="server">
-    <div style="margin-left: 440px">
+    <div style="margin-left: 560px">
      <asp:Button ID="Button1" runat="server" Text="PDF" onclick="Button1_Click" 
             style="font-weight: 700" />
     

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:WrbComp="WrbComp.*"
+			   width="100%" height="100%"
+			   creationComplete="application1_creationCompleteHandler(event)"
+			   pageTitle="Booking Confirmation"
+			   backgroundColor="#fbf9f9">
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "";
+			protected function application1_creationCompleteHandler(event:FlexEvent):void
+			{
+				Global_AC = funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";
+				FnHelp();
+				//Grd.dataProvider = null;
+			}
+			
+			protected function FnHelp():void
+			{
+				useWeb("BookingPayment","PaymentStatusBooking_CUSTOM",[GlobalXml,"PaymentStatusBooking","","",0,0]);
+			}
+			
+			private function Custom_WebSer_Result (Ds_Objects:Object):void				
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "PaymentStatusBooking_CUSTOM")
+				{
+					Grd.dataProvider = null;
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd.dataProvider = Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}									
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				{
+					alignAlert(Alert.show("Booking Confirmed Successfully.","Message !",Alert.OK, 
+						null, null, iconTickLarge, Alert.OK),10,"");
+					FnHelp();
+				}
+			}
+			
+			public function FnChkChange_Recommended(event:Event):void
+			{
+				var Ac:ArrayCollection = new ArrayCollection();				
+				Ac = Grd.dataProvider as ArrayCollection;				
+				var Index:int = Grd.selectedIndex;				
+				if(Ac[Index].Tick == 0)
+				{
+					Ac[Index].Tick = 1;
+				}
+				else
+				{
+					Ac[Index].Tick = 0;
+				}
+			}
+			
+			protected function button_hb1_clickHandler(event:MouseEvent):void
+			{
+				var Ac_Tmp:ArrayCollection = new ArrayCollection();
+				Ac_Tmp = Grd.dataProvider as ArrayCollection;
+				var Cnt:int=0;
+				for(var j:int = 0; j < Ac_Tmp.length; j++)
+				{
+					if(Ac_Tmp[j].Tick == 1)
+					{
+						Cnt = Cnt + 1;
+					}
+				}
+				//
+				if(Cnt == 0)
+				{
+					alignAlert(Alert.show("*  Payment Code is Required.","Requierd Field(s) !",Alert.OK,null,null,
+						iconErrLarge,Alert.OK),10,"");
+					return;
+				}
+				//
+				Ac_Tmp = new ArrayCollection();var len:int=0,i:int=0;
+				Ac_Tmp = Grd.dataProvider as ArrayCollection;
+				len = Ac_Tmp.length;
+				for(i=len; i > 0; i--)
+				{
+					if(Ac_Tmp[i-1].Tick == 0)
+					{
+						Ac_Tmp.removeItemAt(i-1);
+					}
+				}
+				//
+				var GuestPropertyXml:String="";
+				GuestPropertyXml += "<ROOT>";
+				GuestPropertyXml += ObjToXmlStr_Comm(Ac_Tmp,"GridXml")
+				GuestPropertyXml += "</ROOT>";
+				useWeb("BookingPayment","Save_CUSTOM",[GlobalXml,GuestPropertyXml]);
+			}
+			
+			protected function button_hb2_clickHandler(event:MouseEvent):void
+			{
+				FnHelp();
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
+	<s:VGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle" gap="25">
+			<mx:DataGrid id="Grd" x="157" y="3" width="600" height="450"
+						 editable="true" visible="true" focusEnabled="false">
+				<mx:columns>
+					<mx:DataGridColumn width="100" dataField="Tick" headerText="" editable="false">
+						<mx:itemRenderer>
+							<fx:Component>
+								<mx:HBox horizontalAlign="center" verticalAlign="middle">
+									<mx:CheckBox selected="{data.Tick}" enabled="{data.Chk}" 
+												 change="outerDocument.FnChkChange_Recommended(event);"/>
+								</mx:HBox>
+							</fx:Component>
+						</mx:itemRenderer>
+					</mx:DataGridColumn>				
+					<mx:DataGridColumn width="200" dataField="PaymentCode" headerText="Payment Code" editable="false"/>
+					<mx:DataGridColumn width="300" dataField="Remarks" editable="true"/>
+					<mx:DataGridColumn width="0" dataField="Id" visible="false"/>
+				</mx:columns>
+			</mx:DataGrid>
+		<s:HGroup>
+			<WrbComp:Button_HB _Label="Refresh" click="button_hb2_clickHandler(event)" buttonMode="true"/>
+			<WrbComp:Button_HB _Label="Confirm Booking" click="button_hb1_clickHandler(event)" width="120"
+							   buttonMode="true"/>
+		</s:HGroup>
+			
+	</s:VGroup>
+</s:Application>

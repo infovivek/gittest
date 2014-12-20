@@ -98,17 +98,11 @@
 			
 			protected function Btn_Show_clickHandler(event:MouseEvent):void
 			{
-				if(ClientId !=0)
-				{
+				
 				Dt_FromDt.setFocus();
 				useWeb("ApartmentBooking","BookingDtls_CUSTOM",[GlobalXml,'BookingDtls',
 					Dt_FromDt.text,Dt_ToDt.text,'','',0,0,ClientId,0,0,0,0]);
-				}
-				else
-				{
-					alignAlert(Alert.show("Client Details is Required.","Alert Message !",
-					Alert.OK,null,null,iconWarning,Alert.OK),10,"");
-				}
+				
 			}			
 
 			protected function Btn_ExporttoExcel_clickHandler(event:MouseEvent):void
@@ -126,28 +120,30 @@
 					sheet.setCell(0,4,'CRMName');
 					sheet.setCell(0,5,'Property Name');
 					sheet.setCell(0,6,'Property Category');
-					sheet.setCell(0,7,'City');					
-					sheet.setCell(0,8,'GuestName');
-					sheet.setCell(0,9,'CheckInDt');
-					sheet.setCell(0,10,'CheckOutDt');
-					sheet.setCell(0,11,'StayDays');
-					sheet.setCell(0,12,'Tariff / Day');
-					sheet.setCell(0,13,'Total Tariff');
-					sheet.setCell(0,14,'Booking Level');
-					sheet.setCell(0,15,'Tariff Payment Mode');					
-					sheet.setCell(0,16,'Status');
-					sheet.setCell(0,17,'UserName');
-					sheet.setCell(0,18,'BookingDate');
-					sheet.setCell(0,19,Grd_BookingDtls.columns[19].headerText);
-					sheet.setCell(0,20,Grd_BookingDtls.columns[20].headerText);
-					sheet.setCell(0,21,Grd_BookingDtls.columns[21].headerText);
-					sheet.setCell(0,22,Grd_BookingDtls.columns[22].headerText);
-					sheet.setCell(0,23,Grd_BookingDtls.columns[23].headerText);
-					sheet.setCell(0,24,Grd_BookingDtls.columns[24].headerText);
-					sheet.setCell(0,25,Grd_BookingDtls.columns[25].headerText);
-					sheet.setCell(0,26,Grd_BookingDtls.columns[26].headerText);
-					sheet.setCell(0,27,Grd_BookingDtls.columns[27].headerText);
-					sheet.setCell(0,28,Grd_BookingDtls.columns[28].headerText);
+					sheet.setCell(0,7,'City');		
+					sheet.setCell(0,8,'EmpCode');
+					sheet.setCell(0,9,'GuestName');
+					sheet.setCell(0,10,'CheckInDt');
+					sheet.setCell(0,11,'CheckOutDt');
+					sheet.setCell(0,12,'StayDays');
+					sheet.setCell(0,13,'Tariff / Day');
+					sheet.setCell(0,14,'MarkUp');
+					sheet.setCell(0,15,'Total Tariff');
+					sheet.setCell(0,16,'Booking Level');
+					sheet.setCell(0,17,'Tariff Payment Mode');					
+					sheet.setCell(0,18,'Status');
+					sheet.setCell(0,19,'UserName');
+					sheet.setCell(0,20,'BookingDate');
+					sheet.setCell(0,21,Grd_BookingDtls.columns[19].headerText);
+					sheet.setCell(0,22,Grd_BookingDtls.columns[20].headerText);
+					sheet.setCell(0,23,Grd_BookingDtls.columns[21].headerText);
+					sheet.setCell(0,24,Grd_BookingDtls.columns[22].headerText);
+					sheet.setCell(0,25,Grd_BookingDtls.columns[23].headerText);
+					sheet.setCell(0,26,Grd_BookingDtls.columns[24].headerText);
+					sheet.setCell(0,27,Grd_BookingDtls.columns[25].headerText);
+					sheet.setCell(0,28,Grd_BookingDtls.columns[26].headerText);
+					sheet.setCell(0,29,Grd_BookingDtls.columns[27].headerText);
+					sheet.setCell(0,30,Grd_BookingDtls.columns[28].headerText);
 					for(var i:int = 0; i < arrExportResult.length; i++)
 					{
 						sheet.setCell(i+1, 0, arrExportResult[i].SNo);
@@ -158,27 +154,29 @@
 						sheet.setCell(i+1, 5, arrExportResult[i].PropertyName);
 						sheet.setCell(i+1, 6, arrExportResult[i].PropertyCategory);
 						sheet.setCell(i+1, 7, arrExportResult[i].City);
-						sheet.setCell(i+1, 8, arrExportResult[i].GuestName);
-						sheet.setCell(i+1, 9, arrExportResult[i].CheckInDt);
-						sheet.setCell(i+1, 10, arrExportResult[i].CheckOutDt);
-						sheet.setCell(i+1, 11, arrExportResult[i].StayDays);
-						sheet.setCell(i+1, 12, arrExportResult[i].Tariff);
-						sheet.setCell(i+1, 13, arrExportResult[i].TotalTariff);
-						sheet.setCell(i+1, 14, arrExportResult[i].BookingLevel);
-						sheet.setCell(i+1, 15, arrExportResult[i].TariffPaymentMode);
-						sheet.setCell(i+1, 16, arrExportResult[i].Status);
-						sheet.setCell(i+1, 17, arrExportResult[i].UserName);
-						sheet.setCell(i+1, 18, arrExportResult[i].BookingDate);
-						sheet.setCell(i+1, 19, arrExportResult[i].Column1);
-						sheet.setCell(i+1, 20, arrExportResult[i].Column2);
-						sheet.setCell(i+1, 21, arrExportResult[i].Column3);
-						sheet.setCell(i+1, 22, arrExportResult[i].Column4);
-						sheet.setCell(i+1, 23, arrExportResult[i].Column5);
-						sheet.setCell(i+1, 24, arrExportResult[i].Column6);
-						sheet.setCell(i+1, 25, arrExportResult[i].Column7);
-						sheet.setCell(i+1, 26, arrExportResult[i].Column8);
-						sheet.setCell(i+1, 27, arrExportResult[i].Column9);
-						sheet.setCell(i+1, 28, arrExportResult[i].Column10);
+						sheet.setCell(i+1, 8, arrExportResult[i].EmpCode);
+						sheet.setCell(i+1, 9, arrExportResult[i].GuestName);
+						sheet.setCell(i+1, 10, arrExportResult[i].CheckInDt);
+						sheet.setCell(i+1, 11, arrExportResult[i].CheckOutDt);
+						sheet.setCell(i+1, 12, arrExportResult[i].StayDays);
+						sheet.setCell(i+1, 13, arrExportResult[i].Tariff);
+						sheet.setCell(i+1, 14, arrExportResult[i].MarkUp);
+						sheet.setCell(i+1, 15, arrExportResult[i].TotalTariff);
+						sheet.setCell(i+1, 16, arrExportResult[i].BookingLevel);
+						sheet.setCell(i+1, 17, arrExportResult[i].TariffPaymentMode);
+						sheet.setCell(i+1, 18, arrExportResult[i].Status);
+						sheet.setCell(i+1, 19, arrExportResult[i].UserName);
+						sheet.setCell(i+1, 20, arrExportResult[i].BookingDate);
+						sheet.setCell(i+1, 21, arrExportResult[i].Column1);
+						sheet.setCell(i+1, 22, arrExportResult[i].Column2);
+						sheet.setCell(i+1, 23, arrExportResult[i].Column3);
+						sheet.setCell(i+1, 24, arrExportResult[i].Column4);
+						sheet.setCell(i+1, 25, arrExportResult[i].Column5);
+						sheet.setCell(i+1, 26, arrExportResult[i].Column6);
+						sheet.setCell(i+1, 27, arrExportResult[i].Column7);
+						sheet.setCell(i+1, 28, arrExportResult[i].Column8);
+						sheet.setCell(i+1, 29, arrExportResult[i].Column9);
+						sheet.setCell(i+1, 30, arrExportResult[i].Column10);
 					}
 					xlsFile.sheets.addItem(sheet);      
 					var bytes:ByteArray = xlsFile.saveToByteArray();
@@ -261,41 +259,47 @@
 	<fx:Script source = "..\\Common\\Functions.as"/>
 	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
 	<s:VGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
-		<s:BorderContainer width="100%" height="100%" backgroundColor="#fbf9f9" borderVisible="false">
-			<mx:DataGrid id="Grd_BookingDtls" x="0" y="53" width="100%" height="100%"
+	 <s:BorderContainer width="100%" height="100%" backgroundColor="#fbf9f9" borderVisible="false">
+		<s:Scroller x="0" y="60" width="100%" height="450" id="Scr_Grid" visible="true">
+	    	<s:VGroup width="100%" height="100%">
+			<mx:DataGrid id="Grd_BookingDtls" x="0" y="53" width="2400" height="100%"
 						 horizontalScrollPolicy="off">
 				<mx:columns>
 					<mx:DataGridColumn width="50" dataField="SNo"/>
-					<mx:DataGridColumn dataField="BookingCode"/>					
-					<mx:DataGridColumn dataField="MasterClientName"/>
-					<mx:DataGridColumn dataField="ClientName"/>
-					<mx:DataGridColumn dataField="CRMName"/>
-					<mx:DataGridColumn dataField="PropertyName"/>
-					<mx:DataGridColumn dataField="PropertyCategory"/>
-					<mx:DataGridColumn dataField="City"/>
-					<mx:DataGridColumn dataField="GuestName"/>
-					<mx:DataGridColumn dataField="CheckInDt"/>
-					<mx:DataGridColumn dataField="CheckOutDt"/>
-					<mx:DataGridColumn dataField="StayDays"/>					
-					<mx:DataGridColumn dataField="Tariff"/>
-					<mx:DataGridColumn dataField="TotalTariff"/>
-					<mx:DataGridColumn dataField="BookingLevel"/>
-					<mx:DataGridColumn dataField="TariffPaymentMode"/>					
-					<mx:DataGridColumn dataField="Status"/>
-					<mx:DataGridColumn dataField="UserName"/>
-					<mx:DataGridColumn dataField="BookingDate"/>
-					<mx:DataGridColumn dataField="Column1"/>
-					<mx:DataGridColumn dataField="Column2"/>
-					<mx:DataGridColumn dataField="Column3"/>
-					<mx:DataGridColumn dataField="Column4"/>
-					<mx:DataGridColumn dataField="Column5"/>
-					<mx:DataGridColumn dataField="Column6"/>
-					<mx:DataGridColumn dataField="Column7"/>
-					<mx:DataGridColumn dataField="Column8"/>
-					<mx:DataGridColumn dataField="Column9"/>
-					<mx:DataGridColumn dataField="Column10"/>
+					<mx:DataGridColumn width="100" dataField="BookingCode"/>					
+					<mx:DataGridColumn width="115" dataField="MasterClientName"/>
+					<mx:DataGridColumn width="110" dataField="ClientName"/>
+					<mx:DataGridColumn width="75" dataField="CRMName"/>
+					<mx:DataGridColumn width="100" dataField="PropertyName"/>
+					<mx:DataGridColumn width="100" dataField="PropertyCategory"/>
+					<mx:DataGridColumn width="100" dataField="City"/>
+					<mx:DataGridColumn width="100" dataField="EmpCode"/>
+					<mx:DataGridColumn width="100" dataField="GuestName"/>
+					<mx:DataGridColumn width="50" dataField="CheckInDt"/>
+					<mx:DataGridColumn width="50" dataField="CheckOutDt"/>
+					<mx:DataGridColumn width="50" dataField="StayDays"/>					
+					<mx:DataGridColumn width="50" dataField="Tariff"/>
+					<mx:DataGridColumn width="50" dataField="MarkUp"/>
+					<mx:DataGridColumn width="100" dataField="TotalTariff"/>
+					<mx:DataGridColumn width="50" dataField="BookingLevel"/>
+					<mx:DataGridColumn width="100" dataField="TariffPaymentMode"/>					
+					<mx:DataGridColumn width="50" dataField="Status"/>
+					<mx:DataGridColumn width="100" dataField="UserName"/>
+					<mx:DataGridColumn width="50" dataField="BookingDate"/>
+					<mx:DataGridColumn width="100" dataField="Column1"/>
+					<mx:DataGridColumn width="100" dataField="Column2"/>
+					<mx:DataGridColumn width="100" dataField="Column3"/>
+					<mx:DataGridColumn width="100" dataField="Column4"/>
+					<mx:DataGridColumn width="100" dataField="Column5"/>
+					<mx:DataGridColumn width="50" dataField="Column6"/>
+					<mx:DataGridColumn width="50" dataField="Column7"/>
+					<mx:DataGridColumn width="50" dataField="Column8"/>
+					<mx:DataGridColumn width="50" dataField="Column9"/>
+					<mx:DataGridColumn width="50" dataField="Column10"/>
 				</mx:columns>
-			</mx:DataGrid>			
+			</mx:DataGrid>		
+			</s:VGroup>
+		</s:Scroller>
 			<WrbHelpComp:HelpText id="Hlp_ClientName" x="56" y="17.5" width="200" height="23"
 								  onselection="{FnOnselection_Client()}" pxSetColumnsWidth="198,0"/>
 			<mx:Label x="10" y="18.5" text="Client"/>

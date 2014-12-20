@@ -82,15 +82,31 @@ namespace HB.Dao
                 message.Bcc.Add(new System.Net.Mail.MailAddress("vivek@warblerit.com"));
                 message.Bcc.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
                 message.Subject = "Booking Confirmation - " + ds.Tables[2].Rows[0][2].ToString();
+                string typeofpty = ds.Tables[4].Rows[0][8].ToString();
                 string Imagelocation = "";
-                Imagelocation = ds.Tables[6].Rows[0][0].ToString();
+                string Imagealt = "";
+                if (typeofpty == "MGH")
+                {
+                    Imagelocation = ds.Tables[6].Rows[0][4].ToString();
+                    Imagealt = ds.Tables[6].Rows[0][5].ToString();
+                    if (Imagelocation == "")
+                    {
+                        Imagelocation = ds.Tables[6].Rows[0][0].ToString();
+                        Imagealt = ds.Tables[6].Rows[0][1].ToString();
+                    }
+                }
+                else
+                {
+                    Imagelocation = ds.Tables[6].Rows[0][0].ToString();
+                    Imagealt = ds.Tables[6].Rows[0][1].ToString();
+                }
                 string Imagebody =
                             " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #cccdcf solid 1px\">" +
                             "<tr><td>" +
                             "<table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\">" +
                             "<tr> " +
                             "<th align=\"left\" width=\"50%\" style=\"padding: 10px 0px 10px 10px;\">" +
-                            "<img src=" + Imagelocation + " width=\"200px\" height=\"52px\" alt=" + ds.Tables[6].Rows[0][1].ToString() + ">" +              //Image Name Change
+                            "<img src=" + Imagelocation + " width=\"200px\" height=\"52px\" alt=" + Imagealt + ">" +              //Image Name Change
                             "</th><th width=\"50%\"></th></tr></table>";
                 string SecondRow = " <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #ffffff solid 1px\">" +
                             " <tr><td style=\"width: 65%;\">" +
@@ -108,7 +124,6 @@ namespace HB.Dao
                             " </td></tr>" +
                             " </table>";
                 string GuestDetailsTable1 = "";
-                string typeofpty = ds.Tables[4].Rows[0][8].ToString();
                 // MGH,DdP,
                 if ((typeofpty == "MGH") || (typeofpty == "DdP"))
                 {
@@ -118,6 +133,7 @@ namespace HB.Dao
                         " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:120px;\"><p>Guest Name</p></th>" +
                         " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p>Check-In Date / Expected Time</p></th>" +
                         " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p>Check-Out Date</p></th>" +
+                        " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p>Room No</p></th>" +
                         " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p>Tariff / Room / Day</p></th>" +
                         " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p>Occupancy</p></th>" +
                         " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p>Payment Mode<br>for Tariff</p></th>" +
@@ -130,6 +146,7 @@ namespace HB.Dao
                         " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:120px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][0].ToString() + "</p></td>" +
                         " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][1].ToString() + "</p></td>" +
                         " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][2].ToString() + "</p></td>" +
+                        " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][7].ToString() + "</p></td>" +
                         " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p style=\"text-align:center;\">INR " + ds.Tables[0].Rows[i][3].ToString() + "/-</p></td>" +
                         " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][4].ToString() + "</p></td>" +
                         " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:80px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][5].ToString() + "</p></td>" +

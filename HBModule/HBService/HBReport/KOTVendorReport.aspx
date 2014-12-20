@@ -11,7 +11,9 @@
 <body>
    <form id="form1" runat="server">
     <div style="margin-left: 400px">
-     <asp:Button ID="Button1" runat="server" Text="Print" onclick="Button1_Click" />
+     &nbsp;&nbsp;&nbsp;&nbsp;
+     <asp:Button ID="Button1" runat="server" Text="PDF" onclick="Button1_Click" 
+            style="font-weight: 700" />
     </div>
     <div align="center">
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -19,7 +21,8 @@
             Width="100%" Font-Names="Verdana" Font-Size="8pt" 
             InteractiveDeviceInfos="(Collection)" WaitMessageFont-Names="Verdana" 
             WaitMessageFont-Size="14pt" SizeToReportContent="true"
-            PromptAreaCollapsed="true" AsyncRendering="false">
+            PromptAreaCollapsed="true" AsyncRendering="false" 
+            ShowExportControls="False">
         
          <LocalReport ReportPath="NewSnackKOTEntry.rdlc">
                 <DataSources>

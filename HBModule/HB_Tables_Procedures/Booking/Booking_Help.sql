@@ -1496,12 +1496,13 @@ IF @Action = 'Property'
   SingleTariff DECIMAL(27,2),DoubleTariff DECIMAL(27,2),
   SingleandMarkup DECIMAL(27,2),DoubleandMarkup DECIMAL(27,2),
   InclusionCode NVARCHAR(1000),Phone NVARCHAR(100),Email NVARCHAR(1000),
-  Area NVARCHAR(1000),StarRating NVARCHAR(100),MealPlan NVARCHAR(100));
+  Area NVARCHAR(1000),StarRating NVARCHAR(100),MealPlan NVARCHAR(100),
+  TripadvisorRating NVARCHAR(100));
   --
   INSERT INTO #API(HotalName,HotelId,RoomRatePlanCode,RoomRateTypeCode,
   RoomTypename,GetType,PropertyType,SingleTariff,DoubleTariff,
   SingleandMarkup,DoubleandMarkup,InclusionCode,Phone,Email,Area,
-  StarRating,MealPlan)
+  StarRating,MealPlan,TripadvisorRating)
   --
   SELECT SH.HotalName,T.HotelId,
   --T.HotelId AS HotalName,T.HotelId,
@@ -1514,7 +1515,8 @@ IF @Action = 'Property'
   ROUND(T.DoubleTariff+(T.DoubleTariff*@MMTPer)/100,0)
   ELSE T.DoubleTariff END AS DoubleandMarkup,
   ISNULL(I.InclusionCode,''),ISNULL(SH.Phone,''),ISNULL(SH.Email,''),
-  ISNULL(SH.Area,'') AS Area,SH.StarRating,I.MealPlan
+  ISNULL(SH.Area,'') AS Area,SH.StarRating,I.MealPlan,
+  ISNULL(CAST(SH.TRIPRating AS VARCHAR),'')
   FROM #APITariff T
   LEFT OUTER JOIN WRBHBStaticHotels SH WITH(NOLOCK)ON SH.HotalId=T.HotelId
   LEFT OUTER JOIN WRBHBAPIHotelHeader H WITH(NOLOCK)ON H.HotelId=T.HotelId
@@ -1623,15 +1625,15 @@ IF @Action = 'Property'
   Locality NVARCHAR(100),LocalityId BIGINT,MarkupId BIGINT,
   SingleandMarkup1 DECIMAL(27,2),DoubleandMarkup1 DECIMAL(27,2),
   TripleandMarkup1 DECIMAL(27,2),StarRating NVARCHAR(100),
-  TaxAdded NVARCHAR(100),RatePlanCode NVARCHAR(100),
-  RoomTypeCode NVARCHAR(100),MealPlan NVARCHAR(100));
+  TaxAdded NVARCHAR(100),RatePlanCode NVARCHAR(100),RoomTypeCode NVARCHAR(100),
+  MealPlan NVARCHAR(100),TripadvisorRating NVARCHAR(100));
   -- Property data
   INSERT INTO #FINAL(PropertyName,PropertyId,GetType,PropertyType,RoomType,
   SingleTariff,DoubleTariff,TripleTariff,SingleandMarkup,DoubleandMarkup,
   TripleandMarkup,TAC,Inclusions,DiscountModeRS,DiscountModePer,
   DiscountAllowed,Phone,Email,Locality,LocalityId,MarkupId,SingleandMarkup1,
   DoubleandMarkup1,TripleandMarkup1,StarRating,TaxAdded,RatePlanCode,
-  RoomTypeCode,MealPlan)
+  RoomTypeCode,MealPlan,TripadvisorRating)
   SELECT TP.PropertyName,TP.Id AS PropertyId,TP.GetType,TP.PropertyType,
   TP.RoomType,TP.SingleTariff,TP.DoubleTariff,TP.TripleTariff,
   TP.SingleandMarkup,TP.DoubleandMarkup,TP.TripleandMarkup,TP.TAC,
@@ -1650,7 +1652,8 @@ IF @Action = 'Property'
        WHEN T.PropertyType = '7 Star' THEN '7'
        WHEN T.PropertyType = '7+ Star' THEN '7+'
        WHEN T.PropertyType = 'Serviced Appartments' THEN 'S A'
-       ELSE T.PropertyType END AS StarRating,TP.TaxAdded,'','',''
+       ELSE T.PropertyType END AS StarRating,TP.TaxAdded,'','','',
+       ISNULL(CAST(P.TRIPRating AS VARCHAR),'')
   /*,CASE WHEN TP.PropertyType = 'ExP' AND TP.GetType = 'Contract' THEN '#242020'
    WHEN TP.PropertyType = 'ExP' AND TP.GetType = 'Property' THEN '#770E0E'
    WHEN TP.PropertyType = 'InP' AND TP.GetType = 'Contract' THEN '#27B25C'
@@ -1671,12 +1674,12 @@ IF @Action = 'Property'
     SingleandMarkup,DoubleandMarkup,TripleandMarkup,TAC,Inclusions,
     DiscountModeRS,DiscountModePer,DiscountAllowed,Phone,Email,Locality,
     LocalityId,MarkupId,SingleandMarkup1,DoubleandMarkup1,TripleandMarkup1,
-    StarRating,TaxAdded,MealPlan)    
+    StarRating,TaxAdded,MealPlan,TripadvisorRating)    
     SELECT HotalName,HotelId,GetType,PropertyType,RoomTypename,RoomRatePlanCode,
     RoomRateTypeCode,SingleTariff,DoubleTariff,0,SingleandMarkup,
     DoubleandMarkup,0,0,InclusionCode,0,0,0,Phone,Email,Area,0,@MMTId,
     SingleandMarkup AS SingleandMarkup1,DoubleandMarkup,0,StarRating,'',
-    MealPlan FROM #API
+    MealPlan,TripadvisorRating FROM #API
     WHERE SingleandMarkup BETWEEN @MinValue AND @MaxValue
     ORDER BY HotalName,SingleandMarkup ASC;
    END
@@ -1687,12 +1690,12 @@ IF @Action = 'Property'
     SingleandMarkup,DoubleandMarkup,TripleandMarkup,TAC,Inclusions,
     DiscountModeRS,DiscountModePer,DiscountAllowed,Phone,Email,Locality,
     LocalityId,MarkupId,SingleandMarkup1,DoubleandMarkup1,TripleandMarkup1,
-    StarRating,TaxAdded,MealPlan)    
+    StarRating,TaxAdded,MealPlan,TripadvisorRating)    
     SELECT HotalName,HotelId,GetType,PropertyType,RoomTypename,RoomRatePlanCode,
     RoomRateTypeCode,SingleTariff,DoubleTariff,0,SingleandMarkup,
     DoubleandMarkup,0,0,InclusionCode,0,0,0,Phone,Email,Area,0,@MMTId,
     SingleandMarkup AS SingleandMarkup1,DoubleandMarkup,0,StarRating,'',
-    MealPlan FROM #API
+    MealPlan,TripadvisorRating FROM #API
     ORDER BY HotalName,SingleandMarkup ASC;
    END
   --
@@ -1735,7 +1738,8 @@ IF @Action = 'Property'
   TAC,Inclusions,DiscountModeRS,DiscountModePer,DiscountAllowed,Phone,Email,
   Locality,LocalityId,MarkupId,SingleandMarkup1,DoubleandMarkup1,
   TripleandMarkup1,StarRating,TaxAdded,0 AS Tick,1 AS Chk,'' AS Markup,0 AS Id,
-  RatePlanCode,RoomTypeCode,@StateId AS APIHdrId,MealPlan 
+  RatePlanCode,RoomTypeCode,@StateId AS APIHdrId,MealPlan,
+  TripadvisorRating 
   FROM #FINAL; 
   --
   --SELECT COUNT(*) FROM #FINAL; 
@@ -1773,7 +1777,7 @@ IF @Action = 'Property'
   F.Phone,F.Email,F.Locality,F.LocalityId,F.MarkupId,F.SingleandMarkup1,
   F.DoubleandMarkup1,F.TripleandMarkup1,F.StarRating,F.TaxAdded,0 AS Tick,
   1 AS Chk,'' AS Markup,0 AS Id,F.RatePlanCode,F.RoomTypeCode,
-  @StateId AS APIHdrId,F.MealPlan  FROM #ZAXSQA Z
+  @StateId AS APIHdrId,F.MealPlan,F.TripadvisorRating  FROM #ZAXSQA Z
   LEFT OUTER JOIN #FINAL F WITH(NOLOCK) ON Z.PropertyId = F.PropertyId
   WHERE F.PropertyId = Z.PropertyId ORDER BY Z.PropertyCnt ASC;
   /*SELECT P.PropertyName,CAST(TP.Id AS NVARCHAR) AS PropertyId,

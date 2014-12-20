@@ -13,15 +13,17 @@ namespace HB.Dao
         public DataSet FnBookingPaymentEmail(string[] data,User user)
         {
             string UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
-             "', SctId:" + user.SctId + ", Service : BookingRoomMailDAO : Help, " + 
-             ", ProcName:'" + StoredProcedures.BookingDtls_Help;
+             "', SctId:" + user.SctId + ", Service : BookingPaymentEmailDAO : Help, " +
+             ", ProcName:'" + StoredProcedures.BookingConfirmation_Help;
             SqlCommand command = new SqlCommand();
             DataSet ds = new DataSet();
-            command.CommandText = StoredProcedures.BookingDtls_Help;
+            command.CommandText = StoredProcedures.BookingConfirmation_Help;
             command.CommandType = CommandType.StoredProcedure;
             command.Parameters.Add("@Action", SqlDbType.NVarChar).Value = "RoomBookingConfirmed";
-            command.Parameters.Add("@Str", SqlDbType.NVarChar).Value = "";
-            command.Parameters.Add("@Id", SqlDbType.BigInt).Value = Convert.ToInt32(data[2].ToString());
+            command.Parameters.Add("@Str1", SqlDbType.NVarChar).Value = "";
+            command.Parameters.Add("@Str2", SqlDbType.NVarChar).Value = "";
+            command.Parameters.Add("@Id1", SqlDbType.BigInt).Value = Convert.ToInt32(data[4].ToString());
+            command.Parameters.Add("@Id2", SqlDbType.BigInt).Value = 0;
             ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
             System.Net.Mail.MailMessage message = new System.Net.Mail.MailMessage();            
             if (ds.Tables[10].Rows.Count > 0)
@@ -32,60 +34,11 @@ namespace HB.Dao
             {
                 message.From = new System.Net.Mail.MailAddress("stay@staysimplyfied.com", "", System.Text.Encoding.UTF8);
             }
-            message.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
-            message.Subject = "Test Booking - " + ds.Tables[2].Rows[0][2].ToString();
-            /*message.To.Add(new System.Net.Mail.MailAddress("booking_confirmation@staysimplyfied.com"));
-            if (ds.Tables[4].Rows[0][0].ToString() == "0")
-            {
-                if (ds.Tables[8].Rows[0][0].ToString() != "")
-                {
-                    message.To.Add(new System.Net.Mail.MailAddress(ds.Tables[8].Rows[0][0].ToString()));
-                }
-            }
-            else
-            {
-                for (int i = 0; i < ds.Tables[5].Rows.Count; i++)
-                {
-                    if (ds.Tables[5].Rows[i][0].ToString() != "")
-                    {
-                        message.To.Add(new System.Net.Mail.MailAddress(ds.Tables[5].Rows[i][0].ToString()));
-                    }
-                }
-                if (ds.Tables[8].Rows[0][0].ToString() != "")
-                {
-                    message.CC.Add(new System.Net.Mail.MailAddress(ds.Tables[8].Rows[0][0].ToString()));
-                }
-            }
-            //Extra CC
-            for (int i = 0; i < ds.Tables[7].Rows.Count; i++)
-            {
-                if (ds.Tables[7].Rows[i][0].ToString() != "")
-                {
-                    message.CC.Add(new System.Net.Mail.MailAddress(ds.Tables[7].Rows[i][0].ToString()));
-                }
-            }
-            // Extra CC email from Front end
-            if (ds.Tables[8].Rows[0][2].ToString() != "")
-            {
-                string ExtraCC = ds.Tables[8].Rows[0][2].ToString();
-                var ExtraCCEmail = ExtraCC.Split(',');
-                int cnt = ExtraCCEmail.Length;
-                for (int i = 0; i < cnt; i++)
-                {
-                    if (ExtraCCEmail[i].ToString() != "")
-                    {
-                        message.CC.Add(new System.Net.Mail.MailAddress(ExtraCCEmail[i].ToString()));
-                    }
-                }
-            }
-            if (ds.Tables[2].Rows[0][4].ToString() != "")
-            {
-                message.Bcc.Add(new System.Net.Mail.MailAddress(ds.Tables[2].Rows[0][4].ToString()));
-            }
-            message.Bcc.Add(new System.Net.Mail.MailAddress("bookingbcc@staysimplyfied.com"));
+            message.To.Add(new System.Net.Mail.MailAddress("stay@staysimplyfied.com"));
+            message.CC.Add(new System.Net.Mail.MailAddress("shiv@hummingbirdindia.com"));
+            message.Subject = "Booking Payment - " + ds.Tables[2].Rows[0][2].ToString();
             message.Bcc.Add(new System.Net.Mail.MailAddress("vivek@warblerit.com"));
-            message.Bcc.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
-            message.Subject = "Booking Confirmation - " + ds.Tables[2].Rows[0][2].ToString();*/            
+            message.Bcc.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));                        
             string Imagelocation = "";
             Imagelocation = ds.Tables[6].Rows[0][0].ToString();
             string Imagebody =
@@ -98,10 +51,10 @@ namespace HB.Dao
                         "</th><th width=\"50%\"></th></tr></table>";            
             string SecondRow = " <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #ffffff solid 1px\">" +
                         " <tr><td style=\"width: 65%;\">" +
-                        " <p style=\"font-weight:bold; color:orange;\">Booking confirmation details" +
-                        " <span style=\"color:#000; background-color:#ffcc00; padding:5px;\">Booking # : " + ds.Tables[2].Rows[0][2].ToString() + " </span></p>" + //Reservation
-                        " <p style=\"margin:0px;\">Booked by : <span><a href =" + ds.Tables[2].Rows[0][3].ToString() + "></span></p><br>" + //Date
-                        " <p style=\"margin:0px;\">Reservation Date : <span>" + ds.Tables[2].Rows[0][7].ToString() + "</span></p><br>" + //Date
+                        " <p style=\"font-weight:bold; color:orange;\">Booking Payment details" +
+                        " <span style=\"color:#000; background-color:#ffcc00; padding:5px;\">Payment Code # : " + ds.Tables[2].Rows[0][2].ToString() + " </span></p>" + //Reservation
+                        " <p style=\"margin:0px;\">Booked by :<span>" + ds.Tables[2].Rows[0][3].ToString() + "</span></p><br>" + //Date
+                        " <p style=\"margin:0px;\"><a href='http://www.google.com'>Reservation Date : <span>" + ds.Tables[2].Rows[0][7].ToString() + "</span></a></p><br>" + //Date
                         " <p style=\"margin:0px;\">Company Name : <span>" + ds.Tables[2].Rows[0][1].ToString() + "</span></p>" + //company name
                         " </td>" +
                         " <td>" +
@@ -320,7 +273,7 @@ namespace HB.Dao
             catch (Exception ex)
             {
                 CreateLogFiles log = new CreateLogFiles();
-                log.ErrorLog(ex.Message + " --> Room Level Booking Confirmation Mail --> " + message.Subject);
+                log.ErrorLog(ex.Message + " --> Room Level Booking Payment Mail --> " + message.Subject);
             }
             return ds;
         }

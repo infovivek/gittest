@@ -51,6 +51,8 @@ namespace HB.Dao
                 PtoG.Column8 = document.SelectNodes("//GridXml")[i].Attributes["Column8"].Value;
                 PtoG.Column9 = document.SelectNodes("//GridXml")[i].Attributes["Column9"].Value;
                 PtoG.Column10 = document.SelectNodes("//GridXml")[i].Attributes["Column10"].Value;
+                PtoG.BTCFilePath = document.SelectNodes("//GridXml")[i].Attributes["BTCFilePath"].Value;
+                PtoG.RoomCaptured = Convert.ToInt32(document.SelectNodes("//GridXml")[i].Attributes["RoomCaptured"].Value);
                 command = new SqlCommand();
                 if (PtoG.Id != 0)
                 {
@@ -95,6 +97,8 @@ namespace HB.Dao
                 command.Parameters.Add("@Column8", SqlDbType.NVarChar).Value = PtoG.Column8;
                 command.Parameters.Add("@Column9", SqlDbType.NVarChar).Value = PtoG.Column9;
                 command.Parameters.Add("@Column10", SqlDbType.NVarChar).Value = PtoG.Column10;
+                command.Parameters.Add("@BTCFilePath", SqlDbType.NVarChar).Value = PtoG.BTCFilePath;
+                command.Parameters.Add("@RoomCaptured", SqlDbType.Int).Value = PtoG.RoomCaptured;
                 ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
             }
             if (n == 0)

@@ -174,35 +174,7 @@ namespace HB.Dao
                                     }
                                 }
                             }
-                        }
-                        /*int n1 = document.SelectNodes("//RoomTariff").Count;
-                        int n2 = 0;
-                        int RoomDiscountn1 = 0;
-                        int RoomDiscountn2 = 0;
-                        decimal RoomNo1amount = 0;
-                        decimal RoomNo2amount = 0;
-                        decimal RoomDiscountamount1 = 0;
-                        decimal RoomDiscountamount2 = 0;
-                        decimal Taxesamount1 = 0;
-                        decimal Taxesamount2 = 0;
-                        for (int d = 0; d < n1; d++)
-                        {
-                            string Tariffgroup = document.SelectNodes("//Tariff")[d].Attributes["group"].Value;
-                            if (Tariffgroup == "RoomRate")
-                            {
-                                if (n2 == 0)
-                                {
-                                    RoomNo1amount = 
-                                        Convert.ToDecimal(document.SelectNodes("//Tariff")[d].Attributes["amount"].Value);
-                                    n2 += 1;
-                                }
-                                else
-                                {
-                                    RoomNo2amount = 
-                                        Convert.ToDecimal(document.SelectNodes("//Tariff")[d].Attributes["amount"].Value);
-                                }
-                            }
-                        }*/
+                        }                        
                         command = new SqlCommand();
                         ds = new DataSet();
                         command.CommandText = StoredProcedures.API_Help;
@@ -241,10 +213,10 @@ namespace HB.Dao
                             command.Parameters.Add("@Str2", SqlDbType.NVarChar).Value = api.RatePlanCode;
                             command.Parameters.Add("@Str3", SqlDbType.NVarChar).Value = api.RoomTypecode;
                             command.Parameters.Add("@Str4", SqlDbType.NVarChar).Value = api.HeaderId;
-                            command.Parameters.Add("@Id1", SqlDbType.BigInt).Value = RoomRate1;
-                            command.Parameters.Add("@Id2", SqlDbType.BigInt).Value = RoomRate2;
-                            command.Parameters.Add("@Id3", SqlDbType.BigInt).Value = Taxes1;
-                            command.Parameters.Add("@Id4", SqlDbType.BigInt).Value = Taxes2;
+                            command.Parameters.Add("@Id1", SqlDbType.BigInt).Value = Math.Round(RoomRate1 / CntDys);
+                            command.Parameters.Add("@Id2", SqlDbType.BigInt).Value = Math.Round(RoomRate2 / CntDys);
+                            command.Parameters.Add("@Id3", SqlDbType.BigInt).Value = Math.Round(Taxes1 / CntDys);
+                            command.Parameters.Add("@Id4", SqlDbType.BigInt).Value = Math.Round(Taxes2 / CntDys);
                             ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
                             if ((RoomDiscount1 != 0) || (RoomDiscount2 != 0))
                             {
@@ -257,8 +229,8 @@ namespace HB.Dao
                                 command.Parameters.Add("@Str2", SqlDbType.NVarChar).Value = api.RatePlanCode;
                                 command.Parameters.Add("@Str3", SqlDbType.NVarChar).Value = api.RoomTypecode;
                                 command.Parameters.Add("@Str4", SqlDbType.NVarChar).Value = api.HeaderId;
-                                command.Parameters.Add("@Id1", SqlDbType.BigInt).Value = RoomDiscount1;
-                                command.Parameters.Add("@Id2", SqlDbType.BigInt).Value = RoomDiscount2;
+                                command.Parameters.Add("@Id1", SqlDbType.BigInt).Value = Math.Round(RoomDiscount1 / CntDys);
+                                command.Parameters.Add("@Id2", SqlDbType.BigInt).Value = Math.Round(RoomDiscount2 / CntDys);
                                 command.Parameters.Add("@Id3", SqlDbType.BigInt).Value = 0;
                                 command.Parameters.Add("@Id4", SqlDbType.BigInt).Value = 0;
                                 ds = new WrbErpConnection().ExecuteDataSet(command, UserData);

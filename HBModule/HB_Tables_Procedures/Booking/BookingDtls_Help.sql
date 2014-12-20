@@ -193,9 +193,9 @@ IF @Action = 'RoomBookingConfirmed'
   CREATE TABLE #FFF(BookingId BIGINT,RoomId BIGINT,ChkInDt NVARCHAR(100),
   ChkOutDt NVARCHAR(100),Tariff DECIMAL(27,2),Occupancy NVARCHAR(100),
   TariffPaymentMode NVARCHAR(100),ServicePaymentMode NVARCHAR(100),
-  RoomCaptured INT);
+  RoomCaptured INT,RoomNo NVARCHAR(100));
   INSERT INTO #FFF(BookingId,RoomId,ChkInDt,ChkOutDt,Tariff,Occupancy,
-  TariffPaymentMode,ServicePaymentMode,RoomCaptured)
+  TariffPaymentMode,ServicePaymentMode,RoomCaptured,RoomNo)
   SELECT BG.BookingId,BG.RoomId,
   REPLACE(CONVERT(VARCHAR(11),BG.ChkInDt, 106), ' ', '-') +' / '+ 
   LEFT(BG.ExpectChkInTime, 5)+' '+BG.AMPM,
@@ -206,24 +206,26 @@ IF @Action = 'RoomBookingConfirmed'
        ELSE BG.TariffPaymentMode END AS TariffPaymentMode,
   CASE WHEN BG.ServicePaymentMode='Direct' THEN 'Direct<br>(Cash/Card)'
        WHEN BG.ServicePaymentMode = 'Bill to Client' THEN 'Bill to '+@ClientName1
-       ELSE BG.ServicePaymentMode END AS ServicePaymentMode,BG.RoomCaptured 
+       ELSE BG.ServicePaymentMode END AS ServicePaymentMode,BG.RoomCaptured,
+       BG.RoomType 
   FROM WRBHBBookingPropertyAssingedGuest BG
   WHERE BG.IsActive=1 AND BG.IsDeleted=0 AND BG.BookingId=@Id AND
   ISNULL(BG.RoomShiftingFlag,0) = 0 
   GROUP BY BG.BookingId,BG.RoomId,BG.ChkInDt,BG.ExpectChkInTime,BG.AMPM,
   BG.ChkOutDt,BG.Tariff,BG.Occupancy,BG.TariffPaymentMode,
-  BG.ServicePaymentMode,BG.RoomCaptured;
+  BG.ServicePaymentMode,BG.RoomCaptured,BG.RoomType;
   CREATE TABLE #QAZ(Name NVARCHAR(100),ChkInDt NVARCHAR(100),
   ChkOutDt NVARCHAR(100),Tariff DECIMAL(27,2),Occupancy NVARCHAR(100),
-  TariffPaymentMode NVARCHAR(100),ServicePaymentMode NVARCHAR(100));
+  TariffPaymentMode NVARCHAR(100),ServicePaymentMode NVARCHAR(100),
+  RoomNo NVARCHAR(100));
   INSERT INTO #QAZ(Name,ChkInDt,ChkOutDt,Tariff,Occupancy,TariffPaymentMode,
-  ServicePaymentMode)
+  ServicePaymentMode,RoomNo)
   SELECT STUFF((SELECT ', '+BA.Title+'. '+BA.FirstName+'  '+BA.LastName
   FROM WRBHBBookingPropertyAssingedGuest BA 
   WHERE BA.BookingId=B.BookingId AND BA.RoomCaptured=B.RoomCaptured AND
   ISNULL(BA.RoomShiftingFlag,0) = 0
   FOR XML PATH('')),1,1,'') AS Name,B.ChkInDt,B.ChkOutDt,
-  B.Tariff,B.Occupancy,B.TariffPaymentMode,B.ServicePaymentMode
+  B.Tariff,B.Occupancy,B.TariffPaymentMode,B.ServicePaymentMode,B.RoomNo
   FROM #FFF AS B;
   --
   DECLARE @Taxes NVARCHAR(100),@TypeofPtyy NVARCHAR(100),@TXADED NVARCHAR(100);
@@ -237,13 +239,13 @@ IF @Action = 'RoomBookingConfirmed'
    BEGIN    
     SELECT Name,ChkInDt,ChkOutDt,
     CAST(Tariff - ROUND(Tariff*19/100,0) AS DECIMAL(27,2)),Occupancy,
-    TariffPaymentMode,ServicePaymentMode FROM #QAZ;
+    TariffPaymentMode,ServicePaymentMode,RoomNo FROM #QAZ;
     SET @Taxes = 'Taxes as applicable';
    END
   ELSE
    BEGIN    
     SELECT Name,ChkInDt,ChkOutDt,Tariff,Occupancy,TariffPaymentMode,
-    ServicePaymentMode FROM #QAZ;
+    ServicePaymentMode,RoomNo FROM #QAZ;
     --
     SELECT TOP 1 @TypeofPtyy = PropertyType,@TXADED = ISNULL(TaxAdded,'T') 
     FROM WRBHBBookingProperty WHERE Id IN (
@@ -318,7 +320,7 @@ IF @Action = 'RoomBookingConfirmed'
    END
   --
   -- dataset table 3
-  SELECT BP.PropertyName, ISNULL(U.UserName,'')UserName,
+  SELECT BP.PropertyName, ISNULL(U.FirstName,'') as UserName,
   ISNULL(U.Email,'')Email,ISNULL(U.MobileNumber,'')PhoneNumber,
   ISNULL(@MailStr,'') --ISNULL(BP.Email,'') AS Email 
   FROM dbo.WRBHBProperty BP
@@ -507,17 +509,23 @@ IF @Action = 'RoomBookingConfirmed'
   -- dataset table 5
   SELECT EmailId FROM WRBHBBookingGuestDetails WHERE BookingId=@Id;
   -- Dataset Table 6
+  declare @cltlogoMGH nvarchar(100),@cltaltMGH nvarchar(100);
+  SELECT @cltlogoMGH = ISNULL(ClientLogo,''),@cltaltMGH = ISNULL(ClientName,'') 
+  FROM WRBHBClientManagement 
+  WHERE Id = (SELECT ClientId FROM WRBHBBooking WHERE Id = @Id);    
   IF EXISTS (SELECT NULL FROM WRBHBClientwisePricingModel 
   WHERE IsActive=1 AND IsDeleted=0 AND 
   ClientId=(SELECT ClientId FROM WRBHBBooking WHERE Id=@Id))
    BEGIN
-    SELECT ClientLogo,ClientName,@CLogo,@CLogoAlt FROM WRBHBClientManagement 
+    SELECT ClientLogo,ClientName,@CLogo,@CLogoAlt,@cltlogoMGH,@cltaltMGH 
+    FROM WRBHBClientManagement 
     WHERE IsActive=1 AND IsDeleted=0 AND
     Id=(SELECT ClientId FROM WRBHBBooking WHERE Id=@Id);    
    END
   ELSE
    BEGIN
-    SELECT Logo,@CLogoAlt,@CLogo,@CLogoAlt FROM WRBHBCompanyMaster 
+    SELECT Logo,@CLogoAlt,@CLogo,@CLogoAlt,@cltlogoMGH,@cltaltMGH 
+    FROM WRBHBCompanyMaster 
     WHERE IsActive=1 AND IsDeleted=0;
    END
   -- dataset table 7
@@ -595,15 +603,15 @@ IF @Action = 'RoomBookingConfirmed'
   CREATE TABLE #PropertyMailBTCChecking(Name NVARCHAR(100),
   ChkInDt NVARCHAR(100),ChkOutDt NVARCHAR(100),Tariff NVARCHAR(100),
   Occupancy NVARCHAR(100),TariffPaymentMode NVARCHAR(100),
-  ServicePaymentMode NVARCHAR(100));
+  ServicePaymentMode NVARCHAR(100),RoomNo NVARCHAR(100));
   INSERT INTO #PropertyMailBTCChecking(Name,ChkInDt,ChkOutDt,Tariff,
-  Occupancy,TariffPaymentMode,ServicePaymentMode)
+  Occupancy,TariffPaymentMode,ServicePaymentMode,RoomNo)
   SELECT STUFF((SELECT ', '+BA.Title+'. '+BA.FirstName+'  '+BA.LastName
   FROM WRBHBBookingPropertyAssingedGuest BA 
   WHERE BA.BookingId=B.BookingId AND BA.RoomCaptured=B.RoomCaptured AND
   ISNULL(BA.RoomShiftingFlag,0) = 0
   FOR XML PATH('')),1,1,'') AS Name,B.ChkInDt,B.ChkOutDt,
-  B.Tariff,B.Occupancy,B.TariffPaymentMode,B.ServicePaymentMode
+  B.Tariff,B.Occupancy,B.TariffPaymentMode,B.ServicePaymentMode,B.RoomNo
   FROM #FFF AS B;
   IF EXISTS(SELECT NULL FROM WRBHBBookingProperty BP
   LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
@@ -624,13 +632,13 @@ IF @Action = 'RoomBookingConfirmed'
          WHEN Occupancy = 'Double' THEN @Double
          WHEN Occupancy = 'Triple' THEN @Triple
          ELSE Tariff END,Occupancy,TariffPaymentMode,
-    ServicePaymentMode,'BTC',@AgreedTariff,@BelowTACcontent 
+    ServicePaymentMode,'BTC',@AgreedTariff,@BelowTACcontent,RoomNo
     FROM #PropertyMailBTCChecking;
    END
   ELSE
    BEGIN
     SELECT Name,ChkInDt,ChkOutDt,Tariff,Occupancy,TariffPaymentMode,
-    ServicePaymentMode,'NOTBTC',@AgreedTariff,@BelowTACcontent 
+    ServicePaymentMode,'NOTBTC',@AgreedTariff,@BelowTACcontent,RoomNo 
     FROM #PropertyMailBTCChecking;
    END
   -- Dataset Table 11 eND  
@@ -679,7 +687,7 @@ IF @Action = 'BedBookingConfirmed'
   LEFT OUTER JOIN WRBHBUser U  WITH(NOLOCK) ON  U.Id=B.CreatedBy
   WHERE B.Id=@Id;
   -- Dataset Table 3
-  SELECT BP.PropertyName,ISNULL(U.UserName,''),ISNULL(U.Email,''),
+  SELECT BP.PropertyName,ISNULL(U.FirstName,''),ISNULL(U.Email,''),
   ISNULL(U.MobileNumber,''),ISNULL(BP.Email,'')
   FROM dbo.WRBHBProperty BP
   LEFT OUTER JOIN WRBHBPropertyUsers PU WITH(NOLOCK) ON BP.Id=PU.PropertyId
@@ -832,7 +840,7 @@ IF @Action = 'ApartmentBookingConfirmed'
   LEFT OUTER JOIN WRBHBUser U  WITH(NOLOCK) ON  U.Id=B.CreatedBy
   WHERE B.Id=@Id;
   -- Dataset Table 3
-  SELECT BP.PropertyName,ISNULL(U.UserName,''),ISNULL(U.Email,''),
+  SELECT BP.PropertyName,ISNULL(U.FirstName,''),ISNULL(U.Email,''),
   ISNULL(U.MobileNumber,''),ISNULL(BP.Email,'')
   FROM dbo.WRBHBProperty BP
   LEFT OUTER JOIN WRBHBPropertyUsers PU WITH(NOLOCK) ON BP.Id=PU.PropertyId
@@ -1010,7 +1018,7 @@ IF @Action = 'MMTBookingConfirmed'
   (SELECT TOP 1 CAST(ISNULL(BookingPropertyId,'') AS VARCHAR) 
   FROM WRBHBApartmentBookingPropertyAssingedGuest
   WHERE BookingId = @Id GROUP BY BookingPropertyId);
-  SELECT B.BookingCode,U.UserName,
+  SELECT B.BookingCode,U.FirstName,
   REPLACE(CONVERT(VARCHAR(11), B.CreatedDate, 106), ' ', '-') AS ReservationDt,
   C.ClientName,U.Email,B.SpecialRequirements,
   CAST(B.EmailtoGuest AS INT),B.ClientBookerEmail,
@@ -1081,7 +1089,7 @@ IF @Action = 'BookingConfirmedSMS'
       LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest PAG WITH(NOLOCK)ON
       PAG.BookingId = B.Id AND PAG.BookingPropertyTableId = BP.Id AND
       PAG.BookingPropertyId = BP.PropertyId AND PAG.GuestId = BG.GuestId
-      WHERE B.Id = @Id AND BG.MobileNo != '';
+      WHERE B.Id = @Id AND BG.MobileNo != '' AND PAG.GuestId != 0;
      END
     ELSE
      BEGIN
@@ -1100,7 +1108,7 @@ IF @Action = 'BookingConfirmedSMS'
         LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest PAG WITH(NOLOCK)ON
         PAG.BookingId = B.Id AND PAG.BookingPropertyTableId = BP.Id AND
         PAG.BookingPropertyId = BP.PropertyId AND PAG.GuestId = BG.GuestId
-        WHERE B.Id = @Id AND BG.MobileNo != '';
+        WHERE B.Id = @Id AND BG.MobileNo != '' AND PAG.GuestId != 0;
        END
       IF @TypeofPtyy = 'ExP' AND @TXADED = 'T'
        BEGIN
@@ -1113,7 +1121,7 @@ IF @Action = 'BookingConfirmedSMS'
         LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest PAG WITH(NOLOCK)ON
         PAG.BookingId = B.Id AND PAG.BookingPropertyTableId = BP.Id AND
         PAG.BookingPropertyId = BP.PropertyId AND PAG.GuestId = BG.GuestId
-        WHERE B.Id = @Id AND BG.MobileNo != '';
+        WHERE B.Id = @Id AND BG.MobileNo != '' AND PAG.GuestId != 0;
        END
       IF @TypeofPtyy = 'MMT'
        BEGIN
@@ -1126,7 +1134,7 @@ IF @Action = 'BookingConfirmedSMS'
         LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest PAG WITH(NOLOCK)ON
         PAG.BookingId = B.Id AND PAG.BookingPropertyTableId = BP.Id AND
         PAG.BookingPropertyId = BP.PropertyId AND PAG.GuestId = BG.GuestId
-        WHERE B.Id = @Id AND BG.MobileNo != '';
+        WHERE B.Id = @Id AND BG.MobileNo != '' AND PAG.GuestId != 0;
        END
       IF @TypeofPtyy = 'InP' OR @TypeofPtyy = 'MGH' OR @TypeofPtyy = 'CPP' OR
       @TypeofPtyy = 'DdP'
@@ -1140,7 +1148,7 @@ IF @Action = 'BookingConfirmedSMS'
         LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest PAG WITH(NOLOCK)ON
         PAG.BookingId = B.Id AND PAG.BookingPropertyTableId = BP.Id AND
         PAG.BookingPropertyId = BP.PropertyId AND PAG.GuestId = BG.GuestId
-        WHERE B.Id = @Id AND BG.MobileNo != '';
+        WHERE B.Id = @Id AND BG.MobileNo != '' AND PAG.GuestId != 0;
        END
      END
     /*SELECT 'http://api.mVaayoo.com/mvaayooapi/MessageCompose?user=shiv@hummingbirdindia.com:HBsmsconf&senderID=HBCONF&receipientno='+ BG.MobileNo +'&msgtxt=Thank you for booking with HummingBird. Your booking no. '+CAST(B.BookingCode AS VARCHAR)+' at '+BP.PropertyName+','+B.CityName+' @ Rs.'+CAST(PAG.Tariff AS VARCHAR)+'/day. MOP for Stay is '+ PAG.TariffPaymentMode +'&state=4',
@@ -1167,7 +1175,7 @@ IF @Action = 'BookingConfirmedSMS'
     LEFT OUTER JOIN WRBHBApartmentBookingPropertyAssingedGuest PAG WITH(NOLOCK)ON
     PAG.BookingId = B.Id AND PAG.BookingPropertyTableId = BP.Id AND
     PAG.BookingPropertyId = BP.PropertyId AND PAG.GuestId = BG.GuestId
-    WHERE B.Id = @Id AND BG.MobileNo != '';
+    WHERE B.Id = @Id AND BG.MobileNo != '' AND PAG.GuestId != 0;
    END
   IF @BookingLevel = 'Bed'
    BEGIN
@@ -1181,7 +1189,7 @@ IF @Action = 'BookingConfirmedSMS'
     LEFT OUTER JOIN WRBHBBedBookingPropertyAssingedGuest PAG WITH(NOLOCK)ON
     PAG.BookingId = B.Id AND PAG.BookingPropertyTableId = BP.Id AND
     PAG.BookingPropertyId = BP.PropertyId AND PAG.GuestId = BG.GuestId
-    WHERE B.Id = @Id AND BG.MobileNo != '';
+    WHERE B.Id = @Id AND BG.MobileNo != '' AND PAG.GuestId != 0;
    END
   --http://api.mVaayoo.com/mvaayooapi/MessageCompose?user=shiv@hummingbirdindia.com:HBsmsconf&senderID=HBCONF&receipientno=" + MobileNo + "&msgtxt=" + MsgTxt + "&state=4";
  END

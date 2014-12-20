@@ -95,7 +95,7 @@ BEGIN
    WHERE IsActive=1 AND IsDeleted=0 AND CltmgntId=@ClientId AND
    Email=@ClientBookerEmail AND ContactType='Booker')
     BEGIN
-     SELECT @ClientBookerId=Id,@ClientBookerName=FirstName,
+     SELECT TOP 1 @ClientBookerId=Id,@ClientBookerName=FirstName,
      @ClientBookerEmail=Email FROM WRBHBClientManagementAddNewClient
      WHERE IsActive=1 AND IsDeleted=0 AND CltmgntId=@ClientId AND
      Email=@ClientBookerEmail AND ContactType='Booker';
@@ -111,25 +111,7 @@ BEGIN
      @ContactTypeId);
      SET @ClientBookerId=@@IDENTITY;
     END
-  END 
--- New Booker Insert End
-  /*DECLARE @ChkInTime NVARCHAR(100);
-  IF CAST(SUBSTRING(@ExpectedChkInTime,0,3) AS INT) > 12 AND
-  CAST(SUBSTRING(@ExpectedChkInTime,0,3) AS INT) < 22
-   BEGIN    
-    SET @ChkInTime=@ExpectedChkInTime;
-    SET @ExpectedChkInTime='';
-    SET @ExpectedChkInTime = '0'+cast(cast(substring(@ChkInTime,0,3) as int)-12
-     as varchar)+SUBSTRING(@ChkInTime,3,6);
-   END
-  IF CAST(SUBSTRING(@ExpectedChkInTime,0,3) AS INT) > 21 AND
-  CAST(SUBSTRING(@ExpectedChkInTime,0,3) AS INT) < 25
-   BEGIN
-    SET @ChkInTime=@ExpectedChkInTime;
-    SET @ExpectedChkInTime='';
-    SET @ExpectedChkInTime = cast(cast(substring(@ChkInTime,0,3) as int)-12
-     as varchar)+SUBSTRING(@ChkInTime,3,6);
-   END*/
+  END
 -- Booking Insert Begin
  INSERT INTO WRBHBBooking(ClientId,GradeId,StateId,CityId,ClientName,
  CheckInDate,ExpectedChkInTime,CheckOutDate,GradeName,StateName,CityName,

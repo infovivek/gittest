@@ -11,16 +11,16 @@ Created On 	: (25/04/2014)  >
 Section  	: Room Level Booking Property Assinged Guest
 Purpose  	: Room Level Booking Property Assinged Guest
 Remarks  	: <Remarks if any>                        
-Reviewed By	: <Reviewed By (Leave it blank)>
-*/            
+Reviewed By	: <Reviewed By (Leave it blank)>*/
 /*******************************************************************************************************
-*				AMENDMENT BLOCK
+				AMENDMENT BLOCK
 ********************************************************************************************************
 'Name			Date			Signature			Description of Changes
 ********************************************************************************************************	
 Sakthi          12 Jun 2014     Property ChkIn Type & Time,ChkOut Type & Time,Grace Time,Rack Tariff Added
-*******************************************************************************************************
-*/
+Sakthi          11 Dec 2014     BTC file path added
+Sakthi          17 Dec 2014     Payment Flag Check for Booking Code Generation
+********************************************************************************************************/
 CREATE PROCEDURE [dbo].[SP_BookingPropertyAssingedGuest_Insert](
 @BookingId BIGINT,
 @EmpCode NVARCHAR(100),
@@ -56,124 +56,150 @@ BEGIN
    UPDATE WRBHBSSPCodeGeneration SET IsActive=0,IsDeleted=0,
    ModifiedBy=@UsrId,ModifiedDate=GETDATE() WHERE Id=@SSPId;
   END 
- DECLARE @APIHdrId BIGINT=0;
+ DECLARE @APIHdrId BIGINT = 0;
  -- PropertyType & GetType
  DECLARE @PropertyType NVARCHAR(100),@GetType NVARCHAR(100);
- SELECT TOP 1 @PropertyType=PropertyType,@GetType=GetType,@APIHdrId=ISNULL(APIHdrId,0) 
- FROM WRBHBBookingProperty WHERE Id=@BookingPropertyTableId;
- /*IF @APIHdrId != 0
-  BEGIN
-   DELETE FROM WRBHBAPIHeader WHERE Id=@APIHdrId;
-   DELETE FROM WRBHBAPIHotelHeader WHERE HeaderId=@APIHdrId;
-   DELETE FROM WRBHBAPIRateMealPlanInclusionDtls WHERE HeaderId=@APIHdrId;
-   DELETE FROM WRBHBAPIRoomRateDtls WHERE HeaderId=@APIHdrId;
-   DELETE FROM WRBHBAPIRoomTypeDtls WHERE HeaderId=@APIHdrId;
-   DELETE FROM WRBHBAPITariffDtls WHERE HeaderId=@APIHdrId;
-  END*/
+ SELECT TOP 1 @PropertyType = PropertyType,@GetType = GetType,
+ @APIHdrId = ISNULL(APIHdrId,0) 
+ FROM WRBHBBookingProperty WHERE Id = @BookingPropertyTableId;
  -- CheckIn Date & CheckOut Date Data Get From Booking Table
  DECLARE @ChkInDt DATE,@ChkOutDt DATE,@ExpectChkInTime NVARCHAR(100);
  DECLARE @AMPM NVARCHAR(100);
- SELECT TOP 1 @ChkInDt=CheckInDate,@ChkOutDt=CheckOutDate,
- @ExpectChkInTime=ExpectedChkInTime,@AMPM=AMPM FROM WRBHBBooking 
- WHERE Id=@BookingId;
+ SELECT TOP 1 @ChkInDt = CheckInDate,@ChkOutDt = CheckOutDate,
+ @ExpectChkInTime = ExpectedChkInTime,@AMPM = AMPM FROM WRBHBBooking 
+ WHERE Id = @BookingId;
  -- CheckOut Type & Rack Tariff  
  DECLARE @PtyChkInTime INT,@PtyChkInAMPM NVARCHAR(100);
  DECLARE @PtyChkOutTime INT,@PtyChkOutAMPM NVARCHAR(100);
  DECLARE @PtyGraceTime INT;
  --
- SELECT TOP 1 @PtyChkInTime=ISNULL(CheckIn,0),@PtyChkInAMPM=ISNULL(CheckInType,''),
- @PtyChkOutTime=ISNULL(CheckOut,0),@PtyChkOutAMPM=ISNULL(CheckOutType,''),
- @PtyGraceTime=ISNULL(GraceTime,0)
- FROM WRBHBProperty WHERE Id=@BookingPropertyId;
+ SELECT TOP 1 @PtyChkInTime = ISNULL(CheckIn,0),
+ @PtyChkInAMPM = ISNULL(CheckInType,''),
+ @PtyChkOutTime = ISNULL(CheckOut,0),@PtyChkOutAMPM = ISNULL(CheckOutType,''),
+ @PtyGraceTime = ISNULL(GraceTime,0)
+ FROM WRBHBProperty WHERE Id = @BookingPropertyId;
  -- Rack Tariff
- DECLARE @ApartmentId BIGINT=0, @RackSingle DECIMAL(27,2)=0;
- DECLARE @RackDouble DECIMAL(27,2)=0,@RackTriple DECIMAL(27,2)=0;
- DECLARE @LTRack DECIMAL(27,2)=0,@STRack DECIMAL(27,2)=0;
- DECLARE @LTAgreed DECIMAL(27,2)=0,@STAgreed DECIMAL(27,2)=0;
+ DECLARE @ApartmentId BIGINT = 0, @RackSingle DECIMAL(27,2) = 0;
+ DECLARE @RackDouble DECIMAL(27,2) = 0,@RackTriple DECIMAL(27,2) = 0;
+ DECLARE @LTRack DECIMAL(27,2) = 0,@STRack DECIMAL(27,2) = 0;
+ DECLARE @LTAgreed DECIMAL(27,2) = 0,@STAgreed DECIMAL(27,2) = 0;
  --
  IF @RoomId != 0 AND @PropertyType = 'InP'
   BEGIN
-   SELECT TOP 1 @RackSingle=ISNULL(RackTariff,0),
-   @RackDouble=ISNULL(DoubleOccupancyTariff,0),
-   @RackTriple=0,@ApartmentId=ApartmentId
-   FROM WRBHBPropertyRooms WHERE Id=@RoomId;
+   SELECT TOP 1 @RackSingle = ISNULL(RackTariff,0),
+   @RackDouble = ISNULL(DoubleOccupancyTariff,0),
+   @RackTriple = 0,@ApartmentId = ApartmentId
+   FROM WRBHBPropertyRooms WHERE Id = @RoomId;
   END
  IF @PropertyType = 'ExP' AND @GetType = 'Property'
   BEGIN
-   SELECT TOP 1 @RackSingle=ISNULL(R.Single,0),@RackDouble=ISNULL(R.RDouble,0),
-   @RackTriple=ISNULL(R.Triple,0),@LTAgreed=ISNULL(R.LTAgreed,0),
-   @LTRack=ISNULL(R.LTRack,0),@STAgreed=ISNULL(R.STAgreed,0),
-   @STRack=ISNULL(R.STRack,0)
+   SELECT TOP 1 @RackSingle = ISNULL(R.Single,0),@RackDouble = ISNULL(R.RDouble,0),
+   @RackTriple = ISNULL(R.Triple,0),@LTAgreed = ISNULL(R.LTAgreed,0),
+   @LTRack = ISNULL(R.LTRack,0),@STAgreed = ISNULL(R.STAgreed,0),
+   @STRack = ISNULL(R.STRack,0)
    FROM WRBHBPropertyAgreements A
    LEFT OUTER JOIN WRBHBPropertyAgreementsRoomCharges R
-   WITH(NOLOCK)ON R.AgreementId=A.Id
-   WHERE A.PropertyId=@BookingPropertyId AND R.RoomType=@RoomType;   
+   WITH(NOLOCK)ON R.AgreementId = A.Id
+   WHERE A.PropertyId = @BookingPropertyId AND R.RoomType = @RoomType;   
+  END
+ IF @PropertyType = 'MGH' OR @PropertyType = 'DdP'
+  BEGIN
+   SELECT @RoomType = RoomNo FROM WRBHBPropertyRooms
+   WHERE PropertyId = @BookingPropertyId AND Id = @RoomId;
   END
  --
- IF EXISTS (SELECT NULL FROM WRBHBBooking 
- WHERE Id=@BookingId AND PONo='')
+ DECLARE @Cnt INT = 0,@BookingCode BIGINT = 0,@PaymentFlag BIT = 0;
+ DECLARE @PaymentCode BIGINT = 0,@PaymentCodeCnt BIGINT = 0;
+ SELECT @BookingCode = ISNULL(BookingCode,0),@PaymentFlag = ISNULL(PaymentFlag,0),
+ @PaymentCode = ISNULL(PaymentCode,0) 
+ FROM WRBHBBooking WHERE Id = @BookingId;
+ --
+ IF @PaymentFlag = 1
+ BEGIN
+ IF EXISTS (SELECT NULL FROM WRBHBBooking WHERE Id = @BookingId AND PONo='')
   BEGIN
-   DECLARE @PONo NVARCHAR(100)='',@PONoId BIGINT=0;
+   DECLARE @PONo NVARCHAR(100) = '',@PONoId BIGINT = 0;
    IF EXISTS (SELECT NULL FROM WRBHBBookingProperty 
-   WHERE Id=@BookingPropertyTableId AND PropertyId=@BookingPropertyId AND
-   BookingId=@BookingId AND PropertyType='ExP')
+   WHERE Id = @BookingPropertyTableId AND PropertyId = @BookingPropertyId AND
+   BookingId = @BookingId AND PropertyType = 'ExP')
     BEGIN
-     IF EXISTS (SELECT NULL FROM WRBHBBooking WHERE PONoId !=0)
+     IF EXISTS (SELECT NULL FROM WRBHBBooking WHERE PONoId != 0)
       BEGIN
-       SET @PONoId=(SELECT TOP 1 PONoId+1 FROM WRBHBBooking WHERE PONoId !=0
+       SET @PONoId = (SELECT TOP 1 PONoId+1 FROM WRBHBBooking WHERE PONoId != 0
        ORDER BY PONoId DESC);
       END
      ELSE
       BEGIN
-       SET @PONoId=1;
+       SET @PONoId = 1;
       END
      IF EXISTS (SELECT NULL FROM WRBHBBooking 
-     WHERE MONTH(CreatedDate)=MONTH(GETDATE()) AND
-     YEAR(CreatedDate)=YEAR(GETDATE()) AND PONo!='')
+     WHERE MONTH(CreatedDate) = MONTH(GETDATE()) AND
+     YEAR(CreatedDate) = YEAR(GETDATE()) AND PONo != '')
       BEGIN
-       SELECT TOP 1 @PONo=SUBSTRING(PONo,0,13)+'0'+
-       CAST(CAST(SUBSTRING(PONo,13,LEN(PONo)) AS INT)+1 AS VARCHAR)
+       SELECT TOP 1 @PONo = SUBSTRING(PONo,0,13) + '0' +
+       CAST(CAST(SUBSTRING(PONo,13,LEN(PONo)) AS INT) + 1 AS VARCHAR)
        FROM WRBHBBooking
-       WHERE MONTH(CreatedDate)=MONTH(GETDATE()) AND
-       YEAR(CreatedDate)=YEAR(GETDATE()) AND PONo!='' 
+       WHERE MONTH(CreatedDate) = MONTH(GETDATE()) AND
+       YEAR(CreatedDate) = YEAR(GETDATE()) AND PONo != '' 
        ORDER BY PONoId DESC;
       END
      ELSE
       BEGIN
-       SELECT @PONo='HBE/'+CAST(YEAR(GETDATE()) AS VARCHAR)+'-'+
-       CAST(SUBSTRING(CONVERT(VARCHAR,GETDATE(),103),4,2) AS VARCHAR)+'/01';
+       SELECT @PONo = 'HBE/' + CAST(YEAR(GETDATE()) AS VARCHAR) + '-' +
+       CAST(SUBSTRING(CONVERT(VARCHAR,GETDATE(),103),4,2) AS VARCHAR) + '/01';
       END
-     UPDATE WRBHBBooking SET PONo=@PONo,PONoId=@PONoId
-     WHERE Id=@BookingId;
+     UPDATE WRBHBBooking SET PONo = @PONo,PONoId = @PONoId WHERE Id = @BookingId;
     END   
   END
+ END
  -- TITLE
- DECLARE @Title NVARCHAR(100)='';
- SET @Title=(SELECT TOP 1 ISNULL(Title,'') FROM WRBHBBookingGuestDetails 
- WHERE GuestId=@GuestId AND BookingId=@BookingId);
+ DECLARE @Title NVARCHAR(100) = '';
+ SET @Title = (SELECT TOP 1 ISNULL(Title,'Mr') FROM WRBHBBookingGuestDetails 
+ WHERE GuestId = @GuestId AND BookingId = @BookingId);
  --
- IF @PropertyType != 'MMT'
+ IF @PaymentFlag = 1
   BEGIN
-   DECLARE @Cnt INT=0,@BookingCode BIGINT=0;
-   SET @BookingCode=(SELECT ISNULL(BookingCode,0) FROM WRBHBBooking 
-   WHERE Id=@BookingId);
-   IF @BookingCode = 0
+   IF @PropertyType != 'MMT'
     BEGIN
-     SET @Cnt=(SELECT COUNT(*) FROM WRBHBBooking WHERE IsDeleted=0 AND 
-     IsActive=1 AND BookingCode != 0);
-     IF @Cnt = 0 
-      BEGIN 
-       SET @BookingCode=1; 
+     IF @BookingCode = 0
+      BEGIN
+       SET @Cnt = (SELECT COUNT(*) FROM WRBHBBooking WHERE IsDeleted = 0 AND
+       IsActive = 1 AND BookingCode != 0);
+       IF @Cnt = 0
+        BEGIN
+         SET @BookingCode = 1;
+        END
+       ELSE
+        BEGIN
+         SET @BookingCode = (SELECT TOP 1 BookingCode + 1 FROM WRBHBBooking
+         WHERE IsDeleted = 0 AND IsActive = 1 AND BookingCode != 0
+         ORDER BY BookingCode DESC);
+        END
+      UPDATE WRBHBBooking SET BookingCode = @BookingCode WHERE Id = @BookingId;
+      END
+    END
+  END
+ IF @PaymentFlag = 0
+  BEGIN
+   DECLARE @PaymentCode1 BIGINT = 0;
+   IF @PaymentCode = 0
+    BEGIN
+     SET @PaymentCodeCnt = (SELECT COUNT(*) FROM WRBHBBooking 
+     WHERE IsDeleted = 0 AND IsActive = 1 AND PaymentCode != 0);
+     IF @PaymentCodeCnt = 0
+      BEGIN
+       SET @PaymentCode1 = 1;
       END
      ELSE
       BEGIN
-       SET @BookingCode=(SELECT TOP 1 BookingCode+1 FROM WRBHBBooking 
-       WHERE IsDeleted=0 AND IsActive=1 AND BookingCode != 0 
-       ORDER BY BookingCode DESC);
+       SELECT TOP 1 @PaymentCode1 = PaymentCode + 1 FROM WRBHBBooking
+       WHERE IsDeleted = 0 AND IsActive = 1 AND PaymentCode != 0 
+       ORDER BY PaymentCode DESC;
       END
-     UPDATE WRBHBBooking SET BookingCode=@BookingCode WHERE Id=@BookingId;
+    UPDATE WRBHBBooking SET PaymentCode = @PaymentCode1 WHERE Id = @BookingId;
     END
   END
+ --
  -- Insert
  INSERT INTO WRBHBBookingPropertyAssingedGuest(BookingId,EmpCode,
  FirstName,LastName,GuestId,Occupancy,RoomType,Tariff,RoomId,
@@ -184,8 +210,7 @@ BEGIN
  PtyChkInTime,PtyChkInAMPM,PtyChkOutTime,PtyChkOutAMPM,PtyGraceTime,
  LTonAgreed,LTonRack,STonAgreed,STonRack,CurrentStatus,RoomShiftingFlag,
  Title,Column1,Column2,Column3,Column4,Column5,Column6,Column7,Column8,
- Column9,Column10,BTCFilePath/*,ChkColumn1,ChkColumn2,ChkColumn3,ChkColumn4,ChkColumn5,
- ChkColumn6,ChkColumn7,ChkColumn8,ChkColumn9,ChkColumn10*/)
+ Column9,Column10,BTCFilePath)
  VALUES(@BookingId,@EmpCode,@FirstName,@LastName,@GuestId,@Occupancy,
  @RoomType,@Tariff,@RoomId,@BookingPropertyId,@BookingPropertyTableId,
  @UsrId,GETDATE(),@UsrId,GETDATE(),1,0,NEWID(),@SSPId,
@@ -194,10 +219,9 @@ BEGIN
  @RackTriple,@PtyChkInTime,@PtyChkInAMPM,@PtyChkOutTime,@PtyChkOutAMPM,
  @PtyGraceTime,@LTAgreed,@LTRack,@STAgreed,@STRack,'Booked',0,@Title,
  @Column1,@Column2,@Column3,@Column4,@Column5,@Column6,@Column7,@Column8,
- @Column9,@Column10,@BTCFilePath/*,@ChkColumn1,@ChkColumn2,@ChkColumn3,@ChkColumn4,
- @ChkColumn5,@ChkColumn6,@ChkColumn7,@ChkColumn8,@ChkColumn9,@ChkColumn10*/);
- SELECT Id,RowId FROM WRBHBBookingPropertyAssingedGuest 
- WHERE Id=@@IDENTITY;
+ @Column9,@Column10,@BTCFilePath);
+ SELECT Id,RowId,@PaymentCode1 FROM WRBHBBookingPropertyAssingedGuest 
+ WHERE Id = @@IDENTITY;
  DECLARE @CltId BIGINT = (SELECT ClientId FROM WRBHBBooking 
  WHERE Id = @BookingId);
  DECLARE @UpdateChkColumn1 BIT = 0,@UpdateChkColumn2 BIT = 0;

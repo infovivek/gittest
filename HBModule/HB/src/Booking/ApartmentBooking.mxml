@@ -63,6 +63,7 @@
 				var cxz:ArrayCollection=new ArrayCollection();
 				Grd_Property.dataProvider=cxz;
 				Tcl_Time.setTime=new Date("11/11/11,12:00:00");
+				Txt_Result.visible = false;
 				//
 				FnHelp_PageLoad();FnHelp_Title();
 				//
@@ -197,6 +198,7 @@
 				{
 					if(Save_Method == "Tab2_to_Tab3")
 					{
+						Pnl_Upload.visible = false;
 						Id=Ds_Objects.result.Tables.Table.Rows[0].Id;
 						Bdr_Tab2.visible=false;Bdr_Tab3.visible=true;
 						Btn_Tab1.setStyle("backgroundColor","#c2c2c2");
@@ -730,20 +732,33 @@
 									//Chk_C10.selected = false;
 								}
 							}
-							Hlp_Column1.text = Hlp_Client.text=Ds_Objects.result.Tables.Table11.Rows[0].Column1;
-							Hlp_Column2.text = Hlp_Client.text=Ds_Objects.result.Tables.Table11.Rows[0].Column2;
-							Hlp_Column3.text = Hlp_Client.text=Ds_Objects.result.Tables.Table11.Rows[0].Column3;
-							Hlp_Column4.text = Hlp_Client.text=Ds_Objects.result.Tables.Table11.Rows[0].Column4;
-							Hlp_Column5.text = Hlp_Client.text=Ds_Objects.result.Tables.Table11.Rows[0].Column5;
-							Hlp_Column6.text = Hlp_Client.text=Ds_Objects.result.Tables.Table11.Rows[0].Column6;
-							Hlp_Column7.text = Hlp_Client.text=Ds_Objects.result.Tables.Table11.Rows[0].Column7;
-							Hlp_Column8.text = Hlp_Client.text=Ds_Objects.result.Tables.Table11.Rows[0].Column8;
-							Hlp_Column9.text = Hlp_Client.text=Ds_Objects.result.Tables.Table11.Rows[0].Column9;
-							Hlp_Column10.text = Hlp_Client.text=Ds_Objects.result.Tables.Table11.Rows[0].Column10;
+							Hlp_Column1.text = Ds_Objects.result.Tables.Table11.Rows[0].Column1;
+							Hlp_Column2.text = Ds_Objects.result.Tables.Table11.Rows[0].Column2;
+							Hlp_Column3.text = Ds_Objects.result.Tables.Table11.Rows[0].Column3;
+							Hlp_Column4.text = Ds_Objects.result.Tables.Table11.Rows[0].Column4;
+							Hlp_Column5.text = Ds_Objects.result.Tables.Table11.Rows[0].Column5;
+							Hlp_Column6.text = Ds_Objects.result.Tables.Table11.Rows[0].Column6;
+							Hlp_Column7.text = Ds_Objects.result.Tables.Table11.Rows[0].Column7;
+							Hlp_Column8.text = Ds_Objects.result.Tables.Table11.Rows[0].Column8;
+							Hlp_Column9.text = Ds_Objects.result.Tables.Table11.Rows[0].Column9;
+							Hlp_Column10.text = Ds_Objects.result.Tables.Table11.Rows[0].Column10;
 						}
 						Pnl_CustomFields.visible = true;
 						Btn_BackTab3.enabled = false;
 						Btn_Backed.enabled = false;
+					}
+					else
+					{
+						Hlp_Column1.fnClear();
+						Hlp_Column2.fnClear();
+						Hlp_Column3.fnClear();
+						Hlp_Column4.fnClear();
+						Hlp_Column5.fnClear();
+						Hlp_Column6.fnClear();
+						Hlp_Column7.fnClear();
+						Hlp_Column8.fnClear();
+						Hlp_Column9.fnClear();
+						Hlp_Column10.fnClear();
 					}
 				}
 			}		
@@ -1588,6 +1603,10 @@
 				{
 					Err = Err + "*  Property is Required.\n";
 				}
+				if(ApartmentId == 0)
+				{
+					Err = Err + "*  Apartment Type is Required.\n";
+				}
 				if(TariffPaymentMode == "")
 				{
 					Err = Err + "*  Tariff Payment Mode is Required.\n";
@@ -1649,7 +1668,17 @@
 						}
 					}
 				}*/
-				Grd_GuestTab3.dataProvider=null;
+				Txt_Result.text = "";
+				Txt_FileName.text = "";
+				if(TariffPaymentMode == "Bill to Company (BTC)")
+				{
+					FnBrowse()
+				}
+				if(TariffPaymentMode != "Bill to Company (BTC)")
+				{
+					FnAddtoCart();
+				}
+				/*Grd_GuestTab3.dataProvider=null;
 				var Len:int=Ac.length;
 				for(var j:int = 0; j < Len; j++)
 				{
@@ -1672,7 +1701,199 @@
 					}					
 				}
 				Grd_GuestTab3.dataProvider=Tmp.source;
-				Grd_PropertyAssignedGuest.dataProvider=Ac1;				
+				Grd_PropertyAssignedGuest.dataProvider=Ac1;*/				
+			}
+			
+			public var uploadURL:URLRequest = new URLRequest();
+			public var Img_Str:String = "";
+			private var fileRef:FileReference = new FileReference();
+			public function FnBrowse():void
+			{
+				Pnl_Upload.visible = true;
+				Load();
+			}
+			
+			public function Load():void
+			{
+				Btn_Browse.addEventListener(MouseEvent.CLICK, browseFiles);
+				fileRef = new FileReference();
+				fileRef.addEventListener(Event.SELECT, selectHandler);
+			}
+			
+			public function FnUpload():void
+			{
+				if(Txt_FileName.text == "")
+				{
+					Pnl_Upload.visible = false;
+					FnAddtoCart();
+				}
+				else
+				{
+					uploadFiles();
+				}
+			}
+			
+			private var fileTypes:Array = new Array();
+			//private var imageTypes:FileFilter = new FileFilter("Images ( *.jpg; *.jpeg; *.gif; *.png; *.eml)" ,"*.jpg; *.jpeg; *.gif; *.png; *.eml");			
+			//private var documentTypes:FileFilter = new FileFilter("Documents (*.pdf), (*.doc),(*.docx), (*.rtf), (*.txt)",("*.pdf; *.doc; *.rtf, *.txt"));
+			private function browseFiles(event:Event):void
+			{
+				fileTypes = new Array();
+				//fileTypes.push(imageTypes);
+				//fileTypes.push(documentTypes);
+				fileRef.browse(fileTypes);
+			}
+			
+			private function selectHandler(event:Event):void
+			{
+				Txt_FileName.text = "";
+				Txt_FileName.text = event.currentTarget.name.toString();				
+			}
+			
+			private function uploadFiles():void
+			{
+				cursorManager.setBusyCursor();
+				//Id = 123;BedId = 123;
+				uploadURL = new URLRequest();
+				uploadURL.url = "http://sstage.in/BookingBTCUpload.php?id="+String(Id)+","+String(ApartmentId)+"&pid=0&imgcount=0&imgformat="+Txt_FileName.text;
+				//uploadURL.url = "http://sstage.in/BookingBTCUpload.php?id=Sakthi&pid=0&imgcount=0&imgformat="+ImageFormat;
+				uploadURL.method = "POST";
+				uploadURL.contentType = "multipart/form-data";
+				fileRef.addEventListener(Event.COMPLETE, completeHandler);
+				fileRef.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA,dataHandler);
+				fileRef.addEventListener(SecurityErrorEvent.SECURITY_ERROR,securityErrorHandler);
+				fileRef.addEventListener(HTTPStatusEvent.HTTP_STATUS,httpStatusHandler);
+				fileRef.addEventListener(IOErrorEvent.IO_ERROR,ioErrorHandler);
+				fileRef.upload(uploadURL);
+				Pnl_Upload.visible = false;
+			}	
+			
+			private function completeHandler(event:Event):void
+			{
+				//Alert.show("File Uploaded successfully");	
+				cursorManager.removeBusyCursor();
+			}
+			private function dataHandler(event:DataEvent):void
+			{
+				cursorManager.removeBusyCursor();
+				Txt_Result.text = "";
+				Txt_Result.text = event.data.toString();
+				var Err_Image:String = Txt_Result.text;
+				var Fatal:String = Err_Image.substr(8,18);
+				if(Fatal == "b>Fatal error</b>:")
+				{
+					alignAlert(Alert.show("There was an error uploading the file, please try again!","Alert Message !",
+						Alert.OK, null, null,iconWarning, Alert.OK),10,"");
+				}
+				else
+				{
+					if(Txt_Result.text == "There was an error uploading the file, please try again!")
+					{
+						alignAlert(Alert.show(Txt_Result.text,"Alert Message !",Alert.OK, null, null,iconWarning, Alert.OK),10,"");
+					}
+					else
+					{
+						FnAddtoCart();
+					}
+				}								
+			}
+			
+			private function securityErrorHandler(event:SecurityErrorEvent):void
+			{
+				cursorManager.removeBusyCursor();
+				//mx.controls.Alert.show(String(event),"Security Error",0);
+				alignAlert(Alert.show("There was an error uploading the file, please try again!","Alert Message !",
+					Alert.OK, null, null,iconWarning, Alert.OK),10,"");
+			}
+			
+			private function httpStatusHandler(event:HTTPStatusEvent):void
+			{
+				cursorManager.removeBusyCursor();
+				alignAlert(Alert.show("There was an error uploading the file, please try again!","Alert Message !",
+					Alert.OK, null, null,iconWarning, Alert.OK),10,"");
+				//if (event.status != 200)
+				//{
+				//	mx.controls.Alert.show(String(event),"Error",0);
+				//}
+			}
+			
+			private function ioErrorHandler(event:IOErrorEvent):void
+			{
+				cursorManager.removeBusyCursor();
+				alignAlert(Alert.show("There was an error uploading the file, please try again!","Alert Message !",
+					Alert.OK, null, null,iconWarning, Alert.OK),10,"");
+				//mx.controls.Alert.show(String(event),"ioError",0);
+			}
+			
+			public function FnAddtoCart():void
+			{
+				var Tmp:ArrayCollection=new ArrayCollection();
+				Tmp=Grd_GuestTab3.dataProvider as ArrayCollection;
+				var Ac:ArrayCollection=new ArrayCollection();
+				var Ac1:ArrayCollection=new ArrayCollection();
+				Ac=Tmp;
+				Ac1=Grd_PropertyAssignedGuest.dataProvider as ArrayCollection;
+				Grd_GuestTab3.dataProvider=null;
+				var Len:int=Ac.length;
+				var FilePath:String = "";
+				if(TariffPaymentMode == "Bill to Company (BTC)")
+				{
+					if(Txt_Result.text == "")
+					{
+						FilePath = "";
+					}
+					else
+					{
+						FilePath = "http://sstage.in/BookingBTCUpload/"+Txt_Result.text;
+					}
+				}
+				else
+				{
+					FilePath = "";
+				}
+				var Ac_Captured:ArrayCollection = new ArrayCollection();
+				Ac_Captured = Grd_PropertyAssignedGuest.dataProvider as ArrayCollection; 
+				var RoomCaptured:Number = 0,maxValue:Number = 1;
+				for each (var o:Object in Ac_Captured)
+				{
+					if (o.RoomCaptured > maxValue)
+					{
+						maxValue = o.RoomCaptured;
+					}
+				}				
+				RoomCaptured = maxValue + 1;
+				for(var j:int = 0; j < Len; j++)
+				{
+					if(Ac[j].Tick == 1)
+					{
+						Cnt = Cnt + 1;
+						Ac1.addItem
+							({EmpCode:Ac[j].EmpCode,FirstName:Ac[j].FirstName,LastName:Ac[j].LastName,
+								GuestId:Ac[j].GuestId,ApartmentType:ApartmentType,Tariff:Txt_Tariff.text,
+								ApartmentId:ApartmentId,SSPId:SSPId,
+								BookingPropertyId:BookingPropertyId,
+								BookingPropertyTableId:BookingPropertyTableId,
+								ServicePaymentMode:ServicePaymentMode,
+								TariffPaymentMode:TariffPaymentMode,Id:0,Name:Ac[j].Name,
+								Column1:Ac[j].Txt_C1,Column2:Ac[j].Txt_C2,Column3:Ac[j].Txt_C3,Column4:Ac[j].Txt_C4,
+								Column5:Ac[j].Txt_C5,Column6:Ac[j].Txt_C6,Column7:Ac[j].Txt_C7,Column8:Ac[j].Txt_C8,
+								Column9:Ac[j].Txt_C9,Column10:Ac[j].Txt_C10,BTCFilePath:FilePath,
+								RoomCaptured:RoomCaptured});
+						Tmp.removeItemAt(j);
+						j=0;Len=Ac.length;j=j-1;
+					}					
+				}
+				Grd_GuestTab3.dataProvider=Tmp.source;
+				Grd_PropertyAssignedGuest.dataProvider=Ac1;
+				//
+				var Ac_ApartmentType:ArrayCollection = new ArrayCollection();
+				Ac_ApartmentType = Ddl_Apartment.dataProvider as ArrayCollection;				
+				var index:int = Ddl_Apartment.selectedIndex;
+				Ac_ApartmentType.removeItemAt(Ddl_Apartment.selectedIndex);
+				ApartmentId = 0;
+				Ddl_Apartment.dataProvider = null;
+				Ddl_Apartment.dataProvider = Ac_ApartmentType;
+				Ddl_Apartment.prompt = "Please Select Apartment";
 			}
 			
 			protected function Btn_Backed_clickHandler(event:MouseEvent):void
@@ -1722,7 +1943,7 @@
 			
 			private function PressYes(event:CloseEvent):void 
 			{
-				if (event.detail==Alert.YES) 
+				if (event.detail == Alert.YES) 
 				{
 					FnSave_Tab3();
 				}
@@ -1742,7 +1963,7 @@
 						SpecialRequirements:Txt_SpecialRequirements.text,
 						Id:Id,Status:"Direct Booked",AMPM:Ddl_AMPM.selectedItem,
 						BookingLevel:"Apartment",ExtraCCEmail:Txt_ExtraCCemail.text,HRPolicy:Chk_HRPolicy.selected,
-						HRPolicyOverrideRemarks:"",PropertyRefNo:""}]);
+						HRPolicyOverrideRemarks:"",PropertyRefNo:"",PaymentFlag:true}]);
 				var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
 				var Tmp1:ArrayCollection=new ArrayCollection();
 				var GuestXml:String="";
@@ -2516,6 +2737,8 @@
 						<mx:DataGridColumn width="0" dataField="Column8" visible="false"/>
 						<mx:DataGridColumn width="0" dataField="Column9" visible="false"/>
 						<mx:DataGridColumn width="0" dataField="Column10" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="BTCFilePath" visible="false"/>
+						<mx:DataGridColumn width="0" dataField="RoomCaptured" visible="false"/>
 					</mx:columns>
 				</mx:DataGrid>
 				<s:TextInput x="465" y="78.3" id="Txt_Tariff" height="23" width="80" textAlign="center"
@@ -2531,6 +2754,16 @@
 					<mx:Label x="586" y="190.5" text="22/05/2014"
 							  id="Lbl_ChkOutDt"/>
 				</s:HGroup>
+				<s:Panel x="247" y="121" width="477" height="132" title="Upload Files" id="Pnl_Upload"
+						 borderVisible="false" visible="false">
+					<s:TextInput x="31" y="32" width="200" id="Txt_FileName" height="32" editable="false"/>
+					<s:TextInput x="23" y="5" width="200" id="Txt_Result"/>
+					<WrbComp:Button_HB id="Btn_Browse" x="254" y="32" _Label="Browse"
+									   click="FnBrowse()" buttonMode="true"/>
+					<WrbComp:Button_HB id="Btn_Upload" x="360" y="32" _Label="Add"
+									   click="FnUpload()" buttonMode="true"/>
+					<s:Label x="456" y="-21" text="X" click="{Pnl_Upload.visible=false}" toolTip="Close" buttonMode="true"/>
+				</s:Panel>
 			</s:BorderContainer>
 			<WrbComp:Button_HB id="Btn_Tab1Next" x="860" y="469.25" _Label="Next" depth="0"
 							   click="Btn_Tab1Next_clickHandler(event)" buttonMode="true"/>

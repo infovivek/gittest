@@ -32,5 +32,7 @@ namespace HB.Entity
         public string Column8 { get; set; }
         public string Column9 { get; set; }
         public string Column10 { get; set; }
+        public string BTCFilePath { get; set; }
+        public int RoomCaptured { get; set; }
     }
 }

@@ -263,19 +263,23 @@
 				{
 					hlp_Client.visible=true;
 					lbl_Client.visible=true;
+					lnk_Clear.visible=true;
+					brd_Rbtn_client.visible=false;
 				}
 				else if(drp_category.selectedItem=="ClientWise")
 				{
 					hlp_Client.visible=true;
 					lbl_Client.visible=true;
+					lnk_Clear.visible=true;
 					brd_Rbtn_client.visible=true;
+					Rbtn_Booking.selected=true;
 				}
 				else if(drp_category.selectedItem=="UserWise")
 				{
 					hlp_Client.visible=false;
 					lbl_Client.visible=false;
 					brd_Rbtn_client.visible=false;
-					Rbtn_Booking.selected=true;
+					lnk_Clear.visible=false;
 				}
 			}
 			public function Ddl_Client_changeHandler():void
@@ -310,7 +314,7 @@
 			
 			<mx:DataGrid id="Grd_BookingCnt" x="0" y="129" width="100%" height="369" depth="1">
 				<mx:columns>
-					<mx:DataGridColumn dataField="Name" headerText="Name" width="200"/>
+					<mx:DataGridColumn dataField="Name" headerText="Name" width="175"/>
 					<mx:DataGridColumn dataField="D01" headerText="1"/>					
 					<mx:DataGridColumn dataField="D02" headerText="2"/>
 					<mx:DataGridColumn dataField="D03" headerText="3"/>
@@ -342,7 +346,7 @@
 					<mx:DataGridColumn dataField="D29" headerText="29"/>
 					<mx:DataGridColumn dataField="D30" headerText="30"/>
 					<mx:DataGridColumn dataField="D31" headerText="31"/>
-					<mx:DataGridColumn dataField="Tot" headerText="Total"/>
+					<mx:DataGridColumn dataField="Tot" headerText="Total" width="75"/>
 				</mx:columns>
 			</mx:DataGrid>
 			<WrbComp:Button_HB id="Btn_Show" x="666" y="21" height="32" _Label="Show"
@@ -358,7 +362,8 @@
 			<WrbHelpComp:HelpText id="hlp_Client" x="199" y="63" width="200" depth="2000" visible="false"
 					  onselection="{Ddl_Client_changeHandler()}" pxSetColumnsWidth="200,0">
 				</WrbHelpComp:HelpText>
-			<mx:LinkButton x="404" y="60.5" label="Clear" click="linkbutton1_clickHandler(event)" toolTip="Client Clear"/>
+			<mx:LinkButton x="404" y="60.5" label="Clear" click="linkbutton1_clickHandler(event)" 
+						   toolTip="Client Clear" id="lnk_Clear" visible="false"/>
 			<s:Label x="102" y="67" text="Select Client" id="lbl_Client" visible="false"/>
 			<s:Label x="102" y="27" text="Select Category"/>
 			<s:DropDownList x="199" y="21" width="200" id="drp_category"

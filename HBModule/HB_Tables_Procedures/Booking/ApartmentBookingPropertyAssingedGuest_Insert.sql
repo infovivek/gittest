@@ -44,7 +44,9 @@ CREATE PROCEDURE [dbo].[SP_ApartmentBookingPropertyAssingedGuest_Insert](
 @Column7 NVARCHAR(100),
 @Column8 NVARCHAR(100),
 @Column9 NVARCHAR(100),
-@Column10 NVARCHAR(100))
+@Column10 NVARCHAR(100),
+@RoomCaptured INT,
+@BTCFilePath NVARCHAR(500))
 AS
 BEGIN
  IF @SSPId != 0
@@ -101,17 +103,16 @@ BEGIN
  TariffPaymentMode,ChkInDt,ChkOutDt,ExpectChkInTime,AMPM,CreatedBy,
  CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId,
  RackTariff,PtyChkInTime,PtyChkInAMPM,PtyChkOutTime,PtyChkOutAMPM,
- PtyGraceTime,CurrentStatus,Title,
- Column1,Column2,Column3,Column4,Column5,Column6,Column7,Column8,Column9,
- Column10)
+ PtyGraceTime,CurrentStatus,Title,Column1,Column2,Column3,Column4,Column5,
+ Column6,Column7,Column8,Column9,Column10,RoomCaptured,RoomShiftingFlag,
+ BTCFilePath)
  VALUES(@BookingId,@EmpCode,@FirstName,@LastName,@GuestId,@ApartmentType,
  @Tariff,@ApartmentId,@SSPId,@BookingPropertyId,@BookingPropertyTableId,
  @ServicePaymentMode,@TariffPaymentMode,@ChkInDt,@ChkOutDt,@ExptTime,
  @AMPM,@UsrId,GETDATE(),@UsrId,GETDATE(),1,0,NEWID(),
  @RackTariff,@PtyChkInTime,@PtyChkInAMPM,@PtyChkOutTime,@PtyChkOutAMPM,
- @PtyGraceTime,'Booked',@Title,
- @Column1,@Column2,@Column3,@Column4,@Column5,@Column6,@Column7,@Column8,
- @Column9,@Column10);
+ @PtyGraceTime,'Booked',@Title,@Column1,@Column2,@Column3,@Column4,@Column5,
+ @Column6,@Column7,@Column8,@Column9,@Column10,@RoomCaptured,0,@BTCFilePath);
  SELECT Id,RowId FROM WRBHBApartmentBookingPropertyAssingedGuest 
  WHERE Id=@@IDENTITY;
  --

@@ -45,7 +45,9 @@ CREATE PROCEDURE [dbo].[SP_BedBookingPropertyAssingedGuest_Insert](
 @Column7 NVARCHAR(100),
 @Column8 NVARCHAR(100),
 @Column9 NVARCHAR(100),
-@Column10 NVARCHAR(100))
+@Column10 NVARCHAR(100),
+@BTCFilePath NVARCHAR(500),
+@RoomCaptured INT)
 AS
 BEGIN
  IF @SSPId != 0
@@ -106,7 +108,7 @@ BEGIN
  ApartmentId,RackTariff,PtyChkInAMPM,PtyChkOutAMPM,PtyChkInTime,
  PtyChkOutTime,PtyGraceTime,CurrentStatus,Title,
  Column1,Column2,Column3,Column4,Column5,Column6,Column7,Column8,Column9,
- Column10)
+ Column10,BTCFilePath,RoomCaptured,RoomShiftingFlag)
  VALUES(@BookingId,@EmpCode,@FirstName,@LastName,@GuestId,@BedType,
  @Tariff,@RoomId,@BedId,@SSPId,@BookingPropertyId,@BookingPropertyTableId,
  @ServicePaymentMode,@TariffPaymentMode,@ChkInDt,@ChkOutDt,@ExptTime,
@@ -114,7 +116,7 @@ BEGIN
  @ApartmentId,@RackTariff,@PtyChkInAMPM,@PtyChkOutAMPM,@PtyChkInTime,
  @PtyChkOutTime,@PtyGraceTime,'Booked',@Title,
  @Column1,@Column2,@Column3,@Column4,@Column5,@Column6,@Column7,@Column8,
- @Column9,@Column10);
+ @Column9,@Column10,@BTCFilePath,@RoomCaptured,0);
  SELECT Id,RowId FROM WRBHBBedBookingPropertyAssingedGuest 
  WHERE Id = @@IDENTITY;
  --
