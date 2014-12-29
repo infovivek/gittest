@@ -72,7 +72,7 @@ BEGIN
    Latitude = @Latitude,Longitude = @Longitude
    WHERE IsActive = 1 AND IsDeleted = 0 AND CityCode = @CityCode AND 
    HotalId = @HotalId;
-   SELECT Id,RowId FROM WRBHBStaticHotels
+   SELECT Id,RowId,'Update' FROM WRBHBStaticHotels
    WHERE IsActive = 1 AND IsDeleted = 0 AND CityCode = @CityCode AND 
    HotalId = @HotalId;
   END
@@ -88,7 +88,7 @@ BEGIN
    @CheckOutTime,@CheckInTime,@Description,@HotalName,@StarRating,
    @TwentyFourHourCheckinAllowed,@WebAddress,@Image,0,GETDATE(),0,GETDATE(),
    1,0,NEWID(),@HotelCount,@Latitude,@Longitude);
-   SELECT Id,RowId FROM WRBHBStaticHotels WHERE Id = @@IDENTITY;
+   SELECT Id,RowId,'New' FROM WRBHBStaticHotels WHERE Id = @@IDENTITY;
   END
 END
     

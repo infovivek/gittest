@@ -39,7 +39,7 @@ CREATE PROCEDURE [dbo].[Sp_CheckoutIntermediate_Insert](
 @CheckInDate NVARCHAR(100),@InVoiceNo NVARCHAR(100),@LTTaxPer DECIMAL(27,2),@STTaxPer DECIMAL(27,2),
 @VATPer DECIMAL(27,2),@RestaurantSTPer DECIMAL(27,2),@BusinessSupportST DECIMAL(27,2),@ClientId INT,@CityId INT,
 @ServiceChargeChk INT,@BillFromDate NVARCHAR(100),@BillEndDate NVARCHAR(100),@Intermediate NVARCHAR(100),
-@Preformainvoice BIT)
+@Preformainvoice BIT,@Email NVARCHAR(100))
 
 AS
 BEGIN
@@ -189,7 +189,7 @@ DECLARE @invoice1 NVARCHAR(100),@Length BIGINT;
 		BTC,PropertyType,Status,STAgreedAmount,LTAgreedAmount,STRackAmount,LTRackAmount,CheckInDate,CheckOutDate,
 		InVoiceNo,Flag,PrintInvoice ,PaymentStatus,ServiceTaxPer,LuxuryTaxPer,ServiceEntryFlag,VATPer,
 		RestaurantSTPer,BusinessSupportST,ClientId,CityId,
-		ServiceChargeChk,BillFromDate,BillEndDate,Intermediate,IntermediateFlag,PIInvoice,Preformainvoice)
+		ServiceChargeChk,BillFromDate,BillEndDate,Intermediate,IntermediateFlag,PIInvoice,Preformainvoice,Email)
 
 		VALUES
 		(@CheckOutNo,@GuestName,@Stay,@Type,@BookingLevel,@BillDate,
@@ -206,7 +206,7 @@ DECLARE @invoice1 NVARCHAR(100),@Length BIGINT;
 		@BTC,@PropertyType ,@Status,@STAgreedAmount,@LTAgreedAmount,@STRackAmount,@LTRackAmount,
 		@CheckInDate,@CheckOutDate,@InVoiceNo,0,0,'UnPaid',@STTaxPer,@LTTaxPer,0,
 		@VATPer,@RestaurantSTPer,@BusinessSupportST,@ClientId,@CityId,
-		@ServiceChargeChk,@BillFromDate,@BillEndDate,@Intermediate,0,@PIInvoice,@Preformainvoice)
+		@ServiceChargeChk,@BillFromDate,@BillEndDate,@Intermediate,0,@PIInvoice,@Preformainvoice,@Email)
 
 		SET @InsId=@@IDENTITY;
 		SELECT  Id,RowId FROM WRBHBChechkOutHdr WHERE Id=@InsId;
@@ -228,7 +228,7 @@ DECLARE @invoice1 NVARCHAR(100),@Length BIGINT;
 		BTC,PropertyType,Status,STAgreedAmount,LTAgreedAmount,STRackAmount,LTRackAmount,CheckInDate,CheckOutDate,
 		InVoiceNo,Flag,PrintInvoice ,PaymentStatus,ServiceTaxPer,LuxuryTaxPer,ServiceEntryFlag,VATPer,
 		RestaurantSTPer,BusinessSupportST,ClientId,CityId,
-		ServiceChargeChk,BillFromDate,BillEndDate,Intermediate,IntermediateFlag,PIInvoice,Preformainvoice)
+		ServiceChargeChk,BillFromDate,BillEndDate,Intermediate,IntermediateFlag,PIInvoice,Preformainvoice,Email)
 
 		VALUES
 		(@CheckOutNo,@GuestName,@Stay,@Type,@BookingLevel,@BillDate,
@@ -245,7 +245,7 @@ DECLARE @invoice1 NVARCHAR(100),@Length BIGINT;
 		@BTC,@PropertyType ,@Status,@STAgreedAmount,@LTAgreedAmount,@STRackAmount,@LTRackAmount,
 		@CheckInDate,@CheckOutDate,@InVoiceNo,0,0,'UnPaid',@STTaxPer,@LTTaxPer,0,
 		@VATPer,@RestaurantSTPer,@BusinessSupportST,@ClientId,@CityId,
-		@ServiceChargeChk,@BillFromDate,@BillEndDate,@Intermediate,1,0,0)
+		@ServiceChargeChk,@BillFromDate,@BillEndDate,@Intermediate,1,0,0,@Email)
 
 		SET @InsId=@@IDENTITY;
 		SELECT  Id,RowId FROM WRBHBChechkOutHdr WHERE Id=@InsId;
@@ -324,7 +324,7 @@ BEGIN
 		BTC,PropertyType,Status,STAgreedAmount,LTAgreedAmount,STRackAmount,LTRackAmount,CheckInDate,CheckOutDate,
 		InVoiceNo,Flag,PrintInvoice ,PaymentStatus,ServiceTaxPer,LuxuryTaxPer,ServiceEntryFlag,VATPer,
 		RestaurantSTPer,BusinessSupportST,ClientId,CityId,
-		ServiceChargeChk,BillFromDate,BillEndDate,Intermediate,IntermediateFlag,PIInvoice,Preformainvoice)
+		ServiceChargeChk,BillFromDate,BillEndDate,Intermediate,IntermediateFlag,PIInvoice,Preformainvoice,Email)
 
 		VALUES
 		(@CheckOutNo,@GuestName,@Stay,@Type,@BookingLevel,@BillDate,
@@ -341,7 +341,7 @@ BEGIN
 		@BTC,@PropertyType ,@Status,@STAgreedAmount,@LTAgreedAmount,@STRackAmount,@LTRackAmount,
 		@CheckInDate,@CheckOutDate,@InVoiceNo,0,0,'UnPaid',@STTaxPer,@LTTaxPer,0,
 		@VATPer,@RestaurantSTPer,@BusinessSupportST,@ClientId,@CityId,
-		@ServiceChargeChk,@BillFromDate,@BillEndDate,@Intermediate,0,0,0)
+		@ServiceChargeChk,@BillFromDate,@BillEndDate,@Intermediate,0,0,0,@Email)
 
 		SET @InsId=@@IDENTITY;
 		SELECT  Id,RowId FROM WRBHBChechkOutHdr WHERE Id=@InsId;

@@ -61,6 +61,7 @@
     <Compile Include="BusinessService\ChangePasswordService.cs" />
     <Compile Include="BusinessService\CheckInForecastReportServices.cs" />
     <Compile Include="BusinessService\CheckoutAndIntermediateService.cs" />
+    <Compile Include="BusinessService\CheckOutandInterSettleService.cs" />
     <Compile Include="BusinessService\CheckOutPaymentCardService.cs" />
     <Compile Include="BusinessService\CheckOutPaymentCashService.cs" />
     <Compile Include="BusinessService\CheckOutPaymentChequeService.cs" />

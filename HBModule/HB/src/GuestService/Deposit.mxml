@@ -1275,7 +1275,7 @@
 					<mx:DataGridColumn dataField="Amount" headerText="Amount" width="100" editable="false"/>
 					<mx:DataGridColumn dataField="DepositeTo" headerText="Deposit To" width="200" editable="false"/>
 					<mx:DataGridColumn dataField="DepositedBy" headerText="Deposited By" width="100" editable="false"/>
-					<mx:DataGridColumn dataField="Comments" headerText="Comments" width="100" editable="true"/>
+					<mx:DataGridColumn dataField="Comments" headerText="Comments" width="100" editable="false"/>
 					<mx:DataGridColumn dataField="ChallanImage" headerText="Comments" width="100" visible="false"/>
 					<mx:DataGridColumn dataField="ViewDetails" headerText="View Details" width="70" editable="false">
 						<mx:itemRenderer >
@@ -1328,7 +1328,7 @@
 					<mx:DataGridColumn dataField="Amount" headerText="Amount" width="100" editable="false"/>
 					<mx:DataGridColumn dataField="DepositeTo" headerText="Deposit To" width="200" editable="false"/>
 					<mx:DataGridColumn dataField="DepositedBy" headerText="Deposited By" width="100" editable="false"/>
-					<mx:DataGridColumn dataField="Comments" headerText="Comments" width="100" editable="true"/>
+					<mx:DataGridColumn dataField="Comments" headerText="Comments" width="100" editable="false"/>
 					<mx:DataGridColumn dataField="ChallanImage" headerText="Comments" width="100" visible="false"/>
 					<mx:DataGridColumn dataField="ViewDetails" headerText="View Details" width="75" editable="false">
 						<mx:itemRenderer >
@@ -1416,7 +1416,7 @@
 		</WrbHelpComp:HelpText>
 		<s:CheckBox x="241" y="205" label="Select All" id="Chk_Selectall" change="Chk_Selectall_changeHandler1(event)" />
 		<mx:DataGrid id="Grd_Invoice" x="234" y="227"  verticalAlign="middle" editable="true" 
-					 width="500" height="125" tabIndex="4">
+					 width="600" height="125" tabIndex="4">
 			<mx:columns>
 				<mx:DataGridColumn dataField="Tick" headerText="" width="25" editable="false" >
 					<mx:itemRenderer>
@@ -1433,9 +1433,9 @@
 				<mx:DataGridColumn dataField="InvoiceNo" headerText="Invoice No" width="80" editable="false" visible="true"/>
 				<mx:DataGridColumn dataField="CheckIn"  visible="true" width="60" editable="false"/>
 				<mx:DataGridColumn dataField="CheckOut"  visible="true" width="60" editable="false"/>
-				<mx:DataGridColumn dataField="Total" width="45" visible="true" editable="false"/>
+				<mx:DataGridColumn dataField="Total" width="55" visible="true" editable="false"/>
 				<mx:DataGridColumn dataField="ChkOutHdrId" width="10" visible="false"/>
-				<mx:DataGridColumn dataField="BillType" width="10" visible="false"/>
+				<mx:DataGridColumn dataField="BillType" headerText="Bill Type" visible="true" editable="false" width="80"/>
 				<mx:DataGridColumn dataField="ClientId" width="10" visible="false"/>
 				
 				
@@ -1461,7 +1461,7 @@
 					<mx:DataGridColumn dataField="Amount" headerText="Amount" width="100" editable="false"/>
 					<mx:DataGridColumn dataField="BTCTo" headerText="To" width="150" editable="false"/>
 					<mx:DataGridColumn dataField="BTCMode" headerText="Mode" width="125" editable="false"/>
-					<mx:DataGridColumn dataField="Comments" headerText="Comments" width="100" editable="true"/>
+					<mx:DataGridColumn dataField="Comments" headerText="Comments" width="100" editable="false"/>
 					<mx:DataGridColumn dataField="ChallanImage" headerText="Comments" width="100" visible="false"/>
 					<mx:DataGridColumn dataField="ViewDetails" headerText="View Details" width="100" editable="false">
 						<mx:itemRenderer >
@@ -1492,7 +1492,7 @@
 	<s:BorderContainer x="0" y="46" width="100%" height="100%" id="Brd_BTC_Panel" backgroundColor="#fbf9f9"
 					   visible="false">
 		<s:Label id="lblNewBTC" x="137" y="23" text="New BTC Deposit" color="red"/>
-		<s:Label x="139" y="150" text="Date Deposited"/>
+		<s:Label x="139" y="167" text="Date Deposited"/>
 		<s:Label x="449" y="89" text="Amount Deposited" visible="false"/>
 		<s:Label x="609" y="55" text="To"/>
 		<s:Label x="610" y="95" height="11" text="Mode"/>
@@ -1502,15 +1502,15 @@
 				<fx:String>Courier</fx:String>
 			</s:ArrayList>
 		</s:DropDownList>
-		<s:Label x="138" y="103" text="Client"/>
-		<WrbHelpComp:HelpText id="hlp_ClientName" x="233" y="96" width="188" height="22" pxSetColumnsWidth="220,0"
+		<s:Label x="138" y="113" text="Client"/>
+		<WrbHelpComp:HelpText id="hlp_ClientName" x="233" y="106" width="188" height="22" pxSetColumnsWidth="220,0"
 							  onselection="{Ddl_Client_changeHandler()}"  pxTabIndex="1" depth="10"
 							  pxSetPrompt="Select Client" />
 		<s:Label x="609" y="161" text="Remarks"/>
 		<s:TextInput x="584" y="81" width="171" maxChars="10" id="txt_BTCDepositAmount" restrict="0-9" visible="false"/>
 		<s:Image x="462" y="311" width="100" height="100" id="Img_BTCChalan"
 				 source="@Embed(source='../Assets/user.jpg')" visible="false"/>
-		<s:TextArea id="txt_BTCRemarks" x="694" y="161" width="171" height="89" maxChars="2000"/>
+		<s:TextArea id="txt_BTCRemarks" x="694" y="161" width="171" height="66" maxChars="2000"/>
 		<s:Button id="btn_BTCSave" x="390" y="397" height="31" label="Save" click="CashSave()"/>
 		<s:Button id="btn_BTCClose" x="504" y="397" height="31" label="Close" click="BTCCancel()"/>
 		<s:DropDownList id="Drp_BTCTo" x="694" y="49" width="180" prompt="Select To" >
@@ -1519,24 +1519,24 @@
 				<fx:String>Client</fx:String>
 			</s:ArrayList>
 		</s:DropDownList>
-		<mx:DateField id="dt_BTCDate" x="233" y="139" selectableRange="{{rangeEnd:new Date()}}"  
+		<mx:DateField id="dt_BTCDate" x="233" y="159" selectableRange="{{rangeEnd:new Date()}}"  
 					  formatString="DD/MM/YYYY"/>
 		<s:Label x="555" y="83" text="*" color="red" visible="false"/>
 		
 		<s:Label x="658" y="49" text="*" color="red"/>
 		<s:Label x="609" y="136" id="lblDoneBy" text="Done By" visible="true"/>
-		<s:TextInput x="694" y="128" id="txt_DoneBy" width="171" visible="true" prompt="Done By" enabled="false"/>
+		<s:TextInput x="694" y="128" id="txt_DoneBy" width="171" visible="true" prompt="Done By" enabled="true"/>
 		
 		<s:Label x="138" y="60" text="Property"/>
 		
-		<s:Label x="138" y="210" text="Invoice No's"/>
+		<s:Label x="138" y="240" text="Invoice No's"/>
 		<s:Label x="138" y="379" text="Total Amount"/>
 		<WrbHelpComp:HelpText id="hlp_BTCProperty" x="233" y="55" width="187" height="22" pxSetColumnsWidth="187,0" 
 							  onselection="{Ddl_Property1_changeHandler()}"  pxTabIndex="1" depth="10">
 		</WrbHelpComp:HelpText>
-		<s:CheckBox x="239" y="165" label="Select All" id="Chk_Selectall1" change="Chk_Selectall_changeHandler(event)" />
-		<mx:DataGrid id="Grd_BTCInvoice" x="231" y="185"  verticalAlign="middle" editable="true" 
-					 width="460" height="178" tabIndex="4">
+		<s:CheckBox x="239" y="210" label="Select All" id="Chk_Selectall1" change="Chk_Selectall_changeHandler(event)" />
+		<mx:DataGrid id="Grd_BTCInvoice" x="231" y="235"  verticalAlign="middle" editable="true" 
+					 width="600" height="125" tabIndex="4">
 			<mx:columns>
 				<mx:DataGridColumn dataField="Tick" headerText="" width="25" editable="false">
 					<mx:itemRenderer>
@@ -1549,20 +1549,20 @@
 					</mx:itemRenderer>
 				</mx:DataGridColumn>
 				<mx:DataGridColumn dataField="Client" headerText="Client" width="100" visible="true" editable="false"/>
-				<mx:DataGridColumn dataField="GuestName" headerText="GuestName" width="80" editable="false" visible="true"/>
-				<mx:DataGridColumn dataField="InvoiceNo" headerText="Invoice No" width="60" editable="false" visible="true"/>
+				<mx:DataGridColumn dataField="GuestName" headerText="GuestName" width="100" editable="false" visible="true"/>
+				<mx:DataGridColumn dataField="InvoiceNo" headerText="Invoice No" width="80" editable="false" visible="true"/>
 				<mx:DataGridColumn dataField="CheckIn"  visible="true" width="60" editable="false"/>
 				<mx:DataGridColumn dataField="CheckOut"  visible="true" width="60" editable="false"/>
-				<mx:DataGridColumn dataField="BillType"  visible="false" width="10" />
+				<mx:DataGridColumn dataField="BillType"  headerText="Bill Type" editable="false" visible="true" width="100" />
 				<mx:DataGridColumn dataField="ClientId"  visible="false" width="10"/>
 				<mx:DataGridColumn dataField="ChkOutHdrId" width="10" visible="false"/>
-				<mx:DataGridColumn dataField="Total" width="45"  visible="true" editable="false" />
+				<mx:DataGridColumn dataField="Total" width="50"  visible="true" editable="false" />
 				
 			</mx:columns>
 		</mx:DataGrid>
 		<s:TextInput id="txt_BTCTotal" x="233" y="371" enabled="false"/>
 		<s:Label x="659" y="84" text="*" color="red"/>
 		<s:Label x="189" y="53" text="*" color="red"/>
-		<s:Label x="205" y="201" text="*" color="red"/>
+		<s:Label x="205" y="231" text="*" color="red"/>
 	</s:BorderContainer>
 </s:Application>

@@ -7,7 +7,7 @@ namespace HB.Entity
 {
    public class VendorSettlementEntity
     {
-        public int PropertyId { get; set; }
+        public long PropertyId { get; set; }
         public int TACId { get; set; }
         public string TACInvoiceNo { get; set; }
         public string BillDate { get; set; }

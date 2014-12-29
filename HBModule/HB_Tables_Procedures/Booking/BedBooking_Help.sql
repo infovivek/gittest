@@ -47,7 +47,7 @@ IF @Action = 'BedLevel_Property'
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
   PG.BookingPropertyId=P.Id
   WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Internal Property' AND  
+  P.IsDeleted=0 AND --P.Category='Internal Property' AND  
   /*PG.ChkInDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
   CONVERT(DATE,@ChkOutDt,103) AND P.CityId=@CityId;*/
   CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
@@ -60,7 +60,7 @@ IF @Action = 'BedLevel_Property'
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
   PG.BookingPropertyId=P.Id
   WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Internal Property' AND
+  P.IsDeleted=0 AND --P.Category='Internal Property' AND
   CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) BETWEEN 
   CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
   P.CityId=@CityId GROUP BY PG.RoomId;
@@ -72,7 +72,7 @@ IF @Action = 'BedLevel_Property'
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
   PG.BookingPropertyId=P.Id
   WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Internal Property' AND
+  P.IsDeleted=0 AND --P.Category='Internal Property' AND
   CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
   CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
   CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
@@ -89,7 +89,7 @@ IF @Action = 'BedLevel_Property'
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
   PG.BookingPropertyId=P.Id
   WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Internal Property' AND
+  P.IsDeleted=0 AND --P.Category='Internal Property' AND
   CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
   CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) <= 
   CAST(@ChkInDt AS DATETIME) AND
@@ -99,6 +99,7 @@ IF @Action = 'BedLevel_Property'
   /*PG.ChkInDt <= CONVERT(DATE,@ChkInDt,103) AND
   PG.ChkOutDt >= CONVERT(DATE,@ChkOutDt,103) AND P.CityId=@CityId;*/
   -- Room Booked End
+  --select * from #ExsInPRoom;return;
   -- Bed Booked Begin
   CREATE TABLE #ExstsInPBed(BedId BIGINT);
   INSERT INTO #ExstsInPBed(BedId) 
@@ -106,7 +107,7 @@ IF @Action = 'BedLevel_Property'
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
   PG.BookingPropertyId=P.Id
   WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Internal Property' AND
+  P.IsDeleted=0 AND --P.Category='Internal Property' AND
   CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
   CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
   CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
@@ -119,7 +120,7 @@ IF @Action = 'BedLevel_Property'
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
   PG.BookingPropertyId=P.Id
   WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Internal Property' AND 
+  P.IsDeleted=0 AND --P.Category='Internal Property' AND 
   /*PG.ChkOutDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
   CONVERT(DATE,@ChkOutDt,103) AND P.CityId=@CityId;*/
   CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) BETWEEN 
@@ -131,7 +132,7 @@ IF @Action = 'BedLevel_Property'
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
   PG.BookingPropertyId=P.Id
   WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Internal Property' AND 
+  P.IsDeleted=0 AND --P.Category='Internal Property' AND 
   /*PG.ChkInDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
   CONVERT(DATE,@ChkOutDt,103) AND
   PG.ChkOutDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
@@ -148,7 +149,7 @@ IF @Action = 'BedLevel_Property'
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
   PG.BookingPropertyId=P.Id
   WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Internal Property' AND 
+  P.IsDeleted=0 AND --P.Category='Internal Property' AND 
   /*PG.ChkInDt <= CONVERT(DATE,@ChkInDt,103) AND
   PG.ChkOutDt >= CONVERT(DATE,@ChkOutDt,103) AND P.CityId=@CityId;*/
   CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
@@ -158,6 +159,7 @@ IF @Action = 'BedLevel_Property'
   CAST(@ChkOutDt AS DATETIME) AND P.CityId=@CityId
   GROUP BY PG.BedId;
   -- Bed Booked End
+  --select * from #ExstsInPBed;return;
   -- Apartment Booked Begin
   CREATE TABLE #ExstsInPApartment(ApartmentId BIGINT);
   INSERT INTO #ExstsInPApartment(ApartmentId) 
@@ -165,7 +167,7 @@ IF @Action = 'BedLevel_Property'
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
   PG.BookingPropertyId=P.Id
   WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Internal Property' AND
+  P.IsDeleted=0 AND --P.Category='Internal Property' AND
   CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
   CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
   CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
@@ -178,7 +180,7 @@ IF @Action = 'BedLevel_Property'
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
   PG.BookingPropertyId=P.Id
   WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Internal Property' AND 
+  P.IsDeleted=0 AND --P.Category='Internal Property' AND 
   /*PG.ChkOutDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
   CONVERT(DATE,@ChkOutDt,103) AND P.CityId=@CityId;*/
   CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) BETWEEN 
@@ -190,7 +192,7 @@ IF @Action = 'BedLevel_Property'
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
   PG.BookingPropertyId=P.Id
   WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Internal Property' AND 
+  P.IsDeleted=0 AND --P.Category='Internal Property' AND 
   /*PG.ChkInDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
   CONVERT(DATE,@ChkOutDt,103) AND
   PG.ChkOutDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
@@ -207,7 +209,7 @@ IF @Action = 'BedLevel_Property'
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
   PG.BookingPropertyId=P.Id
   WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Internal Property' AND 
+  P.IsDeleted=0 AND --P.Category='Internal Property' AND 
   /*PG.ChkInDt <= CONVERT(DATE,@ChkInDt,103) AND
   PG.ChkOutDt >= CONVERT(DATE,@ChkOutDt,103) AND P.CityId=@CityId;*/
   CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
@@ -381,8 +383,8 @@ IF @Action = 'BedLevel_Tab2_to_Tab3_Dtls'
   WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND 
   /*PG.ChkOutDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
   CONVERT(DATE,@ChkOutDt,103) AND PG.BookingPropertyId=@PropertyId;*/
-  CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+
-  CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
+  CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+ 
+  CAST('11:59:00 AM' AS VARCHAR) AS DATETIME) BETWEEN 
   CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
   PG.BookingPropertyId=@PropertyId GROUP BY PG.RoomId;
   --
@@ -425,15 +427,17 @@ IF @Action = 'BedLevel_Tab2_to_Tab3_Dtls'
   CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
   PG.BookingPropertyId=@PropertyId GROUP BY PG.BedId;
   --
+  --select * from #ExistsInPBed;return;
+  --
   INSERT INTO #ExistsInPBed(BedId) 
   SELECT PG.BedId FROM WRBHBBedBookingPropertyAssingedGuest PG
-  WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND 
-  /*PG.ChkOutDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
-  CONVERT(DATE,@ChkOutDt,103) AND PG.BookingPropertyId=@PropertyId;*/
+  WHERE PG.IsActive = 1 AND PG.IsDeleted = 0 AND
   CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+
-  CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
+  CAST('11:59:00 AM' AS VARCHAR) AS DATETIME) BETWEEN 
   CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
-  PG.BookingPropertyId=@PropertyId GROUP BY PG.BedId;
+  PG.BookingPropertyId = @PropertyId GROUP BY PG.BedId;
+  --
+  --select * from #ExistsInPBed;return;
   --
   INSERT INTO #ExistsInPBed(BedId) 
   SELECT PG.BedId FROM WRBHBBedBookingPropertyAssingedGuest PG
@@ -480,7 +484,7 @@ IF @Action = 'BedLevel_Tab2_to_Tab3_Dtls'
   /*PG.ChkOutDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
   CONVERT(DATE,@ChkOutDt,103) AND PG.BookingPropertyId=@PropertyId;*/
   CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+
-  CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
+  CAST('11:59:00 AM' AS VARCHAR) AS DATETIME) BETWEEN 
   CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
   PG.BookingPropertyId=@PropertyId GROUP BY PG.ApartmentId;
   --
@@ -620,7 +624,7 @@ IF @Action = 'BeforeSaveBedValidation'
   SELECT PG.RoomId FROM WRBHBBookingPropertyAssingedGuest PG
   WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND PG.RoomId!=0 AND
   CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+
-  CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
+  CAST('11:59:00 AM' AS VARCHAR) AS DATETIME) BETWEEN 
   CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME)
   AND PG.BookingPropertyId=@PropertyId
   GROUP BY PG.RoomId;
@@ -660,7 +664,7 @@ IF @Action = 'BeforeSaveBedValidation'
   SELECT PG.BedId FROM WRBHBBedBookingPropertyAssingedGuest PG
   WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND
   CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+
-  CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
+  CAST('11:59:00 AM' AS VARCHAR) AS DATETIME) BETWEEN 
   CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
   PG.BookingPropertyId=@PropertyId GROUP BY PG.BedId;
   --
@@ -698,7 +702,7 @@ IF @Action = 'BeforeSaveBedValidation'
   SELECT PG.ApartmentId FROM WRBHBApartmentBookingPropertyAssingedGuest PG
   WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND
   CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+
-  CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
+  CAST('11:59:00 AM' AS VARCHAR) AS DATETIME) BETWEEN 
   CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
   PG.BookingPropertyId=@PropertyId GROUP BY PG.ApartmentId;
   --

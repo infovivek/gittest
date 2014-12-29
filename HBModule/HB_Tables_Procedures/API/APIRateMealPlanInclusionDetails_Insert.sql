@@ -28,11 +28,26 @@ CREATE PROCEDURE [dbo].[SP_APIRateMealPlanInclusionDetails_Insert](
 @InclusionCode NVARCHAR(MAX))
 AS
 BEGIN
- INSERT INTO WRBHBAPIRateMealPlanInclusionDtls(HeaderId,HotelId,
- RatePlanType,RatePlanCode,MealPlanCode,MealPlan,InclusionCode)
- VALUES(@HeaderId,@HotelId,dbo.TRIM(@RatePlanType),
- dbo.TRIM(@RatePlanCode),dbo.TRIM(@MealPlanCode),dbo.TRIM(@MealPlan),
- dbo.TRIM(@InclusionCode));
- SELECT Id FROM WRBHBAPIRateMealPlanInclusionDtls WHERE Id=@@IDENTITY;
+ IF EXISTS (SELECT NULL FROM WRBHBAPIRateMealPlanInclusionDtls
+ WHERE HotelId = @HotelId AND HeaderId = @HeaderId AND 
+ RatePlanCode = @RatePlanCode)
+  BEGIN
+   UPDATE WRBHBAPIRateMealPlanInclusionDtls SET RatePlanType = @RatePlanType,
+   MealPlanCode = @MealPlanCode,MealPlan = @MealPlan,
+   InclusionCode = @InclusionCode WHERE HotelId = @HotelId AND 
+   HeaderId = @HeaderId AND RatePlanCode = @RatePlanCode;
+   SELECT Id FROM WRBHBAPIRateMealPlanInclusionDtls
+   WHERE HotelId = @HotelId AND HeaderId = @HeaderId AND 
+   RatePlanCode = @RatePlanCode;   
+  END
+ ELSE
+  BEGIN
+   INSERT INTO WRBHBAPIRateMealPlanInclusionDtls(HeaderId,HotelId,
+   RatePlanType,RatePlanCode,MealPlanCode,MealPlan,InclusionCode)
+   VALUES(@HeaderId,@HotelId,dbo.TRIM(@RatePlanType),
+   dbo.TRIM(@RatePlanCode),dbo.TRIM(@MealPlanCode),dbo.TRIM(@MealPlan),
+   dbo.TRIM(@InclusionCode));
+   SELECT Id FROM WRBHBAPIRateMealPlanInclusionDtls WHERE Id=@@IDENTITY;
+  END
 END
 GO

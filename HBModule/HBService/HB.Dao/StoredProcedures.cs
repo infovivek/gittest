@@ -766,5 +766,10 @@ namespace HB.Dao
         public const string ExtCheckOutConsolidate_Bill = "SP_ExtCheckOutConsolidate_Bill";
         //
         public const string BookingConfirmation_Help = "SP_BookingConfirmation_Help";
+
+
+        //checkout Inter settlement
+        public const string CheckOutInterSettleHdr_Insert = "SP_CheckOutInterSettleHdr_Insert";
+        public const string CheckOutInterSettleDtl_Insert = "SP_CheckOutInterSettleDtl_Insert";
     }
 }

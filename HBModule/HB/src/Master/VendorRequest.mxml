@@ -37,7 +37,7 @@
 			public static var GlobalXml:String = "",TypeServiceId:int=0,ErrStr:String="";
 			public var Id:int=0,ErrMsg:String="",PropertyId:int=0,PropertyName:String="",UserId:int=0,
 				VendorId:int=0,ApartmentId:int=0,RoomId:int=0;
-			public var AddMode:Boolean=true,Flag:Boolean=true,CategoryId:int=0,Category:String="";
+			public var AddMode:Boolean=true,Flag:Boolean=true,CategoryId:int=0,RangeEnd:String="",Category:String="";
 			
 			private var fileRef:FileReference = new FileReference();
 			private var fileTypes:Array = new Array();
@@ -62,6 +62,7 @@
 				GlobalXml += "</ROOT>";
 				Help();
 				dt_Date.selectedDate = new Date();
+				dt_Duedate.selectedDate = new Date();
 				hlp_Property.text="";
 			}
 			public function Help():void
@@ -80,6 +81,27 @@
 //					{
 //						dt_Date.text=Ds_Objects.result.Tables.Table.Rows[0].Date;		
 //					}
+					
+					var Dt:String = dt_Date.text;					
+					var Y:String = Dt.substr(6,10);
+					var M:String = Dt.substr(3,2);
+					var D:String = Dt.substr(0,2);
+					var RangeStart:String = Y+'/'+M+'/'+D;
+					var sda:String=dt_Duedate.text;
+					var Y1:String = sda.substr(6,10);
+					var M1:String = sda.substr(3,2);
+					var D1:String = sda.substr(0,2);
+					//var D:String =String(Number(Dt.substr(0,2))+1);
+					var ToDt:String = Y1+'/'+M1+'/'+D1;
+					dt_Duedate.selectableRange = {rangeStart:new Date(RangeStart)};
+					if(new Date(RangeStart) > new Date(ToDt))
+					{
+						dt_Duedate.selectedDate = new Date(RangeStart);
+					}
+					else
+					{
+						dt_Duedate.selectedDate = new Date(ToDt);
+					}
 				}
 				if (Ds_Objects.currentTarget.description.toString() == "Property_CUSTOM")
 				{
@@ -262,24 +284,34 @@
 				 {
 					 if(hlp_apartment.text!="") 
 					 {
-						 if(Flag==true)
+						 if(txt_ImageName.text=="")
 						 {
-							 Brd_imageUpload.visible=true;
-							 Flag=false;
+							 if(Flag==true)
+							 {
+								 Brd_imageUpload.visible=true;
+								 Flag=false;
+							 }
+							 ErrStr=ErrStr+"*  Bill is Required.\n";
 						 }
-						 ErrStr=ErrStr+"*  Bill is Required.\n";
 					 }
 				 }
 				 else if(Type =="Room")
 				 {
-					 if(hlp_Room.text!="") 
+					 if(hlp_apartment.text=="")
 					 {
-						 if(Flag==true)
+						ErrStr=ErrStr+"*  ApartmentNo is Required.\n";
+					 }
+					 else if(hlp_Room.text!="") 
+					 {
+						 if(txt_ImageName.text=="")
 						 {
-							 Brd_imageUpload.visible=true;
-							 Flag=false;
+							 if(Flag==true)
+							 {
+								 Brd_imageUpload.visible=true;
+								 Flag=false;
+							 }
+							 ErrStr=ErrStr+"*  Bill is Required.\n";
 						 }
-						 ErrStr=ErrStr+"*  Bill is Required.\n";
 					 }
 				 }
 				return ErrStr;
@@ -813,10 +845,10 @@
 								  onselection="{Ddl_Service_changeHandler()}"  pxTabIndex="4" depth="2500">
 			</WrbHelpComp:HelpText>
 			<s:TextArea x="577" y="270" width="200" height="83" id="Txt_Des" tabIndex="12"/>
-			<s:TextInput x="577" y="141" width="126" id="Txt_Amount" tabIndex="9" restrict="0-9"/>
+			<s:TextInput x="577" y="141" width="126" id="Txt_Amount" tabIndex="9" restrict="0-9."/>
 			<s:TextInput x="577" y="176" id="Txt_Billno" tabIndex="10"/>
 			<mx:DateField x="578" y="101" width="126" id="dt_Duedate" yearNavigationEnabled="true" tabIndex="11" 
-						  formatString="DD/MM/YYYY"  enabled="true"/>
+						  formatString="DD/MM/YYYY" selectableRange="{{rangeEnd:new Date()}}" enabled="true"/>
 			
 			<WrbHelpComp:HelpText x="207" y="216" width="200" id="hlp_Type" height="22" pxSetColumnsWidth="200" 
 								  onselection="{Ddl_Type_changeHandler()}"  pxTabIndex="5" depth="2000">

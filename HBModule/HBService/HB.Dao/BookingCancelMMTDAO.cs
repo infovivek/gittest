@@ -120,10 +120,12 @@ namespace HB.Dao
                             //
                             System.Net.Mail.MailMessage message = new System.Net.Mail.MailMessage();
                             //DSBooking.Tables[1].Rows[0][4].ToString()    
-                            message.From = new System.Net.Mail.MailAddress("stay@staysimplyfied.com", "", System.Text.Encoding.UTF8);
+                            //message.From = new System.Net.Mail.MailAddress("stay@staysimplyfied.com", "", System.Text.Encoding.UTF8);
+                            message.From = new System.Net.Mail.MailAddress("stay@hummingbirdindia.com", "", System.Text.Encoding.UTF8);
                             //message.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
                             //message.Subject = " Test Booking Canceled - " + ds.Tables[0].Rows[0][2].ToString();
-                            message.To.Add(new System.Net.Mail.MailAddress("stay@staysimplyfied.com"));
+                            //message.To.Add(new System.Net.Mail.MailAddress("stay@staysimplyfied.com"));
+                            message.To.Add(new System.Net.Mail.MailAddress("stay@hummingbirdindia.com"));
                             if (ds.Tables[0].Rows[0][0].ToString() == "0")
                             {
                                 message.To.Add(new System.Net.Mail.MailAddress(ds.Tables[0].Rows[0][1].ToString()));

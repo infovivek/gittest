@@ -174,7 +174,8 @@
 						sheet.setCell(1,7,'MOP');
 						sheet.setCell(1,8,'Property Email');
 						sheet.setCell(1,9,'Contact Number');
-						//sheet.setCell(1,10,'');
+						sheet.setCell(1,10,'BookingCode');
+						sheet.setCell(1,11,'Category');
 						
 						for(var i:int=0;i<arrExportResult.length;i++)
 						{
@@ -184,10 +185,12 @@
 							sheet.setCell(i+2, 3, arrExportResult[i].CityName);
 							sheet.setCell(i+2, 4, arrExportResult[i].CheckinDate);
 							sheet.setCell(i+2, 5, arrExportResult[i].CheckOutDate);
-							sheet.setCell(i+2, 7, arrExportResult[i].NoOfdays);
-							sheet.setCell(i+2, 8, arrExportResult[i].MOP); 
+							sheet.setCell(i+2, 6, arrExportResult[i].NoOfdays);
+							sheet.setCell(i+2, 7, arrExportResult[i].MOP); 
 							sheet.setCell(i+2, 8, arrExportResult[i].Propertyemail);
 							sheet.setCell(i+2, 9, arrExportResult[i].ContactNum); 
+							sheet.setCell(i+2, 10, arrExportResult[i].BookingCode);
+							sheet.setCell(i+2, 11, arrExportResult[i].Category);
 						}			 
 						
 						Grd_ListClient1.dataProvider = arrExportResult;
@@ -298,7 +301,8 @@
 					<mx:DataGridColumn dataField="Propertyemail"   width="100" textAlign="left"  />
 					<mx:DataGridColumn dataField="ContactNum"  headerText="Contact Number" width="100" textAlign="left" />
 					<mx:DataGridColumn dataField="BookingLevel" visible="false" /> 
-					<mx:DataGridColumn dataField="BookingCode" visible="false"/>
+					<mx:DataGridColumn dataField="BookingCode"  width="100"/>
+					<mx:DataGridColumn dataField="Category"  width="100"/>
 					
 				</mx:columns>
 			</mx:DataGrid> 

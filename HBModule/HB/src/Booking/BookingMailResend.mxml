@@ -41,7 +41,7 @@
 					Hlp_Property.dataProvider=sda;Hlp_Property.fnClear();PropertyId=0;
 					var dsa:ArrayCollection=new ArrayCollection();
 					Hlp_BookingCode.dataProvider=dsa;Hlp_BookingCode.fnClear();BookingId=0;
-					UsrEmail="";
+					UsrEmail="";Txt_Email.text = "";
 					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
 					{
 						Hlp_Client.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
@@ -114,6 +114,7 @@
 			
 			protected function FnClear():void
 			{
+				
 				FnHelp();
 			}
 			

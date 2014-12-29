@@ -31,7 +31,7 @@ namespace HB.Dao
 
            //Header Insert
            MapPOAndVendorEntity MapPOVEN = new MapPOAndVendorEntity();
-           MapPOVEN.PropertyId = Convert.ToInt32(document.SelectSingleNode("HdrXml").Attributes["PropertyId"].Value);
+           MapPOVEN.PropertyId = Convert.ToInt64(document.SelectSingleNode("HdrXml").Attributes["PropertyId"].Value);
            MapPOVEN.InvoiceAmount = Convert.ToDecimal(document.SelectSingleNode("HdrXml").Attributes["InvoiceAmount"].Value);
            MapPOVEN.InvoiceDate = document.SelectSingleNode("HdrXml").Attributes["InvoiceDate"].Value;
            MapPOVEN.InvoiceNo = document.SelectSingleNode("HdrXml").Attributes["InvoiceNo"].Value;
@@ -291,7 +291,7 @@ namespace HB.Dao
                command.CommandText = StoredProcedures.MapPOandVendor_Help;
                command.CommandType = CommandType.StoredProcedure;
                command.Parameters.Add("@Action", SqlDbType.NVarChar).Value = data[1].ToString();
-               command.Parameters.Add("@PropertyId", SqlDbType.BigInt).Value = Convert.ToInt32(data[2].ToString());
+               command.Parameters.Add("@PropertyId", SqlDbType.BigInt).Value = data[2].ToString();
                command.Parameters.Add("@FromDate", SqlDbType.NVarChar).Value = data[3].ToString();
                command.Parameters.Add("@ToDate", SqlDbType.NVarChar).Value = data[4].ToString();
                command.Parameters.Add("@Param1", SqlDbType.NVarChar).Value = data[5].ToString();

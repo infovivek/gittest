@@ -49,12 +49,31 @@ BEGIN
  SET @TMP = dbo.TRIM(REPLACE(@PenaltyDescription,'MakeMyTrip','StaySimplyfied'));
  SET @TMP1 = dbo.TRIM(REPLACE(@TMP,'Make My Trip','StaySimplyfied')); 
  SET @TMP2 = dbo.TRIM('<ul><li>'+@TMP1+'</li></ul>');
- INSERT INTO WRBHBAPIRoomRateDtls(HotelId,HeaderId,
- RoomRateroomTypeCode,RoomRateratePlanCode,
- RoomRateavailableCount,RoomRateavailStatus,PenaltyDescription)
- VALUES(@HotelId,@HeaderId,dbo.TRIM(@RoomRateroomTypeCode),
- dbo.TRIM(@RoomRateratePlanCode),dbo.TRIM(@RoomRateavailableCount),
- dbo.TRIM(@RoomRateavailStatus),dbo.TRIM(@TMP2));
- SELECT Id FROM WRBHBAPIRoomRateDtls WHERE Id=@@IDENTITY;
+ IF EXISTS (SELECT NULL FROM WRBHBAPIRoomRateDtls WHERE HeaderId = @HeaderId AND
+ HotelId = @HotelId AND RoomRateratePlanCode = @RoomRateratePlanCode AND
+ RoomRateroomTypeCode = @RoomRateroomTypeCode)
+  BEGIN
+   UPDATE WRBHBAPIRoomRateDtls SET 
+   RoomRateavailableCount = @RoomRateavailableCount,
+   RoomRateavailStatus = @RoomRateavailStatus,
+   PenaltyDescription = @TMP2
+   WHERE HeaderId = @HeaderId AND HotelId = @HotelId AND 
+   RoomRateratePlanCode = @RoomRateratePlanCode AND
+   RoomRateroomTypeCode = @RoomRateroomTypeCode;
+   SELECT Id FROM WRBHBAPIRoomRateDtls
+   WHERE HeaderId = @HeaderId AND HotelId = @HotelId AND 
+   RoomRateratePlanCode = @RoomRateratePlanCode AND
+   RoomRateroomTypeCode = @RoomRateroomTypeCode;
+  END
+ ELSE
+  BEGIN
+   INSERT INTO WRBHBAPIRoomRateDtls(HotelId,HeaderId,
+   RoomRateroomTypeCode,RoomRateratePlanCode,
+   RoomRateavailableCount,RoomRateavailStatus,PenaltyDescription)
+   VALUES(@HotelId,@HeaderId,dbo.TRIM(@RoomRateroomTypeCode),
+   dbo.TRIM(@RoomRateratePlanCode),dbo.TRIM(@RoomRateavailableCount),
+   dbo.TRIM(@RoomRateavailStatus),dbo.TRIM(@TMP2));
+   SELECT Id FROM WRBHBAPIRoomRateDtls WHERE Id=@@IDENTITY;
+  END
 END
 GO

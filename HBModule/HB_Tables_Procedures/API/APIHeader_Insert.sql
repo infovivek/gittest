@@ -25,20 +25,21 @@ AS
 BEGIN 
  DECLARE @CityCode NVARCHAR(100) = '';
  SET @CityCode = (SELECT ISNULL(CityCode,'') FROM WRBHBCity WHERE Id=@CityId);
- INSERT INTO WRBHBAPIHeader(CityCode,FromDt,ToDt,CreatedBy,CreatedDate,
+ /*INSERT INTO WRBHBAPIHeader(CityCode,FromDt,ToDt,CreatedBy,CreatedDate,
  ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId,CityId)
  VALUES(dbo.TRIM(@CityCode),@FromDt,@ToDt,@UsrId,GETDATE(),@UsrId,GETDATE(),
  1,0,NEWID(),@CityId);
- --
- --DECLARE @SDF NVARCHAR(1000) = '';
- --SET @SDF ='"<StayDateRange start=\"'+@FromDt+'\" end=\"'+@ToDt+'\"/>"';
- --
- SELECT Id,CityCode,'New' FROM WRBHBAPIHeader WHERE Id=@@IDENTITY;
- /*IF EXISTS (SELECT NULL FROM WRBHBAPIHeader WHERE CityId=@CityId AND
+ SELECT Id,CityCode,'New' FROM WRBHBAPIHeader WHERE Id=@@IDENTITY;*/
+ 
+ IF EXISTS (SELECT NULL FROM WRBHBAPIHeader WHERE CityId=@CityId AND
  CityCode=@CityCode AND IsActive=1 AND IsDeleted=0)-- AND
  --CONVERT(DATE,CreatedDate,103)=CONVERT(DATE,GETDATE(),103))
   BEGIN
-   SELECT TOP 1 Id,CityCode,'Exists' FROM WRBHBAPIHeader 
+   --SELECT TOP 1 Id,CityCode,'Exists' FROM WRBHBAPIHeader
+   UPDATE WRBHBAPIHeader SET FromDt = @FromDt,ToDt = @ToDt,
+   ModifiedDate = GETDATE() WHERE CityId = @CityId AND
+   CityCode = @CityCode AND IsActive = 1 AND IsDeleted = 0; 
+   SELECT TOP 1 Id,CityCode,'New','Exists' FROM WRBHBAPIHeader 
    WHERE CityId=@CityId AND CityCode=@CityCode AND IsActive=1 AND 
    IsDeleted=0 ORDER BY Id DESC; --AND
    --CONVERT(DATE,CreatedDate,103)=CONVERT(DATE,GETDATE(),103);
@@ -50,7 +51,7 @@ BEGIN
    VALUES(dbo.TRIM(@CityCode),@FromDt,@ToDt,@UsrId,GETDATE(),
    @UsrId,GETDATE(),1,0,NEWID(),@CityId);
    SELECT Id,CityCode,'New' FROM WRBHBAPIHeader WHERE Id=@@IDENTITY;
-  END*/
+  END
  /*SET @CityCode = (SELECT ISNULL(CityCode,'') FROM WRBHBAPICityCode 
  WHERE Id=@CityId);
  IF EXISTS (SELECT NULL FROM WRBHBAPIHeader WHERE CityId=@CityId AND

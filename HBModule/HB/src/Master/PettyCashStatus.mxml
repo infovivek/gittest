@@ -869,7 +869,7 @@
 										   visible="true">
 						</mx:DataGridColumn>
 						<mx:DataGridColumn dataField="Description" headerText="Description" width="140" 
-										   editable="false" visible="true">
+										   editable="true" visible="true">
 						</mx:DataGridColumn>
 						
 						<mx:DataGridColumn dataField="Amount" headerText="Amount" width="100" editable="false">

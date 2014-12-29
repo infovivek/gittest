@@ -63,6 +63,8 @@
     <Compile Include="CheckInDtlsBo.cs" />
     <Compile Include="CheckInForecastReportBO.cs" />
     <Compile Include="CheckoutAndIntermediateBO.cs" />
+    <Compile Include="CheckOutandInterSettleDtlBO.cs" />
+    <Compile Include="CheckOutandInterSettleHdrBO.cs" />
     <Compile Include="CheckOutPaymentBO.cs" />
     <Compile Include="CheckOutPaymentCardBO.cs" />
     <Compile Include="CheckOutPaymentCashBO.cs" />

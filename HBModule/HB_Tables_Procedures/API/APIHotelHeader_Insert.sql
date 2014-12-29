@@ -22,8 +22,19 @@ CREATE PROCEDURE [dbo].[SP_APIHotelHeader_Insert](
 @HeaderId BIGINT,@HotelId BIGINT,@StarRating INT,@HotelCount INT) 
 AS
 BEGIN
- INSERT INTO WRBHBAPIHotelHeader(HeaderId,HotelId,StarRating,HotelCount)
- VALUES(@HeaderId,@HotelId,@StarRating,@HotelCount);
- SELECT Id FROM WRBHBAPIHotelHeader WHERE Id=@@IDENTITY;
+ IF EXISTS (SELECT NULL FROM WRBHBAPIHotelHeader WHERE HotelId = @HotelId AND
+ HeaderId = @HeaderId)
+  BEGIN
+   UPDATE WRBHBAPIHotelHeader SET StarRating = @StarRating
+   WHERE HotelId = @HotelId AND HeaderId = @HeaderId;
+   SELECT Id FROM WRBHBAPIHotelHeader
+   WHERE HotelId = @HotelId AND HeaderId = @HeaderId
+  END
+ ELSE
+  BEGIN
+   INSERT INTO WRBHBAPIHotelHeader(HeaderId,HotelId,StarRating,HotelCount)
+   VALUES(@HeaderId,@HotelId,@StarRating,@HotelCount);
+   SELECT Id FROM WRBHBAPIHotelHeader WHERE Id=@@IDENTITY;
+  END
 END
 GO

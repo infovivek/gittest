@@ -24,7 +24,7 @@ namespace HB.Dao
 
            //Header Insert
            VendorSettlementEntity VendoSettle = new VendorSettlementEntity();
-           var PropertyId = Convert.ToInt32(document.SelectSingleNode("HdrXml").Attributes["PropertyId"].Value);
+           var PropertyId = Convert.ToInt64(document.SelectSingleNode("HdrXml").Attributes["PropertyId"].Value);
 
            document = new XmlDocument();
            document.LoadXml(data[2].ToString());

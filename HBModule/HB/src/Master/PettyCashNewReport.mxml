@@ -224,7 +224,7 @@
 					xlsFile.sheets.addItem(sheet);
 					var bytes: ByteArray = xlsFile.saveToByteArray();
 					var fr:FileReference = new FileReference();
-					fr.save(bytes,"SampleExport.xls");
+					fr.save(bytes,"PC Report.xls");
 				}
 				else
 				{

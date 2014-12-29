@@ -29,7 +29,7 @@ WHERE IsActive=1 AND IsDeleted=0);
 SET @CLogoAlt='Staysimplyfied';
 --
 DECLARE @ClientName NVARCHAR(100),@ClientName1 NVARCHAR(100);
-SELECT @ClientName = ClientName FROM WRBHBClientManagement
+SELECT @ClientName = dbo.TRIM(ClientName) FROM WRBHBClientManagement
 WHERE Id = (SELECT ClientId FROM WRBHBBooking WHERE Id = @Id);
 CREATE TABLE #QAZXSW(Id INT,Name NVARCHAR(100));
 INSERT INTO #QAZXSW(Id,Name)
@@ -188,7 +188,7 @@ IF @Action = 'ClientGuestLoad'
   Id=(SELECT ClientId FROM WRBHBBooking WHERE Id=@Id)); 
  END
 IF @Action = 'RoomBookingConfirmed'
- BEGIN  
+ BEGIN
   -- Dataset Table 0
   CREATE TABLE #FFF(BookingId BIGINT,RoomId BIGINT,ChkInDt NVARCHAR(100),
   ChkOutDt NVARCHAR(100),Tariff DECIMAL(27,2),Occupancy NVARCHAR(100),
@@ -230,7 +230,7 @@ IF @Action = 'RoomBookingConfirmed'
   --
   DECLARE @Taxes NVARCHAR(100),@TypeofPtyy NVARCHAR(100),@TXADED NVARCHAR(100);
   DECLARE @BookingPropertyTableId BIGINT;
-  --  
+  --
   IF EXISTS (SELECT NULL FROM WRBHBBookingProperty P
   LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest G WITH(NOLOCK)ON
   G.BookingId=P.BookingId AND G.BookingPropertyTableId=P.Id
@@ -290,6 +290,8 @@ IF @Action = 'RoomBookingConfirmed'
   LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK) ON  C.Id=B.ClientId
   LEFT OUTER JOIN WRBHBUser U  WITH(NOLOCK) ON  U.Id=B.CreatedBy
   WHERE B.Id=@Id;
+  --
+  --select 'df';return;
   -- Get CPP & Property Mail
   DECLARE @MailStr NVARCHAR(1000)='';  
   IF EXISTS(SELECT NULL FROM WRBHBBookingProperty BP
@@ -589,7 +591,7 @@ IF @Action = 'RoomBookingConfirmed'
     SELECT * FROM dbo.Split(@PropertyEmail, ',');
    END  
   -- Final Select
-  SELECT Email FROM #Mail WHERE Email != '';
+  SELECT Email FROM #Mail WHERE Email != '' GROUP BY Email;
   -- Dataset Table 9 Email Address End
   -- Dataset Table 10 Begin
   SELECT MasterClientId FROM WRBHBClientSMTP
@@ -597,6 +599,8 @@ IF @Action = 'RoomBookingConfirmed'
   MasterClientId=(SELECT MasterClientId FROM WRBHBClientManagement
   WHERE IsActive=1 AND IsDeleted=0 AND
   Id=(SELECT ClientId FROM WRBHBBooking WHERE Id=@Id));
+  --
+  --select 'df';return;
   -- Dataset Table 10 End
   DECLARE @BelowTACcontent NVARCHAR(MAX) = 'Kindly arrange to pay the above TAC amount to HummingBird by CHEQUE or through Bank Transfer (NEFT).<br><b>CHEQUE</b> : Kindly issue the cheque in Favour of "Humming Bird Travel & Stay Pvt Ltd".<br><b>Bank Transfer (NEFT)</b> : <br>Payee Name : Humming Bird Travel & Stay Pvt. Ltd.<br>Bank Name : HDFC Bank<br>Account No. : 17552560000226<br>IFSC : HDFC0001755';
   -- Dataset Table 11 bEGIN
@@ -641,7 +645,7 @@ IF @Action = 'RoomBookingConfirmed'
     ServicePaymentMode,'NOTBTC',@AgreedTariff,@BelowTACcontent,RoomNo 
     FROM #PropertyMailBTCChecking;
    END
-  -- Dataset Table 11 eND  
+  -- Dataset Table 11 eND 
  END
 IF @Action = 'BedBookingConfirmed'
  BEGIN

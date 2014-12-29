@@ -96,7 +96,8 @@ IF @Action = 'SingleDoubleRateLoad'
  END
 IF @Action = 'CityCode'
  BEGIN
-  select 'SRS';
+  --select 'SRS';
+  select CityCode from WRBHBCity where Id in (2344,2244)
   /*create table #dffd(cc nvarchar(100));
   insert into #dffd(cc)
   select CityCode from WRBHBAPICityCode
@@ -117,7 +118,8 @@ IF @Action = 'GetCityId'
   /*SELECT Id FROM WRBHBCity 
   WHERE ISNULL(CityCode,'') != '' AND IsActive = 1 AND IsDeleted = 0
   ORDER BY Id ASC;*/
-  SELECT 1107 AS Id; --BANGLORE
+  select Id from WRBHBCity where Id in (2344,2244)
+  --SELECT 1107 AS Id; --BANGLORE
   --SELECT 2423 AS Id; --COIMBATORE
   --SELECT * FROM WRBHBCity WHERE CityCode='CJB'
   --SELECT * FROM WRBHBCity WHERE CityCode='BLR'

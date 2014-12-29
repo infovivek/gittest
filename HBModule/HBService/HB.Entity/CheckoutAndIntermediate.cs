@@ -70,5 +70,6 @@ namespace HB.Entity
         public string BillEndDate { get; set; }
         public string Intermediate { get; set; }
         public bool Preformainvoice { get; set; }
+        public string Email { get; set; }
     }
 }

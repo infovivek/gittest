@@ -295,7 +295,7 @@ BEGIN
 		
 	    INSERT INTO #Final1(ServiceItem,ItemId,Quantity,VendorRate,TotalCost,Revenue,Flag)
 	    SELECT 'Total' AS ServiceItem,'' AS ItemId,SUM(Quantity) AS Quantity,SUM(Cost) AS Cost,
-	    Quantity*Cost AS Total,
+	    SUM(Quantity)*(Cost) AS Total,
 	    SUM(Revenue) AS Revenue,3 FROM #Cost
 	    group by Quantity,Cost
 	    
@@ -306,7 +306,7 @@ BEGIN
 	    
 	    INSERT INTO #Final(ServiceItem,ItemId,Quantity,VendorRate,TotalCost,Revenue,Flag)
 	   
-	    SELECT ServiceItem,ItemId,SUM(Quantity) AS Quantity,Cost,SUM(Quantity)*Cost AS Total,
+	    SELECT ServiceItem,ItemId,SUM(Quantity) AS Quantity,Cost,SUM(Quantity)*Cost AS TotalCost,
 	    SUM(Revenue) AS Revenue,1 FROM #Cost
 	    group by ServiceItem,ItemId,Cost,Flag
 	    ORDER BY Flag ASC
@@ -322,6 +322,7 @@ BEGIN
 	   	     
 	    SELECT ServiceItem,Quantity,VendorRate,TotalCost,Revenue 
 	    FROM #Final
+	    ORDER BY Flag ASC
 		
 	    
 	  END 
@@ -581,7 +582,7 @@ BEGIN
 		
 	    INSERT INTO #Final2(ServiceItem,ItemId,Quantity,VendorRate,TotalCost,Revenue,Flag)
 	    SELECT 'Total' AS ServiceItem,'' AS ItemId,SUM(Quantity) AS Quantity,SUM(Cost) AS Cost,
-	    Quantity*Cost AS Total,
+	    SUM(Quantity)*Cost AS Total,
 	    SUM(Revenue) AS Revenue,3 FROM #Costs
 	    group by Quantity,Cost
 		
@@ -604,8 +605,9 @@ BEGIN
 	    
 	   	    
 	    
-	    SELECT ServiceItem,Quantity,VendorRate,TotalCost,Revenue FROM #Finals
-	   
+	    SELECT ServiceItem,Quantity,VendorRate,TotalCost,Revenue 
+	    FROM #Finals
+	    ORDER BY Flag ASC
 	    
 	  END 
  IF @Action='Print'

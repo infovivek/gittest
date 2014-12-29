@@ -15,7 +15,7 @@ namespace HB.Entity
 
        public string Property { get; set; }
 
-       public int PropertyId { get; set; }
+       public long PropertyId { get; set; }
 
        public decimal TotalPOAmount { get; set; }
 

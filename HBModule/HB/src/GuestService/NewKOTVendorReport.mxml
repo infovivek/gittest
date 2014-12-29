@@ -273,13 +273,13 @@
 					xlsFile = new ExcelFile();
 					var sheet:Sheet = new Sheet();
 					
-					sheet.resize(arrExportResult.length+1,5);
+					sheet.resize(arrExportResult.length+1,4);
 					
 					sheet.setCell(0,0,'ServiceItem');
 					sheet.setCell(0,1,'Quantity');
 					sheet.setCell(0,2,'VendorRate');
 					sheet.setCell(0,3,'TotalCost');
-					sheet.setCell(0,4,'Revenue');
+					
 					
 					
 					for(var i:int=0;i<arrExportResult.length;i++)
@@ -288,7 +288,7 @@
 						sheet.setCell(i+1, 1, arrExportResult[i].Quantity);
 						sheet.setCell(i+1, 2, arrExportResult[i].VendorRate);
 						sheet.setCell(i+1, 3, arrExportResult[i].TotalCost);
-						sheet.setCell(i+1, 4, arrExportResult[i].Revenue);
+						
 						
 					}
 					Grd_Status1.dataProvider = arrExportResult;
@@ -313,13 +313,13 @@
 			
 		]]>
 	</fx:Script>
-	<mx:Label x="297" y="55" text="Property"/>
+	<mx:Label x="277" y="55" text="Property"/>
 	<mx:Label x="96" y="51" width="10" height="12" text="*" color="Red"/>
-	<mx:Label x="545" y="56" text="From"/>
+	<mx:Label x="524" y="56" text="From"/>
 	
-	<mx:DateField x="726" y="54" width="110" id="dt_To" yearNavigationEnabled="true" tabIndex="4" 
+	<mx:DateField x="706" y="54" width="100" id="dt_To" yearNavigationEnabled="true" tabIndex="4" 
 				  formatString="DD/MM/YYYY"/>
-	<mx:Button x="846" y="54" width="65" label="Search" click="Grd_DetailsClick()"/>
+	<mx:Button x="826" y="54" width="65" label="Search" click="Grd_DetailsClick()"/>
 	
 	<mx:DataGrid id="Grd_Status" x="65" y="102" editable="true" width="843" height="309" visible="true">
 		<mx:columns>
@@ -327,7 +327,7 @@
 			<mx:DataGridColumn dataField="Quantity" headerText="Quantity" width="150" editable="false" />
 			<mx:DataGridColumn dataField="Cost" headerText="VendorRate" width="150" editable="false" textAlign="center"/>							
 			<mx:DataGridColumn dataField="Total" headerText="TotalCost" width="150" editable="false" textAlign="center"/>
-			<mx:DataGridColumn dataField="Revenue" headerText="Revenue" width="150" editable="false" textAlign="center"/>
+			<mx:DataGridColumn dataField="Revenue" headerText="Revenue" width="150" editable="false" visible="false" textAlign="center"/>
 			
 		</mx:columns>
 	</mx:DataGrid>
@@ -341,13 +341,13 @@
 			</mx:columns>
 	</mx:DataGrid>
 
-	<WrbHelpComp:HelpText id="hlp_Property" x="354" y="54" width="183" height="23" depth="46"
+	<WrbHelpComp:HelpText id="hlp_Property" x="334" y="54" width="183" height="23" depth="46"
 						  onselection="{OnSelectionPropertyname()}" pxSetColumnsWidth="193,0"
 						  pxSetHeight="183" pxTabIndex="2">
 	</WrbHelpComp:HelpText>
 	<mx:Label x="57" y="56" text="Vendor"/>
-	<mx:Label x="575" y="51" width="10" height="12" text="*" color="Red"/>
-	<WrbHelpComp:HelpText id="hlp_vendor" x="107" y="54" width="183" height="23" depth="46"
+	<mx:Label x="554" y="51" width="10" height="12" text="*" color="Red"/>
+	<WrbHelpComp:HelpText id="hlp_vendor" x="107" y="54" width="168" height="23" depth="46"
 						  onselection="{OnSelectionVendorname()}" pxSetColumnsWidth="0,193"
 						  pxSetHeight="183" pxTabIndex="1">
 	</WrbHelpComp:HelpText>
@@ -355,14 +355,14 @@
 	</WrbComp:Button_BB>
 	<WrbComp:Button_BB x="550" y="465" Lable_val="Print" id="btn_Print" click="Print()">
 	</WrbComp:Button_BB>
-	<mx:Label x="697" y="56" text="To"/>
-	<mx:Label x="714" y="51" width="10" height="12" text="*" color="Red"/>
-	<mx:DateField id="dt_From" x="586" y="54" width="105" height="23" formatString="DD/MM/YYYY"
+	<mx:Label x="677" y="56" text="To"/>
+	<mx:Label x="694" y="51" width="10" height="12" text="*" color="Red"/>
+	<mx:DateField id="dt_From" x="565" y="54" width="105" height="23" formatString="DD/MM/YYYY"
 				  tabIndex="3" yearNavigationEnabled="true"/>
 	<mx:Label x="138" y="426" text="Total"/>
-	<mx:Label id="lbl_Revenue" x="804" y="426" width="62" text=""/>
-	<mx:Label id="lbl_Total" x="636" y="426" width="70" text=""/>
-	<mx:Label id="lbl_VendorRate" x="479" y="426" width="66" text=""/>
-	<mx:Label id="lbl_Quantity" x="334" y="426" width="54" text=""/>
+	<mx:Label id="lbl_Revenue" x="824" y="426" width="62" visible="false" text=""/>
+	<mx:Label id="lbl_Total" x="776" y="426" width="70" text=""/>
+	<mx:Label id="lbl_VendorRate" x="579" y="426" width="66" text=""/>
+	<mx:Label id="lbl_Quantity" x="394" y="426" width="54" text=""/>
 	
 </s:Application>

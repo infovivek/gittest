@@ -40,7 +40,8 @@ namespace HB.Dao
             }
             else
             {
-                message.From = new System.Net.Mail.MailAddress("stay@staysimplyfied.com", "", System.Text.Encoding.UTF8);
+                //message.From = new System.Net.Mail.MailAddress("stay@staysimplyfied.com", "", System.Text.Encoding.UTF8);
+                message.From = new System.Net.Mail.MailAddress("stay@hummingbirdindia.com", "", System.Text.Encoding.UTF8);
             }
             //message.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
             //message.Subject = "Bed Booking Confirmation - " + ds.Tables[2].Rows[0][2].ToString();

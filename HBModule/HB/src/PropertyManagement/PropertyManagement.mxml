@@ -3720,18 +3720,18 @@
 					{
 						arrObj.LTAgreed="0";
 					}
-					if(arrObj.Inclusive=="true")
-					{							
-						arrObj.STAgreed="0";
+//					if(arrObj.Inclusive=="true")
+//					{							
+//						arrObj.STAgreed="0";
+//					
+//						arrObj.STRack="0";
+//					
+//						arrObj.LTRack="0";
+//					
+//						arrObj.LTAgreed="0";							
+//					}
 					
-						arrObj.STRack="0";
-					
-						arrObj.LTRack="0";
-					
-						arrObj.LTAgreed="0";							
-					}
-					
-					if((arrObj.Inclusive=="false")&&(arrObj.STRack=="0")&&(arrObj.LTRack=="0")&&(arrObj.LTAgreed=="0")&&(arrObj.STAgreed=="0"))
+					if((arrObj.LTRack=="0")&&(arrObj.LTAgreed=="0")&&(arrObj.STAgreed=="0"))
 					{
 						
 						ErrString="* Rack OR Agreed are Requierd";
@@ -3751,7 +3751,7 @@
 //					{
 //						ErrString="ST Rack OR STAgreed Any one Service Tax is Enter.System Not Allow Both.";
 //					}
-					if((arrObj.Inclusive=="false")&&(arrObj.LTRack!="0")&&(arrObj.LTAgreed!="0"))
+					if((arrObj.LTRack!="0")&&(arrObj.LTAgreed!="0"))
 					{
 						ErrString="* LTRack OR LTAgreed Any one Service Tax is Enter.System Not Allow Both.";
 					}

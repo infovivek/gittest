@@ -49,9 +49,21 @@
 					{
 						Cnt = Ds_Objects.result.Tables.Table.Rows[0].Cnt;
 					}
-					if(Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					if(drp_category.selectedItem !="ClientWise")
 					{
-						Grd_BookingCnt.dataProvider = Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+						
+						if(Ds_Objects.result.Tables.Table1.Rows.length > 0)
+						{
+							Grd_BookingCnt.dataProvider = Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+						}
+					}
+					else
+					{
+						
+						if(Ds_Objects.result.Tables.Table1.Rows.length > 0)
+						{
+							Grd_MasterBookingCnt.dataProvider = Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+						}
 					}
 										
 				}
@@ -124,6 +136,8 @@
 			
 			protected function Btn_ExportExcel_clickHandler(event:MouseEvent):void
 			{
+			  if(drp_category.selectedItem!="ClientWise")
+			  {
 				Ac = new ArrayCollection();
 				Ac = Grd_BookingCnt.dataProvider as ArrayCollection;
 				if(Ac.length > 0)
@@ -256,6 +270,144 @@
 					alignAlert(Alert.show("User Details is Required.","Alert Message !",
 						Alert.OK,null,null,iconWarning,Alert.OK),10,"");
 				}
+			  }
+			  else
+			  {
+				  Ac = new ArrayCollection();
+				  Ac = Grd_MasterBookingCnt.dataProvider as ArrayCollection;
+				  if(Ac.length > 0)
+				  {
+					  var xlsFile:ExcelFile = new ExcelFile();
+					  var sheet:Sheet = new Sheet();
+					  var sheet1:Sheet = new Sheet();
+					  sheet.resize(Ac.length+3,37);
+					  sheet.setCell(0,0,"");
+					  sheet.setCell(1,0,"");
+					  sheet.setCell(2,0,"Client Name");
+					  sheet.setCell(2,1,"Master Client Name");
+					  sheet.setCell(2,2,"1");
+					  sheet.setCell(2,3,"2");
+					  sheet.setCell(2,4,"3");
+					  sheet.setCell(2,5,"4");
+					  sheet.setCell(2,6,"5");
+					  sheet.setCell(2,7,"6");
+					  sheet.setCell(2,8,"7");
+					  sheet.setCell(2,9,"8");
+					  sheet.setCell(2,10,"9");
+					  sheet.setCell(2,11,"10");
+					  sheet.setCell(2,12,"11");
+					  sheet.setCell(2,13,"12");
+					  sheet.setCell(2,14,"13");
+					  sheet.setCell(2,15,"14");
+					  sheet.setCell(2,16,"15");
+					  sheet.setCell(2,17,"16");
+					  sheet.setCell(2,18,"17");
+					  sheet.setCell(2,19,"18");
+					  sheet.setCell(2,20,"19");
+					  sheet.setCell(2,21,"20");
+					  sheet.setCell(2,22,"21");
+					  sheet.setCell(2,23,"22");
+					  sheet.setCell(2,24,"23");
+					  sheet.setCell(2,25,"24");
+					  sheet.setCell(2,26,"25");
+					  sheet.setCell(2,27,"26");
+					  sheet.setCell(2,28,"27");
+					  if(Cnt == 28)
+					  {
+						  sheet.setCell(2,29,"28");
+						  sheet.setCell(2,30,"Total");
+					  }
+					  if(Cnt == 29)
+					  {
+						  sheet.setCell(2,29,"28");
+						  sheet.setCell(2,30,"29");
+						  sheet.setCell(2,31,"Total");
+					  }				    
+					  if(Cnt == 30)
+					  {
+						  sheet.setCell(2,29,"28");
+						  sheet.setCell(2,30,"29");
+						  sheet.setCell(2,31,"30");
+						  sheet.setCell(2,32,"Total");
+					  }				    
+					  if(Cnt == 31)
+					  {
+						  sheet.setCell(2,29,"28");
+						  sheet.setCell(2,30,"29");
+						  sheet.setCell(2,31,"30");
+						  sheet.setCell(2,32,"31");
+						  sheet.setCell(2,33,"Total");
+					  }				    				
+					  for(var i:int = 0; i < Ac.length; i++)
+					  {
+						  sheet.setCell(i+3, 0, Ac[i].Name);
+						  sheet.setCell(i+3, 1, Ac[i].MasterClient);
+						  sheet.setCell(i+3, 2, Ac[i].D01);
+						  sheet.setCell(i+3, 3, Ac[i].D02);
+						  sheet.setCell(i+3, 4, Ac[i].D03);
+						  sheet.setCell(i+3, 5, Ac[i].D04);
+						  sheet.setCell(i+3, 6, Ac[i].D05);
+						  sheet.setCell(i+3, 7, Ac[i].D06);
+						  sheet.setCell(i+3, 8, Ac[i].D07);
+						  sheet.setCell(i+3, 9, Ac[i].D08);
+						  sheet.setCell(i+3, 10, Ac[i].D09);
+						  sheet.setCell(i+3, 11, Ac[i].D10);
+						  sheet.setCell(i+3, 12, Ac[i].D11);
+						  sheet.setCell(i+3, 13, Ac[i].D12);
+						  sheet.setCell(i+3, 14, Ac[i].D13);
+						  sheet.setCell(i+3, 15, Ac[i].D14);
+						  sheet.setCell(i+3, 16, Ac[i].D15);
+						  sheet.setCell(i+3, 17, Ac[i].D16);
+						  sheet.setCell(i+3, 18, Ac[i].D17);
+						  sheet.setCell(i+3, 19, Ac[i].D18);
+						  sheet.setCell(i+3, 20, Ac[i].D19);
+						  sheet.setCell(i+3, 21, Ac[i].D20);
+						  sheet.setCell(i+3, 22, Ac[i].D21);
+						  sheet.setCell(i+3, 23, Ac[i].D22);
+						  sheet.setCell(i+3, 24, Ac[i].D23);
+						  sheet.setCell(i+3, 25, Ac[i].D24);
+						  sheet.setCell(i+3, 26, Ac[i].D25);
+						  sheet.setCell(i+3, 27, Ac[i].D26);
+						  sheet.setCell(i+3, 28, Ac[i].D27);
+						  if(Cnt == 28)
+						  {
+							  sheet.setCell(i+3, 29, Ac[i].D28);
+							  sheet.setCell(i+3, 30, Ac[i].Tot);
+						  }
+						  if(Cnt == 29)
+						  {
+							  sheet.setCell(i+3, 29, Ac[i].D28);
+							  sheet.setCell(i+3, 30, Ac[i].D29);
+							  sheet.setCell(i+3, 31, Ac[i].Tot);
+						  }
+						  if(Cnt == 30)
+						  {
+							  sheet.setCell(i+3, 29, Ac[i].D28);
+							  sheet.setCell(i+3, 30, Ac[i].D29);
+							  sheet.setCell(i+3, 31, Ac[i].D30);
+							  sheet.setCell(i+3, 32, Ac[i].Tot);
+						  }
+						  if(Cnt == 31)
+						  {
+							  sheet.setCell(i+3, 29, Ac[i].D28);
+							  sheet.setCell(i+3, 30, Ac[i].D29);
+							  sheet.setCell(i+3, 31, Ac[i].D30);
+							  sheet.setCell(i+3, 32, Ac[i].D31);
+							  sheet.setCell(i+3, 33, Ac[i].Tot);
+						  }					    
+					  }
+					  xlsFile.sheets.addItem(sheet);
+					  var bytes:ByteArray = xlsFile.saveToByteArray();
+					  var fr:FileReference = new FileReference();
+					  var str:String="UserWiseBookingCountReport.xls";
+					  fr.save(bytes,str);
+				  }
+				  else
+				  {
+					  alignAlert(Alert.show("User Details is Required.","Alert Message !",
+						  Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+				  }
+			  }
 			}
 			public function Ddl_category_changeHandler():void
 			{
@@ -265,6 +417,9 @@
 					lbl_Client.visible=true;
 					lnk_Clear.visible=true;
 					brd_Rbtn_client.visible=false;
+					Grd_BookingCnt.visible=true;
+					Grd_MasterBookingCnt.visible=false;
+					Grd_MasterBookingCnt.dataProvider=null;
 				}
 				else if(drp_category.selectedItem=="ClientWise")
 				{
@@ -273,6 +428,9 @@
 					lnk_Clear.visible=true;
 					brd_Rbtn_client.visible=true;
 					Rbtn_Booking.selected=true;
+					Grd_BookingCnt.visible=false;
+					Grd_MasterBookingCnt.visible=true;
+					Grd_MasterBookingCnt.dataProvider=null;
 				}
 				else if(drp_category.selectedItem=="UserWise")
 				{
@@ -280,6 +438,9 @@
 					lbl_Client.visible=false;
 					brd_Rbtn_client.visible=false;
 					lnk_Clear.visible=false;
+					Grd_BookingCnt.visible=true;
+					Grd_MasterBookingCnt.visible=false;
+					Grd_MasterBookingCnt.dataProvider=null;
 				}
 			}
 			public function Ddl_Client_changeHandler():void
@@ -310,7 +471,7 @@
 	<fx:Script source = "..\\Common\\Functions.as"/>
 	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
 	<s:VGroup x="0" y="0" width="100%" height="100%">
-		<s:BorderContainer width="100%" height="100%" borderColor="#fbf9f9" borderVisible="false">
+		<s:BorderContainer width="100%" height="100%" borderColor="#fbf9f9" borderVisible="false" id="Brd_Client">
 			
 			<mx:DataGrid id="Grd_BookingCnt" x="0" y="129" width="100%" height="369" depth="1">
 				<mx:columns>
@@ -349,6 +510,44 @@
 					<mx:DataGridColumn dataField="Tot" headerText="Total" width="75"/>
 				</mx:columns>
 			</mx:DataGrid>
+			<mx:DataGrid id="Grd_MasterBookingCnt" x="0" y="129" width="100%" height="369" depth="1" visible="false">
+					<mx:columns>
+						<mx:DataGridColumn dataField="Name" headerText="Client Name" width="150"/>
+						<mx:DataGridColumn dataField="MasterClient" headerText="Master Client Name" width="150"/>
+						<mx:DataGridColumn dataField="D01" headerText="1"/>					
+						<mx:DataGridColumn dataField="D02" headerText="2"/>
+						<mx:DataGridColumn dataField="D03" headerText="3"/>
+						<mx:DataGridColumn dataField="D04" headerText="4"/>
+						<mx:DataGridColumn dataField="D05" headerText="5"/>
+						<mx:DataGridColumn dataField="D06" headerText="6"/>
+						<mx:DataGridColumn dataField="D07" headerText="7"/>
+						<mx:DataGridColumn dataField="D08" headerText="8"/>
+						<mx:DataGridColumn dataField="D09" headerText="9"/>					
+						<mx:DataGridColumn dataField="D10" headerText="10"/>					
+						<mx:DataGridColumn dataField="D11" headerText="11"/>
+						<mx:DataGridColumn dataField="D12" headerText="12"/>
+						<mx:DataGridColumn dataField="D13" headerText="13"/>
+						<mx:DataGridColumn dataField="D14" headerText="14"/>
+						<mx:DataGridColumn dataField="D15" headerText="15"/>
+						<mx:DataGridColumn dataField="D16" headerText="16"/>
+						<mx:DataGridColumn dataField="D17" headerText="17"/>
+						<mx:DataGridColumn dataField="D18" headerText="18"/>
+						<mx:DataGridColumn dataField="D19" headerText="19"/>
+						<mx:DataGridColumn dataField="D20" headerText="20"/>
+						<mx:DataGridColumn dataField="D21" headerText="21"/>
+						<mx:DataGridColumn dataField="D22" headerText="22"/>
+						<mx:DataGridColumn dataField="D23" headerText="23"/>
+						<mx:DataGridColumn dataField="D24" headerText="24"/>
+						<mx:DataGridColumn dataField="D25" headerText="25"/>
+						<mx:DataGridColumn dataField="D26" headerText="26"/>
+						<mx:DataGridColumn dataField="D27" headerText="27"/>
+						<mx:DataGridColumn dataField="D28" headerText="28"/>
+						<mx:DataGridColumn dataField="D29" headerText="29"/>
+						<mx:DataGridColumn dataField="D30" headerText="30"/>
+						<mx:DataGridColumn dataField="D31" headerText="31"/>
+						<mx:DataGridColumn dataField="Tot" headerText="Total" width="75"/>
+					</mx:columns>
+				</mx:DataGrid>
 			<WrbComp:Button_HB id="Btn_Show" x="666" y="21" height="32" _Label="Show"
 							   click="Btn_Show_clickHandler(event)"/>
 			<WrbComp:Button_HB id="Btn_ExportExcel" x="661" y="61" _Label="Export to Excel"

@@ -98,13 +98,13 @@ IF @Action='PageLoad'
     SELECT @ClientAddress=CAddress1+','+CCity+','+CState+','+CPincode FROM WRBHBClientManagement H   
 	WHERE H.Id=@ClientId
 	
-	select distinct  h.GuestName as GuestName,h.Name,h.Stay,h.Type,h.BookingLevel,
+	SELECT  h.GuestName as GuestName,h.Name,h.Stay,h.Type,h.BookingLevel,
 	convert(nvarchar(100),h.BillDate,103) as BillDate,
 	h.ClientName,h.Id,h.InVoiceNo,
 	h.ChkOutTariffTotal as TotalTariff,h.ChkOutTariffLT as LuxuryTax,h.ChkOutTariffNetAmount as NetAmount,
 	h.ChkOutTariffST2 as SerivceNet,h.ChkOutTariffST3 as SerivceTax,h.ChkOutTariffCess as Cess,
 	h.ChkOutTariffHECess as HCess,h.ChkOutTariffSC as ServiceCharge,convert(nvarchar(100),
-	h.CheckInDate,103) as ArrivalDate,
+	d.ArrivalDate,103) as ArrivalDate,
 	d.Tariff,(p.PropertyName+','+p.Propertaddress) as Propertyaddress,(c.CityName+','+
 	s.StateName+','+p.Postal) as Propcity,c.CityName,s.StateName,p.Postal,
 	p.Phone,p.Email,@CompanyName as CompanyName,@LOGO AS logo,
@@ -129,7 +129,7 @@ IF @Action='PageLoad'
     'Service Tax @'+CAST(h.BusinessSupportST AS NVARCHAR)+'% on Others' ServiceOT,sum(CS.OtherService) OtherService,
     sum(CS.ChkOutServiceST) ChkOutServiceST,sum(CS.Cess) CessService,sum(CS.HECess) HECess,
     'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),GETDATE(),103) as InVoicedate,
-    'Rupees : '+dbo.fn_NtoWord(ROUND(CS.ChkOutServiceNetAmount,0),'','') AS AmtWords
+    'Rupees : '+dbo.fn_NtoWord(ROUND(SUM(CS.ChkOutServiceNetAmount),0),'','') AS AmtWords
 	
 	from  WRBHBCheckInHdr d
 	 join WRBHBChechkOutHdr h on h.ChkInHdrId = d.Id and d.IsActive = 1 and d.IsDeleted = 0
@@ -142,13 +142,13 @@ IF @Action='PageLoad'
 	join WRBHBBooking b on b.Id = d.BookingId	
 	join WRBHBTaxMaster t on t.StateId=s.Id   
 	where h.IsActive = 1 and h.IsDeleted = 0 and CS.CheckOutHdrId =  @Id1
-	group by h.GuestName ,h.Name,h.Stay,h.Type,h.BookingLevel,
+	GROUP BY h.GuestName ,h.Name,h.Stay,h.Type,h.BookingLevel,
 	BillDate,h.ClientName,h.Id,	h.ChkOutTariffTotal ,h.ChkOutTariffLT ,h.ChkOutTariffNetAmount,
 	h.ChkOutTariffST2 ,h.ChkOutTariffST3 ,h.ChkOutTariffCess ,
 	h.ChkOutTariffHECess ,h.ChkOutTariffSC,h.CheckInDate,d.Tariff,p.PropertyName,p.Propertaddress,
 	c.CityName,s.StateName,p.Postal,p.Phone,p.Email,	
     H.VATPer,h.RestaurantSTPer ,
-    h.BusinessSupportST ,h.InVoiceNo,h.BillFromDate,h.BillEndDate,t.LuxuryNo,CS.ChkOutServiceNetAmount
+    h.BusinessSupportST ,h.InVoiceNo,h.BillFromDate,h.BillEndDate,t.LuxuryNo,d.ArrivalDate--,CS.ChkOutServiceNetAmount
    
 	
 	END

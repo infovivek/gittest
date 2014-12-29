@@ -41,10 +41,71 @@ CREATE PROCEDURE dbo.[SP_NewSnackKOTEntryReport_Help]
 		WHERE C.IsActive=1 AND C.IsDeleted=0 AND  P.Category IN('Internal Property','Managed G H')
  END
  IF @Action='KOTDETAILS'
+ 
  BEGIN
 	    CREATE TABLE  #Guest(ConsumerType NVARCHAR(100),Name NVARCHAR(100),ServiceItem NVARCHAR(100),
 	    Quantity INT,Revenue DECIMAL(27,2))
 	    --Details for Property and Date 
+	    CREATE TABLE #Id(ChkInId INT,GuestId INT,RoomId INT,BedId INT,ApartmentId INT,ClientId INT,
+	    BookingId INT,BookLevel NVARCHAR(100))
+	    INSERT INTO #Id(ChkInId,GuestId,RoomId,BedId,ApartmentId,ClientId,BookingId,BookLevel)
+	    SELECT Id AS ChkInId,GuestId,RoomId,BedId,ApartmentId,ClientId,BookingId,Type
+	    FROM WRBHBCheckInHdr 
+	    WHERE PropertyId=@PropertyId
+	    
+	    CREATE TABLE #Contract(Id BIGINT,Complimentary BIT,ServiceName NVARCHAR(100),Price DECIMAL(27,2),
+		Enable BIT,ChkInnId INT,GuesId INT,ProductId INT)
+		
+		CREATE TABLE #ContractFinal(Id BIGINT,Complimentary BIT,ServiceName NVARCHAR(100),Price DECIMAL(27,2),
+		Enable BIT,ChkInnId INT,GuesId INT,ProductId INT)
+	    
+        INSERT INTO #Contract(Id,Complimentary,ServiceName,Price,Enable,ChkInnId,GuesId,ProductId)
+	    SELECT CS.Id,Complimentary,ServiceName,Price,Enable,D.ChkInId,D.GuestId,ProductId
+	    FROM dbo.WRBHBContractManagement H
+	    JOIN #Id D ON H.BookingLevel=D.BookLevel AND H.ClientId=D.ClientId
+	    JOIN WRBHBContractManagementTariffAppartment CM WITH(NOLOCK) ON H.Id=CM.ContractId AND CM.RoomId=D.RoomId
+	    AND CM.IsActive=1 AND CM.IsDeleted=0
+	    JOIN WRBHBContractManagementServices CS ON H.Id=CS.ContractId AND CS.IsActive=1 AND CS.IsDeleted=0
+	    WHERE  H.IsActive=1 AND H.IsDeleted=0 AND D.BookLevel='Room' 
+	    
+         INSERT INTO #Contract(Id,Complimentary,ServiceName,Price,Enable,ChkInnId,GuesId,ProductId)
+		 SELECT CS.Id,Complimentary,ServiceName,Price,Enable,D.ChkInId,D.GuestId,ProductId
+		 FROM dbo.WRBHBContractManagement H
+		 JOIN #Id D ON H.BookingLevel=D.BookLevel AND H.ClientId=D.ClientId
+		 JOIN WRBHBContractManagementTariffAppartment CM WITH(NOLOCK) ON H.Id=CM.ContractId AND CM.RoomId=D.RoomId
+		 AND CM.IsActive=1 AND CM.IsDeleted=0
+		 JOIN WRBHBContractManagementServices CS ON H.Id=CS.ContractId AND CS.IsActive=1 AND CS.IsDeleted=0
+		 WHERE   H.IsActive=1 AND H.IsDeleted=0 AND D.BookLevel='Bed'
+		 
+		 INSERT INTO #Contract(Id,Complimentary,ServiceName,Price,Enable,ChkInnId,GuesId,ProductId)
+		 SELECT CS.Id,Complimentary,ServiceName,Price,Enable,D.ChkInId,D.GuestId,ProductId
+		 FROM dbo.WRBHBContractManagement H
+		  JOIN #Id D ON H.BookingLevel=D.BookLevel AND H.ClientId=D.ClientId
+		 JOIN WRBHBContractManagementAppartment CM WITH(NOLOCK) ON H.Id=CM.ContractId AND CM.ApartmentId=D.ApartmentId
+		 AND CM.IsActive=1 AND CM.IsDeleted=0
+		 JOIN WRBHBContractManagementServices CS ON H.Id=CS.ContractId AND CS.IsActive=1 AND CS.IsDeleted=0
+		 WHERE  D.BookLevel='Apartment' AND H.IsActive=1 AND H.IsDeleted=0	
+		 
+		  INSERT INTO #Contract(Id,Complimentary,ServiceName,Price,Enable,ChkInnId,GuesId,ProductId)
+		  SELECT DISTINCT CS.Id,Complimentary,ServiceName,Price,Enable,D.ChkInId,D.GuestId,ProductId
+		  FROM WRBHBContractNonDedicated C
+		  JOIN #Id D ON C.ClientId=D.ClientId
+		  JOIN WRBHBContractNonDedicatedApartment CM ON @PropertyId=CM.PropertyId AND CM.NondedContractId = C.Id AND CM.IsActive=1 AND CM.IsDeleted=0 
+	      JOIN WRBHBContractNonDedicatedServices CS ON C.Id=CS.NondedContractId AND CS.IsActive=1 AND CS.IsDeleted=0
+	      WHERE C.IsActive=1 AND C.IsDeleted=0	
+	      
+	     UPDATE #Contract SET Price=0 
+		 WHERE Complimentary=1
+		 
+		INSERT INTO #ContractFinal(Id,Complimentary,ServiceName,Price,Enable,ChkInnId,GuesId,ProductId)
+		SELECT Id,ISComplimentary,ProductName,PerQuantityprice,Enable,0,0,Id
+		FROM WRBHBContarctProductMaster 
+		WHERE IsActive=1 AND IsDeleted=0
+		
+		UPDATE #ContractFinal SET Price=S.Price
+		FROM  #ContractFinal O
+		JOIN #Contract S ON O.ProductId=S.ProductId
+				
 	IF(@Str3 ='Guest')
 	BEGIN
 	    INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue)
@@ -63,85 +124,67 @@ CREATE PROCEDURE dbo.[SP_NewSnackKOTEntryReport_Help]
 	    
 		SELECT 'Guest' AS ConsumerType,KD.GuestName,'BreakfastVeg' AS ServiceItem,
 		(KD.BreakfastVeg) AS Quantity,
-		(KD.BreakfastVeg)*(CP.PerQuantityprice) AS Revenue
+		0 AS Revenue
 		FROM WRBHBKOTDtls KD
 		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
-		JOIN WRBHBMapVendor MP ON KD.PropertyId=MP.PropertyId AND MP.IsActive=1 AND MP.IsDeleted=0
-		JOIN WRBHBVendorCost VC ON MP.VendorId=VC.VendorId AND VC.IsActive=1 AND VC.IsDeleted=0
-		JOIN WRBHBContarctProductMaster CP ON VC.ItemId=Cp.Id AND CP.IsActive=1 AND CP.IsDeleted=0
-		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId AND CP.ProductName='Breakfast'
+		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
 		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.BreakfastVeg !=0  
-		group by KD.GuestName,KD.BreakfastVeg,CP.PerQuantityprice
+		group by KD.GuestName,KD.BreakfastVeg
 		
 		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue)
 	    
 		SELECT 'Guest' AS ConsumerType,KD.GuestName,'BreakfastNonVeg' AS ServiceItem,
 		(KD.BreakfastNonVeg) AS Quantity,
-		(KD.BreakfastNonVeg)*(0) AS Revenue
+		0 AS Revenue
 		FROM WRBHBKOTDtls KD
 		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
-		JOIN WRBHBMapVendor MP ON KD.PropertyId=MP.PropertyId AND MP.IsActive=1 AND MP.IsDeleted=0
-		JOIN WRBHBVendorCost VC ON MP.VendorId=VC.VendorId AND VC.IsActive=1 AND VC.IsDeleted=0
-		JOIN WRBHBContarctProductMaster CP ON VC.ItemId=Cp.Id AND CP.IsActive=1 AND CP.IsDeleted=0
-		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId AND CP.ProductName='Breakfast'
+		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
 		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.BreakfastNonVeg !=0  
-		group by KD.GuestName,KD.BreakfastNonVeg,CP.PerQuantityprice
+		group by KD.GuestName,KD.BreakfastNonVeg
 		
 		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue)
 	    
 		SELECT 'Guest' AS ConsumerType,KD.GuestName,'LunchVeg' AS ServiceItem,
 		(KD.LunchVeg) AS Quantity,
-		(KD.LunchVeg)*(CP.PerQuantityprice) AS Revenue
+		0 AS Revenue
 		FROM WRBHBKOTDtls KD
 		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
-		JOIN WRBHBMapVendor MP ON KD.PropertyId=MP.PropertyId AND MP.IsActive=1 AND MP.IsDeleted=0
-		JOIN WRBHBVendorCost VC ON MP.VendorId=VC.VendorId AND VC.IsActive=1 AND VC.IsDeleted=0
-		JOIN WRBHBContarctProductMaster CP ON VC.ItemId=Cp.Id AND CP.IsActive=1 AND CP.IsDeleted=0
-		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId AND CP.ProductName='Lunch (Veg)'
+		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
 		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.LunchVeg !=0  
-		group by KD.GuestName,KD.LunchVeg,CP.PerQuantityprice
+		group by KD.GuestName,KD.LunchVeg
 		
 		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue)
 	    
 		SELECT 'Guest' AS ConsumerType,KD.GuestName,'LunchNonVeg' AS ServiceItem,
 		(KD.LunchNonVeg) AS Quantity,
-		(KD.LunchNonVeg)*(CP.PerQuantityprice) AS Revenue
+		0 AS Revenue
 		FROM WRBHBKOTDtls KD
 		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
-		JOIN WRBHBMapVendor MP ON KD.PropertyId=MP.PropertyId AND MP.IsActive=1 AND MP.IsDeleted=0
-		JOIN WRBHBVendorCost VC ON MP.VendorId=VC.VendorId AND VC.IsActive=1 AND VC.IsDeleted=0
-		JOIN WRBHBContarctProductMaster CP ON VC.ItemId=Cp.Id AND CP.IsActive=1 AND CP.IsDeleted=0
-		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId AND CP.ProductName='Lunch (Non-Veg)'
+		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
 		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.LunchNonVeg !=0  
-		group by KD.GuestName,KD.LunchNonVeg,CP.PerQuantityprice
+		group by KD.GuestName,KD.LunchNonVeg
 		
 		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue)
 	    
 		SELECT 'Guest' AS ConsumerType,KD.GuestName,'DinnerVeg' AS ServiceItem,
 		(KD.DinnerVeg) AS Quantity,
-		(KD.DinnerVeg)*(CP.PerQuantityprice) AS Revenue
+		0 AS Revenue
 		FROM WRBHBKOTDtls KD
 		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
-		JOIN WRBHBMapVendor MP ON KD.PropertyId=MP.PropertyId AND MP.IsActive=1 AND MP.IsDeleted=0
-		JOIN WRBHBVendorCost VC ON MP.VendorId=VC.VendorId AND VC.IsActive=1 AND VC.IsDeleted=0
-		JOIN WRBHBContarctProductMaster CP ON VC.ItemId=Cp.Id AND CP.IsActive=1 AND CP.IsDeleted=0
-		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId AND CP.ProductName='Dinner (Veg)'
+		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
 		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.DinnerVeg !=0  
-		group by KD.GuestName,KD.DinnerVeg,CP.PerQuantityprice
+		group by KD.GuestName,KD.DinnerVeg
 		
 		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue)
 	    
 		SELECT 'Guest' AS ConsumerType,KD.GuestName,'DinnerNonVeg' AS ServiceItem,
 		(KD.DinnerNonVeg) AS Quantity,
-		(KD.DinnerNonVeg)*(CP.PerQuantityprice) AS Revenue
+		0 AS Revenue
 		FROM WRBHBKOTDtls KD
 		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
-		JOIN WRBHBMapVendor MP ON KD.PropertyId=MP.PropertyId AND MP.IsActive=1 AND MP.IsDeleted=0
-		JOIN WRBHBVendorCost VC ON MP.VendorId=VC.VendorId AND VC.IsActive=1 AND VC.IsDeleted=0
-		JOIN WRBHBContarctProductMaster CP ON VC.ItemId=Cp.Id AND CP.IsActive=1 AND CP.IsDeleted=0
-		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId AND CP.ProductName='Dinner (Non-Veg)'
+		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
 		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.DinnerNonVeg !=0  
-		group by KD.GuestName,KD.DinnerNonVeg,CP.PerQuantityprice
+		group by KD.GuestName,KD.DinnerNonVeg
 			
 	END
  	IF(@Str3 ='Staff')
@@ -267,88 +310,70 @@ CREATE PROCEDURE dbo.[SP_NewSnackKOTEntryReport_Help]
 		group by ServiceItem,KH.GuestName,KD.Quantity,KD.Amount
 
 		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue)
-    
+	    
 		SELECT 'Guest' AS ConsumerType,KD.GuestName,'BreakfastVeg' AS ServiceItem,
 		(KD.BreakfastVeg) AS Quantity,
-		(KD.BreakfastVeg)*(CP.PerQuantityprice) AS Revenue
+		0 AS Revenue
 		FROM WRBHBKOTDtls KD
-		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0 
-		JOIN WRBHBMapVendor MP ON KD.PropertyId=MP.PropertyId AND MP.IsActive=1 AND MP.IsDeleted=0
-		JOIN WRBHBVendorCost VC ON MP.VendorId=VC.VendorId AND VC.IsActive=1 AND VC.IsDeleted=0
-		JOIN WRBHBContarctProductMaster CP ON VC.ItemId=Cp.Id AND CP.IsActive=1 AND CP.IsDeleted=0
-		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId AND CP.ProductName='Breakfast'
+		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
+		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
 		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.BreakfastVeg !=0  
-		group by KD.GuestName,KD.BreakfastVeg,CP.PerQuantityprice
-	
+		group by KD.GuestName,KD.BreakfastVeg
+		
 		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue)
 	    
-		SELECT  'Guest' AS ConsumerType,KD.GuestName,'BreakfastNonVeg' AS ServiceItem,
+		SELECT 'Guest' AS ConsumerType,KD.GuestName,'BreakfastNonVeg' AS ServiceItem,
 		(KD.BreakfastNonVeg) AS Quantity,
-		(KD.BreakfastNonVeg)*(0) AS Revenue
+		0 AS Revenue
 		FROM WRBHBKOTDtls KD
-		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0 
-		JOIN WRBHBMapVendor MP ON KD.PropertyId=MP.PropertyId AND MP.IsActive=1 AND MP.IsDeleted=0
-		JOIN WRBHBVendorCost VC ON MP.VendorId=VC.VendorId AND VC.IsActive=1 AND VC.IsDeleted=0
-		JOIN WRBHBContarctProductMaster CP ON VC.ItemId=Cp.Id AND CP.IsActive=1 AND CP.IsDeleted=0
-		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId AND CP.ProductName='Breakfast'
-		AND  CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.BreakfastNonVeg !=0  
-		group by KD.GuestName,KD.BreakfastNonVeg,CP.PerQuantityprice
-		 
+		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
+		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
+		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.BreakfastNonVeg !=0  
+		group by KD.GuestName,KD.BreakfastNonVeg
+		
 		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue)
 	    
-		SELECT  'Guest' AS ConsumerType,KD.GuestName,'LunchVeg' AS ServiceItem,
+		SELECT 'Guest' AS ConsumerType,KD.GuestName,'LunchVeg' AS ServiceItem,
 		(KD.LunchVeg) AS Quantity,
-		(KD.LunchVeg)*(CP.PerQuantityprice) AS Revenue
+		0 AS Revenue
 		FROM WRBHBKOTDtls KD
-		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0 
-		JOIN WRBHBMapVendor MP ON KD.PropertyId=MP.PropertyId AND MP.IsActive=1 AND MP.IsDeleted=0
-		JOIN WRBHBVendorCost VC ON MP.VendorId=VC.VendorId AND VC.IsActive=1 AND VC.IsDeleted=0
-		JOIN WRBHBContarctProductMaster CP ON VC.ItemId=Cp.Id AND CP.IsActive=1 AND CP.IsDeleted=0
-		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId AND CP.ProductName='Lunch (Veg)'
+		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
+		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
 		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.LunchVeg !=0  
-		group by KD.GuestName,KD.LunchVeg,CP.PerQuantityprice
+		group by KD.GuestName,KD.LunchVeg
 		
 		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue)
 	    
-		SELECT  'Guest' AS ConsumerType,KD.GuestName,'LunchNonVeg' AS ServiceItem,
+		SELECT 'Guest' AS ConsumerType,KD.GuestName,'LunchNonVeg' AS ServiceItem,
 		(KD.LunchNonVeg) AS Quantity,
-		(KD.LunchNonVeg)*(CP.PerQuantityprice) AS Revenue
+		0 AS Revenue
 		FROM WRBHBKOTDtls KD
-		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0 
-		JOIN WRBHBMapVendor MP ON KD.PropertyId=MP.PropertyId AND MP.IsActive=1 AND MP.IsDeleted=0
-		JOIN WRBHBVendorCost VC ON MP.VendorId=VC.VendorId AND VC.IsActive=1 AND VC.IsDeleted=0
-		JOIN WRBHBContarctProductMaster CP ON VC.ItemId=Cp.Id AND CP.IsActive=1 AND CP.IsDeleted=0
-		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId AND CP.ProductName='Lunch (Non-Veg)'
-		AND  CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.LunchNonVeg !=0  
-		group by KD.GuestName,KD.LunchNonVeg,CP.PerQuantityprice
+		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
+		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
+		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.LunchNonVeg !=0  
+		group by KD.GuestName,KD.LunchNonVeg
 		
 		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue)
 	    
-		SELECT  'Guest' AS ConsumerType,KD.GuestName,'DinnerVeg' AS ServiceItem,
+		SELECT 'Guest' AS ConsumerType,KD.GuestName,'DinnerVeg' AS ServiceItem,
 		(KD.DinnerVeg) AS Quantity,
-		(KD.DinnerVeg)*(CP.PerQuantityprice) AS Revenue
+		0 AS Revenue
 		FROM WRBHBKOTDtls KD
-		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0 
-		JOIN WRBHBMapVendor MP ON KD.PropertyId=MP.PropertyId AND MP.IsActive=1 AND MP.IsDeleted=0
-		JOIN WRBHBVendorCost VC ON MP.VendorId=VC.VendorId AND VC.IsActive=1 AND VC.IsDeleted=0
-		JOIN WRBHBContarctProductMaster CP ON VC.ItemId=Cp.Id AND CP.IsActive=1 AND CP.IsDeleted=0
-		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId AND CP.ProductName='Dinner (Veg)'
-		AND  CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.DinnerVeg !=0  
-		group by KD.GuestName,KD.DinnerVeg,CP.PerQuantityprice
+		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
+		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
+		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.DinnerVeg !=0  
+		group by KD.GuestName,KD.DinnerVeg
 		
 		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue)
 	    
-		SELECT  'Guest' AS ConsumerType,KD.GuestName,'DinnerNonVeg' AS ServiceItem,
+		SELECT 'Guest' AS ConsumerType,KD.GuestName,'DinnerNonVeg' AS ServiceItem,
 		(KD.DinnerNonVeg) AS Quantity,
-		(KD.DinnerNonVeg)*(CP.PerQuantityprice) AS Revenue
+		0 AS Revenue
 		FROM WRBHBKOTDtls KD
-		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0 
-		JOIN WRBHBMapVendor MP ON KD.PropertyId=MP.PropertyId AND MP.IsActive=1 AND MP.IsDeleted=0
-		JOIN WRBHBVendorCost VC ON MP.VendorId=VC.VendorId AND VC.IsActive=1 AND VC.IsDeleted=0
-		JOIN WRBHBContarctProductMaster CP ON VC.ItemId=Cp.Id AND CP.IsActive=1 AND CP.IsDeleted=0
-		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId AND CP.ProductName='Dinner (Non-Veg)'
-		AND  CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.DinnerNonVeg !=0  
-		group by KD.GuestName,KD.DinnerNonVeg,CP.PerQuantityprice
+		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
+		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
+		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.DinnerNonVeg !=0  
+		group by KD.GuestName,KD.DinnerNonVeg
 
 		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue)
 		
@@ -463,7 +488,9 @@ CREATE PROCEDURE dbo.[SP_NewSnackKOTEntryReport_Help]
 		 
 	 END
 		SELECT  ConsumerType,Name,ServiceItem,SUM(Quantity) AS Quantity,SUM(Revenue) AS Revenue
-		FROM #Guest group by ConsumerType,Name,ServiceItem
+		FROM #Guest G
+		LEFT OUTER JOIN #ContractFinal F ON G.ServiceItem=F.ServiceName
+		group by ConsumerType,Name,ServiceItem
 		
 	 
  END
@@ -485,89 +512,71 @@ CREATE PROCEDURE dbo.[SP_NewSnackKOTEntryReport_Help]
 		group by ServiceItem,KH.GuestName,KD.Quantity,KD.Amount
 		
 			
-		INSERT INTO #Guests(ConsumerType,Name,ServiceItem,Quantity,Revenue)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue)
 	    
 		SELECT 'Guest' AS ConsumerType,KD.GuestName,'BreakfastVeg' AS ServiceItem,
 		(KD.BreakfastVeg) AS Quantity,
-		(KD.BreakfastVeg)*(CP.PerQuantityprice) AS Revenue
+		0 AS Revenue
 		FROM WRBHBKOTDtls KD
 		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
-		JOIN WRBHBMapVendor MP ON KD.PropertyId=MP.PropertyId AND MP.IsActive=1 AND MP.IsDeleted=0
-		JOIN WRBHBVendorCost VC ON MP.VendorId=VC.VendorId AND VC.IsActive=1 AND VC.IsDeleted=0
-		JOIN WRBHBContarctProductMaster CP ON VC.ItemId=Cp.Id AND CP.IsActive=1 AND CP.IsDeleted=0
-		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND CP.ProductName='Breakfast'
+		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
 		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.BreakfastVeg !=0  
-		group by KD.GuestName,KD.BreakfastVeg,CP.PerQuantityprice
+		group by KD.GuestName,KD.BreakfastVeg
 		
-		INSERT INTO #Guests(ConsumerType,Name,ServiceItem,Quantity,Revenue)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue)
 	    
 		SELECT 'Guest' AS ConsumerType,KD.GuestName,'BreakfastNonVeg' AS ServiceItem,
 		(KD.BreakfastNonVeg) AS Quantity,
-		(KD.BreakfastNonVeg)*(0) AS Revenue
+		0 AS Revenue
 		FROM WRBHBKOTDtls KD
 		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
-		JOIN WRBHBMapVendor MP ON KD.PropertyId=MP.PropertyId AND MP.IsActive=1 AND MP.IsDeleted=0
-		JOIN WRBHBVendorCost VC ON MP.VendorId=VC.VendorId AND VC.IsActive=1 AND VC.IsDeleted=0
-		JOIN WRBHBContarctProductMaster CP ON VC.ItemId=Cp.Id AND CP.IsActive=1 AND CP.IsDeleted=0
-		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND CP.ProductName='Breakfast'
+		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
 		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.BreakfastNonVeg !=0  
-		group by KD.GuestName,KD.BreakfastNonVeg,CP.PerQuantityprice
+		group by KD.GuestName,KD.BreakfastNonVeg
 		
-		INSERT INTO #Guests(ConsumerType,Name,ServiceItem,Quantity,Revenue)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue)
 	    
 		SELECT 'Guest' AS ConsumerType,KD.GuestName,'LunchVeg' AS ServiceItem,
 		(KD.LunchVeg) AS Quantity,
-		(KD.LunchVeg)*(CP.PerQuantityprice) AS Revenue
+		0 AS Revenue
 		FROM WRBHBKOTDtls KD
 		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
-		JOIN WRBHBMapVendor MP ON KD.PropertyId=MP.PropertyId AND MP.IsActive=1 AND MP.IsDeleted=0
-		JOIN WRBHBVendorCost VC ON MP.VendorId=VC.VendorId AND VC.IsActive=1 AND VC.IsDeleted=0
-		JOIN WRBHBContarctProductMaster CP ON VC.ItemId=Cp.Id AND CP.IsActive=1 AND CP.IsDeleted=0
-		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND CP.ProductName='Lunch (Veg)'
+		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
 		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.LunchVeg !=0  
-		group by KD.GuestName,KD.LunchVeg,CP.PerQuantityprice
+		group by KD.GuestName,KD.LunchVeg
 		
-		INSERT INTO #Guests(ConsumerType,Name,ServiceItem,Quantity,Revenue)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue)
 	    
 		SELECT 'Guest' AS ConsumerType,KD.GuestName,'LunchNonVeg' AS ServiceItem,
 		(KD.LunchNonVeg) AS Quantity,
-		(KD.LunchNonVeg)*(CP.PerQuantityprice) AS Revenue
+		0 AS Revenue
 		FROM WRBHBKOTDtls KD
 		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
-		JOIN WRBHBMapVendor MP ON KD.PropertyId=MP.PropertyId AND MP.IsActive=1 AND MP.IsDeleted=0
-		JOIN WRBHBVendorCost VC ON MP.VendorId=VC.VendorId AND VC.IsActive=1 AND VC.IsDeleted=0
-		JOIN WRBHBContarctProductMaster CP ON VC.ItemId=Cp.Id AND CP.IsActive=1 AND CP.IsDeleted=0
-		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND CP.ProductName='Lunch (Non-Veg)'
+		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
 		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.LunchNonVeg !=0  
-		group by KD.GuestName,KD.LunchNonVeg,CP.PerQuantityprice
+		group by KD.GuestName,KD.LunchNonVeg
 		
-		INSERT INTO #Guests(ConsumerType,Name,ServiceItem,Quantity,Revenue)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue)
 	    
 		SELECT 'Guest' AS ConsumerType,KD.GuestName,'DinnerVeg' AS ServiceItem,
 		(KD.DinnerVeg) AS Quantity,
-		(KD.DinnerVeg)*(CP.PerQuantityprice) AS Revenue
+		0 AS Revenue
 		FROM WRBHBKOTDtls KD
 		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
-		JOIN WRBHBMapVendor MP ON KD.PropertyId=MP.PropertyId AND MP.IsActive=1 AND MP.IsDeleted=0
-		JOIN WRBHBVendorCost VC ON MP.VendorId=VC.VendorId AND VC.IsActive=1 AND VC.IsDeleted=0
-		JOIN WRBHBContarctProductMaster CP ON VC.ItemId=Cp.Id AND CP.IsActive=1 AND CP.IsDeleted=0
-		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND CP.ProductName='Dinner (Veg)'
+		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
 		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.DinnerVeg !=0  
-		group by KD.GuestName,KD.DinnerVeg,CP.PerQuantityprice
+		group by KD.GuestName,KD.DinnerVeg
 		
-		INSERT INTO #Guests(ConsumerType,Name,ServiceItem,Quantity,Revenue)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue)
 	    
 		SELECT 'Guest' AS ConsumerType,KD.GuestName,'DinnerNonVeg' AS ServiceItem,
 		(KD.DinnerNonVeg) AS Quantity,
-		(KD.DinnerNonVeg)*(CP.PerQuantityprice) AS Revenue
+		0 AS Revenue
 		FROM WRBHBKOTDtls KD
 		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
-		JOIN WRBHBMapVendor MP ON KD.PropertyId=MP.PropertyId AND MP.IsActive=1 AND MP.IsDeleted=0
-		JOIN WRBHBVendorCost VC ON MP.VendorId=VC.VendorId AND VC.IsActive=1 AND VC.IsDeleted=0
-		JOIN WRBHBContarctProductMaster CP ON VC.ItemId=Cp.Id AND CP.IsActive=1 AND CP.IsDeleted=0
-		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND CP.ProductName='Dinner (Non-Veg)'
+		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
 		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.DinnerNonVeg !=0  
-		group by KD.GuestName,KD.DinnerNonVeg,CP.PerQuantityprice
+		group by KD.GuestName,KD.DinnerNonVeg
 			
 	END
  	IF(@Str3 ='Staff')
@@ -689,89 +698,71 @@ CREATE PROCEDURE dbo.[SP_NewSnackKOTEntryReport_Help]
 		AND CONVERT(NVARCHAR,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103)  
 		group by ServiceItem,KH.GuestName,KD.Quantity,KD.Amount
 
-		INSERT INTO #Guests(ConsumerType,Name,ServiceItem,Quantity,Revenue)
-    
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue)
+	    
 		SELECT 'Guest' AS ConsumerType,KD.GuestName,'BreakfastVeg' AS ServiceItem,
 		(KD.BreakfastVeg) AS Quantity,
-		(KD.BreakfastVeg)*(CP.PerQuantityprice) AS Revenue
+		0 AS Revenue
 		FROM WRBHBKOTDtls KD
-		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0 
-		JOIN WRBHBMapVendor MP ON KD.PropertyId=MP.PropertyId AND MP.IsActive=1 AND MP.IsDeleted=0
-		JOIN WRBHBVendorCost VC ON MP.VendorId=VC.VendorId AND VC.IsActive=1 AND VC.IsDeleted=0
-		JOIN WRBHBContarctProductMaster CP ON VC.ItemId=Cp.Id AND CP.IsActive=1 AND CP.IsDeleted=0
-		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND CP.ProductName='Breakfast'
+		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
+		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
 		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.BreakfastVeg !=0  
-		group by KD.GuestName,KD.BreakfastVeg,CP.PerQuantityprice
-	
-		INSERT INTO #Guests(ConsumerType,Name,ServiceItem,Quantity,Revenue)
+		group by KD.GuestName,KD.BreakfastVeg
+		
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue)
 	    
-		SELECT  'Guest' AS ConsumerType,KD.GuestName,'BreakfastNonVeg' AS ServiceItem,
+		SELECT 'Guest' AS ConsumerType,KD.GuestName,'BreakfastNonVeg' AS ServiceItem,
 		(KD.BreakfastNonVeg) AS Quantity,
-		(KD.BreakfastNonVeg)*(0) AS Revenue
+		0 AS Revenue
 		FROM WRBHBKOTDtls KD
-		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0 
-		JOIN WRBHBMapVendor MP ON KD.PropertyId=MP.PropertyId AND MP.IsActive=1 AND MP.IsDeleted=0
-		JOIN WRBHBVendorCost VC ON MP.VendorId=VC.VendorId AND VC.IsActive=1 AND VC.IsDeleted=0
-		JOIN WRBHBContarctProductMaster CP ON VC.ItemId=Cp.Id AND CP.IsActive=1 AND CP.IsDeleted=0
-		WHERE KD.IsActive=1 AND KD.IsDeleted=0  AND CP.ProductName='Breakfast'
-		AND  CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.BreakfastNonVeg !=0  
-		group by KD.GuestName,KD.BreakfastNonVeg,CP.PerQuantityprice
-		 
-		INSERT INTO #Guests(ConsumerType,Name,ServiceItem,Quantity,Revenue)
+		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
+		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
+		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.BreakfastNonVeg !=0  
+		group by KD.GuestName,KD.BreakfastNonVeg
+		
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue)
 	    
-		SELECT  'Guest' AS ConsumerType,KD.GuestName,'LunchVeg' AS ServiceItem,
+		SELECT 'Guest' AS ConsumerType,KD.GuestName,'LunchVeg' AS ServiceItem,
 		(KD.LunchVeg) AS Quantity,
-		(KD.LunchVeg)*(CP.PerQuantityprice) AS Revenue
+		0 AS Revenue
 		FROM WRBHBKOTDtls KD
-		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0 
-		JOIN WRBHBMapVendor MP ON KD.PropertyId=MP.PropertyId AND MP.IsActive=1 AND MP.IsDeleted=0
-		JOIN WRBHBVendorCost VC ON MP.VendorId=VC.VendorId AND VC.IsActive=1 AND VC.IsDeleted=0
-		JOIN WRBHBContarctProductMaster CP ON VC.ItemId=Cp.Id AND CP.IsActive=1 AND CP.IsDeleted=0
-		WHERE KD.IsActive=1 AND KD.IsDeleted=0  AND CP.ProductName='Lunch (Veg)'
+		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
+		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
 		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.LunchVeg !=0  
-		group by KD.GuestName,KD.LunchVeg,CP.PerQuantityprice
+		group by KD.GuestName,KD.LunchVeg
 		
-		INSERT INTO #Guests(ConsumerType,Name,ServiceItem,Quantity,Revenue)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue)
 	    
-		SELECT  'Guest' AS ConsumerType,KD.GuestName,'LunchNonVeg' AS ServiceItem,
+		SELECT 'Guest' AS ConsumerType,KD.GuestName,'LunchNonVeg' AS ServiceItem,
 		(KD.LunchNonVeg) AS Quantity,
-		(KD.LunchNonVeg)*(CP.PerQuantityprice) AS Revenue
+		0 AS Revenue
 		FROM WRBHBKOTDtls KD
-		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0 
-		JOIN WRBHBMapVendor MP ON KD.PropertyId=MP.PropertyId AND MP.IsActive=1 AND MP.IsDeleted=0
-		JOIN WRBHBVendorCost VC ON MP.VendorId=VC.VendorId AND VC.IsActive=1 AND VC.IsDeleted=0
-		JOIN WRBHBContarctProductMaster CP ON VC.ItemId=Cp.Id AND CP.IsActive=1 AND CP.IsDeleted=0
-		WHERE KD.IsActive=1 AND KD.IsDeleted=0  AND CP.ProductName='Lunch (Non-Veg)'
-		AND  CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.LunchNonVeg !=0  
-		group by KD.GuestName,KD.LunchNonVeg,CP.PerQuantityprice
+		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
+		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
+		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.LunchNonVeg !=0  
+		group by KD.GuestName,KD.LunchNonVeg
 		
-		INSERT INTO #Guests(ConsumerType,Name,ServiceItem,Quantity,Revenue)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue)
 	    
-		SELECT  'Guest' AS ConsumerType,KD.GuestName,'DinnerVeg' AS ServiceItem,
+		SELECT 'Guest' AS ConsumerType,KD.GuestName,'DinnerVeg' AS ServiceItem,
 		(KD.DinnerVeg) AS Quantity,
-		(KD.DinnerVeg)*(CP.PerQuantityprice) AS Revenue
+		0 AS Revenue
 		FROM WRBHBKOTDtls KD
-		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0 
-		JOIN WRBHBMapVendor MP ON KD.PropertyId=MP.PropertyId AND MP.IsActive=1 AND MP.IsDeleted=0
-		JOIN WRBHBVendorCost VC ON MP.VendorId=VC.VendorId AND VC.IsActive=1 AND VC.IsDeleted=0
-		JOIN WRBHBContarctProductMaster CP ON VC.ItemId=Cp.Id AND CP.IsActive=1 AND CP.IsDeleted=0
-		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND CP.ProductName='Dinner (Veg)'
-		AND  CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.DinnerVeg !=0  
-		group by KD.GuestName,KD.DinnerVeg,CP.PerQuantityprice
+		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
+		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
+		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.DinnerVeg !=0  
+		group by KD.GuestName,KD.DinnerVeg
 		
-		INSERT INTO #Guests(ConsumerType,Name,ServiceItem,Quantity,Revenue)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue)
 	    
-		SELECT  'Guest' AS ConsumerType,KD.GuestName,'DinnerNonVeg' AS ServiceItem,
+		SELECT 'Guest' AS ConsumerType,KD.GuestName,'DinnerNonVeg' AS ServiceItem,
 		(KD.DinnerNonVeg) AS Quantity,
-		(KD.DinnerNonVeg)*(CP.PerQuantityprice) AS Revenue
+		0 AS Revenue
 		FROM WRBHBKOTDtls KD
-		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0 
-		JOIN WRBHBMapVendor MP ON KD.PropertyId=MP.PropertyId AND MP.IsActive=1 AND MP.IsDeleted=0
-		JOIN WRBHBVendorCost VC ON MP.VendorId=VC.VendorId AND VC.IsActive=1 AND VC.IsDeleted=0
-		JOIN WRBHBContarctProductMaster CP ON VC.ItemId=Cp.Id AND CP.IsActive=1 AND CP.IsDeleted=0
-		WHERE KD.IsActive=1 AND KD.IsDeleted=0  AND CP.ProductName='Dinner (Non-Veg)'
-		AND  CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.DinnerNonVeg !=0  
-		group by KD.GuestName,KD.DinnerNonVeg,CP.PerQuantityprice
+		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
+		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
+		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.DinnerNonVeg !=0  
+		group by KD.GuestName,KD.DinnerNonVeg
 
 		INSERT INTO #Guests(ConsumerType,Name,ServiceItem,Quantity,Revenue)
 		

@@ -60,14 +60,12 @@ BEGIN
 IF ISNULL(@PrintInvoice,0) = '1' 
 	BEGIN
 	IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE  MONTH(CreatedDate)=MONTH(GETDATE()) AND
-		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(PIInvoice,'') != '')
+		WHERE   ISNULL(PIInvoice,'') != '')
 			BEGIN
 				SELECT TOP 1 @PIInvoice=   SUBSTRING(PIInvoice,0,4)
 			  + CAST(SUBSTRING(PIInvoice,4,9)+1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE  MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND PIInvoice!=''  and PIInvoice!='0'
+				WHERE  PIInvoice!=''  and PIInvoice!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -75,15 +73,31 @@ IF ISNULL(@PrintInvoice,0) = '1'
 				SELECT @PIInvoice='PI/1';
 			END
 			
+	--IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
+	--	WHERE PropertyType ='External Property' and PrintInvoice = 1 and MONTH(CreatedDate)=MONTH(GETDATE()) AND
+	--	YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(InVoiceNo,'') != '')
+	--		BEGIN
+	--			SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
+	--			CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
+	--			FROM WRBHBChechkOutHdr
+	--			WHERE PropertyType ='External Property' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
+	--			YEAR(CreatedDate)=YEAR(GETDATE()) AND InvoiceNo!='' and PrintInvoice = 1  and InvoiceNo!='0'
+	--			ORDER BY Id DESC;
+	--		END
+	--		ELSE
+	--			BEGIN
+	--			SELECT @InVoiceNo='EXT/1';
+	--		END
+	--END
+	
 	IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE PropertyType ='External Property' and PrintInvoice = 1 and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(InVoiceNo,'') != '')
+		WHERE PropertyType in('External Property','MMT','CPP') and PrintInvoice = 1  AND ISNULL(InVoiceNo,'') != '')
 			BEGIN
 				SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
 				CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE PropertyType ='External Property' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND InvoiceNo!='' and PrintInvoice = 1  and InvoiceNo!='0'
+				WHERE PropertyType in('External Property','MMT','CPP')
+				 AND InvoiceNo!='' and PrintInvoice = 1  and InvoiceNo!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -91,21 +105,16 @@ IF ISNULL(@PrintInvoice,0) = '1'
 				SELECT @InVoiceNo='EXT/1';
 			END
 	END
-	--ELSE
-	--BEGIN
-	--	set @InVoiceNo='0';
-	--END
+	
 	IF @BTC = 'Bill to Company (BTC)'  OR @PrintInvoice = 1 
 	BEGIN
 	IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE  MONTH(CreatedDate)=MONTH(GETDATE()) AND
-		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(PIInvoice,'') != '')
+		WHERE   ISNULL(PIInvoice,'') != '')
 			BEGIN
 				SELECT TOP 1 @PIInvoice=   SUBSTRING(PIInvoice,0,4)
 			  + CAST(SUBSTRING(PIInvoice,4,9)+1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE  MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND PIInvoice!='' and InvoiceNo!='0'
+				WHERE  PIInvoice!='' and InvoiceNo!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -114,14 +123,12 @@ IF ISNULL(@PrintInvoice,0) = '1'
 			END
 			
 		IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE PropertyType ='External Property' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(InVoiceNo,'') != '')
+		WHERE PropertyType in('External Property','MMT','CPP') AND ISNULL(InVoiceNo,'') != '')
 			BEGIN
 				SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
 				CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE PropertyType ='External Property' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND InvoiceNo!=''  and InvoiceNo!='0'
+				WHERE PropertyType in('External Property','MMT','CPP') AND InvoiceNo!=''  and InvoiceNo!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -136,14 +143,14 @@ IF ISNULL(@PrintInvoice,0) = '1'
 	IF @BTC = 'Bill to Client' OR @PrintInvoice = 1 
 	BEGIN
 	IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE  MONTH(CreatedDate)=MONTH(GETDATE()) AND
-		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(PIInvoice,'') != '')
+		WHERE   ISNULL(PIInvoice,'') != '')
 			BEGIN
 				SELECT TOP 1 @PIInvoice=   SUBSTRING(PIInvoice,0,4)
 			  + CAST(SUBSTRING(PIInvoice,4,9)+1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE  MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND PIInvoice!='' and PIInvoice!='0'
+				WHERE  
+			--	MONTH(CreatedDate)=MONTH(GETDATE()) AND YEAR(CreatedDate)=YEAR(GETDATE()) AND 
+				PIInvoice!='' and PIInvoice!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -152,14 +159,14 @@ IF ISNULL(@PrintInvoice,0) = '1'
 			END
 			
 		IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE PropertyType ='External Property' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(InVoiceNo,'') != '')
+		WHERE PropertyType in('External Property','MMT','CPP')  AND ISNULL(InVoiceNo,'') != '')
 			BEGIN
 				SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
 				CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE PropertyType ='External Property' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND InvoiceNo!='' and InvoiceNo!='0'
+				WHERE PropertyType in('External Property','MMT','CPP')
+			--	 and MONTH(CreatedDate)=MONTH(GETDATE()) AND YEAR(CreatedDate)=YEAR(GETDATE()) 
+				AND InvoiceNo!='' and InvoiceNo!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -178,14 +185,12 @@ BEGIN
 IF ISNULL(@PrintInvoice,0) = '1' 
 	BEGIN
 	IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE  MONTH(CreatedDate)=MONTH(GETDATE()) AND
-		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(PIInvoice,'') != '')
+		WHERE   ISNULL(PIInvoice,'') != '')
 			BEGIN
 				SELECT TOP 1 @PIInvoice=   SUBSTRING(PIInvoice,0,4)
 			  + CAST(SUBSTRING(PIInvoice,4,9)+1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE  MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND PIInvoice!=''  and PIInvoice!='0'
+				WHERE   PIInvoice!=''  and PIInvoice!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -194,14 +199,12 @@ IF ISNULL(@PrintInvoice,0) = '1'
 			END
 			
 	IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE PropertyType ='Managed G H' and PrintInvoice = 1 and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(InVoiceNo,'') != '')
+		WHERE PropertyType ='Managed G H' and PrintInvoice = 1  AND ISNULL(InVoiceNo,'') != '')
 			BEGIN
 				SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
 				CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE PropertyType ='Managed G H' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND InvoiceNo!='' and PrintInvoice = 1  and InvoiceNo!='0'
+				WHERE PropertyType ='Managed G H'  AND InvoiceNo!='' and PrintInvoice = 1  and InvoiceNo!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -213,14 +216,12 @@ IF ISNULL(@PrintInvoice,0) = '1'
 	IF @Direct = 'Direct'  
 	BEGIN
 		IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE PropertyType ='Managed G H' and PrintInvoice = 1 and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(InVoiceNo,'') != '')
+		WHERE PropertyType ='Managed G H' and PrintInvoice = 1  AND ISNULL(InVoiceNo,'') != '')
 		BEGIN
 			SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
 			CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 			FROM WRBHBChechkOutHdr
-			WHERE PropertyType ='Managed G H' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-			YEAR(CreatedDate)=YEAR(GETDATE()) AND InvoiceNo!='' and PrintInvoice = 1  and InvoiceNo!='0'
+			WHERE PropertyType ='Managed G H'  AND InvoiceNo!='' and PrintInvoice = 1  and InvoiceNo!='0'
 			ORDER BY Id DESC;
 		END
 		ELSE
@@ -235,14 +236,12 @@ IF ISNULL(@PrintInvoice,0) = '1'
 	IF @BTC = 'Bill to Company (BTC)'  OR @PrintInvoice = 1 
 	BEGIN
 	IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE  MONTH(CreatedDate)=MONTH(GETDATE()) AND
-		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(PIInvoice,'') != '')
+		WHERE   ISNULL(PIInvoice,'') != '')
 			BEGIN
 				SELECT TOP 1 @PIInvoice=   SUBSTRING(PIInvoice,0,4)
 			  + CAST(SUBSTRING(PIInvoice,4,9)+1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE  MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND PIInvoice!='' and InvoiceNo!='0'
+				WHERE   PIInvoice!='' and InvoiceNo!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -251,14 +250,12 @@ IF ISNULL(@PrintInvoice,0) = '1'
 			END
 			
 		IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE PropertyType ='Managed G H' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(InVoiceNo,'') != '')
+		WHERE PropertyType ='Managed G H' AND ISNULL(InVoiceNo,'') != '')
 			BEGIN
 				SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
 				CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE PropertyType ='Managed G H' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND InvoiceNo!=''  and InvoiceNo!='0'
+				WHERE PropertyType ='Managed G H'  AND InvoiceNo!=''  and InvoiceNo!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -273,14 +270,12 @@ IF ISNULL(@PrintInvoice,0) = '1'
 	IF @BTC = 'Bill to Client' OR @PrintInvoice = 1 
 	BEGIN
 	IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE  MONTH(CreatedDate)=MONTH(GETDATE()) AND
-		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(PIInvoice,'') != '')
+		WHERE   ISNULL(PIInvoice,'') != '')
 			BEGIN
 				SELECT TOP 1 @PIInvoice=   SUBSTRING(PIInvoice,0,4)
 			  + CAST(SUBSTRING(PIInvoice,4,9)+1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE  MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND PIInvoice!='' and PIInvoice!='0'
+				WHERE   PIInvoice!='' and PIInvoice!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -289,14 +284,12 @@ IF ISNULL(@PrintInvoice,0) = '1'
 			END
 			
 		IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE PropertyType ='Managed G H' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(InVoiceNo,'') != '')
+		WHERE PropertyType ='Managed G H'  AND ISNULL(InVoiceNo,'') != '')
 			BEGIN
 				SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
 				CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE PropertyType ='Managed G H' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND InvoiceNo!='' and InvoiceNo!='0'
+				WHERE PropertyType ='Managed G H'  AND InvoiceNo!='' and InvoiceNo!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -312,14 +305,12 @@ BEGIN
 IF ISNULL(@PrintInvoice,0) = '1' 
 	BEGIN
 	IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE  MONTH(CreatedDate)=MONTH(GETDATE()) AND
-		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(PIInvoice,'') != '')
+		WHERE  ISNULL(PIInvoice,'') != '')
 			BEGIN
 				SELECT TOP 1 @PIInvoice=   SUBSTRING(PIInvoice,0,4)
 			  + CAST(SUBSTRING(PIInvoice,4,9)+1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE  MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND PIInvoice!=''  and PIInvoice!='0'
+				WHERE   PIInvoice!=''  and PIInvoice!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -328,14 +319,12 @@ IF ISNULL(@PrintInvoice,0) = '1'
 			END
 			
 	IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE PropertyType ='External Property' and PrintInvoice = 1 and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(InVoiceNo,'') != '')
+		WHERE PropertyType in('External Property','MMT','CPP') and PrintInvoice = 1  AND ISNULL(InVoiceNo,'') != '')
 			BEGIN
 				SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
 				CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE PropertyType ='External Property' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND InvoiceNo!='' and PrintInvoice = 1  and InvoiceNo!='0'
+				WHERE PropertyType in('External Property','MMT','CPP') AND InvoiceNo!='' and PrintInvoice = 1  and InvoiceNo!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -350,14 +339,12 @@ IF ISNULL(@PrintInvoice,0) = '1'
 	IF @BTC = 'Bill to Company (BTC)'  OR @PrintInvoice = 1 
 	BEGIN
 	IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE  MONTH(CreatedDate)=MONTH(GETDATE()) AND
-		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(PIInvoice,'') != '')
+		WHERE   ISNULL(PIInvoice,'') != '')
 			BEGIN
 				SELECT TOP 1 @PIInvoice=   SUBSTRING(PIInvoice,0,4)
 			  + CAST(SUBSTRING(PIInvoice,4,9)+1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE  MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND PIInvoice!='' and InvoiceNo!='0'
+				WHERE   PIInvoice!='' and InvoiceNo!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -366,14 +353,12 @@ IF ISNULL(@PrintInvoice,0) = '1'
 			END
 			
 		IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE PropertyType ='External Property' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(InVoiceNo,'') != '')
+		WHERE PropertyType in('External Property','MMT','CPP') AND ISNULL(InVoiceNo,'') != '')
 			BEGIN
 				SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
 				CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE PropertyType ='External Property' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND InvoiceNo!=''  and InvoiceNo!='0'
+				WHERE PropertyType in('External Property','MMT','CPP')  AND InvoiceNo!=''  and InvoiceNo!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -388,14 +373,12 @@ IF ISNULL(@PrintInvoice,0) = '1'
 	IF @BTC = 'Bill to Client' OR @PrintInvoice = 1 
 	BEGIN
 	IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE  MONTH(CreatedDate)=MONTH(GETDATE()) AND
-		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(PIInvoice,'') != '')
+		WHERE  ISNULL(PIInvoice,'') != '')
 			BEGIN
 				SELECT TOP 1 @PIInvoice=   SUBSTRING(PIInvoice,0,4)
 			  + CAST(SUBSTRING(PIInvoice,4,9)+1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE  MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND PIInvoice!='' and PIInvoice!='0'
+				WHERE   PIInvoice!='' and PIInvoice!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -404,14 +387,12 @@ IF ISNULL(@PrintInvoice,0) = '1'
 			END
 			
 		IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE PropertyType ='External Property' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(InVoiceNo,'') != '')
+		WHERE PropertyType in('External Property','MMT','CPP') AND ISNULL(InVoiceNo,'') != '')
 			BEGIN
 				SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
 				CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE PropertyType ='External Property' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND InvoiceNo!='' and InvoiceNo!='0'
+				WHERE PropertyType in('External Property','MMT','CPP') AND InvoiceNo!='' and InvoiceNo!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -432,14 +413,12 @@ BEGIN
 IF ISNULL(@PrintInvoice,0) = '1' 
 	BEGIN
 		IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE PropertyType ='External Property' and PrintInvoice = 1 and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(InVoiceNo,'') != '')
+		WHERE PropertyType in('External Property','MMT','CPP') and PrintInvoice = 1 AND ISNULL(InVoiceNo,'') != '')
 			BEGIN
 				SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
 				CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE PropertyType ='External Property' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND InvoiceNo!='' and PrintInvoice = 1 and InvoiceNo!='0'
+				WHERE PropertyType in('External Property','MMT','CPP') AND InvoiceNo!='' and PrintInvoice = 1 and InvoiceNo!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -454,14 +433,12 @@ IF ISNULL(@PrintInvoice,0) = '1'
 	IF @BTC = 'Bill to Company (BTC)'  OR @PrintInvoice = 1 
 	BEGIN
 		IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE PropertyType ='External Property' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(InVoiceNo,'') != '')
+		WHERE PropertyType in('External Property','MMT','CPP') AND ISNULL(InVoiceNo,'') != '')
 			BEGIN
 				SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
 				CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE PropertyType ='External Property' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND InvoiceNo!='' and  InvoiceNo!='0'
+				WHERE PropertyType in('External Property','MMT','CPP') AND InvoiceNo!='' and  InvoiceNo!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -476,14 +453,12 @@ IF ISNULL(@PrintInvoice,0) = '1'
 	IF @BTC = 'Bill to Client' OR @PrintInvoice = 1 
 	BEGIN
 		IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE PropertyType ='External Property' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(InVoiceNo,'') != '')
+		WHERE PropertyType in('External Property','MMT','CPP') AND ISNULL(InVoiceNo,'') != '')
 			BEGIN
 				SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
 				CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE PropertyType ='External Property' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND InvoiceNo!='' and  InvoiceNo!='0'
+				WHERE PropertyType in('External Property','MMT','CPP') AND InvoiceNo!='' and  InvoiceNo!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -497,15 +472,13 @@ BEGIN
 	IF @BTC = 'Bill to Company (BTC)'  
 	BEGIN
 		IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE PropertyType ='External Property' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(InVoiceNo,'') != '')
+		WHERE PropertyType in('External Property','MMT','CPP') AND ISNULL(InVoiceNo,'') != '')
 			BEGIN
 			
 				SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
 				CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE PropertyType ='CPP' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND InvoiceNo!='' and  InvoiceNo!='0'
+				WHERE PropertyType in('External Property','MMT','CPP')  AND InvoiceNo!='' and  InvoiceNo!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -521,14 +494,12 @@ BEGIN
 IF ISNULL(@PrintInvoice,0) = '1' 
 	BEGIN
 	IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE  MONTH(CreatedDate)=MONTH(GETDATE()) AND
-		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(PIInvoice,'') != '')
+		WHERE   ISNULL(PIInvoice,'') != '')
 			BEGIN
 				SELECT TOP 1 @PIInvoice=   SUBSTRING(PIInvoice,0,4)
 			  + CAST(SUBSTRING(PIInvoice,4,9)+1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE  MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND PIInvoice!=''  and PIInvoice!='0'
+				WHERE  PIInvoice!=''  and PIInvoice!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -537,14 +508,12 @@ IF ISNULL(@PrintInvoice,0) = '1'
 			END
 			
 	IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE PropertyType ='Managed G H' and PrintInvoice = 1 and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(InVoiceNo,'') != '')
+		WHERE PropertyType ='Managed G H' and PrintInvoice = 1 AND ISNULL(InVoiceNo,'') != '')
 			BEGIN
 				SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
 				CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE PropertyType ='Managed G H' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND InvoiceNo!='' and PrintInvoice = 1  and InvoiceNo!='0'
+				WHERE PropertyType ='Managed G H' AND InvoiceNo!='' and PrintInvoice = 1  and InvoiceNo!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -559,14 +528,12 @@ IF ISNULL(@PrintInvoice,0) = '1'
 	IF @BTC = 'Bill to Company (BTC)'  OR @PrintInvoice = 1 
 	BEGIN
 	IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE  MONTH(CreatedDate)=MONTH(GETDATE()) AND
-		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(PIInvoice,'') != '')
+		WHERE  ISNULL(PIInvoice,'') != '')
 			BEGIN
 				SELECT TOP 1 @PIInvoice=   SUBSTRING(PIInvoice,0,4)
 			  + CAST(SUBSTRING(PIInvoice,4,9)+1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE  MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND PIInvoice!='' and InvoiceNo!='0'
+				WHERE   PIInvoice!='' and InvoiceNo!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -575,14 +542,12 @@ IF ISNULL(@PrintInvoice,0) = '1'
 			END
 			
 		IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE PropertyType ='Managed G H' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(InVoiceNo,'') != '')
+		WHERE PropertyType ='Managed G H' AND ISNULL(InVoiceNo,'') != '')
 			BEGIN
 				SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
 				CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE PropertyType ='Managed G H' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND InvoiceNo!=''  and InvoiceNo!='0'
+				WHERE PropertyType ='Managed G H' AND InvoiceNo!=''  and InvoiceNo!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -597,14 +562,12 @@ IF ISNULL(@PrintInvoice,0) = '1'
 	IF @BTC = 'Bill to Client' OR @PrintInvoice = 1 
 	BEGIN
 	IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE  MONTH(CreatedDate)=MONTH(GETDATE()) AND
-		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(PIInvoice,'') != '')
+		WHERE   ISNULL(PIInvoice,'') != '')
 			BEGIN
 				SELECT TOP 1 @PIInvoice=   SUBSTRING(PIInvoice,0,4)
 			  + CAST(SUBSTRING(PIInvoice,4,9)+1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE  MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND PIInvoice!='' and PIInvoice!='0'
+				WHERE    PIInvoice!='' and PIInvoice!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -613,14 +576,12 @@ IF ISNULL(@PrintInvoice,0) = '1'
 			END
 			
 		IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE PropertyType ='Managed G H' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(InVoiceNo,'') != '')
+		WHERE PropertyType ='Managed G H' AND ISNULL(InVoiceNo,'') != '')
 			BEGIN
 				SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
 				CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE PropertyType ='Managed G H' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND InvoiceNo!='' and InvoiceNo!='0'
+				WHERE PropertyType ='Managed G H'  AND InvoiceNo!='' and InvoiceNo!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -636,14 +597,12 @@ BEGIN
 IF ISNULL(@PrintInvoice,0) = '1' 
 	BEGIN
 		IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE PropertyType ='External Property' and PrintInvoice = 1 and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(InVoiceNo,'') != '')
+		WHERE PropertyType in('External Property','MMT','CPP') and PrintInvoice = 1 AND ISNULL(InVoiceNo,'') != '')
 			BEGIN
 				SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
 				CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE PropertyType ='MMT' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND InvoiceNo!='' and PrintInvoice = 1 and InvoiceNo!='0'
+				WHERE PropertyType in('External Property','MMT','CPP') AND InvoiceNo!='' and PrintInvoice = 1 and InvoiceNo!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -658,14 +617,12 @@ IF ISNULL(@PrintInvoice,0) = '1'
 	IF @BTC = 'Bill to Company (BTC)'  OR @PrintInvoice = 1 
 	BEGIN
 		IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE PropertyType ='External Property' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(InVoiceNo,'') != '')
+		WHERE PropertyType in('External Property','MMT','CPP') AND ISNULL(InVoiceNo,'') != '')
 			BEGIN
 				SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
 				CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE PropertyType ='MMT' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND InvoiceNo!='' and  InvoiceNo!='0'
+				WHERE PropertyType in('External Property','MMT','CPP') AND InvoiceNo!='' and  InvoiceNo!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -680,14 +637,12 @@ IF ISNULL(@PrintInvoice,0) = '1'
 	IF @BTC = 'Bill to Client' OR @PrintInvoice = 1 
 	BEGIN
 		IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE PropertyType ='External Property' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-		YEAR(CreatedDate)=YEAR(GETDATE()) AND ISNULL(InVoiceNo,'') != '')
+		WHERE PropertyType in('External Property','MMT','CPP') AND ISNULL(InVoiceNo,'') != '')
 			BEGIN
 				SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
 				CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE PropertyType ='MMT' and MONTH(CreatedDate)=MONTH(GETDATE()) AND
-				YEAR(CreatedDate)=YEAR(GETDATE()) AND InvoiceNo!='' and  InvoiceNo!='0'
+				WHERE PropertyType in('External Property','MMT','CPP') AND InvoiceNo!='' and  InvoiceNo!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE

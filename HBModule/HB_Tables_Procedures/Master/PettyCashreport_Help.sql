@@ -559,8 +559,13 @@ BEGIN
 		ORDER BY PC.Id ASC
 
 				
-		SELECT Id as SNo,Requestedby,RequestedOn,ExpenseHead,ExpenseItem,Description,Amount,
-		BillDate,BillStartDate,BillEndDate,Property	FROM #PCNEW 
+		SELECT Id as SNo,ISNULL(Requestedby,'') AS Requestedby,ISNULL(RequestedOn,'') AS RequestedOn,
+		ISNULL(ExpenseHead,'') AS ExpenseHead,ISNULL(ExpenseItem,'') AS ExpenseItem,
+		ISNULL(Description,'') AS Description,ISNULL(Amount,'') AS Amount,
+		ISNULL(BillDate,'') AS BillDate,ISNULL(BillStartDate,'') AS BillStartDate,
+		ISNULL(BillEndDate,'') AS BillEndDate,
+		ISNULL(Property,'') AS	Property
+		FROM #PCNEW 
 			
 		
 END	

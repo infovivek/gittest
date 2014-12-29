@@ -82,7 +82,7 @@ DECLARE @CompanyName VARCHAR(100),@Address NVARCHAR(100),@PanCardNo VARCHAR(100)
 	sum(cs.ChkOutServiceVat) as Vat,h.ChkOutTariffST3 as SerivceTax,
 	(h.ChkOutTariffCess+sum(cs.Cess)) as Cess,
 	(h.ChkOutTariffHECess+sum(cs.HECess)) as HCess,--CSDD.BillAmount,
-	convert(nvarchar(100),h.CheckInDate,103) as ArrivalDate,
+	convert(nvarchar(100),d.ArrivalDate,103) as ArrivalDate,
 	ROUND (d.Tariff,0) Tariff,(p.PropertyName+','+p.Propertaddress) as Propertyaddress,(c.CityName+','+
 	s.StateName+','+p.Postal) as Propcity,c.CityName,s.StateName,p.Postal,
 	p.Phone,p.Email,
@@ -148,7 +148,7 @@ DECLARE @CompanyName VARCHAR(100),@Address NVARCHAR(100),@PanCardNo VARCHAR(100)
 	c.CityName,s.StateName,p.Postal,p.Phone,p.Email,	
     H.VATPer,h.RestaurantSTPer ,
     h.BusinessSupportST,h.ChkOutTariffST1 ,H.LuxuryTaxPer,H.ServiceTaxPer,h.ChkOutTariffExtraAmount,
-    h.InVoiceNo,h.NoOfDays,h.BillFromDate,h.BillEndDate,h.CreatedDate,t.LuxuryNo
+    h.InVoiceNo,h.NoOfDays,h.BillFromDate,h.BillEndDate,h.CreatedDate,t.LuxuryNo,d.ArrivalDate
     
     
     

@@ -26,11 +26,12 @@
 	<fx:Script source="..\\Common\\Functions.as"/>
 	<fx:Script>
 		<![CDATA[
+			import spark.events.IndexChangeEvent;
 			public static var Global_AC:ArrayCollection = new ArrayCollection();
 			public static var GlobalXml:String = "";
 			public var Ac:ArrayCollection=new ArrayCollection();
 			public var ErrorFlag:Boolean=true;
-			public var PropertyId:Number=0;
+			public var PropertyId:String="0";
 			public var Help_AC:ArrayCollection=new ArrayCollection();
 			public var Id:Number=0;
 			//Image Upload
@@ -63,11 +64,7 @@
 				help();	
 				init();
 			}
-			private function help():void
-			{				
-				useWeb("MapPOAndVendor","Property_CUSTOM", [GlobalXml, "Property",0, "","","",0]);
-				
-			}
+			
 			private function Custom_WebSer_Result (Ds_Objects:Object):void
 			{
 				if (Ds_Objects.currentTarget.description.toString() == "Property_CUSTOM")
@@ -132,7 +129,7 @@
 				var Help_AC1:ArrayCollection = new ArrayCollection();
 				Grd_FinalAdjustment.dataProvider=Help_AC1;
 				hlp_Property.text="";
-				PropertyId=0;
+				PropertyId="0";
 				Chk_Selectall.selected=false;
 				txt_ImageName.text="";
 				txt_InvoiceAmount.text="";
@@ -233,8 +230,11 @@
 					ErrorFlag=false;
 				}
 				if(ErrorFlag==true)
-				{					
-					useWeb("MapPOAndVendor","POSerch_CUSTOM", [GlobalXml,"POSerch",PropertyId,DT_From.text,DT_To.text,"",0]);									
+				{	if(dd_Type.selectedIndex==0)	
+					useWeb("MapPOAndVendor","POSerch_CUSTOM", [GlobalXml,"POSerch",PropertyId,DT_From.text,DT_To.text,"ExP",0]);
+				else
+					useWeb("MapPOAndVendor","POSerch_CUSTOM", [GlobalXml,"MMTPOSerch",0,DT_From.text,DT_To.text,PropertyId,0]);
+					
 				}
 			}
 			public function Change(LabelName:String):void
@@ -277,7 +277,7 @@
 				else
 				{
 					hlp_Property.text="";
-					PropertyId=0;
+					PropertyId="0";
 					
 				}
 			}
@@ -574,24 +574,39 @@
 				}
 			}
 			
+			protected function help():void
+			{
+				if(dd_Type.selectedIndex==0)
+					useWeb("MapPOAndVendor","Property_CUSTOM", [GlobalXml, "Property",0, "","","",0]);
+				else
+					useWeb("MapPOAndVendor","Property_CUSTOM", [GlobalXml, "MMTProperty",0, "","","",0]);
+			}
+			
 		]]>
 	</fx:Script>
 	<s:BorderContainer x="0" y="0" width="100%" height="69" borderVisible="false" backgroundColor="#f4efef" depth="10">
 		<s:HGroup x="0" y="0" width="100%" height="90%" horizontalAlign="center" verticalAlign="middle">
-			<s:Group x="75" y="14" width="806" height="34">
-				<mx:Label x="15" y="8" text="Vendor" id="Lbl_Vendor"/>
-				<mx:Label id="Lbl_Vendor0" x="57" y="2" width="13" text="*" color="red" fontSize="16"/>
-				<mx:Label id="Lbl_Vendor1" x="372" y="2" width="13" text="*" color="red" fontSize="16"/>
-				<mx:Label id="Lbl_Vendor2" x="551" y="2" width="13" text="*" color="red" fontSize="16"/>
-				<mx:Label x="312" y="8" width="65" height="16" text="From Date" id="Lbl_FDT"/>
-				<mx:Label x="505" y="8" text="To Date" id="Lbl_TDT"/>
-				<WrbHelpComp:HelpText x="77" y="8.5" width="214" id="hlp_Property" pxSetPrompt="Vendor" pxTabIndex="1"
+			<s:Group x="1" y="14" width="100%" height="34">
+				<mx:Label x="165" y="8" text="Vendor" id="Lbl_Vendor"/>
+				<mx:Label x="5" y="8" text="Type" id="Lbl_Vendor7"/>
+				<mx:Label id="Lbl_Vendor0" x="207" y="2" width="13" text="*" color="red" fontSize="16"/>
+				<mx:Label id="Lbl_Vendor1" x="522" y="2" width="13" text="*" color="red" fontSize="16"/>
+				<mx:Label id="Lbl_Vendor2" x="701" y="2" width="13" text="*" color="red" fontSize="16"/>
+				<mx:Label x="462" y="8" width="65" height="16" text="From Date" id="Lbl_FDT"/>
+				<mx:Label x="655" y="8" text="To Date" id="Lbl_TDT"/>
+				<WrbHelpComp:HelpText x="227" y="8.5" width="214" id="hlp_Property" pxSetPrompt="Vendor" pxTabIndex="1"
 									  pxSetColumnsWidth="300,0" onselection="{fnGetProperty()}">
 				</WrbHelpComp:HelpText>
-				<mx:DateField x="393" y="7" id="DT_From" tabIndex="2" change="Change('Lbl_FDT')" formatString="DD/MM/YYYY"/>
-				<mx:DateField x="571" y="7" id="DT_To" tabIndex="3" change="Change('Lbl_TDT')" formatString="DD/MM/YYYY"/>
-				<s:Image x="683" y="-9" source="assets/a1.png" toolTip="Search" click="Search()" tabIndex="5"/>
-				<s:Image x="757" y="-9" source="assets/dust_bin1.png" toolTip="Clear" click="Clear()"/>
+				<mx:DateField x="543" y="7" id="DT_From" tabIndex="2" change="Change('Lbl_FDT')" formatString="DD/MM/YYYY"/>
+				<mx:DateField x="721" y="7" id="DT_To" tabIndex="3" change="Change('Lbl_TDT')" formatString="DD/MM/YYYY"/>
+				<s:Image x="833" y="-9" source="assets/a1.png" toolTip="Search" click="Search()" tabIndex="5"/>
+				<s:Image x="907" y="-9" source="assets/dust_bin1.png" toolTip="Clear" click="Clear()"/>
+				<s:DropDownList x="45" y="8" id="dd_Type" selectedItem="External" change="help()">
+					<mx:ArrayCollection>
+						<fx:String>External</fx:String>
+						<fx:String>MMT</fx:String>					
+					</mx:ArrayCollection>
+				</s:DropDownList>
 			</s:Group>
 		</s:HGroup>
 	</s:BorderContainer>

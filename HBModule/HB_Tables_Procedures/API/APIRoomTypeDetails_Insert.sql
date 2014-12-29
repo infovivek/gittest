@@ -25,10 +25,20 @@ CREATE PROCEDURE [dbo].[SP_APIRoomTypeDetails_Insert](
 @RoomTypeCode NVARCHAR(100))
 AS
 BEGIN
- INSERT INTO WRBHBAPIRoomTypeDtls(HeaderId,HotelId,RoomTypeName,
- RoomTypeCode)
- VALUES(@HeaderId,@HotelId,dbo.TRIM(@RoomTypeName),
- dbo.TRIM(@RoomTypeCode));
- SELECT Id FROM WRBHBAPIRoomTypeDtls WHERE Id=@@IDENTITY;
+ IF EXISTS (SELECT NULL FROM WRBHBAPIRoomTypeDtls WHERE HeaderId = @HeaderId AND
+ HotelId = @HotelId AND RoomTypecode = @RoomTypeCode)
+  BEGIN
+   UPDATE WRBHBAPIRoomTypeDtls SET RoomTypename = @RoomTypeName
+   WHERE HeaderId = @HeaderId AND HotelId = @HotelId AND 
+   RoomTypecode = @RoomTypeCode;
+   SELECT Id FROM WRBHBAPIRoomTypeDtls WHERE HeaderId = @HeaderId AND
+   HotelId = @HotelId AND RoomTypecode = @RoomTypeCode;
+  END
+ ELSE
+  BEGIN
+   INSERT INTO WRBHBAPIRoomTypeDtls(HeaderId,HotelId,RoomTypeName,RoomTypeCode)
+   VALUES(@HeaderId,@HotelId,dbo.TRIM(@RoomTypeName),dbo.TRIM(@RoomTypeCode));
+   SELECT Id FROM WRBHBAPIRoomTypeDtls WHERE Id=@@IDENTITY;
+  END
 END
 GO

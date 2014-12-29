@@ -31,7 +31,7 @@
 			public static var GlobalXml:String = "";
 			public var Ac:ArrayCollection=new ArrayCollection();
 			public var ErrorFlag:Boolean=true;
-			public var PropertyId:Number=0;
+			public var PropertyId:String="0";
 			public var Help_AC:ArrayCollection=new ArrayCollection();
 			public var Advance_AC:ArrayCollection=new ArrayCollection();
 			public var AdvanceTotal:Number=0;
@@ -108,11 +108,12 @@
 				
 			}				
 			
-			private function help():void
+			protected function help():void
 			{
-				//This function call to MAP PO VENDOR SERVICE
-				useWeb("MapPOAndVendor","Property_CUSTOM", [GlobalXml, "Property",0, "","","",0]);
-				
+				if(dd_Type.selectedIndex==0)
+					useWeb("MapPOAndVendor","Property_CUSTOM", [GlobalXml, "Property",0, "","","",0]);
+				else
+					useWeb("MapPOAndVendor","Property_CUSTOM", [GlobalXml, "MMTProperty",0, "","","",0]);
 			}
 			public function fnGetProperty():void
 			{
@@ -124,12 +125,12 @@
 					PropertyId=hlp_Property.Select_Row.ZId	
 					
 					//This function call to MAP PO VENDOR SERVICE
-					useWeb("MapPOAndVendor","PropertySearch_CUSTOM", [GlobalXml, "PropertySearch",PropertyId, "","","",0]);
+					useWeb("MapPOAndVendor","PropertySearch_CUSTOM", [GlobalXml, "PropertySearch",0, "","",PropertyId,0]);
 				}
 				else
 				{
 					hlp_Property.text="";
-					PropertyId=0;
+					PropertyId="0";
 					
 				}
 			}
@@ -180,7 +181,7 @@
 				lbl_InvoiceVendor.text="Total Vendor Invoice Amount : 0.00 ";
 				lbl_Total.text="Total Amount to be paid : 0.00 ";
 				lbl_InvoiceTAC.text="Total TAC Invoice Amount : 0.00  ";
-				PropertyId=0;
+				PropertyId="0";
 				hlp_Property.text="";
 				lbl_Error.visible=false;
 				Change('lbl_Error');
@@ -307,18 +308,18 @@
 					ErrorFlag=false;
 					return;
 				}
-//				var Temp_Ac1:ArrayCollection=new ArrayCollection();
-//				Temp_Ac1=Grd_TAC.dataProvider as ArrayCollection;
-//				if(Temp_Ac1.length==0)
-//				{
-//					lbl_Error.visible=true;
-//					lbl_Error.text="This Is An Invalid Process";
-//					fader.target=lbl_Error;				
-//					fader.play();
-//					lbl_Error.setStyle("color","red");
-//					ErrorFlag=false;
-//					return;
-//				}
+				//				var Temp_Ac1:ArrayCollection=new ArrayCollection();
+				//				Temp_Ac1=Grd_TAC.dataProvider as ArrayCollection;
+				//				if(Temp_Ac1.length==0)
+				//				{
+				//					lbl_Error.visible=true;
+				//					lbl_Error.text="This Is An Invalid Process";
+				//					fader.target=lbl_Error;				
+				//					fader.play();
+				//					lbl_Error.setStyle("color","red");
+				//					ErrorFlag=false;
+				//					return;
+				//				}
 				if(InoviceAmount==0)
 				{
 					lbl_Error.visible=true;
@@ -329,16 +330,16 @@
 					ErrorFlag=false;
 					return;
 				}
-//				if(Total_AmountTAC==0)
-//				{
-//					lbl_Error.visible=true;
-//					lbl_Error.text="Please Select TAC Invoice Amount";
-//					fader.target=lbl_Error;				
-//					fader.play();
-//					lbl_Error.setStyle("color","red");
-//					ErrorFlag=false;
-//					return;
-//				}
+				//				if(Total_AmountTAC==0)
+				//				{
+				//					lbl_Error.visible=true;
+				//					lbl_Error.text="Please Select TAC Invoice Amount";
+				//					fader.target=lbl_Error;				
+				//					fader.play();
+				//					lbl_Error.setStyle("color","red");
+				//					ErrorFlag=false;
+				//					return;
+				//				}
 				if(InoviceAmount<=Total_AmountTAC)
 				{
 					lbl_Error.visible=true;
@@ -406,7 +407,7 @@
 					txt_AmountPaid.text=String(InoviceAmount-Total_AmountTAC);
 					Brd_Settlement.visible=true;
 					
-						
+					
 				}
 			}
 			public function Change(LabelName:String):void
@@ -449,16 +450,16 @@
 					{
 						lbl_AdvanceAmountTotal.text="INR "+String(AdvanceTotal-Number(txt_AdjustAdvance.text));
 						txt_AmountPaid.text=String(InoviceAmount-Total_AmountTAC-Number(txt_AdjustAdvance.text))
-							if(txt_AmountPaid.text=="0")
-							{
-								lbl_Payment.visible=false;
-								DD_PaymentMode.enabled=false;
-							}
-							else
-							{
-								lbl_Payment.visible=true;
-								DD_PaymentMode.enabled=true;
-							}
+						if(txt_AmountPaid.text=="0")
+						{
+							lbl_Payment.visible=false;
+							DD_PaymentMode.enabled=false;
+						}
+						else
+						{
+							lbl_Payment.visible=true;
+							DD_PaymentMode.enabled=true;
+						}
 						
 						lbl_Error1.visible=false;
 						Change('lbl_Error1')
@@ -728,13 +729,20 @@
 	<s:BorderContainer x="0" y="0" width="100%" height="58" borderVisible="false" backgroundColor="#f4efef" depth="10">
 		<s:HGroup x="0" y="0" width="100%" height="59" horizontalAlign="center" verticalAlign="middle">
 			<s:Group x="75" y="14" width="806" height="34">
-				<mx:Label x="15" y="8" text="Vendor" id="Lbl_Vendor"/>
+				<mx:Label x="218" y="8" text="Vendor" id="Lbl_Vendor"/>
 				<mx:Label id="Lbl_Vendor0" x="57" y="2" width="13" text="*" color="red" fontSize="16"/>
-				<WrbHelpComp:HelpText x="77" y="8.5" width="284" id="hlp_Property" pxSetPrompt="Vendor" pxTabIndex="1"
+				<WrbHelpComp:HelpText x="267" y="8.5" width="284" id="hlp_Property" pxSetPrompt="Vendor" pxTabIndex="1"
 									  pxSetColumnsWidth="300,0" onselection="{fnGetProperty()}">
 				</WrbHelpComp:HelpText>				
 				<s:Image x="757" y="-9" source="assets/dust_bin1.png" toolTip="Clear" click="MainClear()"/>
 				<mx:Label x="419" y="7" text="TAC Invoice Amount Not Greater Than Invoice Amount" id="lbl_Error" color="RED" visible="false"/>
+				<mx:Label x="5" y="8" text="Type" id="Lbl_Vendor7"/>
+				<s:DropDownList x="45" y="8" id="dd_Type" selectedItem="External" change="help()">
+					<mx:ArrayCollection>
+						<fx:String>External</fx:String>
+						<fx:String>MMT</fx:String>					
+					</mx:ArrayCollection>
+				</s:DropDownList>
 			</s:Group>
 		</s:HGroup>
 	</s:BorderContainer>
@@ -842,3 +850,4 @@
 		</s:VGroup>
 	</s:BorderContainer>
 </s:Application>
+

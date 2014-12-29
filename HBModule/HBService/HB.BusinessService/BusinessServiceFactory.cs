@@ -370,7 +370,10 @@ namespace HB.BusinessService
                     break;
                 case "BookingPayment":
                     _businessService = new BookingPaymentEmailService();
-                    break;                    
+                    break;
+                case "CheckOutInterSettleHdr":
+                    _businessService = new CheckOutandInterSettleService();
+                    break;
             }
             return _businessService;
         }

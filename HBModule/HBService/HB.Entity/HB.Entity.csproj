@@ -58,6 +58,8 @@
     <Compile Include="ChangePassword.cs" />
     <Compile Include="CheckInDtls.cs" />
     <Compile Include="CheckoutAndIntermediate.cs" />
+    <Compile Include="CheckOutandInterSettleDtl.cs" />
+    <Compile Include="CheckOutandInterSettleHdr.cs" />
     <Compile Include="CheckOutPayment.cs" />
     <Compile Include="CheckOutPaymentCard.cs" />
     <Compile Include="CheckOutPaymentCash.cs" />
