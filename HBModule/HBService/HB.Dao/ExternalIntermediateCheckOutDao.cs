@@ -242,6 +242,7 @@ namespace HB.Dao
             //    ExChkOut.PrintInvoice = Convert.ToBoolean(doc.SelectSingleNode("HdrXml").Attributes["PrintInvoice"].Value);
             //}
             ExChkOut.PrintInvoice = Convert.ToBoolean(doc.SelectSingleNode("HdrXml").Attributes["PrintInvoice"].Value);
+            ExChkOut.Email = doc.SelectSingleNode("HdrXml").Attributes["Email"].Value;
             Cmd = new SqlCommand();
             if (ExChkOut.Id != 0)
             {
@@ -320,6 +321,7 @@ namespace HB.Dao
             Cmd.Parameters.Add("@BillFromDate", SqlDbType.NVarChar).Value = ExChkOut.BillFromDate;
             Cmd.Parameters.Add("@BillEndDate", SqlDbType.NVarChar).Value = ExChkOut.BillEndDate;
             Cmd.Parameters.Add("@Intermediate", SqlDbType.NVarChar).Value = ExChkOut.Intermediate;
+            Cmd.Parameters.Add("@Email", SqlDbType.NVarChar).Value = ExChkOut.Email;
             Cmd.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = user.Id;
             ds = new WrbErpConnection().ExecuteDataSet(Cmd, UserData);
             //  document.LoadXml(data[2].ToString());
@@ -459,6 +461,7 @@ namespace HB.Dao
                                 ExChkOut.BillFromDate1 = doc.SelectSingleNode("HdrXml").Attributes["BillFromDate"].Value;
                                 ExChkOut.BillEndDate1 = doc.SelectSingleNode("HdrXml").Attributes["BillEndDate"].Value;
                                 ExChkOut.Intermediate1 = doc.SelectSingleNode("HdrXml").Attributes["Intermediate"].Value;
+              //                  ExChkOut.Email1 = doc.SelectSingleNode("HdrXml").Attributes["Email"].Value;
                                 Cmd = new SqlCommand();
                                 if (ExChkOut.Id != 0)
                                 {
@@ -518,6 +521,7 @@ namespace HB.Dao
                                 Cmd.Parameters.Add("@BillFromDate", SqlDbType.NVarChar).Value = ExChkOut.BillFromDate1;
                                 Cmd.Parameters.Add("@BillEndDate", SqlDbType.NVarChar).Value = ExChkOut.BillEndDate1;
                                 Cmd.Parameters.Add("@Intermediate", SqlDbType.NVarChar).Value = ExChkOut.Intermediate1;
+                     //           Cmd.Parameters.Add("@Email", SqlDbType.NVarChar).Value = ExChkOut.Email1;
                                 Cmd.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = user.Id;
                                 ds = new WrbErpConnection().ExecuteDataSet(Cmd, UserData);
 

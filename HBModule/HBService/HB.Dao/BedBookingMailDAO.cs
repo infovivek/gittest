@@ -226,14 +226,30 @@ namespace HB.Dao
                 message.Subject = "Booking Confirmation - " + ds.Tables[2].Rows[0][2].ToString();               
             }*/
             string Imagelocation = "";
-            Imagelocation = ds.Tables[6].Rows[0][0].ToString();
+            string Imagealt = "";
+            string PtyType = ds.Tables[5].Rows[0][1].ToString();
+            if (PtyType == "MGH")
+            {
+                Imagelocation = ds.Tables[6].Rows[0][4].ToString();
+                Imagealt = ds.Tables[6].Rows[0][5].ToString();
+                if (Imagelocation == "")
+                {
+                    Imagelocation = ds.Tables[6].Rows[0][0].ToString();
+                    Imagealt = ds.Tables[6].Rows[0][1].ToString();
+                }
+            }
+            else
+            {
+                Imagelocation = ds.Tables[6].Rows[0][0].ToString();
+                Imagealt = ds.Tables[6].Rows[0][1].ToString();
+            }
             string Imagebody =
                         " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #cccdcf solid 1px\">" +
                         "<tr><td>" +
                         "<table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\">" +
                         "<tr> " +
                         "<th align=\"left\" width=\"50%\" style=\"padding: 10px 0px 10px 10px;\">" +
-                        "<img src=" + Imagelocation + " width=\"200px\" height=\"52px\" alt=" + ds.Tables[6].Rows[0][1].ToString() + ">" +              //Image Name Change
+                        "<img src=" + Imagelocation + " width=\"200px\" height=\"52px\" alt=" + Imagealt + ">" +              //Image Name Change
                         "</th><th width=\"50%\"></th></tr></table>";
             /*string Imagebody =
                 " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800pxpx\" border=\"0\" align=\"center\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #cccdcf solid 1px\">" +
@@ -256,29 +272,59 @@ namespace HB.Dao
                 " <p style=\"color:orange; font-weight:bold; font-size:14px;\"> Guest Details</p>" +
                 " </td> </tr></table>";
             // Dataset Table 0 begin
-            string GuestDetailsTable1 =
-                " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\">" +
-                " <tr style=\"font-size:11px; font-weight:normal;\">" +
-                " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:120px;\"><p>Guest Name</p></th>" +
-                " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p>Check-In Date / Expected Time</p></th>" +
-                " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p>Check-Out Date</p></th>" +
-                " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p>Tariff / Bed / Day</p></th>" +
-                " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p>Payment Mode<br>for Tariff</p></th>" +
-                " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #ccc; width:96px;\"><p>Payment Mode<br>for Service</p></th>" +
-                " </tr>";
-            for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+            string GuestDetailsTable1 = "";
+            if (PtyType == "MGH")
             {
-                GuestDetailsTable1 +=
-                "<tr style=\"font-size:11px; font-weight:normal;\">" +
-                " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:120px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][0].ToString() + "</p></td>" +
-                " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][1].ToString() + "</p></td>" +
-                " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][2].ToString() + "</p></td>" +
-                " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p style=\"text-align:center;\">INR " + ds.Tables[0].Rows[i][3].ToString() + "/-</p></td>" +
-                " <th style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][4].ToString() + "</p></th>" +
-                " <th style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #ccc; width:96px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][5].ToString() + "</p></th>" +
-                " </tr>";
+                GuestDetailsTable1 =
+                    " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\">" +
+                    " <tr style=\"font-size:11px; font-weight:normal;\">" +
+                    " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:120px;\"><p>Guest Name</p></th>" +
+                    " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p>Check-In Date / Expected Time</p></th>" +
+                    " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p>Check-Out Date</p></th>" +
+                    " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p>Room No</p></th>" +
+                    " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p>Payment Mode<br>for Tariff</p></th>" +
+                    " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #ccc; width:96px;\"><p>Payment Mode<br>for Service</p></th>" +
+                    " </tr>";
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    GuestDetailsTable1 +=
+                    "<tr style=\"font-size:11px; font-weight:normal;\">" +
+                    " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:120px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][0].ToString() + "</p></td>" +
+                    " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][1].ToString() + "</p></td>" +
+                    " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][2].ToString() + "</p></td>" +
+                    " <th style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #ccc; width:96px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][6].ToString() + "</p></th>" +
+                    " <th style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][4].ToString() + "</p></th>" +
+                    " <th style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #ccc; width:96px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][5].ToString() + "</p></th>" +
+                    " </tr>";
+                }
+                GuestDetailsTable1 += "</table>";
             }
-            GuestDetailsTable1 += "</table>";
+            else
+            {
+                GuestDetailsTable1 =
+                    " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\">" +
+                    " <tr style=\"font-size:11px; font-weight:normal;\">" +
+                    " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:120px;\"><p>Guest Name</p></th>" +
+                    " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p>Check-In Date / Expected Time</p></th>" +
+                    " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p>Check-Out Date</p></th>" +
+                    " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p>Tariff / Bed / Day</p></th>" +
+                    " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p>Payment Mode<br>for Tariff</p></th>" +
+                    " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #ccc; width:96px;\"><p>Payment Mode<br>for Service</p></th>" +
+                    " </tr>";
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    GuestDetailsTable1 +=
+                    "<tr style=\"font-size:11px; font-weight:normal;\">" +
+                    " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:120px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][0].ToString() + "</p></td>" +
+                    " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][1].ToString() + "</p></td>" +
+                    " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][2].ToString() + "</p></td>" +
+                    " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p style=\"text-align:center;\">INR " + ds.Tables[0].Rows[i][3].ToString() + "/-</p></td>" +
+                    " <th style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][4].ToString() + "</p></th>" +
+                    " <th style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #ccc; width:96px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][5].ToString() + "</p></th>" +
+                    " </tr>";
+                }
+                GuestDetailsTable1 += "</table>";
+            }
             // Dataset Table 0 end
             string Note = "";
             string CheckInPolicy = "";
@@ -564,14 +610,31 @@ namespace HB.Dao
                         message1.Subject = "Booking Confirmation - " + ds.Tables[2].Rows[0][2].ToString();
                     }*/
                     string Imagelocation1 = "";
-                    Imagelocation1 = ds.Tables[6].Rows[0][2].ToString();
+                    string Imagealt1 = "";
+                    string PtyType1 = ds.Tables[5].Rows[0][1].ToString();
+                    if (PtyType1 == "MGH")
+                    {
+                        Imagelocation1 = ds.Tables[6].Rows[0][4].ToString();
+                        Imagealt1 = ds.Tables[6].Rows[0][5].ToString();
+                        if (Imagelocation1 == "")
+                        {
+                            Imagelocation1 = ds.Tables[6].Rows[0][2].ToString();
+                            Imagealt1 = ds.Tables[6].Rows[0][3].ToString();
+                        }
+                    }
+                    else
+                    {
+                        Imagelocation1 = ds.Tables[6].Rows[0][2].ToString();
+                        Imagealt1 = ds.Tables[6].Rows[0][3].ToString();
+                    }
+                    
                     string Imagebody1 =
                         " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #cccdcf solid 1px\">" +
                         "<tr><td>" +
                         "<table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\">" +
                         "<tr> " +
                         "<th align=\"left\" width=\"50%\" style=\"padding: 10px 0px 10px 10px;\">" +
-                        "<img src=" + Imagelocation + " width=\"200px\" height=\"52px\" alt=" + ds.Tables[6].Rows[0][3].ToString() + ">" +              //Image Name Change
+                        "<img src=" + Imagelocation + " width=\"200px\" height=\"52px\" alt=" + Imagealt1 + ">" +              //Image Name Change
                         "</th><th width=\"50%\"></th></tr></table>";
                     /*string Imagebody1 =
                         " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #cccdcf solid 1px\">" +
@@ -593,28 +656,59 @@ namespace HB.Dao
                         " </td></tr><tr><td width=\"800px\" style=\"margin-bottom:\">" +
                         " <p style=\"color:orange; font-weight:bold; font-size:14px;\"> Guest Details :</p>" +
                         " </td> </tr></table>";
-                    string GuestDetailsTable11 =
-                        " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\">" +
-                        " <tr style=\"font-size:11px; font-weight:normal;\">" +
-                        " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:120px;\"><p>Guest Name</p></th>" +
-                        " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p>Check-In Date / Expected Time</p></th>" +
-                        " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p>Check-Out Date</p></th>" +
-                        " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p>Tariff / Bed / Day</p></th>" +
-                        " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p>Payment Mode<br>for Tariff</p></th>" +
-                        " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #ccc; width:96px;\"><p>Payment Mode<br>for Service</p></th>" +
-                        " </tr>";
-                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    string GuestDetailsTable11 = "";
+                    if (PtyType1 == "MGH")
                     {
-                        GuestDetailsTable11 +=
-                        "<tr style=\"font-size:11px; font-weight:normal;\">" +
-                        " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:120px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][0].ToString() + "</p></td>" +
-                        " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][1].ToString() + "</p></td>" +
-                        " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][2].ToString() + "</p></td>" +
-                        " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p style=\"text-align:center;\">INR " + ds.Tables[0].Rows[i][3].ToString() + "/-</p></td>" +
-                        " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][4].ToString() + "</p></td>" +
-                        " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #ccc; width:96px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][5].ToString() + "</p></td></tr>";
+                        GuestDetailsTable11 =
+                            " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\">" +
+                            " <tr style=\"font-size:11px; font-weight:normal;\">" +
+                            " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:120px;\"><p>Guest Name</p></th>" +
+                            " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p>Check-In Date / Expected Time</p></th>" +
+                            " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p>Check-Out Date</p></th>" +
+                            " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p>Room No</p></th>" +
+                            " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p>Tariff / Bed / Day</p></th>" +
+                            " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p>Payment Mode<br>for Tariff</p></th>" +
+                            " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #ccc; width:96px;\"><p>Payment Mode<br>for Service</p></th>" +
+                            " </tr>";
+                        for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                        {
+                            GuestDetailsTable11 +=
+                            "<tr style=\"font-size:11px; font-weight:normal;\">" +
+                            " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:120px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][0].ToString() + "</p></td>" +
+                            " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][1].ToString() + "</p></td>" +
+                            " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][2].ToString() + "</p></td>" +
+                            " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][6].ToString() + "</p></td>" +
+                            " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p style=\"text-align:center;\">INR " + ds.Tables[0].Rows[i][3].ToString() + "/-</p></td>" +
+                            " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][4].ToString() + "</p></td>" +
+                            " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #ccc; width:96px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][5].ToString() + "</p></td></tr>";
+                        }
+                        GuestDetailsTable11 += "</table>";
                     }
-                    GuestDetailsTable11 += "</table>";
+                    else
+                    {
+                        GuestDetailsTable11 =
+                            " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\">" +
+                            " <tr style=\"font-size:11px; font-weight:normal;\">" +
+                            " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:120px;\"><p>Guest Name</p></th>" +
+                            " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p>Check-In Date / Expected Time</p></th>" +
+                            " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p>Check-Out Date</p></th>" +
+                            " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p>Tariff / Bed / Day</p></th>" +
+                            " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p>Payment Mode<br>for Tariff</p></th>" +
+                            " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #ccc; width:96px;\"><p>Payment Mode<br>for Service</p></th>" +
+                            " </tr>";
+                        for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                        {
+                            GuestDetailsTable11 +=
+                            "<tr style=\"font-size:11px; font-weight:normal;\">" +
+                            " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:120px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][0].ToString() + "</p></td>" +
+                            " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][1].ToString() + "</p></td>" +
+                            " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][2].ToString() + "</p></td>" +
+                            " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p style=\"text-align:center;\">INR " + ds.Tables[0].Rows[i][3].ToString() + "/-</p></td>" +
+                            " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][4].ToString() + "</p></td>" +
+                            " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #ccc; width:96px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][5].ToString() + "</p></td></tr>";
+                        }
+                        GuestDetailsTable11 += "</table>";
+                    }
                     string SplReq = ds.Tables[2].Rows[0][8].ToString();
                     if(SplReq == "")
                     {

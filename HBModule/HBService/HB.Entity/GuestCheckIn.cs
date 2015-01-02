@@ -55,7 +55,7 @@ namespace HB.Entity
         public int ClientId { get; set; }
         public int CityId { get; set; }
         public int ServiceCharge { get; set; }
-
+        public string TariffPaymentMode { get; set; }
         // Details
         public int DtlsId { get; set; }
         public int HdrId { get; set; }

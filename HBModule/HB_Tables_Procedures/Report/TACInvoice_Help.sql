@@ -53,8 +53,8 @@ CREATE PROCEDURE Sp_TACInvoice_Help
 	WHERE C.IsActive=1 and c.IsDeleted=0 AND p.Category!='Managed G H' 
 		
 	SELECT Id,BillNo,CreatedDate,InvoiceNo,Property,Amount,Tax,TotalAmount,Guests,Client,
-	CONVERT(NVARCHAR,CONVERT(DATE,ChkInDate,103),110) AS CheckInDate,
-				CONVERT(NVARCHAR,CONVERT(DATE,ChkOutDate,103),110) AS CheckOutDate,
+	CONVERT(NVARCHAR,CONVERT(DATE,ChkInDate,103),110) AS ChkInDate,
+				CONVERT(NVARCHAR,CONVERT(DATE,ChkOutDate,103),110) AS ChkOutDate,
 				NOOfDays TotalDays,PerdayRate Perday FROM #TEMP	
  END
 END

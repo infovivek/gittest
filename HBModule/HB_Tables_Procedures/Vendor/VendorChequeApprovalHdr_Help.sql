@@ -424,7 +424,121 @@ END
 		 UPDATE WRBHBVendorRequest SET Partial=1,ModifiedBy=@UserId,ModifiedDate=GETDATE()
 		 WHERE UserId=@UserId AND Id=@CreatedById;
 	END
-	
+	IF @Action='ReportPAGELOAD'
+ BEGIN
+		CREATE TABLE #RePort(Requestedby NVARCHAR(100),RequestedOn NVARCHAR(100),
+		RequestedAmount DECIMAL(27,2),PropertyName NVARCHAR(100),Status NVARCHAR(100),Process BIT,
+		Processedby NVARCHAR(100),Processedon NVARCHAR(100),Id INT,RequestedUserId INT,PropertyId INT,UserId INT)
+		
+		INSERT INTO #RePort(Requestedby,RequestedOn,
+		RequestedAmount,PropertyName,Status,Process,Processedby,Processedon,Id,RequestedUserId,PropertyId,UserId)
+		
+		SELECT  DISTINCT (U.FirstName+' '+U.LastName) AS Requestedby,
+		CONVERT(NVARCHAR(100),VC.RequestedOn,103) AS RequestedOn,VC.RequestedAmount AS RequestedAmount,
+		P.PropertyName,
+		VC.Status AS Status,0 AS Process,(US.FirstName+' '+US.LastName) AS Processedby,
+		CONVERT(NVARCHAR(100),VC.Processedon,103) AS Processedon, VC.Id,VC.RequestedUserId AS RequestedUserId,
+		VC.PropertyId,VC.UserId
+		From WRBHBVendorChequeApprovalDtl VC
+		JOIN WRBHBProperty P ON VC.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
+		JOIN WRBHBPropertyUsers PU ON P.Id=PU.PropertyId AND PU.IsActive=1 AND PU.IsDeleted=0
+		JOIN WRBHBUser U ON  VC.RequestedUserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
+		JOIN WRBHBUser US ON VC.UserId=US.Id AND US.IsActive=1 AND US.IsDeleted=0
+		WHERE VC.IsActive=1 AND VC.IsDeleted=0 
+		AND VC.Process=1 AND
+		VC.Status ='Payment Released' AND
+		P.Category IN('Internal Property','Managed G H')
+		AND PU.UserType IN('Resident Managers','Assistant Resident Managers','Operations Managers',
+		'Ops Head','Finance')	
+		
+					
+		SELECT  Requestedby,RequestedOn,sum(RequestedAmount) AS RequestedAmount,PropertyName AS Property,Status,
+		Process,Processedon,Processedby,Id,RequestedUserId,PropertyId 
+		FROM #RePort
+		group by  Requestedby,RequestedOn,PropertyName,Status,
+		Process,Processedon,Processedby,Id,RequestedUserId,PropertyId 
+		
+		SELECT P.PropertyName Property,P.Id Id	
+		FROM WRBHBPropertyUsers  PU 
+		JOIN WRBHBProperty P ON PU.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
+		WHERE P.Category IN('Internal Property','Managed G H') AND PU.IsActive=1 AND PU.IsDeleted=0
+		GROUP BY  P.PropertyName,P.Id
+		ORDER BY P.Id 
+		
+END
+IF @Action='ReportPropertyLoad'
+BEGIN
+		CREATE TABLE #RePort1(Requestedby NVARCHAR(100),RequestedOn NVARCHAR(100),
+		RequestedAmount DECIMAL(27,2),PropertyName NVARCHAR(100),Status NVARCHAR(100),Process BIT,
+		Processedby NVARCHAR(100),Processedon NVARCHAR(100),Id INT,RequestedUserId INT,PropertyId INT,UserId INT)
+		
+	IF(@Str ='All')
+	BEGIN
+		IF(@UserId !=0)
+		BEGIN
+		
+			INSERT INTO #RePort1(Requestedby,RequestedOn,
+			RequestedAmount,PropertyName,Status,Process,Processedby,Processedon,Id,RequestedUserId,PropertyId,UserId)
+			SELECT  DISTINCT (U.FirstName+' '+U.LastName) AS Requestedby,
+			CONVERT(NVARCHAR(100),VC.RequestedOn,103) AS RequestedOn,VC.RequestedAmount AS RequestedAmount,
+			P.PropertyName,
+			VC.Status AS Status,0 AS Process,(US.FirstName+' '+US.LastName) AS Processedby,
+			CONVERT(NVARCHAR(100),VC.Processedon,103) AS Processedon, VC.Id,VC.RequestedUserId AS RequestedUserId,
+			VC.PropertyId,VC.UserId
+			From WRBHBVendorChequeApprovalDtl VC
+			JOIN WRBHBProperty P ON VC.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
+			JOIN WRBHBPropertyUsers PU ON P.Id=PU.PropertyId AND PU.IsActive=1 AND PU.IsDeleted=0
+			JOIN WRBHBUser U ON  VC.RequestedUserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
+			JOIN WRBHBUser US ON VC.UserId=US.Id AND US.IsActive=1 AND US.IsDeleted=0
+			WHERE VC.IsActive=1 AND VC.IsDeleted=0 AND PU.UserId=@UserId AND VC.PropertyId=@CreatedById
+			AND VC.Process=1 AND
+			VC.Status ='Payment Released' AND
+			P.Category IN('Internal Property','Managed G H')
+			AND PU.UserType IN('Resident Managers','Assistant Resident Managers','Operations Managers',
+			'Ops Head','Finance')	
+	END
+	ELSE 
+	BEGIN
+		    INSERT INTO #RePort1(Requestedby,RequestedOn,
+			RequestedAmount,PropertyName,Status,Process,Processedby,Processedon,Id,RequestedUserId,PropertyId,UserId)
+			SELECT  DISTINCT (U.FirstName+' '+U.LastName) AS Requestedby,
+			CONVERT(NVARCHAR(100),VC.RequestedOn,103) AS RequestedOn,VC.RequestedAmount AS RequestedAmount,
+			P.PropertyName,
+			VC.Status AS Status,0 AS Process,(US.FirstName+' '+US.LastName) AS Processedby,
+			CONVERT(NVARCHAR(100),VC.Processedon,103) AS Processedon, VC.Id,VC.RequestedUserId AS RequestedUserId,
+			VC.PropertyId,VC.UserId
+			From WRBHBVendorChequeApprovalDtl VC
+			JOIN WRBHBProperty P ON VC.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
+			JOIN WRBHBPropertyUsers PU ON P.Id=PU.PropertyId AND PU.IsActive=1 AND PU.IsDeleted=0
+			JOIN WRBHBUser U ON  VC.RequestedUserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
+			JOIN WRBHBUser US ON VC.UserId=US.Id AND US.IsActive=1 AND US.IsDeleted=0
+			WHERE VC.IsActive=1 AND VC.IsDeleted=0 AND VC.PropertyId=@CreatedById
+			AND VC.Process=1 AND
+			VC.Status ='Payment Released' AND
+			P.Category IN('Internal Property','Managed G H')
+			AND PU.UserType IN('Resident Managers','Assistant Resident Managers','Operations Managers',
+			'Ops Head','Finance')		
+	END
+END			
+		SELECT  ISNULL(Requestedby,'') AS Requestedby,ISNULL(RequestedOn,'') AS RequestedOn,
+		ISNULL(sum(RequestedAmount),0) AS RequestedAmount,
+		ISNULL(PropertyName,'') AS Property,ISNULL(Status,'') AS Status,
+		ISNULL(Process,'') AS Process,ISNULL(Processedon,'') AS Processedon ,
+		ISNULL(Processedby,'') AS Processedby,Id,RequestedUserId,PropertyId 
+		FROM #RePort1
+		group by  Requestedby,RequestedOn,PropertyName,Status,
+		Process,Processedon,Processedby,Id,RequestedUserId,PropertyId
+
+END
+IF @Action='ReportUserLoad'
+BEGIN
+		SELECT DISTINCT PU.UserName,PU.UserId AS Id	
+		FROM WRBHBPropertyUsers  PU 
+		JOIN WRBHBProperty P ON PU.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
+		WHERE PU.PropertyId=@CreatedById AND 
+		P.Category IN('Internal Property','Managed G H') AND PU.IsActive=1 AND PU.IsDeleted=0 
+		AND PU.UserType IN('Resident Managers' ,'Assistant Resident Managers')
+ END
  END
  
 

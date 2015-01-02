@@ -128,10 +128,9 @@ BEGIN
 		SELECT HeaderName AS ExpenseHead,Id AS ExpenseId FROM WRBHBExpenseHeads
 		Where Status='Active'
 		
-		SELECT Balance AS ClosingBalance FROM WRBHBPettyCashStatusHdr 
+		SELECT OpeningBalance AS ClosingBalance FROM WRBHBPettyCashHdr 
 		WHERE UserId=@UserId AND PropertyId=@Id AND
-		Id=(SELECT MAX(Id) FROM WRBHBPettyCashStatusHdr WHERE UserId=@UserId AND PropertyId=@Id)
-		AND IsActive=1 AND IsDeleted=0
+		CONVERT(date,Date,103)=CONVERT(date,@Str,103)
 		
 		SELECT Id AS HId FROM WRBHBPettyCashStatusHdr
 		WHERE IsActive=1 AND IsDeleted=0 AND PropertyId=@Id AND UserId=@UserId

@@ -95,6 +95,7 @@ namespace HB.Dao
             ChkIn.ClientId = Convert.ToInt32(doc.SelectSingleNode("HdrXml").Attributes["ClientId"].Value);
             ChkIn.CityId = Convert.ToInt32(doc.SelectSingleNode("HdrXml").Attributes["CityId"].Value);
             ChkIn.ServiceCharge = Convert.ToInt32(doc.SelectSingleNode("HdrXml").Attributes["ServiceCharge"].Value);
+            ChkIn.TariffPaymentMode = doc.SelectSingleNode("HdrXml").Attributes["TariffPaymentMode"].Value;
             if (doc.SelectSingleNode("HdrXml").Attributes["SingleMarkupAmount"].Value == "")
             {
                 ChkIn.SingleMarkupAmount = 0;
@@ -181,6 +182,7 @@ namespace HB.Dao
             command.Parameters.Add("@ClientId", SqlDbType.Int).Value = ChkIn.ClientId;
             command.Parameters.Add("@CityId", SqlDbType.Int).Value = ChkIn.CityId;
             command.Parameters.Add("@ServiceCharge", SqlDbType.Int).Value = ChkIn.ServiceCharge;
+            command.Parameters.Add("@TariffPaymentMode", SqlDbType.NVarChar).Value = ChkIn.TariffPaymentMode;
 
    /*         DataSet Value = new WrbErpConnection().ExecuteDataSet(command, UserData);
             if (Value.Tables["DBERRORTBL"].Rows.Count > 0)

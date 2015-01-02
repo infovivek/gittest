@@ -265,7 +265,7 @@ BEGIN
 		
 IF (ISNULL(@IntId,0)!=0)
 BEGIN
-	SELECT GuestName as Name,RoomNo,EmpCode,ApartmentType,BedType,PropertyType FROM WRBHBCheckInHdr  
+	SELECT GuestName as Name,RoomNo,EmpCode,ApartmentType,BedType,PropertyType,EmailId FROM WRBHBCheckInHdr  
 	WHERE  Id=@CheckInHdrId AND IsActive=1 AND IsDeleted=0 
 
 	CREATE TABLE #LEVEL(ChkInDate NVARCHAR(100),ChkOutDate NVARCHAR(100),
@@ -315,8 +315,21 @@ BEGIN
 	WHERE IsActive = 1 AND IsDeleted = 0 AND Status = 'UnSettled' AND ChkInHdrId =@CheckInHdrId
 		
 		
-	--BillDate 
-	SELECT CONVERT(varchar(103),@ChkOutDate,103) as BillDate,convert(nvarchar(100),GETDATE(),103) as TodayDate
+	----BillDate 
+	--SELECT CONVERT(varchar(103),@ChkOutDate,103) as BillDate,convert(nvarchar(100),GETDATE(),103) as TodayDate
+	DECLARE @Roles NVARCHAR(100);
+		SET @Roles=(SELECT Roles FROM WRBHBUserRoles  WHERE UserId = @UserId AND IsActive = 1 AND IsDeleted = 0 AND Roles='Operations Managers');
+		
+		IF(@Roles = 'Operations Managers')
+		BEGIN
+		--BillDate   
+			SELECT CONVERT(NVARCHAR(103),@ChkOutDate,103) as BillDate ,convert(nvarchar(100),@ChkOutDate,103) as TodayDate
+		END
+		ELSE
+		BEGIN
+		--BillDate   
+			SELECT CONVERT(NVARCHAR(103),@ChkOutDate,103) as BillDate ,convert(nvarchar(100),GETDATE(),103) as TodayDate
+		END
 	
 	
 
@@ -341,7 +354,7 @@ BEGIN
 END
 ELSE
 BEGIN
-	SELECT GuestName as Name,RoomNo,EmpCode,ApartmentType,BedType,PropertyType FROM WRBHBCheckInHdr  
+	SELECT GuestName as Name,RoomNo,EmpCode,ApartmentType,BedType,PropertyType,EmailId FROM WRBHBCheckInHdr  
 	WHERE  Id=@CheckInHdrId AND IsActive=1 AND IsDeleted=0 
 	
 	CREATE TABLE #LEVELs(ChkInDate NVARCHAR(100),ChkOutDate NVARCHAR(100),
@@ -384,8 +397,19 @@ BEGIN
 	WHERE IsActive = 1 and IsDeleted = 0 and Id =@CheckInHdrId;
 		
 		
-	--BillDate 
-	SELECT CONVERT(varchar(103),@ChkOutDate,103) as BillDate,convert(nvarchar(100),GETDATE(),103) as TodayDate
+	--DECLARE @Roles NVARCHAR(100);
+		SET @Roles=(SELECT Roles FROM WRBHBUserRoles  WHERE UserId = @UserId AND IsActive = 1 AND IsDeleted = 0 AND Roles='Operations Managers');
+		
+		IF(@Roles = 'Operations Managers')
+		BEGIN
+		--BillDate   
+			SELECT CONVERT(NVARCHAR(103),@ChkOutDate,103) as BillDate ,convert(nvarchar(100),@ChkOutDate,103) as TodayDate
+		END
+		ELSE
+		BEGIN
+		--BillDate   
+			SELECT CONVERT(NVARCHAR(103),@ChkOutDate,103) as BillDate ,convert(nvarchar(100),GETDATE(),103) as TodayDate
+		END
 	
 	
 

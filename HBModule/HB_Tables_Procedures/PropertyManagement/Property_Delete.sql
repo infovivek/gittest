@@ -28,7 +28,7 @@ CREATE PROCEDURE [dbo].[sp_Property_Delete](
 )
 AS
 BEGIN   
-			UPDATE WRBHBProperty SET ModifiedBy=@UserId,ModifiedDate=GETDATE(),IsDeleted=1,IsActive=0 WHERE Id =@Id; 
-			UPDATE WRBHBPropertyUsers SET ModifiedBy=@UserId,ModifiedDate=GETDATE(),IsDeleted=1,IsActive=0 WHERE PropertyId =@Id;
-			UPDATE WRBHBPropertyBlocks SET ModifiedBy=@UserId,ModifiedDate=GETDATE(),IsDeleted=1,IsActive=0 WHERE PropertyId =@Id;
+			UPDATE WRBHBProperty SET ModifiedBy=@UserId,ModifiedDate=GETDATE() WHERE Id =@Id; 
+			UPDATE WRBHBPropertyUsers SET ModifiedBy=@UserId,ModifiedDate=GETDATE() WHERE PropertyId =@Id;
+			UPDATE WRBHBPropertyBlocks SET ModifiedBy=@UserId,ModifiedDate=GETDATE() WHERE PropertyId =@Id;
 END

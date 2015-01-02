@@ -394,7 +394,8 @@ IF (ISNULL(@IntId,0)!=0)
 BEGIN
 
 
-SELECT GuestName as Name,RoomNo,EmpCode,ApartmentType,BedType,PropertyType FROM WRBHBCheckInHdr  
+
+SELECT GuestName as Name,RoomNo,EmpCode,ApartmentType,BedType,PropertyType,EmailId FROM WRBHBCheckInHdr  
 		WHERE  Id=@CheckInHdrId AND IsActive=1 AND IsDeleted=0 
  
 		CREATE TABLE #LEVEL(ChkInDate NVARCHAR(100),ChkOutDate NVARCHAR(100),Id BIGINT,
@@ -419,8 +420,9 @@ If @BookingLevel = 'Room'
 		from WRBHBBookingPropertyAssingedGuest  
 		where GuestId = @GuestId and BookingId = @BookingId 
 		--group by TariffPaymentMode,ServicePaymentMode  ,ChkInDt,ChkOutDt
+		and IsDeleted=0 and IsActive=1
 		order by Id desc
-		--and IsDeleted=0 and IsActive=1 
+		 
 		
 	END  
 If @BookingLevel = 'Bed'  
@@ -436,6 +438,7 @@ If @BookingLevel = 'Bed'
 		TariffPaymentMode,ServicePaymentMode     
 		from WRBHBBedBookingPropertyAssingedGuest  
 		where GuestId = @GuestId and BookingId = @BookingId  
+		and IsDeleted=0 and IsActive=1
 		order by Id desc
 	END   
 If @BookingLevel = 'Apartment'  
@@ -445,6 +448,7 @@ If @BookingLevel = 'Apartment'
 		TariffPaymentMode,ServicePaymentMode   
 		from WRBHBApartmentBookingPropertyAssingedGuest  
 		where GuestId = @GuestId and BookingId = @BookingId 
+		and IsDeleted=0 and IsActive=1
 		order by Id desc
 		--group by TariffPaymentMode,ServicePaymentMode  
 		--and IsDeleted=0 and IsActive=1  
@@ -498,8 +502,19 @@ If @BookingLevel = 'Apartment'
 		
 		--select * from WRBHBChechkOutHdr where Id = 1894
     
- --BillDate   
-		SELECT CONVERT(NVARCHAR(103),@ChkOutDate,103) as BillDate ,convert(nvarchar(100),GETDATE(),103) as TodayDate
+ DECLARE @Roles NVARCHAR(100);
+		SET @Roles=(SELECT Roles FROM WRBHBUserRoles  WHERE UserId = @UserId AND IsActive = 1 AND IsDeleted = 0 AND Roles='Operations Managers');
+		
+		IF(@Roles = 'Operations Managers')
+		BEGIN
+		--BillDate   
+			SELECT CONVERT(NVARCHAR(103),@ChkOutDate,103) as BillDate ,convert(nvarchar(100),@ChkOutDate,103) as TodayDate
+		END
+		ELSE
+		BEGIN
+		--BillDate   
+			SELECT CONVERT(NVARCHAR(103),@ChkOutDate,103) as BillDate ,convert(nvarchar(100),GETDATE(),103) as TodayDate
+		END
 		
 		
 		DECLARE @TariffPaymentMode nvarchar(100),@ServicePaymentMode nvarchar(100);  
@@ -541,7 +556,7 @@ BEGIN
 
 
 
-SELECT GuestName as Name,RoomNo,EmpCode,ApartmentType,BedType,PropertyType FROM WRBHBCheckInHdr  
+SELECT GuestName as Name,RoomNo,EmpCode,ApartmentType,BedType,PropertyType,EmailId FROM WRBHBCheckInHdr  
 		WHERE  Id=@CheckInHdrId AND IsActive=1 AND IsDeleted=0 
  
 		CREATE TABLE #LEVELs(ChkInDate NVARCHAR(100),ChkOutDate NVARCHAR(100),Id BIGINT,
@@ -566,6 +581,7 @@ If @BookingLevel = 'Room'
 		from WRBHBBookingPropertyAssingedGuest  
 		where GuestId = @GuestId and BookingId = @BookingId 
 		--group by TariffPaymentMode,ServicePaymentMode  ,ChkInDt,ChkOutDt
+		and IsDeleted=0 and IsActive=1
 		order by Id desc
 		--and IsDeleted=0 and IsActive=1 
 		
@@ -583,6 +599,7 @@ If @BookingLevel = 'Bed'
 		TariffPaymentMode,ServicePaymentMode     
 		from WRBHBBedBookingPropertyAssingedGuest  
 		where GuestId = @GuestId and BookingId = @BookingId  
+		and IsDeleted=0 and IsActive=1
 		order by Id desc
 	END   
 If @BookingLevel = 'Apartment'  
@@ -592,6 +609,7 @@ If @BookingLevel = 'Apartment'
 		TariffPaymentMode,ServicePaymentMode   
 		from WRBHBApartmentBookingPropertyAssingedGuest  
 		where GuestId = @GuestId and BookingId = @BookingId 
+		and IsDeleted=0 and IsActive=1
 		order by Id desc
 		--group by TariffPaymentMode,ServicePaymentMode  
 		--and IsDeleted=0 and IsActive=1  
@@ -637,8 +655,19 @@ If @BookingLevel = 'Apartment'
 		WHERE IsActive = 1 and IsDeleted = 0 and Id =@CheckInHdrId;  
     
     
- --BillDate   
-		SELECT CONVERT(NVARCHAR(103),@ChkOutDate,103) as BillDate ,convert(nvarchar(100),GETDATE(),103) as TodayDate
+		SET @Roles=(SELECT Roles FROM WRBHBUserRoles  WHERE UserId = @UserId AND IsActive = 1 AND IsDeleted = 0 AND Roles='Operations Managers');
+		
+		IF(@Roles = 'Operations Managers')
+		BEGIN
+		--BillDate   
+			SELECT CONVERT(NVARCHAR(103),@ChkOutDate,103) as BillDate ,convert(nvarchar(100),@ChkOutDate,103) as TodayDate
+		END
+		ELSE
+		BEGIN
+		--BillDate   
+			SELECT CONVERT(NVARCHAR(103),@ChkOutDate,103) as BillDate ,convert(nvarchar(100),GETDATE(),103) as TodayDate
+		END
+		
 		
 		
 		--DECLARE @TariffPaymentMode nvarchar(100),@ServicePaymentMode nvarchar(100);  
@@ -702,8 +731,9 @@ If @BookingLevel = 'Room'
 		from WRBHBBookingPropertyAssingedGuest  
 		where GuestId = @GuestId and BookingId = @BookingId 
 		--group by TariffPaymentMode,ServicePaymentMode  ,ChkInDt,ChkOutDt
+		and IsDeleted=0 and IsActive=1 
 		order by Id desc
-		--and IsDeleted=0 and IsActive=1 
+		
 		
 	END  
 If @BookingLevel = 'Bed'  
@@ -714,6 +744,7 @@ If @BookingLevel = 'Bed'
 		TariffPaymentMode,ServicePaymentMode     
 		from WRBHBBedBookingPropertyAssingedGuest  
 		where GuestId = @GuestId and BookingId = @BookingId  
+		and IsDeleted=0 and IsActive=1 
 		order by Id desc
 	END   
 If @BookingLevel = 'Apartment'  
@@ -723,6 +754,7 @@ If @BookingLevel = 'Apartment'
 		TariffPaymentMode,ServicePaymentMode   
 		from WRBHBApartmentBookingPropertyAssingedGuest  
 		where GuestId = @GuestId and BookingId = @BookingId 
+		and IsDeleted=0 and IsActive=1 
 		order by Id desc
 		--group by TariffPaymentMode,ServicePaymentMode  
 		--and IsDeleted=0 and IsActive=1  
@@ -838,21 +870,21 @@ If @BookingLevel = 'Room'
 		INSERT INTO #PaymentMode(TariffPaymentMode,ServicePaymentMode)  
 		SELECT TariffPaymentMode,ServicePaymentMode  
 		FROM WRBHBBookingPropertyAssingedGuest  
-		WHERE GuestId = @GuestId and BookingId = @BookingId  --AND IsActive = 1 and IsDeleted = 0
+		WHERE GuestId = @GuestId and BookingId = @BookingId  AND IsActive = 1 and IsDeleted = 0
 	END  
 If @BookingLevel = 'Bed'  
 	BEGIN  
 		INSERT INTO #PaymentMode(TariffPaymentMode,ServicePaymentMode)  
 		SELECT TariffPaymentMode,ServicePaymentMode   
 		FROM WRBHBBedBookingPropertyAssingedGuest  
-		WHERE GuestId = @GuestId and BookingId = @BookingId  --AND IsActive = 1 and IsDeleted = 0
+		WHERE GuestId = @GuestId and BookingId = @BookingId  AND IsActive = 1 and IsDeleted = 0
 	END   
 If @BookingLevel = 'Apartment'  
 	BEGIN  
 		INSERT INTO #PaymentMode(TariffPaymentMode,ServicePaymentMode)  
 		SELECT TariffPaymentMode,ServicePaymentMode   
 		FROM WRBHBApartmentBookingPropertyAssingedGuest  
-		WHERE GuestId = @GuestId and BookingId = @BookingId  --AND IsActive = 1 and IsDeleted = 0
+		WHERE GuestId = @GuestId and BookingId = @BookingId  AND IsActive = 1 and IsDeleted = 0
 	END  
   
 	--	DECLARE @TariffPaymentMode nvarchar(100),@ServicePaymentMode nvarchar(100);  
@@ -1582,6 +1614,7 @@ BEGIN
 			  select TariffPaymentMode,ServicePaymentMode  
 			  from WRBHBBookingPropertyAssingedGuest  
 			  where GuestId = @GuestId and BookingId = @BookingId  
+			  and IsDeleted=0 and IsActive=1 
 		 END  
 		If @BookingLevel = 'Bed'  
 		 BEGIN  
@@ -1589,13 +1622,15 @@ BEGIN
 			  select TariffPaymentMode,ServicePaymentMode   
 			  from WRBHBBedBookingPropertyAssingedGuest  
 			  where GuestId = @GuestId and BookingId = @BookingId  
+			  and IsDeleted=0 and IsActive=1 
 		 END   
 		If @BookingLevel = 'Apartment'  
 		BEGIN  
 			INSERT INTO #PaymentMode1(TariffPaymentMode,ServicePaymentMode)  
 			select TariffPaymentMode,ServicePaymentMode   
 			from WRBHBApartmentBookingPropertyAssingedGuest  
-			where GuestId = @GuestId and BookingId = @BookingId  
+			where GuestId = @GuestId and BookingId = @BookingId 
+			and IsDeleted=0 and IsActive=1  
 		END  
 
 		DECLARE @TariffPaymentModes nvarchar(100),@ServicePaymentModes nvarchar(100);  

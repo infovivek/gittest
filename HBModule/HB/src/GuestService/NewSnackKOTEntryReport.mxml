@@ -165,20 +165,22 @@
 						
 						sheet.setCell(0,0,'ServiceItem');
 						sheet.setCell(0,1,'Quantity');
-						sheet.setCell(0,2,'Revenue');
+						sheet.setCell(0,2,'Price');
+						sheet.setCell(0,3,'Revenue');
 												
 						for(var i:int=0;i<arrExportResult.length;i++)
 						{
 							sheet.setCell(i+1, 0, arrExportResult[i].ServiceItem);
 							sheet.setCell(i+1, 1, arrExportResult[i].Quantity);
-							sheet.setCell(i+1, 2, arrExportResult[i].Revenue);
+							sheet.setCell(i+1, 2, arrExportResult[i].Price);
+							sheet.setCell(i+1, 3, arrExportResult[i].Revenue);
 							
 						}
 						Grd_Status.dataProvider = arrExportResult;
 						xlsFile.sheets.addItem(sheet);      
 						var bytes: ByteArray = xlsFile.saveToByteArray();
 						var fr:FileReference = new FileReference();
-						fr.save(bytes,"SampleExport.xls");
+						fr.save(bytes,"GuestWise KOT Report.xls");
 					}
 					else
 					{
@@ -224,7 +226,8 @@
 			<mx:DataGridColumn dataField="Name" headerText="Name" width="150" editable="false" textAlign="left"/>
 			<mx:DataGridColumn dataField="ServiceItem" headerText="ServiceItem" width="200" 
 							   textAlign="left" editable="false"/>
-			<mx:DataGridColumn dataField="Quantity" headerText="Quantity" width="100" editable="false"/>							
+			<mx:DataGridColumn dataField="Quantity" headerText="Quantity" width="100" editable="false"/>
+			<mx:DataGridColumn dataField="Price" headerText="Price" width="100" editable="false"/>
 			<mx:DataGridColumn dataField="Revenue" headerText="Revenue" textAlign="right" width="200" editable="false"/>
 			
 		</mx:columns>

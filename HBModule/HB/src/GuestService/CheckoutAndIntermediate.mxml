@@ -152,8 +152,8 @@
 			protected function Help():void
 			{				
 				
-	//			useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId,0]);
-			 	useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65,0]);
+		//		useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId,0]);
+			 	useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,19,0]);
 				Txt_ServiceBillAmt.editable=false;
 				Txt_ServiceVat.editable=false;
 				Txt_SerivceTax.editable=false;
@@ -262,6 +262,7 @@
 						Txt_Apartment.text=Ds_Objects.result.Tables.Table.Rows[0].ApartmentType;
 						Txt_Bed.text=Ds_Objects.result.Tables.Table.Rows[0].BedType;
 						Txt_PropertyType.text=Ds_Objects.result.Tables.Table.Rows[0].PropertyType;
+						txt_Email.text = Ds_Objects.result.Tables.Table.Rows[0].EmailId;
 						
 						
 					}
@@ -757,6 +758,7 @@
 									Txt_Pname.text=Ds_Objects.result.Tables.Table12.Rows[0].Name;
 									Txt_SName.text=Ds_Objects.result.Tables.Table12.Rows[0].Name;
 									Txt_CName.text=Ds_Objects.result.Tables.Table12.Rows[0].Name;
+		//							txt_EmailId.text=Ds_Objects.result.Tables.Table12.Rows[0].Email;
 								}
 								
 								if (Ds_Objects.result.Tables.Table13.Rows.length > 0)
@@ -796,6 +798,7 @@
 									Txt_Pname.text=Ds_Objects.result.Tables.Table12.Rows[0].Name;
 									Txt_SName.text=Ds_Objects.result.Tables.Table12.Rows[0].Name;
 									Txt_CName.text=Ds_Objects.result.Tables.Table12.Rows[0].Name;
+			//						txt_EmailId.text=Ds_Objects.result.Tables.Table12.Rows[0].Email;
 								}
 								
 								if (Ds_Objects.result.Tables.Table13.Rows.length > 0)
@@ -838,6 +841,7 @@
 									Txt_Pname.text=Ds_Objects.result.Tables.Table12.Rows[0].Name;
 									Txt_SName.text=Ds_Objects.result.Tables.Table12.Rows[0].Name;
 									Txt_CName.text=Ds_Objects.result.Tables.Table12.Rows[0].Name;
+			//						txt_EmailId.text=Ds_Objects.result.Tables.Table12.Rows[0].Email;
 								}
 								
 								if (Ds_Objects.result.Tables.Table13.Rows.length > 0)
@@ -922,6 +926,7 @@
 										Txt_Pname.text=Ds_Objects.result.Tables.Table12.Rows[0].Name;
 										Txt_SName.text=Ds_Objects.result.Tables.Table12.Rows[0].Name;
 										Txt_CName.text=Ds_Objects.result.Tables.Table12.Rows[0].Name;
+			//							txt_EmailId.text=Ds_Objects.result.Tables.Table12.Rows[0].Email;
 									}
 									
 									if (Ds_Objects.result.Tables.Table13.Rows.length > 0)
@@ -983,6 +988,7 @@
 										Txt_Pname.text=Ds_Objects.result.Tables.Table12.Rows[0].Name;
 										Txt_SName.text=Ds_Objects.result.Tables.Table12.Rows[0].Name;
 										Txt_CName.text=Ds_Objects.result.Tables.Table12.Rows[0].Name;
+		//								txt_EmailId.text=Ds_Objects.result.Tables.Table12.Rows[0].Email;
 									}
 									
 									if (Ds_Objects.result.Tables.Table13.Rows.length > 0)
@@ -1046,6 +1052,7 @@
 										Txt_Pname.text=Ds_Objects.result.Tables.Table12.Rows[0].Name;
 										Txt_SName.text=Ds_Objects.result.Tables.Table12.Rows[0].Name;
 										Txt_CName.text=Ds_Objects.result.Tables.Table12.Rows[0].Name;
+			//							txt_EmailId.text=Ds_Objects.result.Tables.Table12.Rows[0].Email;
 									}
 									
 									if (Ds_Objects.result.Tables.Table13.Rows.length > 0)
@@ -2348,6 +2355,7 @@
 						Txt_Pname.text=Ds_Objects.result.Tables.Table1.Rows[0].Name;
 						Txt_SName.text=Ds_Objects.result.Tables.Table1.Rows[0].Name;
 						Txt_CName.text=Ds_Objects.result.Tables.Table1.Rows[0].Name;
+	//					txt_EmailId.text=Ds_Objects.result.Tables.Table1.Rows[0].Email; 
 					}
 					if (Ds_Objects.result.Tables.Table2.Rows.length > 0)
 					{
@@ -3034,7 +3042,7 @@
 									VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 									ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk,
 									BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"",
-									Preformainvoice:Chk_PIInvoice.selected
+									Preformainvoice:Chk_PIInvoice.selected,Email:txt_Email.text
 									//Flag:Flag1
 								}]);
 							var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
@@ -3070,7 +3078,7 @@
 									VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 									ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk,
 									BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"",
-									Preformainvoice:Chk_PIInvoice.selected
+									Preformainvoice:Chk_PIInvoice.selected,Email:txt_Email.text
 									//Flag:Flag1
 								}]);
 							var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
@@ -3106,7 +3114,7 @@
 									VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 									ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk,
 									BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"",
-									Preformainvoice:Chk_PIInvoice.selected
+									Preformainvoice:Chk_PIInvoice.selected,Email:txt_Email.text
 									//Flag:Flag1
 								}]);
 							var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
@@ -3181,7 +3189,7 @@
 										VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 										ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk,
 										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate",
-										Preformainvoice:Chk_PIInvoice.selected
+										Preformainvoice:Chk_PIInvoice.selected,Email:txt_Email.text
 										//Flag:Flag1
 									}]);
 								var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
@@ -3217,7 +3225,7 @@
 										VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 										ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk,
 										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate",
-										Preformainvoice:Chk_PIInvoice.selected
+										Preformainvoice:Chk_PIInvoice.selected,Email:txt_Email.text
 										//Flag:Flag1
 									}]);
 								var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
@@ -3256,7 +3264,7 @@
 										VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 										ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk,
 										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate",
-										Preformainvoice:Chk_PIInvoice.selected
+										Preformainvoice:Chk_PIInvoice.selected,Email:txt_Email.text
 										//Flag:Flag1
 									}]);
 								var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
@@ -3291,7 +3299,7 @@
 										VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 										ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk,
 										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate",
-										Preformainvoice:Chk_PIInvoice.selected
+										Preformainvoice:Chk_PIInvoice.selected,Email:txt_Email.text
 										//Flag:Flag1
 									}]);
 								var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
@@ -3327,7 +3335,7 @@
 										VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 										ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk,
 										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate",
-										Preformainvoice:Chk_PIInvoice.selected
+										Preformainvoice:Chk_PIInvoice.selected,Email:txt_Email.text
 										//Flag:Flag1
 									}]);
 								var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
@@ -3387,8 +3395,8 @@
 					Txt_CheckInType.text==hlp_GuestName.Select_Row.Type;
 					ExtraMaters=0;
 					
-					useWeb("CheckoutAndIntermediate","GuestDetail_CUSTOM",[GlobalXml,"GuestDetails","","","",CheckInHdrId,0,0,0,ExtraMaters]);
-					
+					useWeb("CheckoutAndIntermediate","GuestDetail_CUSTOM",[GlobalXml,"GuestDetails","","","",CheckInHdrId,0,0,Global_AC[0].UsrId,ExtraMaters]);
+		//			useWeb("CheckoutAndIntermediate","GuestDetail_CUSTOM",[GlobalXml,"GuestDetails","","","",CheckInHdrId,0,0,19,ExtraMaters]);
 		//			useWeb("GuestCheckOut","Guest_CUSTOM",[GlobalXml,"CHKINROOMDETAILS","",CheckInHdrId,StateId,0,0,ExtraMaters]);
 					//		useWeb("CheckOutServiceHdr","TariffLoad_CUSTOM",[GlobalXml,"ProductLoad",CheckInHdrId,GuestId,StateId,0,0,0]);
 					
@@ -3470,6 +3478,7 @@
 				txt_itemamt.text="";
 				ExtraMaters=0;
 				chk_ServiceCharge.selected=false;
+			 //   txt_Email.text="";
 				
 			}
 			
@@ -4143,6 +4152,7 @@
 						PayeeName:Txt_Pname.text,
 						Address:Txt_address.text,
 						Consolidated:Chk_Select.selected,
+					//	EmailId:txt_EmailId.text,
 						Id:Id}]);
 				var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
 				var BILL:ArrayCollection= new  ArrayCollection();
@@ -4153,6 +4163,7 @@
 				SettleXml += ObjToXmlStr_Comm(BILL,"SettleXml")
 				SettleXml += "</ROOT>";
 				useWeb("CheckOutSettleHdr","Save_CUSTOM",[GlobalXml,HdrXml,SettleXml]);
+		//		useWeb("CheckOutInterSettleHdr","Save_CUSTOM",[GlobalXml,HdrXml,SettleXml]);
 				
 				
 			}
@@ -4258,6 +4269,8 @@
 				
 				lbl_ConPaid.text="";
 				lbl_ConPaymode.text="";
+				txt_Email.text="";
+				txt_EmailId.text="";
 				
 				
 			}
@@ -4347,6 +4360,8 @@
 				
 				lbl_ConPaid.text="";
 				lbl_ConPaymode.text="";
+				txt_Email.text="";
+				txt_EmailId.text="";
 			}
 			
 			protected function Chk_Select_clickHandler(event:MouseEvent):void
@@ -7988,6 +8003,9 @@
 				
 				// TODO Auto-generated method stub
 				
+				
+				
+				
 
 					if(Checkout.selected == true)
 					{
@@ -8045,6 +8063,7 @@
 						//var TodayDate:String=TodayDate;
 						var BillTo:String=DT_BillTo.text;
 						var BillTo1:String=TodayDate;
+						
 						var D:String=BillTo.substr(0,2);
 						var M:String=BillTo.substr(3,2);
 						var Y:String=BillTo.substr(6,10);
@@ -8058,12 +8077,12 @@
 						var M3:String=BillFrom.substr(3,2);
 						var Y3:String=BillFrom.substr(6,10);
 						var RangeMiddle:String=Y3+'/'+M3+'/'+D3;
-						var RangeEnd:String=Y1+'/'+M1+'/'+D1;
+						var RangeEnd:String=Y2+'/'+M2+'/'+D2;
 						var RangeStart:String=Y+'/'+M+'/'+D;
 						//					var BillTo1 = 
 						//						{rangeStart:new Date(RangeStart),rangeEnd:new Date(RangeEnd)};
 						//					BillTo1=new Date(RangeEnd);
-						if(RangeMiddle  == RangeStart)
+						if(RangeStart  == RangeEnd)
 						{
 							alignAlert(Alert.show("Can't be Process Intermediate for Checkout Date","Alert Message !",
 								Alert.OK,null,null,iconWarning,Alert.OK),10,"");
@@ -8076,6 +8095,7 @@
 							//		useWeb("CheckOutServiceHdr","TariffLoad_CUSTOM",[GlobalXml,"ProductLoad",BillFrom,,CheckInHdrId,GuestId,StateId,0,0,0]);
 							
 						}
+						
 							
 						else
 						{
@@ -8512,6 +8532,7 @@
 						<mx:Label x="410" y="125" width="26" text="Rs:"/>
 						<mx:Label id="lbl_ServicePaid" x="432" y="125" width="72" text=""/>
 						<mx:Label id="lbl_ServicePayMode" x="506" y="125" width="90"/>
+						<s:TextInput x="6" y="170" id="txt_EmailId" width="100" visible="false"/>
 					</s:BorderContainer>
 					<s:BorderContainer x="23" y="215" width="602" height="200" id="bdr_Consolidate" borderVisible="false" backgroundColor="#fbf9f9" 
 									   visible="false">
@@ -9057,6 +9078,7 @@
 				</WrbComp:Button_HB>
 				<WrbComp:Button_HB x="153" y="464" id="ProcessClear" Lable_val="Clear" click="ProcessClear_clickHandler(event)">
 				</WrbComp:Button_HB>
+				<s:TextInput x="76" y="438" id="txt_Email" width="100" visible="false"/>
 				
 				
 			</s:Group>

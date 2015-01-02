@@ -126,7 +126,8 @@ CREATE TABLE #TFFINALS(GuestName NVARCHAR(500),GuestId BIGINT,RoomId BIGINT,
 Typess NVARCHAR(100),ClientName NVARCHAR(200),Property NVARCHAR(200),PropertyId BIGINT,PropertyType NVARCHAR(100),
 TariffTotal DECIMAL(27,2),CheckInDate  NVARCHAR(100),CheckOutDate NVARCHAR(50),Occupancy nvarchar(100),
 BookingId BIGINT,ChkInHdrId BIGINT ,ChkoutId BIGINT,TariffPaymentMode NVARCHAR(100),
-TotalDays Bigint ,IDE bigint NOt null primary Key Identity(1,1),Btypes nvarchar(300),CurrentStatus nvarchar(100) )
+TotalDays Bigint ,IDE bigint NOt null primary Key Identity(1,1),Btypes nvarchar(300),CurrentStatus nvarchar(100),
+RoomShiftingFlag int)
 
 CREATE TABLE #TFFINALSs(RoomId BIGINT,
 Typess NVARCHAR(100),ClientName NVARCHAR(200),Property NVARCHAR(200),PropertyId BIGINT,PropertyType NVARCHAR(100),
@@ -138,12 +139,12 @@ TotalDays Bigint ,IDE bigint NOt null primary Key Identity(1,1),Btypes nvarchar(
 
 INSERT INTO #TFFINALS( GuestName,GuestId,RoomId,Typess,ClientName,Property,PropertyId,PropertyType,
 			TariffTotal,CheckOutDate,CheckInDate,TotalDays,Occupancy,BookingId,ChkoutId,ChkInHdrId,
-			TariffPaymentMode,CurrentStatus,Btypes) 
+			TariffPaymentMode,CurrentStatus,Btypes,RoomShiftingFlag) 
 
 			Select  D.FirstName,GuestId,RoomId,D.RoomType,ClientName,''Property,d.BookingPropertyId PropertyId,
 			'Internal Property'PropertyType,Tariff,CONVERT(NVARCHAR,d.ChkOutDt,103),CONVERT(NVARCHAR,d.ChkInDt,103),
 			DateDiff(day,d.ChkInDt,d.ChkOutDt) NofDays,D.Occupancy ,
-			BookingId,isnull(D.CheckOutHdrId ,0),isnull(D.CheckInHdrId,0),TariffpaymentMode,D.CurrentStatus,'RoomLvl'Btypes
+			BookingId,isnull(D.CheckOutHdrId ,0),isnull(D.CheckInHdrId,0),TariffpaymentMode,D.CurrentStatus,'RoomLvl'Btypes,RoomShiftingFlag
 			from WRBHBBooking H
 			JOIN WRBHBBookingPropertyAssingedGuest D ON H.Id=D.BookingId
 			WHERE d.RoomShiftingFlag=0  AND D.CurrentStatus !=('Canceled')
@@ -152,42 +153,45 @@ INSERT INTO #TFFINALS( GuestName,GuestId,RoomId,Typess,ClientName,Property,Prope
 			  --and month(CONVERT(DATE,D.ChkOutDt,103))=11 and d.BookingPropertyId=2 
 			GROUP BY  D.CheckOutHdrId ,D.FirstName,GuestId,RoomId,D.RoomType,ClientName,d.BookingPropertyId,d.ChkInDt,
 			Tariff,CheckOutDate,BookingId,D.CheckOutHdrId,D.CheckInHdrId,d.ChkInDt,Tariff,D.ChkOutDt,TariffpaymentMode,
-			D.CurrentStatus,D.Occupancy 
+			D.CurrentStatus,D.Occupancy ,RoomShiftingFlag
 
  INSERT INTO #TFFINALS( GuestName,GuestId,RoomId,Typess,ClientName,Property,PropertyId,PropertyType,
 			TariffTotal,CheckOutDate,CheckInDate,TotalDays,Occupancy,BookingId,ChkoutId,ChkInHdrId,
-			TariffPaymentMode,CurrentStatus,Btypes) 
+			TariffPaymentMode,CurrentStatus,Btypes,RoomShiftingFlag) 
 			
 			Select  D.FirstName,GuestId,RoomId,D.BedType,ClientName,''Property,d.BookingPropertyId PropertyId,
 			'Internal Property'PropertyType,Tariff,CONVERT(NVARCHAR,d.ChkOutDt,103),CONVERT(NVARCHAR,d.ChkInDt,103)
 			,DateDiff(day,d.ChkInDt,d.ChkOutDt) NofDays,'BedBook',
-			BookingId,0,0,TariffpaymentMode,D.CurrentStatus,'BedLvl'Btypes
+			BookingId,0,0,TariffpaymentMode,D.CurrentStatus,'BedLvl'Btypes,RoomShiftingFlag
 			from WRBHBBooking H
 			JOIN WRBHBBedBookingPropertyAssingedGuest D ON H.Id=D.BookingId
 			WHERE    D.CurrentStatus !='Canceled' and BookingPropertyId in(1,2,3,6,7,267)
 			AND D.IsActive=1 and D.IsDeleted=0 AND TariffPaymentMode!='Bill to Client'--and d.BookingPropertyId=2 
 			GROUP BY D.FirstName,GuestId,RoomId,D.BedType,ClientName,d.BookingPropertyId,d.ChkInDt,
-			Tariff,CheckOutDate,BookingId,d.ChkInDt,Tariff,D.ChkOutDt,TariffpaymentMode,D.CurrentStatus 
+			Tariff,CheckOutDate,BookingId,d.ChkInDt,Tariff,D.ChkOutDt,TariffpaymentMode,D.CurrentStatus ,
+			RoomShiftingFlag
 
 
 
   
 			 INSERT INTO #TFFINALS( GuestName,GuestId,RoomId,Typess,ClientName,Property,PropertyId,PropertyType,
 						TariffTotal,CheckOutDate,CheckInDate,TotalDays,Occupancy,BookingId,ChkoutId,ChkInHdrId,
-						TariffPaymentMode,CurrentStatus,Btypes) 
+						TariffPaymentMode,CurrentStatus,Btypes,RoomShiftingFlag) 
 			Select  D.FirstName,GuestId,D.ApartmentId,D.ApartmentType,ClientName,''Property,d.BookingPropertyId PropertyId,
 			'Internal Property'PropertyType,Tariff,CONVERT(NVARCHAR,d.ChkOutDt,103),CONVERT(NVARCHAR,d.ChkInDt,103),
 			DateDiff(day,d.ChkInDt,d.ChkOutDt) NofDays,'Apartment',
-			BookingId,0,0,TariffpaymentMode,D.CurrentStatus,'ApartLvl'Btypes
+			BookingId,0,0,TariffpaymentMode,D.CurrentStatus,'ApartLvl'Btypes,RoomShiftingFlag
 			from WRBHBBooking H
 			JOIN WRBHBApartmentBookingPropertyAssingedGuest D ON H.Id=D.BookingId
 			WHERE    D.CurrentStatus !='Canceled' and BookingPropertyId in(1,2,3,6,7,267)
 			AND D.IsActive=1 and D.IsDeleted=0 AND TariffPaymentMode!='Bill to Client'--and d.BookingPropertyId=2 
 			GROUP BY D.FirstName,GuestId,ApartmentId,D.ApartmentType,ClientName,d.BookingPropertyId,d.ChkInDt,
-			Tariff,CheckOutDate,BookingId,d.ChkInDt,Tariff,D.ChkOutDt,TariffpaymentMode,D.CurrentStatus
+			Tariff,CheckOutDate,BookingId,d.ChkInDt,Tariff,D.ChkOutDt,TariffpaymentMode,D.CurrentStatus,
+			RoomShiftingFlag
 
 
- Update #TFFINALS set TotalDays =C.NoOfDays
+ Update #TFFINALS set TotalDays =C.NoOfDays,CheckOutDate=CONVERT(NVARCHAR,c.CheckOutDate,103),
+ CheckInDate=CONVERT(NVARCHAR,c.CheckInDate,103)
  from  #TFFINALS F
  JOIN WRBHBChechkOutHdr C WITH(NOLOCK) ON C.Id=F.ChkoutId AND c.IsActive=1 AND c.IsDeleted=0 
  where f.ChkoutId!=0  
@@ -198,8 +202,21 @@ INSERT INTO #TFFINALS( GuestName,GuestId,RoomId,Typess,ClientName,Property,Prope
  JOIN WRBHBProperty C WITH(NOLOCK) ON C.Id=F.PropertyId AND c.IsActive=1 AND c.IsDeleted=0 
  where c.category='Internal Property'
  
+  Update #TFFINALS set CheckInDate=CONVERT(NVARCHAR,c.ArrivalDate,103)
+ from  #TFFINALS F
+ JOIN WRBHBCheckInHdr C WITH(NOLOCK) ON C.Id=F.ChkInHdrId AND c.IsActive=1 AND c.IsDeleted=0 
+ where c.PropertyType='Internal Property' AND  f.ChkInHdrId!=0 AND CurrentStatus in ('CheckIn','CheckOut') 
  
  
+ Update #TFFINALS set TotalDays= DATEDIFF(day, CONVERT(DATE,CheckInDate,103),CONVERT(DATE,CheckOutDate,103))
+  where PropertyType ='Internal Property' AND ChkInHdrId!=0 AND CurrentStatus in ('CheckIn','CheckOut') 
+ 
+ --Select * from #TFFINALS where RoomShiftingFlag=1
+ 
+ -- Select * from #TFFINALS
+  --where BookingiD in (5278)
+
+
 INSERT INTO #TFFINALSs( RoomId,Typess,ClientName,Property,PropertyId,PropertyType,
 			TariffTotal,CheckOutDate,CheckInDate,TotalDays,Occupancy,BookingId,ChkoutId,ChkInHdrId,
 			TariffPaymentMode,CurrentStatus,Btypes) 
@@ -227,7 +244,7 @@ INSERT INTO #TFFINALSs( RoomId,Typess,ClientName,Property,PropertyId,PropertyTyp
  order by BookingId 
 	 UPDATE #TFFINALSs SET TotalDays=1 WHERE ISNULL(TotalDays,0)=0
 		 
- 	
+
  --Select * from #TFFINALSs  where PropertyId =2 AND BookingId=4681  
    -- order by BookingId; 
  
@@ -275,8 +292,8 @@ INSERT INTO #TFFINALSs( RoomId,Typess,ClientName,Property,PropertyId,PropertyTyp
 			 END 
 			  
      END   
-      --Select * from #TFFINAL  where PropertyId =2  and MONTH(CONVERT(DATE,CheckOutDate,103))= 11
-    --order by BookingId;return;
+    --  Select * from #TFFINAL WHERE MONTH(CONVERT(DATE,CheckOutDate,103))= 12
+    -- order by BookingId;return;
    --DROP TABLE #NDDCountForecast
      --DROP TABLE #NDDCountForecastNew
      --DROP TABLE #NDDCountForecastData

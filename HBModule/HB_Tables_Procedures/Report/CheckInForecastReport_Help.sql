@@ -47,11 +47,6 @@ CREATE TABLE #TFMODES(TariffPaymentMode NVARCHAR(200),BookingId BIGINT,GuestId B
 BookingPropertyId BIGINT,Tariff DECIMAL(27,2) ,CheckOutDate NVARCHAR(50),CheckInDate Nvarchar(100)
 )
 
-CREATE TABLE #TFFINAL(CheckOutNo NVARCHAR(100),GuestName NVARCHAR(500),GuestId BIGINT,RoomId BIGINT,
-Typess NVARCHAR(100),ClientName NVARCHAR(200),Property NVARCHAR(200),PropertyId BIGINT,PropertyType NVARCHAR(100),
-ChkOutTariffTotal DECIMAL(27,2),CheckOutDate NVARCHAR(50),BookingId BIGINT,ChkoutId BIGINT,ChkInHdrId BIGINT ,
-TariffPaymentMode NVARCHAR(100),PrintInvoice bit,CheckInDate  NVARCHAR(100),TotalDays Bigint,GTVAmount Decimal(27,2) ,
-Direct1Amt Decimal(27,2))
  
 
 CREATE TABLE #TEST(CheckOutNo NVARCHAR(100),GuestName NVARCHAR(500),GuestId BIGINT,RoomId BIGINT,
@@ -134,6 +129,11 @@ BookingId BIGINT,ChkInHdrId BIGINT ,ChkoutId BIGINT,TariffPaymentMode NVARCHAR(1
 TotalDays Bigint ,IDE bigint NOt null primary Key Identity(1,1),Btypes nvarchar(300),CurrentStatus nvarchar(100) )
 
 
+CREATE TABLE #TFFINAL(CheckOutNo NVARCHAR(100),GuestName NVARCHAR(500),GuestId BIGINT,RoomId BIGINT,
+Typess NVARCHAR(100),ClientName NVARCHAR(200),Property NVARCHAR(200),PropertyId BIGINT,PropertyType NVARCHAR(100),
+ChkOutTariffTotal DECIMAL(27,2),CheckOutDate NVARCHAR(50),BookingId BIGINT,ChkoutId BIGINT,ChkInHdrId BIGINT ,
+TariffPaymentMode NVARCHAR(100),PrintInvoice bit,CheckInDate  NVARCHAR(100),TotalDays Bigint,GTVAmount Decimal(27,2) ,
+Direct1Amt Decimal(27,2))
 
 INSERT INTO #TFFINALS( GuestName,GuestId,RoomId,Typess,ClientName,Property,PropertyId,PropertyType,
 			TariffTotal,CheckOutDate,CheckInDate,TotalDays,Occupancy,BookingId,ChkoutId,ChkInHdrId,
@@ -189,7 +189,7 @@ INSERT INTO #TFFINALS( GuestName,GuestId,RoomId,Typess,ClientName,Property,Prope
 			Tariff,CheckOutDate,BookingId,d.ChkInDt,Tariff,D.ChkOutDt,TariffpaymentMode,D.CurrentStatus
 
 
- Update #TFFINALS set TotalDays =C.NoOfDays
+ Update #TFFINALS set TotalDays =C.NoOfDays,CheckOutDate=CONVERT(NVARCHAR,c.CheckOutDate,103)
  from  #TFFINALS F
  JOIN WRBHBChechkOutHdr C WITH(NOLOCK) ON C.Id=F.ChkoutId AND c.IsActive=1 AND c.IsDeleted=0 
  where f.ChkoutId!=0  
@@ -199,17 +199,30 @@ INSERT INTO #TFFINALS( GuestName,GuestId,RoomId,Typess,ClientName,Property,Prope
  from  #TFFINALS F
  JOIN WRBHBProperty C WITH(NOLOCK) ON C.Id=F.PropertyId AND c.IsActive=1 AND c.IsDeleted=0 
  where c.category='Internal Property'
+ 
+  Update #TFFINALS set CheckInDate=CONVERT(NVARCHAR,c.ArrivalDate,103)
+ from  #TFFINALS F
+ JOIN WRBHBCheckInHdr C WITH(NOLOCK) ON C.Id=F.ChkInHdrId AND c.IsActive=1 AND c.IsDeleted=0 
+ where c.PropertyType='Internal Property' AND  f.ChkInHdrId!=0 AND
+  CurrentStatus in ('CheckIn','CheckOut') 
+ 
 
 	update #TFFINALS set   CheckOutDate = CONVERT(nvarchar(100),GETDATE(),103) ,
 	TotalDays= DateDiff(day,CONVERT(date,CheckInDate,103),CONVERT(Date,GETDATE(),103)) 
 	where CurrentStatus in ('CheckIn') 
 	and CONVERT(date,CheckOutDate,103) > CONVERT(Date,GETDATE(),103)
-
+	
+	
+	update #TFFINALS set TotalDays= DateDiff(day,CONVERT(date,CheckInDate,103),CONVERT(Date,CheckOutDate,103)) 
+	where CurrentStatus in ('CheckIn','CheckOut') 
+	 
 	----Select  DateDiff(day,CONVERT(date,CheckInDate,103),GETDATE())   from #TFFINALS 
 	-- Select * from #TFFINALS where CurrentStatus in ('CheckIn') 
 	-- and CONVERT(date,CheckOutDate,103) >= CONVERT(Date,GETDATE(),103) 
  
- 
+ --Select * from #TFFINALS where BookingId=6059
+
+ --order by BookingId
  
 INSERT INTO #TFFINALSs( RoomId,Typess,ClientName,Property,PropertyId,PropertyType,
 			TariffTotal,CheckOutDate,CheckInDate,TotalDays,Occupancy,BookingId,ChkoutId,ChkInHdrId,
@@ -239,7 +252,13 @@ INSERT INTO #TFFINALSs( RoomId,Typess,ClientName,Property,PropertyId,PropertyTyp
  
 	 UPDATE #TFFINALSs SET TotalDays=1 WHERE ISNULL(TotalDays,0)=0
 	 Delete #TFFINALSs where CurrentStatus='Booked'	 
- 	 
+     Delete #TFFINALSs   WHERE ISNULL(TotalDays,0)< 0-- and  CONVERT(DATE,CheckInDate,103) <CONVERT(DATE,'01/09/2014',103) 
+ --Select * from #TFFINALS where BookingId=4791
+  --Select * from WRBHBBookingPropertyAssingedGuest 
+ --where BookingId=3837
+ 
+ -- Select * from WRBHBApartmentBookingPropertyAssingedGuest 
+ --where BookingId=7298
  
   Declare  @Count BIGINT ,@j int,@Tariff DECIMAL(27,2),@NoOfDays BIGINT;   
 	 Declare  @CheckOutNo NVARCHAR(100),@GuestName NVARCHAR(500),@GuestId BIGINT,@RoomId BIGINT;
@@ -286,8 +305,9 @@ INSERT INTO #TFFINALSs( RoomId,Typess,ClientName,Property,PropertyId,PropertyTyp
 			 END 
 			  
      END  
-       DELETE #TFFINAL where CONVERT(DATE,CheckOutDate,103)>= CONVERT(DATE,GETDATE(),103)	 
-  -- Select * from #TFFINAL   where MONTH(CONVERT(DATE,CheckOutDate,103))= 12 AND PROPERTYID=2
+       DELETE #TFFINAL where CONVERT(DATE,CheckOutDate,103)> CONVERT(DATE,GETDATE(),103)	 
+     --Select * from #TFFINAL   where   BookingId=4791   
+  --order by  BookingId 
    --  order by BookingId;return;
    --DROP TABLE #NDDCountForecast
      --DROP TABLE #NDDCountForecastNew

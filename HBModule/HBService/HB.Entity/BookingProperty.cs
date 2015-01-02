@@ -39,5 +39,11 @@ namespace HB.Entity
         public int APIHdrId { get; set; }
         //
         public string TaxAdded { get; set; }
+        // 29 DEC 2014
+        public decimal LTAgreed { get; set; }
+        public decimal STAgreed { get; set; }
+        public decimal LTRack { get; set; }
+        public decimal BaseTariff { get; set; }
+        public bool TaxInclusive { get; set; }
     }
 }

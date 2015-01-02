@@ -106,7 +106,7 @@
 				//var num:Number= (end.getUTCFullYear() - start.getUTCFullYear()) * 12 +(end.getUTCMonth() - start.getUTCMonth());								
 				//useWeb("BOOKING","Tab2_to_Tab3_Dtls_CUSTOM",[GlobalXml,'Tab2_to_Tab3_Dtls','','','','',0,0,0,0,0,26,0]);				
 				var ss:String=Global_AC[0].UsrId;				
-				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Room',7671]);
+				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Room',7998]);
 				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,"RoomResend",6630]);				
 				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Bed',1528]);
 				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Apartment',2027]);
@@ -4475,6 +4475,8 @@
 								<mx:DataGridColumn width="80" dataField="RoomType" editable="false"/>
 								<mx:DataGridColumn width="35" dataField="TaxAdded" editable="false"
 												   headerText="Tax"/>								
+								<mx:DataGridColumn width="50" dataField="BaseTariff" editable="false"
+												   headerText="Base"/>
 								<mx:DataGridColumn width="50" dataField="SingleTariff" editable="false"
 												   headerText="Single"/>
 								<mx:DataGridColumn width="50" dataField="DoubleTariff" editable="false"
@@ -4506,6 +4508,11 @@
 								<mx:DataGridColumn width="0" dataField="RoomTypeCode" visible="false"/>
 								<mx:DataGridColumn width="0" dataField="APIHdrId" visible="false"/>
 								<mx:DataGridColumn width="0" dataField="TripadvisorRating" visible="false"/>
+								<!-- 29 DEC 2014 -->
+								<mx:DataGridColumn width="0" dataField="LTAgreed" visible="false"/>
+								<mx:DataGridColumn width="0" dataField="LTRack" visible="false"/>								
+								<mx:DataGridColumn width="0" dataField="STAgreed" visible="false"/>
+								<mx:DataGridColumn width="0" dataField="TaxInclusive" visible="false"/>								
 							</mx:columns>
 						</mx:DataGrid>
 						<mx:DataGrid id="Grd_RecommendedProperty" x="22.25" y="397" width="925" height="228"
@@ -4536,6 +4543,8 @@
 												   textAlign="left"/>
 								<mx:DataGridColumn width="35" dataField="TaxAdded" editable="false"
 												   headerText="Tax"/>
+								<mx:DataGridColumn width="50" dataField="BaseTariff" editable="false"
+												   headerText="Base"/>
 								<mx:DataGridColumn width="50" dataField="SingleTariff" editable="false"
 												   headerText="Single"/>
 								<mx:DataGridColumn width="50" dataField="DoubleTariff" editable="false"
@@ -4567,6 +4576,11 @@
 								<mx:DataGridColumn width="0" dataField="RoomTypeCode" visible="false"/>
 								<mx:DataGridColumn width="0" dataField="APIHdrId" visible="false"/>
 								<mx:DataGridColumn width="0" dataField="TripadvisorRating" visible="false"/>
+								<!-- 29 DEC 2014 -->
+								<mx:DataGridColumn width="0" dataField="LTAgreed" visible="false"/>
+								<mx:DataGridColumn width="0" dataField="LTRack" visible="false"/>								
+								<mx:DataGridColumn width="0" dataField="STAgreed" visible="false"/>
+								<mx:DataGridColumn width="0" dataField="TaxInclusive" visible="false"/>
 							</mx:columns>
 						</mx:DataGrid>
 						

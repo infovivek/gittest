@@ -71,6 +71,7 @@ namespace HB.Entity
         public string BillFromDate { get; set; }
         public string BillEndDate { get; set; }
         public string Intermediate { get; set; }
+        public string Email { get; set; }
 
         // Details
         public int Id1 { get; set; }
@@ -110,5 +111,6 @@ namespace HB.Entity
         public string BillFromDate1 { get; set; }
         public string BillEndDate1 { get; set; }
         public string Intermediate1 { get; set; }
+       // public string Email1 { get; set; }
     }
 }

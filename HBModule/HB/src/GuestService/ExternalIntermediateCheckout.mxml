@@ -121,8 +121,8 @@
 			
 			protected function Help():void
 			{				
-		//		useWeb("ExterIntermediateChkoutService","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId]);
-				useWeb("ExterIntermediateChkoutService","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65]);
+				useWeb("ExterIntermediateChkoutService","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId]);
+		//		useWeb("ExterIntermediateChkoutService","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65]);
 				//			useWeb("GuestCheckOut","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,0]);
 				Txt_ServiceBillAmt.editable=false;
 				Txt_ServiceVat.editable=false;
@@ -222,6 +222,7 @@
 						Txt_Apartment.text=Ds_Objects.result.Tables.Table.Rows[0].ApartmentType;
 						Txt_Bed.text=Ds_Objects.result.Tables.Table.Rows[0].BedType;
 						Txt_PropertyType.text=Ds_Objects.result.Tables.Table.Rows[0].PropertyType;
+						txt_Email.text = Ds_Objects.result.Tables.Table.Rows[0].EmailId;
 						
 						if((Txt_PropertyType.text == "Managed G H")||(Txt_PropertyType.text == "MMT")||(Txt_PropertyType.text == "CPP"))
 						{
@@ -6201,7 +6202,8 @@
 										PrintInvoice:Chk_PrintInvoice.selected,InVoiceNo:Txt_ChkoutInvoice.text,LT:lbl_tarffLT.text,ST:lbl_TariffST.text,
 										VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 										ClientId:ClientId,CityId:CityId,
-										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:""
+										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"",
+										Email:txt_Email.text
 									}]);
 								
 								
@@ -6268,7 +6270,8 @@
 										LT:lbl_tarffLT.text,ST:lbl_TariffST.text,
 										VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 										ClientId:ClientId,CityId:CityId,
-										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:""
+										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"",
+										Email:txt_Email.text
 										
 									}]);
 								
@@ -6311,7 +6314,8 @@
 										LT:lbl_tarffLT.text,ST:lbl_TariffST.text,
 										VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 										ClientId:ClientId,CityId:CityId,
-										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:""
+										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"",
+										Email:txt_Email.text
 										
 									}]);
 								
@@ -6356,7 +6360,8 @@
 										PrintInvoice:Chk_PrintInvoice.selected,InVoiceNo:Txt_ChkoutInvoice.text,LT:lbl_tarffLT.text,ST:lbl_TariffST.text,
 										VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 										ClientId:ClientId,CityId:CityId,
-										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate"
+										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate",
+										Email:txt_Email.text
 									}]);
 								
 								
@@ -6423,7 +6428,8 @@
 										LT:lbl_tarffLT.text,ST:lbl_TariffST.text,
 										VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 										ClientId:ClientId,CityId:CityId,
-										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate"
+										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate",
+										Email:txt_Email.text
 										
 									}]);
 								
@@ -6466,7 +6472,8 @@
 										LT:lbl_tarffLT.text,ST:lbl_TariffST.text,
 										VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 										ClientId:ClientId,CityId:CityId,
-										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate"
+										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate",
+										Email:txt_Email.text
 										
 									}]);
 								
@@ -6515,7 +6522,8 @@
 										PrintInvoice:Chk_PrintInvoice.selected,InVoiceNo:Txt_ChkoutInvoice.text,LT:lbl_tarffLT.text,ST:lbl_TariffST.text,
 										VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 										ClientId:ClientId,CityId:CityId,
-										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:""
+										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"",
+										Email:txt_Email.text
 									}]);
 								
 								
@@ -6582,7 +6590,8 @@
 										LT:lbl_tarffLT.text,ST:lbl_TariffST.text,
 										VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 										ClientId:ClientId,CityId:CityId,
-										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:""
+										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"",
+										Email:txt_Email.text
 										
 									}]);
 								
@@ -6625,7 +6634,8 @@
 										LT:lbl_tarffLT.text,ST:lbl_TariffST.text,
 										VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 										ClientId:ClientId,CityId:CityId,
-										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:""
+										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"",
+										Email:txt_Email.text
 										
 									}]);
 								
@@ -6670,7 +6680,8 @@
 										PrintInvoice:Chk_PrintInvoice.selected,InVoiceNo:Txt_ChkoutInvoice.text,LT:lbl_tarffLT.text,ST:lbl_TariffST.text,
 										VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 										ClientId:ClientId,CityId:CityId,
-										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate"
+										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate",
+										Email:txt_Email.text
 									}]);
 								
 								
@@ -6737,7 +6748,8 @@
 										LT:lbl_tarffLT.text,ST:lbl_TariffST.text,
 										VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 										ClientId:ClientId,CityId:CityId,
-										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate"
+										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate",
+										Email:txt_Email.text
 										
 									}]);
 								
@@ -6780,7 +6792,8 @@
 										LT:lbl_tarffLT.text,ST:lbl_TariffST.text,
 										VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 										ClientId:ClientId,CityId:CityId,
-										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate"
+										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate",
+										Email:txt_Email.text
 										
 									}]);
 								
@@ -6859,7 +6872,8 @@
 					Txt_CheckInType.text==hlp_GuestName.Select_Row.Type;
 					//	PropertyId=hlp_GuestName.Select_Row.PropertyId;
 					
-					useWeb("ExterIntermediateChkoutService","GuestDetail_CUSTOM",[GlobalXml,"GuestDetails","","","",CheckInHdrId,0,0,0]);
+			//		useWeb("ExterIntermediateChkoutService","GuestDetail_CUSTOM",[GlobalXml,"GuestDetails","","","",CheckInHdrId,0,0,0]);
+					useWeb("ExterIntermediateChkoutService","GuestDetail_CUSTOM",[GlobalXml,"GuestDetails","","","",CheckInHdrId,0,0,Global_AC[0].UsrId]);
 //					useWeb("ExternalCheckOut","Guest_CUSTOM",[GlobalXml,"CHKINROOMDETAILS","",CheckInHdrId,StateId,0,0]);
 //					useWeb("CheckOutServiceHdr","TariffLoad_CUSTOM",[GlobalXml,"ProductLoad","",GuestId,StateId,0,0]);
 			//		useWeb("IntermediateCheckoutService","TariffLoad_CUSTOM",[GlobalXml,"ProductLoad",CheckInHdrId,GuestId,StateId,0,0,0]);
@@ -6959,6 +6973,7 @@
 					BTC.selected=false;
 					DT_BillFromDate.text="";
 					DT_BillTo.text="";
+					txt_Email.text="";
 				}
 				hlp_property.text="";
 				hlp_GuestName.text="";
@@ -7581,6 +7596,7 @@
 				
 				lbl_ConPaid.text="";
 				lbl_ConPaymode.text="";
+				txt_Email.text="";
 			}
 			
 			protected function AllClear():void
@@ -7662,6 +7678,7 @@
 				
 				lbl_ConPaid.text="";
 				lbl_ConPaymode.text="";
+				txt_Email.text="";
 				
 			}
 			protected function Chk_Select_clickHandler(event:MouseEvent):void
@@ -12316,7 +12333,8 @@
 									LT:lbl_tarffLT.text,ST:lbl_TariffST.text,
 									VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 									ClientId:ClientId,CityId:CityId,
-									BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:""
+									BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"",
+									Email:txt_Email.text
 								}]);
 							
 							
@@ -12389,7 +12407,8 @@
 									LT:lbl_tarffLT.text,ST:lbl_TariffST.text,
 									VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 									ClientId:ClientId,CityId:CityId,
-									BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate"
+									BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate",
+									Email:txt_Email.text
 								}]);
 							
 							
@@ -12486,6 +12505,18 @@
 					//var TodayDate:String=TodayDate;
 					var BillTo:String=DT_BillTo.text;
 					var BillTo1:String=TodayDate;
+//					var D:String=BillTo.substr(0,2);
+//					var M:String=BillTo.substr(3,2);
+//					var Y:String=BillTo.substr(6,10);
+//					var D1:String=BillTo1.substr(0,2);
+//					var M1:String=BillTo1.substr(3,2);
+//					var Y1:String=BillTo1.substr(6,10);
+//					var D2:String=BillTo2.substr(0,2);
+//					var M2:String=BillTo2.substr(3,2);
+//					var Y2:String=BillTo2.substr(6,10);
+//					var RangeMiddle:String=Y2+'/'+M2+'/'+D2;
+//					var RangeEnd:String=Y1+'/'+M1+'/'+D1;
+//					var RangeStart:String=Y+'/'+M+'/'+D;
 					var D:String=BillTo.substr(0,2);
 					var M:String=BillTo.substr(3,2);
 					var Y:String=BillTo.substr(6,10);
@@ -12495,8 +12526,11 @@
 					var D2:String=BillTo2.substr(0,2);
 					var M2:String=BillTo2.substr(3,2);
 					var Y2:String=BillTo2.substr(6,10);
-					var RangeMiddle:String=Y2+'/'+M2+'/'+D2;
-					var RangeEnd:String=Y1+'/'+M1+'/'+D1;
+					var D3:String=BillFrom.substr(0,2);
+					var M3:String=BillFrom.substr(3,2);
+					var Y3:String=BillFrom.substr(6,10);
+					var RangeMiddle:String=Y3+'/'+M3+'/'+D3;
+					var RangeEnd:String=Y2+'/'+M2+'/'+D2;
 					var RangeStart:String=Y+'/'+M+'/'+D;
 					
 //					if(RangeStart == RangeEnd)
@@ -12518,7 +12552,8 @@
 //						return;
 //						Sctrl.enabled=false;
 //					}
-					if(RangeMiddle  == RangeStart)
+//					if(RangeMiddle  == RangeStart)
+					if(RangeStart  == RangeEnd)
 					{
 						alignAlert(Alert.show("Can't be Process Intermediate for Checkout Date","Alert Message !",
 							Alert.OK,null,null,iconWarning,Alert.OK),10,"");
@@ -13510,7 +13545,7 @@
 				</WrbComp:Button_HB>
 				<WrbComp:Button_HB x="153" y="464" id="ProcessClear" Lable_val="Clear" click="ProcessClear_clickHandler(event)">
 				</WrbComp:Button_HB>
-				
+				<s:TextInput x="76" y="438" id="txt_Email" width="100" visible="false"/>
 			</s:Group>
 		</s:BorderContainer>	
 	</s:VGroup>

@@ -183,7 +183,8 @@ INSERT INTO #TFFINALS( GuestName,GuestId,RoomId,Typess,ClientName,Property,Prope
 			Tariff,CheckOutDate,BookingId,d.ChkInDt,Tariff,D.ChkOutDt,TariffpaymentMode,D.CurrentStatus
 
 
- Update #TFFINALS set TotalDays =C.NoOfDays
+ Update #TFFINALS set TotalDays =C.NoOfDays,CheckOutDate=CONVERT(NVARCHAR,c.CheckOutDate,103),
+ CheckInDate=CONVERT(NVARCHAR,c.CheckInDate,103)
  from  #TFFINALS F
  JOIN WRBHBChechkOutHdr C WITH(NOLOCK) ON C.Id=F.ChkoutId AND c.IsActive=1 AND c.IsDeleted=0 
  where f.ChkoutId!=0  
@@ -193,6 +194,15 @@ INSERT INTO #TFFINALS( GuestName,GuestId,RoomId,Typess,ClientName,Property,Prope
  from  #TFFINALS F
  JOIN WRBHBProperty C WITH(NOLOCK) ON C.Id=F.PropertyId AND c.IsActive=1 AND c.IsDeleted=0 
  where c.category='Internal Property'
+ 
+  Update #TFFINALS set CheckInDate=CONVERT(NVARCHAR,c.ArrivalDate,103)
+ from  #TFFINALS F
+ JOIN WRBHBCheckInHdr C WITH(NOLOCK) ON C.Id=F.ChkInHdrId AND c.IsActive=1 AND c.IsDeleted=0 
+ where c.PropertyType='Internal Property' AND  f.ChkInHdrId!=0 AND CurrentStatus in ('CheckIn','CheckOut') 
+ 
+ 
+ Update #TFFINALS set TotalDays= DATEDIFF(day, CONVERT(DATE,CheckInDate,103),CONVERT(DATE,CheckOutDate,103))
+  where PropertyType ='Internal Property' AND ChkInHdrId!=0 AND CurrentStatus in ('CheckIn','CheckOut') 
  
  
  
@@ -225,7 +235,7 @@ INSERT INTO #TFFINALS( GuestName,GuestId,RoomId,Typess,ClientName,Property,Prope
 	 UPDATE #TFFINALSs SET TotalDays=1 WHERE ISNULL(TotalDays,0)=0
 		 
  	
-  --Select * from #TFFINALSs    
+  --Select * from #TFFINALSs    where BookingId=6059
    -- order by BookingId; 
  --	update #TFFINALSs set   CheckOutDate = CONVERT(nvarchar(100),GETDATE(),103) ,
 	--TotalDays= DateDiff(day,CONVERT(date,CheckInDate,103),CONVERT(Date,GETDATE(),103)) 
@@ -583,7 +593,7 @@ LEFT OUTER JOIN WRBHBPropertyAgreements PA WITH(NOLOCK) ON PA.IsActive=1 AND PA.
 	--where Type in ('CheckIn') 
 	--and CONVERT(date,CheckOutDt,103) > CONVERT(Date,GETDATE(),103)
 	
-    --Select * from #ExternalForecastNew  
+    --Select * from #ExternalForecastNew  where type!='Booking'
    -- return
     Declare @Tacinvoice int;Declare @Category nvarchar(100),@MarkUps Decimal(27,2),@SingleTariffs Decimal(27,2);
     SELECT TOP 1 @Tariff=Tariff,@GuestId=PropertyAssGustId,@BookingId=BookingId,
@@ -1008,9 +1018,10 @@ Declare @ShiftCountSS int;
     dELETE  from #TFFINAL WHERE  (cONVERT(DATE,CheckOutDate,103))>= cONVERT(DATE,GETDATE(),103)
 		dELETE  from #TFFINAL WHERE  GuestName='Booked'
  
- --Select * from #TFFINAL  where propertyType='Internal Property' AND MONTH(CONVERT(DATE,CheckOutDate,103))= 12
--- order by BookingId
- --Return;
+ --Select * from #TFFINAL  where propertyType='Internal Property' AND MONTH(CONVERT(DATE,CheckOutDate,103))= 11
+  --order by BookingId
+-- Return;
+ --Exec Sp_TariffBasedReports @Action='PageLoad',@Param1=0,@Param2=2014,@FromDate='',@ToDate='',@UserId=1
  --truncate table #TFFINALSs;
  --          INSERT INTO #TFFINALSs( RoomId,Typess,ClientName,Property,PropertyId,PropertyType,
 	--		TariffTotal,CheckOutDate,CheckInDate,TotalDays,Occupancy,BookingId,ChkoutId,ChkInHdrId,

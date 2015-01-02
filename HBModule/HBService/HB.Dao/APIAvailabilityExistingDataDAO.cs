@@ -100,6 +100,9 @@ namespace HB.Dao
                 HttpWebResponse wr = (HttpWebResponse)httpRequest.GetResponse();
                 StreamReader srd = new StreamReader(wr.GetResponseStream());
                 string ResponseXML = srd.ReadToEnd();
+                //
+                //JObject dynObj = JObject.Parse(ResponseXML); 
+                //
                 command = new SqlCommand();
                 XmlDocument document = new XmlDocument();
                 document.LoadXml(ResponseXML);

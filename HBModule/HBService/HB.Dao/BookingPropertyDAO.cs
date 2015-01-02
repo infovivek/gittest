@@ -144,6 +144,40 @@ namespace HB.Dao
                 BookPty.RoomTypeCode = document.SelectNodes("//GridXml")[i].Attributes["RoomTypeCode"].Value;
                 //
                 BookPty.TaxAdded = document.SelectNodes("//GridXml")[i].Attributes["TaxAdded"].Value;
+                // 29 DEC 2014
+                if (document.SelectNodes("//GridXml")[i].Attributes["LTAgreed"].Value == "")
+                {
+                    BookPty.LTAgreed = 0;
+                }
+                else
+                {
+                    BookPty.LTAgreed = Convert.ToDecimal(document.SelectNodes("//GridXml")[i].Attributes["LTAgreed"].Value);
+                }
+                if (document.SelectNodes("//GridXml")[i].Attributes["STAgreed"].Value == "")
+                {
+                    BookPty.STAgreed = 0;
+                }
+                else
+                {
+                    BookPty.STAgreed = Convert.ToDecimal(document.SelectNodes("//GridXml")[i].Attributes["STAgreed"].Value);
+                }
+                if (document.SelectNodes("//GridXml")[i].Attributes["LTRack"].Value == "")
+                {
+                    BookPty.LTRack = 0;
+                }
+                else
+                {
+                    BookPty.LTRack = Convert.ToDecimal(document.SelectNodes("//GridXml")[i].Attributes["LTRack"].Value);
+                }
+                BookPty.TaxInclusive = Convert.ToBoolean(document.SelectNodes("//GridXml")[i].Attributes["TaxInclusive"].Value);
+                if (document.SelectNodes("//GridXml")[i].Attributes["BaseTariff"].Value == "")
+                {
+                    BookPty.BaseTariff = 0;
+                }
+                else
+                {
+                    BookPty.BaseTariff = Convert.ToDecimal(document.SelectNodes("//GridXml")[i].Attributes["BaseTariff"].Value);
+                }
                 SqlCommand command = new SqlCommand();
                 if (BookPty.Id != 0)
                 {
@@ -188,6 +222,12 @@ namespace HB.Dao
                 command.Parameters.Add("@RoomTypeCode", SqlDbType.NVarChar).Value = BookPty.RoomTypeCode;
                 command.Parameters.Add("@PropertyCnt", SqlDbType.NVarChar).Value = n;
                 command.Parameters.Add("@TaxAdded", SqlDbType.NVarChar).Value = BookPty.TaxAdded;
+                //
+                command.Parameters.Add("@LTRack", SqlDbType.Decimal).Value = BookPty.LTRack;
+                command.Parameters.Add("@LTAgreed", SqlDbType.Decimal).Value = BookPty.LTAgreed;
+                command.Parameters.Add("@STAgreed", SqlDbType.Decimal).Value = BookPty.STAgreed;
+                command.Parameters.Add("@BaseTariff", SqlDbType.Decimal).Value = BookPty.BaseTariff;
+                command.Parameters.Add("@TaxInclusive", SqlDbType.Bit).Value = BookPty.TaxInclusive;
                 ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
             }            
             if (n == 0)

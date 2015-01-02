@@ -33,7 +33,7 @@ ALTER PROCEDURE [dbo].[SP_ExterInterCheckOutHdr_Insert](
 @STRackAmount decimal(27,2),@LTRackAmount decimal(27,2),@Status nvarchar(100),@CheckOutDate nvarchar(100),
 @CheckInDate nvarchar(100),@PrintInvoice bit,@InVoiceNo nvarchar(100),@LTTaxPer DECIMAL(27,2),@STTaxPer DECIMAL(27,2),
 @VATPer decimal(27,2),@RestaurantSTPer decimal(27,2),@BusinessSupportST decimal(27,2),@ClientId int,@CityId int,
-@BillFromDate NVARCHAR(100),@BillEndDate NVARCHAR(100),@Intermediate NVARCHAR(100))
+@BillFromDate NVARCHAR(100),@BillEndDate NVARCHAR(100),@Intermediate NVARCHAR(100),@Email NVARCHAR(100))
 AS
 BEGIN
 DECLARE @InsId INT,@Cnt INT,@Cnt1 INT,@SCode INT;
@@ -676,7 +676,7 @@ END
 		BTC,PropertyType,STAgreedAmount,LTAgreedAmount,STRackAmount,LTRackAmount,Status ,
 		CheckInDate,CheckOutDate ,InVoiceNo,Flag,PrintInvoice ,PaymentStatus,ServiceTaxPer,LuxuryTaxPer,ServiceEntryFlag,VATPer,
 		RestaurantSTPer,BusinessSupportST,ClientId,CityId,BillFromDate,BillEndDate,Intermediate,IntermediateFlag,PIInvoice,
-		ServiceChargeChk,Preformainvoice)
+		ServiceChargeChk,Preformainvoice,Email)
 
 		VALUES
 		(@CheckOutNo,@GuestName,@Stay,@Type,@BookingLevel,@BillDate,
@@ -693,7 +693,7 @@ END
 		@BTC,@PropertyType,@STAgreedAmount,@LTAgreedAmount,@STRackAmount,@LTRackAmount,@Status,
 		@CheckInDate,@CheckOutDate,@InVoiceNo,0,@PrintInvoice,'UnPaid',@STTaxPer,@LTTaxPer,0,
 		@VATPer,@RestaurantSTPer,@BusinessSupportST,@ClientId,@CityId,@BillFromDate,@BillEndDate,@Intermediate,
-		1,0,0,0)
+		1,0,0,0,@Email)
 
 		SET @InsId=@@IDENTITY;
 		SELECT  Id ,PropertyType,RowId FROM WRBHBChechkOutHdr WHERE Id=@InsId;
@@ -738,7 +738,7 @@ END
 		BTC,PropertyType,STAgreedAmount,LTAgreedAmount,STRackAmount,LTRackAmount,Status ,
 		CheckInDate,CheckOutDate ,InVoiceNo,Flag,PrintInvoice ,PaymentStatus,ServiceTaxPer,LuxuryTaxPer,ServiceEntryFlag,VATPer,
 		RestaurantSTPer,BusinessSupportST,ClientId,CityId,BillFromDate,BillEndDate,Intermediate,IntermediateFlag,
-		PIInvoice,ServiceChargeChk,Preformainvoice)
+		PIInvoice,ServiceChargeChk,Preformainvoice,Email)
 
 		VALUES
 		(@CheckOutNo,@GuestName,@Stay,@Type,@BookingLevel,@BillDate,
@@ -754,7 +754,7 @@ END
 		CAST((@PropertyId) AS NVARCHAR(100)),@GuestId,@BookingId,@StateId,@Direct ,
 		@BTC,@PropertyType,@STAgreedAmount,@LTAgreedAmount,@STRackAmount,@LTRackAmount,@Status,
 		@CheckInDate,@CheckOutDate,@InVoiceNo,0,@PrintInvoice,'UnPaid',@STTaxPer,@LTTaxPer,0,
-		@VATPer,@RestaurantSTPer,@BusinessSupportST,@ClientId,@CityId,@BillFromDate,@BillEndDate,@Intermediate,0,0,0,0)
+		@VATPer,@RestaurantSTPer,@BusinessSupportST,@ClientId,@CityId,@BillFromDate,@BillEndDate,@Intermediate,0,0,0,0,@Email)
 
 		SET @InsId=@@IDENTITY;
 		SELECT  Id ,PropertyType,RowId FROM WRBHBChechkOutHdr WHERE Id=@InsId;

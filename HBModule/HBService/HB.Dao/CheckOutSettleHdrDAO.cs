@@ -109,7 +109,7 @@ namespace HB.Dao
                            " <p style=\"margin-top:10px;\">" +
                            "<span>Dear    " + ChkOutSet.PayeeName + " , </span> " + " <br>" +
                            " </p>" +
-                           "<span>Thank you for Choosing HummingBird for your Stay. " +
+                           "<span>Thank you for Booking HummingBird for your Stay. " +
                             " <br>" +
                             " <br>" +
                            "<span>We request you to share your feedback during your stay at <B> " + ds.Tables[1].Rows[0][0].ToString() + "  </B>  " +
