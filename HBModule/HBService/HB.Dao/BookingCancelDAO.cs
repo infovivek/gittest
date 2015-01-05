@@ -87,9 +87,9 @@ namespace HB.Dao
                 System.Net.Mail.MailMessage message = new System.Net.Mail.MailMessage();
                 //DSBooking.Tables[1].Rows[0][4].ToString()    
 
-                message.From = new System.Net.Mail.MailAddress("stay@staysimplyfied.com", "", System.Text.Encoding.UTF8);
+                message.From = new System.Net.Mail.MailAddress("stay@hummingbird.com", "", System.Text.Encoding.UTF8);
                 //message.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
-                message.To.Add(new System.Net.Mail.MailAddress("stay@staysimplyfied.com"));
+                message.To.Add(new System.Net.Mail.MailAddress("stay@hummingbird.com"));
                 if (ds.Tables[0].Rows[0][10].ToString() == "False")
                 {
                     Valid = EmailValidate(ds.Tables[4].Rows[0][0].ToString());
@@ -138,26 +138,39 @@ namespace HB.Dao
                     }
                 }
                 //Extra CC
-                for (int i = 0; i < ds.Tables[6].Rows.Count; i++)
+                //for (int i = 0; i < ds.Tables[6].Rows.Count; i++)
+                //{
+                //    Valid = EmailValidate(ds.Tables[6].Rows[i][0].ToString());
+                //    if (Valid == "True")
+                //    {
+                //        message.CC.Add(new System.Net.Mail.MailAddress(ds.Tables[6].Rows[i][0].ToString()));
+                //    }
+                //    else
+                //    {
+                //        if (Err != "")
+                //            Err += " , " + ds.Tables[6].Rows[i][0].ToString();
+                //        else
+                //            Err += ds.Tables[6].Rows[i][0].ToString();
+                //    }
+                //}
+                Valid = EmailValidate(ds.Tables[0].Rows[0][1].ToString());
+                if (Valid == "True")
                 {
-                    Valid = EmailValidate(ds.Tables[6].Rows[i][0].ToString());
-                    if (Valid == "True")
-                    {
-                        message.CC.Add(new System.Net.Mail.MailAddress(ds.Tables[6].Rows[i][0].ToString()));
-                    }
+                    message.CC.Add(new System.Net.Mail.MailAddress(ds.Tables[0].Rows[0][1].ToString()));
+                }
+                else
+                {
+                    if (Err != "")
+                        Err += " , " + ds.Tables[0].Rows[0][1].ToString();
                     else
-                    {
-                        if (Err != "")
-                            Err += " , " + ds.Tables[6].Rows[i][0].ToString();
-                        else
-                            Err += ds.Tables[6].Rows[i][0].ToString();
-                    }
+                        Err += ds.Tables[0].Rows[0][1].ToString();
                 }
                 message.Bcc.Add(new System.Net.Mail.MailAddress("vivek@warblerit.com"));
                 //message.Bcc.Add(new System.Net.Mail.MailAddress("prabathkar@admonk.in"));
                 //message.Bcc.Add(new System.Net.Mail.MailAddress("deepak@admonk.in"));
                 message.Bcc.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
                 message.Bcc.Add(new System.Net.Mail.MailAddress("arun@warblerit.com"));
+                //message.CC.Add(new System.Net.Mail.MailAddress("arun@warblerit.com"));
                 //
                 message.Subject = "Stay Modification Booking # : " + ds.Tables[0].Rows[0][0].ToString();
 
@@ -324,9 +337,11 @@ namespace HB.Dao
                 message.IsBodyHtml = true;
                 // SMTP Email email:
                 System.Net.Mail.SmtpClient smtp = new System.Net.Mail.SmtpClient();
-                smtp.Host = "smtp.gmail.com";
+               // smtp.Host = "smtp.gmail.com";
                 smtp.Port = 587;
-                smtp.Credentials = new System.Net.NetworkCredential("stay@staysimplyfied.com", "stay1234");
+            //  smtp.Credentials = new System.Net.NetworkCredential("stay@hummingbird.com", "stay1234");
+                smtp.Host = "email-smtp.us-west-2.amazonaws.com"; 
+                smtp.Credentials = new System.Net.NetworkCredential("AKIAIIVF5D5D3CJAX7SQ", "ApmuZkd+L8tissEga8kac3quhhwohEi5CB+dYD36KTq3");
                 smtp.EnableSsl = true;
                 if (Err == "")
                 {
@@ -406,9 +421,9 @@ namespace HB.Dao
                             System.Net.Mail.MailMessage message = new System.Net.Mail.MailMessage();
                             //DSBooking.Tables[1].Rows[0][4].ToString()    
 
-                            message.From = new System.Net.Mail.MailAddress("stay@staysimplyfied.com", "", System.Text.Encoding.UTF8);
+                            message.From = new System.Net.Mail.MailAddress("stay@hummingbird.com", "", System.Text.Encoding.UTF8);
                             //message.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
-                            message.To.Add(new System.Net.Mail.MailAddress("stay@staysimplyfied.com"));
+                            message.To.Add(new System.Net.Mail.MailAddress("stay@hummingbird.com"));
                             if (ds.Tables[0].Rows[0][7].ToString() == "False")
                             {
                                 Valid = EmailValidate(ds.Tables[4].Rows[0][0].ToString());
@@ -471,13 +486,25 @@ namespace HB.Dao
                                         Err += ds.Tables[3].Rows[i][0].ToString();
                                 }
                             }
+                            Valid = EmailValidate(ds.Tables[0].Rows[0][1].ToString());
+                            if (Valid == "True")
+                            {
+                                message.CC.Add(new System.Net.Mail.MailAddress(ds.Tables[0].Rows[0][1].ToString()));
+                            }
+                            else
+                            {
+                                if (Err != "")
+                                    Err += " , " + ds.Tables[0].Rows[0][1].ToString();
+                                else
+                                    Err += ds.Tables[0].Rows[0][1].ToString();
+                            }
                             message.Bcc.Add(new System.Net.Mail.MailAddress("vivek@warblerit.com"));
                             //message.Bcc.Add(new System.Net.Mail.MailAddress("prabathkar@admonk.in"));
                             //message.Bcc.Add(new System.Net.Mail.MailAddress("deepak@admonk.in"));
                             message.Bcc.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
                             message.Bcc.Add(new System.Net.Mail.MailAddress("arun@warblerit.com"));
                             //
-                            message.Subject = "Booking Canceled - " + ds.Tables[0].Rows[0][0].ToString();
+                            message.Subject = "Booking Confirmation - " + ds.Tables[0].Rows[0][0].ToString() + "- Cancelled ";
 
                             string Imagelocation = "";
 
@@ -575,13 +602,15 @@ namespace HB.Dao
                             message.IsBodyHtml = true;
                             // SMTP Email email:
                             System.Net.Mail.SmtpClient smtp = new System.Net.Mail.SmtpClient();
-                            smtp.Host = "smtp.gmail.com";
+                           // smtp.Host = "smtp.gmail.com";
                             smtp.Port = 587;
-                            smtp.Credentials = new System.Net.NetworkCredential("stay@staysimplyfied.com", "stay1234");
+                           // smtp.Credentials = new System.Net.NetworkCredential("stay@hummingbird.com", "stay1234");
+                            smtp.Host = "email-smtp.us-west-2.amazonaws.com";
+                            smtp.Credentials = new System.Net.NetworkCredential("AKIAIIVF5D5D3CJAX7SQ", "ApmuZkd+L8tissEga8kac3quhhwohEi5CB+dYD36KTq3");
                             smtp.EnableSsl = true;
                             if (Err == "")
                             {
-                                 smtp.Send(message);
+                                smtp.Send(message);
                                 //ds.Tables.Add(ETable);
                             }
                             else
@@ -624,9 +653,9 @@ namespace HB.Dao
                            System.Net.Mail.MailMessage message = new System.Net.Mail.MailMessage();
                            //DSBooking.Tables[1].Rows[0][4].ToString()    
 
-                           message.From = new System.Net.Mail.MailAddress("stay@staysimplyfied.com", "", System.Text.Encoding.UTF8);
+                           message.From = new System.Net.Mail.MailAddress("stay@hummingbird.com", "", System.Text.Encoding.UTF8);
                            //message.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
-                           message.To.Add(new System.Net.Mail.MailAddress("stay@staysimplyfied.com"));
+                           message.To.Add(new System.Net.Mail.MailAddress("stay@hummingbird.com"));
                            if (ds.Tables[0].Rows[0][7].ToString() == "False")
                            {
                                Valid = EmailValidate(ds.Tables[4].Rows[0][0].ToString());
@@ -660,7 +689,7 @@ namespace HB.Dao
                                            Err += ds.Tables[5].Rows[i][0].ToString();
                                    }
                                }
-                               if (ds.Tables[6].Rows[0][0].ToString() != "")
+                               if (ds.Tables[4].Rows[0][0].ToString() != "")
                                {
                                    Valid = EmailValidate(ds.Tables[4].Rows[0][0].ToString());
                                    if (Valid == "True")
@@ -693,12 +722,12 @@ namespace HB.Dao
                                }
                            }
                            message.Bcc.Add(new System.Net.Mail.MailAddress("vivek@warblerit.com"));
-                           message.Bcc.Add(new System.Net.Mail.MailAddress("prabathkar@admonk.in"));
-                           message.Bcc.Add(new System.Net.Mail.MailAddress("deepak@admonk.in"));
+                           //message.Bcc.Add(new System.Net.Mail.MailAddress("prabathkar@admonk.in"));
+                           //message.Bcc.Add(new System.Net.Mail.MailAddress("deepak@admonk.in"));
                            message.Bcc.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
                            message.Bcc.Add(new System.Net.Mail.MailAddress("arun@warblerit.com"));
 
-                           message.Subject = "Booking Canceled - " + ds.Tables[0].Rows[0][0].ToString();
+                           message.Subject = "Booking Confirmation - " + ds.Tables[0].Rows[0][0].ToString() + "- Cancelled ";
 
                            string Imagelocation = "";
 
@@ -799,13 +828,15 @@ namespace HB.Dao
                            message.IsBodyHtml = true;
                            // SMTP Email email:
                            System.Net.Mail.SmtpClient smtp = new System.Net.Mail.SmtpClient();
-                           smtp.Host = "smtp.gmail.com";
+                           //smtp.Host = "smtp.gmail.com";
                            smtp.Port = 587;
-                           smtp.Credentials = new System.Net.NetworkCredential("stay@staysimplyfied.com", "stay1234");
+                          // smtp.Credentials = new System.Net.NetworkCredential("stay@hummingbird.com", "stay1234");
+                           smtp.Host = "email-smtp.us-west-2.amazonaws.com"; 
+                           smtp.Credentials = new System.Net.NetworkCredential("AKIAIIVF5D5D3CJAX7SQ", "ApmuZkd+L8tissEga8kac3quhhwohEi5CB+dYD36KTq3");
                            smtp.EnableSsl = true;
                            if (Err == "")
                            {
-                               smtp.Send(message);
+                              smtp.Send(message);
                               // ds.Tables.Add(ETable);
                            }
                            else
@@ -885,8 +916,8 @@ namespace HB.Dao
                                }
                            }
                            message.Bcc.Add(new System.Net.Mail.MailAddress("vivek@warblerit.com"));
-                           message.Bcc.Add(new System.Net.Mail.MailAddress("prabathkar@admonk.in"));
-                           message.Bcc.Add(new System.Net.Mail.MailAddress("deepak@admonk.in"));
+                           //message.Bcc.Add(new System.Net.Mail.MailAddress("prabathkar@admonk.in"));
+                          // message.Bcc.Add(new System.Net.Mail.MailAddress("deepak@admonk.in"));
                            message.Bcc.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
                            message.Bcc.Add(new System.Net.Mail.MailAddress("arun@warblerit.com"));
                            //
@@ -993,7 +1024,9 @@ namespace HB.Dao
                            System.Net.Mail.SmtpClient smtp = new System.Net.Mail.SmtpClient();
                            smtp.Host = "smtp.gmail.com";
                            smtp.Port = 587;
-                           smtp.Credentials = new System.Net.NetworkCredential("stay@staysimplyfied.com", "stay1234");
+                          // smtp.Credentials = new System.Net.NetworkCredential("stay@hummingbird.com", "stay1234");
+                           smtp.Host = "email-smtp.us-west-2.amazonaws.com"; 
+                           smtp.Credentials = new System.Net.NetworkCredential("AKIAIIVF5D5D3CJAX7SQ", "ApmuZkd+L8tissEga8kac3quhhwohEi5CB+dYD36KTq3");
                            smtp.EnableSsl = true;
                            if (Err == "")
                            {

@@ -754,18 +754,20 @@ BEGIN
 			SELECT TOP 1 @NoOfDays=0,@chktime=ArrivalTime,@TimeType=TimeType,
 			--@Tariff=Tariff,
 			@Tariff=((round(ISNULL(Tariff,0)+(ISNULL(Tariff,0)*ISNULL(@STAgreed,0)/100)+(ISNULL(Tariff,0)*ISNULL(@LTAgreed,0)/100)+(ISNULL(Tariff,0)*ISNULL(@STRack,0)/100)+
-			(ISNULL(Tariff,0)*ISNULL(@LTRack,0)/100),0))+@SingleMarkup),
+			(ISNULL(Tariff,0)*ISNULL(@LTRack,0)/100),0))),
 			@RackTariffSingle=RackTariffSingle,
 			@RackTariffDouble=RackTariffDouble,@i=0,@SingleMarkupAmount = SingleMarkupAmount,
 			@DoubleMarkupAmount = DoubleMarkupAmount,
 			--	@RackTariff=RackTariff,
 			@prtyId=PropertyId,@chkouttime= CONVERT(VARCHAR(8),GETDATE(),108) FROM WRBHBCheckInHdr 
 			where Id=@CheckInHdrId and Occupancy='Single'
+			
+			
 	-- this is for Double markup amount add	(External )		
 			SELECT TOP 1 @NoOfDays=0,@chktime=ArrivalTime,@TimeType=TimeType,
 			--@Tariff=Tariff,
 			@Tariff=((round(ISNULL(Tariff,0)+(ISNULL(Tariff,0)*ISNULL(@STAgreed,0)/100)+(ISNULL(Tariff,0)*ISNULL(@LTAgreed,0)/100)+(ISNULL(Tariff,0)*ISNULL(@STRack,0)/100)+
-			(ISNULL(Tariff,0)*ISNULL(@LTRack,0)/100),0))+@DoubleMarkup),
+			(ISNULL(Tariff,0)*ISNULL(@LTRack,0)/100),0))),
 			@RackTariffSingle=RackTariffSingle,
 			@RackTariffDouble=RackTariffDouble,@i=0,@SingleMarkupAmount = SingleMarkupAmount,
 			@DoubleMarkupAmount = DoubleMarkupAmount,
@@ -776,7 +778,7 @@ BEGIN
 			SELECT TOP 1 @NoOfDays=0,@chktime=ArrivalTime,@TimeType=TimeType,
 			--@Tariff=Tariff,
 			@Tariff=((round(ISNULL(Tariff,0)+(ISNULL(Tariff,0)*ISNULL(@STAgreed,0)/100)+(ISNULL(Tariff,0)*ISNULL(@LTAgreed,0)/100)+(ISNULL(Tariff,0)*ISNULL(@STRack,0)/100)+
-			(ISNULL(Tariff,0)*ISNULL(@LTRack,0)/100),0))+@TripleMarkup),
+			(ISNULL(Tariff,0)*ISNULL(@LTRack,0)/100),0))),
 			@RackTariffSingle=RackTariffSingle,
 			@RackTariffDouble=RackTariffDouble,@i=0,@SingleMarkupAmount = SingleMarkupAmount,
 			@DoubleMarkupAmount = DoubleMarkupAmount,

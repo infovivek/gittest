@@ -23,9 +23,9 @@ CREATE PROCEDURE [dbo].[SP_CheckInHdr_Insert](@RoomId BIGINT,@PropertyId BIGINT=
 @Direct BIT,@BTC BIT,@Image NVARCHAR(MAX)=NULL,@EmpCode NVARCHAR(100)=NULL,@BookingCode NVARCHAR(100)=NULL,
 @CreatedBy INT,@TimeType NVARCHAR(100)=NULL,@Occupancy NVARCHAR(100)=NULL,@RackTariffSingle DECIMAL(27,2),
 @RackTariffDouble DECIMAL(27,2)=NULL,@ApartmentId INT=NULL,@BedId INT=NULL,@ApartmentType NVARCHAR(100),
-@BedType NVARCHAR(100),@Type NVARCHAR(100),@RefGuestId nvarchar(100),@PropertyType nvarchar(100),
+@BedType NVARCHAR(100),@Type NVARCHAR(100),@RefGuestId nvarchar(100),@PropertyType NVARCHAR(100),
 @CheckStatus NVARCHAR(100),@GuestImage NVARCHAR(100),@SingleMarkupAmount DECIMAL(27,2),
-@DoubleMarkupAmount DECIMAL(27,2),@ClientId int,@CityId int,@ServiceCharge int)
+@DoubleMarkupAmount DECIMAL(27,2),@ClientId int,@CityId int,@ServiceCharge int,@TariffPaymentMode NVARCHAR(100))
 
 AS
 BEGIN
@@ -53,7 +53,7 @@ EmailId,Designation,Nationality,IdProof,ChkinAdvance,Tariff,
 Direct,BTC,EmpCode,BookingCode,Image,CreatedBy,TimeType,Occupancy,RackTariffSingle,
 RackTariffDouble,ApartmentId,BedId,ApartmentType,BedType,Type,PropertyType,CheckStatus,
 GuestImage,SingleMarkupAmount,DoubleMarkupAmount,ClientId,CityId,ServiceCharge,
-NewCheckInDate,NewCheckoutDate,
+NewCheckInDate,NewCheckoutDate,TariffPaymentMode,
 ModifiedBy,CreatedDate,ModifiedDate,IsActive,IsDeleted,RowId)
 
 VALUES(@RoomId,CAST((@PropertyId) AS NVARCHAR(100)),@BookingId,@StateId,@GuestId,@RefGuestId,@ChkInGuest,
@@ -63,7 +63,7 @@ CONVERT(date,@ChkoutDate,103),@RoomNo,@GuestName,@ClientName,@Property,
 @Direct,@BTC,@EmpCode,@BookingCode,@Image,@CreatedBy,@TimeType,@Occupancy,@RackTariffSingle,
 @RackTariffDouble,@ApartmentId,@BedId,@ApartmentType,@BedType,@Type,@PropertyType ,@CheckStatus,
 @GuestImage,@SingleMarkupAmount,@DoubleMarkupAmount,@ClientId,@CityId,@ServiceCharge,
-CONVERT(date,@ArrivalDate,103),CONVERT(date,@ChkoutDate,103),
+CONVERT(date,@ArrivalDate,103),CONVERT(date,@ChkoutDate,103),@TariffPaymentMode,
 @CreatedBy,GETDATE(),GETDATE(),1,0,NEWID());
 
 SET @InsId=@@IDENTITY;

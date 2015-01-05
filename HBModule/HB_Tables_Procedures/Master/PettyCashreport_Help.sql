@@ -44,7 +44,7 @@ BEGIN
 		
 		SELECT (S.FirstName+''+S.LastName) AS Submittedby,P.PropertyName AS Property,
 		CONVERT(NVARCHAR,CAST(PC.CreatedDate AS Date),103) AS SubmittedOn,SUM(U.Paid) AS Amount,
-		'1st FortNight' AS FortNight,MONTH(CONVERT(date,PC.CreatedDate,103)) AS Month,
+		'1st&2nd FortNight' AS FortNight,MONTH(CONVERT(date,PC.CreatedDate,103)) AS Month,
 		PC.PropertyId,PC.UserId,(S.FirstName+''+S.LastName) AS LastProcessedBy,'Submitted',
 		CONVERT(NVARCHAR,CAST(PC.CreatedDate AS Date),103) AS LastProcessedOn   
 		FROM WRBHBPettyCashStatusHdr  PC
@@ -459,15 +459,19 @@ BEGIN
 		'' AS Bill
 		
 		INSERT INTO #PettyCash1(Date,ExpenseHead,Description,ApprovedAmount,PaidAmount,Bill)
-		SELECT '' AS Date,'' AS ExpenseHead,'' AS Description,'OpeningBalance' AS ApprovedAmount,
-		OpeningBalance AS PaidAmount,'' AS Bill FROM WRBHBPettyCashHdr
-		WHERE UserId =@UserId AND PropertyId=@Id AND Date=CONVERT(Date,@Str,103) AND IsActive=1 AND IsDeleted=0
-		
-		INSERT INTO #PettyCash1(Date,ExpenseHead,Description,ApprovedAmount,PaidAmount,Bill)
 		SELECT '' AS Date,'' AS ExpenseHead,'' AS Description,'AmountReceived' AS ApprovedAmount,
 		SUM(P.ApprovedAmount) AS PaidAmount,'' AS Bill FROM WRBHBPettyCashHdr PC
 		JOIN WRBHBPettyCash P ON PC.Id=P.PettyCashHdrId AND P.IsActive=1 AND P.IsDeleted=0
 		WHERE UserId =@UserId AND PropertyId=@Id AND Date=CONVERT(Date,@Str,103) AND PC.IsActive=1 AND PC.IsDeleted=0
+		
+		INSERT INTO #PettyCash1(Date,ExpenseHead,Description,ApprovedAmount,PaidAmount,Bill)
+		SELECT DISTINCT '' AS Date,'' AS ExpenseHead,'OpeningBalance' AS Description,H.OpeningBalance AS ApprovedAmount,
+		'' AS PaidAmount,'' AS Bill FROM WRBHBPettyCashHdr H
+		JOIN WRBHBPettyCashStatus D ON D.Status=CONVERT(NVARCHAR(100),H.Date,103) AND
+		H.UserId=D.UserId AND H.PropertyId=D.PropertyId AND D.IsActive=1 AND D.IsDeleted=0
+		WHERE H.UserId =@UserId AND H.PropertyId=@Id AND H.IsActive=1 AND H.IsDeleted=0
+		AND CONVERT(NVARCHAR,CAST(D.CreatedDate AS Date),103)=CONVERT(NVARCHAR(100),@Str,103) 
+
 			
 		INSERT INTO #PettyCash1(Date,ExpenseHead,Description,ApprovedAmount,PaidAmount,Bill)
 		SELECT CONVERT(NVARCHAR,CONVERT(DATE,CAST(U.CreatedDate AS Date),103),110),
@@ -483,14 +487,19 @@ BEGIN
 	
 				
 		INSERT INTO #PettyCash1(Date,ExpenseHead,Description,ApprovedAmount,PaidAmount,Bill)
-		SELECT '' AS Date,'' AS ExpenseHead,'TotalAmount' AS Description,SUM(Amount) AS ApprovedAmount,SUM(Paid) AS PaidAmount,
-		'' AS Bill
-		FROM WRBHBPettyCashStatus 
-		WHERE UserId =@UserId AND PropertyId=@Id AND IsActive=1 AND IsDeleted=0
-		AND CONVERT(NVARCHAR,CAST(CreatedDate AS Date),103)=CONVERT(NVARCHAR(100),@Str,103)
 		
+		SELECT '' AS Date,'' AS ExpenseHead,'TotalAmount' AS Description,SUM(Amount)+H.OpeningBalance AS ApprovedAmount,SUM(Paid) AS PaidAmount,
+		'' AS Bill
+		FROM WRBHBPettyCashStatus D
+		JOIN  WRBHBPettyCashHdr H ON D.Status=CONVERT(NVARCHAR(100),H.Date,103) AND
+		H.UserId=D.UserId AND H.PropertyId=D.PropertyId AND D.IsActive=1 AND D.IsDeleted=0
+		WHERE D.UserId =@UserId AND D.PropertyId=@Id AND D.IsActive=1 AND D.IsDeleted=0
+		AND CONVERT(NVARCHAR,CAST(D.CreatedDate AS Date),103)=CONVERT(NVARCHAR(100),@Str,103)
+		GROUP BY H.OpeningBalance
+		
+				
 		INSERT INTO #PettyCash1(Date,ExpenseHead,Description,ApprovedAmount,PaidAmount,Bill)
-		SELECT '' AS Date,'' AS ExpenseHead,'' AS Description,'ClosingBalance' AS ApprovedAmount,Balance AS PaidAmount,
+		SELECT '' AS Date,'' AS ExpenseHead,'ClosingBalance' AS Description,Balance AS ApprovedAmount,'' AS PaidAmount,
 		'' AS Bill FROM WRBHBPettyCashStatus
 		WHERE UserId =@UserId AND PropertyId=@Id AND CONVERT(Date,CreatedDate,103)=CONVERT(Date,@Str,103) AND 
 		IsActive=1 AND IsDeleted=0

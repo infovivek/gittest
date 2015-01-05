@@ -71,5 +71,7 @@ namespace HB.Entity
         public string Intermediate { get; set; }
         public bool Preformainvoice { get; set; }
         public string Email { get; set; }
+        public string TariffPaymentMode { get; set; }
+        public string BookingType { get; set; }
     }
 }

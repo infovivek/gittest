@@ -21,6 +21,33 @@ BEGIN
 SET NOCOUNT ON
 SET ANSI_WARNINGS OFF
 --VENDOR SETTLEMENT 
+DECLARE @COUNT INT,@CheckInDT NVARCHAR(100),@CheckOutDT NVARCHAR(100),@TID INT,
+	@BookingId INT,@Tariff DECIMAL(27,2)
+	CREATE TABLE #InvoicDateCheckout(checks BIT,PONo NVARCHAR(100),GuestName NVARCHAR(100),StayDuration NVARCHAR(100),
+	BookingCode NVARCHAR(100),POAmount DECIMAL(27,2),CheckOutId BIGINT,BookingId BIGINT,
+	Flag Bit,TID INT PRIMARY KEY IDENTITY(1,1),GuestId INT )
+	
+	CREATE TABLE #InvoicDateBooking(PONo NVARCHAR(100),GuestName NVARCHAR(100),StayDuration NVARCHAR(100),
+	BookingCode NVARCHAR(100),POAmount DECIMAL(27,2),BookingId BIGINT,GuestId BIGINT,
+	CheckInDt NVARCHAR(100),CheckOutDT NVARCHAR(100),
+	Flag Bit,TID INT PRIMARY KEY IDENTITY(1,1))
+	
+	CREATE TABLE #InvoicDate(PONo NVARCHAR(100),GuestName NVARCHAR(100),StayDuration NVARCHAR(100),
+	BookingCode NVARCHAR(100),POAmount DECIMAL(27,2),BookingId BIGINT,GuestId BIGINT,
+	CheckInDt NVARCHAR(100),CheckOutDT NVARCHAR(100),
+	Flag Bit,TID INT PRIMARY KEY IDENTITY(1,1),Tariff DECIMAL(27,2),NoOfDaysCount INT)
+	
+	CREATE TABLE #InvoicDateFinal(PONo NVARCHAR(100),GuestName NVARCHAR(100),StayDuration NVARCHAR(100),
+	BookingCode NVARCHAR(100),POAmount DECIMAL(27,2),BookingId BIGINT,GuestId BIGINT,
+	CheckInDt NVARCHAR(100),CheckOutDT NVARCHAR(100),checks BIT,CheckOutStayDuration NVARCHAR(100),
+	Flag Bit,TID INT PRIMARY KEY IDENTITY(1,1),Tariff DECIMAL(27,2),NoOfDaysCount INT,BillAmount DECIMAL(27,2),
+	CheckOutId BIGINT,MapPOAndVendorPaymentDtlsId BIGINT,Adjustment DECIMAL(27,2),OrderData NVARCHAR(100))
+	
+	CREATE TABLE #InvoicDateAdjusment(PONo NVARCHAR(100),GuestName NVARCHAR(100),StayDuration NVARCHAR(100),
+	BookingCode NVARCHAR(100),POAmount DECIMAL(27,2),BookingId BIGINT,GuestId BIGINT,
+	CheckInDt NVARCHAR(100),CheckOutDT NVARCHAR(100),checks BIT,CheckOutStayDuration NVARCHAR(100),
+	Flag Bit,TID INT PRIMARY KEY IDENTITY(1,1),Tariff DECIMAL(27,2),NoOfDaysCount INT,BillAmount DECIMAL(27,2),
+	CheckOutId BIGINT,MapPOAndVendorPaymentDtlsId BIGINT,Adjustment DECIMAL(27,2),OrderData NVARCHAR(100))
 IF @Action ='PropertySearch'
 BEGIN
 	CREATE TABLE #InvoiceData(checks BIT,InvoiceNo NVARCHAR(100),InvoiceDate NVARCHAR(100),
@@ -56,7 +83,7 @@ BEGIN
 	FROM WRBHBMapPOAndVendorPaymentHdr H
 	JOIN WRBHBMapPOAndVendorPaymentDtls D WITH(NOLOCK) ON H.Id=D.MapPOAndVendorPaymentHdrId
 	AND D.IsActive=1 AND D.IsDeleted=0 
-	WHERE H.IsActive=1 AND H.IsDeleted=0 AND H.PropertyId=@PropertyId
+	WHERE H.IsActive=1 AND H.IsDeleted=0 AND H.PropertyId=CAST(@Param1 AS BIGINT)
 	AND H.Id NOT IN(SELECT InvoiceId FROM WRBHBVendorSettlementInvoiceAmount S WHERE S.IsActive=1 AND S.IsDeleted=0) 
 	GROUP BY InvoiceNo,InvoiceDate,InvoiceAmount,H.Id
 	
@@ -79,7 +106,7 @@ BEGIN
 	TotalBusinessSupportST,Id TACId,0 Adjusment,TACAmount AdjusementAmount
 	FROM WRBHBExternalChechkOutTAC H
 	WHERE TACInvoiceNo!='0' AND TACAmount!=0 AND ISNULL(SettlementFlag,0)=0 AND 
-	PropertyType='External Property' AND PropertyId=@PropertyId
+	PropertyType='External Property' AND PropertyId=CAST(@Param1 AS BIGINT)
 	
 	--GET TAC ADJUSEMENT AMOUNT 
 	INSERT INTO #TACInvoiceDataAdjusment(InvoiceAmount,TACId,Adjusment)
@@ -99,7 +126,7 @@ BEGIN
 	--ADVANCE AMOUNT TAKEN
 	INSERT INTO #AdvanceAmount(AdvanceAmount,Id,AdjusmentAmount)
 	SELECT AdvanceAmount,Id,0 AdjusmentAmount FROM WRBHBVendorAdvancePayment
-	WHERE IsActive=1 AND IsDeleted=0 AND PropertyId=@PropertyId
+	WHERE IsActive=1 AND IsDeleted=0 AND PropertyId=CAST(@Param1 AS BIGINT)
 	AND ISNULL(SettlementFlag,0)=0
 	
 	INSERT INTO #AdvanceAdjusment(Id,AdjusmentAmount)
@@ -126,33 +153,18 @@ BEGIN
 	WHERE IsDeleted=0 AND IsActive=1
 	
 END
+IF @Action ='MMTProperty'
+BEGIN
+	SELECT HotalName+'- '+City  PropertyName,CAST(HotalId AS NVARCHAR(500))ZId FROM  dbo.WRBHBStaticHotels 
+	WHERE IsDeleted=0 AND IsActive=1
+	
+	SELECT ClientName,Id ZId FROM  dbo.WRBHBClientManagement 
+	WHERE IsDeleted=0 AND IsActive=1
+	
+END
 IF @Action ='POSerch'
 BEGIN
-	CREATE TABLE #InvoicDateCheckout(checks BIT,PONo NVARCHAR(100),GuestName NVARCHAR(100),StayDuration NVARCHAR(100),
-	BookingCode NVARCHAR(100),POAmount DECIMAL(27,2),CheckOutId BIGINT,BookingId BIGINT,
-	Flag Bit,TID INT PRIMARY KEY IDENTITY(1,1),GuestId INT )
 	
-	CREATE TABLE #InvoicDateBooking(PONo NVARCHAR(100),GuestName NVARCHAR(100),StayDuration NVARCHAR(100),
-	BookingCode NVARCHAR(100),POAmount DECIMAL(27,2),BookingId BIGINT,GuestId BIGINT,
-	CheckInDt NVARCHAR(100),CheckOutDT NVARCHAR(100),
-	Flag Bit,TID INT PRIMARY KEY IDENTITY(1,1))
-	
-	CREATE TABLE #InvoicDate(PONo NVARCHAR(100),GuestName NVARCHAR(100),StayDuration NVARCHAR(100),
-	BookingCode NVARCHAR(100),POAmount DECIMAL(27,2),BookingId BIGINT,GuestId BIGINT,
-	CheckInDt NVARCHAR(100),CheckOutDT NVARCHAR(100),
-	Flag Bit,TID INT PRIMARY KEY IDENTITY(1,1),Tariff DECIMAL(27,2),NoOfDaysCount INT)
-	
-	CREATE TABLE #InvoicDateFinal(PONo NVARCHAR(100),GuestName NVARCHAR(100),StayDuration NVARCHAR(100),
-	BookingCode NVARCHAR(100),POAmount DECIMAL(27,2),BookingId BIGINT,GuestId BIGINT,
-	CheckInDt NVARCHAR(100),CheckOutDT NVARCHAR(100),checks BIT,CheckOutStayDuration NVARCHAR(100),
-	Flag Bit,TID INT PRIMARY KEY IDENTITY(1,1),Tariff DECIMAL(27,2),NoOfDaysCount INT,BillAmount DECIMAL(27,2),
-	CheckOutId BIGINT,MapPOAndVendorPaymentDtlsId BIGINT,Adjustment DECIMAL(27,2),OrderData NVARCHAR(100))
-	
-	CREATE TABLE #InvoicDateAdjusment(PONo NVARCHAR(100),GuestName NVARCHAR(100),StayDuration NVARCHAR(100),
-	BookingCode NVARCHAR(100),POAmount DECIMAL(27,2),BookingId BIGINT,GuestId BIGINT,
-	CheckInDt NVARCHAR(100),CheckOutDT NVARCHAR(100),checks BIT,CheckOutStayDuration NVARCHAR(100),
-	Flag Bit,TID INT PRIMARY KEY IDENTITY(1,1),Tariff DECIMAL(27,2),NoOfDaysCount INT,BillAmount DECIMAL(27,2),
-	CheckOutId BIGINT,MapPOAndVendorPaymentDtlsId BIGINT,Adjustment DECIMAL(27,2),OrderData NVARCHAR(100))
 	
 	--checkout PO amount
 	INSERT INTO #InvoicDateCheckout(checks,PONo,GuestName,StayDuration,BookingCode,POAmount,CheckOutId,BookingId,
@@ -165,7 +177,7 @@ BEGIN
 	AND H.PropertyId=G.BookingPropertyId AND G.IsActive=1 AND G.IsDeleted=0 AND
 	CONVERT(DATE,G.ChkOutDt,103) BETWEEN CONVERT(DATE,@FromDate,103) AND CONVERT(DATE,@ToDate,103)
 	JOIN dbo.WRBHBBookingProperty  P WITH(NOLOCK) ON P.BookingId=B.Id AND
-	P.Id=G.BookingPropertyTableId AND P.IsActive=1 AND P.IsDeleted=0 AND P.PropertyType='ExP'
+	P.Id=G.BookingPropertyTableId AND P.IsActive=1 AND P.IsDeleted=0 AND P.PropertyType=@Param1
 	WHERE H.IsDeleted=0 AND H.IsActive=1 AND H.PropertyId=@PropertyId AND
 	ISNULL(InVoiceNo,'')!='' AND
 	H.Id NOT  IN(SELECT CheckOutId FROM WRBHBMapPOAndVendorPaymentDtls WHERE IsActive=1 AND IsDeleted=0
@@ -204,8 +216,132 @@ BEGIN
 	JOIN WRBHBBookingProperty A WITH(NOLOCK) ON A.BookingId=G.BookingId AND  G.BookingPropertyTableId=A.Id 
 	AND G.IsActive=1 AND G.IsDeleted=0 AND G.GuestId=B.GuestId
 	
-	DECLARE @COUNT INT,@CheckInDT NVARCHAR(100),@CheckOutDT NVARCHAR(100),@TID INT,
-	@BookingId INT,@Tariff DECIMAL(27,2)
+	
+	
+	SELECT @COUNT=COUNT(*) FROM #InvoicDateBooking WHERE Flag=0
+	
+	SELECT TOP 1 @BookingId=BookingId,@Tariff=POAmount
+	FROM  #InvoicDateBooking 
+	WHERE Flag=0 
+	ORDER BY TID ASC
+		
+	WHILE @COUNT>0
+	BEGIN
+		SELECT TOP 1 @CheckInDT=CheckInDt
+		FROM  #InvoicDateBooking 
+		WHERE Flag=0 AND BookingId=@BookingId
+		ORDER BY TID ASC
+		
+		SELECT TOP 1 @CheckOutDT=CheckOutDT
+		FROM  #InvoicDateBooking 
+		WHERE Flag=0 AND BookingId=@BookingId
+		ORDER BY TID DESC 
+		
+		
+		INSERT INTO #InvoicDate(POAmount,BookingId,StayDuration,NoOfDaysCount,Tariff)
+		
+		SELECT DATEDIFF(day, CONVERT(DATE,@CheckInDT,103), CONVERT(DATE,@CheckOutDT,103))* @Tariff,
+		@BookingId,@CheckInDT+' To '+@CheckOutDT,
+		DATEDIFF(day, CONVERT(DATE,@CheckInDT,103),CONVERT(DATE,@CheckOutDT,103)),
+		@Tariff
+		
+		UPDATE #InvoicDateBooking SET Flag=1 WHERE BookingId=@BookingId
+		
+		SELECT @COUNT=COUNT(*) FROM #InvoicDateBooking WHERE Flag=0
+		
+		SELECT TOP 1 @BookingId=BookingId,@Tariff=POAmount
+		FROM  #InvoicDateBooking 
+		WHERE Flag=0 
+		ORDER BY TID ASC
+	
+	END
+	
+	INSERT INTO #InvoicDateFinal(checks,PONo,GuestName,StayDuration,CheckOutStayDuration,BookingCode,POAmount,
+	BillAmount,CheckOutId,BookingId,GuestId,MapPOAndVendorPaymentDtlsId,Adjustment,OrderData)
+	SELECT 0 checks,B.PONo PONo,B.GuestName,G.StayDuration,B.StayDuration,B.BookingCode BookingCode,
+	G.POAmount POAmount,B.POAmount BillAmount,B.CheckOutId,B.BookingId,B.GuestId,0,0,'Z'
+	FROM #InvoicDateCheckout B
+	JOIN #InvoicDate  G WITH(NOLOCK) ON B.BookingId=G.BookingId
+	
+	
+	--ADJUSEMENT AMOUT TAKEN REMAINING AMOUNT
+	INSERT INTO #InvoicDateAdjusment(checks,PONo,GuestName,StayDuration,CheckOutStayDuration,BookingCode,POAmount,
+	BillAmount,CheckOutId,BookingId,GuestId,MapPOAndVendorPaymentDtlsId,Adjustment,OrderData)	
+	SELECT 0,PONo,GuestName,StayDuration,'',BookingCode,0,0,CheckOutId,
+	BookingId,0,0,SUM(Adjustment),'A'
+	FROM WRBHBMapPOAndVendorPaymentDtls
+	WHERE (POAmount-Adjustment)!=0 AND Adjustment!=0
+	GROUP BY PONo,GuestName,StayDuration,BookingCode,CheckOutId,
+	BookingId	
+	
+	
+	--UPDATE ADJUSEMENT AMOUT
+	UPDATE #InvoicDateFinal SET Adjustment = A.Adjustment
+	FROM #InvoicDateAdjusment A 
+	JOIN #InvoicDateFinal S ON S.CheckOutId=A.CheckOutId
+	
+	SELECT checks,PONo,GuestName,StayDuration,CheckOutStayDuration,BookingCode,POAmount-Adjustment POAmount,
+	BillAmount-Adjustment BillAmount,CheckOutId,BookingId,GuestId,MapPOAndVendorPaymentDtlsId,Adjustment
+	FROM #InvoicDateFinal	
+	ORDER BY OrderData
+	
+	
+END
+IF @Action ='MMTPOSerch'
+BEGIN
+	
+	
+	--checkout PO amount
+	INSERT INTO #InvoicDateCheckout(checks,PONo,GuestName,StayDuration,BookingCode,POAmount,CheckOutId,BookingId,
+	Flag,GuestId)
+	SELECT 0 checks,B.MMTPONo PONo,G.FirstName GuestName,H.Stay StayDuration,B.BookingCode BookingCode,
+	H.ChkOutTariffTotal POAmount,H.Id CheckOutId,B.Id BookingId,0,H.GuestId
+	FROM  WRBHBChechkOutHdr H
+	JOIN WRBHBBooking B WITH(NOLOCK) ON B.Id=H.BookingId AND B.IsActive=1 AND B.IsDeleted=0
+	JOIN dbo.WRBHBBookingPropertyAssingedGuest  G WITH(NOLOCK) ON B.Id=G.BookingId AND H.GuestId=G.GuestId
+	AND H.PropertyId=G.BookingPropertyId AND G.IsActive=1 AND G.IsDeleted=0 AND
+	CONVERT(DATE,G.ChkOutDt,103) BETWEEN CONVERT(DATE,@FromDate,103) AND CONVERT(DATE,@ToDate,103)
+	JOIN dbo.WRBHBBookingProperty  P WITH(NOLOCK) ON P.BookingId=B.Id AND
+	P.Id=G.BookingPropertyTableId AND P.IsActive=1 AND P.IsDeleted=0 AND P.PropertyType='MMT'
+	WHERE H.IsDeleted=0 AND H.IsActive=1 AND H.PropertyId=CAST(@Param1 as BIGINT) AND
+	ISNULL(InVoiceNo,'')!='' AND
+	H.Id NOT  IN(SELECT CheckOutId FROM WRBHBMapPOAndVendorPaymentDtls WHERE IsActive=1 AND IsDeleted=0
+	AND (POAmount-Adjustment)=0 )
+	GROUP BY B.MMTPONo,G.FirstName,H.Stay,B.BookingCode,H.ChkOutTariffTotal,H.Id,B.Id,h.GuestId	
+	ORDER BY H.Id ASC
+	
+
+	--BOOKING TARIFF AMOUNT FOR Single OCCUPANCY
+	INSERT INTO #InvoicDateBooking(GuestName,POAmount,BookingId,GuestId,
+	CheckInDt,CheckOutDT,Flag)
+	SELECT G.FirstName,A.SingleTariff,G.BookingId,G.GuestId,
+	CONVERT(NVARCHAR,G.ChkInDt,103),CONVERT(NVARCHAR,G.ChkOutDt,103),0
+	FROM #InvoicDateCheckout B
+	JOIN dbo.WRBHBBookingPropertyAssingedGuest  G WITH(NOLOCK) ON B.BookingId=G.BookingId AND Occupancy='Single'
+	JOIN WRBHBBookingProperty A WITH(NOLOCK) ON A.BookingId=G.BookingId AND  G.BookingPropertyTableId=A.Id 
+	AND G.IsActive=1 AND G.IsDeleted=0 AND G.GuestId=B.GuestId
+	
+    --BOOKING TARIFF AMOUNT FOR Double OCCUPANCY
+	INSERT INTO #InvoicDateBooking(GuestName,POAmount,BookingId,GuestId,
+	CheckInDt,CheckOutDT,Flag)
+	SELECT G.FirstName,A.DoubleTariff,G.BookingId,G.GuestId,
+	CONVERT(NVARCHAR,G.ChkInDt,103),CONVERT(NVARCHAR,G.ChkOutDt,103),0
+	FROM #InvoicDateCheckout B
+	JOIN dbo.WRBHBBookingPropertyAssingedGuest  G WITH(NOLOCK) ON B.BookingId=G.BookingId AND Occupancy='Double'
+	JOIN WRBHBBookingProperty A WITH(NOLOCK) ON A.BookingId=G.BookingId AND  G.BookingPropertyTableId=A.Id 
+	AND G.IsActive=1 AND G.IsDeleted=0 AND G.GuestId=B.GuestId
+	
+	--BOOKING TARIFF AMOUNT FOR Triple OCCUPANCY
+	INSERT INTO #InvoicDateBooking(GuestName,POAmount,BookingId,GuestId,
+	CheckInDt,CheckOutDT,Flag)
+	SELECT G.FirstName,A.TripleTariff,G.BookingId,G.GuestId,
+	CONVERT(NVARCHAR,G.ChkInDt,103),CONVERT(NVARCHAR,G.ChkOutDt,103),0
+	FROM #InvoicDateCheckout B
+	JOIN dbo.WRBHBBookingPropertyAssingedGuest  G WITH(NOLOCK) ON B.BookingId=G.BookingId AND Occupancy='Triple'
+	JOIN WRBHBBookingProperty A WITH(NOLOCK) ON A.BookingId=G.BookingId AND  G.BookingPropertyTableId=A.Id 
+	AND G.IsActive=1 AND G.IsDeleted=0 AND G.GuestId=B.GuestId
+	
+	
 	
 	SELECT @COUNT=COUNT(*) FROM #InvoicDateBooking WHERE Flag=0
 	

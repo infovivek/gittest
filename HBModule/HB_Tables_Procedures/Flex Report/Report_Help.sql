@@ -23,9 +23,33 @@ CREATE PROCEDURE [dbo].[SP_Report_Help](
 AS
 BEGIN
 IF @Action ='Property'  
- BEGIN  
+ BEGIN 
+    CREATE TABLE #NDD(RoomId BIGINT,PropertyId BIGINT)
+    CREATE TABLE #Property(PropertyName NVARCHAR(100),ZId BIGINT,PropertyType NVARCHAR(100))   
+	INSERT INTO #NDD(RoomId,PropertyId)  
+    SELECT 0,CA.PropertyId FROM dbo.WRBHBContractManagementAppartment CA      
+    JOIN dbo.WRBHBContractManagement C ON C.Id=CA.ContractId AND 
+    LTRIM(ContractType)IN(LTRIM(' Managed Contracts '))   
+    AND C.IsActive=1 AND C.IsDeleted=0
+    WHERE CA.IsActive=1 AND CA.IsDeleted=0  
+       
+    INSERT INTO #NDD(RoomId,PropertyId)     
+    SELECT CR.RoomId,CR.PropertyId FROM dbo.WRBHBContractManagementTariffAppartment CR  
+    JOIN dbo.WRBHBContractManagement C ON C.Id=CR.ContractId AND 
+    LTRIM(ContractType)IN(LTRIM(' Managed Contracts '))   
+    AND C.IsActive=1 AND C.IsDeleted=0  
+    WHERE  CR.IsActive=1 AND CR.IsDeleted=0  
+    
+   INSERT INTO #Property (PropertyName,ZId,PropertyType) 
    SELECT  PropertyName,Id ZId,Category PropertyType FROM dbo.WRBHBProperty   
-   WHERE IsActive=1 AND IsDeleted=0 AND Category in('Internal Property','Managed G H') ;  
+   WHERE IsActive=1 AND IsDeleted=0 AND Category in('Internal Property') ; 
+   
+   INSERT INTO #Property (PropertyName,ZId,PropertyType) 
+   SELECT  PropertyName,Id ZId,Category PropertyType FROM dbo.WRBHBProperty   
+   WHERE IsActive=1 AND IsDeleted=0 AND Category in('Managed G H') AND
+   Id IN(SELECT PropertyId FROM #NDD)  
+   
+  SELECT PropertyName,ZId,PropertyType FROM #Property
      
  END   
  IF @Action ='OccupancyChart'  
@@ -115,8 +139,8 @@ IF @Action ='Property'
    DECLARE @PropertyType NVARCHAR(100);   
      
    SELECT @PropertyType=Category FROM WRBHBProperty WHERE Id=@Pram2  
-   IF  @PropertyType='Internal Property'  
-   BEGIN  
+   --IF  @PropertyType='Internal Property'  
+   --BEGIN  
     
     --GET DATA FROM BOOKING ROOM LEVEL  
     INSERT INTO #BookingRoom(Id,BookingId,RoomId,BedId,RoomName,GuestName,CheckInDt,CheckOutDt,  
@@ -379,258 +403,258 @@ IF @Action ='Property'
     GROUP BY G.Id,BookingId,R.Id,RoomType,FirstName,ChkInDt,ChkOutDt,G.ExpectChkInTime,G.AMPM,G.CurrentStatus  
     
    
-   END  
-   ELSE  
-   BEGIN  
-   ----------Managed GH  
-   --GET DATA FROM BOOKING ROOM LEVEL  
-    INSERT INTO #BookingRoom(Id,BookingId,BedId,RoomId,RoomName,GuestName,CheckInDt,CheckOutDt,  
-    Type,Occupancy,BookingLevel,GuestCount,CheckInTime,TimeType,BStatus)   
-    SELECT G.Id,BookingId,0,RoomId,G.RoomType,FirstName,CAST(CAST(G.ChkInDt AS NVARCHAR)+' '+G.ExpectChkInTime+' '+G.AMPM as DATETIME) ChkInDt,  
-    CONVERT(NVARCHAR,ChkOutDt,103) ChkOutDt,CurrentStatus,G.Occupancy,'Room',1,G.ExpectChkInTime,G.AMPM,G.CurrentStatus    
-    FROM WRBHBBooking B     
-    JOIN WRBHBBookingPropertyAssingedGuest G ON B.Id =G.BookingId  
-    AND CONVERT(DATE,ChkInDt,103) BETWEEN CONVERT(DATE,@Pram3,103)  
-    AND CONVERT(DATE,@Pram4,103) AND   
-    --CONVERT(DATE,ChkOutDt,103) BETWEEN CONVERT(DATE,@Pram3,103)  
-    --AND CONVERT(DATE,@Pram4,103) --  
-    BookingPropertyId=@Pram2  
-    AND G.IsActive=1 AND G.IsDeleted=0  
-    JOIN WRBHBPropertyRooms R WITH(NOLOCK) ON R.Id=G.RoomId AND R.IsActive=1 AND R.IsDeleted=0  
-    AND G.BookingPropertyId=R.PropertyId --AND R.RoomStatus='Active'  
-    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
-    --AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.RoomId=G.RoomId AND CO.IsActive=1 AND CO.IsDeleted=0)  
-    GROUP BY G.Id,BookingId,RoomId,G.RoomType,FirstName,ChkInDt,ChkOutDt,G.Occupancy,G.ExpectChkInTime,G.AMPM,
-    G.CurrentStatus    
+   --END  
+   --ELSE  
+   --BEGIN  
+   ------------Managed GH  
+   ----GET DATA FROM BOOKING ROOM LEVEL  
+   -- INSERT INTO #BookingRoom(Id,BookingId,BedId,RoomId,RoomName,GuestName,CheckInDt,CheckOutDt,  
+   -- Type,Occupancy,BookingLevel,GuestCount,CheckInTime,TimeType,BStatus)   
+   -- SELECT G.Id,BookingId,0,RoomId,G.RoomType,FirstName,CAST(CAST(G.ChkInDt AS NVARCHAR)+' '+G.ExpectChkInTime+' '+G.AMPM as DATETIME) ChkInDt,  
+   -- CONVERT(NVARCHAR,ChkOutDt,103) ChkOutDt,CurrentStatus,G.Occupancy,'Room',1,G.ExpectChkInTime,G.AMPM,G.CurrentStatus    
+   -- FROM WRBHBBooking B     
+   -- JOIN WRBHBBookingPropertyAssingedGuest G ON B.Id =G.BookingId  
+   -- AND CONVERT(DATE,ChkInDt,103) BETWEEN CONVERT(DATE,@Pram3,103)  
+   -- AND CONVERT(DATE,@Pram4,103) AND   
+   -- --CONVERT(DATE,ChkOutDt,103) BETWEEN CONVERT(DATE,@Pram3,103)  
+   -- --AND CONVERT(DATE,@Pram4,103) --  
+   -- BookingPropertyId=@Pram2  
+   -- AND G.IsActive=1 AND G.IsDeleted=0  
+   -- JOIN WRBHBPropertyRooms R WITH(NOLOCK) ON R.Id=G.RoomId AND R.IsActive=1 AND R.IsDeleted=0  
+   -- AND G.BookingPropertyId=R.PropertyId --AND R.RoomStatus='Active'  
+   -- WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
+   -- --AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.RoomId=G.RoomId AND CO.IsActive=1 AND CO.IsDeleted=0)  
+   -- GROUP BY G.Id,BookingId,RoomId,G.RoomType,FirstName,ChkInDt,ChkOutDt,G.Occupancy,G.ExpectChkInTime,G.AMPM,
+   -- G.CurrentStatus    
       
-    INSERT INTO #BookingRoom(Id,BookingId,BedId,RoomId,RoomName,GuestName,CheckInDt,CheckOutDt,  
-    Type,Occupancy,BookingLevel,GuestCount,CheckInTime,TimeType,BStatus)   
-    SELECT G.Id,BookingId,0,RoomId,G.RoomType,FirstName,CAST(CAST(G.ChkInDt AS NVARCHAR)+' '+G.ExpectChkInTime+' '+G.AMPM as DATETIME) ChkInDt,  
-    CONVERT(NVARCHAR,ChkOutDt,103) ChkOutDt,CurrentStatus,G.Occupancy,'Room',1,G.ExpectChkInTime,G.AMPM,G.CurrentStatus     
-    FROM WRBHBBooking B     
-    JOIN WRBHBBookingPropertyAssingedGuest G ON B.Id =G.BookingId  
-    --AND CONVERT(DATE,ChkInDt,103) BETWEEN CONVERT(DATE,@Pram3,103)  
-    --AND CONVERT(DATE,@Pram4,103) AND   
-    AND CONVERT(DATE,ChkOutDt,103) BETWEEN CONVERT(DATE,@Pram3,103)  
-    AND CONVERT(DATE,@Pram4,103) AND  
-    BookingPropertyId=@Pram2   
-    AND G.IsActive=1 AND G.IsDeleted=0  
-    JOIN WRBHBPropertyRooms R WITH(NOLOCK) ON R.Id=G.RoomId AND R.IsActive=1 AND R.IsDeleted=0  
-    AND G.BookingPropertyId=R.PropertyId --AND R.RoomStatus='Active'  
-    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
-    AND B.Id NOT IN(SELECT BookingId FROM #BookingRoom BR WHERE BR.RoomId=G.RoomId)  
-    --AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.RoomId=G.RoomId AND CO.IsActive=1 AND CO.IsDeleted=0)  
-    GROUP BY G.Id,BookingId,RoomId,G.RoomType,FirstName,ChkInDt,ChkOutDt,G.Occupancy,G.ExpectChkInTime,G.AMPM,
-    G.CurrentStatus    
+   -- INSERT INTO #BookingRoom(Id,BookingId,BedId,RoomId,RoomName,GuestName,CheckInDt,CheckOutDt,  
+   -- Type,Occupancy,BookingLevel,GuestCount,CheckInTime,TimeType,BStatus)   
+   -- SELECT G.Id,BookingId,0,RoomId,G.RoomType,FirstName,CAST(CAST(G.ChkInDt AS NVARCHAR)+' '+G.ExpectChkInTime+' '+G.AMPM as DATETIME) ChkInDt,  
+   -- CONVERT(NVARCHAR,ChkOutDt,103) ChkOutDt,CurrentStatus,G.Occupancy,'Room',1,G.ExpectChkInTime,G.AMPM,G.CurrentStatus     
+   -- FROM WRBHBBooking B     
+   -- JOIN WRBHBBookingPropertyAssingedGuest G ON B.Id =G.BookingId  
+   -- --AND CONVERT(DATE,ChkInDt,103) BETWEEN CONVERT(DATE,@Pram3,103)  
+   -- --AND CONVERT(DATE,@Pram4,103) AND   
+   -- AND CONVERT(DATE,ChkOutDt,103) BETWEEN CONVERT(DATE,@Pram3,103)  
+   -- AND CONVERT(DATE,@Pram4,103) AND  
+   -- BookingPropertyId=@Pram2   
+   -- AND G.IsActive=1 AND G.IsDeleted=0  
+   -- JOIN WRBHBPropertyRooms R WITH(NOLOCK) ON R.Id=G.RoomId AND R.IsActive=1 AND R.IsDeleted=0  
+   -- AND G.BookingPropertyId=R.PropertyId --AND R.RoomStatus='Active'  
+   -- WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
+   -- AND B.Id NOT IN(SELECT BookingId FROM #BookingRoom BR WHERE BR.RoomId=G.RoomId)  
+   -- --AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.RoomId=G.RoomId AND CO.IsActive=1 AND CO.IsDeleted=0)  
+   -- GROUP BY G.Id,BookingId,RoomId,G.RoomType,FirstName,ChkInDt,ChkOutDt,G.Occupancy,G.ExpectChkInTime,G.AMPM,
+   -- G.CurrentStatus    
       
-    INSERT INTO #BookingRoom(Id,BookingId,BedId,RoomId,RoomName,GuestName,CheckInDt,CheckOutDt,  
-    Type,Occupancy,BookingLevel,GuestCount,CheckInTime,TimeType,BStatus)   
-    SELECT G.Id,BookingId,0,RoomId,G.RoomType,FirstName,CAST(CAST(G.ChkInDt AS NVARCHAR)+' '+G.ExpectChkInTime+' '+G.AMPM as DATETIME) ChkInDt,  
-    CONVERT(NVARCHAR,ChkOutDt,103) ChkOutDt,CurrentStatus,G.Occupancy,'Room',1,G.ExpectChkInTime,G.AMPM,G.CurrentStatus     
-    FROM WRBHBBooking B     
-    JOIN WRBHBBookingPropertyAssingedGuest G ON B.Id =G.BookingId  
-    AND CONVERT(DATE,ChkInDt,103) < CONVERT(DATE,@Pram3,103)  
-    --AND CONVERT(DATE,@Pram4,103) AND   
-    AND CONVERT(DATE,ChkOutDt,103) > CONVERT(DATE,@Pram4,103)  
-    -- AND CONVERT(DATE,@Pram4,103) AND  
-    AND BookingPropertyId=@Pram2   
-    AND G.IsActive=1 AND G.IsDeleted=0  
-    JOIN WRBHBPropertyRooms R WITH(NOLOCK) ON R.Id=G.RoomId AND R.IsActive=1 AND R.IsDeleted=0  
-    AND G.BookingPropertyId=R.PropertyId --AND R.RoomStatus='Active'  
-    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
-    AND B.Id NOT IN(SELECT BookingId FROM #BookingRoom BR WHERE BR.RoomId=G.RoomId)  
-   -- AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.RoomId=G.RoomId AND CO.IsActive=1 AND CO.IsDeleted=0)  
-    GROUP BY G.Id,BookingId,RoomId,G.RoomType,FirstName,ChkInDt,ChkOutDt,G.Occupancy,G.ExpectChkInTime,G.CurrentStatus   
+   -- --INSERT INTO #BookingRoom(Id,BookingId,BedId,RoomId,RoomName,GuestName,CheckInDt,CheckOutDt,  
+   -- --Type,Occupancy,BookingLevel,GuestCount,CheckInTime,TimeType,BStatus)   
+   -- SELECT G.Id,BookingId,0,RoomId,G.RoomType,FirstName,CAST(CAST(G.ChkInDt AS NVARCHAR)+' '+G.ExpectChkInTime+' '+G.AMPM as DATETIME) ChkInDt,  
+   -- CONVERT(NVARCHAR,ChkOutDt,103) ChkOutDt,CurrentStatus,G.Occupancy,'Room',1,G.ExpectChkInTime,G.AMPM,G.CurrentStatus     
+   -- FROM WRBHBBooking B     
+   -- JOIN WRBHBBookingPropertyAssingedGuest G ON B.Id =G.BookingId  
+   -- AND CONVERT(DATE,ChkInDt,103) < CONVERT(DATE,@Pram3,103)  
+   -- --AND CONVERT(DATE,@Pram4,103) AND   
+   -- AND CONVERT(DATE,ChkOutDt,103) > CONVERT(DATE,@Pram4,103)  
+   -- -- AND CONVERT(DATE,@Pram4,103) AND  
+   -- AND BookingPropertyId=@Pram2   
+   -- AND G.IsActive=1 AND G.IsDeleted=0  
+   -- JOIN WRBHBPropertyRooms R WITH(NOLOCK) ON R.Id=G.RoomId AND R.IsActive=1 AND R.IsDeleted=0  
+   -- AND G.BookingPropertyId=R.PropertyId --AND R.RoomStatus='Active'  
+   -- WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
+   -- AND B.Id NOT IN(SELECT BookingId FROM #BookingRoom BR WHERE BR.RoomId=G.RoomId)  
+   ---- AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.RoomId=G.RoomId AND CO.IsActive=1 AND CO.IsDeleted=0)  
+   -- GROUP BY G.Id,BookingId,RoomId,G.RoomType,FirstName,ChkInDt,ChkOutDt,G.Occupancy,G.ExpectChkInTime,G.CurrentStatus,G.AMPM   
       
       
-    INSERT INTO #BookingRoom(Id,BookingId,BedId,RoomId,RoomName,GuestName,CheckInDt,CheckOutDt,  
-    Type,Occupancy,BookingLevel,GuestCount,CheckInTime,TimeType,BStatus)   
-    SELECT G.Id,BookingId,0,RoomId,G.RoomType,FirstName,CAST(CAST(G.ChkInDt AS NVARCHAR)+' '+G.ExpectChkInTime+' '+G.AMPM as DATETIME) ChkInDt,  
-    CONVERT(NVARCHAR,ChkOutDt,103) ChkOutDt,CurrentStatus,G.Occupancy,'Room',1,G.ExpectChkInTime,G.AMPM,  
-    G.CurrentStatus   
-    FROM WRBHBBooking B     
-    JOIN WRBHBBookingPropertyAssingedGuest G ON B.Id =G.BookingId  
-    AND CONVERT(DATE,ChkInDt,103) > CONVERT(DATE,@Pram3,103)  
-    --AND CONVERT(DATE,@Pram4,103) AND   
-    AND CONVERT(DATE,ChkOutDt,103) < CONVERT(DATE,@Pram4,103)  
-    -- AND CONVERT(DATE,@Pram4,103) AND  
-    AND BookingPropertyId=@Pram2   
-    AND G.IsActive=1 AND G.IsDeleted=0  
-    JOIN WRBHBPropertyRooms R WITH(NOLOCK) ON R.Id=G.RoomId AND R.IsActive=1 AND R.IsDeleted=0  
-    AND G.BookingPropertyId=R.PropertyId --AND R.RoomStatus='Active'  
-    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
-    AND B.Id NOT IN(SELECT BookingId FROM #BookingRoom BR WHERE BR.RoomId=G.RoomId)  
-    --AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.BedId=G.BedId AND CO.IsActive=1 AND CO.IsDeleted=0)  
-    GROUP BY G.Id,BookingId,RoomId,G.RoomType,FirstName,ChkInDt,ChkOutDt,G.Occupancy,G.ExpectChkInTime,G.AMPM,G.CurrentStatus    
+   -- INSERT INTO #BookingRoom(Id,BookingId,BedId,RoomId,RoomName,GuestName,CheckInDt,CheckOutDt,  
+   -- Type,Occupancy,BookingLevel,GuestCount,CheckInTime,TimeType,BStatus)   
+   -- SELECT G.Id,BookingId,0,RoomId,G.RoomType,FirstName,CAST(CAST(G.ChkInDt AS NVARCHAR)+' '+G.ExpectChkInTime+' '+G.AMPM as DATETIME) ChkInDt,  
+   -- CONVERT(NVARCHAR,ChkOutDt,103) ChkOutDt,CurrentStatus,G.Occupancy,'Room',1,G.ExpectChkInTime,G.AMPM,  
+   -- G.CurrentStatus   
+   -- FROM WRBHBBooking B     
+   -- JOIN WRBHBBookingPropertyAssingedGuest G ON B.Id =G.BookingId  
+   -- AND CONVERT(DATE,ChkInDt,103) > CONVERT(DATE,@Pram3,103)  
+   -- --AND CONVERT(DATE,@Pram4,103) AND   
+   -- AND CONVERT(DATE,ChkOutDt,103) < CONVERT(DATE,@Pram4,103)  
+   -- -- AND CONVERT(DATE,@Pram4,103) AND  
+   -- AND BookingPropertyId=@Pram2   
+   -- AND G.IsActive=1 AND G.IsDeleted=0  
+   -- JOIN WRBHBPropertyRooms R WITH(NOLOCK) ON R.Id=G.RoomId AND R.IsActive=1 AND R.IsDeleted=0  
+   -- AND G.BookingPropertyId=R.PropertyId --AND R.RoomStatus='Active'  
+   -- WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
+   -- AND B.Id NOT IN(SELECT BookingId FROM #BookingRoom BR WHERE BR.RoomId=G.RoomId)  
+   -- --AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.BedId=G.BedId AND CO.IsActive=1 AND CO.IsDeleted=0)  
+   -- GROUP BY G.Id,BookingId,RoomId,G.RoomType,FirstName,ChkInDt,ChkOutDt,G.Occupancy,G.ExpectChkInTime,G.AMPM,G.CurrentStatus    
     
-    --GET DATA FROM BOOKING BED LEVEL  
-    INSERT INTO #BookingBed(Id,BookingId,BedId,RoomId,RoomName,GuestName,CheckInDt,CheckOutDt,  
-    Type,Occupancy,BookingLevel,GuestCount,CheckInTime,TimeType,BStatus)   
-    SELECT G.Id,BookingId,BedId,RoomId,RoomNo,FirstName,CAST(CAST(G.ChkInDt AS NVARCHAR)+' '+G.ExpectChkInTime+' '+G.AMPM as DATETIME) ChkInDt,  
-    CONVERT(NVARCHAR,ChkOutDt,103) ChkOutDt,CurrentStatus,'Single','Bed',1,G.ExpectChkInTime,G.AMPM,
-    G.CurrentStatus     
-    FROM WRBHBBooking B     
-    JOIN WRBHBBedBookingPropertyAssingedGuest G ON B.Id =G.BookingId  
-    AND CONVERT(DATE,ChkInDt,103) BETWEEN CONVERT(DATE,@Pram3,103)  
-    AND CONVERT(DATE,@Pram4,103) AND   
-    --CONVERT(DATE,ChkOutDt,103) BETWEEN CONVERT(DATE,@Pram3,103)  
-    --AND CONVERT(DATE,@Pram4,103) --  
-    BookingPropertyId=@Pram2  
-    AND G.IsActive=1 AND G.IsDeleted=0  
-    JOIN WRBHBPropertyRooms R WITH(NOLOCK) ON R.Id=G.RoomId AND R.IsActive=1 AND R.IsDeleted=0  
-    AND G.BookingPropertyId=R.PropertyId --AND R.RoomStatus='Active'  
-    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
-   -- AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.BedId=G.BedId AND CO.IsActive=1 AND CO.IsDeleted=0)  
-    GROUP BY G.Id,BookingId,BedId,RoomId,RoomNo,FirstName,ChkInDt,ChkOutDt,G.ExpectChkInTime,G.AMPM,
-    G.CurrentStatus
+   -- --GET DATA FROM BOOKING BED LEVEL  
+   -- INSERT INTO #BookingBed(Id,BookingId,BedId,RoomId,RoomName,GuestName,CheckInDt,CheckOutDt,  
+   -- Type,Occupancy,BookingLevel,GuestCount,CheckInTime,TimeType,BStatus)   
+   -- SELECT G.Id,BookingId,BedId,RoomId,RoomNo,FirstName,CAST(CAST(G.ChkInDt AS NVARCHAR)+' '+G.ExpectChkInTime+' '+G.AMPM as DATETIME) ChkInDt,  
+   -- CONVERT(NVARCHAR,ChkOutDt,103) ChkOutDt,CurrentStatus,'Single','Bed',1,G.ExpectChkInTime,G.AMPM,
+   -- G.CurrentStatus     
+   -- FROM WRBHBBooking B     
+   -- JOIN WRBHBBedBookingPropertyAssingedGuest G ON B.Id =G.BookingId  
+   -- AND CONVERT(DATE,ChkInDt,103) BETWEEN CONVERT(DATE,@Pram3,103)  
+   -- AND CONVERT(DATE,@Pram4,103) AND   
+   -- --CONVERT(DATE,ChkOutDt,103) BETWEEN CONVERT(DATE,@Pram3,103)  
+   -- --AND CONVERT(DATE,@Pram4,103) --  
+   -- BookingPropertyId=@Pram2  
+   -- AND G.IsActive=1 AND G.IsDeleted=0  
+   -- JOIN WRBHBPropertyRooms R WITH(NOLOCK) ON R.Id=G.RoomId AND R.IsActive=1 AND R.IsDeleted=0  
+   -- AND G.BookingPropertyId=R.PropertyId --AND R.RoomStatus='Active'  
+   -- WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
+   ---- AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.BedId=G.BedId AND CO.IsActive=1 AND CO.IsDeleted=0)  
+   -- GROUP BY G.Id,BookingId,BedId,RoomId,RoomNo,FirstName,ChkInDt,ChkOutDt,G.ExpectChkInTime,G.AMPM,
+   -- G.CurrentStatus
         
           
-    INSERT INTO #BookingBed(Id,BookingId,BedId,RoomId,RoomName,GuestName,CheckInDt,CheckOutDt,  
-    Type,Occupancy,BookingLevel,GuestCount,CheckInTime,TimeType,BStatus)   
-    SELECT G.Id,BookingId,BedId,RoomId,RoomNo,FirstName,CAST(CAST(G.ChkInDt AS NVARCHAR)+' '+G.ExpectChkInTime+' '+G.AMPM as DATETIME) ChkInDt,  
-    CONVERT(NVARCHAR,ChkOutDt,103) ChkOutDt,CurrentStatus,'Single','Bed',1,G.ExpectChkInTime,G.AMPM,
-    G.CurrentStatus    
-    FROM WRBHBBooking B     
-    JOIN WRBHBBedBookingPropertyAssingedGuest G ON B.Id =G.BookingId AND  
-    --AND CONVERT(DATE,ChkInDt,103) BETWEEN CONVERT(DATE,@Pram3,103)  
-    --AND CONVERT(DATE,@Pram4,103) AND   
-    CONVERT(DATE,ChkOutDt,103) BETWEEN CONVERT(DATE,@Pram3,103)  
-    AND CONVERT(DATE,@Pram4,103) AND  
-    BookingPropertyId=@Pram2  
-    AND G.IsActive=1 AND G.IsDeleted=0   
-    JOIN WRBHBPropertyRooms R WITH(NOLOCK) ON R.Id=G.RoomId AND R.IsActive=1 AND R.IsDeleted=0  
-    AND G.BookingPropertyId=R.PropertyId --AND R.RoomStatus='Active'  
-    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
-    AND B.Id NOT IN(SELECT BookingId FROM #BookingBed BB WHERE BB.BedId=G.BedId)  
-   -- AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.BedId=G.BedId AND CO.IsActive=1 AND CO.IsDeleted=0)  
-    GROUP BY G.Id,BookingId,BedId,RoomId,RoomNo,FirstName,ChkInDt,ChkOutDt,G.ExpectChkInTime,G.AMPM,
-    G.CurrentStatus    
+   -- INSERT INTO #BookingBed(Id,BookingId,BedId,RoomId,RoomName,GuestName,CheckInDt,CheckOutDt,  
+   -- Type,Occupancy,BookingLevel,GuestCount,CheckInTime,TimeType,BStatus)   
+   -- SELECT G.Id,BookingId,BedId,RoomId,RoomNo,FirstName,CAST(CAST(G.ChkInDt AS NVARCHAR)+' '+G.ExpectChkInTime+' '+G.AMPM as DATETIME) ChkInDt,  
+   -- CONVERT(NVARCHAR,ChkOutDt,103) ChkOutDt,CurrentStatus,'Single','Bed',1,G.ExpectChkInTime,G.AMPM,
+   -- G.CurrentStatus    
+   -- FROM WRBHBBooking B     
+   -- JOIN WRBHBBedBookingPropertyAssingedGuest G ON B.Id =G.BookingId AND  
+   -- --AND CONVERT(DATE,ChkInDt,103) BETWEEN CONVERT(DATE,@Pram3,103)  
+   -- --AND CONVERT(DATE,@Pram4,103) AND   
+   -- CONVERT(DATE,ChkOutDt,103) BETWEEN CONVERT(DATE,@Pram3,103)  
+   -- AND CONVERT(DATE,@Pram4,103) AND  
+   -- BookingPropertyId=@Pram2  
+   -- AND G.IsActive=1 AND G.IsDeleted=0   
+   -- JOIN WRBHBPropertyRooms R WITH(NOLOCK) ON R.Id=G.RoomId AND R.IsActive=1 AND R.IsDeleted=0  
+   -- AND G.BookingPropertyId=R.PropertyId --AND R.RoomStatus='Active'  
+   -- WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
+   -- AND B.Id NOT IN(SELECT BookingId FROM #BookingBed BB WHERE BB.BedId=G.BedId)  
+   ---- AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.BedId=G.BedId AND CO.IsActive=1 AND CO.IsDeleted=0)  
+   -- GROUP BY G.Id,BookingId,BedId,RoomId,RoomNo,FirstName,ChkInDt,ChkOutDt,G.ExpectChkInTime,G.AMPM,
+   -- G.CurrentStatus    
       
-    INSERT INTO #BookingBed(Id,BookingId,BedId,RoomId,RoomName,GuestName,CheckInDt,CheckOutDt,  
-    Type,Occupancy,BookingLevel,GuestCount,CheckInTime,TimeType,BStatus)   
-    SELECT G.Id,BookingId,BedId,RoomId,RoomNo,FirstName,CAST(CAST(G.ChkInDt AS NVARCHAR)+' '+G.ExpectChkInTime+' '+G.AMPM as DATETIME) ChkInDt,  
-    CONVERT(NVARCHAR,ChkOutDt,103) ChkOutDt,CurrentStatus,'Single','Bed',1,G.ExpectChkInTime,G.AMPM,
-    G.CurrentStatus     
-    FROM WRBHBBooking B     
-    JOIN WRBHBBedBookingPropertyAssingedGuest G ON B.Id =G.BookingId AND  
-    CONVERT(DATE,ChkInDt,103) < CONVERT(DATE,@Pram3,103)  
-    --AND CONVERT(DATE,@Pram4,103) AND   
-    AND CONVERT(DATE,ChkOutDt,103) > CONVERT(DATE,@Pram4,103)  
-    AND BookingPropertyId=@Pram2  
-    AND G.IsActive=1 AND G.IsDeleted=0   
-    JOIN WRBHBPropertyRooms R WITH(NOLOCK) ON R.Id=G.RoomId AND R.IsActive=1 AND R.IsDeleted=0  
-    AND G.BookingPropertyId=R.PropertyId --AND R.RoomStatus='Active'  
-    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
-    AND B.Id NOT IN(SELECT BookingId FROM #BookingBed BB WHERE BB.BedId=G.BedId)  
-    --AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.BedId=G.BedId AND CO.IsActive=1 AND CO.IsDeleted=0)  
-    GROUP BY G.Id,BookingId,BedId,RoomId,RoomNo,FirstName,ChkInDt,ChkOutDt,G.ExpectChkInTime,G.AMPM,
-    G.CurrentStatus    
+   -- INSERT INTO #BookingBed(Id,BookingId,BedId,RoomId,RoomName,GuestName,CheckInDt,CheckOutDt,  
+   -- Type,Occupancy,BookingLevel,GuestCount,CheckInTime,TimeType,BStatus)   
+   -- SELECT G.Id,BookingId,BedId,RoomId,RoomNo,FirstName,CAST(CAST(G.ChkInDt AS NVARCHAR)+' '+G.ExpectChkInTime+' '+G.AMPM as DATETIME) ChkInDt,  
+   -- CONVERT(NVARCHAR,ChkOutDt,103) ChkOutDt,CurrentStatus,'Single','Bed',1,G.ExpectChkInTime,G.AMPM,
+   -- G.CurrentStatus     
+   -- FROM WRBHBBooking B     
+   -- JOIN WRBHBBedBookingPropertyAssingedGuest G ON B.Id =G.BookingId AND  
+   -- CONVERT(DATE,ChkInDt,103) < CONVERT(DATE,@Pram3,103)  
+   -- --AND CONVERT(DATE,@Pram4,103) AND   
+   -- AND CONVERT(DATE,ChkOutDt,103) > CONVERT(DATE,@Pram4,103)  
+   -- AND BookingPropertyId=@Pram2  
+   -- AND G.IsActive=1 AND G.IsDeleted=0   
+   -- JOIN WRBHBPropertyRooms R WITH(NOLOCK) ON R.Id=G.RoomId AND R.IsActive=1 AND R.IsDeleted=0  
+   -- AND G.BookingPropertyId=R.PropertyId --AND R.RoomStatus='Active'  
+   -- WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
+   -- AND B.Id NOT IN(SELECT BookingId FROM #BookingBed BB WHERE BB.BedId=G.BedId)  
+   -- --AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.BedId=G.BedId AND CO.IsActive=1 AND CO.IsDeleted=0)  
+   -- GROUP BY G.Id,BookingId,BedId,RoomId,RoomNo,FirstName,ChkInDt,ChkOutDt,G.ExpectChkInTime,G.AMPM,
+   -- G.CurrentStatus    
       
-    INSERT INTO #BookingBed(Id,BookingId,BedId,RoomId,RoomName,GuestName,CheckInDt,CheckOutDt,  
-    Type,Occupancy,BookingLevel,GuestCount,CheckInTime,TimeType,BStatus)   
-    SELECT G.Id,BookingId,BedId,RoomId,RoomNo,FirstName,CAST(CAST(G.ChkInDt AS NVARCHAR)+' '+G.ExpectChkInTime+' '+G.AMPM as DATETIME) ChkInDt,  
-    CONVERT(NVARCHAR,ChkOutDt,103) ChkOutDt,CurrentStatus,'Single','Bed',1,G.ExpectChkInTime,G.AMPM,
-    G.CurrentStatus    
-    FROM WRBHBBooking B     
-    JOIN WRBHBBedBookingPropertyAssingedGuest G ON B.Id =G.BookingId AND  
-    CONVERT(DATE,ChkInDt,103) > CONVERT(DATE,@Pram3,103)  
-    --AND CONVERT(DATE,@Pram4,103) AND   
-    AND CONVERT(DATE,ChkOutDt,103) < CONVERT(DATE,@Pram4,103)  
-    AND BookingPropertyId=@Pram2  
-    AND G.IsActive=1 AND G.IsDeleted=0   
-    JOIN WRBHBPropertyRooms R WITH(NOLOCK) ON R.Id=G.RoomId AND R.IsActive=1 AND R.IsDeleted=0  
-    AND G.BookingPropertyId=R.PropertyId --AND R.RoomStatus='Active'  
-    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
-    AND B.Id NOT IN(SELECT BookingId FROM #BookingBed BB WHERE BB.BedId=G.BedId)  
-    --AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.BedId=G.BedId AND CO.IsActive=1 AND CO.IsDeleted=0)  
-    GROUP BY G.Id,BookingId,BedId,RoomId,RoomNo,FirstName,ChkInDt,ChkOutDt,G.ExpectChkInTime,G.AMPM,G.CurrentStatus    
+   -- INSERT INTO #BookingBed(Id,BookingId,BedId,RoomId,RoomName,GuestName,CheckInDt,CheckOutDt,  
+   -- Type,Occupancy,BookingLevel,GuestCount,CheckInTime,TimeType,BStatus)   
+   -- SELECT G.Id,BookingId,BedId,RoomId,RoomNo,FirstName,CAST(CAST(G.ChkInDt AS NVARCHAR)+' '+G.ExpectChkInTime+' '+G.AMPM as DATETIME) ChkInDt,  
+   -- CONVERT(NVARCHAR,ChkOutDt,103) ChkOutDt,CurrentStatus,'Single','Bed',1,G.ExpectChkInTime,G.AMPM,
+   -- G.CurrentStatus    
+   -- FROM WRBHBBooking B     
+   -- JOIN WRBHBBedBookingPropertyAssingedGuest G ON B.Id =G.BookingId AND  
+   -- CONVERT(DATE,ChkInDt,103) > CONVERT(DATE,@Pram3,103)  
+   -- --AND CONVERT(DATE,@Pram4,103) AND   
+   -- AND CONVERT(DATE,ChkOutDt,103) < CONVERT(DATE,@Pram4,103)  
+   -- AND BookingPropertyId=@Pram2  
+   -- AND G.IsActive=1 AND G.IsDeleted=0   
+   -- JOIN WRBHBPropertyRooms R WITH(NOLOCK) ON R.Id=G.RoomId AND R.IsActive=1 AND R.IsDeleted=0  
+   -- AND G.BookingPropertyId=R.PropertyId --AND R.RoomStatus='Active'  
+   -- WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
+   -- AND B.Id NOT IN(SELECT BookingId FROM #BookingBed BB WHERE BB.BedId=G.BedId)  
+   -- --AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.BedId=G.BedId AND CO.IsActive=1 AND CO.IsDeleted=0)  
+   -- GROUP BY G.Id,BookingId,BedId,RoomId,RoomNo,FirstName,ChkInDt,ChkOutDt,G.ExpectChkInTime,G.AMPM,G.CurrentStatus    
       
-    --GET DATA FROM BOOKING APARTMENT LEVEL  
-    INSERT INTO #BookingApartment(Id,BookingId,BedId,RoomId,RoomName,GuestName,CheckInDt,CheckOutDt,  
-    Type,Occupancy,BookingLevel,GuestCount,CheckInTime,TimeType,BStatus)   
-    SELECT G.Id,BookingId,0,R.Id,RoomType,FirstName,CAST(CAST(G.ChkInDt AS NVARCHAR)+' '+G.ExpectChkInTime+' '+G.AMPM as DATETIME) ChkInDt,  
-    CONVERT(NVARCHAR,ChkOutDt,103) ChkOutDt,CurrentStatus,'Double','Apartment',1,G.ExpectChkInTime,G.AMPM,G.CurrentStatus     
-    FROM WRBHBBooking B     
-    JOIN WRBHBApartmentBookingPropertyAssingedGuest G ON B.Id =G.BookingId  
-    AND CONVERT(DATE,ChkInDt,103) BETWEEN CONVERT(DATE,@Pram3,103)  
-    AND CONVERT(DATE,@Pram4,103) AND      
-    --CONVERT(DATE,ChkOutDt,103) BETWEEN CONVERT(DATE,@Pram3,103)  
-    --AND CONVERT(DATE,@Pram4,103) --  
-    BookingPropertyId=@Pram2  
-    AND G.IsActive=1 AND G.IsDeleted=0  
-    JOIN dbo.WRBHBPropertyApartment A WITH(NOLOCK) ON  G.BookingPropertyId=A.PropertyId AND G.ApartmentId=A.Id  
-    AND A.IsActive=1 AND B.IsDeleted=0  
-    JOIN WRBHBPropertyRooms R ON R.ApartmentId=G.ApartmentId AND R.IsActive=1 AND R.IsDeleted=0 --AND R.RoomStatus='Active'  
-    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
-    --AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.ApartmentId=G.ApartmentId AND CO.IsActive=1 AND CO.IsDeleted=0)  
-    GROUP BY G.Id,BookingId,R.Id,RoomType,FirstName,ChkInDt,ChkOutDt,G.ExpectChkInTime,G.AMPM,G.CurrentStatus    
+   -- --GET DATA FROM BOOKING APARTMENT LEVEL  
+   -- INSERT INTO #BookingApartment(Id,BookingId,BedId,RoomId,RoomName,GuestName,CheckInDt,CheckOutDt,  
+   -- Type,Occupancy,BookingLevel,GuestCount,CheckInTime,TimeType,BStatus)   
+   -- SELECT G.Id,BookingId,0,R.Id,RoomType,FirstName,CAST(CAST(G.ChkInDt AS NVARCHAR)+' '+G.ExpectChkInTime+' '+G.AMPM as DATETIME) ChkInDt,  
+   -- CONVERT(NVARCHAR,ChkOutDt,103) ChkOutDt,CurrentStatus,'Double','Apartment',1,G.ExpectChkInTime,G.AMPM,G.CurrentStatus     
+   -- FROM WRBHBBooking B     
+   -- JOIN WRBHBApartmentBookingPropertyAssingedGuest G ON B.Id =G.BookingId  
+   -- AND CONVERT(DATE,ChkInDt,103) BETWEEN CONVERT(DATE,@Pram3,103)  
+   -- AND CONVERT(DATE,@Pram4,103) AND      
+   -- --CONVERT(DATE,ChkOutDt,103) BETWEEN CONVERT(DATE,@Pram3,103)  
+   -- --AND CONVERT(DATE,@Pram4,103) --  
+   -- BookingPropertyId=@Pram2  
+   -- AND G.IsActive=1 AND G.IsDeleted=0  
+   -- JOIN dbo.WRBHBPropertyApartment A WITH(NOLOCK) ON  G.BookingPropertyId=A.PropertyId AND G.ApartmentId=A.Id  
+   -- AND A.IsActive=1 AND B.IsDeleted=0  
+   -- JOIN WRBHBPropertyRooms R ON R.ApartmentId=G.ApartmentId AND R.IsActive=1 AND R.IsDeleted=0 --AND R.RoomStatus='Active'  
+   -- WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
+   -- --AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.ApartmentId=G.ApartmentId AND CO.IsActive=1 AND CO.IsDeleted=0)  
+   -- GROUP BY G.Id,BookingId,R.Id,RoomType,FirstName,ChkInDt,ChkOutDt,G.ExpectChkInTime,G.AMPM,G.CurrentStatus    
       
       
-    INSERT INTO #BookingApartment(Id,BookingId,BedId,RoomId,RoomName,GuestName,CheckInDt,CheckOutDt,  
-    Type,Occupancy,BookingLevel,GuestCount,CheckInTime,TimeType,BStatus)   
-    SELECT G.Id,BookingId,0,R.Id,RoomType,FirstName,CAST(CAST(G.ChkInDt AS NVARCHAR)+' '+G.ExpectChkInTime+' '+G.AMPM as DATETIME) ChkInDt,  
-    CONVERT(NVARCHAR,ChkOutDt,103) ChkOutDt,CurrentStatus,'Double','Apartment',1,G.ExpectChkInTime,G.AMPM,
-    G.CurrentStatus     
-    FROM WRBHBBooking B     
-    JOIN WRBHBApartmentBookingPropertyAssingedGuest G ON B.Id =G.BookingId AND  
-    --AND CONVERT(DATE,ChkInDt,103) BETWEEN CONVERT(DATE,@Pram3,103)  
-    -- AND CONVERT(DATE,@Pram4,103) AND      
-    CONVERT(DATE,ChkOutDt,103) BETWEEN CONVERT(DATE,@Pram3,103)  
-    AND CONVERT(DATE,@Pram4,103) AND  
-    BookingPropertyId=@Pram2  
-    AND G.IsActive=1 AND G.IsDeleted=0  
-    JOIN dbo.WRBHBPropertyApartment A WITH(NOLOCK) ON  G.BookingPropertyId=A.PropertyId AND G.ApartmentId=A.Id  
-    AND A.IsActive=1 AND B.IsDeleted=0  
-    JOIN WRBHBPropertyRooms R ON R.ApartmentId=G.ApartmentId AND R.IsActive=1 AND R.IsDeleted=0 --AND R.RoomStatus='Active'  
-    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
-    AND B.Id NOT IN(SELECT BookingId FROM #BookingApartment BA WHERE BA.RoomId=R.Id )  
-    --AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.ApartmentId=G.ApartmentId AND CO.IsActive=1 AND CO.IsDeleted=0)  
-    GROUP BY G.Id,BookingId,R.Id,RoomType,FirstName,ChkInDt,ChkOutDt,G.ExpectChkInTime,G.AMPM,
-    G.CurrentStatus    
+   -- INSERT INTO #BookingApartment(Id,BookingId,BedId,RoomId,RoomName,GuestName,CheckInDt,CheckOutDt,  
+   -- Type,Occupancy,BookingLevel,GuestCount,CheckInTime,TimeType,BStatus)   
+   -- SELECT G.Id,BookingId,0,R.Id,RoomType,FirstName,CAST(CAST(G.ChkInDt AS NVARCHAR)+' '+G.ExpectChkInTime+' '+G.AMPM as DATETIME) ChkInDt,  
+   -- CONVERT(NVARCHAR,ChkOutDt,103) ChkOutDt,CurrentStatus,'Double','Apartment',1,G.ExpectChkInTime,G.AMPM,
+   -- G.CurrentStatus     
+   -- FROM WRBHBBooking B     
+   -- JOIN WRBHBApartmentBookingPropertyAssingedGuest G ON B.Id =G.BookingId AND  
+   -- --AND CONVERT(DATE,ChkInDt,103) BETWEEN CONVERT(DATE,@Pram3,103)  
+   -- -- AND CONVERT(DATE,@Pram4,103) AND      
+   -- CONVERT(DATE,ChkOutDt,103) BETWEEN CONVERT(DATE,@Pram3,103)  
+   -- AND CONVERT(DATE,@Pram4,103) AND  
+   -- BookingPropertyId=@Pram2  
+   -- AND G.IsActive=1 AND G.IsDeleted=0  
+   -- JOIN dbo.WRBHBPropertyApartment A WITH(NOLOCK) ON  G.BookingPropertyId=A.PropertyId AND G.ApartmentId=A.Id  
+   -- AND A.IsActive=1 AND B.IsDeleted=0  
+   -- JOIN WRBHBPropertyRooms R ON R.ApartmentId=G.ApartmentId AND R.IsActive=1 AND R.IsDeleted=0 --AND R.RoomStatus='Active'  
+   -- WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
+   -- AND B.Id NOT IN(SELECT BookingId FROM #BookingApartment BA WHERE BA.RoomId=R.Id )  
+   -- --AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.ApartmentId=G.ApartmentId AND CO.IsActive=1 AND CO.IsDeleted=0)  
+   -- GROUP BY G.Id,BookingId,R.Id,RoomType,FirstName,ChkInDt,ChkOutDt,G.ExpectChkInTime,G.AMPM,
+   -- G.CurrentStatus    
       
-    INSERT INTO #BookingApartment(Id,BookingId,BedId,RoomId,RoomName,GuestName,CheckInDt,CheckOutDt,  
-    Type,Occupancy,BookingLevel,GuestCount,CheckInTime,TimeType,BStatus)   
-    SELECT G.Id,BookingId,0,R.Id,RoomType,FirstName,CAST(CAST(G.ChkInDt AS NVARCHAR)+' '+G.ExpectChkInTime+' '+G.AMPM as DATETIME) ChkInDt,  
-    CONVERT(NVARCHAR,ChkOutDt,103) ChkOutDt,CurrentStatus,'Double','Apartment',1,G.ExpectChkInTime,G.AMPM,
-    G.CurrentStatus     
-    FROM WRBHBBooking B     
-    JOIN WRBHBApartmentBookingPropertyAssingedGuest G ON B.Id =G.BookingId AND  
-    CONVERT(DATE,ChkInDt,103) > CONVERT(DATE,@Pram3,103)  
-    --AND CONVERT(DATE,@Pram4,103) AND   
-    AND CONVERT(DATE,ChkOutDt,103) < CONVERT(DATE,@Pram4,103) AND  
-    BookingPropertyId=@Pram2  
-    AND G.IsActive=1 AND G.IsDeleted=0  
-    JOIN dbo.WRBHBPropertyApartment A WITH(NOLOCK) ON  G.BookingPropertyId=A.PropertyId AND G.ApartmentId=A.Id  
-    AND A.IsActive=1 AND B.IsDeleted=0  
-    JOIN WRBHBPropertyRooms R ON R.ApartmentId=G.ApartmentId AND R.IsActive=1 AND R.IsDeleted=0 --AND R.RoomStatus='Active'  
-    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
-    AND B.Id NOT IN(SELECT BookingId FROM #BookingApartment BA WHERE BA.RoomId=R.Id )  
-    --AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.ApartmentId=G.ApartmentId AND CO.IsActive=1 AND CO.IsDeleted=0)  
-    GROUP BY G.Id,BookingId,R.Id,RoomType,FirstName,ChkInDt,ChkOutDt,G.ExpectChkInTime,G.AMPM ,
-    G.CurrentStatus   
+   -- INSERT INTO #BookingApartment(Id,BookingId,BedId,RoomId,RoomName,GuestName,CheckInDt,CheckOutDt,  
+   -- Type,Occupancy,BookingLevel,GuestCount,CheckInTime,TimeType,BStatus)   
+   -- SELECT G.Id,BookingId,0,R.Id,RoomType,FirstName,CAST(CAST(G.ChkInDt AS NVARCHAR)+' '+G.ExpectChkInTime+' '+G.AMPM as DATETIME) ChkInDt,  
+   -- CONVERT(NVARCHAR,ChkOutDt,103) ChkOutDt,CurrentStatus,'Double','Apartment',1,G.ExpectChkInTime,G.AMPM,
+   -- G.CurrentStatus     
+   -- FROM WRBHBBooking B     
+   -- JOIN WRBHBApartmentBookingPropertyAssingedGuest G ON B.Id =G.BookingId AND  
+   -- CONVERT(DATE,ChkInDt,103) > CONVERT(DATE,@Pram3,103)  
+   -- --AND CONVERT(DATE,@Pram4,103) AND   
+   -- AND CONVERT(DATE,ChkOutDt,103) < CONVERT(DATE,@Pram4,103) AND  
+   -- BookingPropertyId=@Pram2  
+   -- AND G.IsActive=1 AND G.IsDeleted=0  
+   -- JOIN dbo.WRBHBPropertyApartment A WITH(NOLOCK) ON  G.BookingPropertyId=A.PropertyId AND G.ApartmentId=A.Id  
+   -- AND A.IsActive=1 AND B.IsDeleted=0  
+   -- JOIN WRBHBPropertyRooms R ON R.ApartmentId=G.ApartmentId AND R.IsActive=1 AND R.IsDeleted=0 --AND R.RoomStatus='Active'  
+   -- WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
+   -- AND B.Id NOT IN(SELECT BookingId FROM #BookingApartment BA WHERE BA.RoomId=R.Id )  
+   -- --AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.ApartmentId=G.ApartmentId AND CO.IsActive=1 AND CO.IsDeleted=0)  
+   -- GROUP BY G.Id,BookingId,R.Id,RoomType,FirstName,ChkInDt,ChkOutDt,G.ExpectChkInTime,G.AMPM ,
+   -- G.CurrentStatus   
       
-    INSERT INTO #BookingApartment(Id,BookingId,BedId,RoomId,RoomName,GuestName,CheckInDt,CheckOutDt,  
-    Type,Occupancy,BookingLevel,GuestCount,CheckInTime,TimeType,BStatus)   
-    SELECT G.Id,BookingId,0,R.Id,RoomType,FirstName,CAST(CAST(G.ChkInDt AS NVARCHAR)+' '+G.ExpectChkInTime+' '+G.AMPM as DATETIME) ChkInDt,  
-    CONVERT(NVARCHAR,ChkOutDt,103) ChkOutDt,CurrentStatus,'Double','Apartment',1,G.ExpectChkInTime,G.AMPM ,
-    G.CurrentStatus    
-    FROM WRBHBBooking B     
-    JOIN WRBHBApartmentBookingPropertyAssingedGuest G ON B.Id =G.BookingId AND  
-    CONVERT(DATE,ChkInDt,103) < CONVERT(DATE,@Pram3,103)  
-    --AND CONVERT(DATE,@Pram4,103) AND   
-    AND CONVERT(DATE,ChkOutDt,103) > CONVERT(DATE,@Pram4,103) AND  
-    BookingPropertyId=@Pram2  
-    AND G.IsActive=1 AND G.IsDeleted=0  
-    JOIN dbo.WRBHBPropertyApartment A WITH(NOLOCK) ON  G.BookingPropertyId=A.PropertyId AND G.ApartmentId=A.Id  
-    AND A.IsActive=1 AND B.IsDeleted=0  
-    JOIN WRBHBPropertyRooms R ON R.ApartmentId=G.ApartmentId AND R.IsActive=1 AND R.IsDeleted=0 --AND R.RoomStatus='Active'  
-    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
-    AND B.Id NOT IN(SELECT BookingId FROM #BookingApartment BA WHERE BA.RoomId=R.Id)  
-    --AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.ApartmentId=G.ApartmentId AND CO.IsActive=1 AND CO.IsDeleted=0)  
-    GROUP BY G.Id,BookingId,R.Id,RoomType,FirstName,ChkInDt,ChkOutDt,G.ExpectChkInTime,G.AMPM,
-    G.CurrentStatus       
+   -- INSERT INTO #BookingApartment(Id,BookingId,BedId,RoomId,RoomName,GuestName,CheckInDt,CheckOutDt,  
+   -- Type,Occupancy,BookingLevel,GuestCount,CheckInTime,TimeType,BStatus)   
+   -- SELECT G.Id,BookingId,0,R.Id,RoomType,FirstName,CAST(CAST(G.ChkInDt AS NVARCHAR)+' '+G.ExpectChkInTime+' '+G.AMPM as DATETIME) ChkInDt,  
+   -- CONVERT(NVARCHAR,ChkOutDt,103) ChkOutDt,CurrentStatus,'Double','Apartment',1,G.ExpectChkInTime,G.AMPM ,
+   -- G.CurrentStatus    
+   -- FROM WRBHBBooking B     
+   -- JOIN WRBHBApartmentBookingPropertyAssingedGuest G ON B.Id =G.BookingId AND  
+   -- CONVERT(DATE,ChkInDt,103) < CONVERT(DATE,@Pram3,103)  
+   -- --AND CONVERT(DATE,@Pram4,103) AND   
+   -- AND CONVERT(DATE,ChkOutDt,103) > CONVERT(DATE,@Pram4,103) AND  
+   -- BookingPropertyId=@Pram2  
+   -- AND G.IsActive=1 AND G.IsDeleted=0  
+   -- JOIN dbo.WRBHBPropertyApartment A WITH(NOLOCK) ON  G.BookingPropertyId=A.PropertyId AND G.ApartmentId=A.Id  
+   -- AND A.IsActive=1 AND B.IsDeleted=0  
+   -- JOIN WRBHBPropertyRooms R ON R.ApartmentId=G.ApartmentId AND R.IsActive=1 AND R.IsDeleted=0 --AND R.RoomStatus='Active'  
+   -- WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
+   -- AND B.Id NOT IN(SELECT BookingId FROM #BookingApartment BA WHERE BA.RoomId=R.Id)  
+   -- --AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.ApartmentId=G.ApartmentId AND CO.IsActive=1 AND CO.IsDeleted=0)  
+   -- GROUP BY G.Id,BookingId,R.Id,RoomType,FirstName,ChkInDt,ChkOutDt,G.ExpectChkInTime,G.AMPM,
+   -- G.CurrentStatus       
      
-   END  
+   --END  
       
     --Booking Guest Count ROOM LEVEL  
     INSERT INTO #BookingCount(BookingId,RoomId,GuestCount,BookingLevel)  
@@ -816,8 +840,8 @@ IF @Action ='Property'
      
      
    --Get rooms are dedicated or non dedicater  
-   IF  @PropertyType='Internal Property'  
-   BEGIN  
+   --IF  @PropertyType='Internal Property'  
+   --BEGIN  
     INSERT INTO #NDDCount(RoomId,PropertyId)  
     SELECT R.Id,R.PropertyId FROM dbo.WRBHBContractManagementAppartment CA  
     JOIN dbo.WRBHBPropertyRooms R WITH(NOLOCK) ON  CA.ApartmentId=R.ApartmentId AND CA.PropertyId=@Pram2  
@@ -830,17 +854,17 @@ IF @Action ='Property'
     SELECT CR.RoomId,CR.PropertyId FROM dbo.WRBHBContractManagementTariffAppartment CR  
     JOIN dbo.WRBHBContractManagement C ON C.Id=CR.ContractId AND LTRIM(ContractType)IN(LTRIM(' Dedicated Contracts '),LTRIM(' Managed Contracts '))   
     AND C.IsActive=1 AND C.IsDeleted=0  
-    WHERE CR.PropertyId=@Pram2 AND CR.IsActive=1 AND CR.IsDeleted=0  
-   END  
-   ELSE  
-   BEGIN  
-    INSERT INTO #NDDCount(RoomId,PropertyId)  
-    SELECT R.Id,R.PropertyId FROM dbo.WRBHBPropertyBlocks B    
-    JOIN dbo.WRBHBPropertyRooms R WITH(NOLOCK) ON B.Id=R.BlockId    
-    AND B.PropertyId=R.PropertyId AND R.IsActive=1 AND R.IsDeleted=0      
-    WHERE B.PropertyId=@Pram2 AND  B.IsActive=1 AND B.IsDeleted=0   
-    ORDER BY B.BlockName,R.RoomNo ASC  
-   END  
+    WHERE CR.PropertyId=@Pram2 AND CR.IsActive=1 AND CR.IsDeleted=0  AND CR.RoomId!=0 
+   --END  
+   --ELSE  
+   --BEGIN  
+   -- INSERT INTO #NDDCount(RoomId,PropertyId)  
+   -- SELECT R.Id,R.PropertyId FROM dbo.WRBHBPropertyBlocks B    
+   -- JOIN dbo.WRBHBPropertyRooms R WITH(NOLOCK) ON B.Id=R.BlockId    
+   -- AND B.PropertyId=R.PropertyId AND R.IsActive=1 AND R.IsDeleted=0      
+   -- WHERE B.PropertyId=@Pram2 AND  B.IsActive=1 AND B.IsDeleted=0   
+   -- ORDER BY B.BlockName,R.RoomNo ASC  
+   --END  
      
    INSERT INTO #OccupancyFinal(Id,BedId,BookingId,RoomId,RoomName,GuestName,CheckInDt,CheckOutDt,Type,Occupancy,RoomType,  
    BookingLevel,BookingCode,ClientName,Split,GuestCount)  
@@ -991,8 +1015,8 @@ IF @Action ='Property'
      
      
     --TABLE 1 ROOMS IN THAT GIVEN PROPERTY  
-   IF  @PropertyType='Internal Property'  
-   BEGIN  
+   --IF  @PropertyType='Internal Property'  
+   --BEGIN  
     SELECT B.BlockName+'-'+A.ApartmentNo+'-'+R.RoomNo as Room,R.Id FROM dbo.WRBHBPropertyBlocks B     
     JOIN dbo.WRBHBPropertyApartment A WITH(NOLOCK) ON B.Id=A.BlockId AND B.PropertyId=A.PropertyId   
     AND A.IsActive=1 AND A.IsDeleted=0 AND A.SellableApartmentType!='HUB' AND a.Status='Active'  
@@ -1000,36 +1024,55 @@ IF @Action ='Property'
     AND A.PropertyId=R.PropertyId AND R.IsActive=1 AND R.IsDeleted=0 AND R.RoomStatus='Active'     
     WHERE B.PropertyId=@Pram2 AND  B.IsActive=1 AND B.IsDeleted=0   
     ORDER BY B.BlockName,A.ApartmentNo,R.RoomNo ASC  
-   END  
-   ELSE  
-   BEGIN  
-    SELECT B.BlockName+'-'+R.RoomNo as Room,R.Id FROM dbo.WRBHBPropertyBlocks B    
-    JOIN dbo.WRBHBPropertyRooms R WITH(NOLOCK) ON B.Id=R.BlockId    
-    AND B.PropertyId=R.PropertyId AND R.IsActive=1 AND R.IsDeleted=0      
-    WHERE B.PropertyId=@Pram2 AND  B.IsActive=1 AND B.IsDeleted=0   
-    ORDER BY B.BlockName,R.RoomNo ASC  
-   END  
-    --TABLE 2 DEDICATED COUNT  
-   SELECT COUNT(*) DDCount FROM #NDDCount   
-     
-    --TABLE 3 PROPERTY ROOMS COUNT  
+   --END  
+   --ELSE  
+   --BEGIN  
+   -- SELECT B.BlockName+'-'+R.RoomNo as Room,R.Id FROM dbo.WRBHBPropertyBlocks B    
+   -- JOIN dbo.WRBHBPropertyRooms R WITH(NOLOCK) ON B.Id=R.BlockId    
+   -- AND B.PropertyId=R.PropertyId AND R.IsActive=1 AND R.IsDeleted=0      
+   -- WHERE B.PropertyId=@Pram2 AND  B.IsActive=1 AND B.IsDeleted=0   
+   -- ORDER BY B.BlockName,R.RoomNo ASC  
+   --END 
    IF  @PropertyType='Internal Property'  
    BEGIN  
-    SELECT COUNT(*) NDDCount FROM dbo.WRBHBPropertyBlocks B     
-    JOIN dbo.WRBHBPropertyApartment A WITH(NOLOCK) ON B.Id=A.BlockId AND B.PropertyId=A.PropertyId   
-    AND A.IsActive=1 AND A.IsDeleted=0 AND A.SellableApartmentType!='HUB' AND a.Status='Active'  
-    JOIN dbo.WRBHBPropertyRooms R WITH(NOLOCK) ON B.Id=R.BlockId AND A.Id=R.ApartmentId   
-    AND A.PropertyId=R.PropertyId AND R.IsActive=1 AND R.IsDeleted=0 AND R.RoomStatus='Active'    
-    WHERE B.PropertyId=@Pram2 AND  B.IsActive=1 AND B.IsDeleted=0  
+    --TABLE 2 DEDICATED COUNT  
+	   SELECT COUNT(*) DDCount FROM #NDDCount   
+	     
+		--TABLE 3 PROPERTY ROOMS COUNT  
+	   --IF  @PropertyType='Internal Property'  
+	   --BEGIN  
+		SELECT COUNT(*) NDDCount FROM dbo.WRBHBPropertyBlocks B     
+		JOIN dbo.WRBHBPropertyApartment A WITH(NOLOCK) ON B.Id=A.BlockId AND B.PropertyId=A.PropertyId   
+		AND A.IsActive=1 AND A.IsDeleted=0 AND A.SellableApartmentType!='HUB' AND a.Status='Active'  
+		JOIN dbo.WRBHBPropertyRooms R WITH(NOLOCK) ON B.Id=R.BlockId AND A.Id=R.ApartmentId   
+		AND A.PropertyId=R.PropertyId AND R.IsActive=1 AND R.IsDeleted=0 AND R.RoomStatus='Active'    
+		WHERE B.PropertyId=@Pram2 AND  B.IsActive=1 AND B.IsDeleted=0  
    END  
-   ELSE  
-   BEGIN     
-    SELECT COUNT(*) NDDCount FROM dbo.WRBHBPropertyBlocks B    
-    JOIN dbo.WRBHBPropertyRooms R WITH(NOLOCK) ON B.Id=R.BlockId    
-    AND B.PropertyId=R.PropertyId AND R.IsActive=1 AND R.IsDeleted=0      
-    WHERE B.PropertyId=@Pram2 AND  B.IsActive=1 AND B.IsDeleted=0   
+  ELSE  
+  BEGIN  
+		SELECT COUNT(*) DDCount  FROM dbo.WRBHBPropertyBlocks B     
+		JOIN dbo.WRBHBPropertyApartment A WITH(NOLOCK) ON B.Id=A.BlockId AND B.PropertyId=A.PropertyId   
+		AND A.IsActive=1 AND A.IsDeleted=0 AND A.SellableApartmentType!='HUB' AND a.Status='Active'  
+		JOIN dbo.WRBHBPropertyRooms R WITH(NOLOCK) ON B.Id=R.BlockId AND A.Id=R.ApartmentId   
+		AND A.PropertyId=R.PropertyId AND R.IsActive=1 AND R.IsDeleted=0 AND R.RoomStatus='Active'    
+		WHERE B.PropertyId=@Pram2 AND  B.IsActive=1 AND B.IsDeleted=0  
+	    
+		 --TABLE 2 DEDICATED COUNT 
+		 SELECT COUNT(*) NDDCount  FROM dbo.WRBHBPropertyBlocks B     
+		JOIN dbo.WRBHBPropertyApartment A WITH(NOLOCK) ON B.Id=A.BlockId AND B.PropertyId=A.PropertyId   
+		AND A.IsActive=1 AND A.IsDeleted=0 AND A.SellableApartmentType!='HUB' AND a.Status='Active'  
+		JOIN dbo.WRBHBPropertyRooms R WITH(NOLOCK) ON B.Id=R.BlockId AND A.Id=R.ApartmentId   
+		AND A.PropertyId=R.PropertyId AND R.IsActive=1 AND R.IsDeleted=0 AND R.RoomStatus='Active'    
+		WHERE B.PropertyId=@Pram2 AND  B.IsActive=1 AND B.IsDeleted=0 
+	    --SELECT COUNT(*) NDDCount FROM #NDDCount
+    
+  END   
+   -- SELECT COUNT(*) NDDCount FROM dbo.WRBHBPropertyBlocks B    
+   -- JOIN dbo.WRBHBPropertyRooms R WITH(NOLOCK) ON B.Id=R.BlockId    
+   -- AND B.PropertyId=R.PropertyId AND R.IsActive=1 AND R.IsDeleted=0      
+   -- WHERE B.PropertyId=@Pram2 AND  B.IsActive=1 AND B.IsDeleted=0   
       
-   END  
+   --END  
     -- TABLE 4 OCCUPANCY DATE  
    SELECT DATA FROM #OccupancyData  
      
@@ -1042,33 +1085,64 @@ IF @Action ='Property'
    SELECT RoomId,o.DT,RoomType,o.CheckOutDt FROM #OccupancyFinalCount1 o  
    JOIN #DateSplit s ON o.DT=s.DT       
    GROUP BY RoomId,o.DT,RoomType,o.CheckOutDt  
-     
-   ---TABLE 6 GROUP BY NonDedicated OCCUPANCY ROOM  
-   INSERT INTO  #DateROOMS(RoomId,DT,RoomType)  
-   SELECT RoomId,DT,RoomType FROM #DateROOM  
-   WHERE RoomType='NonDedicated' AND DT!=CheckOutDate  
-   GROUP BY DT,RoomType,RoomId  
-   ORDER BY CONVERT(DATE,DT,103) ASC   
-     
-   SELECT COUNT(*) NDDCount,DT,RoomType   
-   FROM #DateROOMS  
-   GROUP BY DT,RoomType  
-     
-   ---TABLE 7 GROUP BY NonDedicated OCCUPANCY ROOM  
-   INSERT INTO  #DateROOMS1(RoomId,DT,RoomType)  
-   SELECT RoomId,DT,RoomType FROM #DateROOM  
-   WHERE RoomType!='NonDedicated' AND DT!=CheckOutDate  
-   GROUP BY DT,RoomType,RoomId  
-   ORDER BY CONVERT(DATE,DT,103) ASC   
-     
-   SELECT COUNT(*) DDCount,DT,RoomType   
-   FROM #DateROOMS1  
-   GROUP BY DT,RoomType  
-     
+   
+   IF  @PropertyType='Internal Property'  
+   BEGIN    
+	   ---TABLE 6 GROUP BY NonDedicated OCCUPANCY ROOM  
+	   INSERT INTO  #DateROOMS(RoomId,DT,RoomType)  
+	   SELECT RoomId,DT,RoomType FROM #DateROOM  
+	   WHERE RoomType='NonDedicated' AND DT!=CheckOutDate  
+	   GROUP BY DT,RoomType,RoomId  
+	   ORDER BY CONVERT(DATE,DT,103) ASC   
+	     
+	   SELECT COUNT(*) NDDCount,DT,RoomType   
+	   FROM #DateROOMS  
+	   GROUP BY DT,RoomType  
+	     
+	   ---TABLE 7 GROUP BY NonDedicated OCCUPANCY ROOM  
+	   INSERT INTO  #DateROOMS1(RoomId,DT,RoomType)  
+	   SELECT RoomId,DT,RoomType FROM #DateROOM  
+	   WHERE RoomType!='NonDedicated' AND DT!=CheckOutDate  
+	   GROUP BY DT,RoomType,RoomId  
+	   ORDER BY CONVERT(DATE,DT,103) ASC   
+	     
+	   SELECT COUNT(*) DDCount,DT,RoomType   
+	   FROM #DateROOMS1  
+	   GROUP BY DT,RoomType  
+   END
+   ELSE
+   BEGIN
+		 ---TABLE 6 GROUP BY NonDedicated OCCUPANCY ROOM  
+	   INSERT INTO  #DateROOMS1(RoomId,DT,RoomType)  
+	   SELECT RoomId,DT,RoomType FROM #DateROOM  
+	   WHERE RoomType!='NonDedicated' AND DT!=CheckOutDate  
+	   GROUP BY DT,RoomType,RoomId  
+	   ORDER BY CONVERT(DATE,DT,103) ASC   
+	     
+	   SELECT COUNT(*) NDDCount ,DT,RoomType   
+	   FROM #DateROOMS1  
+	   GROUP BY DT,RoomType 
+	   
+	   ---TABLE 7 GROUP BY NonDedicated OCCUPANCY ROOM  
+	   INSERT INTO  #DateROOMS(RoomId,DT,RoomType)  
+	   SELECT RoomId,DT,RoomType FROM #DateROOM  
+	   WHERE RoomType='NonDedicated' AND DT!=CheckOutDate  
+	   GROUP BY DT,RoomType,RoomId  
+	   ORDER BY CONVERT(DATE,DT,103) ASC   
+	     
+	   SELECT COUNT(*) DDCount,DT,RoomType   
+	   FROM #DateROOMS  
+	   GROUP BY DT,RoomType 
+   
+   
+   END  
    ---TABLE 8 GROUP BY DATE WISE Guest  
    SELECT SUM(GuestCount) NOGuest,DT  
    FROM #OccupancyFinalCount1 O  
    GROUP BY DT  
+   
+   ---TABLE 9 GROUP BY DATE WISE Guest  
+   select @PropertyType PropertyType
      
  END  
  END  

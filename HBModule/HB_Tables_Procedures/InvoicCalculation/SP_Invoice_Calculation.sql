@@ -786,7 +786,7 @@ BEGIN
 			TAC,TACPer,Tariff)   
 			SELECT H.BookingId,H.Id,H.RoomId,RoomNo,H.GuestName,CONVERT(NVARCHAR,ArrivalDate,103) ChkInDt,  
 			CONVERT(NVARCHAR,G.ChkOutDt,103) ChkOutDt,'CheckedIn','',Category,P.Id,  
-			ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,  
+			ServicePaymentMode,G.TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,  
 			ISNULL(PA.TAC,0),ISNULL(PA.TACPer,0),H.Tariff   
 			FROM WrbHbCheckInHdr H  
 			JOIN WRBHBProperty P WITH(NOLOCK) ON H.PropertyId= P.Id AND P.IsActive=1 AND P.IsDeleted=0  
@@ -802,7 +802,7 @@ BEGIN
 			AND YEAR(CONVERT(DATE,H.CreatedDate,103))=YEAR(CONVERT(DATE,@CDATE,103)) 
 			GROUP BY H.BookingId,H.Id,H.RoomId,RoomNo,H.GuestName,ArrivalDate,  
 	 		G.ChkOutDt,Category,P.Id,    
-			ServicePaymentMode,TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,PA.TAC,PA.TACPer,H.Tariff
+			ServicePaymentMode,G.TariffPaymentMode,SingleTariff,SingleandMarkup,Markup,PA.TAC,PA.TACPer,H.Tariff
 	     
 			DECLARE @Tariff DECIMAL(27,2),@ChkInDate NVARCHAR(100),@ChkOutDate NVARCHAR(100),@Count INT;  
 			DECLARE @DateDiff int,@i BIGINT,@HR NVARCHAR(100),@RoomId BIGINT,@BookingId BIGINT,@NoOfDays INT,  

@@ -395,7 +395,7 @@ BEGIN
 
 
 
-SELECT GuestName as Name,RoomNo,EmpCode,ApartmentType,BedType,PropertyType,EmailId FROM WRBHBCheckInHdr  
+SELECT GuestName as Name,RoomNo,EmpCode,ApartmentType,BedType,PropertyType,EmailId,Type FROM WRBHBCheckInHdr  
 		WHERE  Id=@CheckInHdrId AND IsActive=1 AND IsDeleted=0 
  
 		CREATE TABLE #LEVEL(ChkInDate NVARCHAR(100),ChkOutDate NVARCHAR(100),Id BIGINT,
@@ -556,7 +556,7 @@ BEGIN
 
 
 
-SELECT GuestName as Name,RoomNo,EmpCode,ApartmentType,BedType,PropertyType,EmailId FROM WRBHBCheckInHdr  
+SELECT GuestName as Name,RoomNo,EmpCode,ApartmentType,BedType,PropertyType,EmailId,Type FROM WRBHBCheckInHdr  
 		WHERE  Id=@CheckInHdrId AND IsActive=1 AND IsDeleted=0 
  
 		CREATE TABLE #LEVELs(ChkInDate NVARCHAR(100),ChkOutDate NVARCHAR(100),Id BIGINT,
@@ -696,7 +696,8 @@ If @BookingLevel = 'Apartment'
 		Id--,ArrivalDate  
 		FROM WRBHBCheckInHdr WHERE Id=@CheckInHdrId;
 		
-		SELECT IntermediateFlag FROM WRBHBChechkOutHdr where Status = 'UnSettled' AND ChkInHdrId=@CheckInHdrId;
+		SELECT IntermediateFlag FROM WRBHBChechkOutHdr where Status = 'UnSettled' AND ChkInHdrId=@CheckInHdrId 
+		and IsActive=1 AND IsDeleted=0;
 END		
 
  END

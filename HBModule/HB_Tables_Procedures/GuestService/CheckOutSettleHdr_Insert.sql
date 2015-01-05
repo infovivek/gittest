@@ -30,8 +30,13 @@ AS
 BEGIN
 
 DECLARE @Id INT,@ChkInHdrId int,@GuestName nvarchar(100),@NoOfDays int,@GuestId nvarchar(100),@BookingId int,
-@RoomId int,@BedId int,@ApartmentId int,@PropertyId int,@Logo NVARCHAR(MAX);
+@RoomId int,@BedId int,@ApartmentId int,@PropertyId int,@Logo NVARCHAR(MAX),@TariffPaymentMode NVARCHAR(100);
 SET @LOGO=(SELECT Logo FROM WRBHBCompanyMaster)
+SET @GuestId=(SELECT GuestId FROM WRBHBChechkOutHdr where Id=@ChkOutHdrId)
+SET @BookingId=(SELECT BookingId FROM WRBHBChechkOutHdr where Id=@ChkOutHdrId)
+SET @BedId=(SELECT BedId FROM WRBHBChechkOutHdr where Id=@ChkOutHdrId)
+SET @ApartmentId=(SELECT ApartmentId FROM WRBHBChechkOutHdr where Id=@ChkOutHdrId)
+
 
  -- INSERT,
 INSERT INTO WRBHBCheckOutSettleHdr(ChkOutHdrId,PayeeName,Address,Consolidated,
@@ -56,6 +61,23 @@ ModifiedBy=@CreatedBy,ModifiedDate=GETDATE(),
 Status= 'CheckOut',Flag=1
 
 WHERE  Id =@ChkOutHdrId --and GuestId=@GuestId and PropertyId =@PropertyId;
+
+ 
+
+UPDATE WRBHBBookingPropertyAssingedGuest SET CurrentStatus = 'CheckOut' ,
+ CheckOutHdrId = @ChkOutHdrId
+ WHERE BookingId=@BookingId and 
+ RoomCaptured=(SELECT TOP 1 RoomCaptured FROM WRBHBBookingPropertyAssingedGuest
+ WHERE BookingId=@BookingId and GuestId=@GuestId
+ ORDER BY Id ASC);
+ 
+ UPDATE WRBHBBedBookingPropertyAssingedGuest SET CurrentStatus = 'CheckOut' 
+ WHERE BookingId=@BookingId and  BedId =@BedId AND -- GuestId=@GuestId and
+ IsActive= 1 and IsDeleted = 0;
+ 
+ UPDATE WRBHBApartmentBookingPropertyAssingedGuest SET CurrentStatus = 'CheckOut' 
+ WHERE BookingId=@BookingId and  ApartmentId =@ApartmentId AND --GuestId=@GuestId and
+ IsActive= 1 and IsDeleted = 0;
 
 
 

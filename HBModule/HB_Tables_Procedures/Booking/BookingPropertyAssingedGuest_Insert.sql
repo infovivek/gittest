@@ -91,12 +91,19 @@ BEGIN
    @RackTriple = 0,@ApartmentId = ApartmentId
    FROM WRBHBPropertyRooms WHERE Id = @RoomId;
   END
+ IF @PropertyType = 'CPP'
+  BEGIN
+   SELECT @LTRack = LTRack,@LTAgreed = LTAgreed,@STAgreed = STAgreed 
+   FROM WRBHBBookingProperty 
+   WHERE Id = @BookingPropertyTableId;
+  END
  IF @PropertyType = 'ExP' AND @GetType = 'Property'
   BEGIN
+   SELECT @LTRack = LTRack,@LTAgreed = LTAgreed,@STAgreed = STAgreed 
+   FROM WRBHBBookingProperty 
+   WHERE Id = @BookingPropertyTableId;
    SELECT TOP 1 @RackSingle = ISNULL(R.Single,0),@RackDouble = ISNULL(R.RDouble,0),
-   @RackTriple = ISNULL(R.Triple,0),@LTAgreed = ISNULL(R.LTAgreed,0),
-   @LTRack = ISNULL(R.LTRack,0),@STAgreed = ISNULL(R.STAgreed,0),
-   @STRack = ISNULL(R.STRack,0)
+   @RackTriple = ISNULL(R.Triple,0)
    FROM WRBHBPropertyAgreements A
    LEFT OUTER JOIN WRBHBPropertyAgreementsRoomCharges R
    WITH(NOLOCK)ON R.AgreementId = A.Id

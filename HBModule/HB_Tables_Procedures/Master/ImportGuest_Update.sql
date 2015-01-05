@@ -47,6 +47,7 @@ CREATE PROCEDURE [dbo].[Sp_ImportGuest_Update]
 )
 AS
 BEGIN
+--THIS IS ARUN, AM USING THIS PRC FOR ADDCLIENT GUEST PLEASE ASK ME AND CHANGE
 DECLARE @Identity int
 Update WRBHBClientManagementAddClientGuest SET CompanyName=@CompanyName,
 EmpCode=@EmpCode,FirstName=@FirstName,LastName=@LastName,Grade=@Grade,

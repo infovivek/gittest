@@ -64,7 +64,7 @@ BEGIN
 		
 		INSERT INTO  #RentAndMaintenance(OwnerName,PropertyName,ApartmentNo,RentelAmount,TDSAMOUNT,RentType,
 		TIACredit,TIADebit,NTIACredit,NTIADebit,Type)
-		SELECT OwnerName,PropertyName,B.BlockName+'-'+A.ApartmentNo ApartmentNo,RentelAmount,TDSAMOUNT,RentType,
+		SELECT PO.FirstName+' '+PO.Lastname OwnerName,PropertyName,B.BlockName+'-'+A.ApartmentNo ApartmentNo,RentelAmount,TDSAMOUNT,RentType,
 		TIAAdjusementCreditAmount TIACredit,TIAAdjusementDebitAmount TIADebit,
 		NTIAAdjusementCreditAmount NTIACredit,NTIAAdjusementDebitAmount NTIADebit,'Rental'		
 		FROM WRBHBInvoiceRentAmount	R
@@ -82,7 +82,7 @@ BEGIN
 		JOIN WRBHBInvoiceMaintenanceAmount R WITH(NOLOCK) ON  R.RentMonthGeneratedMaintenanceId=S.Id
 		JOIN WRBHBPropertyBlocks B WITH(NOLOCK) ON B.PropertyId=R.PropertyId AND B.IsActive=1 AND B.IsDeleted=0
 		JOIN WRBHBPropertyApartment A	WITH(NOLOCK) ON A.PropertyId=R.PropertyId AND B.Id=A.BlockId
-		AND A.IsActive=1 AND A.IsDeleted=0 and R.ApartmentId=A.Id
+		AND A.IsActive=1 AND A.IsDeleted=0 and R.ApartmentId=A.Id		
 		WHERE MONTH(CONVERT(DATE,LastMonth,103))=MONTH(@DATE) AND
 		YEAR(CONVERT(DATE,LastMonth,103))=YEAR(@DATE)
 		AND RentelAmount!=CAST(0 AS DECIMAL)

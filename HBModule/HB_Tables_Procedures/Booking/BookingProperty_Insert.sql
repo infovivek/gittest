@@ -18,7 +18,7 @@ Reviewed By	: <Reviewed By (Leave it blank)>
 ********************************************************************************************************
 'Name			Date		     Description of Changes
 ********************************************************************************************************	
-
+Sakthi          29 DEC 2014      LT,ST & Taxinclusive ADDED
 *******************************************************************************************************
 */
 CREATE PROCEDURE [dbo].[SP_BookingProperty_Insert](
@@ -54,7 +54,12 @@ CREATE PROCEDURE [dbo].[SP_BookingProperty_Insert](
 @RatePlanCode NVARCHAR(100),
 @RoomTypeCode NVARCHAR(100),
 @PropertyCnt INT,
-@TaxAdded NVARCHAR(100)) 
+@TaxAdded NVARCHAR(100),
+@LTAgreed DECIMAL(27,2),
+@LTRack DECIMAL(27,2),
+@STAgreed DECIMAL(27,2),
+@TaxInclusive BIT,
+@BaseTariff DECIMAL(27,2)) 
 AS
 BEGIN
  --
@@ -123,7 +128,8 @@ BEGIN
  LocalityId,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,
  IsDeleted,RowId,MarkupId,SingleandMarkup1,DoubleandMarkup1,TripleandMarkup1,
  APIHdrId,RatePlanCode,RoomTypeCode,SingleRoomRate,SingleTaxes,
- SingleRoomDiscount,DubRoomRate,DubTaxes,DubRoomDiscount,TACPer,TaxAdded)
+ SingleRoomDiscount,DubRoomRate,DubTaxes,DubRoomDiscount,TACPer,TaxAdded,
+ LTAgreed,LTRack,STAgreed,TaxInclusive,BaseTariff)
  VALUES(@BookingId,@PropertyName,@PropertyId,@GetType,@PropertyType,
  @RoomType,@SingleTariff,@DoubleTariff,@TripleTariff,@SingleandMarkup,
  @DoubleandMarkup,@TripleandMarkup,@Markup,@TAC,@Inclusions,
@@ -131,7 +137,8 @@ BEGIN
  @LocalityId,@UsrId,GETDATE(),@UsrId,GETDATE(),1,0,NEWID(),@MarkupId,
  @SingleandMarkup1,@DoubleandMarkup1,@TripleandMarkup1,@APIHdrId,
  @RatePlanCode,@RoomTypeCode,@SingleRoomRate,@SingleTaxes,@SingleRoomDiscount,
- @DubRoomRate,@DubTaxes,@DubRoomDiscount,@TACPer,@TaxAdded);
+ @DubRoomRate,@DubTaxes,@DubRoomDiscount,@TACPer,@TaxAdded,
+ @LTAgreed,@LTRack,@STAgreed,@TaxInclusive,@BaseTariff);
  SELECT Id,RowId FROM WRBHBBookingProperty WHERE Id=@@IDENTITY;
 END
 GO

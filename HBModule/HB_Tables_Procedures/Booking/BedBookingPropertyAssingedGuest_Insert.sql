@@ -98,6 +98,16 @@ BEGIN
      ORDER BY BookingCode DESC);
     END
    UPDATE WRBHBBooking SET BookingCode=@BookingCode WHERE Id=@BookingId;
+  END
+ --
+ DECLARE @PropertyType NVARCHAR(100) = '';
+ SELECT TOP 1 @PropertyType = PropertyType 
+ FROM WRBHBBedBookingProperty WHERE Id = @BookingPropertyTableId;
+ IF @PropertyType = 'MGH'
+  BEGIN
+   SELECT TOP 1 @BedType = R.RoomNo+' - '+B.BedNO FROM WRBHBPropertyRooms R
+   LEFT OUTER JOIN WRBHBPropertyRoomBeds B WITH(NOLOCK) ON B.RoomId = R.Id
+   WHERE R.Id = @RoomId AND B.Id = @BedId;
   END 
  -- Insert 
  INSERT INTO WRBHBBedBookingPropertyAssingedGuest(BookingId,EmpCode,

@@ -191,6 +191,8 @@ namespace HB.Dao
             ChkOut.Intermediate = doc.SelectSingleNode("HdrXml").Attributes["Intermediate"].Value;
             ChkOut.Preformainvoice = Convert.ToBoolean(doc.SelectSingleNode("HdrXml").Attributes["Preformainvoice"].Value);
             ChkOut.Email = doc.SelectSingleNode("HdrXml").Attributes["Email"].Value;
+            ChkOut.TariffPaymentMode = doc.SelectSingleNode("HdrXml").Attributes["TariffPaymentMode"].Value;
+            ChkOut.BookingType = doc.SelectSingleNode("HdrXml").Attributes["BookingType"].Value;
             if (doc.SelectSingleNode("HdrXml").Attributes["STAgreedAmount"].Value == "")
             {
                 ChkOut.STAgreedAmount = 0;
@@ -338,6 +340,8 @@ namespace HB.Dao
             Cmd.Parameters.Add("@Intermediate", SqlDbType.NVarChar).Value = ChkOut.Intermediate;
             Cmd.Parameters.Add("@Preformainvoice", SqlDbType.Bit).Value = ChkOut.Preformainvoice;
             Cmd.Parameters.Add("@Email", SqlDbType.NVarChar).Value = ChkOut.Email;
+            Cmd.Parameters.Add("@TariffPaymentMode", SqlDbType.NVarChar).Value = ChkOut.TariffPaymentMode;
+            Cmd.Parameters.Add("@BookingType", SqlDbType.NVarChar).Value = ChkOut.BookingType;
             //      Cmd.Parameters.Add("@Flag", SqlDbType.Bit).Value = ChkOut.Flag;
             Cmd.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = user.Id;
             ds = new WrbErpConnection().ExecuteDataSet(Cmd, UserData);

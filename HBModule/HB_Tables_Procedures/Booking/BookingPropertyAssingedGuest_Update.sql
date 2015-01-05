@@ -170,7 +170,7 @@ END
 	END
 	
 	---TABLE 3
-	SELECT BP.PropertyName, ISNULL(PU.UserName,'')UserName,
+	SELECT BP.PropertyName, ISNULL(U.FirstName,'')UserName,
 	ISNULL(U.Email,'')Email,ISNULL(U.MobileNumber,'')PhoneNumber,
 	ISNULL(BP.Email,'') AS Email
 	FROM dbo.WRBHBProperty BP

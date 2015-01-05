@@ -411,117 +411,96 @@ IF @Action = 'Property'
  BEGIN
   IF @Id2 = 123
    BEGIN
-    /*DECLARE @TMPDeletePropertyId BIGINT = 0,@TMPPropertyType NVARCHAR(100)='';
-    SELECT TOP 1 @TMPDeletePropertyId=PropertyId,@TMPPropertyType=PropertyType
-    FROM WRBHBBookingProperty WHERE BookingId=@Id1;
-    IF @TMPPropertyType = 'MMT'
-     BEGIN
-      DELETE FROM WRBHBAPIHotelHeader
-      WHERE HotelId=@TMPDeletePropertyId AND HeaderId=@StateId;
-      DELETE FROM WRBHBAPIRateMealPlanInclusionDtls
-      WHERE HotelId=@TMPDeletePropertyId AND HeaderId=@StateId;
-      DELETE FROM WRBHBAPIRoomRateDtls
-      WHERE HotelId=@TMPDeletePropertyId AND HeaderId=@StateId;
-      DELETE FROM WRBHBAPIRoomTypeDtls
-      WHERE HotelId=@TMPDeletePropertyId AND HeaderId=@StateId;
-      DELETE FROM WRBHBAPITariffDtls
-      WHERE HotelId=@TMPDeletePropertyId AND HeaderId=@StateId;
-     END*/
-    DELETE FROM WRBHBBooking WHERE Id=@Id1;
+    /*DELETE FROM WRBHBBooking WHERE Id=@Id1;
     DELETE FROM WRBHBBookingGuestDetails WHERE BookingId=@Id1;
     DELETE FROM WRBHBBookingProperty WHERE BookingId=@Id1;
-    DELETE FROM WRBHBBookingPropertyAssingedGuest WHERE BookingId=@Id1;
+    DELETE FROM WRBHBBookingPropertyAssingedGuest WHERE BookingId=@Id1;*/
+    UPDATE WRBHBBooking SET IsActive = 0, IsDeleted = 1 WHERE Id=@Id1;
+    UPDATE WRBHBBookingGuestDetails SET IsActive = 0, IsDeleted = 1 
+    WHERE BookingId=@Id1;
+    UPDATE WRBHBBookingProperty SET IsActive = 0, IsDeleted = 1 
+    WHERE BookingId=@Id1;
+    UPDATE WRBHBBookingPropertyAssingedGuest SET IsActive = 0, IsDeleted = 1 
+    WHERE BookingId=@Id1;
    END
   DECLARE @StarFlag BIT=0,@StarId INT=0;
   DECLARE @MinValue DECIMAL(27,2)=0,@MaxValue DECIMAL(27,2)=0;
   DECLARE @StarCnt INT=0;
--- # Contract managed GH #
-  CREATE TABLE #ExistingManagedGHProperty(RoomId BIGINT);
+  CREATE TABLE #BookedRoom(RoomId BIGINT,BookingLevel NVARCHAR(100));
   -- Booked Room Begin
-  INSERT INTO #ExistingManagedGHProperty(RoomId) 
-  SELECT PG.RoomId FROM WRBHBBookingPropertyAssingedGuest PG
+  INSERT INTO #BookedRoom(RoomId,BookingLevel) 
+  SELECT PG.RoomId,'Room' FROM WRBHBBookingPropertyAssingedGuest PG
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
-  PG.BookingPropertyId=P.Id
-  WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Managed G H' AND
-  CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
+  PG.BookingPropertyId = P.Id
+  WHERE PG.IsActive = 1 AND PG.IsDeleted = 0 AND P.IsActive = 1 AND 
+  P.IsDeleted = 0 AND CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
   CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
   CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
-  P.CityId=@CityId GROUP BY PG.RoomId;   
-  /*PG.ChkInDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
-  CONVERT(DATE,@ChkOutDt,103);*/
+  P.CityId = @CityId GROUP BY PG.RoomId;
   -- 
-  INSERT INTO #ExistingManagedGHProperty(RoomId) 
-  SELECT PG.RoomId FROM WRBHBBookingPropertyAssingedGuest PG
+  INSERT INTO #BookedRoom(RoomId,BookingLevel)
+  SELECT PG.RoomId,'Room' FROM WRBHBBookingPropertyAssingedGuest PG
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
-  PG.BookingPropertyId=P.Id
-  WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Managed G H' AND
+  PG.BookingPropertyId = P.Id
+  WHERE PG.IsActive = 1 AND PG.IsDeleted = 0 AND P.IsActive = 1 AND 
+  P.IsDeleted = 0 AND 
   CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) BETWEEN 
   CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
-  P.CityId=@CityId GROUP BY PG.RoomId; 
-  /*PG.ChkOutDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
-  CONVERT(DATE,@ChkOutDt,103);*/
+  P.CityId=@CityId GROUP BY PG.RoomId;
   -- 
-  INSERT INTO #ExistingManagedGHProperty(RoomId) 
-  SELECT PG.RoomId FROM WRBHBBookingPropertyAssingedGuest PG
+  INSERT INTO #BookedRoom(RoomId,BookingLevel)
+  SELECT PG.RoomId,'Room' FROM WRBHBBookingPropertyAssingedGuest PG
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
   PG.BookingPropertyId=P.Id
   WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Managed G H' AND 
+  P.IsDeleted=0 AND
   CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
   CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
   CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
   CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) BETWEEN 
   CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
   P.CityId=@CityId GROUP BY PG.RoomId;
-  /*PG.ChkInDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
-  CONVERT(DATE,@ChkOutDt,103) AND
-  PG.ChkOutDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
-  CONVERT(DATE,@ChkOutDt,103);*/
   -- 
-  INSERT INTO #ExistingManagedGHProperty(RoomId)
-  SELECT PG.RoomId FROM WRBHBBookingPropertyAssingedGuest PG
+  INSERT INTO #BookedRoom(RoomId,BookingLevel)
+  SELECT PG.RoomId,'Room' FROM WRBHBBookingPropertyAssingedGuest PG
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
   PG.BookingPropertyId=P.Id
   WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Managed G H' AND
+  P.IsDeleted=0 AND
   CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
   CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) <= 
   CAST(@ChkInDt AS DATETIME) AND
   CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) >=
-  CAST(@ChkOutDt AS DATETIME) AND P.CityId=@CityId GROUP BY PG.RoomId; 
-  /*PG.ChkInDt <= CONVERT(DATE,@ChkInDt,103) AND
-  PG.ChkOutDt >= CONVERT(DATE,@ChkOutDt,103);*/
+  CAST(@ChkOutDt AS DATETIME) AND P.CityId=@CityId GROUP BY PG.RoomId;
   -- Booked Room End
   -- Booked BED Begin
-  INSERT INTO #ExistingManagedGHProperty(RoomId) 
-  SELECT PG.RoomId FROM WRBHBBedBookingPropertyAssingedGuest PG
+  INSERT INTO #BookedRoom(RoomId,BookingLevel)
+  SELECT PG.RoomId,'Bed' FROM WRBHBBedBookingPropertyAssingedGuest PG
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
   PG.BookingPropertyId=P.Id
   WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Managed G H' AND
+  P.IsDeleted=0 AND
   CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
   CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
   CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
   P.CityId=@CityId GROUP BY PG.RoomId;
   -- 
-  INSERT INTO #ExistingManagedGHProperty(RoomId) 
-  SELECT PG.RoomId FROM WRBHBBedBookingPropertyAssingedGuest PG
+  INSERT INTO #BookedRoom(RoomId,BookingLevel)
+  SELECT PG.RoomId,'Bed' FROM WRBHBBedBookingPropertyAssingedGuest PG
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
   PG.BookingPropertyId=P.Id
   WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Managed G H' AND
+  P.IsDeleted=0 AND
   CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) BETWEEN 
   CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
   P.CityId=@CityId GROUP BY PG.RoomId;
   -- 
-  INSERT INTO #ExistingManagedGHProperty(RoomId) 
-  SELECT PG.RoomId FROM WRBHBBedBookingPropertyAssingedGuest PG
+  INSERT INTO #BookedRoom(RoomId,BookingLevel)
+  SELECT PG.RoomId,'Bed' FROM WRBHBBedBookingPropertyAssingedGuest PG
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
   PG.BookingPropertyId=P.Id
   WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Managed G H' AND 
+  P.IsDeleted=0 AND
   CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
   CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
   CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
@@ -529,18 +508,76 @@ IF @Action = 'Property'
   CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
   P.CityId=@CityId GROUP BY PG.RoomId;
   -- 
-  INSERT INTO #ExistingManagedGHProperty(RoomId)
-  SELECT PG.RoomId FROM WRBHBBedBookingPropertyAssingedGuest PG
+  INSERT INTO #BookedRoom(RoomId,BookingLevel)
+  SELECT PG.RoomId,'Bed' FROM WRBHBBedBookingPropertyAssingedGuest PG
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
   PG.BookingPropertyId=P.Id
   WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Managed G H' AND
+  P.IsDeleted=0 AND 
   CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
   CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) <= 
   CAST(@ChkInDt AS DATETIME) AND
   CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) >=
   CAST(@ChkOutDt AS DATETIME) AND P.CityId=@CityId GROUP BY PG.RoomId;
   -- Booked BED End
+  CREATE TABLE #BookedApartment(ApartmentId BIGINT);
+  -- Booked Apartment Begin
+  INSERT INTO #BookedApartment(ApartmentId)
+  SELECT PG.ApartmentId FROM WRBHBApartmentBookingPropertyAssingedGuest PG
+  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
+  PG.BookingPropertyId=P.Id
+  WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
+  P.IsDeleted=0 AND
+  CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
+  CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
+  CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
+  P.CityId=@CityId GROUP BY PG.ApartmentId;
+  -- 
+  INSERT INTO #BookedApartment(ApartmentId)
+  SELECT PG.ApartmentId FROM WRBHBApartmentBookingPropertyAssingedGuest PG
+  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
+  PG.BookingPropertyId=P.Id
+  WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
+  P.IsDeleted=0 AND
+  CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) BETWEEN 
+  CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
+  P.CityId=@CityId GROUP BY PG.ApartmentId;
+  -- 
+  INSERT INTO #BookedApartment(ApartmentId)
+  SELECT PG.ApartmentId FROM WRBHBApartmentBookingPropertyAssingedGuest PG
+  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
+  PG.BookingPropertyId=P.Id
+  WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
+  P.IsDeleted=0 AND
+  CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
+  CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
+  CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
+  CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) BETWEEN 
+  CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
+  P.CityId=@CityId GROUP BY PG.ApartmentId;
+  -- 
+  INSERT INTO #BookedApartment(ApartmentId)
+  SELECT PG.ApartmentId FROM WRBHBApartmentBookingPropertyAssingedGuest PG
+  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
+  PG.BookingPropertyId=P.Id
+  WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
+  P.IsDeleted=0 AND
+  CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
+  CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) <= 
+  CAST(@ChkInDt AS DATETIME) AND
+  CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) >=
+  CAST(@ChkOutDt AS DATETIME) AND P.CityId=@CityId GROUP BY PG.ApartmentId;
+  -- Booked Apartment End
+  -- Dedicated Room
+  CREATE TABLE #DedicatedRoom(RoomId BIGINT);
+  INSERT INTO #DedicatedRoom(RoomId)
+  SELECT RoomId FROM WRBHBContractManagementTariffAppartment
+  WHERE IsActive=1 AND IsDeleted=0 AND RoomId != 0;
+  -- Dedicated Apartment
+  CREATE TABLE #DedicatedApartment(ApartmentId BIGINT);
+  INSERT INTO #DedicatedApartment(ApartmentId)  
+  SELECT T.ApartmentId FROM WRBHBContractManagementAppartment T 
+  WHERE T.IsActive=1 AND T.IsDeleted=0 AND T.ApartmentId != 0;
   -- Avaliable M G H Property
   CREATE TABLE #ManagedGH(PropertyName NVARCHAR(100),Id BIGINT,
   GetType NVARCHAR(100),PropertyType NVARCHAR(100));
@@ -562,126 +599,12 @@ IF @Action = 'Property'
   P.Category='Managed G H' AND A.IsActive = 1 AND A.IsDeleted = 0 AND
   A.Status = 'Active' AND R.RoomStatus = 'Active' AND
   A.SellableApartmentType != 'HUB' AND 
-  R.Id NOT IN (SELECT RoomId FROM #ExistingManagedGHProperty)
+  R.Id NOT IN (SELECT RoomId FROM #BookedRoom) AND
+  A.Id NOT IN (SELECT ApartmentId FROM #BookedApartment) AND
+  R.Id NOT IN (SELECT RoomId FROM #DedicatedRoom) AND
+  A.Id NOT IN (SELECT ApartmentId FROM #DedicatedApartment)
   GROUP BY P.PropertyName,P.Id;
--- # Dedicated #
-  CREATE TABLE #ExistingDedicatedProperty(RoomId BIGINT);
-  CREATE TABLE #ExDdPApartmnt(ApartmentId BIGINT);
-  -- Booked Room Begin
-  INSERT INTO #ExistingDedicatedProperty(RoomId) 
-  SELECT PG.RoomId FROM WRBHBBookingPropertyAssingedGuest PG
-  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
-  PG.BookingPropertyId=P.Id
-  WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Internal Property' AND
-  CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
-  CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
-  CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
-  P.CityId=@CityId GROUP BY PG.RoomId;  
-  /*PG.ChkInDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
-  CONVERT(DATE,@ChkOutDt,103);*/
-  -- 
-  INSERT INTO #ExistingDedicatedProperty(RoomId) 
-  SELECT PG.RoomId FROM WRBHBBookingPropertyAssingedGuest PG
-  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
-  PG.BookingPropertyId=P.Id
-  WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Internal Property' AND
-  CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) BETWEEN 
-  CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
-  P.CityId=@CityId GROUP BY PG.RoomId; 
-  /*PG.ChkOutDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
-  CONVERT(DATE,@ChkOutDt,103);*/
-  -- 
-  INSERT INTO #ExistingDedicatedProperty(RoomId) 
-  SELECT PG.RoomId FROM WRBHBBookingPropertyAssingedGuest PG
-  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
-  PG.BookingPropertyId=P.Id
-  WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Internal Property' AND 
-  CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
-  CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
-  CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
-  CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) BETWEEN 
-  CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
-  P.CityId=@CityId GROUP BY PG.RoomId;
-  /*PG.ChkInDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
-  CONVERT(DATE,@ChkOutDt,103) AND
-  PG.ChkOutDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
-  CONVERT(DATE,@ChkOutDt,103);*/
-  -- 
-  INSERT INTO #ExistingDedicatedProperty(RoomId)
-  SELECT PG.RoomId FROM WRBHBBookingPropertyAssingedGuest PG
-  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
-  PG.BookingPropertyId=P.Id
-  WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Internal Property' AND
-  CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
-  CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) <= 
-  CAST(@ChkInDt AS DATETIME) AND
-  CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) >=
-  CAST(@ChkOutDt AS DATETIME) AND P.CityId=@CityId GROUP BY PG.RoomId; 
-  /*PG.ChkInDt <= CONVERT(DATE,@ChkInDt,103) AND
-  PG.ChkOutDt >= CONVERT(DATE,@ChkOutDt,103);*/
-  -- Booked Room End
-  -- Booked Apartment Begin
-  INSERT INTO #ExDdPApartmnt(ApartmentId) 
-  SELECT PG.ApartmentId FROM WRBHBApartmentBookingPropertyAssingedGuest PG
-  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
-  PG.BookingPropertyId=P.Id
-  WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Internal Property' AND
-  CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
-  CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
-  CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
-  P.CityId=@CityId GROUP BY PG.ApartmentId; 
-  /*PG.ChkInDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
-  CONVERT(DATE,@ChkOutDt,103);*/
-  --
-  INSERT INTO #ExDdPApartmnt(ApartmentId) 
-  SELECT PG.ApartmentId FROM WRBHBApartmentBookingPropertyAssingedGuest PG
-  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
-  PG.BookingPropertyId=P.Id
-  WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Internal Property' AND
-  CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) BETWEEN 
-  CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
-  P.CityId=@CityId GROUP BY PG.ApartmentId;
-  /*PG.ChkOutDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
-  CONVERT(DATE,@ChkOutDt,103);*/
-  --
-  INSERT INTO #ExDdPApartmnt(ApartmentId) 
-  SELECT PG.ApartmentId FROM WRBHBApartmentBookingPropertyAssingedGuest PG
-  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
-  PG.BookingPropertyId=P.Id
-  WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Internal Property' AND 
-  CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
-  CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
-  CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
-  CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) BETWEEN 
-  CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
-  P.CityId=@CityId GROUP BY PG.ApartmentId;
-  /*PG.ChkInDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
-  CONVERT(DATE,@ChkOutDt,103) AND
-  PG.ChkOutDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
-  CONVERT(DATE,@ChkOutDt,103);*/
-  -- 
-  INSERT INTO #ExDdPApartmnt(ApartmentId) 
-  SELECT PG.ApartmentId FROM WRBHBApartmentBookingPropertyAssingedGuest PG
-  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
-  PG.BookingPropertyId=P.Id
-  WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Internal Property' AND 
-  CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
-  CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) <= 
-  CAST(@ChkInDt AS DATETIME) AND
-  CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) >=
-  CAST(@ChkOutDt AS DATETIME) AND P.CityId=@CityId GROUP BY PG.ApartmentId; 
-  /*PG.ChkInDt <= CONVERT(DATE,@ChkInDt,103) AND
-  PG.ChkOutDt >= CONVERT(DATE,@ChkOutDt,103);*/
-  -- Booked Apartment End
-  -- Avaliable Property
+  -- #Dedicated Property
   CREATE TABLE #Dedicated(PropertyName NVARCHAR(100),Id BIGINT,
   GetType NVARCHAR(100),PropertyType NVARCHAR(100));
   CREATE TABLE #TmpDedicated(PropertyName NVARCHAR(100),Id BIGINT,
@@ -698,7 +621,7 @@ IF @Action = 'Property'
   D.IsDeleted=0 AND H.IsActive=1 AND H.IsDeleted=0 AND 
   H.ContractType=' Dedicated Contracts ' AND 
   H.BookingLevel='Room' AND P.CityId=@CityId AND H.ClientId=@ClientId AND
-  D.RoomId NOT IN (SELECT RoomId FROM #ExistingDedicatedProperty);
+  D.RoomId NOT IN (SELECT RoomId FROM #BookedRoom);
   -- Apartment
   INSERT INTO #TmpDedicated(PropertyName,Id,GetType,PropertyType)
   SELECT P.PropertyName,P.Id,'Contract','DdP' FROM WRBHBProperty P
@@ -713,7 +636,7 @@ IF @Action = 'Property'
   R.IsActive=1 AND R.IsDeleted=0 AND 
   H.ContractType=' Dedicated Contracts ' AND H.BookingLevel='Apartment' AND
   H.ClientId=@ClientId AND P.CityId=@CityId AND
-  D.ApartmentId NOT IN (SELECT ApartmentId FROM #ExDdPApartmnt);
+  D.ApartmentId NOT IN (SELECT ApartmentId FROM #BookedApartment);
   --
   INSERT INTO #Dedicated(PropertyName,Id,GetType,PropertyType)
   SELECT PropertyName,Id,GetType,PropertyType FROM #TmpDedicated D
@@ -758,13 +681,6 @@ IF @Action = 'Property'
         G.ClientId=@ClientId;
        END    
      END
-    /*SELECT @MinValue=ISNULL(MinValue,0),@MaxValue=ISNULL(MaxValue,0) 
-    FROM WRBHBClientGradeValue G
-    LEFT OUTER JOIN WRBHBClientGradeValueDetails GV WITH(NOLOCK)ON
-    G.Id=GV.ClientGradeValueId
-    WHERE G.IsActive=1 AND G.IsDeleted=0 AND GV.IsActive=1 AND 
-    GV.IsDeleted=0 AND G.GradeId=@GradeId AND GV.CityId=@CityId AND
-    G.ClientId=@ClientId;*/
    END
   IF @GradeId = 0 AND @Str1 != ''
    BEGIN
@@ -805,265 +721,114 @@ IF @Action = 'Property'
       END    
    END
 -- # Get Minimum Value & Maximum Value # End
--- # Client Prefered # Begin
+-- # Client Prefered # Begin  
+  CREATE TABLE #ClientPrefered1(PropertyName NVARCHAR(100),Id BIGINT,
+  GetType NVARCHAR(100),PropertyType NVARCHAR(100),RoomType NVARCHAR(100),
+  AgreedSingle DECIMAL(27,2),AgreedDouble DECIMAL(27,2),AgreedTriple DECIMAL(27,2),
+  RackSingle DECIMAL(27,2),RackDouble DECIMAL(27,2),RackTriple DECIMAL(27,2),
+  TaxInclusive BIT,LTAgreed DECIMAL(27,2),LTRack DECIMAL(27,2),
+  STAgreed DECIMAL(27,2),Facility NVARCHAR(100),Email NVARCHAR(100),
+  ContactPhone NVARCHAR(100),StarRatingId BIGINT,HRSingle DECIMAL(27,2));
+  INSERT INTO #ClientPrefered1(PropertyName,Id,GetType,PropertyType,RoomType,
+  AgreedSingle,AgreedDouble,AgreedTriple,RackSingle,RackDouble,RackTriple,
+  TaxInclusive,LTAgreed,LTRack,STAgreed,Facility,Email,ContactPhone,
+  StarRatingId,HRSingle)  
+  SELECT P.PropertyName,P.Id,'Contract','CPP',D.RoomType,D.TariffSingle,
+  D.TariffDouble,D.TariffTriple,ISNULL(D.RTariffSingle,0),
+  ISNULL(D.RTariffDouble,0),ISNULL(D.RTariffTriple,0),
+  ISNULL(D.TaxInclusive,0),ISNULL(D.LTAgreed,0),ISNULL(D.LTRack,0),
+  ISNULL(D.STAgreed,0),ISNULL(D.Facility,''),ISNULL(D.Email,''),
+  ISNULL(D.ContactPhone,''),P.PropertyType,
+  CASE WHEN ISNULL(D.TaxInclusive,0) = 1 THEN
+  D.TariffSingle - ROUND((D.TariffSingle * 19) / 100,0) ELSE D.TariffSingle END 
+  FROM WRBHBProperty P
+  LEFT OUTER JOIN WRBHBContractClientPref_Details D WITH(NOLOCK)ON
+  P.Id=D.PropertyId
+  LEFT OUTER JOIN WRBHBContractClientPref_Header H WITH(NOLOCK)ON 
+  H.Id=D.HeaderId
+  WHERE P.IsActive=1 AND P.IsDeleted=0 AND D.IsActive=1 AND 
+  D.IsDeleted=0 AND H.IsActive=1 AND H.IsDeleted=0 AND  
+  H.ClientId=@ClientId AND P.CityId=@CityId;
+  --
+  --SELECT * FROM #ClientPrefered1;
+  --SELECT @StarFlag,@MinValue,@MaxValue
+  --SELECT AgreedSingle,HRSingle,TaxInclusive FROM #ClientPrefered1;;RETURN;
+  --
   CREATE TABLE #ClientPrefered(PropertyName NVARCHAR(100),Id BIGINT,
   GetType NVARCHAR(100),PropertyType NVARCHAR(100),RoomType NVARCHAR(100),
   SingleTariff DECIMAL(27,2),DoubleTariff DECIMAL(27,2),
-  TripleTariff DECIMAL(27,2));
+  TripleTariff DECIMAL(27,2),LTAgreed DECIMAL(27,2),STAgreed DECIMAL(27,2),
+  LTRack DECIMAL(27,2),TaxInclusive BIT,HRSingle DECIMAL(27,2));
   IF @StarCnt != 0
    BEGIN
     IF @StarFlag = 1
      BEGIN
       INSERT INTO #ClientPrefered(PropertyName,Id,GetType,PropertyType,
-      RoomType,SingleTariff,DoubleTariff)
-      SELECT P.PropertyName,P.Id,'Contract','CPP',D.RoomType,
-      D.TariffSingle,D.TariffDouble FROM WRBHBProperty P
-      LEFT OUTER JOIN WRBHBContractClientPref_Details D WITH(NOLOCK)ON
-      P.Id=D.PropertyId
-      LEFT OUTER JOIN WRBHBContractClientPref_Header H WITH(NOLOCK)ON 
-      H.Id=D.HeaderId
-      WHERE P.IsActive=1 AND P.IsDeleted=0 AND D.IsActive=1 AND 
-      D.IsDeleted=0 AND H.IsActive=1 AND H.IsDeleted=0 AND  
-      H.ClientId=@ClientId AND P.CityId=@CityId AND P.PropertyType=@StarId;
+      RoomType,SingleTariff,DoubleTariff,TripleTariff,
+      LTAgreed,STAgreed,LTRack,TaxInclusive,HRSingle)
+      SELECT C1.PropertyName,C1.Id,C1.GetType,C1.PropertyType,C1.RoomType,
+      CASE WHEN ISNULL(C1.TaxInclusive,0) = 0 THEN
+      C1.AgreedSingle + ROUND((((C1.AgreedSingle * C1.LTAgreed) / 100) + 
+      ((C1.AgreedSingle * C1.STAgreed) / 100) + 
+      ((C1.RackSingle * C1.LTRack) / 100)),0) ELSE C1.AgreedSingle END,
+      CASE WHEN ISNULL(C1.TaxInclusive,0) = 0 THEN
+      C1.AgreedDouble + ROUND((((C1.AgreedDouble * C1.LTAgreed) / 100) + 
+      ((C1.AgreedDouble * C1.STAgreed) / 100) + 
+      ((C1.RackDouble * C1.LTRack) / 100)),0) ELSE C1.AgreedDouble END,
+      CASE WHEN ISNULL(C1.TaxInclusive,0) = 0 THEN
+      C1.AgreedTriple + ROUND((((C1.AgreedTriple * C1.LTAgreed) / 100) + 
+      ((C1.AgreedTriple * C1.STAgreed) / 100) + 
+      ((C1.RackTriple * C1.LTRack) / 100)),0) ELSE C1.AgreedTriple END,
+      LTAgreed,STAgreed,LTRack,ISNULL(C1.TaxInclusive,0),C1.HRSingle
+      FROM #ClientPrefered1 C1 WHERE C1.StarRatingId = @StarId;
      END
     IF @StarFlag = 0
      BEGIN
       INSERT INTO #ClientPrefered(PropertyName,Id,GetType,PropertyType,
-      RoomType,SingleTariff,DoubleTariff)
-      SELECT P.PropertyName,P.Id,'Contract','CPP',D.RoomType,
-      D.TariffSingle,D.TariffDouble FROM WRBHBProperty P
-      LEFT OUTER JOIN WRBHBContractClientPref_Details D WITH(NOLOCK)ON
-      D.PropertyId=P.Id
-      LEFT OUTER JOIN WRBHBContractClientPref_Header H WITH(NOLOCK)ON 
-	  H.Id=D.HeaderId
-	  WHERE P.IsActive=1 AND P.IsDeleted=0 AND D.IsActive=1 AND 
-	  D.IsDeleted=0 AND H.IsActive=1 AND H.IsDeleted=0 AND 
-	  P.CityId=@CityId AND H.ClientId=@ClientId AND 
-	  D.TariffSingle BETWEEN @MinValue AND @MaxValue;
+      RoomType,SingleTariff,DoubleTariff,TripleTariff,
+      LTAgreed,STAgreed,LTRack,TaxInclusive,HRSingle)
+      SELECT C1.PropertyName,C1.Id,C1.GetType,C1.PropertyType,C1.RoomType,
+      CASE WHEN ISNULL(C1.TaxInclusive,0) = 0 THEN
+      C1.AgreedSingle + ROUND((((C1.AgreedSingle * C1.LTAgreed) / 100) + 
+      ((C1.AgreedSingle * C1.STAgreed) / 100) + 
+      ((C1.RackSingle * C1.LTRack) / 100)),0) ELSE C1.AgreedSingle END,
+      CASE WHEN ISNULL(C1.TaxInclusive,0) = 0 THEN
+      C1.AgreedDouble + ROUND((((C1.AgreedDouble * C1.LTAgreed) / 100) + 
+      ((C1.AgreedDouble * C1.STAgreed) / 100) + 
+      ((C1.RackDouble * C1.LTRack) / 100)),0) ELSE C1.AgreedDouble END,
+      CASE WHEN ISNULL(C1.TaxInclusive,0) = 0 THEN
+      C1.AgreedTriple + ROUND((((C1.AgreedTriple * C1.LTAgreed) / 100) + 
+      ((C1.AgreedTriple * C1.STAgreed) / 100) + 
+      ((C1.RackTriple * C1.LTRack) / 100)),0) ELSE C1.AgreedTriple END,
+      LTAgreed,STAgreed,LTRack,ISNULL(C1.TaxInclusive,0),C1.HRSingle
+      FROM #ClientPrefered1 C1 
+      WHERE C1.HRSingle BETWEEN @MinValue AND @MaxValue;
      END
    END
   ELSE
    BEGIN
     INSERT INTO #ClientPrefered(PropertyName,Id,GetType,PropertyType,
-    RoomType,SingleTariff,DoubleTariff)
-    SELECT P.PropertyName,P.Id,'Contract','CPP',D.RoomType,
-    D.TariffSingle,D.TariffDouble FROM WRBHBProperty P
-    LEFT OUTER JOIN WRBHBContractClientPref_Details D WITH(NOLOCK)ON
-    P.Id=D.PropertyId
-    LEFT OUTER JOIN WRBHBContractClientPref_Header H WITH(NOLOCK)ON 
-    H.Id=D.HeaderId
-    WHERE P.IsActive=1 AND P.IsDeleted=0 AND D.IsActive=1 AND 
-    D.IsDeleted=0 AND H.IsActive=1 AND H.IsDeleted=0 AND  
-    H.ClientId=@ClientId AND P.CityId=@CityId;
+    RoomType,SingleTariff,DoubleTariff,TripleTariff,
+    LTAgreed,STAgreed,LTRack,TaxInclusive,HRSingle)
+    SELECT C1.PropertyName,C1.Id,C1.GetType,C1.PropertyType,C1.RoomType,
+    CASE WHEN ISNULL(C1.TaxInclusive,0) = 0 THEN
+    C1.AgreedSingle + ROUND((((C1.AgreedSingle * C1.LTAgreed) / 100) + 
+    ((C1.AgreedSingle * C1.STAgreed) / 100) + 
+    ((C1.RackSingle * C1.LTRack) / 100)),0) ELSE C1.AgreedSingle END,
+    CASE WHEN ISNULL(C1.TaxInclusive,0) = 0 THEN
+    C1.AgreedDouble + ROUND((((C1.AgreedDouble * C1.LTAgreed) / 100) + 
+    ((C1.AgreedDouble * C1.STAgreed) / 100) + 
+    ((C1.RackDouble * C1.LTRack) / 100)),0) ELSE C1.AgreedDouble END,
+    CASE WHEN ISNULL(C1.TaxInclusive,0) = 0 THEN
+    C1.AgreedTriple + ROUND((((C1.AgreedTriple * C1.LTAgreed) / 100) + 
+    ((C1.AgreedTriple * C1.STAgreed) / 100) + 
+    ((C1.RackTriple * C1.LTRack) / 100)),0) ELSE C1.AgreedTriple END,
+    LTAgreed,STAgreed,LTRack,ISNULL(C1.TaxInclusive,0),C1.HRSingle
+    FROM #ClientPrefered1 C1;
    END
 -- # Client Prefered # End
--- # Internal # Begin
-  -- Existing Begin
-  CREATE TABLE #ExistingInternalProperty(RoomId BIGINT);
-  -- Dedicated Rooms
-  INSERT INTO #ExistingInternalProperty(RoomId)
-  SELECT RoomId FROM WRBHBContractManagementTariffAppartment
-  WHERE IsActive=1 AND IsDeleted=0 AND RoomId != 0;
-  -- Dedicated Apartment
-  INSERT INTO #ExistingInternalProperty(RoomId)  
-  SELECT R.Id FROM WRBHBPropertyRooms R
-  LEFT OUTER JOIN WRBHBContractManagementAppartment T 
-  WITH(NOLOCK)ON T.ApartmentId=R.ApartmentId
-  WHERE R.IsActive=1 AND R.IsDeleted=0 AND T.IsActive=1 AND 
-  T.IsDeleted=0 AND T.ApartmentId != 0 
-  AND R.ApartmentId=T.ApartmentId;
-  -- Room Booked Begin
-  INSERT INTO #ExistingInternalProperty(RoomId) 
-  SELECT PG.RoomId FROM WRBHBBookingPropertyAssingedGuest PG
-  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
-  PG.BookingPropertyId=P.Id
-  WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Internal Property' AND
-  CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
-  CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
-  CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
-  P.CityId=@CityId GROUP BY PG.RoomId;
-  --PG.ChkInDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
-  --CONVERT(DATE,@ChkOutDt,103) AND P.CityId=@CityId;
-  -- 
-  INSERT INTO #ExistingInternalProperty(RoomId) 
-  SELECT PG.RoomId FROM WRBHBBookingPropertyAssingedGuest PG
-  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
-  PG.BookingPropertyId=P.Id
-  WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Internal Property' AND
-  CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) BETWEEN 
-  CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
-  P.CityId=@CityId GROUP BY PG.RoomId;
-  --PG.ChkOutDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
-  --CONVERT(DATE,@ChkOutDt,103) AND P.CityId=@CityId;
-  -- 
-  INSERT INTO #ExistingInternalProperty(RoomId) 
-  SELECT PG.RoomId FROM WRBHBBookingPropertyAssingedGuest PG
-  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
-  PG.BookingPropertyId=P.Id
-  WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Internal Property' AND
-  CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
-  CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
-  CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
-  CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) BETWEEN 
-  CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
-  P.CityId=@CityId GROUP BY PG.RoomId; 
-  --PG.ChkInDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
-  --CONVERT(DATE,@ChkOutDt,103) AND
-  --PG.ChkOutDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
-  --CONVERT(DATE,@ChkOutDt,103) AND P.CityId=@CityId;
-  -- 
-  INSERT INTO #ExistingInternalProperty(RoomId)
-  SELECT PG.RoomId FROM WRBHBBookingPropertyAssingedGuest PG
-  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
-  PG.BookingPropertyId=P.Id
-  WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Internal Property' AND 
-  CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
-  CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) <= 
-  CAST(@ChkInDt AS DATETIME) AND
-  CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) >=
-  CAST(@ChkOutDt AS DATETIME) AND
-  P.CityId=@CityId GROUP BY PG.RoomId;
-  /*PG.ChkInDt <= CONVERT(DATE,@ChkInDt,103) AND
-  PG.ChkOutDt >= CONVERT(DATE,@ChkOutDt,103) AND*/
-  -- Room Booked End
-  -- Bed Booked Begin
-  INSERT INTO #ExistingInternalProperty(RoomId) 
-  SELECT PG.RoomId FROM WRBHBBedBookingPropertyAssingedGuest PG
-  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
-  PG.BookingPropertyId=P.Id
-  WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Internal Property' AND
-  CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
-  CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
-  CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
-  P.CityId=@CityId AND P.CityId=@CityId GROUP BY PG.RoomId; 
-  /*PG.ChkInDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
-  CONVERT(DATE,@ChkOutDt,103) AND P.CityId=@CityId;*/
-  --
-  INSERT INTO #ExistingInternalProperty(RoomId) 
-  SELECT PG.RoomId FROM WRBHBBedBookingPropertyAssingedGuest PG
-  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
-  PG.BookingPropertyId=P.Id
-  WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Internal Property' AND
-  CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) BETWEEN 
-  CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
-  P.CityId=@CityId AND P.CityId=@CityId GROUP BY PG.RoomId; 
-  /*PG.ChkOutDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
-  CONVERT(DATE,@ChkOutDt,103) AND P.CityId=@CityId;*/
-  --
-  INSERT INTO #ExistingInternalProperty(RoomId) 
-  SELECT PG.RoomId FROM WRBHBBedBookingPropertyAssingedGuest PG
-  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
-  PG.BookingPropertyId=P.Id
-  WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Internal Property' AND 
-  CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
-  CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
-  CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
-  CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) BETWEEN 
-  CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
-  P.CityId=@CityId AND P.CityId=@CityId GROUP BY PG.RoomId;  
-  /*PG.ChkInDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
-  CONVERT(DATE,@ChkOutDt,103) AND
-  PG.ChkOutDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
-  CONVERT(DATE,@ChkOutDt,103) AND P.CityId=@CityId;*/
-  --
-  INSERT INTO #ExistingInternalProperty(RoomId)
-  SELECT PG.RoomId FROM WRBHBBedBookingPropertyAssingedGuest PG
-  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
-  PG.BookingPropertyId=P.Id
-  WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND P.IsActive=1 AND 
-  P.IsDeleted=0 AND P.Category='Internal Property' AND 
-  CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
-  CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) <= 
-  CAST(@ChkInDt AS DATETIME) AND
-  CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) >=
-  CAST(@ChkOutDt AS DATETIME) AND 
-  P.CityId=@CityId GROUP BY PG.RoomId;
-  /*PG.ChkInDt <= CONVERT(DATE,@ChkInDt,103) AND
-  PG.ChkOutDt >= CONVERT(DATE,@ChkOutDt,103) AND 
-  P.CityId=@CityId;*/
-  -- Bed Booked End
-  -- Apartment Booked Begin
-  INSERT INTO #ExistingInternalProperty(RoomId)
-  SELECT R.Id FROM WRBHBPropertyRooms R
-  LEFT OUTER JOIN WRBHBApartmentBookingPropertyAssingedGuest PG
-  WITH(NOLOCK)ON PG.BookingPropertyId=R.PropertyId AND
-  PG.ApartmentId=R.ApartmentId
-  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
-  P.Id=PG.BookingPropertyId
-  WHERE R.IsActive=1 AND R.IsDeleted=0 AND PG.IsActive=1 AND 
-  PG.IsDeleted=0 AND P.IsActive=1 AND P.IsDeleted=0 AND 
-  P.Category='Internal Property' AND R.ApartmentId=PG.ApartmentId AND
-  CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
-  CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
-  CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
-  P.CityId=@CityId GROUP BY R.Id; 
-  /*PG.ChkInDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
-  CONVERT(DATE,@ChkOutDt,103) AND P.CityId=@CityId;*/
-  --
-  INSERT INTO #ExistingInternalProperty(RoomId)
-  SELECT R.Id FROM WRBHBPropertyRooms R
-  LEFT OUTER JOIN WRBHBApartmentBookingPropertyAssingedGuest PG
-  WITH(NOLOCK)ON PG.BookingPropertyId=R.PropertyId AND
-  PG.ApartmentId=R.ApartmentId
-  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
-  P.Id=PG.BookingPropertyId
-  WHERE R.IsActive=1 AND R.IsDeleted=0 AND PG.IsActive=1 AND 
-  PG.IsDeleted=0 AND P.IsActive=1 AND P.IsDeleted=0 AND 
-  P.Category='Internal Property' AND R.ApartmentId=PG.ApartmentId AND
-  CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) BETWEEN 
-  CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
-  P.CityId=@CityId GROUP BY R.Id; 
-  /*PG.ChkOutDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
-  CONVERT(DATE,@ChkOutDt,103) AND P.CityId=@CityId;*/
-  --
-  INSERT INTO #ExistingInternalProperty(RoomId)
-  SELECT R.Id FROM WRBHBPropertyRooms R
-  LEFT OUTER JOIN WRBHBApartmentBookingPropertyAssingedGuest PG
-  WITH(NOLOCK)ON PG.BookingPropertyId=R.PropertyId AND
-  PG.ApartmentId=R.ApartmentId
-  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
-  P.Id=PG.BookingPropertyId
-  WHERE R.IsActive=1 AND R.IsDeleted=0 AND PG.IsActive=1 AND 
-  PG.IsDeleted=0 AND P.IsActive=1 AND P.IsDeleted=0 AND 
-  P.Category='Internal Property' AND R.ApartmentId=PG.ApartmentId AND 
-  CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
-  CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) BETWEEN 
-  CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
-  CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) BETWEEN 
-  CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
-  P.CityId=@CityId GROUP BY R.Id;
-  /*PG.ChkInDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
-  CONVERT(DATE,@ChkOutDt,103) AND
-  PG.ChkOutDt BETWEEN CONVERT(DATE,@ChkInDt,103) AND 
-  CONVERT(DATE,@ChkOutDt,103) AND P.CityId=@CityId;*/
-  --
-  INSERT INTO #ExistingInternalProperty(RoomId)
-  SELECT R.Id FROM WRBHBPropertyRooms R
-  LEFT OUTER JOIN WRBHBApartmentBookingPropertyAssingedGuest PG
-  WITH(NOLOCK)ON PG.BookingPropertyId=R.PropertyId AND
-  PG.ApartmentId=R.ApartmentId
-  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON 
-  P.Id=PG.BookingPropertyId
-  WHERE R.IsActive=1 AND R.IsDeleted=0 AND PG.IsActive=1 AND 
-  PG.IsDeleted=0 AND P.IsActive=1 AND P.IsDeleted=0 AND 
-  P.Category='Internal Property' AND R.ApartmentId=PG.ApartmentId AND 
-  CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
-  CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME) <= 
-  CAST(@ChkInDt AS DATETIME) AND
-  CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) >=
-  CAST(@ChkOutDt AS DATETIME) AND P.CityId=@CityId
-  GROUP BY R.Id;
-  /*PG.ChkInDt <= CONVERT(DATE,@ChkInDt,103) AND
-  PG.ChkOutDt >= CONVERT(DATE,@ChkOutDt,103) AND 
-  P.CityId=@CityId;*/
-  -- Apartment Booked End
+  --select * from #ClientPrefered where Id = 890;return;
+-- # Internal # Begin  
   -- Existing End
   CREATE TABLE #Intrnl(PropertyName NVARCHAR(100),Id BIGINT,
   GetType NVARCHAR(100),PropertyType NVARCHAR(100),
@@ -1089,7 +854,10 @@ IF @Action = 'Property'
   H.IsDeleted=0 AND H.ClientId=@ClientId AND P.CityId=@CityId AND
   A.Status='Active' AND R.RoomStatus='Active' AND
   A.SellableApartmentType != 'HUB' AND A.IsActive=1 AND A.IsDeleted=0 AND
-  R.Id NOT IN (SELECT RoomId FROM #ExistingInternalProperty)
+  R.Id NOT IN (SELECT RoomId FROM #BookedRoom) AND
+  A.Id NOT IN (SELECT ApartmentId FROM #BookedApartment) AND
+  R.Id NOT IN (SELECT RoomId FROM #DedicatedRoom) AND
+  A.Id NOT IN (SELECT ApartmentId FROM #DedicatedApartment)
   GROUP BY P.PropertyName,P.Id,T.RoomTarif,T.DoubleTarif;
   -- Internal Property
   INSERT INTO #Intrnl(PropertyName,Id,GetType,PropertyType,RoomType,
@@ -1107,7 +875,10 @@ IF @Action = 'Property'
   A.Status='Active' AND R.RoomStatus='Active' AND
   R.IsActive=1 AND R.IsDeleted=0 AND
   A.SellableApartmentType != 'HUB' AND A.IsActive=1 AND A.IsDeleted=0 AND 
-  R.Id NOT IN (SELECT RoomId FROM #ExistingInternalProperty) AND
+  R.Id NOT IN (SELECT RoomId FROM #BookedRoom) AND
+  A.Id NOT IN (SELECT ApartmentId FROM #BookedApartment) AND
+  R.Id NOT IN (SELECT RoomId FROM #DedicatedRoom) AND
+  A.Id NOT IN (SELECT ApartmentId FROM #DedicatedApartment) AND
   P.Id NOT IN (SELECT D.PropertyId FROM WRBHBContractNonDedicated H
   LEFT OUTER JOIN WRBHBContractNonDedicatedApartment D
   WITH(NOLOCK)ON H.Id=D.NondedContractId
@@ -1118,6 +889,9 @@ IF @Action = 'Property'
   GROUP BY P.PropertyName,P.Id,R.RackTariff,
   R.DoubleOccupancyTariff,R.DiscountModeRS,R.DiscountModePer,
   R.DiscountAllowed;
+  --
+  --SELECT * FROM #Intrnl;
+  --SELECT @StarFlag,@MinValue,@MaxValue;RETURN;
   -- # Internal Min & Max    
   CREATE TABLE #Internal(PropertyName NVARCHAR(100),Id BIGINT,
   GetType NVARCHAR(100),PropertyType NVARCHAR(100),RoomType NVARCHAR(100),
@@ -1160,228 +934,209 @@ IF @Action = 'Property'
   ------- # Markup
   DECLARE @Markup DECIMAL(27,2)=0,@Flag BIT=0,@MarkupId BIGINT=0;
   DECLARE @Per DECIMAL(27,2)=0,@Rs DECIMAL(27,2)=0;  
-  SET @Flag=(SELECT Flag FROM WRBHBMarkup WHERE IsActive=1 AND 
+  SET @Flag=(SELECT TOP 1 Flag FROM WRBHBMarkup WHERE IsActive=1 AND 
   IsDeleted=0);
-  SET @MarkupId=(SELECT Id FROM WRBHBMarkup WHERE IsActive=1 AND 
+  SET @MarkupId=(SELECT TOP 1 Id FROM WRBHBMarkup WHERE IsActive=1 AND 
   IsDeleted=0);
   IF @Flag = 0
    BEGIN
-    SET @Rs=(SELECT Value FROM WRBHBMarkup 
+    SET @Rs=(SELECT TOP 1 Value FROM WRBHBMarkup 
     WHERE IsActive=1 AND IsDeleted=0);
     SET @Per = 0;
    END
   ELSE
    BEGIN
-    SET @Per=(SELECT Value FROM WRBHBMarkup 
+    SET @Per=(SELECT TOP 1 Value FROM WRBHBMarkup 
     WHERE IsActive=1 AND IsDeleted=0);
     SET @Rs = 0;
    END
-  ------- # Markup
-  CREATE TABLE #ExternalNOTINProperty(PropertyId BIGINT);
-  INSERT INTO #ExternalNOTINProperty(PropertyId)
-  SELECT D.PropertyId FROM WRBHBContractClientPref_Header H
-  LEFT OUTER JOIN WRBHBContractClientPref_Details D 
-  WITH(NOLOCK)ON D.HeaderId=H.Id
-  WHERE H.IsActive=1 AND H.IsDeleted=0 AND D.IsActive=1 AND 
-  D.IsDeleted=0 AND H.ClientId=@ClientId
-  GROUP BY D.PropertyId;
--- # External # Begin
-  CREATE TABLE #External1(PropertyName NVARCHAR(100),Id BIGINT,
+-- #External # Begin
+  CREATE TABLE #TmpExternal(PropertyName NVARCHAR(100),Id BIGINT,
   GetType NVARCHAR(100),PropertyType NVARCHAR(100),RoomType NVARCHAR(100),
-  SingleTariff DECIMAL(27,2),DoubleTariff DECIMAL(27,2),
-  TripleTariff DECIMAL(27,2),SingleandMarkup DECIMAL(27,2),
-  DoubleandMarkup DECIMAL(27,2),TripleandMarkup DECIMAL(27,2),
-  TAC BIT,MarkupId BIGINT,TaxAdded NVARCHAR(100));
-  -- Non Dedicated Property
-  INSERT INTO #External1(PropertyName,Id,GetType,PropertyType,RoomType,
-  SingleTariff,DoubleTariff,TripleTariff,SingleandMarkup,
-  DoubleandMarkup,TripleandMarkup,TAC,MarkupId,TaxAdded)
-  SELECT P.PropertyName,P.Id,'Contract','ExP',D.ApartMentType,
-  D.RoomTarif,D.DoubleTarif,D.TripleTarif,D.RoomTarif,D.DoubleTarif,
-  D.TripleTarif,1,0,'' FROM WRBHBProperty P
-  LEFT OUTER JOIN WRBHBContractNonDedicatedApartment D WITH(NOLOCK)ON
-  P.Id=D.PropertyId
-  LEFT OUTER JOIN WRBHBContractNonDedicated H WITH(NOLOCK)ON 
-  H.Id=D.NondedContractId
-  WHERE P.IsActive=1 AND P.IsDeleted=0 AND D.IsActive=1 AND 
-  D.IsDeleted=0 AND H.IsActive=1 AND H.IsDeleted=0 AND 
-  P.CityId=@CityId AND H.ClientId=@ClientId AND
-  P.Category='External Property' AND 
-  P.Id NOT IN (SELECT PropertyId FROM #ExternalNOTINProperty);
-  --
-  --select * from #External1;return;
-  -- 
-  INSERT INTO #ExternalNOTINProperty(PropertyId)
-  SELECT D.PropertyId FROM WRBHBContractNonDedicated H
-  LEFT OUTER JOIN WRBHBContractNonDedicatedApartment D WITH(NOLOCK)ON
-  H.Id=D.NondedContractId WHERE H.IsDeleted=0 AND H.IsActive=1 AND 
-  D.IsDeleted=0 AND D.IsActive=1 AND H.ClientId=@ClientId;
-  --  
-  -- Property
-  INSERT INTO #External1(PropertyName,Id,GetType,PropertyType,RoomType,
-  SingleTariff,DoubleTariff,TripleTariff,SingleandMarkup,DoubleandMarkup,
-  TripleandMarkup,TAC,MarkupId,TaxAdded)
-  SELECT P.PropertyName,P.Id,'Property','ExP',R.RoomType,
-  R.RackSingle,R.RackDouble,R.RackTriple,R.RackSingle,
-  R.RackDouble,R.RackTriple,A.TAC,0,
-  --CASE WHEN ISNULL(R.Inclusive,0) = 1 THEN 'Y' ELSE 'N' END
-  CASE WHEN ISNULL(R.Inclusive,0) = 1 THEN 'N' ELSE 'T' END
+  AgreedSingle DECIMAL(27,2),AgreedDouble DECIMAL(27,2),
+  AgreedTriple DECIMAL(27,2),RackSingle DECIMAL(27,2),
+  RackDouble DECIMAL(27,2),RackTriple DECIMAL(27,2),TAC BIT,
+  Inclusive BIT,Facility NVARCHAR(100),LTAgreed DECIMAL(27,2),
+  LTRack DECIMAL(27,2),STAgreed DECIMAL(27,2),RoomId BIGINT,
+  StarRatingId BIGINT,HRSingle DECIMAL(27,2));
+  INSERT INTO #TmpExternal(PropertyName,Id,GetType,PropertyType,RoomType,
+  AgreedSingle,AgreedDouble,AgreedTriple,RackSingle,RackDouble,RackTriple,
+  TAC,Inclusive,Facility,LTAgreed,LTRack,STAgreed,RoomId,StarRatingId,
+  HRSingle)  
+  SELECT P.PropertyName,P.Id,'Property','ExP',R.RoomType,  
+  R.RackSingle,R.RackDouble,R.RackTriple,
+  R.Single,R.RDouble,R.Triple,ISNULL(A.TAC,0),ISNULL(R.Inclusive,0),
+  ISNULL(R.Facility,''),R.LTAgreed,R.LTRack,R.STAgreed,R.Id,P.PropertyType,
+  CASE WHEN ISNULL(R.Inclusive,0) = 1 THEN
+  R.RackSingle - ROUND(((R.RackSingle * 19) / 100),0) ELSE R.RackSingle END
   FROM WRBHBProperty P
   LEFT OUTER JOIN WRBHBPropertyAgreements A WITH(NOLOCK)ON 
   A.PropertyId=P.Id
   LEFT OUTER JOIN WRBHBPropertyAgreementsRoomCharges R WITH(NOLOCK)ON
   R.AgreementId=A.Id
   WHERE P.IsActive=1 AND P.IsDeleted=0 AND A.IsActive=1 AND 
-  A.IsDeleted=0 AND R.IsActive=1 AND R.IsDeleted=0 AND P.CityId=@CityId 
-  AND P.Category='External Property' AND A.TAC = 1 AND 
-  P.Id NOT IN (SELECT PropertyId FROM #ExternalNOTINProperty);
+  A.IsDeleted=0 AND R.IsActive=1 AND R.IsDeleted=0 AND 
+  P.Category='External Property' AND P.CityId=@CityId;
   --
-  --select * from #External1;return;
+  --SELECT AgreedSingle,HRSingle,Inclusive,Id FROM #TmpExternal;
+  --SELECT @StarFlag,@MinValue,@MaxValue;
+  --SELECT * FROM #TmpExternal WHERE Id = 1476;RETURN;
   --
- IF @Flag = 0
-  BEGIN
-   INSERT INTO #External1(PropertyName,Id,GetType,PropertyType,RoomType,
-   SingleTariff,DoubleTariff,TripleTariff,SingleandMarkup,DoubleandMarkup,
-   TripleandMarkup,TAC,MarkupId,TaxAdded)
-   SELECT P.PropertyName,P.Id,'Property','ExP',R.RoomType,
-   R.RackSingle,R.RackDouble,R.RackTriple,
-   CASE WHEN R.RackSingle > 0 THEN R.RackSingle+@Rs ELSE R.RackSingle END,
-   CASE WHEN R.RackDouble > 0 THEN R.RackDouble+@Rs ELSE R.RackDouble END,
-   CASE WHEN R.RackTriple > 0 THEN R.RackTriple+@Rs ELSE R.RackTriple END,
-   A.TAC,@MarkupId,
-   --CASE WHEN ISNULL(R.Inclusive,0) = 1 THEN 'Y' ELSE 'N' END 
-   CASE WHEN ISNULL(R.Inclusive,0) = 1 THEN 'N' ELSE 'T' END
-   FROM WRBHBProperty P
-   LEFT OUTER JOIN WRBHBPropertyAgreements A WITH(NOLOCK)ON 
-   A.PropertyId=P.Id
-   LEFT OUTER JOIN WRBHBPropertyAgreementsRoomCharges R WITH(NOLOCK)ON
-   R.AgreementId=A.Id
-   WHERE P.IsActive=1 AND P.IsDeleted=0 AND A.IsActive=1 AND 
-   A.IsDeleted=0 AND R.IsActive=1 AND R.IsDeleted=0 AND P.CityId=@CityId 
-   AND P.Category='External Property' AND A.TAC = 0 AND
-   P.Id NOT IN (SELECT PropertyId FROM #ExternalNOTINProperty);
-  END
- ELSE
-  BEGIN
-   IF @Per != 0
-    BEGIN
-     INSERT INTO #External1(PropertyName,Id,GetType,PropertyType,RoomType,
-     SingleTariff,DoubleTariff,TripleTariff,SingleandMarkup,
-     DoubleandMarkup,TripleandMarkup,TAC,MarkupId,TaxAdded)
-     SELECT P.PropertyName,P.Id,'Property','ExP',R.RoomType,
-     R.RackSingle,R.RackDouble,R.RackTriple,
-     R.RackSingle+ROUND((R.RackSingle * @Per)/100,0),
-     R.RackDouble+ROUND((R.RackDouble * @Per)/100,0),
-     CASE WHEN R.RackTriple > 0 THEN 
-     R.RackTriple+ROUND((R.RackTriple * @Per)/100,0)
-     ELSE R.RackTriple END,A.TAC,@MarkupId,
-     --CASE WHEN ISNULL(R.Inclusive,0) = 1 THEN 'Y' ELSE 'N' END
-     CASE WHEN ISNULL(R.Inclusive,0) = 1 THEN 'N' ELSE 'T' END
-     FROM WRBHBProperty P
-     LEFT OUTER JOIN WRBHBPropertyAgreements A WITH(NOLOCK)ON 
-     A.PropertyId=P.Id
-     LEFT OUTER JOIN WRBHBPropertyAgreementsRoomCharges R WITH(NOLOCK)ON
-     R.AgreementId=A.Id
-     WHERE P.IsActive=1 AND P.IsDeleted=0 AND A.IsActive=1 AND 
-     A.IsDeleted=0 AND R.IsActive=1 AND R.IsDeleted=0 AND P.CityId=@CityId 
-     AND P.Category='External Property' AND A.TAC = 0 AND
-     P.Id NOT IN (SELECT PropertyId FROM #ExternalNOTINProperty);
-    END
-   ELSE
-    BEGIN
-     INSERT INTO #External1(PropertyName,Id,GetType,PropertyType,RoomType,
-     SingleTariff,DoubleTariff,TripleTariff,SingleandMarkup,
-     DoubleandMarkup,TripleandMarkup,TAC,MarkupId,TaxAdded)
-     SELECT P.PropertyName,P.Id,'Property','ExP',R.RoomType,
-     R.RackSingle,R.RackDouble,R.RackTriple,R.RackSingle,R.RackDouble,
-     R.RackTriple,A.TAC,@MarkupId,
-     --CASE WHEN ISNULL(R.Inclusive,0) = 1 THEN 'Y' ELSE 'N' END
-     CASE WHEN ISNULL(R.Inclusive,0) = 1 THEN 'N' ELSE 'T' END
-     FROM WRBHBProperty P
-     LEFT OUTER JOIN WRBHBPropertyAgreements A WITH(NOLOCK)ON 
-     A.PropertyId=P.Id
-     LEFT OUTER JOIN WRBHBPropertyAgreementsRoomCharges R WITH(NOLOCK)ON
-     R.AgreementId=A.Id
-     WHERE P.IsActive=1 AND P.IsDeleted=0 AND A.IsActive=1 AND 
-     A.IsDeleted=0 AND R.IsActive=1 AND R.IsDeleted=0 AND P.CityId=@CityId 
-     AND P.Category='External Property' AND A.TAC = 0 AND
-     P.Id NOT IN (SELECT PropertyId FROM #ExternalNOTINProperty);
-    END   
-  END
- CREATE TABLE #TMPPTY(PropertyId BIGINT,RoomType NVARCHAR(100));
- INSERT INTO #TMPPTY(PropertyId,RoomType)
- SELECT Id,RoomType FROM #External1 GROUP BY Id,RoomType;
- -- Get Facility Begin
- CREATE TABLE #TMPFacility(PropertyId BIGINT,RoomType NVARCHAR(100),
- Facility NVARCHAR(100));
- INSERT INTO #TMPFacility(PropertyId,RoomType,Facility)
- SELECT E.PropertyId,E.RoomType,R.Facility FROM #TMPPTY E
- LEFT OUTER JOIN WRBHBPropertyAgreements A WITH(NOLOCK)ON
- A.PropertyId=E.PropertyId
- LEFT OUTER JOIN WRBHBPropertyAgreementsRoomCharges R WITH(NOLOCK)ON
- R.AgreementId=A.Id
- WHERE A.IsActive=1 AND A.IsDeleted=0 AND R.IsActive=1 AND R.IsDeleted=0
- AND R.RoomType=E.RoomType;
- --
- CREATE TABLE #Facility(PropertyId BIGINT,RoomType NVARCHAR(100),
- Facility NVARCHAR(100));
- INSERT INTO #Facility(PropertyId,RoomType,Facility)
- SELECT E.PropertyId,E.RoomType,ISNULL(F.Facility,'') FROM #TMPPTY E
- LEFT OUTER JOIN #TMPFacility F ON F.PropertyId=E.PropertyId
- AND E.RoomType=F.RoomType; 
- -- Get Facility End 
- CREATE TABLE #External(PropertyName NVARCHAR(100),Id BIGINT,
- GetType NVARCHAR(100),PropertyType NVARCHAR(100),RoomType NVARCHAR(100),
- SingleTariff DECIMAL(27,2),DoubleTariff DECIMAL(27,2),
- TripleTariff DECIMAL(27,2),SingleandMarkup DECIMAL(27,2),
- DoubleandMarkup DECIMAL(27,2),TripleandMarkup DECIMAL(27,2),
- TAC BIT,Facility NVARCHAR(100),MarkupId BIGINT,TaxAdded NVARCHAR(100));
- IF @StarCnt != 0
-  BEGIN
-   --select * from #External1;
-   --select @MinValue,@MaxValue,@StarFlag;
-   IF @StarFlag = 1
-    BEGIN
-     INSERT INTO #External(PropertyName,Id,GetType,PropertyType,RoomType,
-     SingleTariff,DoubleTariff,TripleTariff,SingleandMarkup,
-     DoubleandMarkup,TripleandMarkup,TAC,Facility,MarkupId,TaxAdded)
-     SELECT E.PropertyName,E.Id,E.GetType,E.PropertyType,E.RoomType,
-     E.SingleTariff,E.DoubleTariff,E.TripleTariff,E.SingleandMarkup,
-     E.DoubleandMarkup,E.TripleandMarkup,E.TAC,F.Facility,E.MarkupId,
-     E.TaxAdded FROM #External1 E
-     LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id=E.Id
-     JOIN #Facility F ON F.PropertyId=E.Id
-     WHERE P.IsActive=1 AND P.IsDeleted=0 AND P.PropertyType=@StarId
-     AND E.RoomType=F.RoomType AND E.Id=F.PropertyId;
-    END
-   IF @StarFlag = 0
-    BEGIN
-     INSERT INTO #External(PropertyName,Id,GetType,PropertyType,RoomType,
-     SingleTariff,DoubleTariff,TripleTariff,SingleandMarkup,
-     DoubleandMarkup,TripleandMarkup,TAC,Facility,MarkupId,TaxAdded)
-     SELECT E.PropertyName,E.Id,E.GetType,E.PropertyType,E.RoomType,
-     E.SingleTariff,E.DoubleTariff,E.TripleTariff,E.SingleandMarkup,
-     E.DoubleandMarkup,E.TripleandMarkup,E.TAC,F.Facility,E.MarkupId,
-     E.TaxAdded FROM #External1 E
-     LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id=E.Id
-     LEFT OUTER JOIN #Facility F ON F.PropertyId=E.Id AND
-     E.RoomType=F.RoomType
-     WHERE E.SingleandMarkup BETWEEN @MinValue AND @MaxValue;
-     --select * from #External;return;
-    END
-  END
- ELSE
-  BEGIN   
-   INSERT INTO #External(PropertyName,Id,GetType,PropertyType,RoomType,
-   SingleTariff,DoubleTariff,TripleTariff,SingleandMarkup,
-   DoubleandMarkup,TripleandMarkup,TAC,Facility,MarkupId,TaxAdded)
-   SELECT E.PropertyName,E.Id,E.GetType,E.PropertyType,E.RoomType,
-   E.SingleTariff,E.DoubleTariff,E.TripleTariff,E.SingleandMarkup,
-   E.DoubleandMarkup,E.TripleandMarkup,E.TAC,F.Facility,E.MarkupId,
-   E.TaxAdded FROM #External1 E
-   LEFT OUTER JOIN #Facility F ON F.PropertyId=E.Id AND
-   E.RoomType=F.RoomType;
-  END
+  CREATE TABLE #TmpExpHR(PropertyName NVARCHAR(100),Id BIGINT,
+  GetType NVARCHAR(100),PropertyType NVARCHAR(100),RoomType NVARCHAR(100),
+  AgreedSingle DECIMAL(27,2),AgreedDouble DECIMAL(27,2),
+  AgreedTriple DECIMAL(27,2),RackSingle DECIMAL(27,2),
+  RackDouble DECIMAL(27,2),RackTriple DECIMAL(27,2),TAC BIT,
+  Inclusive BIT,Facility NVARCHAR(100),LTAgreed DECIMAL(27,2),
+  LTRack DECIMAL(27,2),STAgreed DECIMAL(27,2),RoomId BIGINT,
+  StarRatingId BIGINT,HRSingle DECIMAL(27,2));
+  INSERT INTO #TmpExpHR(PropertyName,Id,GetType,PropertyType,RoomType,
+  AgreedSingle,AgreedDouble,AgreedTriple,RackSingle,RackDouble,RackTriple,
+  TAC,Inclusive,Facility,LTAgreed,LTRack,STAgreed,RoomId,StarRatingId,
+  HRSingle)
+  SELECT PropertyName,Id,GetType,PropertyType,RoomType,AgreedSingle,
+  AgreedDouble,AgreedTriple,RackSingle,RackDouble,RackTriple,TAC,Inclusive,
+  Facility,LTAgreed,LTRack,STAgreed,RoomId,StarRatingId,
+  CASE WHEN TAC = 1 THEN HRSingle
+       WHEN TAC = 0 AND @Flag = 0 THEN HRSingle + @Rs
+       WHEN TAC = 0 AND @Flag = 1 THEN HRSingle + ROUND((HRSingle * @Per / 100),0)
+       ELSE HRSingle END
+  FROM #TmpExternal;
+  --
+  --SELECT @Flag,@Rs;
+  --SELECT * FROM #TmpExternal WHERE Id = 1476;RETURN;
+  --  
+  CREATE TABLE #TmpExternalHR(PropertyName NVARCHAR(100),Id BIGINT,
+  GetType NVARCHAR(100),PropertyType NVARCHAR(100),RoomType NVARCHAR(100),
+  AgreedSingle DECIMAL(27,2),AgreedDouble DECIMAL(27,2),
+  AgreedTriple DECIMAL(27,2),RackSingle DECIMAL(27,2),
+  RackDouble DECIMAL(27,2),RackTriple DECIMAL(27,2),TAC BIT,
+  Inclusive BIT,Facility NVARCHAR(100),LTAgreed DECIMAL(27,2),
+  LTRack DECIMAL(27,2),STAgreed DECIMAL(27,2),RoomId BIGINT,
+  StarRatingId BIGINT,HRSingle DECIMAL(27,2));
+  IF @StarCnt != 0
+   BEGIN
+    IF @StarFlag = 1
+     BEGIN
+      INSERT INTO #TmpExternalHR(PropertyName,Id,GetType,PropertyType,RoomType,
+      AgreedSingle,AgreedDouble,AgreedTriple,RackSingle,RackDouble,RackTriple,
+      TAC,Inclusive,Facility,LTAgreed,LTRack,STAgreed,RoomId,StarRatingId,
+      HRSingle)
+      SELECT PropertyName,Id,GetType,PropertyType,RoomType,AgreedSingle,
+      AgreedDouble,AgreedTriple,RackSingle,RackDouble,RackTriple,TAC,Inclusive,
+      Facility,LTAgreed,LTRack,STAgreed,RoomId,StarRatingId,HRSingle 
+      FROM #TmpExpHR WHERE StarRatingId = @StarId;
+     END
+    IF @StarFlag = 0
+     BEGIN
+      INSERT INTO #TmpExternalHR(PropertyName,Id,GetType,PropertyType,RoomType,
+      AgreedSingle,AgreedDouble,AgreedTriple,RackSingle,RackDouble,RackTriple,
+      TAC,Inclusive,Facility,LTAgreed,LTRack,STAgreed,RoomId,StarRatingId,
+      HRSingle)
+      SELECT PropertyName,Id,GetType,PropertyType,RoomType,AgreedSingle,
+      AgreedDouble,AgreedTriple,RackSingle,RackDouble,RackTriple,TAC,Inclusive,
+      Facility,LTAgreed,LTRack,STAgreed,RoomId,StarRatingId,HRSingle 
+      FROM #TmpExpHR WHERE HRSingle BETWEEN @MinValue AND @MaxValue;
+     END
+   END
+  ELSE
+   BEGIN
+    INSERT INTO #TmpExternalHR(PropertyName,Id,GetType,PropertyType,RoomType,
+    AgreedSingle,AgreedDouble,AgreedTriple,RackSingle,RackDouble,RackTriple,
+    TAC,Inclusive,Facility,LTAgreed,LTRack,STAgreed,RoomId,StarRatingId,HRSingle)
+    SELECT PropertyName,Id,GetType,PropertyType,RoomType,AgreedSingle,
+    AgreedDouble,AgreedTriple,RackSingle,RackDouble,RackTriple,TAC,Inclusive,
+    Facility,LTAgreed,LTRack,STAgreed,RoomId,StarRatingId,HRSingle 
+    FROM #TmpExpHR;
+   END
+  --
+  --SELECT 'HI';RETURN;
+  --SELECT * FROM #TmpExternalHR WHERE Id = 1476;RETURN;
+  --
+  CREATE TABLE #External1(PropertyName NVARCHAR(100),Id BIGINT,
+  GetType NVARCHAR(100),PropertyType NVARCHAR(100),RoomType NVARCHAR(100),
+  SingleTariff DECIMAL(27,2),DoubleTariff DECIMAL(27,2),TripleTariff DECIMAL(27,2),
+  TAC BIT,Facility NVARCHAR(100),TaxAdded NVARCHAR(100),
+  LTAgreed DECIMAL(27,2),STAgreed DECIMAL(27,2),LTRack DECIMAL(27,2),
+  TaxInclusive BIT,HRSingle DECIMAL(27,2));
+  INSERT INTO #External1(PropertyName,Id,GetType,PropertyType,RoomType,
+  SingleTariff,DoubleTariff,TripleTariff,TAC,Facility,TaxAdded,
+  LTAgreed,STAgreed,LTRack,TaxInclusive,HRSingle)
+  SELECT PropertyName,Id,GetType,PropertyType,RoomType,
+  CASE WHEN ISNULL(H.Inclusive,0) = 0 THEN 
+  (H.AgreedSingle + ROUND((((H.AgreedSingle * H.LTAgreed)/100) + 
+  ((H.AgreedSingle * H.STAgreed)/100) + ((H.RackSingle * H.LTRack)/100)),0))
+  ELSE H.AgreedSingle END,
+  CASE WHEN ISNULL(H.Inclusive,0) = 0 THEN 
+  (H.AgreedDouble + ROUND((((H.AgreedDouble * H.LTAgreed)/100) + 
+  ((H.AgreedDouble * H.STAgreed)/100) + ((H.RackDouble * H.LTRack)/100)),0))
+  ELSE H.AgreedDouble END,
+  CASE WHEN ISNULL(H.Inclusive,0) = 0 THEN 
+  (H.AgreedTriple + ROUND((((H.AgreedTriple * H.LTAgreed)/100) + 
+  ((H.AgreedTriple * H.STAgreed)/100) + ((H.RackTriple * H.LTRack)/100)),0))
+  ELSE H.AgreedTriple END,H.TAC,H.Facility,'N',
+  H.LTAgreed,H.STAgreed,H.LTRack,H.Inclusive,HRSingle FROM #TmpExternalHR H;
+  --
+  --SELECT SingleTariff,Id FROM #External1;RETURN;
+  --SELECT 'HI';RETURN;
+  --
+  CREATE TABLE #External(PropertyName NVARCHAR(100),Id BIGINT,
+  GetType NVARCHAR(100),PropertyType NVARCHAR(100),RoomType NVARCHAR(100),
+  SingleTariff DECIMAL(27,2),DoubleTariff DECIMAL(27,2),
+  TripleTariff DECIMAL(27,2),SingleandMarkup DECIMAL(27,2),
+  DoubleandMarkup DECIMAL(27,2),TripleandMarkup DECIMAL(27,2),
+  TAC BIT,MarkupId BIGINT,TaxAdded NVARCHAR(100),Facility NVARCHAR(100),
+  LTAgreed DECIMAL(27,2),STAgreed DECIMAL(27,2),LTRack DECIMAL(27,2),
+  TaxInclusive BIT,HRSingle DECIMAL(27,2));  
+  --
+  INSERT INTO #External(PropertyName,Id,GetType,PropertyType,RoomType,
+  SingleTariff,DoubleTariff,TripleTariff,SingleandMarkup,DoubleandMarkup,
+  TripleandMarkup,TAC,MarkupId,TaxAdded,Facility,
+  LTAgreed,STAgreed,LTRack,TaxInclusive,HRSingle)
+  SELECT PropertyName,Id,GetType,PropertyType,RoomType,SingleTariff,DoubleTariff,
+  TripleTariff,SingleTariff,DoubleTariff,TripleTariff,TAC,0,TaxAdded,Facility,
+  LTAgreed,STAgreed,LTRack,TaxInclusive,HRSingle 
+  FROM #External1 WHERE TAC = 1;
+  --
+  --SELECT @Flag,@Rs;
+  --SELECT * FROM #External;RETURN;  
+  --
+  IF @Flag = 0
+   BEGIN
+    INSERT INTO #External(PropertyName,Id,GetType,PropertyType,RoomType,
+    SingleTariff,DoubleTariff,TripleTariff,SingleandMarkup,DoubleandMarkup,
+    TripleandMarkup,TAC,MarkupId,TaxAdded,Facility,
+    LTAgreed,STAgreed,LTRack,TaxInclusive,HRSingle)
+    SELECT PropertyName,Id,GetType,PropertyType,RoomType,
+    SingleTariff,DoubleTariff,TripleTariff,
+    CASE WHEN SingleTariff > 0 THEN SingleTariff + @Rs ELSE SingleTariff END,
+    CASE WHEN DoubleTariff > 0 THEN DoubleTariff + @Rs ELSE DoubleTariff END,
+    CASE WHEN TripleTariff > 0 THEN TripleTariff + @Rs ELSE TripleTariff END,
+    TAC,@MarkupId,TaxAdded,Facility,LTAgreed,STAgreed,LTRack,TaxInclusive,
+    HRSingle FROM #External1 WHERE TAC = 0;
+   END
+  ELSE
+   BEGIN
+    INSERT INTO #External(PropertyName,Id,GetType,PropertyType,RoomType,
+    SingleTariff,DoubleTariff,TripleTariff,SingleandMarkup,DoubleandMarkup,
+    TripleandMarkup,TAC,MarkupId,TaxAdded,Facility,
+    LTAgreed,STAgreed,LTRack,TaxInclusive,HRSingle)
+    SELECT PropertyName,Id,GetType,PropertyType,RoomType,
+    SingleTariff,DoubleTariff,TripleTariff,
+    CASE WHEN SingleTariff > 0 THEN 
+    SingleTariff + ROUND((SingleTariff * @Per)/100,0) ELSE SingleTariff END,
+    CASE WHEN DoubleTariff > 0 THEN 
+    DoubleTariff + ROUND((DoubleTariff * @Per)/100,0) ELSE DoubleTariff END,
+    CASE WHEN TripleTariff > 0 THEN 
+    TripleTariff + ROUND((TripleTariff * @Per)/100,0) ELSE TripleTariff END,
+    TAC,@MarkupId,TaxAdded,Facility,
+    LTAgreed,STAgreed,LTRack,TaxInclusive,HRSingle FROM #External1 WHERE TAC = 0;
+   END
+  --
+  --SELECT * FROM #ManagedGH;
+  --SELECT * FROM #Dedicated;
+  --SELECT * FROM #External;RETURN;
+  --SELECT * FROM #External WHERE Id = 485;RETURN;
 -- #External # END
 -- API data BEGIN
   CREATE TABLE #GETTariffs(HotelId BIGINT,RoomRatePlanCode NVARCHAR(100),
@@ -1437,16 +1192,15 @@ IF @Action = 'Property'
   --
   --SELECT * FROM #GETTariffs;RETURN;
   --
-  CREATE TABLE #APITariff(HotelId BIGINT,RoomRatePlanCode NVARCHAR(100),
+  CREATE TABLE #APITariff2(HotelId BIGINT,RoomRatePlanCode NVARCHAR(100),
   RoomRateTypeCode NVARCHAR(100),AvailableCount INT,SingleTariff DECIMAL(27,2),
-  DoubleTariff DECIMAL(27,2));
-  --
-  INSERT INTO #APITariff(HotelId,RoomRatePlanCode,RoomRateTypeCode,
-  AvailableCount,SingleTariff,DoubleTariff)
-  --
+  DoubleTariff DECIMAL(27,2),HRSingle DECIMAL(27,2));
+  INSERT INTO #APITariff2(HotelId,RoomRatePlanCode,RoomRateTypeCode,
+  AvailableCount,SingleTariff,DoubleTariff,HRSingle)
   SELECT HotelId,RoomRatePlanCode,RoomRateTypeCode,AvailableCount,
-  (SingleRoomRate+SingleTaxes)-SingleRoomDiscount AS Single,
-  (DubRoomRate+DubTaxes)-DubRoomDiscount AS Dub FROM #GETTariffs;
+  (SingleRoomRate + SingleTaxes) - SingleRoomDiscount AS Single,
+  (DubRoomRate + DubTaxes) - DubRoomDiscount AS Dub,
+  SingleRoomRate - SingleRoomDiscount FROM #GETTariffs;
   --
   DECLARE @MMTId BIGINT=0,@MMTPer DECIMAL(27,2)=0;
   IF EXISTS (SELECT NULL FROM WRBHBMMTMarkup WHERE IsActive=1 AND IsDeleted=0)
@@ -1455,40 +1209,33 @@ IF @Action = 'Property'
     WHERE IsActive=1 AND IsDeleted=0;
    END  
   --
-  --SELECT @MMTId,@MMTPer;
-  --HOTELNAMEEMPTY
-/*CREATE TABLE #APIHOTELNAMEEMPTY(HotalName NVARCHAR(100),HotelId BIGINT,
-  RoomRatePlanCode NVARCHAR(100),RoomRateTypeCode NVARCHAR(100),
-  RoomTypename NVARCHAR(100),GetType NVARCHAR(100),PropertyType NVARCHAR(100),
-  SingleTariff DECIMAL(27,2),DoubleTariff DECIMAL(27,2),
-  SingleandMarkup DECIMAL(27,2),DoubleandMarkup DECIMAL(27,2),
-  InclusionCode NVARCHAR(1000),Phone NVARCHAR(100),Email NVARCHAR(1000),
-  Area NVARCHAR(1000),StarRating NVARCHAR(100));
+  CREATE TABLE #APITariff1(HotelId BIGINT,RoomRatePlanCode NVARCHAR(100),
+  RoomRateTypeCode NVARCHAR(100),AvailableCount INT,SingleTariff DECIMAL(27,2),
+  DoubleTariff DECIMAL(27,2),HRSingle DECIMAL(27,2));
+  INSERT INTO #APITariff1(HotelId,RoomRatePlanCode,RoomRateTypeCode,
+  AvailableCount,SingleTariff,DoubleTariff,HRSingle)
+  SELECT HotelId,RoomRatePlanCode,RoomRateTypeCode,AvailableCount,
+  SingleTariff,DoubleTariff,HRSingle + ROUND((HRSingle * @MMTPer /100),0) 
+  FROM #APITariff2;
   --
-  INSERT INTO #APIHOTELNAMEEMPTY(HotalName,HotelId,RoomRatePlanCode,
-  RoomRateTypeCode,RoomTypename,GetType,PropertyType,SingleTariff,DoubleTariff,
-  SingleandMarkup,DoubleandMarkup,InclusionCode,Phone,Email,Area,
-  StarRating)
-  --
-  SELECT SH.HotalName,T.HotelId,T.RoomRatePlanCode,T.RoomRateTypeCode,
-  RT.RoomTypename,'API','MMT',T.SingleTariff,T.DoubleTariff,  
-  CASE WHEN @MMTPer > 0 THEN 
-  ROUND(T.SingleTariff+(T.SingleTariff*@MMTPer)/100,0) 
-  ELSE T.SingleTariff END AS SingleandMarkup,
-  CASE WHEN @MMTPer > 0 THEN 
-  ROUND(T.DoubleTariff+(T.DoubleTariff*@MMTPer)/100,0)
-  ELSE T.DoubleTariff END AS DoubleandMarkup,
-  ISNULL(I.InclusionCode,''),ISNULL(SH.Phone,''),ISNULL(SH.Email,''),
-  SH.Area,SH.StarRating
-  FROM #APITariff T
-  LEFT OUTER JOIN WRBHBStaticHotals SH WITH(NOLOCK)ON SH.HotalId=T.HotelId
-  LEFT OUTER JOIN WRBHBAPIHotelHeader H WITH(NOLOCK)ON H.HotelId=T.HotelId
-  LEFT OUTER JOIN WRBHBAPIRoomTypeDtls RT WITH(NOLOCK)ON RT.HotelId=T.HotelId 
-  AND RT.RoomTypecode=T.RoomRateTypeCode AND RT.HeaderId=H.HeaderId
-  LEFT OUTER JOIN WRBHBAPIRateMealPlanInclusionDtls I WITH(NOLOCK)ON
-  I.HotelId=T.HotelId AND I.RatePlanCode=T.RoomRatePlanCode AND 
-  I.HeaderId=H.HeaderId
-  WHERE H.HeaderId=@StateId;*/
+  CREATE TABLE #APITariff(HotelId BIGINT,RoomRatePlanCode NVARCHAR(100),
+  RoomRateTypeCode NVARCHAR(100),AvailableCount INT,SingleTariff DECIMAL(27,2),
+  DoubleTariff DECIMAL(27,2),HRSingle DECIMAL(27,2));
+  IF @MaxValue != 0
+   BEGIN
+    INSERT INTO #APITariff(HotelId,RoomRatePlanCode,RoomRateTypeCode,
+    AvailableCount,SingleTariff,DoubleTariff,HRSingle)
+    SELECT HotelId,RoomRatePlanCode,RoomRateTypeCode,AvailableCount,
+    SingleTariff,DoubleTariff,HRSingle FROM #APITariff1
+    WHERE HRSingle BETWEEN @MinValue AND @MaxValue;
+   END
+  ELSE
+   BEGIN
+    INSERT INTO #APITariff(HotelId,RoomRatePlanCode,RoomRateTypeCode,
+    AvailableCount,SingleTariff,DoubleTariff,HRSingle)
+    SELECT HotelId,RoomRatePlanCode,RoomRateTypeCode,AvailableCount,
+    SingleTariff,DoubleTariff,HRSingle FROM #APITariff1;
+   END  
   --
   CREATE TABLE #API(HotalName NVARCHAR(100),HotelId BIGINT,
   RoomRatePlanCode NVARCHAR(100),RoomRateTypeCode NVARCHAR(100),
@@ -1497,12 +1244,12 @@ IF @Action = 'Property'
   SingleandMarkup DECIMAL(27,2),DoubleandMarkup DECIMAL(27,2),
   InclusionCode NVARCHAR(1000),Phone NVARCHAR(100),Email NVARCHAR(1000),
   Area NVARCHAR(1000),StarRating NVARCHAR(100),MealPlan NVARCHAR(100),
-  TripadvisorRating NVARCHAR(100));
+  TripadvisorRating NVARCHAR(100),HRSingle DECIMAL(27,2));
   --
   INSERT INTO #API(HotalName,HotelId,RoomRatePlanCode,RoomRateTypeCode,
   RoomTypename,GetType,PropertyType,SingleTariff,DoubleTariff,
   SingleandMarkup,DoubleandMarkup,InclusionCode,Phone,Email,Area,
-  StarRating,MealPlan,TripadvisorRating)
+  StarRating,MealPlan,TripadvisorRating,HRSingle)
   --
   SELECT SH.HotalName,T.HotelId,
   --T.HotelId AS HotalName,T.HotelId,
@@ -1516,7 +1263,7 @@ IF @Action = 'Property'
   ELSE T.DoubleTariff END AS DoubleandMarkup,
   ISNULL(I.InclusionCode,''),ISNULL(SH.Phone,''),ISNULL(SH.Email,''),
   ISNULL(SH.Area,'') AS Area,SH.StarRating,I.MealPlan,
-  ISNULL(CAST(SH.TRIPRating AS VARCHAR),'')
+  ISNULL(CAST(SH.TRIPRating AS VARCHAR),''),HRSingle
   FROM #APITariff T
   LEFT OUTER JOIN WRBHBStaticHotels SH WITH(NOLOCK)ON SH.HotalId=T.HotelId
   LEFT OUTER JOIN WRBHBAPIHotelHeader H WITH(NOLOCK)ON H.HotelId=T.HotelId
@@ -1527,7 +1274,6 @@ IF @Action = 'Property'
   I.HeaderId=H.HeaderId
   WHERE H.HeaderId=@StateId AND ISNULL(SH.HotalName,'') != '';
   --
-  --HotalName COUNT(*) FROM #APIHOTELNAMEEMPTY;
   --SELECT * FROM #API;RETURN
 -- API data END
   CREATE TABLE #Property(PropertyName NVARCHAR(100),Id BIGINT,
@@ -1536,14 +1282,16 @@ IF @Action = 'Property'
   TripleTariff DECIMAL(27,2),SingleandMarkup DECIMAL(27,2),
   DoubleandMarkup DECIMAL(27,2),TripleandMarkup DECIMAL(27,2),
   TAC BIT,Facility NVARCHAR(100),DiscountModeRS BIT,DiscountModePer BIT,
-  DiscountAllowed DECIMAL(27,2),MarkupId BIGINT,TaxAdded NVARCHAR(100));
+  DiscountAllowed DECIMAL(27,2),MarkupId BIGINT,TaxAdded NVARCHAR(100),
+  LTAgreed DECIMAL(27,2),STAgreed DECIMAL(27,2),LTRack DECIMAL(27,2),
+  TaxInclusive BIT,HRSingle DECIMAL(27,2));
   --- Managed G H
   INSERT INTO #Property(PropertyName,Id,GetType,PropertyType,RoomType,
   SingleTariff,DoubleTariff,TripleTariff,SingleandMarkup,DoubleandMarkup,
   TripleandMarkup,TAC,Facility,DiscountModeRS,DiscountModePer,
   DiscountAllowed,MarkupId,TaxAdded)
   SELECT PropertyName,Id,GetType,PropertyType,'',0,0,0,0,0,0,0,
-  'CP',0,0,0,0,'' FROM #ManagedGH 
+  'CP',0,0,0,0,'T' FROM #ManagedGH 
   GROUP BY PropertyName,Id,GetType,PropertyType
   ORDER BY PropertyName ASC;
   -- Dedicated
@@ -1552,7 +1300,7 @@ IF @Action = 'Property'
   TripleandMarkup,TAC,Facility,DiscountModeRS,DiscountModePer,
   DiscountAllowed,MarkupId,TaxAdded)
   SELECT P.PropertyName,I.Id,I.GetType,I.PropertyType,'',0,0,0,0,0,0,0,
-  'CP',0,0,0,0,'' FROM #Dedicated I
+  'CP',0,0,0,0,'T' FROM #Dedicated I
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id=I.Id
   LEFT OUTER JOIN WRBHBPropertyBlocks B WITH(NOLOCK)ON B.PropertyId=I.Id
   LEFT OUTER JOIN WRBHBPropertyApartment A WITH(NOLOCK)ON
@@ -1563,29 +1311,34 @@ IF @Action = 'Property'
   A.IsActive=1 AND A.IsDeleted=0 AND R.IsActive=1 AND R.IsDeleted=0 AND
   A.Status='Active' AND R.RoomStatus='Active' AND
   A.SellableApartmentType != 'HUB' AND
-  R.Id NOT IN (SELECT RoomId FROM #ExistingDedicatedProperty) AND
-  A.Id NOT IN (SELECT ApartmentId FROM #ExDdPApartmnt)
+  R.Id NOT IN (SELECT RoomId FROM #BookedRoom) AND
+  A.Id NOT IN (SELECT ApartmentId FROM #BookedApartment)
   GROUP BY P.PropertyName,I.Id,I.GetType,I.PropertyType
   ORDER BY PropertyName ASC;
   -- Client Prefered
   INSERT INTO #Property(PropertyName,Id,GetType,PropertyType,RoomType,
   SingleTariff,DoubleTariff,TripleTariff,SingleandMarkup,DoubleandMarkup,
   TripleandMarkup,TAC,Facility,DiscountModeRS,DiscountModePer,
-  DiscountAllowed,MarkupId,TaxAdded)
+  DiscountAllowed,MarkupId,TaxAdded,LTAgreed,STAgreed,LTRack,TaxInclusive,
+  HRSingle)
   SELECT PropertyName,Id,GetType,PropertyType,RoomType,SingleTariff,
-  DoubleTariff,0,SingleTariff,DoubleTariff,0,0,'CP',0,0,0,0,'' 
-  FROM #ClientPrefered 
+  DoubleTariff,TripleTariff,SingleTariff,DoubleTariff,TripleTariff,0,'CP',0,0,
+  0,0,'N',
+  LTAgreed,STAgreed,LTRack,TaxInclusive,HRSingle FROM #ClientPrefered
   GROUP BY PropertyName,Id,GetType,PropertyType,RoomType,SingleTariff,
-  DoubleTariff,SingleTariff,DoubleTariff
+  DoubleTariff,TripleTariff,LTAgreed,STAgreed,LTRack,TaxInclusive,HRSingle
   ORDER BY PropertyName ASC;
+  --
+  --SELECT * FROM #Property;RETURN;
   -- #Internal
   INSERT INTO #Property(PropertyName,Id,GetType,PropertyType,RoomType,
   SingleTariff,DoubleTariff,TripleTariff,SingleandMarkup,DoubleandMarkup,
   TripleandMarkup,TAC,Facility,DiscountModeRS,DiscountModePer,
-  DiscountAllowed,MarkupId,TaxAdded)
+  DiscountAllowed,MarkupId,TaxAdded,HRSingle)
   SELECT I.PropertyName,I.Id,I.GetType,I.PropertyType,I.RoomType,
   I.SingleTariff,I.DoubleTariff,0,I.SingleTariff,I.DoubleTariff,0,0,'CP',
-  I.DiscountModeRS,I.DiscountModePer,I.DiscountAllowed,0,'' FROM #Internal I
+  I.DiscountModeRS,I.DiscountModePer,I.DiscountAllowed,0,'T',I.SingleTariff 
+  FROM #Internal I
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id=I.Id
   LEFT OUTER JOIN WRBHBPropertyBlocks B WITH(NOLOCK)ON B.PropertyId=I.Id
   LEFT OUTER JOIN WRBHBPropertyApartment A WITH(NOLOCK)ON
@@ -1596,22 +1349,31 @@ IF @Action = 'Property'
   A.IsActive=1 AND A.IsDeleted=0 AND R.IsActive=1 AND R.IsDeleted=0 AND
   A.Status='Active' AND R.RoomStatus='Active' AND
   A.SellableApartmentType != 'HUB' AND 
-  R.Id NOT IN (SELECT RoomId FROM #ExistingInternalProperty)
+  R.Id NOT IN (SELECT RoomId FROM #BookedRoom) AND
+  A.Id NOT IN (SELECT ApartmentId FROM #BookedApartment) AND
+  R.Id NOT IN (SELECT RoomId FROM #DedicatedRoom) AND
+  A.Id NOT IN (SELECT ApartmentId FROM #DedicatedApartment)
   GROUP BY I.PropertyName,I.Id,I.GetType,I.PropertyType,I.RoomType,
   I.SingleTariff,I.DoubleTariff,I.SingleTariff,I.DoubleTariff,
   I.DiscountModeRS,I.DiscountModePer,I.DiscountAllowed 
-  ORDER BY PropertyName ASC;
+  ORDER BY PropertyName,I.SingleTariff ASC;
+  --
+  --SELECT * FROM #Property;RETURN;
   -- #External
   INSERT INTO #Property(PropertyName,Id,GetType,PropertyType,RoomType,
   SingleTariff,DoubleTariff,TripleTariff,SingleandMarkup,DoubleandMarkup,
   TripleandMarkup,TAC,Facility,DiscountModeRS,DiscountModePer,
-  DiscountAllowed,MarkupId,TaxAdded)
+  DiscountAllowed,MarkupId,TaxAdded,LTAgreed,STAgreed,LTRack,TaxInclusive,
+  HRSingle)
   SELECT PropertyName,Id,GetType,PropertyType,RoomType,SingleTariff,
   DoubleTariff,TripleTariff,SingleandMarkup,DoubleandMarkup,
-  TripleandMarkup,TAC,Facility,0,0,0,MarkupId,TaxAdded FROM #External
+  TripleandMarkup,TAC,Facility,0,0,0,MarkupId,TaxAdded,
+  LTAgreed,STAgreed,LTRack,TaxInclusive,HRSingle FROM #External
   GROUP BY PropertyName,Id,GetType,PropertyType,RoomType,SingleTariff,
   DoubleTariff,TripleTariff,SingleandMarkup,DoubleandMarkup,
-  TripleandMarkup,TAC,Facility,MarkupId,TaxAdded ORDER BY PropertyName ASC; 
+  TripleandMarkup,TAC,Facility,MarkupId,TaxAdded,LTAgreed,STAgreed,LTRack,
+  TaxInclusive,HRSingle
+  ORDER BY PropertyName,SingleandMarkup ASC; 
   --
   --SELECT * FROM #Property;RETURN;
   --- Property select
@@ -1626,14 +1388,17 @@ IF @Action = 'Property'
   SingleandMarkup1 DECIMAL(27,2),DoubleandMarkup1 DECIMAL(27,2),
   TripleandMarkup1 DECIMAL(27,2),StarRating NVARCHAR(100),
   TaxAdded NVARCHAR(100),RatePlanCode NVARCHAR(100),RoomTypeCode NVARCHAR(100),
-  MealPlan NVARCHAR(100),TripadvisorRating NVARCHAR(100));
+  MealPlan NVARCHAR(100),TripadvisorRating NVARCHAR(100),
+  LTAgreed DECIMAL(27,2),STAgreed DECIMAL(27,2),LTRack DECIMAL(27,2),
+  TaxInclusive BIT,HRSingle DECIMAL(27,2));
   -- Property data
   INSERT INTO #FINAL(PropertyName,PropertyId,GetType,PropertyType,RoomType,
   SingleTariff,DoubleTariff,TripleTariff,SingleandMarkup,DoubleandMarkup,
   TripleandMarkup,TAC,Inclusions,DiscountModeRS,DiscountModePer,
   DiscountAllowed,Phone,Email,Locality,LocalityId,MarkupId,SingleandMarkup1,
   DoubleandMarkup1,TripleandMarkup1,StarRating,TaxAdded,RatePlanCode,
-  RoomTypeCode,MealPlan,TripadvisorRating)
+  RoomTypeCode,MealPlan,TripadvisorRating,LTAgreed,STAgreed,LTRack,TaxInclusive,
+  HRSingle)
   SELECT TP.PropertyName,TP.Id AS PropertyId,TP.GetType,TP.PropertyType,
   TP.RoomType,TP.SingleTariff,TP.DoubleTariff,TP.TripleTariff,
   TP.SingleandMarkup,TP.DoubleandMarkup,TP.TripleandMarkup,TP.TAC,
@@ -1652,8 +1417,9 @@ IF @Action = 'Property'
        WHEN T.PropertyType = '7 Star' THEN '7'
        WHEN T.PropertyType = '7+ Star' THEN '7+'
        WHEN T.PropertyType = 'Serviced Appartments' THEN 'S A'
-       ELSE T.PropertyType END AS StarRating,TP.TaxAdded,'','','',
-       ISNULL(CAST(P.TRIPRating AS VARCHAR),'')
+       ELSE ISNULL(T.PropertyType,'') END AS StarRating,TP.TaxAdded,'','','',
+       ISNULL(CAST(P.TRIPRating AS VARCHAR),''),
+       TP.LTAgreed,TP.STAgreed,TP.LTRack,TP.TaxInclusive,TP.HRSingle
   /*,CASE WHEN TP.PropertyType = 'ExP' AND TP.GetType = 'Contract' THEN '#242020'
    WHEN TP.PropertyType = 'ExP' AND TP.GetType = 'Property' THEN '#770E0E'
    WHEN TP.PropertyType = 'InP' AND TP.GetType = 'Contract' THEN '#27B25C'
@@ -1667,7 +1433,19 @@ IF @Action = 'Property'
   LEFT OUTER JOIN WRBHBLocality L WITH(NOLOCK)ON L.Id=P.LocalityId
   LEFT OUTER JOIN WRBHBPropertyType T WITH(NOLOCK)ON T.Id=P.PropertyType;
   -- API data
-  IF @MaxValue != 0
+  INSERT INTO #FINAL(PropertyName,PropertyId,GetType,PropertyType,RoomType,
+  RatePlanCode,RoomTypeCode,SingleTariff,DoubleTariff,TripleTariff,
+  SingleandMarkup,DoubleandMarkup,TripleandMarkup,TAC,Inclusions,
+  DiscountModeRS,DiscountModePer,DiscountAllowed,Phone,Email,Locality,
+  LocalityId,MarkupId,SingleandMarkup1,DoubleandMarkup1,TripleandMarkup1,
+  StarRating,TaxAdded,MealPlan,TripadvisorRating,HRSingle)
+  SELECT HotalName,HotelId,GetType,PropertyType,RoomTypename,RoomRatePlanCode,
+  RoomRateTypeCode,SingleTariff,DoubleTariff,0,SingleandMarkup,
+  DoubleandMarkup,0,0,InclusionCode,0,0,0,Phone,Email,Area,0,@MMTId,
+  SingleandMarkup AS SingleandMarkup1,DoubleandMarkup,0,StarRating,'N',
+  MealPlan,TripadvisorRating,HRSingle FROM #API 
+  ORDER BY HotalName,SingleandMarkup ASC;
+  /*IF @MaxValue != 0
    BEGIN
     INSERT INTO #FINAL(PropertyName,PropertyId,GetType,PropertyType,RoomType,
     RatePlanCode,RoomTypeCode,SingleTariff,DoubleTariff,TripleTariff,
@@ -1697,7 +1475,7 @@ IF @Action = 'Property'
     SingleandMarkup AS SingleandMarkup1,DoubleandMarkup,0,StarRating,'',
     MealPlan,TripadvisorRating FROM #API
     ORDER BY HotalName,SingleandMarkup ASC;
-   END
+   END*/
   --
   --SELECT * FROM #FINAL;RETURN;
   -- Get CPP Property Id
@@ -1739,7 +1517,9 @@ IF @Action = 'Property'
   Locality,LocalityId,MarkupId,SingleandMarkup1,DoubleandMarkup1,
   TripleandMarkup1,StarRating,TaxAdded,0 AS Tick,1 AS Chk,'' AS Markup,0 AS Id,
   RatePlanCode,RoomTypeCode,@StateId AS APIHdrId,MealPlan,
-  TripadvisorRating 
+  TripadvisorRating,ISNULL(LTAgreed,0) AS LTAgreed,ISNULL(STAgreed,0) AS STAgreed,
+  ISNULL(LTRack,0) AS LTRack,ISNULL(TaxInclusive,0) AS TaxInclusive,
+  ISNULL(HRSingle,0) AS BaseTariff 
   FROM #FINAL; 
   --
   --SELECT COUNT(*) FROM #FINAL; 
@@ -1777,7 +1557,11 @@ IF @Action = 'Property'
   F.Phone,F.Email,F.Locality,F.LocalityId,F.MarkupId,F.SingleandMarkup1,
   F.DoubleandMarkup1,F.TripleandMarkup1,F.StarRating,F.TaxAdded,0 AS Tick,
   1 AS Chk,'' AS Markup,0 AS Id,F.RatePlanCode,F.RoomTypeCode,
-  @StateId AS APIHdrId,F.MealPlan,F.TripadvisorRating  FROM #ZAXSQA Z
+  @StateId AS APIHdrId,F.MealPlan,F.TripadvisorRating,
+  ISNULL(F.LTAgreed,0) AS LTAgreed,ISNULL(F.STAgreed,0) AS STAgreed,
+  ISNULL(F.LTRack,0) AS LTRack,ISNULL(TaxInclusive,0) AS TaxInclusive,
+  ISNULL(HRSingle,0) AS BaseTariff   
+  FROM #ZAXSQA Z
   LEFT OUTER JOIN #FINAL F WITH(NOLOCK) ON Z.PropertyId = F.PropertyId
   WHERE F.PropertyId = Z.PropertyId ORDER BY Z.PropertyCnt ASC;
   /*SELECT P.PropertyName,CAST(TP.Id AS NVARCHAR) AS PropertyId,

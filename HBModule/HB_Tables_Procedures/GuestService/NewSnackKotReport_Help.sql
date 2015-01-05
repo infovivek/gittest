@@ -94,8 +94,8 @@ CREATE PROCEDURE dbo.[SP_NewSnackKOTEntryReport_Help]
 	      JOIN WRBHBContractNonDedicatedServices CS ON C.Id=CS.NondedContractId AND CS.IsActive=1 AND CS.IsDeleted=0
 	      WHERE C.IsActive=1 AND C.IsDeleted=0	
 	      
-	     UPDATE #Contract SET Price=0 
-		 WHERE Complimentary=1
+	  --   UPDATE #Contract SET Price=0 
+		 --WHERE Complimentary=1
 		 
 		INSERT INTO #ContractFinal(Id,Complimentary,ServiceName,Price,Enable,ChkInnId,GuesId,ProductId)
 		SELECT Id,ISComplimentary,ProductName,PerQuantityprice,Enable,0,0,Id
@@ -487,10 +487,10 @@ CREATE PROCEDURE dbo.[SP_NewSnackKOTEntryReport_Help]
 	
 		 
 	 END
-		SELECT  ConsumerType,Name,ServiceItem,SUM(Quantity) AS Quantity,SUM(Revenue) AS Revenue
+		SELECT  ConsumerType,Name,ServiceItem,SUM(Quantity) AS Quantity,F.Price,SUM(Quantity)*(F.Price) AS Revenue
 		FROM #Guest G
-		LEFT OUTER JOIN #ContractFinal F ON G.ServiceItem=F.ServiceName
-		group by ConsumerType,Name,ServiceItem
+		JOIN #ContractFinal F ON G.ServiceItem=F.ServiceName
+		group by ConsumerType,Name,ServiceItem,F.Price
 		
 	 
  END

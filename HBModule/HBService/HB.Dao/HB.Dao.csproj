@@ -93,6 +93,8 @@
     <Compile Include="CheckInDtlsDAO.cs" />
     <Compile Include="CheckInForecastReportDAO.cs" />
     <Compile Include="CheckoutAndIntermediateDao.cs" />
+    <Compile Include="CheckOutandInterSettleDtlDao.cs" />
+    <Compile Include="CheckOutandInterSettleHdrDao.cs" />
     <Compile Include="CheckOutPaymentCardDao.cs" />
     <Compile Include="CheckOutPaymentCashDao.cs" />
     <Compile Include="CheckOutPaymentChequeDao.cs" />

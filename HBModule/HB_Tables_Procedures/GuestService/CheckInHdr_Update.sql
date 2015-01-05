@@ -27,7 +27,7 @@ CREATE PROCEDURE [dbo].[SP_CheckInHdr_Update](
 @RackTariffDouble DECIMAL(27,2),@ApartmentId INT=NULL,@BedId INT=NULL,@ApartmentType NVARCHAR(100),
 @BedType NVARCHAR(100),@Type NVARCHAR(100),@RefGuestId nvarchar(100),@PropertyType nvarchar(100),
 @CheckStatus NVARCHAR(100),@GuestImage NVARCHAR(100),@SingleMarkupAmount DECIMAL(27,2),
-@DoubleMarkupAmount DECIMAL(27,2),@ClientId int,@CityId int,@ServiceCharge int)
+@DoubleMarkupAmount DECIMAL(27,2),@ClientId int,@CityId int,@ServiceCharge int,@TariffPaymentMode NVARCHAR(100))
 
 AS
 BEGIN
@@ -47,7 +47,8 @@ ApartmentId = @ApartmentId,BedId =@BedId,ApartmentType = @ApartmentType,
 BedType = @BedType,Type=@Type,RefGuestId=@RefGuestId,PropertyType=@PropertyType,
 CheckStatus=@CheckStatus,GuestImage=@GuestImage,SingleMarkupAmount=@SingleMarkupAmount,
 DoubleMarkupAmount=@DoubleMarkupAmount,ClientId=@ClientId,CityId=@CityId,ServiceCharge=@ServiceCharge,
-NewCheckInDate=CONVERT(Date,@ArrivalDate,103),NewCheckoutDate=CONVERT(Date,@ChkoutDate,103)
+NewCheckInDate=CONVERT(Date,@ArrivalDate,103),NewCheckoutDate=CONVERT(Date,@ChkoutDate,103),
+TariffPaymentMode=@TariffPaymentMode
 WHERE Id=@Id;
 
 SELECT Id,RowId FROM WRBHBCheckInHdr WHERE Id=@Id;
