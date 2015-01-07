@@ -57,12 +57,14 @@ namespace HB.Dao
                 //ds.Tables[1].Rows[0][4].ToString()
                 if (ds.Tables[10].Rows.Count > 0)
                 {
-                    message.From = new System.Net.Mail.MailAddress("homestay@uniglobeatb.co.in", "", System.Text.Encoding.UTF8);
+                    //message.From = new System.Net.Mail.MailAddress("homestay@uniglobeatb.co.in", "", System.Text.Encoding.UTF8);
+                    message.From = new System.Net.Mail.MailAddress(ds.Tables[4].Rows[0][15].ToString(), "", System.Text.Encoding.UTF8);
                 }
                 else
                 {
                     //message.From = new System.Net.Mail.MailAddress("stay@staysimplyfied.com", "", System.Text.Encoding.UTF8);
-                    message.From = new System.Net.Mail.MailAddress("stay@hummingbirdindia.com", "", System.Text.Encoding.UTF8);
+                    //message.From = new System.Net.Mail.MailAddress("stay@hummingbirdindia.com", "", System.Text.Encoding.UTF8);
+                    message.From = new System.Net.Mail.MailAddress(ds.Tables[4].Rows[0][14].ToString(), "", System.Text.Encoding.UTF8);
                 }
                 //message.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
                 //message.Subject = "Room Booking Confirmation - " + ds.Tables[2].Rows[0][2].ToString();
@@ -221,7 +223,8 @@ namespace HB.Dao
                 string Taxes = "";
                 if (ds.Tables[11].Rows[0][7].ToString() == "BTC")
                 {
-                    Taxes = "Taxes as applicable";
+                    //Taxes = "Taxes as applicable";
+                    Taxes = ds.Tables[4].Rows[0][13].ToString();
                 }
                 if (ds.Tables[11].Rows[0][7].ToString() == "NOTBTC")
                 {

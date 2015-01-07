@@ -280,9 +280,11 @@ IF @BookingLevel = 'Room'
     CONVERT(VARCHAR(12),B.CreatedDate,103) BookingDate,BookingLevel,EmailtoGuest  
     FROM WRBHBBooking B  
     LEFT OUTER JOIN WRBHBUser U  WITH(NOLOCK) ON  U.Id=@UsrId  
-    WHERE B.Id=@BookingId;  
+    WHERE B.Id=@BookingId;
+    --
+    DECLARE @Stay NVARCHAR(100) = 'stay@hummingbirdindia.com';
     -- Dataset TABLE 1  
-    SELECT TOP 1 Logo FROM WRBHBCompanyMaster WHERE IsActive = 1
+    SELECT TOP 1 Logo,@Stay FROM WRBHBCompanyMaster WHERE IsActive = 1
     ORDER BY Id DESC;  
     -- Dataset TABLE 2  
     SELECT ISNULL(BP.PropertyName,''),BP.PropertyName+','+Propertaddress+','+  

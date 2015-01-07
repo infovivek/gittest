@@ -96,8 +96,8 @@ IF @Action='PageLoad'
 	 @ClientAddress as Address,  
 	 'INVOICE : For any invoice clarification revert within 7 days from the date of receipt' as Invoice,  
 	 'All cheque or demand drafts in payment of bills should be drawn in favor of Hummingbird Travel and stay pvt.ltd.  
-	 and should be crossed A/C PAYEE ONLY.' as Cheque,'PAN NO :'+@PanCardNo+'   |   '+'TIN : 29340489869'+'   |   '+'L Tax No :'+ t.LuxuryNo+'  |  '
-	 +'CIN No: U72900KA2005PTC035942' as TaxNo,  
+	 and should be crossed A/C PAYEE ONLY.' as Cheque,'PAN NO :'+@PanCardNo+'   |   '+'TIN :'+ t.TINNumber +'   |   '+'L Tax No :'+ t.LuxuryNo+'  |  '
+	 +'CIN No:'+t.CINNumber as TaxNo,  
 	 'LATE PAYMENT : Interest @18% per annum will be charged on all outstanding bill after due date.' as Latepay ,  
 	 'TIN : 29340489869' as Tin,'Taxable Category : Accommodation Service,Business Support Services and Restaurant Services' as Taxablename,  
 	 'Service Tax Regn. No : AABCH5874RST001' as ServiceTaxNo,'Luxury Tax @ '+CAST(H.LuxuryTaxPer AS NVARCHAR)+'%' LTPer,

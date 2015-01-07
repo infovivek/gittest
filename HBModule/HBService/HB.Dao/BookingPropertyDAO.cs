@@ -258,12 +258,14 @@ namespace HB.Dao
                     //DSBooking.Tables[1].Rows[0][4].ToString()
                     if (DSBooking.Tables[8].Rows.Count > 0)
                     {
-                        message.From = new System.Net.Mail.MailAddress("homestay@uniglobeatb.co.in", "", System.Text.Encoding.UTF8);
+                        //message.From = new System.Net.Mail.MailAddress("homestay@uniglobeatb.co.in", "", System.Text.Encoding.UTF8);
+                        message.From = new System.Net.Mail.MailAddress(DSBooking.Tables[2].Rows[0][2].ToString(), "", System.Text.Encoding.UTF8);
                     }
                     else
                     {
                         //message.From = new System.Net.Mail.MailAddress("stay@staysimplyfied.com", "", System.Text.Encoding.UTF8);
-                        message.From = new System.Net.Mail.MailAddress("stay@hummingbirdindia.com", "", System.Text.Encoding.UTF8);
+                        //message.From = new System.Net.Mail.MailAddress("stay@hummingbirdindia.com", "", System.Text.Encoding.UTF8);
+                        message.From = new System.Net.Mail.MailAddress(DSBooking.Tables[2].Rows[0][1].ToString(), "", System.Text.Encoding.UTF8);
                     }
                     //message.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
                     //message.Subject = " Test Recommended Hotel List TID -" + DSBooking.Tables[1].Rows[0][2].ToString();
@@ -431,8 +433,9 @@ namespace HB.Dao
                         " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Type</p></th>" +
                         " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Location</p></th>" +
                         " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Room Type</p></th>" +
-                        " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Single Tariff</p></th>" +
-                        " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Double Tariff</p></th>" +
+                        " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Base Tariff</p></th>" +
+                        " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Single Tariff<br>(Nett Tariff)</p></th>" +
+                        " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Double Tariff<br>(Nett Tariff)</p></th>" +
                         " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Inclusions</p></th>" +
                         " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #fff;\"><p>Check In Policy</p></th>" +
                         "</tr>";
@@ -444,6 +447,7 @@ namespace HB.Dao
                             " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">" + DSBooking.Tables[0].Rows[j][9].ToString() + "</p></td>" +
                             " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">" + DSBooking.Tables[0].Rows[j][2].ToString() + "</p></td>" +
                             " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">" + DSBooking.Tables[0].Rows[j][3].ToString() + "</p></td>" +
+                            " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">" + DSBooking.Tables[0].Rows[j][10].ToString() + "</p></td>" +
                             " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">" + DSBooking.Tables[0].Rows[j][4].ToString() + "</p></td>" +
                             " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">" + DSBooking.Tables[0].Rows[j][7].ToString() + "</p></td>" +
                             " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">" + DSBooking.Tables[0].Rows[j][5].ToString() + "</p></td>" +
@@ -489,10 +493,8 @@ namespace HB.Dao
                     System.Net.Mail.SmtpClient smtp = new System.Net.Mail.SmtpClient();
                     smtp.EnableSsl = true;
                     smtp.Port = 587;
-                    smtp.Host = "email-smtp.us-west-2.amazonaws.com"; 
-                    smtp.Credentials = new System.Net.NetworkCredential("AKIAIIVF5D5D3CJAX7SQ", "ApmuZkd+L8tissEga8kac3quhhwohEi5CB+dYD36KTq3");
-                    //smtp.Host = "smtp.gmail.com"; 
-                    //smtp.Credentials = new System.Net.NetworkCredential("stay@staysimplyfied.com", "stay1234");
+                    smtp.Host = "email-smtp.us-west-2.amazonaws.com";smtp.Credentials = new System.Net.NetworkCredential("AKIAIIVF5D5D3CJAX7SQ", "ApmuZkd+L8tissEga8kac3quhhwohEi5CB+dYD36KTq3");
+                    //smtp.Host = "smtp.gmail.com";smtp.Credentials = new System.Net.NetworkCredential("stay@staysimplyfied.com", "stay1234");
                     try
                     {
                         smtp.Send(message);

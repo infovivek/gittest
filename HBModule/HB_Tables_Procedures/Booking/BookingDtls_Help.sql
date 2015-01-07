@@ -42,11 +42,14 @@ FROM WRBHBClientManagement
 WHERE Id = (SELECT ClientId FROM WRBHBBooking WHERE Id = @Id);
 --
 DECLARE @Taxes NVARCHAR(100),@TypeofPtyy NVARCHAR(100),@TXADED NVARCHAR(100);
-  SELECT TOP 1 @TXADED = ISNULL(TaxAdded,'T'),
-  @TypeofPtyy = PropertyType
-  FROM WRBHBBookingProperty WHERE Id IN (
-  SELECT TOP 1 BookingPropertyTableId FROM WRBHBBookingPropertyAssingedGuest
-  WHERE BookingId = @Id);
+SELECT TOP 1 @TXADED = ISNULL(TaxAdded,'T'),@TypeofPtyy = PropertyType
+FROM WRBHBBookingProperty WHERE Id IN (
+SELECT TOP 1 BookingPropertyTableId FROM WRBHBBookingPropertyAssingedGuest
+WHERE BookingId = @Id);
+--
+DECLARE @Stay NVARCHAR(100),@Uniglobe NVARCHAR(100);
+SET @Stay = 'stay@hummingbirdindia.com';
+SET @Uniglobe = 'homestay@uniglobeatb.co.in';
 --
 /*SET @CLogoAlt=(SELECT TOP 1 LegalCompanyName FROM WRBHBCompanyMaster 
 WHERE IsActive=1 AND IsDeleted=0);*/
@@ -85,9 +88,9 @@ IF @Action = 'ClientGuestLoad'
   CREATE TABLE #ASDS(CityName NVARCHAR(100),PropertyName NVARCHAR(100),
   Locality NVARCHAR(100),RoomType NVARCHAR(100),SingleandMarkup1 NVARCHAR(100),
   Inclusions NVARCHAR(100),Id BIGINT,DoubleandMarkup1 NVARCHAR(100),
-  CheckInType NVARCHAR(100),Typee NVARCHAR(100));
+  CheckInType NVARCHAR(100),Typee NVARCHAR(100),BaseTariff DECIMAL(27,2));
   INSERT INTO #ASDS(CityName,PropertyName,Locality,RoomType,SingleandMarkup1,
-  Inclusions,Id,DoubleandMarkup1,CheckInType,Typee)
+  Inclusions,Id,DoubleandMarkup1,CheckInType,Typee,BaseTariff)
   SELECT C.CityName,BP.PropertyName,BP.Locality,BP.RoomType,
   CASE WHEN BP.TaxAdded = 'N' THEN CAST(BP.SingleandMarkup1 AS VARCHAR) +' <SUP>#</SUP>'
        WHEN BP.TaxAdded = 'T' THEN CAST(BP.SingleandMarkup1 AS VARCHAR) +' <SUP>&#9733;</SUP>'
@@ -99,7 +102,7 @@ IF @Action = 'ClientGuestLoad'
        WHEN BP.TaxAdded = '' THEN CAST(BP.DoubleandMarkup1 AS VARCHAR) +' <SUP>&#9733;</SUP>'
        ELSE CAST(BP.DoubleandMarkup1 AS VARCHAR) +' <SUP>&#9733;</SUP>' END,
   CAST(P.CheckIn AS VARCHAR)+' '+P.CheckInType,
-  BP.PropertyType AS Typee
+  BP.PropertyType AS Typee,BP.BaseTariff
   FROM WRBHBBookingProperty BP
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK) ON P.Id = BP.PropertyId
   LEFT OUTER JOIN WRBHBLocality L WITH(NOLOCK) ON L.Id = BP.LocalityId
@@ -108,11 +111,11 @@ IF @Action = 'ClientGuestLoad'
   BP.PropertyType IN ('ExP','CPP','InP','MGH','DdP');
   --
   INSERT INTO #ASDS(CityName,PropertyName,Locality,RoomType,SingleandMarkup1,
-  Inclusions,Id,DoubleandMarkup1,CheckInType,Typee)
+  Inclusions,Id,DoubleandMarkup1,CheckInType,Typee,BaseTariff)
   SELECT B.CityName,BP.PropertyName,BP.Locality,BP.RoomType,
   CAST(BP.SingleandMarkup1 AS VARCHAR)+' <SUP>#</SUP>',BP.Inclusions,BP.Id,
   CAST(BP.DoubleandMarkup1 AS VARCHAR)+' <SUP>#</SUP>',SH.CheckInTime,
-  'MMT' FROM WRBHBBooking B
+  'MMT',BP.BaseTariff FROM WRBHBBooking B
   LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId = B.Id
   LEFT OUTER JOIN WRBHBCity C WITH(NOLOCK) ON C.Id = B.CityId
   LEFT OUTER JOIN WRBHBStaticHotels SH WITH(NOLOCK)ON 
@@ -122,24 +125,24 @@ IF @Action = 'ClientGuestLoad'
   CREATE TABLE #TTEEMMPP(CityName NVARCHAR(100),PropertyName NVARCHAR(100),
   Locality NVARCHAR(100),RoomType NVARCHAR(100),SingleandMarkup1 NVARCHAR(100),
   Inclusions NVARCHAR(100),Id NVARCHAR(100),DoubleandMarkup1 NVARCHAR(100),
-  CheckInType NVARCHAR(100),Typee NVARCHAR(100));
+  CheckInType NVARCHAR(100),Typee NVARCHAR(100),BaseTariff DECIMAL(27,2));
   INSERT INTO #TTEEMMPP(CityName,PropertyName,Locality,RoomType,
-  SingleandMarkup1,Inclusions,Id,DoubleandMarkup1,CheckInType,Typee)
+  SingleandMarkup1,Inclusions,Id,DoubleandMarkup1,CheckInType,Typee,BaseTariff)
   SELECT CityName,PropertyName,Locality,RoomType,SingleandMarkup1,Inclusions,
-  Id,DoubleandMarkup1,CheckInType,'Company Prefered' FROM #ASDS
+  Id,DoubleandMarkup1,CheckInType,'Company Prefered',BaseTariff FROM #ASDS
   WHERE Typee = 'CPP';
   INSERT INTO #TTEEMMPP(CityName,PropertyName,Locality,RoomType,
-  SingleandMarkup1,Inclusions,Id,DoubleandMarkup1,CheckInType,Typee)
+  SingleandMarkup1,Inclusions,Id,DoubleandMarkup1,CheckInType,Typee,BaseTariff)
   SELECT CityName,PropertyName,Locality,RoomType,SingleandMarkup1,Inclusions,
-  Id,DoubleandMarkup1,CheckInType,'Guest House' FROM #ASDS
+  Id,DoubleandMarkup1,CheckInType,'Guest House',BaseTariff FROM #ASDS
   WHERE Typee = 'MGH';
   INSERT INTO #TTEEMMPP(CityName,PropertyName,Locality,RoomType,
-  SingleandMarkup1,Inclusions,Id,DoubleandMarkup1,CheckInType,Typee)
+  SingleandMarkup1,Inclusions,Id,DoubleandMarkup1,CheckInType,Typee,BaseTariff)
   SELECT CityName,PropertyName,Locality,RoomType,SingleandMarkup1,Inclusions,
-  Id,DoubleandMarkup1,CheckInType,'Others' FROM #ASDS
+  Id,DoubleandMarkup1,CheckInType,'Others',BaseTariff FROM #ASDS
   WHERE Typee NOT IN ('CPP','MGH');
   SELECT CityName,PropertyName,Locality,RoomType,SingleandMarkup1,Inclusions,
-  Id,DoubleandMarkup1,CheckInType,Typee FROM #TTEEMMPP;
+  Id,DoubleandMarkup1,CheckInType,Typee,BaseTariff FROM #TTEEMMPP;
   /*-- dataset table 0
   SELECT C.CityName,BP.PropertyName,BP.Locality,RoomType,
   SingleandMarkup1 AS Tariff,Inclusions,BP.Id,DoubleandMarkup1,
@@ -155,7 +158,7 @@ IF @Action = 'ClientGuestLoad'
   LEFT OUTER JOIN WRBHBUser U  WITH(NOLOCK) ON U.Id = B.CreatedBy
   WHERE B.Id = @Id;
   -- dataset table 2
-  SELECT CAST(EmailtoGuest AS INT) FROM WRBHBBooking 
+  SELECT CAST(EmailtoGuest AS INT),@Stay,@Uniglobe FROM WRBHBBooking 
   WHERE Id=@Id;
   -- dataset table 3
   SELECT EmailId FROM WRBHBBookingGuestDetails WHERE BookingId=@Id;
@@ -214,14 +217,10 @@ IF @Action = 'RoomBookingConfirmed'
   REPLACE(CONVERT(VARCHAR(11), BG.ChkOutDt, 106), ' ', '-'),
   BG.Tariff,BG.Occupancy,
   CASE WHEN BG.TariffPaymentMode='Direct' THEN 'Direct<br>(Cash/Card)'
-       WHEN BG.TariffPaymentMode = 'Bill to Client' THEN 'Bill to '+@ClientName1
-       WHEN BG.TariffPaymentMode = 'Bill to Company (BTC)' AND @TypeofPtyy != 'MGH' 
-       THEN 'Bill to Company (BTC)<br>(7.42% Tax Extra)'       
+       WHEN BG.TariffPaymentMode = 'Bill to Client' THEN 'Bill to '+@ClientName1       
        ELSE BG.TariffPaymentMode END AS TariffPaymentMode,
   CASE WHEN BG.ServicePaymentMode='Direct' THEN 'Direct<br>(Cash/Card)'
-       WHEN BG.ServicePaymentMode = 'Bill to Client' THEN 'Bill to '+@ClientName1
-       WHEN BG.ServicePaymentMode = 'Bill to Company (BTC)' AND @TypeofPtyy != 'MGH'
-       THEN 'Bill to Company (BTC)<br>(7.42% Tax Extra)'
+       WHEN BG.ServicePaymentMode = 'Bill to Client' THEN 'Bill to '+@ClientName1       
        ELSE BG.ServicePaymentMode END AS ServicePaymentMode,BG.RoomCaptured,
        BG.RoomType 
   FROM WRBHBBookingPropertyAssingedGuest BG
@@ -247,6 +246,25 @@ IF @Action = 'RoomBookingConfirmed'
   SELECT Name,ChkInDt,ChkOutDt,Tariff,Occupancy,TariffPaymentMode,
   ServicePaymentMode,RoomNo FROM #QAZ;
   --
+  /*CREATE TABLE #Table0(Name NVARCHAR(100),ChkInDt NVARCHAR(100),
+  ChkOutDt NVARCHAR(100),Tariff DECIMAL(27,2),Occupancy NVARCHAR(100),
+  TariffPaymentMode NVARCHAR(100),ServicePaymentMode NVARCHAR(100),
+  RoomNo NVARCHAR(100));
+  INSERT INTO #Table0(Name,ChkInDt,ChkOutDt,Tariff,Occupancy,TariffPaymentMode,
+  ServicePaymentMode,RoomNo)
+  SELECT Name,ChkInDt,ChkOutDt,Tariff,Occupancy,
+  CASE WHEN TariffPaymentMode = 'Bill to Company (BTC)' AND 
+  @TypeofPtyy NOT IN ('MGH','InP','DdP') 
+  THEN 'Bill to Company (BTC)<br>(7.42% Tax Extra)'
+  ELSE TariffPaymentMode END,
+  CASE WHEN ServicePaymentMode = 'Bill to Company (BTC)' AND 
+  @TypeofPtyy NOT IN ('MGH','InP','DdP') 
+  THEN 'Bill to Company (BTC)<br>(7.42% Tax Extra)'
+  ELSE ServicePaymentMode END,RoomNo FROM #QAZ;
+  --
+  SELECT Name,ChkInDt,ChkOutDt,Tariff,Occupancy,TariffPaymentMode,
+  ServicePaymentMode,RoomNo FROM #Table0;*/
+  --
   IF @TXADED = 'N'
    BEGIN
     SET @Taxes = 'Including Tax';
@@ -254,41 +272,7 @@ IF @Action = 'RoomBookingConfirmed'
   IF @TXADED = 'T'
    BEGIN
     SET @Taxes = 'Taxes as applicable';
-   END    
-  /*IF EXISTS (SELECT NULL FROM WRBHBBookingProperty P
-  LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest G WITH(NOLOCK)ON
-  G.BookingId=P.BookingId AND G.BookingPropertyTableId=P.Id
-  WHERE G.BookingId=@Id AND P.PropertyType='ExP' AND P.TaxAdded = 'N' AND
-  G.TariffPaymentMode = 'Bill to Company (BTC)')
-   BEGIN    
-    SELECT Name,ChkInDt,ChkOutDt,
-    --CAST(Tariff - ROUND(Tariff*19/100,0) AS DECIMAL(27,2)),Occupancy,
-    Tariff,Occupancy,
-    TariffPaymentMode,ServicePaymentMode,RoomNo FROM #QAZ;
-    SET @Taxes = 'Taxes as applicable';
-   END
-  ELSE
-   BEGIN    
-    SELECT Name,ChkInDt,ChkOutDt,Tariff,Occupancy,TariffPaymentMode,
-    ServicePaymentMode,RoomNo FROM #QAZ;
-    --
-    SELECT TOP 1 @TypeofPtyy = PropertyType,@TXADED = ISNULL(TaxAdded,'T') 
-    FROM WRBHBBookingProperty WHERE Id IN (
-    SELECT TOP 1 BookingPropertyTableId FROM WRBHBBookingPropertyAssingedGuest 
-    WHERE BookingId = @Id);
-    IF @TypeofPtyy = 'ExP' AND @TXADED = 'N'
-     BEGIN
-      SET @Taxes = 'Including Tax';
-     END
-    IF @TypeofPtyy = 'ExP' AND @TXADED = 'T'
-     BEGIN
-      SET @Taxes = 'Taxes as applicable';
-     END
-    IF @TypeofPtyy != 'ExP'
-     BEGIN
-      SET @Taxes = 'Taxes as applicable';
-     END    
-   END*/
+   END  
   --
   SELECT TOP 1 @BookingPropertyId=BookingPropertyId 
   FROM WRBHBBookingPropertyAssingedGuest
@@ -525,13 +509,23 @@ IF @Action = 'RoomBookingConfirmed'
    BEGIN
     SET @PropertyRefNo = 'reference number - '+@PtyRefNo;
    END
+  --
+  DECLARE @BTCTaxesContent NVARCHAR(1000) = '';  
+  IF @TypeofPtyy NOT IN ('MGH','InP','DdP')
+   BEGIN
+    SET @BTCTaxesContent = 'Inclusive of Property Taxes (LT & ST) & 7.42% extra ST.';
+   END
+  IF @TypeofPtyy IN ('MGH','InP','DdP')
+   BEGIN
+    SET @BTCTaxesContent = 'Taxes as applicable';
+   END  
   -- dataset table 4
   SELECT CAST(EmailtoGuest AS INT),
   'D:/Backend/flex_bin/Company_Images/Proof_of_Stay.pdf',
   --'D:/admonk/Backend/flex_bin/Company_Images/Proof_of_Stay.pdf',
   'Proof_of_Stay.pdf',@PName,@MobileNo,@SecurityPolicy,
   @CancelationPolicy,@Taxes,@TypeOfProperty,@PropertyRefNo,@CLogo,@CLogoAlt,
-  @TypeOfRoom 
+  @TypeOfRoom,@BTCTaxesContent,@Stay,@Uniglobe 
   FROM WRBHBBooking WHERE Id=@Id;
   -- dataset table 5
   SELECT EmailId FROM WRBHBBookingGuestDetails WHERE BookingId=@Id;
@@ -631,13 +625,8 @@ IF @Action = 'RoomBookingConfirmed'
   ServicePaymentMode NVARCHAR(100),RoomNo NVARCHAR(100));
   INSERT INTO #PropertyMailBTCChecking(Name,ChkInDt,ChkOutDt,Tariff,
   Occupancy,TariffPaymentMode,ServicePaymentMode,RoomNo)
-  SELECT STUFF((SELECT ', '+BA.Title+'. '+BA.FirstName+'  '+BA.LastName
-  FROM WRBHBBookingPropertyAssingedGuest BA 
-  WHERE BA.BookingId=B.BookingId AND BA.RoomCaptured=B.RoomCaptured AND
-  ISNULL(BA.RoomShiftingFlag,0) = 0
-  FOR XML PATH('')),1,1,'') AS Name,B.ChkInDt,B.ChkOutDt,
-  B.Tariff,B.Occupancy,B.TariffPaymentMode,B.ServicePaymentMode,B.RoomNo
-  FROM #FFF AS B;
+  SELECT B.Name,B.ChkInDt,B.ChkOutDt,B.Tariff,B.Occupancy,B.TariffPaymentMode,
+  B.ServicePaymentMode,B.RoomNo FROM #QAZ B;
   IF EXISTS(SELECT NULL FROM WRBHBBookingProperty BP
   LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
   BP.BookingId=BG.BookingId AND BP.Id=BG.BookingPropertyTableId AND
@@ -677,14 +666,10 @@ IF @Action = 'BedBookingConfirmed'
   REPLACE(CONVERT(VARCHAR(11), CheckOutDate, 106), ' ', '-'),
   BA.Tariff,
   CASE WHEN BA.TariffPaymentMode = 'Direct' THEN 'Direct<br>(Cash/Card)'
-       WHEN BA.TariffPaymentMode = 'Bill to Client' THEN 'Bill to '+@ClientName1
-       WHEN BA.TariffPaymentMode = 'Bill to Company (BTC)' AND @TypeofPtyy != 'MGH' 
-       THEN 'Bill to Company (BTC)<br>(7.42% Tax Extra)'
+       WHEN BA.TariffPaymentMode = 'Bill to Client' THEN 'Bill to '+@ClientName1       
        ELSE BA.TariffPaymentMode END AS TariffPaymentMode,       
   CASE WHEN BA.ServicePaymentMode='Direct' THEN 'Direct<br>(Cash/Card)'
-       WHEN BA.ServicePaymentMode = 'Bill to Client' THEN 'Bill to '+@ClientName1
-       WHEN BA.ServicePaymentMode = 'Bill to Company (BTC)' AND @TypeofPtyy != 'MGH'
-       THEN 'Bill to Company (BTC)<br>(7.42% Tax Extra)'
+       WHEN BA.ServicePaymentMode = 'Bill to Client' THEN 'Bill to '+@ClientName1       
        ELSE BA.ServicePaymentMode END AS ServicePaymentMode,
        BA.BedType
   --BA.TariffPaymentMode,BA.ServicePaymentMode
@@ -746,7 +731,7 @@ IF @Action = 'BedBookingConfirmed'
   SET @MobileNo = (SELECT TOP 1 ISNULL(MobileNo,'') FROM #GST1);
   -- Dataset Table 4
   SELECT CAST(EmailtoGuest AS INT),@PName,@MobileNo,
-  @SecurityPolicy,@CancelationPolicy FROM WRBHBBooking 
+  @SecurityPolicy,@CancelationPolicy,@Stay,@Uniglobe FROM WRBHBBooking 
   WHERE Id=@Id;
   --
   DECLARE @BedBookingPropertyType NVARCHAR(100) = '';
@@ -830,14 +815,10 @@ IF @Action = 'ApartmentBookingConfirmed'
   REPLACE(CONVERT(VARCHAR(11), BG.ChkOutDt, 106), ' ', '-'),
   BG.Tariff,
   CASE WHEN BG.TariffPaymentMode='Direct' THEN 'Direct<br>(Cash/Card)'
-       WHEN BG.TariffPaymentMode = 'Bill to Client' THEN 'Bill to '+@ClientName1
-       WHEN BG.TariffPaymentMode = 'Bill to Company (BTC)' THEN
-       'Bill to Company (BTC)<br>(7.42% Tax Extra)'
+       WHEN BG.TariffPaymentMode = 'Bill to Client' THEN 'Bill to '+@ClientName1       
        ELSE BG.TariffPaymentMode END AS TariffPaymentMode,
   CASE WHEN BG.ServicePaymentMode='Direct' THEN 'Direct<br>(Cash/Card)'
-       WHEN BG.ServicePaymentMode = 'Bill to Client' THEN 'Bill to '+@ClientName1
-       WHEN BG.ServicePaymentMode = 'Bill to Company (BTC)' THEN
-       'Bill to Company (BTC)<br>(7.42% Tax Extra)'
+       WHEN BG.ServicePaymentMode = 'Bill to Client' THEN 'Bill to '+@ClientName1       
        ELSE BG.ServicePaymentMode END AS ServicePaymentMode
   --BG.TariffPaymentMode,BG.ServicePaymentMode 
   FROM WRBHBApartmentBookingPropertyAssingedGuest BG
@@ -911,7 +892,7 @@ IF @Action = 'ApartmentBookingConfirmed'
   SET @MobileNo = (SELECT TOP 1 ISNULL(MobileNo,'') FROM #GST11);
   -- Dataset Table 4
   SELECT CAST(EmailtoGuest AS INT),@PName,@MobileNo,
-  @SecurityPolicy,@CancelationPolicy FROM WRBHBBooking 
+  @SecurityPolicy,@CancelationPolicy,@Stay,@Uniglobe FROM WRBHBBooking 
   WHERE Id=@Id;
   -- Dataset Table 5
   SELECT EmailId FROM WRBHBBookingGuestDetails WHERE BookingId=@Id;
@@ -1080,7 +1061,8 @@ IF @Action = 'MMTBookingConfirmed'
   -- dataset table 3 
   /*SELECT EmailId,'Including Tax' FROM WRBHBBookingGuestDetails 
   WHERE BookingId=@Id GROUP BY EmailId;*/
-  SELECT EmailId,'Taxes as applicable' FROM WRBHBBookingGuestDetails 
+  SELECT EmailId,'Taxes as applicable',@Stay,@Uniglobe 
+  FROM WRBHBBookingGuestDetails 
   WHERE BookingId=@Id GROUP BY EmailId;
   -- Dataset Table 4
   IF EXISTS (SELECT NULL FROM WRBHBClientwisePricingModel 

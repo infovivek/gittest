@@ -35,12 +35,14 @@ namespace HB.Dao
             System.Net.Mail.MailMessage message = new System.Net.Mail.MailMessage();
             if (ds.Tables[10].Rows.Count > 0)
             {
-                message.From = new System.Net.Mail.MailAddress("homestay@uniglobeatb.co.in", "", System.Text.Encoding.UTF8);
+                //message.From = new System.Net.Mail.MailAddress("homestay@uniglobeatb.co.in", "", System.Text.Encoding.UTF8);
+                message.From = new System.Net.Mail.MailAddress(ds.Tables[4].Rows[0][6].ToString(), "", System.Text.Encoding.UTF8);
             }
             else
             {
                 //message.From = new System.Net.Mail.MailAddress("stay@staysimplyfied.com", "", System.Text.Encoding.UTF8);
-                message.From = new System.Net.Mail.MailAddress("stay@hummingbirdindia.com", "", System.Text.Encoding.UTF8);
+                //message.From = new System.Net.Mail.MailAddress("stay@hummingbirdindia.com", "", System.Text.Encoding.UTF8);
+                message.From = new System.Net.Mail.MailAddress(ds.Tables[4].Rows[0][5].ToString(), "", System.Text.Encoding.UTF8);
             }
             //message.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
             //message.Subject = "Apartment Booking Confirmation - " + ds.Tables[2].Rows[0][2].ToString();

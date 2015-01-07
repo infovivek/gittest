@@ -96,8 +96,8 @@ DECLARE @CompanyName VARCHAR(100),@Address NVARCHAR(100),@PanCardNo VARCHAR(100)
 	'All cheque or demand drafts in payment of bills should be drawn in favor of Hummingbird Travel and stay pvt.ltd.
 	and should be crossed A/C PAYEE ONLY.' as Cheque,
 	'LATE PAYMENT : Interest @18% per annum will be charged on all outstanding bill after due date.' as Latepay ,
-	'PAN NO :'+@PanCardNo+'   |   '+'TIN : 29340489869'+'   |   '+'L Tax No :'+ t.LuxuryNo+'  |  '
-	 +'CIN No: U72900KA2005PTC035942' as TaxNo,
+	'PAN NO :'+@PanCardNo+'   |   '+'TIN :'+ t.TINNumber+'   |   '+'L Tax No :'+ t.LuxuryNo+'  |  '
+	 +'CIN No: '+t.CINNumber as TaxNo,
 	 'Service Tax Regn. No : AABCH5874RST001' as ServiceTaxNo,
 	'Taxable Category : Accommodation Service,Business Support Services and Restaurant Services' as Taxablename,
 	round((isnull(h.ChkOutTariffNetAmount+sum(CS.ChkOutServiceNetAmount),0)),0) as BillAmount,
@@ -148,7 +148,8 @@ DECLARE @CompanyName VARCHAR(100),@Address NVARCHAR(100),@PanCardNo VARCHAR(100)
 	c.CityName,s.StateName,p.Postal,p.Phone,p.Email,	
     H.VATPer,h.RestaurantSTPer ,
     h.BusinessSupportST,h.ChkOutTariffST1 ,H.LuxuryTaxPer,H.ServiceTaxPer,h.ChkOutTariffExtraAmount,
-    h.InVoiceNo,h.NoOfDays,h.BillFromDate,h.BillEndDate,h.CreatedDate,t.LuxuryNo,d.ArrivalDate
+    h.InVoiceNo,h.NoOfDays,h.BillFromDate,h.BillEndDate,h.CreatedDate,t.LuxuryNo,d.ArrivalDate,
+    t.TINNumber,t.CINNumber
     
     
     

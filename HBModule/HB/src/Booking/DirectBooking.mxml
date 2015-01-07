@@ -106,7 +106,7 @@
 				//var num:Number= (end.getUTCFullYear() - start.getUTCFullYear()) * 12 +(end.getUTCMonth() - start.getUTCMonth());								
 				//useWeb("BOOKING","Tab2_to_Tab3_Dtls_CUSTOM",[GlobalXml,'Tab2_to_Tab3_Dtls','','','','',0,0,0,0,0,26,0]);				
 				var ss:String=Global_AC[0].UsrId;				
-				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Room',7998]);
+				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Room',8315]);
 				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,"RoomResend",6630]);				
 				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Bed',1528]);
 				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Apartment',2027]);
@@ -2431,7 +2431,8 @@
 							   SpecialRequirements:"",Id:Id,Status:"RmdPty",AMPM:Ddl_AMPM.selectedItem,
 							   BookingLevel:"Room",ExtraCCEmail:Txt_ExtraCCEmail.text,
 							   HRPolicy:Chk_HRPolicy.selected,HRPolicyOverrideRemarks:Txt_HRPolicyOverrideRemarks.text,
-							   PropertyRefNo:Txt_PropertyRefNo.text}]);
+							   PropertyRefNo:Txt_PropertyRefNo.text,
+							   PaymentFlag:Chk_PaymentEmail.selected}]);
 						var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
 						var Tmp1:ArrayCollection=new ArrayCollection();
 						var GuestXml:String="";

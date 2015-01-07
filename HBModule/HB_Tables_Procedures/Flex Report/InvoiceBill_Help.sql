@@ -94,7 +94,7 @@ BEGIN
    JOIN WRBHBMasterClientManagement MC WITH(NOLOCK) ON C.MasterClientId=MC.Id AND MC.IsActive=1 AND MC.IsDeleted=0  
    WHERE H.IsActive=1 AND H.IsDeleted=0 AND   
    CONVERT(DATE,H.CreatedDate,103) BETWEEN CONVERT(DATE,@Pram3,103)  
-   AND CONVERT(DATE,@Pram4,103) AND H.Flag=1   
+   AND CONVERT(DATE,@Pram4,103) --AND H.Flag=1   
   END  
   ELSE  
   BEGIN  
@@ -115,7 +115,7 @@ BEGIN
    JOIN WRBHBMasterClientManagement MC WITH(NOLOCK) ON C.MasterClientId=MC.Id AND MC.IsActive=1 AND MC.IsDeleted=0  
    WHERE H.IsActive=1 AND H.IsDeleted=0 AND   
    CONVERT(DATE,H.CreatedDate,103) BETWEEN CONVERT(DATE,@Pram3,103)  
-   AND CONVERT(DATE,@Pram4,103) AND H.Flag=1    
+   AND CONVERT(DATE,@Pram4,103) --AND H.Flag=1    
   END  
  END  
  ELSE  
@@ -140,7 +140,7 @@ BEGIN
    JOIN WRBHBMasterClientManagement MC WITH(NOLOCK) ON C.MasterClientId=MC.Id AND MC.IsActive=1 AND MC.IsDeleted=0  
    WHERE H.IsActive=1 AND H.IsDeleted=0 AND   
    CONVERT(DATE,H.CreatedDate,103) BETWEEN CONVERT(DATE,@Pram3,103)  
-   AND CONVERT(DATE,@Pram4,103) AND H.Flag=1   
+   AND CONVERT(DATE,@Pram4,103) --AND H.Flag=1   
   END  
   ELSE  
   BEGIN    
@@ -163,7 +163,7 @@ BEGIN
    JOIN WRBHBMasterClientManagement MC WITH(NOLOCK) ON C.MasterClientId=MC.Id AND MC.IsActive=1 AND MC.IsDeleted=0  
    WHERE H.IsActive=1 AND H.IsDeleted=0 AND   
    CONVERT(DATE,H.CreatedDate,103) BETWEEN CONVERT(DATE,@Pram3,103)  
-   AND CONVERT(DATE,@Pram4,103) AND H.Flag=1   
+   AND CONVERT(DATE,@Pram4,103) --AND H.Flag=1   
   END    
  END  
  --SERVICE CESS,HCHESS,VAT AMOUNT ADD  

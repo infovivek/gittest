@@ -235,14 +235,14 @@ END
 			VR.Service AS ExpenseHead,VR.VendorName AS VendorName,
 			P.PropertyName AS Property,VR.Duedate AS DueDate,VR.Type,'Cheque' AS PaymentMode,VD.BillNo,
 			VD.Amount AS RequestedAmount,VR.UserId,
-			VR.PropertyId,VR.Id
+			VR.PropertyId,VD.Id
 			FROM WRBHBVendorRequest VR
 			JOIN WRBHBVendorRequestDtl VD ON VR.Id=VD.VendorRequestHdrId AND VD.IsActive=1 AND VD.IsDeleted=0
 			JOIN WRBHBProperty P ON VR.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
 			WHERE VR.PropertyId=@CreatedById AND VR.IsActive=1 AND VR.IsDeleted=0 AND VR.Partial=0 AND
 			VR.Date=CONVERT(Date,@Str,103)
 			group by VR.Service,VR.VendorName,P.PropertyName,VR.Duedate ,VR.Type,VD.BillNo,VD.Amount,
-			VR.UserId,VR.PropertyId,VR.Id,VR.Date
+			VR.UserId,VR.PropertyId,VD.Id,VR.Date
 				
 			SELECT DISTINCT(U.FirstName+' '+U.LastName) AS Requestedby,CONVERT(NVARCHAR(100),VR.Date,103) AS
 			RequestedOn
@@ -256,14 +256,14 @@ END
 			SELECT CONVERT(NVARCHAR(100),VR.Date,103) AS BillDate,
 			VR.Service AS ExpenseHead,VR.VendorName AS VendorName,
 			P.PropertyName AS Property,VR.Duedate,VR.Type,'Cheque' AS PaymentMode,VD.BillNo,VD.Amount AS RequestedAmount,VR.UserId,
-			VR.PropertyId,VR.Id
+			VR.PropertyId,VD.Id
 			FROM WRBHBVendorRequest VR
 			JOIN WRBHBVendorRequestDtl VD ON VR.Id=VD.VendorRequestHdrId AND VD.IsActive=1 AND VD.IsDeleted=0
 			JOIN WRBHBProperty P ON VR.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
 			WHERE VR.PropertyId=@CreatedById AND VR.IsActive=1 AND VR.IsDeleted=0 AND VR.Partial=0
 			AND VR.Date=CONVERT(Date,@Str,103)
 			group by VR.Service,VR.VendorName,P.PropertyName,VR.Duedate,VR.Type,VD.Amount,
-			VD.BillNo,VR.UserId,VR.PropertyId,VR.Id,VR.Date
+			VD.BillNo,VR.UserId,VR.PropertyId,VD.Id,VR.Date
 			
 			INSERT INTO #Final(BillDate,ExpenseHead,VendorName,Property,Duedate,Type,PaymentMode,BillNo,RequestedAmount,
 			UserId,PropertyId,Id)
@@ -402,12 +402,13 @@ END
 		DECLARE @VId1 INT 
 		SET @VId1 =(SELECT DISTINCT VendorRequestHdrId From WRBHBVendorRequestDtl VD
 		JOIN WRBHBVendorRequest VR ON VR.Id=VD.VendorRequestHdrId AND VR.IsActive=1 AND VR.IsDeleted=0
-		WHERE PropertyId=@CreatedById  AND VR.Id=CAST(@Str AS BIGINT))
+		WHERE PropertyId=@CreatedById  AND VD.Id=CAST(@Str AS BIGINT))
+		
 		IF ISNULL(@VId1,0) !=0
 			BEGIN
 				SELECT Filepath AS VendorBill FROM WRBHBVendorRequestDtl VD
 				JOIN WRBHBVendorRequest VR ON VR.Id=VD.VendorRequestHdrId AND VR.IsActive=1 AND VR.IsDeleted=0 
-				WHERE VR.PropertyId=@CreatedById AND VR.UserId=@UserId AND VR.Id=CAST(@Str AS BIGINT) 
+				WHERE VR.PropertyId=@CreatedById AND VR.UserId=@UserId AND VD.Id=CAST(@Str AS BIGINT) 
 				AND VD.IsActive=1 AND VD.IsDeleted=0
 			END
 			ELSE

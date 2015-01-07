@@ -500,7 +500,7 @@ BEGIN
 				
 		INSERT INTO #PettyCash1(Date,ExpenseHead,Description,ApprovedAmount,PaidAmount,Bill)
 		SELECT '' AS Date,'' AS ExpenseHead,'ClosingBalance' AS Description,Balance AS ApprovedAmount,'' AS PaidAmount,
-		'' AS Bill FROM WRBHBPettyCashStatus
+		'' AS Bill FROM WRBHBPettyCashStatusHdr
 		WHERE UserId =@UserId AND PropertyId=@Id AND CONVERT(Date,CreatedDate,103)=CONVERT(Date,@Str,103) AND 
 		IsActive=1 AND IsDeleted=0
 		GROUP BY Balance

@@ -12,7 +12,6 @@ using System.Text.RegularExpressions;
 using System.Net.Mail;
 using System.Net;
 using System.IO;
-using HB.Entity;
 
 namespace HB.Dao
 {
@@ -77,12 +76,14 @@ namespace HB.Dao
             //ds.Tables[1].Rows[0][4].ToString()
             if (ds.Tables[10].Rows.Count > 0)
             {
-                message.From = new System.Net.Mail.MailAddress("homestay@uniglobeatb.co.in", "", System.Text.Encoding.UTF8);
+                //message.From = new System.Net.Mail.MailAddress("homestay@uniglobeatb.co.in", "", System.Text.Encoding.UTF8);
+                message.From = new System.Net.Mail.MailAddress(ds.Tables[4].Rows[0][15].ToString(), "", System.Text.Encoding.UTF8);
             }
             else
             {
                 //message.From = new System.Net.Mail.MailAddress("stay@staysimplyfied.com", "", System.Text.Encoding.UTF8);
-                message.From = new System.Net.Mail.MailAddress("stay@hummingbirdindia.com", "", System.Text.Encoding.UTF8);
+                //message.From = new System.Net.Mail.MailAddress("stay@hummingbirdindia.com", "", System.Text.Encoding.UTF8);
+                message.From = new System.Net.Mail.MailAddress(ds.Tables[4].Rows[0][14].ToString(), "", System.Text.Encoding.UTF8);
             }
             //message.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
             //message.Subject = "Booking - " + ds.Tables[2].Rows[0][2].ToString();
@@ -432,7 +433,8 @@ namespace HB.Dao
             string Taxes = "";
             if (ds.Tables[11].Rows[0][7].ToString() == "BTC")
             {
-                Taxes = "Taxes as applicable";
+                //Taxes = "Taxes as applicable";
+                Taxes = ds.Tables[4].Rows[0][13].ToString();
             }
             if (ds.Tables[11].Rows[0][7].ToString() == "NOTBTC")
             {
@@ -625,12 +627,14 @@ namespace HB.Dao
                     //ds.Tables[1].Rows[0][4].ToString()
                     if (ds.Tables[10].Rows.Count > 0)
                     {
-                        message1.From = new System.Net.Mail.MailAddress("homestay@uniglobeatb.co.in", "", System.Text.Encoding.UTF8);
+                        //message1.From = new System.Net.Mail.MailAddress("homestay@uniglobeatb.co.in", "", System.Text.Encoding.UTF8);
+                        message1.From = new System.Net.Mail.MailAddress(ds.Tables[4].Rows[0][15].ToString(), "", System.Text.Encoding.UTF8);
                     }
                     else
                     {
                         //message1.From = new System.Net.Mail.MailAddress("stay@staysimplyfied.com", "", System.Text.Encoding.UTF8);
-                        message1.From = new System.Net.Mail.MailAddress("stay@hummingbirdindia.com", "", System.Text.Encoding.UTF8);
+                        //message1.From = new System.Net.Mail.MailAddress("stay@hummingbirdindia.com", "", System.Text.Encoding.UTF8);
+                        message1.From = new System.Net.Mail.MailAddress(ds.Tables[4].Rows[0][14].ToString(), "", System.Text.Encoding.UTF8);
                     }
                     //message1.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
                     //message1.Subject = "Booking - " + ds.Tables[2].Rows[0][2].ToString();
@@ -909,7 +913,7 @@ namespace HB.Dao
                         catch (Exception ex)
                         {
                             CreateLogFiles log = new CreateLogFiles();
-                            log.ErrorLog(ex.Message + " --> Room Level Booking Confirmation Property Mail --> "+message1.Subject+"P D F Attachment");
+                            log.ErrorLog(ex.Message + " --> Room Level Booking Confirmation Property Mail --> "+message1.Subject+" PDF Attachment");
                         }
                         AddressDtls1 =
                                 " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +

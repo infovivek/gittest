@@ -69,10 +69,12 @@ namespace HB.Dao
                 try
                 {
                     System.Net.Mail.MailMessage message = new System.Net.Mail.MailMessage();                    
-                    message.From = new System.Net.Mail.MailAddress("stay@staysimplyfied.com", "", System.Text.Encoding.UTF8);
+                    //message.From = new System.Net.Mail.MailAddress("stay@staysimplyfied.com", "", System.Text.Encoding.UTF8);
+                    //message.From = new System.Net.Mail.MailAddress("stay@hummingbirdindia.com", "", System.Text.Encoding.UTF8);
+                    message.From = new System.Net.Mail.MailAddress(ds.Tables[1].Rows[0][1].ToString(), "", System.Text.Encoding.UTF8);
                     //message.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
                     //message.Subject = "Testing Modification Book # : " + ds.Tables[0].Rows[0][0].ToString();
-                    message.To.Add(new System.Net.Mail.MailAddress("stay@staysimplyfied.com"));
+                    message.To.Add(new System.Net.Mail.MailAddress(ds.Tables[1].Rows[0][1].ToString()));
                     if (ds.Tables[0].Rows[0][10].ToString() == "False")
                     {
                         //string gdfg = ds.Tables[4].Rows[0][0].ToString();

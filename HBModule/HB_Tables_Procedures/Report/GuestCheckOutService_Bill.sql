@@ -114,8 +114,8 @@ IF @Action='PageLoad'
 	'All cheque or demand drafts in payment of bills should be drawn in favor of Hummingbird Travel and stay pvt.ltd.
 	and should be crossed A/C PAYEE ONLY.' as Cheque,
 	'LATE PAYMENT : Interest @18% per annum will be charged on all outstanding bill after due date.' as Latepay ,
-	'PAN NO :'+@PanCardNo+'   |   '+'TIN : 29340489869'+'   |   '+'L Tax No :'+ t.LuxuryNo+'  |  '
-	 +'CIN No: U72900KA2005PTC035942' as TaxNo,
+	'PAN NO :'+@PanCardNo+'   |   '+'TIN :'+ t.TINNumber +'   |   '+'L Tax No :'+ t.LuxuryNo+'  |  '
+	 +'CIN No:'+t.CINNumber as TaxNo,
 	'Service Tax Regn. No : AABCH5874RST001' as ServiceTaxNo,
 	'Taxable Category : Accommodation Service,Business Support Services and Restaurant Services' as Taxablename,
 	'Stay simplified is brand of Humming Bird' BrandName,
@@ -148,7 +148,8 @@ IF @Action='PageLoad'
 	h.ChkOutTariffHECess ,h.ChkOutTariffSC,h.CheckInDate,d.Tariff,p.PropertyName,p.Propertaddress,
 	c.CityName,s.StateName,p.Postal,p.Phone,p.Email,	
     H.VATPer,h.RestaurantSTPer ,
-    h.BusinessSupportST ,h.InVoiceNo,h.BillFromDate,h.BillEndDate,t.LuxuryNo,d.ArrivalDate--,CS.ChkOutServiceNetAmount
+    h.BusinessSupportST ,h.InVoiceNo,h.BillFromDate,h.BillEndDate,t.LuxuryNo,d.ArrivalDate,
+    t.TINNumber,t.CINNumber--,CS.ChkOutServiceNetAmount
    
 	
 	END
