@@ -91,6 +91,7 @@
 				var qaz:ArrayCollection=new ArrayCollection();
 				Grd_RecommendedProperty.dataProvider=qaz;
 				Tcl_Time.setTime=new Date("11/11/11,12:00:00");
+				Ddl_AMPM.selectedItem="PM";
 				Chk_MMT.selected=true;
 				Chk_MMT.visible=false;
 				Txt_HRPolicyOverrideRemarks.visible = false;
@@ -106,7 +107,7 @@
 				//var num:Number= (end.getUTCFullYear() - start.getUTCFullYear()) * 12 +(end.getUTCMonth() - start.getUTCMonth());								
 				//useWeb("BOOKING","Tab2_to_Tab3_Dtls_CUSTOM",[GlobalXml,'Tab2_to_Tab3_Dtls','','','','',0,0,0,0,0,26,0]);				
 				var ss:String=Global_AC[0].UsrId;				
-				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Room',8315]);
+				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Room',8610]);
 				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,"RoomResend",6630]);				
 				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Bed',1528]);
 				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Apartment',2027]);
@@ -1937,6 +1938,7 @@
 				Dt_ChkOutDt.selectedDate=new Date();
 				Grd_Guest._clear();Lbl_Sales.text="Sales Person";Lbl_CRM.text="CRM Person";
 				Tcl_Time.setTime=new Date("11/11/11,12:00:00");
+				Ddl_AMPM.selectedItem="PM";
 				Hlp_TrackingNo.fnClear();Lbl_ClientName.text="";
 				// tab 2
 				var sdfsdsd:ArrayCollection=new ArrayCollection();
@@ -3055,21 +3057,26 @@
 					var GetType:String=event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].GetType;
 					var SingleTariffandMarkup:Number=Number(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].SingleandMarkup);
 					var SingleTariff:Number=Number(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].SingleTariff);
-					var Value:Number=SingleTariffandMarkup-SingleTariff;										
+					//var Value:Number=SingleTariffandMarkup-SingleTariff;
+					var Value:Number = Number(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].GeneralMarkup);
 					var TAC:Boolean=Boolean(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].TAC);
 					var DiscountModeRS:Boolean=Boolean(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].DiscountModeRS);
 					var DiscountModePer:Boolean=Boolean(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].DiscountModePer);
 					var DiscountAllowed:Number=Number(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].DiscountAllowed);
 					var Markup:int=event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup;
 					var MarkupStr:String=String(Markup);
+					var LTAgreed:Number=event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].LTAgreed;
+					var STAgreed:Number=event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].STAgreed;
+					var SC:Number=event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].SC;
 					//var Markup:String=NF_Two.format(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup);
 					//var MarkupAmt:String=Markup.replace(/[,]/g,"");
 					if(Markup == 0)
 					{
 						event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup="";
 					}
+					var ExtraMarkup:Number = 0;
 					if((PropertyType == "ExP")&&(Markup != 0))
-					{
+					{						
 						if(TAC == false)
 						{
 							if(Markup < 0)
@@ -3078,11 +3085,13 @@
 								if(Number(MpAmt) <= Value)
 								{
 									event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup=Markup;
+									ExtraMarkup = Markup + Math.round((Markup * LTAgreed / 100) + (Markup * STAgreed / 100) + (Markup * SC / 100)); 
 								}
 								else
 								{
 									var val:String="-"+String(Value);
 									event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup=val;
+									ExtraMarkup =  Number("-"+String(Value + Math.round((Value * LTAgreed / 100) + (Value * STAgreed / 100) + (Value * SC / 100))));
 									Cnt = Cnt + 1;
 									if(Cnt == 1)
 									{
@@ -3099,10 +3108,12 @@
 								if(Markup <= Value)
 								{
 									event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup=Markup;
+									ExtraMarkup = Markup + Math.round((Markup * LTAgreed / 100) + (Markup * STAgreed / 100) + (Markup * SC / 100));									
 								}
 								else
 								{
 									event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup=Value;
+									ExtraMarkup =  Value + Math.round((Value * LTAgreed / 100) + (Value * STAgreed / 100) + (Value * SC / 100));
 									Cnt = Cnt + 1;
 									if(Cnt == 1)
 									{
@@ -3111,15 +3122,15 @@
 										Ddl_PropertyType.setFocus();
 										Cnt=0;
 										return;
-									}									
+									}
 								}
-							}
+							}							
 						}						
 						else
 						{
 							event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup="";
 						}						
-					}			
+					}					
 					else if((PropertyType == "InP")&&(Markup != 0)&&(GetType == "Property"))
 					{
 						if(GetType == "Property")
@@ -3140,10 +3151,12 @@
 								{
 									event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup=Markup;
 									Cnt = 0;
+									ExtraMarkup = Markup;
 								}
 								else
 								{
 									event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup=Discnt;
+									ExtraMarkup = Discnt;
 									Cnt = Cnt + 1;
 									if(Cnt == 1)
 									{
@@ -3160,11 +3173,13 @@
 								if(Number(MpAmt1) <= Discnt)
 								{
 									event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup=Markup;
+									ExtraMarkup = Markup;
 								}
 								else
 								{
 									var val1:String="-"+Discnt;
 									event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup=val1;
+									ExtraMarkup = Number(val1);
 									Cnt = Cnt + 1;
 									if(Cnt == 1)
 									{
@@ -3196,22 +3211,25 @@
 					{
 						event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].SingleandMarkup1=
 							Number(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].SingleandMarkup)+
-							Number(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup);
+							ExtraMarkup;
+							//Number(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup);
 					}					
 					// Double
 					if(Number(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].DoubleandMarkup) > 0)
 					{
 						event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].DoubleandMarkup1=
 							Number(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].DoubleandMarkup)+
-							Number(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup);
+							ExtraMarkup;
+							//Number(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup);
 					}					
 					// Triple
 					if(Number(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].TripleandMarkup) > 0)
 					{
 						event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].TripleandMarkup1=
 							Number(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].TripleandMarkup)+
-							Number(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup);
-					}				
+							ExtraMarkup;
+							//Number(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup);
+					}									
 				}
 			}
 			
@@ -4478,15 +4496,18 @@
 												   headerText="Tax"/>								
 								<mx:DataGridColumn width="50" dataField="BaseTariff" editable="false"
 												   headerText="Base"/>
-								<mx:DataGridColumn width="50" dataField="SingleTariff" editable="false"
+								<mx:DataGridColumn width="0" dataField="SingleTariff" editable="false"
+												   visible="false"/>
+								<mx:DataGridColumn width="0" dataField="DoubleTariff" editable="false"
+												   visible="false"/>
+								<mx:DataGridColumn width="0" dataField="TripleTariff" editable="false"
+												   visible="false"/>
+								<mx:DataGridColumn width="50" dataField="SingleandMarkup" visible="true" editable="false"
 												   headerText="Single"/>
-								<mx:DataGridColumn width="50" dataField="DoubleTariff" editable="false"
-												   headerText="Double"/>
-								<mx:DataGridColumn width="50" dataField="TripleTariff" editable="false"
+								<mx:DataGridColumn width="50" dataField="DoubleandMarkup" visible="true" editable="false"
+												   headerText="Double"/>								
+								<mx:DataGridColumn width="50" dataField="TripleandMarkup" visible="true" editable="false"
 												   headerText="Triple"/>
-								<mx:DataGridColumn width="0" dataField="SingleandMarkup" visible="false"/>
-								<mx:DataGridColumn width="0" dataField="DoubleandMarkup" visible="false"/>								
-								<mx:DataGridColumn width="0" dataField="TripleandMarkup" visible="false"/>
 								<mx:DataGridColumn width="55" dataField="Markup" textAlign="right"/>
 								<mx:DataGridColumn width="60" dataField="SingleandMarkup1" editable="false"
 												   headerText="Mark 1"/>
@@ -4513,7 +4534,9 @@
 								<mx:DataGridColumn width="0" dataField="LTAgreed" visible="false"/>
 								<mx:DataGridColumn width="0" dataField="LTRack" visible="false"/>								
 								<mx:DataGridColumn width="0" dataField="STAgreed" visible="false"/>
-								<mx:DataGridColumn width="0" dataField="TaxInclusive" visible="false"/>								
+								<mx:DataGridColumn width="0" dataField="TaxInclusive" visible="false"/>
+								<mx:DataGridColumn width="0" dataField="GeneralMarkup" visible="false"/>
+								<mx:DataGridColumn width="0" dataField="SC" visible="false"/>
 							</mx:columns>
 						</mx:DataGrid>
 						<mx:DataGrid id="Grd_RecommendedProperty" x="22.25" y="397" width="925" height="228"
@@ -4546,15 +4569,15 @@
 												   headerText="Tax"/>
 								<mx:DataGridColumn width="50" dataField="BaseTariff" editable="false"
 												   headerText="Base"/>
-								<mx:DataGridColumn width="50" dataField="SingleTariff" editable="false"
-												   headerText="Single"/>
-								<mx:DataGridColumn width="50" dataField="DoubleTariff" editable="false"
-												   headerText="Double"/>
-								<mx:DataGridColumn width="50" dataField="TripleTariff" editable="false"
-												   headerText="Triple"/>
-								<mx:DataGridColumn width="0" dataField="SingleandMarkup" visible="false"/>
-								<mx:DataGridColumn width="0" dataField="DoubleandMarkup" visible="false"/>								
-								<mx:DataGridColumn width="0" dataField="TripleandMarkup" visible="false"/>
+								<mx:DataGridColumn width="0" dataField="SingleTariff" visible="false"/>
+								<mx:DataGridColumn width="0" dataField="DoubleTariff" visible="false"/>
+								<mx:DataGridColumn width="0" dataField="TripleTariff" visible="false"/>
+								<mx:DataGridColumn width="50" dataField="SingleandMarkup" headerText="Single"
+												   editable="false"/>
+								<mx:DataGridColumn width="50" dataField="DoubleandMarkup" headerText="Double"
+												   editable="false"/>								
+								<mx:DataGridColumn width="50" dataField="TripleandMarkup" headerText="Triple"
+												   editable="false"/>
 								<mx:DataGridColumn width="55" dataField="Markup" textAlign="right"/>
 								<mx:DataGridColumn width="60" dataField="SingleandMarkup1" editable="false"
 												   headerText="Mark 1"/>
@@ -4582,6 +4605,8 @@
 								<mx:DataGridColumn width="0" dataField="LTRack" visible="false"/>								
 								<mx:DataGridColumn width="0" dataField="STAgreed" visible="false"/>
 								<mx:DataGridColumn width="0" dataField="TaxInclusive" visible="false"/>
+								<mx:DataGridColumn width="0" dataField="GeneralMarkup" visible="false"/>
+								<mx:DataGridColumn width="0" dataField="SC" visible="false"/>
 							</mx:columns>
 						</mx:DataGrid>
 						

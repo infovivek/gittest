@@ -317,12 +317,12 @@
 					
 					sheet.resize(arrExportResult.length+1,7);
 					
-					sheet.setCell(0,0,'SNo');
-					sheet.setCell(0,1,'Date');
-					sheet.setCell(0,2,'ExpenseHead');
-					sheet.setCell(0,3,'Description');
-					sheet.setCell(0,4,'ApprovedAmount');
-					sheet.setCell(0,5,'PaidAmount');
+					sheet.setCell(0,0,'');
+					sheet.setCell(0,1,'');
+					sheet.setCell(0,2,'');
+					sheet.setCell(0,3,'');
+					sheet.setCell(0,4,'');
+					sheet.setCell(0,5,'');
 				
 					
 					for(var i:int=0;i<arrExportResult.length;i++)

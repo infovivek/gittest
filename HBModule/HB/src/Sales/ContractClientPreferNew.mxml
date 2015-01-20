@@ -469,15 +469,15 @@
 			<mx:HRule x="0" y="417" width="100%" strokeColor="#eb1c24"/>
 			<s:Scroller x="0" y="69" width="100%" height="311" id="Scr_Grid" visible="true">
 				<s:VGroup width="100%" height="100%">
-			    <WrbComp:ProDGrid1 x="20" y="96" width="1418" height="288" id="Grd_ClientDtls"
-							   _ColDataField="Property~RoomType~ATariffSingle~ATariffDouble~ATariffTriple~RTariffSingle~RTariffDouble~RTariffTriple~Facility~Inclusive~Tax~LTAgreed~LTRack~STAgreed~ContactName~ContactPhone~ContactEmail~PropertyId~RoomId~Id"
-							   _ColHdrText="Property~Room Type~Single Agreed~Double Agreed~Triple Agreed~Single Rack~Double Rack~Triple Rack~Facility~Inclusive~Tax~LTAgreed~LTRack~STAgreed~Name~Phone~Email~PropertyId~RoomId~Id"
+			    <WrbComp:ProDGrid1 x="20" y="96" width="1320" height="288" id="Grd_ClientDtls"
+							   _ColDataField="Property~RoomType~ATariffSingle~ATariffDouble~ATariffTriple~RTariffSingle~RTariffDouble~RTariffTriple~Facility~Inclusive~LTAgreed~LTRack~STAgreed~ContactName~ContactPhone~ContactEmail~PropertyId~RoomId~Id"
+							   _ColHdrText="Property~Room Type~Single Agreed~Double Agreed~Triple Agreed~Single Rack~Double Rack~Triple Rack~Facility~Inclusive~LTAgreed~LTRack~STAgreed~Name~Phone~Email~PropertyId~RoomId~Id"
 							   _ColType="hlp~hlp~ntxt~ntxt~ntxt~ntxt~ntxt~ntxt~txt~Chk~txt~ntxt~ntxt~ntxt~txt~txt~txt~txt~txt~txt"
-							   _colVisible="1~1~1~1~1~1~1~1~1~1~1~1~1~1~1~1~1~0~0~0"
-							   _ColWidth="180~80~80~80~80~80~80~80~75~75~75~75~75~75~75~75~75~75~0~0~0"
-							   _editable="1~1~1~1~1~1~1~1~1~1~1~1~1~1~1~1~1~0~0~0"
+							   _colVisible="1~1~1~1~1~1~1~1~1~1~1~1~1~1~1~1~0~0~0"
+							   _ColWidth="180~80~80~80~80~80~80~80~75~75~75~75~75~75~75~75~0~0~0"
+							   _editable="1~1~1~1~1~1~1~1~1~1~1~1~1~1~1~1~0~0~0"
 							   _HeaderTxtLbl="true" 
-							   _required="0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0"
+							   _required="0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0"
 							   _spltChar="~"
 							   _tabIndex="2"
 							   _visibleColNos="17"

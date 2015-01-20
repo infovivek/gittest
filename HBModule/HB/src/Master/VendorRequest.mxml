@@ -819,7 +819,7 @@
 			<s:Label x="182" y="216" text="*" color="red"/>
 			<s:Label x="553" y="66" text="*" color="red"/>
 			<mx:DateField x="578" y="62" width="126" id="dt_Date" yearNavigationEnabled="true" tabIndex="8" 
-						  formatString="DD/MM/YYYY" selectableRange="{{rangeEnd:new Date()}}" enabled="false"/>
+						  formatString="DD/MM/YYYY" selectableRange="{{rangeEnd:new Date()}}" enabled="true"/>
 			<WrbHelpComp:HelpText x="207" y="99" id="Ddl_Category" width="200" height="22" pxSetColumnsWidth="0,200" 
 								  onselection="{ExpenseGroupLoad()}"  pxTabIndex="2" depth="4000">
 			</WrbHelpComp:HelpText>			

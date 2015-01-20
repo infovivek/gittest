@@ -303,6 +303,9 @@ namespace HB.Dao
                                     command.Parameters.Add("@UsrId", SqlDbType.BigInt).Value = user.Id;
                                     //BookRequest.ToString()
                                     ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
+                                    //
+                                    CreateLogFiles log1 = new CreateLogFiles();
+                                    log1.ErrorLog("M M T BOOKING CONFIRMATION NO --> " + api.BookHotelReservationIdvalue);
                                 }
                                 else
                                 {

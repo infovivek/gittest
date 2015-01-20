@@ -976,8 +976,8 @@ IF @Action = 'BookingDtls'
   R.PropertyType,R.PropertyId,CityName AS City,CityId,
   ISNULL(GuestName,'') AS GuestName,R.GuestId,
   R.ChkInDt AS CheckInDt,R.ChkOutDt AS CheckOutDt,R.Tariff+ 
-  R.Tariff*ISNULL(LTAgreed,0)/100+ R.Tariff*ISNULL(CP.STAgreed,0)/100
-  +R.Tariff*ISNULL(CP.LTRack,0)/100 AS Tariff,0 AS Markup,
+  R.Tariff*ISNULL(BG.LTonAgreed,0)/100+ R.Tariff*ISNULL(BG.STonAgreed,0)/100
+  +R.Tariff*ISNULL(BG.LTonRack,0)/100 AS Tariff,0 AS Markup,
   StayDays AS StayDays,TotTarif AS TotalTariff,
   R.TariffPaymentMode AS TariffPaymentMode,R.RoomCaptured,R.CurrentStatus AS Status,
   BookerName AS UserName,CONVERT(VARCHAR(100),BookedDt,103) AS BookingDate,
@@ -987,60 +987,10 @@ IF @Action = 'BookingDtls'
   JOIN WRBHBContractClientPref_Header CH ON R.ClientId=CH.ClientId AND CH.IsActive=1
   JOIN WRBHBContractClientPref_Details CP ON CH.Id=CP.HeaderId AND CP.IsActive=1
   AND BG.RoomType=CP.RoomType
-  WHERE R.PropertyType='C P P' AND R.Tariff=CP.TariffSingle
+  WHERE R.PropertyType='C P P' 
   ORDER BY BookingCode,RoomCaptured;
   
-  INSERT INTO #Final(BookingCode,BookingId,MasterClientName,ClientName,ClientId,
-  CRMName,PropertyName,PropertyType,PropertyId,CityName,CityId,GuestName,
-  GuestId,ChkInDt,ChkOutDt,Tariff,Markup,StayDays,TotTarif,TariffPaymentMode,
-  RoomCaptured,CurrentStatus,BookerName,BookedDt,Column1,Column2,Column3,
-  Column4,Column5,Column6,Column7,Column8,Column9,Column10,BookingLevel,Occupancy)
   
-  SELECT DISTINCT BookingCode AS BookingCode,R.BookingId,
-  MasterClientName AS MasterClientName,R.ClientName AS ClientName,R.ClientId,
-  CRMName AS CRMName,R.PropertyName AS PropertyName,
-  R.PropertyType,R.PropertyId,CityName AS City,CityId,
-  ISNULL(GuestName,'') AS GuestName,R.GuestId,
-  R.ChkInDt AS CheckInDt,R.ChkOutDt AS CheckOutDt,R.Tariff+ 
-  R.Tariff*ISNULL(LTAgreed,0)/100+ R.Tariff*ISNULL(CP.STAgreed,0)/100
-  +R.Tariff*ISNULL(CP.LTRack,0)/100 AS Tariff,0 AS Markup,
-  StayDays AS StayDays,TotTarif AS TotalTariff,
-  R.TariffPaymentMode AS TariffPaymentMode,R.RoomCaptured,R.CurrentStatus AS Status,
-  BookerName AS UserName,CONVERT(VARCHAR(100),BookedDt,103) AS BookingDate,
-  R.Column1,R.Column2,R.Column3,R.Column4,R.Column5,R.Column6,R.Column7,R.Column8,R.Column9,R.Column10,
-  BookingLevel AS BookingLevel,BG.Occupancy  FROM #Result R
-  JOIN WRBHBBookingPropertyAssingedGuest BG ON R.BookingId=BG.BookingId AND R.GuestId=BG.GuestId AND BG.IsActive=1
-  JOIN WRBHBContractClientPref_Header CH ON R.ClientId=CH.ClientId AND CH.IsActive=1
-  JOIN WRBHBContractClientPref_Details CP ON CH.Id=CP.HeaderId AND CP.IsActive=1
-  AND BG.RoomType=CP.RoomType
-  WHERE R.PropertyType='C P P' AND R.Tariff=CP.TariffDouble
-  ORDER BY BookingCode,RoomCaptured;
-  
-  INSERT INTO #Final(BookingCode,BookingId,MasterClientName,ClientName,ClientId,
-  CRMName,PropertyName,PropertyType,PropertyId,CityName,CityId,GuestName,
-  GuestId,ChkInDt,ChkOutDt,Tariff,Markup,StayDays,TotTarif,TariffPaymentMode,
-  RoomCaptured,CurrentStatus,BookerName,BookedDt,Column1,Column2,Column3,
-  Column4,Column5,Column6,Column7,Column8,Column9,Column10,BookingLevel,Occupancy)
-  
-  SELECT DISTINCT BookingCode AS BookingCode,R.BookingId,
-  MasterClientName AS MasterClientName,R.ClientName AS ClientName,R.ClientId,
-  CRMName AS CRMName,R.PropertyName AS PropertyName,
-  R.PropertyType,R.PropertyId,CityName AS City,CityId,
-  ISNULL(GuestName,'') AS GuestName,R.GuestId,
-  R.ChkInDt AS CheckInDt,R.ChkOutDt AS CheckOutDt,R.Tariff+ 
-  R.Tariff*ISNULL(LTAgreed,0)/100+ R.Tariff*ISNULL(CP.STAgreed,0)/100
-  +R.Tariff*ISNULL(CP.LTRack,0)/100 AS Tariff,0 AS Markup,
-  StayDays AS StayDays,TotTarif AS TotalTariff,
-  R.TariffPaymentMode AS TariffPaymentMode,R.RoomCaptured,R.CurrentStatus AS Status,
-  BookerName AS UserName,CONVERT(VARCHAR(100),BookedDt,103) AS BookingDate,
-  R.Column1,R.Column2,R.Column3,R.Column4,R.Column5,R.Column6,R.Column7,R.Column8,R.Column9,R.Column10,
-  BookingLevel AS BookingLevel,BG.Occupancy  FROM #Result R
-  JOIN WRBHBBookingPropertyAssingedGuest BG ON R.BookingId=BG.BookingId AND R.GuestId=BG.GuestId AND BG.IsActive=1
-  JOIN WRBHBContractClientPref_Header CH ON R.ClientId=CH.ClientId AND CH.IsActive=1
-  JOIN WRBHBContractClientPref_Details CP ON CH.Id=CP.HeaderId AND CP.IsActive=1
-  AND BG.RoomType=CP.RoomType
-  WHERE R.PropertyType='C P P' AND R.Tariff=CP.TariffTriple
-  ORDER BY BookingCode,RoomCaptured;
   
   INSERT INTO #Final(BookingCode,BookingId,MasterClientName,ClientName,ClientId,
   CRMName,PropertyName,PropertyType,PropertyId,CityName,CityId,GuestName,

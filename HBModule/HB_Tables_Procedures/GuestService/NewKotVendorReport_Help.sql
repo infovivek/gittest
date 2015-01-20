@@ -36,8 +36,10 @@ BEGIN
   
   IF @Action='PropertyLoad'
   BEGIN   
-	   SELECT Property,PropertyId    FROM WRBHBMapVendor 
-	   WHERE IsActive=1 AND IsDeleted=0 AND VendorId=@VendorId;
+	   SELECT Property,PropertyId    
+	   FROM WRBHBMapVendor 
+	    WHERE IsActive=1 AND IsDeleted=0 AND VendorId=@VendorId 
+	   
   END
   IF @Action='Serviceload'
   BEGIN 

@@ -38,119 +38,131 @@ CREATE PROCEDURE dbo.[SP_NewSnackKOTEntryReport_Help]
 		SELECT DISTINCT P.PropertyName AS Property,P.Id AS PropertyId
 		FROM WRBHBCheckInHdr C
 		JOIN WRBHBProperty  P ON C.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
+		JOIN WRBHBPropertyUsers PU ON P.Id=PU.PropertyId AND PU.IsActive=1 AND PU.IsDeleted=0
 		WHERE C.IsActive=1 AND C.IsDeleted=0 AND  P.Category IN('Internal Property','Managed G H')
+		AND PU.UserId=@PropertyId
+		ORDER BY P.PropertyName ASC
  END
  IF @Action='KOTDETAILS'
  
  BEGIN
  
 	    CREATE TABLE  #Guest(ConsumerType NVARCHAR(100),Name NVARCHAR(100),ServiceItem NVARCHAR(100),
-	    Quantity INT,Revenue DECIMAL(27,2),BookinId INt,ChkInId INT,Flag INT)
+	    Quantity INT,Revenue DECIMAL(27,2),ClientId INt,ChkInId INT,Flag INT)
 	    --Details for Property and Date 
 	  	CREATE TABLE #Final(ServiceItem NVARCHAR(100),Quantity INT,Amount DECIMAL(27,2),Date NVARCHAR(100),
 		Id INT,ProductId BIGINT,TypeService NVARCHAR(100),Type NVARCHAR(100))
 
 		CREATE TABLE #Id (ClientId BIGINT,BookingId BIGINT,PropertyId INT,
-		GuestId INT,ChkInId INT,RoomId INT,ApartmentId INT,BedId INT)
+		GuestId INT,ChkInId INT,RoomId INT,ApartmentId INT,BedId INT,BookLevel NVARCHAR(100),
+		SSPID INT,IDE bigint NOt null primary Key Identity(1,1))
 				
-		INSERT INTO #Id(ClientId,BookingId,PropertyId,GuestId,ChkInId,RoomId,ApartmentId,BedId)
+		INSERT INTO #Id(ClientId,BookingId,PropertyId,GuestId,ChkInId,RoomId,ApartmentId,BedId,BookLevel,SSPID)
 		SELECT CH.ClientId,D.BookingId,D.PropertyId,CH.GuestId,CH.Id,CH.RoomId,CH.ApartmentId,
-		Ch.BedId
+		Ch.BedId,CH.Type,BP.SSPId
 		FROM WRBHBKOTDtls D
 		JOIN WRBHBCheckInHdr CH ON D.CheckInId=CH.Id AND CH.IsActive=1 AND CH.IsDeleted=0
+		JOIN WRBHBBookingPropertyAssingedGuest BP ON D.BookingId=BP.BookingId AND BP.IsActive=1
 		WHERE D.PropertyId=@PropertyId AND 
 		CONVERT(date,D.HdrDate,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103)   
 		AND D.IsActive=1 AND D.IsDeleted=0
 		
-			
-				
+		
 		CREATE TABLE #SERVICRAMOUNT(Id BIGINT,Complimentary BIT,ServiceName NVARCHAR(100),Price DECIMAL(27,2),
-		Enable BIT,ProductId BIGINT,TypeService NVARCHAR(100),Type NVARCHAR(100),BookinId INT,ChkInId INT)  
+		Enable BIT,ProductId BIGINT,TypeService NVARCHAR(100),Type NVARCHAR(100),ClientId INT,PropertyId INT)
 		
 		CREATE TABLE #SERVICRAMOUNTFinal(Id BIGINT,Complimentary BIT,ServiceName NVARCHAR(100),Price DECIMAL(27,2),
 		Enable BIT,ProductId BIGINT,TypeService NVARCHAR(100),Type NVARCHAR(100),BookinId INT)
 		
-		--SSP
-		INSERT INTO #SERVICRAMOUNT(Id,Complimentary,ServiceName,Price,Enable,ProductId,TypeService,
-		Type,BookinId,ChkInId)
-		SELECT DISTINCT S.Id,Complimentary,ServiceName,Price,Enable,ProductId,TypeService,'SSP',D.BookingId,D.ChkInId
-		FROM dbo.WRBHBSSPCodeGeneration G			
-		JOIN dbo.WRBHBSSPCodeGenerationServices S WITH(NOLOCK) ON S.SSPCodeGenerationId=G.Id AND S.IsActive=1
-		AND S.IsDeleted=0
-		JOIN #Id D ON G.ClientId=D.ClientId AND G.PropertyId=D.PropertyId
-		WHERE S.TypeService ='Food And Beverages' AND G.IsActive=1 AND G.IsDeleted=0
+	 	 	
+		 	INSERT INTO #SERVICRAMOUNT(Id,Complimentary,ServiceName,Price,Enable,ProductId,TypeService,
+		 	Type,ClientId,PropertyId)
+			
+			SELECT DISTINCT S.Id,Complimentary,ServiceName,Price,Enable,ProductId,TypeService,'SSP',
+			G.ClientId,D.PropertyId
+			FROM dbo.WRBHBSSPCodeGeneration G			
+			JOIN dbo.WRBHBSSPCodeGenerationServices S WITH(NOLOCK) ON S.SSPCodeGenerationId=G.Id AND S.IsActive=1
+			AND S.IsDeleted=0
+			JOIN #Id D ON G.ClientId=D.ClientId AND G.PropertyId=D.PropertyId
+			WHERE  G.PropertyId=@PropertyId AND S.TypeService ='Food And Beverages' AND G.IsActive=1 AND G.IsDeleted=0
+		 
+			INSERT INTO #SERVICRAMOUNT(Id,Complimentary,ServiceName,Price,Enable,ProductId,TypeService,
+			Type,ClientId,PropertyId)
+			SELECT DISTINCT CS.Id,Complimentary,ServiceName,Price,Enable,ProductId,TypeService,'DedicatedContract Room',
+			H.ClientId,D.PropertyId
+			FROM dbo.WRBHBContractManagement H
+			JOIN WRBHBContractManagementTariffAppartment CM WITH(NOLOCK) ON H.Id=CM.ContractId 
+			AND CM.IsActive=1 AND CM.IsDeleted=0
+			JOIN WRBHBContractManagementServices CS ON H.Id=CS.ContractId AND CS.IsActive=1 AND CS.IsDeleted=0
+			JOIN #Id D ON H.ClientId =D.ClientId AND CM.PropertyId=D.PropertyId
+			WHERE CM.PropertyId=@PropertyId AND H.IsActive=1 AND H.IsDeleted=0 AND CS.TypeService ='Food And Beverages'
 		
-			
+			INSERT INTO #SERVICRAMOUNT(Id,Complimentary,ServiceName,Price,Enable,ProductId,TypeService,
+			Type,ClientId,PropertyId)
+			SELECT DISTINCT CS.Id,Complimentary,ServiceName,Price,Enable,ProductId,TypeService,'DedicatedContract Bed',
+			H.ClientId,D.PropertyId
+			FROM dbo.WRBHBContractManagement H
+			JOIN WRBHBContractManagementTariffAppartment CM WITH(NOLOCK) ON H.Id=CM.ContractId 
+			AND CM.IsActive=1 AND CM.IsDeleted=0
+			JOIN WRBHBContractManagementServices CS ON H.Id=CS.ContractId AND CS.IsActive=1 AND CS.IsDeleted=0
+			JOIN #Id D ON H.ClientId =D.ClientId AND CM.PropertyId=D.PropertyId
+			WHERE CM.PropertyId=@PropertyId  AND H.IsActive=1 AND H.IsDeleted=0 AND CS.TypeService ='Food And Beverages'
 		
-		--DEDICATED AND MANAGED GH
-		INSERT INTO #SERVICRAMOUNT(Id,Complimentary,ServiceName,Price,Enable,ProductId,TypeService,
-		Type,BookinId,ChkInId)
-		SELECT DISTINCT CS.Id,Complimentary,ServiceName,Price,Enable,ProductId,TypeService,'DedicatedContract Room',
-		D.BookingId,D.ChkInId
-		FROM dbo.WRBHBContractManagement H
-		JOIN WRBHBContractManagementTariffAppartment CM WITH(NOLOCK) ON H.Id=CM.ContractId 
-		AND CM.IsActive=1 AND CM.IsDeleted=0
-		JOIN WRBHBContractManagementServices CS ON H.Id=CS.ContractId AND CS.IsActive=1 AND CS.IsDeleted=0
-		JOIN #Id D ON H.ClientId =D.ClientId AND CM.RoomId=D.RoomId
-		WHERE H.IsActive=1 AND H.IsDeleted=0 AND CS.TypeService ='Food And Beverages'
+			INSERT INTO #SERVICRAMOUNT(Id,Complimentary,ServiceName,Price,Enable,ProductId,TypeService,
+			Type,ClientId,PropertyId)
+			SELECT DISTINCT CS.Id,Complimentary,ServiceName,Price,Enable,ProductId,TypeService,'DedicatedContract Apartment',
+			H.ClientId,D.ChkInId
+			FROM dbo.WRBHBContractManagement H
+			JOIN WRBHBContractManagementAppartment CM WITH(NOLOCK) ON H.Id=CM.ContractId 
+			AND CM.IsActive=1 AND CM.IsDeleted=0
+			JOIN WRBHBContractManagementServices CS ON H.Id=CS.ContractId AND CS.IsActive=1 AND CS.IsDeleted=0
+			JOIN #Id D ON H.ClientId =D.ClientId AND CM.PropertyId=D.PropertyId
+			WHERE CM.PropertyId=@PropertyId  AND  H.IsActive=1 AND H.IsDeleted=0 AND CS.TypeService ='Food And Beverages'						
 		
-			
-		INSERT INTO #SERVICRAMOUNT(Id,Complimentary,ServiceName,Price,Enable,ProductId,TypeService,
-		Type,BookinId,ChkInId)
-		SELECT DISTINCT CS.Id,Complimentary,ServiceName,Price,Enable,ProductId,TypeService,'DedicatedContract Bed',
-		D.BookingId,D.ChkInId
-		FROM dbo.WRBHBContractManagement H
-		JOIN WRBHBContractManagementTariffAppartment CM WITH(NOLOCK) ON H.Id=CM.ContractId 
-		AND CM.IsActive=1 AND CM.IsDeleted=0
-		JOIN WRBHBContractManagementServices CS ON H.Id=CS.ContractId AND CS.IsActive=1 AND CS.IsDeleted=0
-		JOIN #Id D ON H.ClientId =D.ClientId AND CM.RoomId=D.RoomId
-		WHERE  H.IsActive=1 AND H.IsDeleted=0 AND CS.TypeService ='Food And Beverages'
-			
-		INSERT INTO #SERVICRAMOUNT(Id,Complimentary,ServiceName,Price,Enable,ProductId,TypeService,
-		Type,BookinId,ChkInId)
-		SELECT DISTINCT CS.Id,Complimentary,ServiceName,Price,Enable,ProductId,TypeService,'DedicatedContract Apartment',
-		D.BookingId,D.ChkInId
-		FROM dbo.WRBHBContractManagement H
-		JOIN WRBHBContractManagementAppartment CM WITH(NOLOCK) ON H.Id=CM.ContractId 
-				 AND CM.IsActive=1 AND CM.IsDeleted=0
-		JOIN WRBHBContractManagementServices CS ON H.Id=CS.ContractId AND CS.IsActive=1 AND CS.IsDeleted=0
-		JOIN #Id D ON H.ClientId =D.ClientId AND CM.ApartmentId=D.ApartmentId
-		WHERE   H.IsActive=1 AND H.IsDeleted=0 AND CS.TypeService ='Food And Beverages'						
-			
+		
+		
 		--NON-DEDICATED
 		INSERT INTO #SERVICRAMOUNT(Id,Complimentary,ServiceName,Price,Enable,ProductId,TypeService,
-		Type,BookinId,ChkInId)
+		Type,ClientId,PropertyId)
 		SELECT DISTINCT CS.Id,Complimentary,ServiceName,Price,Enable,ProductId,TypeService,'NonDedicatedContract',
-		D.BookingId,D.ChkInId
+		C.ClientId,D.PropertyId
 		FROM WRBHBContractNonDedicated C
 		JOIN WRBHBContractNonDedicatedApartment CM ON  CM.NondedContractId = C.Id 
 		AND CM.IsActive=1 AND CM.IsDeleted=0 
 	    JOIN WRBHBContractNonDedicatedServices CS ON C.Id=CS.NondedContractId AND CS.IsActive=1 
 	    AND CS.IsDeleted=0
 	    JOIN #Id D ON C.ClientId=D.ClientId AND CM.PropertyId=D.PropertyId
-	    WHERE C.IsActive=1 AND C.IsDeleted=0 AND CS.TypeService ='Food And Beverages'
+	    WHERE CM.PropertyId=@PropertyId  AND C.IsActive=1 AND C.IsDeleted=0 AND CS.TypeService ='Food And Beverages'
 		    
 		UPDATE #SERVICRAMOUNT SET Price=0 
 		WHERE Complimentary=1
 		
-	
-		--INSERT INTO #SERVICRAMOUNTFinal(Id,Complimentary,ServiceName,Price,Enable,ProductId,TypeService,Type,BookinId)
-		--SELECT Id,ISComplimentary,ProductName,PerQuantityprice,Enable,Id,TypeService,'ProductMaster',0 
-		--FROM WRBHBContarctProductMaster 
-		--WHERE IsActive=1 AND IsDeleted=0 AND TypeService ='Food And Beverages'
+		DELETE #Id  FROM  #Id C 
+		JOIN  #SERVICRAMOUNT S ON C.ClientId=S.ClientId
+						
+		DECLARE @cnt INT, @ClientId BIGINT,@PrptyId BIGINT;
+		SET @cnt=(SELECT COUNT(*) from  #Id)
 		
-		
-				
-		--UPDATE #SERVICRAMOUNTFinal SET Price=S.Price,Type=S.Type,BookinId=S.BookinId
-		--FROM  #SERVICRAMOUNTFinal O
-		--JOIN #SERVICRAMOUNT S ON O.ProductId=S.ProductId
-		
-		
-		
+		SELECT TOP 1 @ClientId=ClientId,@PrptyId=PropertyId FROM #Id
+		WHILE @cnt>0
+		BEGIN
+			INSERT INTO #SERVICRAMOUNT(Id,Complimentary,ServiceName,Price,Enable,ProductId,TypeService,Type,
+			ClientId,PropertyId)
+			SELECT Id,ISComplimentary,ProductName,PerQuantityprice,Enable,Id,TypeService,'ProductMaster',@ClientId,@PrptyId
+			FROM WRBHBContarctProductMaster
+			WHERE IsActive=1 AND IsDeleted=0 AND TypeService ='Food And Beverages'
+			
+			Delete #Id where @ClientId=ClientId;
+			
+			Select Top 1 @ClientId=ClientId,@PrptyId=PropertyId from #Id
+			Set @cnt=(Select COUNT(*) from  #Id)
+		END 
+		 
+	 
 				
 	IF(@Str3 ='Guest')
 	BEGIN
-	    INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,BookinId,ChkInId,Flag)
+	    INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,ClientId,ChkInId,Flag)
 	    
 		SELECT 'Guest' AS ConsumerType,KH.GuestName,ServiceItem,(KD.Quantity) AS Quantity,
 		CAST(KD.Amount AS DECIMAL(27,2)) AS Revenue,0,KH.CheckInId,0
@@ -159,78 +171,85 @@ CREATE PROCEDURE dbo.[SP_NewSnackKOTEntryReport_Help]
 		WHERE KH.IsActive=1 AND KH.IsDeleted=0 AND
 		KH.PropertyId=@PropertyId 
 		AND CONVERT(NVARCHAR,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103)  
-		group by ServiceItem,KH.GuestName,KD.Quantity,KD.Amount,KH.CheckInId
+		group by ServiceItem,KH.GuestName,KD.Amount,KH.CheckInId,KD.Quantity
 		
-			
-		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,BookinId,ChkInId,Flag)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,ClientId,ChkInId,Flag)
 	    
 		SELECT 'Guest' AS ConsumerType,KD.GuestName,'Breakfast' AS ServiceItem,
-		(KD.BreakfastVeg) AS Quantity,
-		0 AS Revenue,KD.BookingId,KD.CheckInId,1
+		SUM(KD.BreakfastVeg) AS Quantity,
+		0 AS Revenue,CH.ClientId,KD.CheckInId,1
 		FROM WRBHBKOTDtls KD
 		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
+		JOIN WRBHBCheckInHdr CH ON KD.CheckInId=CH.Id AND CH.IsActive=1 AND CH.IsDeleted=0
 		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
 		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.BreakfastVeg !=0  
-		group by KD.GuestName,KD.BreakfastVeg,KD.BookingId,KD.CheckInId
+		group by KD.GuestName,KD.CheckInId,CH.ClientId
 		
-		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,BookinId,ChkInId,Flag)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,ClientId,ChkInId,Flag)
 	    
 		SELECT 'Guest' AS ConsumerType,KD.GuestName,'Breakfast (Non-Veg)' AS ServiceItem,
-		(KD.BreakfastNonVeg) AS Quantity,
-		0 AS Revenue,KD.BookingId,KD.CheckInId,1
+		SUM(KD.BreakfastNonVeg) AS Quantity,
+		0 AS Revenue,CH.ClientId,KD.CheckInId,1
 		FROM WRBHBKOTDtls KD
 		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
+		JOIN WRBHBCheckInHdr CH ON KD.CheckInId=CH.Id AND CH.IsActive=1 AND CH.IsDeleted=0
 		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
 		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.BreakfastNonVeg !=0  
-		group by KD.GuestName,KD.BreakfastNonVeg,KD.BookingId,KD.CheckInId
+		group by KD.GuestName,KD.CheckInId,CH.ClientId
 		
-		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,BookinId,ChkInId,Flag)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,ClientId,ChkInId,Flag)
 	    
 		SELECT 'Guest' AS ConsumerType,KD.GuestName,'Lunch (Veg)' AS ServiceItem,
-		(KD.LunchVeg) AS Quantity,
-		0 AS Revenue,KD.BookingId,KD.CheckInId,1
+		SUM(KD.LunchVeg) AS Quantity,
+		0 AS Revenue,CH.ClientId,KD.CheckInId,1
 		FROM WRBHBKOTDtls KD
 		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
+		JOIN WRBHBCheckInHdr CH ON KD.CheckInId=CH.Id AND CH.IsActive=1 AND CH.IsDeleted=0
 		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
 		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.LunchVeg !=0  
-		group by KD.GuestName,KD.LunchVeg,KD.BookingId,KD.CheckInId
+		group by KD.GuestName,KD.CheckInId,CH.ClientId
 		
-		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,BookinId,ChkInId,Flag)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,ClientId,ChkInId,Flag)
 	    
 		SELECT 'Guest' AS ConsumerType,KD.GuestName,'Lunch (Non-Veg)' AS ServiceItem,
-		(KD.LunchNonVeg) AS Quantity,
-		0 AS Revenue,KD.BookingId,KD.CheckInId,1
+		SUM(KD.LunchNonVeg) AS Quantity,
+		0 AS Revenue,CH.ClientId,KD.CheckInId,1
 		FROM WRBHBKOTDtls KD
 		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
+		JOIN WRBHBCheckInHdr CH ON KD.CheckInId=CH.Id AND CH.IsActive=1 AND CH.IsDeleted=0
 		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
 		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.LunchNonVeg !=0  
-		group by KD.GuestName,KD.LunchNonVeg,KD.BookingId,KD.CheckInId
+		group by KD.GuestName,KD.CheckInId,CH.ClientId
 		
-		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,BookinId,ChkInId,Flag)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,ClientId,ChkInId,Flag)
 	    
 		SELECT 'Guest' AS ConsumerType,KD.GuestName,'Dinner (Veg)' AS ServiceItem,
-		(KD.DinnerVeg) AS Quantity,
-		0 AS Revenue,KD.BookingId,KD.CheckInId,1
+		SUM(KD.DinnerVeg) AS Quantity,
+		0 AS Revenue,CH.ClientId,KD.CheckInId,1
 		FROM WRBHBKOTDtls KD
 		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
+		JOIN WRBHBCheckInHdr CH ON KD.CheckInId=CH.Id AND CH.IsActive=1 AND CH.IsDeleted=0
 		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
 		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.DinnerVeg !=0  
-		group by KD.GuestName,KD.DinnerVeg,KD.BookingId,KD.CheckInId
+		group by KD.GuestName,KD.CheckInId,CH.ClientId
 		
-		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,BookinId,ChkInId,Flag)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,ClientId,ChkInId,Flag)
 	    
 		SELECT 'Guest' AS ConsumerType,KD.GuestName,'Dinner (Non-Veg)' AS ServiceItem,
-		(KD.DinnerNonVeg) AS Quantity,0 AS Revenue,KD.BookingId,KD.CheckInId,1
+		SUM(KD.DinnerNonVeg) AS Quantity,0 AS Revenue,CH.ClientId,KD.CheckInId,1
 		FROM WRBHBKOTDtls KD
 		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
+		JOIN WRBHBCheckInHdr CH ON KD.CheckInId=CH.Id AND CH.IsActive=1 AND CH.IsDeleted=0
 		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
 		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.DinnerNonVeg !=0  
-		group by KD.GuestName,KD.DinnerNonVeg,KD.BookingId,KD.CheckInId
+		group by KD.GuestName,KD.CheckInId,CH.ClientId
+		
+		
 			
 	END
  	IF(@Str3 ='Staff')
 	BEGIN
-		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,BookinId,ChkInId,Flag)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,ClientId,ChkInId,Flag)
 		
 		SELECT 'Staff' AS ConsumerType,KH.UserName,ServiceItem,(KD.Quantity) AS Quantity,
 		(0)*(KD.Quantity) AS Revenue,0,0,2
@@ -241,7 +260,7 @@ CREATE PROCEDURE dbo.[SP_NewSnackKOTEntryReport_Help]
 		AND CONVERT(NVARCHAR,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103)  
 		group by ServiceItem,KH.UserName,KD.Quantity,KD.Price
 		
-		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,BookinId,ChkInId,Flag)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,ClientId,ChkInId,Flag)
 	    
 		SELECT 'Staff' AS ConsumerType,'Outsource' AS UserName,ServiceItem,(KD.Quantity) AS Quantity,
 		(0)*(KD.Quantity) AS Revenue,0,0,2
@@ -252,7 +271,7 @@ CREATE PROCEDURE dbo.[SP_NewSnackKOTEntryReport_Help]
 		AND CONVERT(NVARCHAR,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103)  
 		group by ServiceItem,KD.Quantity,KD.Price
 		
-		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,BookinId,ChkInId,Flag)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,ClientId,ChkInId,Flag)
 	    
 		SELECT 'Staff' AS ConsumerType,KD.UserName,'BreakfastVeg' AS ServiceItem,
 		(KD.BreakfastVeg) AS Quantity,
@@ -266,7 +285,7 @@ CREATE PROCEDURE dbo.[SP_NewSnackKOTEntryReport_Help]
 		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.BreakfastVeg !=0  
 		group by KD.UserName,KD.BreakfastVeg,CP.PerQuantityprice
 		
-		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,BookinId,ChkInId,Flag)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,ClientId,ChkInId,Flag)
 	    
 		SELECT 'Staff' AS ConsumerType,KD.UserName,'BreakfastNonVeg' AS ServiceItem,
 		(KD.BreakfastNonVeg) AS Quantity,
@@ -280,7 +299,7 @@ CREATE PROCEDURE dbo.[SP_NewSnackKOTEntryReport_Help]
 		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.BreakfastNonVeg !=0  
 		group by KD.UserName,KD.BreakfastNonVeg,CP.PerQuantityprice
 		
-		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,BookinId,ChkInId,Flag)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,ClientId,ChkInId,Flag)
 	    
 		SELECT 'Staff' AS ConsumerType,KD.UserName,'LunchVeg' AS ServiceItem,
 		(KD.LunchVeg) AS Quantity,
@@ -294,7 +313,7 @@ CREATE PROCEDURE dbo.[SP_NewSnackKOTEntryReport_Help]
 		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.LunchVeg !=0  
 		group by KD.UserName,KD.LunchVeg,CP.PerQuantityprice
 		
-		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,BookinId,ChkInId,Flag)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,ClientId,ChkInId,Flag)
 	    
 		SELECT 'Staff' AS ConsumerType,KD.UserName,'LunchNonVeg' AS ServiceItem,
 		(KD.LunchNonVeg) AS Quantity,
@@ -308,7 +327,7 @@ CREATE PROCEDURE dbo.[SP_NewSnackKOTEntryReport_Help]
 		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.LunchNonVeg !=0  
 		group by KD.UserName,KD.LunchNonVeg,CP.PerQuantityprice
 		
-		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,BookinId,ChkInId,Flag)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,ClientId,ChkInId,Flag)
 	    
 		SELECT 'Staff' AS ConsumerType,KD.UserName,'DinnerVeg' AS ServiceItem,
 		(KD.DinnerVeg) AS Quantity,
@@ -322,7 +341,7 @@ CREATE PROCEDURE dbo.[SP_NewSnackKOTEntryReport_Help]
 		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.DinnerVeg !=0  
 		group by KD.UserName,KD.DinnerVeg,CP.PerQuantityprice
 		
-		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,BookinId,ChkInId,Flag)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,ClientId,ChkInId,Flag)
 	    
 		SELECT 'Staff' AS ConsumerType,KD.UserName,'DinnerNonVeg' AS ServiceItem,
 		(KD.DinnerNonVeg) AS Quantity,
@@ -339,7 +358,7 @@ CREATE PROCEDURE dbo.[SP_NewSnackKOTEntryReport_Help]
 	END
 	IF(@Str3 ='ALL')
 	BEGIN
-		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,BookinId,ChkInId,Flag)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,ClientId,ChkInId,Flag)
 		
 		SELECT 'Guest' AS ConsumerType,KH.GuestName,ServiceItem,(KD.Quantity) AS Quantity,
 		CAST(KD.Amount AS DECIMAL(27,2)) AS Revenue,0,KH.CheckInId,0
@@ -350,73 +369,80 @@ CREATE PROCEDURE dbo.[SP_NewSnackKOTEntryReport_Help]
 		AND CONVERT(NVARCHAR,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103)  
 		group by ServiceItem,KH.GuestName,KD.Quantity,KD.Amount,KH.CheckInId
 
-		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,BookinId,ChkInId,Flag)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,ClientId,ChkInId,Flag)
 	    
 		SELECT 'Guest' AS ConsumerType,KD.GuestName,'Breakfast' AS ServiceItem,
-		(KD.BreakfastVeg) AS Quantity,
-		0 AS Revenue,KD.BookingId,KD.CheckInId,1
+		SUM(KD.BreakfastVeg) AS Quantity,
+		0 AS Revenue,CH.ClientId,KD.CheckInId,1
 		FROM WRBHBKOTDtls KD
 		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
+		JOIN WRBHBCheckInHdr CH ON KD.CheckInId=CH.Id AND CH.IsActive=1 AND CH.IsDeleted=0
 		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
 		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.BreakfastVeg !=0  
-		group by KD.GuestName,KD.BreakfastVeg,KD.BookingId,KD.CheckInId
+		group by KD.GuestName,KD.BreakfastVeg,KD.CheckInId,CH.ClientId
 		
-		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,BookinId,ChkInId,Flag)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,ClientId,ChkInId,Flag)
 	    
 		SELECT 'Guest' AS ConsumerType,KD.GuestName,'Breakfast (Non-Veg)' AS ServiceItem,
-		(KD.BreakfastNonVeg) AS Quantity,
-		0 AS Revenue,KD.BookingId,KD.CheckInId,1
+		SUM(KD.BreakfastNonVeg) AS Quantity,
+		0 AS Revenue,CH.ClientId,KD.CheckInId,1
 		FROM WRBHBKOTDtls KD
 		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
+		JOIN WRBHBCheckInHdr CH ON KD.CheckInId=CH.Id AND CH.IsActive=1 AND CH.IsDeleted=0
 		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
 		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.BreakfastNonVeg !=0  
-		group by KD.GuestName,KD.BreakfastNonVeg,KD.BookingId,KD.CheckInId
+		group by KD.GuestName,KD.BreakfastNonVeg,KD.CheckInId,CH.ClientId
 		
-		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,BookinId,ChkInId,Flag)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,ClientId,ChkInId,Flag)
 	    
 		SELECT 'Guest' AS ConsumerType,KD.GuestName,'Lunch (Veg)' AS ServiceItem,
-		(KD.LunchVeg) AS Quantity,
-		0 AS Revenue,KD.BookingId,KD.CheckInId,1
+		SUM(KD.LunchVeg) AS Quantity,
+		0 AS Revenue,CH.ClientId,KD.CheckInId,1
 		FROM WRBHBKOTDtls KD
 		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
+		JOIN WRBHBCheckInHdr CH ON KD.CheckInId=CH.Id AND CH.IsActive=1 AND CH.IsDeleted=0
 		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
 		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.LunchVeg !=0  
-		group by KD.GuestName,KD.LunchVeg,KD.BookingId,KD.CheckInId
+		group by KD.GuestName,KD.LunchVeg,KD.CheckInId,CH.ClientId
 		
-		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,BookinId,ChkInId,Flag)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,ClientId,ChkInId,Flag)
 	    
 		SELECT 'Guest' AS ConsumerType,KD.GuestName,'Lunch (Non-Veg)' AS ServiceItem,
-		(KD.LunchNonVeg) AS Quantity,
-		0 AS Revenue,KD.BookingId,KD.CheckInId,1
+		SUM(KD.LunchNonVeg) AS Quantity,
+		0 AS Revenue,CH.ClientId,KD.CheckInId,1
 		FROM WRBHBKOTDtls KD
 		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
+		JOIN WRBHBCheckInHdr CH ON KD.CheckInId=CH.Id AND CH.IsActive=1 AND CH.IsDeleted=0
 		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
 		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.LunchNonVeg !=0  
-		group by KD.GuestName,KD.LunchNonVeg,KD.BookingId,KD.CheckInId
+		group by KD.GuestName,KD.LunchNonVeg,CH.ClientId,KD.CheckInId
 		
-		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,BookinId,ChkInId,Flag)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,ClientId,ChkInId,Flag)
 	    
 		SELECT 'Guest' AS ConsumerType,KD.GuestName,'Dinner (Veg)' AS ServiceItem,
-		(KD.DinnerVeg) AS Quantity,
-		0 AS Revenue,KD.BookingId,KD.CheckInId,1
+		SUM(KD.DinnerVeg) AS Quantity,
+		0 AS Revenue,CH.ClientId,KD.CheckInId,1
 		FROM WRBHBKOTDtls KD
 		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
+		JOIN WRBHBCheckInHdr CH ON KD.CheckInId=CH.Id AND CH.IsActive=1 AND CH.IsDeleted=0
 		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
 		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.DinnerVeg !=0  
+		group by KD.GuestName,KD.LunchNonVeg,KD.CheckInId,CH.ClientId
 		
-		
-		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,BookinId,ChkInId,Flag)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,ClientId,ChkInId,Flag)
 	    
 		SELECT 'Guest' AS ConsumerType,KD.GuestName,'Dinner (Non-Veg)' AS ServiceItem,
-		(KD.DinnerNonVeg) AS Quantity,
-		0 AS Revenue,KD.BookingId,KD.CheckInId,1
+		SUM(KD.DinnerNonVeg) AS Quantity,
+		0 AS Revenue,CH.ClientId,KD.CheckInId,1
 		FROM WRBHBKOTDtls KD
 		JOIN WRBHBKOTHdr KH ON KD.KOTEntryHdrId=KH.Id AND KH.IsActive=1 AND KH.IsDeleted=0
+		JOIN WRBHBCheckInHdr CH ON KD.CheckInId=CH.Id AND CH.IsActive=1 AND CH.IsDeleted=0
 		WHERE KD.IsActive=1 AND KD.IsDeleted=0 AND KD.PropertyId=@PropertyId 
-		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.DinnerNonVeg !=0  
-		
+		AND CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) 
+		AND KD.DinnerNonVeg !=0  
+		group by KD.GuestName,KD.LunchNonVeg,KD.CheckInId,CH.ClientId
 
-		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,BookinId,ChkInId,Flag)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,ClientId,ChkInId,Flag)
 		
 		SELECT  'Staff' AS ConsumerType,KH.UserName,ServiceItem,(KD.Quantity) AS Quantity,
 		(0)*(KD.Quantity) AS Revenue,0,0,2
@@ -427,7 +453,7 @@ CREATE PROCEDURE dbo.[SP_NewSnackKOTEntryReport_Help]
 		AND   CONVERT(NVARCHAR,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103)  
 		group by ServiceItem,KH.UserName,KD.Quantity,KD.Price
 
-		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,BookinId,ChkInId,Flag)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,ClientId,ChkInId,Flag)
 	    
 		SELECT  'Staff' AS ConsumerType,'Outsource' AS UserName,ServiceItem,(KD.Quantity) AS Quantity,
 		(0)*(KD.Quantity) AS Revenue,0,0,2
@@ -439,7 +465,7 @@ CREATE PROCEDURE dbo.[SP_NewSnackKOTEntryReport_Help]
 		group by ServiceItem,KD.Quantity,KD.Price
 
 	
-		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,BookinId,ChkInId,Flag)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,ClientId,ChkInId,Flag)
 	    
 		SELECT 'Staff' AS ConsumerType,KD.UserName,'BreakfastVeg' AS ServiceItem,
 		(KD.BreakfastVeg) AS Quantity,
@@ -456,7 +482,7 @@ CREATE PROCEDURE dbo.[SP_NewSnackKOTEntryReport_Help]
 
 		
 		
-		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,BookinId,ChkInId,Flag)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,ClientId,ChkInId,Flag)
 	    
 		SELECT 'Staff' AS ConsumerType,KD.UserName,'BreakfastNonVeg' AS ServiceItem,
 		(KD.BreakfastNonVeg) AS Quantity,
@@ -470,7 +496,7 @@ CREATE PROCEDURE dbo.[SP_NewSnackKOTEntryReport_Help]
 		AND  CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.BreakfastNonVeg !=0  
 		group by KD.UserName,KD.BreakfastNonVeg,CP.PerQuantityprice
 		
-		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,BookinId,ChkInId,Flag)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,ClientId,ChkInId,Flag)
 	    
 		SELECT 'Staff' AS ConsumerType,KD.UserName,'LunchVeg' AS ServiceItem,
 		(KD.LunchVeg) AS Quantity,
@@ -484,7 +510,7 @@ CREATE PROCEDURE dbo.[SP_NewSnackKOTEntryReport_Help]
 		AND  CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.LunchVeg !=0  
 		group by KD.UserName,KD.LunchVeg,CP.PerQuantityprice
 		
-		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,BookinId,ChkInId,Flag)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,ClientId,ChkInId,Flag)
 	    
 		SELECT 'Staff' AS ConsumerType,KD.UserName,'LunchNonVeg' AS ServiceItem,
 		(KD.LunchNonVeg) AS Quantity,
@@ -498,7 +524,7 @@ CREATE PROCEDURE dbo.[SP_NewSnackKOTEntryReport_Help]
 		AND  CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.LunchNonVeg !=0  
 		group by KD.UserName,KD.LunchNonVeg,CP.PerQuantityprice
 		
-		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,BookinId,ChkInId,Flag)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,ClientId,ChkInId,Flag)
 	    
 		SELECT 'Staff' AS ConsumerType,KD.UserName,'DinnerVeg' AS ServiceItem,
 		(KD.DinnerVeg) AS Quantity,
@@ -512,7 +538,7 @@ CREATE PROCEDURE dbo.[SP_NewSnackKOTEntryReport_Help]
 		AND  CONVERT(date,KH.Date,103) BETWEEN CONVERT(Date,@Str1,103) AND  CONVERT(Date,@Str2,103) AND KD.DinnerVeg !=0  
 		group by KD.UserName,KD.DinnerVeg,CP.PerQuantityprice
 		
-		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,BookinId,ChkInId,Flag)
+		INSERT INTO #Guest(ConsumerType,Name,ServiceItem,Quantity,Revenue,ClientId,ChkInId,Flag)
 	    
 		SELECT 'Staff' AS ConsumerType,KD.UserName,'DinnerNonVeg' AS ServiceItem,
 		(KD.DinnerNonVeg) AS Quantity,
@@ -535,19 +561,21 @@ CREATE PROCEDURE dbo.[SP_NewSnackKOTEntryReport_Help]
 	    
 	    INSERT INTO #FinaR(ConsumerType,Name,ServiceItem,Quantity,Price,Revenue)
 	    
-	 	SELECT DISTINCT G.ConsumerType,Name,G.ServiceItem,Quantity,(Revenue/Quantity) AS Price,
-		Revenue
-		FROM #Guest G
-		WHERE G.Flag=0
-				
+	 	SELECT ConsumerType,Name,ServiceItem,SUM(Quantity) AS Quantity,(SUM(Revenue)/SUM(Quantity)) AS Price,
+		SUM(Revenue) AS Revenue
+		FROM #Guest 
+		WHERE Flag=0
+		GROUP BY  ConsumerType,Name,ServiceItem
+		
+		
 		INSERT INTO #FinaR(ConsumerType,Name,ServiceItem,Quantity,Price,Revenue)
 	    
-	 	SELECT DISTINCT G.ConsumerType,Name,G.ServiceItem,SUM(Quantity) AS Quantity,Price,
-		SUM(Quantity)*(Price)AS Revenue
+	 	SELECT DISTINCT G.ConsumerType,Name,G.ServiceItem,(Quantity) AS Quantity,Price,
+		F.Price*(G.Quantity) AS  Revenue
 		FROM #Guest G
-		JOIN #SERVICRAMOUNT F ON  G.ChkInId=F.ChkInId AND G.ServiceItem=F.ServiceName 
+		JOIN #SERVICRAMOUNT F ON  F.ClientId =G.ClientId AND F.ServiceName=G.ServiceItem
 		WHERE G.Flag=1
-		group by ConsumerType,Name,ServiceItem,F.Price
+		
 		
 		INSERT INTO #FinaR(ConsumerType,Name,ServiceItem,Quantity,Price,Revenue)
 	    
@@ -560,9 +588,6 @@ CREATE PROCEDURE dbo.[SP_NewSnackKOTEntryReport_Help]
 		 
 		SELECT ConsumerType,Name,ServiceItem,Quantity,Price,Revenue 
 		FROM #FinaR
-		
-		
-	 
  END
  IF @Action='NewKOTDETAILS'
  BEGIN

@@ -37,7 +37,6 @@ CREATE PROCEDURE Sp_ContractClientPref_Detail_Insert
 @LTariffTriple       DECIMAL(27, 2),
 @Facility			Nvarchar(100),
 @TaxInclusive	BIT,
-@TaxPercentage	DECIMAL(27, 2),
 @LTAgreed	DECIMAL(27, 2),
 @LTRack	DECIMAL(27, 2),
 @STAgreed	DECIMAL(27, 2),
@@ -57,7 +56,7 @@ UPDATE WRBHBContractClientPref_Details SET IsActive=0,IsDeleted=1
 	TariffDouble,TariffTriple,RTariffSingle,RTariffDouble,RTariffTriple,Facility,TaxInclusive,TaxPercentage,
 	LTAgreed,LTRack,STAgreed,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId,Email,ContactPhone,ContactName)
 	VALUES (@HeaderId,@PropertyName,@PropertyId,@RoomType,@RoomId,@TariffSingle,@TariffDouble,
-	@TariffTriple,@LTariffSingle,@LTariffDouble,@LTariffTriple,@Facility,@TaxInclusive,@TaxPercentage,
+	@TariffTriple,@LTariffSingle,@LTariffDouble,@LTariffTriple,@Facility,@TaxInclusive,0,
 	@LTAgreed,@LTRack,@STAgreed,@CreatedBy,GETDATE(),@CreatedBy,GETDATE(),1,0,NEWID(),@Email,
 	@ContactPhone,@ContactName)		
 		

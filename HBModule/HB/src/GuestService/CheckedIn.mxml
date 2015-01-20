@@ -136,7 +136,7 @@
 			{				
 				
 				useWeb("GuestCheckIn","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,0,0,0,65]);
-		//		useWeb("GuestCheckIn","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,0,0,0,Global_AC[0].UsrId]);
+	//			useWeb("GuestCheckIn","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,0,0,0,Global_AC[0].UsrId]);
 				//			useWeb("GuestCheckIn","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,0,0,0,0]);
 			}
 			
@@ -387,6 +387,7 @@
 						ClientId = Ds_Objects.result.Tables.Table.Rows[0].ClientId;
 						CityId = Ds_Objects.result.Tables.Table.Rows[0].CityId;
 						ServiceCharge = Ds_Objects.result.Tables.Table.Rows[0].ServiceCharge;
+						Txt_TariffPaymentMode.text=Ds_Objects.result.Tables.Table.Rows[0].TariffPaymentMode;
 						//						Direct.selected = Ds_Objects.result.Tables.Table.Rows[0].TariffPaymentMode;
 						//						Rdbg_Payment.selectedValue = Ds_Objects.result.Tables.Table.Rows[0].ServicePaymentMode;
 						//			
@@ -527,6 +528,7 @@
 						ClientId = Ds_Objects.result.Tables.Table.Rows[0].ClientId;
 						CityId = Ds_Objects.result.Tables.Table.Rows[0].CityId;
 						ServiceCharge = Ds_Objects.result.Tables.Table.Rows[0].ServiceCharge;
+						Txt_TariffPaymentMode.text=Ds_Objects.result.Tables.Table.Rows[0].TariffPaymentMode;
 						
 						Id = Ds_Objects.result.Tables.Table.Rows[0].Id;						
 						Rdbg_Payment_changeHandler();						
@@ -767,7 +769,8 @@
 						ApartmentId:ApartmentId,BedId:BedId,ApartmentType:Txt_Apartment.text,BedType:Txt_Bed.text,
 						Type:Txt_Type.text,PropertyType:Txt_PropertyType.text,CheckStatus:"CheckIn",
 						GuestImage:FilePath.text,SingleMarkupAmount:Txt_SingleMarkup.text,
-						DoubleMarkupAmount:Txt_DoubleMarkup.text,ClientId:ClientId,CityId:CityId,ServiceCharge:ServiceCharge
+						DoubleMarkupAmount:Txt_DoubleMarkup.text,ClientId:ClientId,CityId:CityId,ServiceCharge:ServiceCharge,
+						TariffPaymentMode:Txt_TariffPaymentMode.text
 					}]);
 				var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");		
 				useWeb("GuestCheckIn","Save_CUSTOM",[GlobalXml,HdrXml,Str_Image]);
@@ -838,6 +841,7 @@
 				CityId=0;
 				ClientId=0;
 				ServiceCharge=0;
+				Txt_TariffPaymentMode.text="";
 				
 			}
 			
@@ -1565,6 +1569,7 @@
 				<s:TextInput x="366" y="95" id="Txt_DoubleMarkup" editable="false" visible="false"/>
 				<WrbComp:SaveControl x="244" y="491" id="btn_Sctrl" docRefresh="btn_Sctrl_docRefreshHandler()">
 				</WrbComp:SaveControl>
+				<s:TextInput x="435" y="441" id="Txt_TariffPaymentMode" visible="false"/>
 			</s:Group>
 		</s:BorderContainer>
 	</s:VGroup>	

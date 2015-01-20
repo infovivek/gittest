@@ -44,7 +44,7 @@ CREATE PROCEDURE dbo.[SP_PettyCashApprovalHdr_Help]
 		INSERT INTO #Request(Requestedby,PCAccount,RequestedStatus,ProcessedStatus,Comments,
 		RequestedOn,Process,RequestedAmount,Processedon,Processedby,RequestedUserId,Id,PropertyId)
 		
-		SELECT  DISTINCT (U.FirstName+' '+U.LastName) AS Requestedby,P.PropertyName AS PCAccount,PC.RequestedStatus AS RequestedStatus,
+		SELECT  (U.FirstName+' '+U.LastName) AS Requestedby,P.PropertyName AS PCAccount,PC.RequestedStatus AS RequestedStatus,
 		PC.ProcessedStatus AS ProcessedStatus,PC.Comments AS Comments,
 		CONVERT(NVARCHAR(100),PC.RequestedOn,103) AS RequestedOn,0 AS Process,
 		PC.RequestedAmount AS RequestedAmount,
@@ -60,12 +60,12 @@ CREATE PROCEDURE dbo.[SP_PettyCashApprovalHdr_Help]
 		AND PC.Process=1 AND P.Category IN('Internal Property','Managed G H')
 		AND PU.UserType IN('Resident Managers','Assistant Resident Managers','Operations Managers',
 		'Ops Head','Finance')	
-		
+		ORDER BY CONVERT(DATE,PC.RequestedOn,103) DESC
 				
 		INSERT INTO #Request(Requestedby,PCAccount,RequestedStatus,ProcessedStatus,Comments,
 		RequestedOn,Process,RequestedAmount,Processedon,Processedby,RequestedUserId,Id,PropertyId)
 		
-		SELECT DISTINCT (U.FirstName+' '+U.LastName) AS Requestedby,P.PropertyName AS PCAccount
+		SELECT  (U.FirstName+' '+U.LastName) AS Requestedby,P.PropertyName AS PCAccount
 		,PC.Status AS RequestedStatus,'Waiting For Operation Manager Approval' AS ProcessedStatus,'Processing' AS Comments,
 		CONVERT(NVARCHAR(100),PH.Date,103) AS RequestedOn,0 AS Process,
 		SUM(PC.ApprovedAmount) AS RequestedAmount,CONVERT(NVARCHAR(100),GETDATE(),103) AS Processedon,
@@ -82,7 +82,7 @@ CREATE PROCEDURE dbo.[SP_PettyCashApprovalHdr_Help]
 		AND PU.UserType IN('Resident Managers','Assistant Resident Managers','Operations Managers',
 		'Ops Head','Finance')
 		group by  U.FirstName,U.LastName,P.PropertyName,PC.Status,PH.Date,PH.UserId,PH.PropertyId
-		
+		ORDER BY CONVERT(DATE,PH.Date,103) DESC
 		END
 		
 		SELECT Requestedby,PCAccount,RequestedStatus,ProcessedStatus,Comments,

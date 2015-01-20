@@ -45,5 +45,8 @@ namespace HB.Entity
         public decimal LTRack { get; set; }
         public decimal BaseTariff { get; set; }
         public bool TaxInclusive { get; set; }
+        //
+        public decimal GeneralMarkup { get; set; }
+        public decimal SC { get; set; }
     }
 }

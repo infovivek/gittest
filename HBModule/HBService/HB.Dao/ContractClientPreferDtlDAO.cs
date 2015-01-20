@@ -79,14 +79,14 @@ namespace HB.Dao
                 ctrclpd.Facility = document.SelectNodes("//ClientXml")[i].Attributes["Facility"].Value;
                 ctrclpd.Inclusive = Convert.ToBoolean(document.SelectNodes("//ClientXml")[i].Attributes["Inclusive"].Value);
                 
-                if (document.SelectNodes("//ClientXml")[i].Attributes["Tax"].Value == "")
-                {
-                    ctrclpd.Tax = 0;
-                }
-                else
-                {
-                    ctrclpd.Tax = Convert.ToDecimal(document.SelectNodes("//ClientXml")[i].Attributes["Tax"].Value);
-                }
+                //if (document.SelectNodes("//ClientXml")[i].Attributes["Tax"].Value == "")
+                //{
+                //    ctrclpd.Tax = 0;
+                //}
+                //else
+                //{
+                //    ctrclpd.Tax = Convert.ToDecimal(document.SelectNodes("//ClientXml")[i].Attributes["Tax"].Value);
+                //}
                 if (document.SelectNodes("//ClientXml")[i].Attributes["LTAgreed"].Value == "")
                 {
                     ctrclpd.LTAgreed = 0;
@@ -167,7 +167,7 @@ namespace HB.Dao
                 command.Parameters.Add("@LTariffTriple", SqlDbType.Decimal).Value = ctrclpd.RTariffTriple;
                 command.Parameters.Add("@Facility", SqlDbType.NVarChar).Value = ctrclpd.Facility;
                 command.Parameters.Add("@TaxInclusive", SqlDbType.Bit).Value = ctrclpd.Inclusive;
-                command.Parameters.Add("@TaxPercentage", SqlDbType.Decimal).Value = ctrclpd.Tax;
+               // command.Parameters.Add("@TaxPercentage", SqlDbType.Decimal).Value = ctrclpd.Tax;
                 command.Parameters.Add("@LTAgreed", SqlDbType.Decimal).Value = ctrclpd.LTAgreed;
                 command.Parameters.Add("@LTRack", SqlDbType.Decimal).Value = ctrclpd.LTRack;
                 command.Parameters.Add("@STAgreed", SqlDbType.Decimal).Value = ctrclpd.STAgreed;

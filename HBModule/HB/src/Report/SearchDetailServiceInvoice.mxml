@@ -58,7 +58,7 @@
 				}
 			}
 			
-			public var 	FromDate:String="",ToDate:String="",ChkoutId:String="",Status:String="";
+			public var 	FromDate:String="",ToDate:String="",ChkoutId:String="",Status:String="",ChkInHdrId:String = "";
 			public function Clear():void
 			{
 				DT_From.text="";DT_To.text="";txtInvoiceNumbr.text=""; 
@@ -298,7 +298,7 @@
 				var SelBills:ArrayCollection= new ArrayCollection();
 				SelBills=Grd_SearchInvoice.dataProvider as  ArrayCollection;
 				var ChkutIds:String = "";
-				var ChkutIds1:String = "";
+				var ChkutIds1:String = "";var ChkInHdrIds:String="";
 //				if(Modes.selectedValue==2)
 //				{
 					for(var M:int=0;M<SelBills.length;M++)
@@ -309,11 +309,17 @@
 							{
 								ChkutIds+= SelBills[M].ChkoutId+',';  
 							}  
+							if(SelBills[M].selectRadio==true)
+							{
+								ChkInHdrIds+= SelBills[M].ChkInHdrId+',';  
+							}  
+							
 						}
 						//ChkutIds1+=ChkutIds+',';  
 					} 
 			   //}
 				ChkoutId=ChkutIds; 
+				ChkInHdrId=ChkInHdrIds;
 				Print();
 			}
 			protected function Print():void
@@ -323,7 +329,7 @@
 					Type="Internal";
 					if(ChkoutId!='')
 					{
-						ExternalInterface.call("changeDocumentTitle",Str_ChkOutTAC+ChkoutId+'@'+Type);
+						ExternalInterface.call("changeDocumentTitle",Str_ChkOutTAC+ChkoutId+'@'+Type+'/'+ChkInHdrId);
 					}
 				}
 				if(Modes.selectedValue==1)
@@ -331,7 +337,7 @@
 					Type="External";
 					if(ChkoutId!='')
 					{
-						ExternalInterface.call("changeDocumentTitle",Str_ChkOutTAC+ChkoutId+'@'+Type);
+						ExternalInterface.call("changeDocumentTitle",Str_ChkOutTAC+ChkoutId+'@'+Type+'/'+ChkInHdrId);
 					}
 				} 
 				if(Type=='')
@@ -339,7 +345,7 @@
 					Type="Internal"; 
 					if(ChkoutId!='')
 					{
-						ExternalInterface.call("changeDocumentTitle",Str_ChkOutTAC+ChkoutId+'@'+Type);
+						ExternalInterface.call("changeDocumentTitle",Str_ChkOutTAC+ChkoutId+'@'+Type+'/'+ChkInHdrId);
 					}
 				}  
 			}

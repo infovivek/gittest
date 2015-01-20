@@ -32,7 +32,10 @@
 			import mx.managers.PopUpManager;
 			import mx.rpc.http.mxml.HTTPService;
 			import mx.states.AddItems;
-			
+			import com.as3xls.xls.Cell;
+			import com.as3xls.xls.ExcelFile;
+			import com.as3xls.xls.Sheet;
+			import com.as3xls.xls.Type;
 			import org.hamcrest.mxml.collection.Array;
 			
 			import spark.events.IndexChangeEvent;
@@ -43,7 +46,7 @@
 			public var Id:int=0,ErrMsg:String="",Roles:String="",PropertyId:int=0,PropertyName:String="",UserId:int=0;
 			public var AddMode:Boolean=true,Flag:Boolean=true;
 			public var PId:int=0,UId:int=0;
-			
+			private var xlsFile:ExcelFile;
 			
 			
 			protected function PageLoad(event:FlexEvent):void
@@ -224,6 +227,47 @@
 				Scr_Grid.visible=true;
 				Help();
 			}
+			protected function Export(event:MouseEvent):void
+			{
+				
+				if(Grd_History.dataProvider !=null)
+				{
+					var arrExportResult:ArrayCollection = Grd_History.dataProvider as ArrayCollection;
+					xlsFile = new ExcelFile();
+					var sheet:Sheet = new Sheet();
+					
+					sheet.resize(arrExportResult.length+1,14);
+					
+					sheet.setCell(0,0,'RequestedOn');
+					sheet.setCell(0,1,'ApprovedAmount');
+					sheet.setCell(0,2,'ExpenseAmount');
+					sheet.setCell(0,3,'ExpenseHead');
+					sheet.setCell(0,4,'Description');
+					
+					
+					for(var i:int=0;i<arrExportResult.length;i++)
+					{
+						sheet.setCell(i+1, 0, arrExportResult[i].RequestedOn);
+						sheet.setCell(i+1, 1, arrExportResult[i].ApprovedAmount);
+						sheet.setCell(i+1, 2, arrExportResult[i].ExpenseAmount);
+						sheet.setCell(i+1, 3, arrExportResult[i].ExpenseHead);
+						sheet.setCell(i+1, 4, arrExportResult[i].Description);
+						
+						
+					}
+					Grd_History.dataProvider = arrExportResult;
+					xlsFile.sheets.addItem(sheet);      
+					var bytes: ByteArray = xlsFile.saveToByteArray();
+					var fr:FileReference = new FileReference();
+					fr.save(bytes,"PC Expense Approval.xls");
+				}
+				else
+				{
+					alignAlert(Alert.show("ServiceItem Details Required.","Message !",
+						Alert.OK, null, null, iconErrLarge, Alert.OK),10,"");
+				}
+								
+			}
 			public var Id1:int=0;
 			public function FnAction(Event):void
 			{ 
@@ -357,6 +401,9 @@
 		</s:BorderContainer>
 		<WrbComp:Button_BB id="Sctrl_Reject" x="415" y="398" width="94" height="30"
 						   click="FnReject()" Lable_val="Reject">
+		</WrbComp:Button_BB>
+		<WrbComp:Button_BB id="Sctrl_Export" x="565" y="398" width="94" height="30"
+						   click="Export(event)" Lable_val="Export">
 		</WrbComp:Button_BB>
 	</s:BorderContainer>
 	<s:BorderContainer x="232" y="43" width="538" height="409" id="bdr_Action" visible="false" depth="500">

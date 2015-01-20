@@ -199,12 +199,12 @@ IF ISNULL(@PrintInvoice,0) = '1'
 			END
 			
 	IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE PropertyType ='Managed G H' and PrintInvoice = 1  AND ISNULL(InVoiceNo,'') != '')
+		WHERE PropertyType IN ('Managed G H','DdP') and PrintInvoice = 1  AND ISNULL(InVoiceNo,'') != '')
 			BEGIN
 				SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
 				CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE PropertyType ='Managed G H'  AND InvoiceNo!='' and PrintInvoice = 1  and InvoiceNo!='0'
+				WHERE PropertyType IN ('Managed G H','DdP')  AND InvoiceNo!='' and PrintInvoice = 1  and InvoiceNo!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -216,12 +216,12 @@ IF ISNULL(@PrintInvoice,0) = '1'
 	IF @Direct = 'Direct'  
 	BEGIN
 		IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE PropertyType ='Managed G H' and PrintInvoice = 1  AND ISNULL(InVoiceNo,'') != '')
+		WHERE PropertyType IN ('Managed G H','DdP') and PrintInvoice = 1  AND ISNULL(InVoiceNo,'') != '')
 		BEGIN
 			SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
 			CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 			FROM WRBHBChechkOutHdr
-			WHERE PropertyType ='Managed G H'  AND InvoiceNo!='' and PrintInvoice = 1  and InvoiceNo!='0'
+			WHERE PropertyType IN ('Managed G H','DdP')  AND InvoiceNo!='' and PrintInvoice = 1  and InvoiceNo!='0'
 			ORDER BY Id DESC;
 		END
 		ELSE
@@ -250,12 +250,12 @@ IF ISNULL(@PrintInvoice,0) = '1'
 			END
 			
 		IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE PropertyType ='Managed G H' AND ISNULL(InVoiceNo,'') != '')
+		WHERE PropertyType IN ('Managed G H','DdP') AND ISNULL(InVoiceNo,'') != '')
 			BEGIN
 				SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
 				CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE PropertyType ='Managed G H'  AND InvoiceNo!=''  and InvoiceNo!='0'
+				WHERE PropertyType IN ('Managed G H','DdP')  AND InvoiceNo!=''  and InvoiceNo!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -284,12 +284,12 @@ IF ISNULL(@PrintInvoice,0) = '1'
 			END
 			
 		IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE PropertyType ='Managed G H'  AND ISNULL(InVoiceNo,'') != '')
+		WHERE PropertyType IN ('Managed G H','DdP')  AND ISNULL(InVoiceNo,'') != '')
 			BEGIN
 				SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
 				CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE PropertyType ='Managed G H'  AND InvoiceNo!='' and InvoiceNo!='0'
+				WHERE PropertyType IN ('Managed G H','DdP')  AND InvoiceNo!='' and InvoiceNo!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -508,12 +508,12 @@ IF ISNULL(@PrintInvoice,0) = '1'
 			END
 			
 	IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE PropertyType ='Managed G H' and PrintInvoice = 1 AND ISNULL(InVoiceNo,'') != '')
+		WHERE PropertyType IN ('Managed G H','DdP') and PrintInvoice = 1 AND ISNULL(InVoiceNo,'') != '')
 			BEGIN
 				SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
 				CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE PropertyType ='Managed G H' AND InvoiceNo!='' and PrintInvoice = 1  and InvoiceNo!='0'
+				WHERE PropertyType IN ('Managed G H','DdP') AND InvoiceNo!='' and PrintInvoice = 1  and InvoiceNo!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -542,12 +542,12 @@ IF ISNULL(@PrintInvoice,0) = '1'
 			END
 			
 		IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE PropertyType ='Managed G H' AND ISNULL(InVoiceNo,'') != '')
+		WHERE PropertyType IN ('Managed G H','DdP') AND ISNULL(InVoiceNo,'') != '')
 			BEGIN
 				SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
 				CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE PropertyType ='Managed G H' AND InvoiceNo!=''  and InvoiceNo!='0'
+				WHERE PropertyType IN ('Managed G H','DdP') AND InvoiceNo!=''  and InvoiceNo!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -576,12 +576,12 @@ IF ISNULL(@PrintInvoice,0) = '1'
 			END
 			
 		IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
-		WHERE PropertyType ='Managed G H' AND ISNULL(InVoiceNo,'') != '')
+		WHERE PropertyType IN ('Managed G H','DdP') AND ISNULL(InVoiceNo,'') != '')
 			BEGIN
 				SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
 				CAST(CAST(SUBSTRING(InVoiceNo,5,LEN(InVoiceNo)) AS INT) + 1 AS VARCHAR)
 				FROM WRBHBChechkOutHdr
-				WHERE PropertyType ='Managed G H'  AND InvoiceNo!='' and InvoiceNo!='0'
+				WHERE PropertyType IN ('Managed G H','DdP')  AND InvoiceNo!='' and InvoiceNo!='0'
 				ORDER BY Id DESC;
 			END
 			ELSE
@@ -715,7 +715,7 @@ END
 			WHERE Id = @InsId and PropertyType =  'External Property' 
 
 			UPDATE WRBHBChechkOutHdr set PaymentStatus = 'Paid'  ,IntermediateFlag = 1,IsActive=1
-			WHERE Id = @InsId and PropertyType =  'Managed G H' 
+			WHERE Id = @InsId and PropertyType IN ('Managed G H','DdP') 
 		END
 		IF @PrintInvoice = 1
 		BEGIN
@@ -776,7 +776,7 @@ END
 			WHERE Id = @InsId and PropertyType =  'External Property' 
 
 			UPDATE WRBHBChechkOutHdr set PaymentStatus = 'Paid'  --,Flag = 1
-			WHERE Id = @InsId and PropertyType =  'Managed G H' 
+			WHERE Id = @InsId and PropertyType IN ('Managed G H','DdP') 
 		END
 		IF @PrintInvoice = 1
 		BEGIN

@@ -404,13 +404,23 @@ IF @Action = 'RoomBookingConfirmed'
     DECLARE @DoubleMarkup DECIMAL(27,2) = 0;
     DECLARE @TripleMarkup DECIMAL(27,2) = 0;
     DECLARE @TACFlag BIT = 0;
-    SELECT TOP 1 @SingleTariff = SingleTariff,@DoubleTariff = DoubleTariff,
+    /*SELECT TOP 1 @SingleTariff = SingleTariff,@DoubleTariff = DoubleTariff,
     @TripleTariff = TripleTariff,@TACFlag = ISNULL(TAC,0),
     @SingleMarkup = (SingleandMarkup1 - SingleTariff),
     @DoubleMarkup = (DoubleandMarkup1 - DoubleTariff),
     @TripleMarkup = (TripleandMarkup1 - TripleTariff)
     FROM WRBHBBookingProperty P    
-    WHERE P.BookingId=@Id AND P.PropertyId = @BookingPropertyId;
+    WHERE P.BookingId=@Id AND P.PropertyId = @BookingPropertyId;*/
+    SELECT TOP 1 @SingleTariff = (SingleandMarkup1 - (GeneralMarkup + Markup)),
+    @DoubleTariff = (DoubleandMarkup1 - (GeneralMarkup + Markup)),
+    @TripleTariff = (TripleandMarkup1 - (GeneralMarkup + Markup)),
+    @TACFlag = ISNULL(TAC,0),
+    @SingleMarkup = (GeneralMarkup + Markup),
+    @DoubleMarkup = (GeneralMarkup + Markup),
+    @TripleMarkup = (GeneralMarkup + Markup)
+    FROM WRBHBBookingProperty P
+    WHERE P.Id IN (SELECT BookingPropertyTableId 
+    FROM WRBHBBookingPropertyAssingedGuest WHERE BookingId = @Id);
     --
     IF @TACFlag = 0
      BEGIN
@@ -977,13 +987,13 @@ IF @Action = 'MMTBookingConfirmed'
   BG.Tariff,BG.Occupancy,
   CASE WHEN BG.TariffPaymentMode='Direct' THEN 'Direct<br>(Cash/Card)'
        WHEN BG.TariffPaymentMode = 'Bill to Client' THEN 'Bill to '+@ClientName1
-       WHEN BG.TariffPaymentMode = 'Bill to Company (BTC)' THEN
-       'Bill to Company (BTC)<br>(7.42% Tax Extra)'
+       --WHEN BG.TariffPaymentMode = 'Bill to Company (BTC)' THEN
+       --'Bill to Company (BTC)<br>(7.42% Tax Extra)'
        ELSE BG.TariffPaymentMode END AS TariffPaymentMode,
   CASE WHEN BG.ServicePaymentMode='Direct' THEN 'Direct<br>(Cash/Card)'
        WHEN BG.ServicePaymentMode = 'Bill to Client' THEN 'Bill to '+@ClientName1
-       WHEN BG.ServicePaymentMode = 'Bill to Company (BTC)' THEN
-       'Bill to Company (BTC)<br>(7.42% Tax Extra)'
+       --WHEN BG.ServicePaymentMode = 'Bill to Company (BTC)' THEN
+       --'Bill to Company (BTC)<br>(7.42% Tax Extra)'
        ELSE BG.ServicePaymentMode END AS ServicePaymentMode,BG.RoomCaptured 
   FROM WRBHBBookingPropertyAssingedGuest BG
   WHERE BG.IsActive=1 AND BG.IsDeleted=0 AND BG.BookingId=@Id 
@@ -1003,9 +1013,9 @@ IF @Action = 'MMTBookingConfirmed'
   B.Tariff,B.Occupancy,B.TariffPaymentMode,B.ServicePaymentMode
   FROM #FFF1 AS B;
   -- DATASET TABLE 0
-  SELECT Name,ChkInDt,ChkOutDt,
-  CAST(Tariff - ROUND((Tariff * 19 / 100),0) AS DECIMAL(27,2)),Occupancy,
-  TariffPaymentMode,ServicePaymentMode FROM #MAILGUESTDATA;  
+  SELECT Name,ChkInDt,ChkOutDt,Tariff,
+  --CAST(Tariff - ROUND((Tariff * 19 / 100),0) AS DECIMAL(27,2)),
+  Occupancy,TariffPaymentMode,ServicePaymentMode FROM #MAILGUESTDATA;  
   ---
   SELECT TOP 1 @BookingPropertyId=BookingPropertyId 
   FROM WRBHBBookingPropertyAssingedGuest
@@ -1043,9 +1053,9 @@ IF @Action = 'MMTBookingConfirmed'
   FROM WRBHBStaticHotels SH
   WHERE SH.HotalId=@BookingPropertyId AND SH.IsActive=1 AND SH.IsDeleted=0;
   -- dataset table 2
-  DECLARE @MMTPId NVARCHAR(100) = 
-  (SELECT TOP 1 CAST(ISNULL(BookingPropertyId,'') AS VARCHAR) 
-  FROM WRBHBApartmentBookingPropertyAssingedGuest
+  DECLARE @MMTPId NVARCHAR(100) = '';
+  SET @MMTPId = (SELECT TOP 1 CAST(ISNULL(BookingPropertyId,'') AS VARCHAR) 
+  FROM WRBHBBookingPropertyAssingedGuest
   WHERE BookingId = @Id GROUP BY BookingPropertyId);
   SELECT B.BookingCode,U.FirstName,
   REPLACE(CONVERT(VARCHAR(11), B.CreatedDate, 106), ' ', '-') AS ReservationDt,
@@ -1061,7 +1071,8 @@ IF @Action = 'MMTBookingConfirmed'
   -- dataset table 3 
   /*SELECT EmailId,'Including Tax' FROM WRBHBBookingGuestDetails 
   WHERE BookingId=@Id GROUP BY EmailId;*/
-  SELECT EmailId,'Taxes as applicable',@Stay,@Uniglobe 
+  --SELECT EmailId,'Taxes as applicable',@Stay,@Uniglobe 
+  SELECT EmailId,'Including Tax',@Stay,@Uniglobe
   FROM WRBHBBookingGuestDetails 
   WHERE BookingId=@Id GROUP BY EmailId;
   -- Dataset Table 4

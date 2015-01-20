@@ -46,9 +46,12 @@ IF @Action = 'CityLoad'
  END
 IF @Action = 'GetAPIData'
  BEGIN
-  SELECT TOP 1 Id,citycode FROM WRBHBAPIHeader
+  /*SELECT TOP 1 Id,citycode FROM WRBHBAPIHeader
   WHERE IsActive=1 AND IsDeleted=0 AND CityId=@CityId AND
-  ISNULL(citycode,'') != '' ORDER BY Id DESC;
+  ISNULL(citycode,'') != '' ORDER BY Id DESC;*/
+  SELECT Id,citycode FROM WRBHBAPIHeader
+  WHERE IsActive=1 AND IsDeleted=0 AND 
+  CityCode = (SELECT ISNULL(CityCode,'') FROM WRBHBCity WHERE Id = @CityId)
  END
 IF @Action = 'Tab1_Next'
  BEGIN
@@ -213,6 +216,7 @@ IF @Action = 'Tab1_Next'
 IF @Action = 'GuestDelete'
  BEGIN
   DELETE FROM WRBHBBookingGuestDetails WHERE Id=@Id1;
+  --UPDATE WRBHBBookingGuestDetails SET IsActive = 0,IsDeleted = 1 WHERE Id = @Id1;
  END
 IF @Action = 'Tab2_to_Tab3_Dtls'
  BEGIN
@@ -958,18 +962,22 @@ IF @Action = 'Property'
   RackDouble DECIMAL(27,2),RackTriple DECIMAL(27,2),TAC BIT,
   Inclusive BIT,Facility NVARCHAR(100),LTAgreed DECIMAL(27,2),
   LTRack DECIMAL(27,2),STAgreed DECIMAL(27,2),RoomId BIGINT,
-  StarRatingId BIGINT,HRSingle DECIMAL(27,2));
+  StarRatingId BIGINT,HRSingle DECIMAL(27,2),SC DECIMAL(27,2));
   INSERT INTO #TmpExternal(PropertyName,Id,GetType,PropertyType,RoomType,
   AgreedSingle,AgreedDouble,AgreedTriple,RackSingle,RackDouble,RackTriple,
   TAC,Inclusive,Facility,LTAgreed,LTRack,STAgreed,RoomId,StarRatingId,
-  HRSingle)  
+  HRSingle,SC)  
   SELECT P.PropertyName,P.Id,'Property','ExP',R.RoomType,  
   R.RackSingle,R.RackDouble,R.RackTriple,
   R.Single,R.RDouble,R.Triple,ISNULL(A.TAC,0),ISNULL(R.Inclusive,0),
-  ISNULL(R.Facility,''),R.LTAgreed,R.LTRack,R.STAgreed,R.Id,P.PropertyType,
+  ISNULL(R.Facility,''),
+  CASE WHEN ISNULL(R.Inclusive,0) = 0 THEN R.LTAgreed ELSE 0 END,
+  CASE WHEN ISNULL(R.Inclusive,0) = 0 THEN R.LTRack ELSE 0 END,
+  CASE WHEN ISNULL(R.Inclusive,0) = 0 THEN R.STAgreed ELSE 0 END,
+  R.Id,P.PropertyType,
   CASE WHEN ISNULL(R.Inclusive,0) = 1 THEN
-  R.RackSingle - ROUND(((R.RackSingle * 19) / 100),0) ELSE R.RackSingle END
-  FROM WRBHBProperty P
+  R.RackSingle - ROUND(((R.RackSingle * 19) / 100),0) ELSE R.RackSingle END,
+  ISNULL(R.SC,0) FROM WRBHBProperty P
   LEFT OUTER JOIN WRBHBPropertyAgreements A WITH(NOLOCK)ON 
   A.PropertyId=P.Id
   LEFT OUTER JOIN WRBHBPropertyAgreementsRoomCharges R WITH(NOLOCK)ON
@@ -989,18 +997,18 @@ IF @Action = 'Property'
   RackDouble DECIMAL(27,2),RackTriple DECIMAL(27,2),TAC BIT,
   Inclusive BIT,Facility NVARCHAR(100),LTAgreed DECIMAL(27,2),
   LTRack DECIMAL(27,2),STAgreed DECIMAL(27,2),RoomId BIGINT,
-  StarRatingId BIGINT,HRSingle DECIMAL(27,2));
+  StarRatingId BIGINT,HRSingle DECIMAL(27,2),SC DECIMAL(27,2));
   INSERT INTO #TmpExpHR(PropertyName,Id,GetType,PropertyType,RoomType,
   AgreedSingle,AgreedDouble,AgreedTriple,RackSingle,RackDouble,RackTriple,
   TAC,Inclusive,Facility,LTAgreed,LTRack,STAgreed,RoomId,StarRatingId,
-  HRSingle)
+  HRSingle,SC)
   SELECT PropertyName,Id,GetType,PropertyType,RoomType,AgreedSingle,
   AgreedDouble,AgreedTriple,RackSingle,RackDouble,RackTriple,TAC,Inclusive,
   Facility,LTAgreed,LTRack,STAgreed,RoomId,StarRatingId,
   CASE WHEN TAC = 1 THEN HRSingle
        WHEN TAC = 0 AND @Flag = 0 THEN HRSingle + @Rs
        WHEN TAC = 0 AND @Flag = 1 THEN HRSingle + ROUND((HRSingle * @Per / 100),0)
-       ELSE HRSingle END
+       ELSE HRSingle END,SC
   FROM #TmpExternal;
   --
   --SELECT @Flag,@Rs;
@@ -1013,7 +1021,7 @@ IF @Action = 'Property'
   RackDouble DECIMAL(27,2),RackTriple DECIMAL(27,2),TAC BIT,
   Inclusive BIT,Facility NVARCHAR(100),LTAgreed DECIMAL(27,2),
   LTRack DECIMAL(27,2),STAgreed DECIMAL(27,2),RoomId BIGINT,
-  StarRatingId BIGINT,HRSingle DECIMAL(27,2));
+  StarRatingId BIGINT,HRSingle DECIMAL(27,2),SC DECIMAL(27,2));
   IF @StarCnt != 0
    BEGIN
     IF @StarFlag = 1
@@ -1021,10 +1029,10 @@ IF @Action = 'Property'
       INSERT INTO #TmpExternalHR(PropertyName,Id,GetType,PropertyType,RoomType,
       AgreedSingle,AgreedDouble,AgreedTriple,RackSingle,RackDouble,RackTriple,
       TAC,Inclusive,Facility,LTAgreed,LTRack,STAgreed,RoomId,StarRatingId,
-      HRSingle)
+      HRSingle,SC)
       SELECT PropertyName,Id,GetType,PropertyType,RoomType,AgreedSingle,
       AgreedDouble,AgreedTriple,RackSingle,RackDouble,RackTriple,TAC,Inclusive,
-      Facility,LTAgreed,LTRack,STAgreed,RoomId,StarRatingId,HRSingle 
+      Facility,LTAgreed,LTRack,STAgreed,RoomId,StarRatingId,HRSingle,SC 
       FROM #TmpExpHR WHERE StarRatingId = @StarId;
      END
     IF @StarFlag = 0
@@ -1032,10 +1040,10 @@ IF @Action = 'Property'
       INSERT INTO #TmpExternalHR(PropertyName,Id,GetType,PropertyType,RoomType,
       AgreedSingle,AgreedDouble,AgreedTriple,RackSingle,RackDouble,RackTriple,
       TAC,Inclusive,Facility,LTAgreed,LTRack,STAgreed,RoomId,StarRatingId,
-      HRSingle)
+      HRSingle,SC)
       SELECT PropertyName,Id,GetType,PropertyType,RoomType,AgreedSingle,
       AgreedDouble,AgreedTriple,RackSingle,RackDouble,RackTriple,TAC,Inclusive,
-      Facility,LTAgreed,LTRack,STAgreed,RoomId,StarRatingId,HRSingle 
+      Facility,LTAgreed,LTRack,STAgreed,RoomId,StarRatingId,HRSingle,SC 
       FROM #TmpExpHR WHERE HRSingle BETWEEN @MinValue AND @MaxValue;
      END
    END
@@ -1043,10 +1051,11 @@ IF @Action = 'Property'
    BEGIN
     INSERT INTO #TmpExternalHR(PropertyName,Id,GetType,PropertyType,RoomType,
     AgreedSingle,AgreedDouble,AgreedTriple,RackSingle,RackDouble,RackTriple,
-    TAC,Inclusive,Facility,LTAgreed,LTRack,STAgreed,RoomId,StarRatingId,HRSingle)
+    TAC,Inclusive,Facility,LTAgreed,LTRack,STAgreed,RoomId,StarRatingId,HRSingle,
+    SC)
     SELECT PropertyName,Id,GetType,PropertyType,RoomType,AgreedSingle,
     AgreedDouble,AgreedTriple,RackSingle,RackDouble,RackTriple,TAC,Inclusive,
-    Facility,LTAgreed,LTRack,STAgreed,RoomId,StarRatingId,HRSingle 
+    Facility,LTAgreed,LTRack,STAgreed,RoomId,StarRatingId,HRSingle,SC 
     FROM #TmpExpHR;
    END
   --
@@ -1058,24 +1067,27 @@ IF @Action = 'Property'
   SingleTariff DECIMAL(27,2),DoubleTariff DECIMAL(27,2),TripleTariff DECIMAL(27,2),
   TAC BIT,Facility NVARCHAR(100),TaxAdded NVARCHAR(100),
   LTAgreed DECIMAL(27,2),STAgreed DECIMAL(27,2),LTRack DECIMAL(27,2),
-  TaxInclusive BIT,HRSingle DECIMAL(27,2));
+  TaxInclusive BIT,HRSingle DECIMAL(27,2),SC DECIMAL(27,2));
   INSERT INTO #External1(PropertyName,Id,GetType,PropertyType,RoomType,
   SingleTariff,DoubleTariff,TripleTariff,TAC,Facility,TaxAdded,
-  LTAgreed,STAgreed,LTRack,TaxInclusive,HRSingle)
+  LTAgreed,STAgreed,LTRack,TaxInclusive,HRSingle,SC)
   SELECT PropertyName,Id,GetType,PropertyType,RoomType,
   CASE WHEN ISNULL(H.Inclusive,0) = 0 THEN 
   (H.AgreedSingle + ROUND((((H.AgreedSingle * H.LTAgreed)/100) + 
-  ((H.AgreedSingle * H.STAgreed)/100) + ((H.RackSingle * H.LTRack)/100)),0))
+  ((H.AgreedSingle * H.STAgreed)/100) + ((H.RackSingle * H.LTRack)/100) +
+  ((H.AgreedSingle * H.SC)/100)),0))
   ELSE H.AgreedSingle END,
   CASE WHEN ISNULL(H.Inclusive,0) = 0 THEN 
   (H.AgreedDouble + ROUND((((H.AgreedDouble * H.LTAgreed)/100) + 
-  ((H.AgreedDouble * H.STAgreed)/100) + ((H.RackDouble * H.LTRack)/100)),0))
+  ((H.AgreedDouble * H.STAgreed)/100) + ((H.RackDouble * H.LTRack)/100) +
+  ((H.AgreedDouble * H.SC)/100)),0))
   ELSE H.AgreedDouble END,
   CASE WHEN ISNULL(H.Inclusive,0) = 0 THEN 
   (H.AgreedTriple + ROUND((((H.AgreedTriple * H.LTAgreed)/100) + 
-  ((H.AgreedTriple * H.STAgreed)/100) + ((H.RackTriple * H.LTRack)/100)),0))
+  ((H.AgreedTriple * H.STAgreed)/100) + ((H.RackTriple * H.LTRack)/100) +
+  ((H.AgreedTriple * H.SC)/100)),0))
   ELSE H.AgreedTriple END,H.TAC,H.Facility,'N',
-  H.LTAgreed,H.STAgreed,H.LTRack,H.Inclusive,HRSingle FROM #TmpExternalHR H;
+  H.LTAgreed,H.STAgreed,H.LTRack,H.Inclusive,HRSingle,H.SC FROM #TmpExternalHR H;
   --
   --SELECT SingleTariff,Id FROM #External1;RETURN;
   --SELECT 'HI';RETURN;
@@ -1087,15 +1099,16 @@ IF @Action = 'Property'
   DoubleandMarkup DECIMAL(27,2),TripleandMarkup DECIMAL(27,2),
   TAC BIT,MarkupId BIGINT,TaxAdded NVARCHAR(100),Facility NVARCHAR(100),
   LTAgreed DECIMAL(27,2),STAgreed DECIMAL(27,2),LTRack DECIMAL(27,2),
-  TaxInclusive BIT,HRSingle DECIMAL(27,2));  
+  TaxInclusive BIT,HRSingle DECIMAL(27,2),GeneralMarkup DECIMAL(27,2),
+  SC DECIMAL(27,2));  
   --
   INSERT INTO #External(PropertyName,Id,GetType,PropertyType,RoomType,
   SingleTariff,DoubleTariff,TripleTariff,SingleandMarkup,DoubleandMarkup,
   TripleandMarkup,TAC,MarkupId,TaxAdded,Facility,
-  LTAgreed,STAgreed,LTRack,TaxInclusive,HRSingle)
+  LTAgreed,STAgreed,LTRack,TaxInclusive,HRSingle,GeneralMarkup,SC)
   SELECT PropertyName,Id,GetType,PropertyType,RoomType,SingleTariff,DoubleTariff,
   TripleTariff,SingleTariff,DoubleTariff,TripleTariff,TAC,0,TaxAdded,Facility,
-  LTAgreed,STAgreed,LTRack,TaxInclusive,HRSingle 
+  LTAgreed,STAgreed,LTRack,TaxInclusive,HRSingle,0,SC 
   FROM #External1 WHERE TAC = 1;
   --
   --SELECT @Flag,@Rs;
@@ -1106,6 +1119,29 @@ IF @Action = 'Property'
     INSERT INTO #External(PropertyName,Id,GetType,PropertyType,RoomType,
     SingleTariff,DoubleTariff,TripleTariff,SingleandMarkup,DoubleandMarkup,
     TripleandMarkup,TAC,MarkupId,TaxAdded,Facility,
+    LTAgreed,STAgreed,LTRack,TaxInclusive,HRSingle,GeneralMarkup,SC)
+    SELECT PropertyName,Id,GetType,PropertyType,RoomType,
+    SingleTariff,DoubleTariff,TripleTariff,
+    CASE WHEN SingleTariff > 0 AND TaxInclusive = 0 THEN SingleTariff + @Rs +
+    ROUND((((@Rs * LTAgreed) / 100) + ((@Rs * STAgreed) / 100) +
+    ((@Rs * SC) / 100)),0) 
+         WHEN SingleTariff > 0 AND TaxInclusive = 1 THEN SingleTariff + @Rs
+         ELSE SingleTariff END,
+    CASE WHEN DoubleTariff > 0 AND TaxInclusive = 0 THEN DoubleTariff + @Rs + 
+    ROUND((((@Rs * LTAgreed) / 100) + ((@Rs * STAgreed) / 100) +
+    ((@Rs * SC) / 100)),0) 
+         WHEN DoubleTariff > 0 AND TaxInclusive = 1 THEN DoubleTariff + @Rs
+         ELSE DoubleTariff END,
+    CASE WHEN TripleTariff > 0 AND TaxInclusive = 0 THEN TripleTariff + @Rs + 
+    ROUND((((@Rs * LTAgreed) / 100) + ((@Rs * STAgreed) / 100) +
+    ((@Rs * SC) / 100)),0) 
+         WHEN TripleTariff > 0 AND TaxInclusive = 1 THEN TripleTariff + @Rs
+         ELSE TripleTariff END,
+    TAC,@MarkupId,TaxAdded,Facility,LTAgreed,STAgreed,LTRack,TaxInclusive,
+    HRSingle,@Rs,SC FROM #External1 WHERE TAC = 0;
+    /*INSERT INTO #External(PropertyName,Id,GetType,PropertyType,RoomType,
+    SingleTariff,DoubleTariff,TripleTariff,SingleandMarkup,DoubleandMarkup,
+    TripleandMarkup,TAC,MarkupId,TaxAdded,Facility,
     LTAgreed,STAgreed,LTRack,TaxInclusive,HRSingle)
     SELECT PropertyName,Id,GetType,PropertyType,RoomType,
     SingleTariff,DoubleTariff,TripleTariff,
@@ -1113,14 +1149,46 @@ IF @Action = 'Property'
     CASE WHEN DoubleTariff > 0 THEN DoubleTariff + @Rs ELSE DoubleTariff END,
     CASE WHEN TripleTariff > 0 THEN TripleTariff + @Rs ELSE TripleTariff END,
     TAC,@MarkupId,TaxAdded,Facility,LTAgreed,STAgreed,LTRack,TaxInclusive,
-    HRSingle FROM #External1 WHERE TAC = 0;
+    HRSingle FROM #External1 WHERE TAC = 0;*/
    END
   ELSE
    BEGIN
     INSERT INTO #External(PropertyName,Id,GetType,PropertyType,RoomType,
     SingleTariff,DoubleTariff,TripleTariff,SingleandMarkup,DoubleandMarkup,
     TripleandMarkup,TAC,MarkupId,TaxAdded,Facility,
-    LTAgreed,STAgreed,LTRack,TaxInclusive,HRSingle)
+    LTAgreed,STAgreed,LTRack,TaxInclusive,HRSingle,GeneralMarkup,SC)
+    SELECT PropertyName,Id,GetType,PropertyType,RoomType,
+    SingleTariff,DoubleTariff,TripleTariff,
+    CASE WHEN SingleTariff > 0 AND TaxInclusive = 0 THEN SingleTariff + 
+    ROUND((SingleTariff * @Per)/100,0) + 
+    ROUND(((ROUND((SingleTariff * @Per)/100,0) * LTAgreed / 100) +
+    (ROUND((SingleTariff * @Per)/100,0) * STAgreed / 100) +
+    (ROUND((SingleTariff * @Per)/100,0) * SC / 100)),0) 
+         WHEN SingleTariff > 0 AND TaxInclusive = 1 THEN SingleTariff +
+         ROUND((SingleTariff * @Per)/100,0)
+         ELSE SingleTariff END,
+    CASE WHEN DoubleTariff > 0 AND TaxInclusive = 0 THEN DoubleTariff + 
+    ROUND((DoubleTariff * @Per)/100,0) +
+    ROUND(((ROUND((DoubleTariff * @Per)/100,0) * LTAgreed / 100) +
+    (ROUND((DoubleTariff * @Per)/100,0) * STAgreed / 100) +
+    (ROUND((DoubleTariff * @Per)/100,0) * SC / 100)),0) 
+         WHEN DoubleTariff > 0 AND TaxInclusive = 1 THEN DoubleTariff + 
+         ROUND((DoubleTariff * @Per)/100,0)
+         ELSE DoubleTariff END,
+    CASE WHEN TripleTariff > 0 AND TaxInclusive = 0 THEN TripleTariff + 
+    ROUND((TripleTariff * @Per)/100,0) +
+    ROUND(((ROUND((TripleTariff * @Per)/100,0) * LTAgreed / 100) +
+    (ROUND((TripleTariff * @Per)/100,0) * STAgreed / 100) +
+    (ROUND((TripleTariff * @Per)/100,0) * SC / 100)),0) 
+         WHEN TripleTariff > 0 AND TaxInclusive = 1 THEN TripleTariff + 
+         ROUND((TripleTariff * @Per)/100,0)
+         ELSE TripleTariff END,
+    TAC,@MarkupId,TaxAdded,Facility,LTAgreed,STAgreed,LTRack,TaxInclusive,
+    HRSingle,ROUND((SingleTariff * @Per)/100,0),SC FROM #External1 WHERE TAC = 0;    
+    /*INSERT INTO #External(PropertyName,Id,GetType,PropertyType,RoomType,
+    SingleTariff,DoubleTariff,TripleTariff,SingleandMarkup,DoubleandMarkup,
+    TripleandMarkup,TAC,MarkupId,TaxAdded,Facility,
+    LTAgreed,STAgreed,LTRack,TaxInclusive,HRSingle,GeneralMarkup)
     SELECT PropertyName,Id,GetType,PropertyType,RoomType,
     SingleTariff,DoubleTariff,TripleTariff,
     CASE WHEN SingleTariff > 0 THEN 
@@ -1130,7 +1198,7 @@ IF @Action = 'Property'
     CASE WHEN TripleTariff > 0 THEN 
     TripleTariff + ROUND((TripleTariff * @Per)/100,0) ELSE TripleTariff END,
     TAC,@MarkupId,TaxAdded,Facility,
-    LTAgreed,STAgreed,LTRack,TaxInclusive,HRSingle FROM #External1 WHERE TAC = 0;
+    LTAgreed,STAgreed,LTRack,TaxInclusive,HRSingle FROM #External1 WHERE TAC = 0;*/
    END
   --
   --SELECT * FROM #ManagedGH;
@@ -1157,7 +1225,7 @@ IF @Action = 'Property'
   FROM WRBHBAPIHotelHeader H
   LEFT OUTER JOIN WRBHBAPIRoomRateDtls RR WITH(NOLOCK)ON
   RR.HotelId=H.HotelId AND RR.RoomRateavailStatus='B' AND
-  RR.HeaderId=H.HeaderId AND RR.RoomRateavailableCount >= @PropertyId
+  RR.HeaderId=H.HeaderId --AND RR.RoomRateavailableCount >= @PropertyId
   LEFT OUTER JOIN WRBHBAPITariffDtls T11
   WITH(NOLOCK)ON T11.RoomRateHdrId=RR.Id AND T11.RoomTariffroomNumber=1 AND
   T11.Tariffgroup='RoomRate' AND T11.HeaderId=H.HeaderId AND
@@ -1284,7 +1352,8 @@ IF @Action = 'Property'
   TAC BIT,Facility NVARCHAR(100),DiscountModeRS BIT,DiscountModePer BIT,
   DiscountAllowed DECIMAL(27,2),MarkupId BIGINT,TaxAdded NVARCHAR(100),
   LTAgreed DECIMAL(27,2),STAgreed DECIMAL(27,2),LTRack DECIMAL(27,2),
-  TaxInclusive BIT,HRSingle DECIMAL(27,2));
+  TaxInclusive BIT,HRSingle DECIMAL(27,2),GeneralMarkup DECIMAL(27,2),
+  SC DECIMAL(27,2));
   --- Managed G H
   INSERT INTO #Property(PropertyName,Id,GetType,PropertyType,RoomType,
   SingleTariff,DoubleTariff,TripleTariff,SingleandMarkup,DoubleandMarkup,
@@ -1364,15 +1433,15 @@ IF @Action = 'Property'
   SingleTariff,DoubleTariff,TripleTariff,SingleandMarkup,DoubleandMarkup,
   TripleandMarkup,TAC,Facility,DiscountModeRS,DiscountModePer,
   DiscountAllowed,MarkupId,TaxAdded,LTAgreed,STAgreed,LTRack,TaxInclusive,
-  HRSingle)
+  HRSingle,GeneralMarkup,SC)
   SELECT PropertyName,Id,GetType,PropertyType,RoomType,SingleTariff,
   DoubleTariff,TripleTariff,SingleandMarkup,DoubleandMarkup,
   TripleandMarkup,TAC,Facility,0,0,0,MarkupId,TaxAdded,
-  LTAgreed,STAgreed,LTRack,TaxInclusive,HRSingle FROM #External
+  LTAgreed,STAgreed,LTRack,TaxInclusive,HRSingle,GeneralMarkup,SC FROM #External
   GROUP BY PropertyName,Id,GetType,PropertyType,RoomType,SingleTariff,
   DoubleTariff,TripleTariff,SingleandMarkup,DoubleandMarkup,
   TripleandMarkup,TAC,Facility,MarkupId,TaxAdded,LTAgreed,STAgreed,LTRack,
-  TaxInclusive,HRSingle
+  TaxInclusive,HRSingle,GeneralMarkup,SC
   ORDER BY PropertyName,SingleandMarkup ASC; 
   --
   --SELECT * FROM #Property;RETURN;
@@ -1390,7 +1459,8 @@ IF @Action = 'Property'
   TaxAdded NVARCHAR(100),RatePlanCode NVARCHAR(100),RoomTypeCode NVARCHAR(100),
   MealPlan NVARCHAR(100),TripadvisorRating NVARCHAR(100),
   LTAgreed DECIMAL(27,2),STAgreed DECIMAL(27,2),LTRack DECIMAL(27,2),
-  TaxInclusive BIT,HRSingle DECIMAL(27,2));
+  TaxInclusive BIT,HRSingle DECIMAL(27,2),GeneralMarkup DECIMAL(27,2),
+  SC DECIMAL(27,2));
   -- Property data
   INSERT INTO #FINAL(PropertyName,PropertyId,GetType,PropertyType,RoomType,
   SingleTariff,DoubleTariff,TripleTariff,SingleandMarkup,DoubleandMarkup,
@@ -1398,7 +1468,7 @@ IF @Action = 'Property'
   DiscountAllowed,Phone,Email,Locality,LocalityId,MarkupId,SingleandMarkup1,
   DoubleandMarkup1,TripleandMarkup1,StarRating,TaxAdded,RatePlanCode,
   RoomTypeCode,MealPlan,TripadvisorRating,LTAgreed,STAgreed,LTRack,TaxInclusive,
-  HRSingle)
+  HRSingle,GeneralMarkup,SC)
   SELECT TP.PropertyName,TP.Id AS PropertyId,TP.GetType,TP.PropertyType,
   TP.RoomType,TP.SingleTariff,TP.DoubleTariff,TP.TripleTariff,
   TP.SingleandMarkup,TP.DoubleandMarkup,TP.TripleandMarkup,TP.TAC,
@@ -1419,7 +1489,8 @@ IF @Action = 'Property'
        WHEN T.PropertyType = 'Serviced Appartments' THEN 'S A'
        ELSE ISNULL(T.PropertyType,'') END AS StarRating,TP.TaxAdded,'','','',
        ISNULL(CAST(P.TRIPRating AS VARCHAR),''),
-       TP.LTAgreed,TP.STAgreed,TP.LTRack,TP.TaxInclusive,TP.HRSingle
+       TP.LTAgreed,TP.STAgreed,TP.LTRack,TP.TaxInclusive,TP.HRSingle,
+       ISNULL(TP.GeneralMarkup,0),ISNULL(TP.SC,0)
   /*,CASE WHEN TP.PropertyType = 'ExP' AND TP.GetType = 'Contract' THEN '#242020'
    WHEN TP.PropertyType = 'ExP' AND TP.GetType = 'Property' THEN '#770E0E'
    WHEN TP.PropertyType = 'InP' AND TP.GetType = 'Contract' THEN '#27B25C'
@@ -1438,12 +1509,12 @@ IF @Action = 'Property'
   SingleandMarkup,DoubleandMarkup,TripleandMarkup,TAC,Inclusions,
   DiscountModeRS,DiscountModePer,DiscountAllowed,Phone,Email,Locality,
   LocalityId,MarkupId,SingleandMarkup1,DoubleandMarkup1,TripleandMarkup1,
-  StarRating,TaxAdded,MealPlan,TripadvisorRating,HRSingle)
+  StarRating,TaxAdded,MealPlan,TripadvisorRating,HRSingle,GeneralMarkup,SC)
   SELECT HotalName,HotelId,GetType,PropertyType,RoomTypename,RoomRatePlanCode,
   RoomRateTypeCode,SingleTariff,DoubleTariff,0,SingleandMarkup,
   DoubleandMarkup,0,0,InclusionCode,0,0,0,Phone,Email,Area,0,@MMTId,
   SingleandMarkup AS SingleandMarkup1,DoubleandMarkup,0,StarRating,'N',
-  MealPlan,TripadvisorRating,HRSingle FROM #API 
+  MealPlan,TripadvisorRating,HRSingle,0,0 FROM #API 
   ORDER BY HotalName,SingleandMarkup ASC;
   /*IF @MaxValue != 0
    BEGIN
@@ -1519,7 +1590,7 @@ IF @Action = 'Property'
   RatePlanCode,RoomTypeCode,@StateId AS APIHdrId,MealPlan,
   TripadvisorRating,ISNULL(LTAgreed,0) AS LTAgreed,ISNULL(STAgreed,0) AS STAgreed,
   ISNULL(LTRack,0) AS LTRack,ISNULL(TaxInclusive,0) AS TaxInclusive,
-  ISNULL(HRSingle,0) AS BaseTariff 
+  ISNULL(HRSingle,0) AS BaseTariff,GeneralMarkup,SC 
   FROM #FINAL; 
   --
   --SELECT COUNT(*) FROM #FINAL; 
@@ -1560,7 +1631,7 @@ IF @Action = 'Property'
   @StateId AS APIHdrId,F.MealPlan,F.TripadvisorRating,
   ISNULL(F.LTAgreed,0) AS LTAgreed,ISNULL(F.STAgreed,0) AS STAgreed,
   ISNULL(F.LTRack,0) AS LTRack,ISNULL(TaxInclusive,0) AS TaxInclusive,
-  ISNULL(HRSingle,0) AS BaseTariff   
+  ISNULL(HRSingle,0) AS BaseTariff,GeneralMarkup,SC   
   FROM #ZAXSQA Z
   LEFT OUTER JOIN #FINAL F WITH(NOLOCK) ON Z.PropertyId = F.PropertyId
   WHERE F.PropertyId = Z.PropertyId ORDER BY Z.PropertyCnt ASC;
@@ -2152,11 +2223,18 @@ IF @Action = 'BookingPropertyDtls'
    END
   IF @PropertyType = 'ExP'
    BEGIN
-    SELECT BP.RoomType AS label,0 AS RoomId,
+    /*SELECT BP.RoomType AS label,0 AS RoomId,
     BP.SingleandMarkup+BP.Markup AS SingleandMarkup,
     BP.DoubleandMarkup+BP.Markup AS DoubleandMarkup,
     CASE WHEN BP.TripleandMarkup > 0 THEN BP.TripleandMarkup+BP.Markup
     ELSE BP.TripleandMarkup END AS TripleandMarkup 
+    FROM WRBHBBookingProperty BP
+    WHERE BP.IsActive=1 AND BP.IsDeleted=0 AND BP.PropertyId=@PropertyId
+    AND BP.Id=@Id1;*/
+    SELECT BP.RoomType AS label,0 AS RoomId,
+    BP.SingleandMarkup1 AS SingleandMarkup,
+    BP.DoubleandMarkup1 AS DoubleandMarkup,
+    BP.TripleandMarkup1 AS TripleandMarkup 
     FROM WRBHBBookingProperty BP
     WHERE BP.IsActive=1 AND BP.IsDeleted=0 AND BP.PropertyId=@PropertyId
     AND BP.Id=@Id1;

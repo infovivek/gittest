@@ -59,7 +59,9 @@ CREATE PROCEDURE [dbo].[SP_BookingProperty_Insert](
 @LTRack DECIMAL(27,2),
 @STAgreed DECIMAL(27,2),
 @TaxInclusive BIT,
-@BaseTariff DECIMAL(27,2)) 
+@BaseTariff DECIMAL(27,2),
+@GeneralMarkup DECIMAL(27,2),
+@SC DECIMAL(27,2)) 
 AS
 BEGIN
  --
@@ -129,7 +131,8 @@ BEGIN
  IsDeleted,RowId,MarkupId,SingleandMarkup1,DoubleandMarkup1,TripleandMarkup1,
  APIHdrId,RatePlanCode,RoomTypeCode,SingleRoomRate,SingleTaxes,
  SingleRoomDiscount,DubRoomRate,DubTaxes,DubRoomDiscount,TACPer,TaxAdded,
- LTAgreed,LTRack,STAgreed,TaxInclusive,BaseTariff)
+ LTAgreed,LTRack,STAgreed,TaxInclusive,BaseTariff,GeneralMarkup,
+ ExpWithTax,SC)
  VALUES(@BookingId,@PropertyName,@PropertyId,@GetType,@PropertyType,
  @RoomType,@SingleTariff,@DoubleTariff,@TripleTariff,@SingleandMarkup,
  @DoubleandMarkup,@TripleandMarkup,@Markup,@TAC,@Inclusions,
@@ -138,7 +141,7 @@ BEGIN
  @SingleandMarkup1,@DoubleandMarkup1,@TripleandMarkup1,@APIHdrId,
  @RatePlanCode,@RoomTypeCode,@SingleRoomRate,@SingleTaxes,@SingleRoomDiscount,
  @DubRoomRate,@DubTaxes,@DubRoomDiscount,@TACPer,@TaxAdded,
- @LTAgreed,@LTRack,@STAgreed,@TaxInclusive,@BaseTariff);
+ @LTAgreed,@LTRack,@STAgreed,@TaxInclusive,@BaseTariff,@GeneralMarkup,1,@SC);
  SELECT Id,RowId FROM WRBHBBookingProperty WHERE Id=@@IDENTITY;
 END
 GO

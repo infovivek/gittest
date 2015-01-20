@@ -184,7 +184,7 @@
 						xlsFile = new ExcelFile();
 						var sheet:Sheet = new Sheet();
 						
-						sheet.resize(arrExportResult.length+2,9);
+						sheet.resize(arrExportResult.length+2,10);
 						
 						//sheet.setCell(0,5,Type+" Report");
 						sheet.setCell(1,0,'S.NO');

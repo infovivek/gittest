@@ -178,6 +178,22 @@ namespace HB.Dao
                 {
                     BookPty.BaseTariff = Convert.ToDecimal(document.SelectNodes("//GridXml")[i].Attributes["BaseTariff"].Value);
                 }
+                if (document.SelectNodes("//GridXml")[i].Attributes["GeneralMarkup"].Value == "")
+                {
+                    BookPty.GeneralMarkup = 0;
+                }
+                else
+                {
+                    BookPty.GeneralMarkup = Convert.ToDecimal(document.SelectNodes("//GridXml")[i].Attributes["GeneralMarkup"].Value);
+                }
+                if (document.SelectNodes("//GridXml")[i].Attributes["SC"].Value == "")
+                {
+                    BookPty.SC = 0;
+                }
+                else
+                {
+                    BookPty.SC = Convert.ToDecimal(document.SelectNodes("//GridXml")[i].Attributes["SC"].Value);
+                }
                 SqlCommand command = new SqlCommand();
                 if (BookPty.Id != 0)
                 {
@@ -228,6 +244,9 @@ namespace HB.Dao
                 command.Parameters.Add("@STAgreed", SqlDbType.Decimal).Value = BookPty.STAgreed;
                 command.Parameters.Add("@BaseTariff", SqlDbType.Decimal).Value = BookPty.BaseTariff;
                 command.Parameters.Add("@TaxInclusive", SqlDbType.Bit).Value = BookPty.TaxInclusive;
+                //
+                command.Parameters.Add("@GeneralMarkup", SqlDbType.Decimal).Value = BookPty.GeneralMarkup;
+                command.Parameters.Add("@SC", SqlDbType.Decimal).Value = BookPty.SC;
                 ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
             }            
             if (n == 0)

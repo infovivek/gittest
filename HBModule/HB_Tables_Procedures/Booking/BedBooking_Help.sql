@@ -25,10 +25,12 @@ IF @Action = 'BedLevel_Property'
  BEGIN
   IF @Id2 = 123
    BEGIN
-    DELETE FROM WRBHBBooking WHERE Id=@Id1;
-    DELETE FROM WRBHBBookingGuestDetails WHERE BookingId=@Id1;
-    DELETE FROM WRBHBBedBookingProperty WHERE BookingId=@Id1;
-    DELETE FROM WRBHBBedBookingPropertyAssingedGuest WHERE BookingId=@Id1;
+    UPDATE WRBHBBooking SET IsActive = 0,IsDeleted = 1 WHERE Id=@Id1;
+    UPDATE WRBHBBookingGuestDetails SET IsActive = 0,IsDeleted = 1 WHERE BookingId=@Id1;
+    UPDATE WRBHBBedBookingProperty SET IsActive = 0,IsDeleted = 1  
+    WHERE BookingId=@Id1;
+    UPDATE WRBHBBedBookingPropertyAssingedGuest SET IsActive = 0,
+    IsDeleted = 1 WHERE BookingId=@Id1;
    END
   -- Dedicated Rooms
   CREATE TABLE #ExstsDdpRoom(RoomId BIGINT);

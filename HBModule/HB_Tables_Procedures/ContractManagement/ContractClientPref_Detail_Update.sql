@@ -16,7 +16,7 @@ Reviewed By	: <Reviewed By (Leave it blank)>
 /*******************************************************************************************************
 *				AMENDMENT BLOCK
 ********************************************************************************************************
-'Name			Date			Signature			Description of Changes
+'Name			Date			Signature			Description of Chang0es
 ********************************************************************************************************	
 *******************************************************************************************************
 */
@@ -36,7 +36,6 @@ CREATE PROCEDURE Sp_ContractClientPref_Detail_Update
 @LTariffTriple       DECIMAL(27, 2),
 @Facility			Nvarchar(100),
 @TaxInclusive	BIT,
-@TaxPercentage	DECIMAL(27, 2),
 @LTAgreed	DECIMAL(27, 2),
 @LTRack	DECIMAL(27, 2),
 @STAgreed	DECIMAL(27, 2),
@@ -51,7 +50,7 @@ BEGIN
 	UPDATE WRBHBContractClientPref_Details SET HeaderId=@HeaderId,PropertyName=@PropertyName,PropertyId=@PropertyId,
 	RoomType=@RoomType,RoomId=@RoomId,TariffSingle=@TariffSingle,TariffDouble=@TariffDouble,TariffTriple=@TariffTriple,
 	RTariffSingle=@LTariffSingle,RTariffDouble=@LTariffDouble,RTariffTriple=@LTariffTriple,
-	Facility=@Facility,TaxInclusive=@TaxInclusive,TaxPercentage=@TaxPercentage,
+	Facility=@Facility,TaxInclusive=@TaxInclusive,TaxPercentage=0,
 	LTAgreed=@LTAgreed,LTRack=@LTRack,STAgreed=@STAgreed,ModifiedBy=@CreatedBy,
 	ModifiedDate=GETDATE(),Email=@Email,ContactPhone=@ContactPhone,ContactName=@ContactName where Id=@Id;
 				

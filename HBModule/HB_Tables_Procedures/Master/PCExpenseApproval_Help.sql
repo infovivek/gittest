@@ -182,6 +182,19 @@ END
 	END
 	IF @Action='Reject'
 	BEGIN
+		 DECLARE @Identity int,@ErrMsg NVARCHAR(MAX),@Str1 NVARCHAR(100);
+
+		 SET @Str1=(SELECT UserType FROM WRBHBPropertyUsers WITH (NOLOCK) 
+		 WHERE UPPER(UserId) = UPPER(@UserId) AND IsActive=1 AND IsDeleted=0 AND PropertyId=@PropertyId
+		 AND UserType='Operations Managers')
+		
+		 IF ISNULL(@Str1,'') !='Operations Managers'
+		 BEGIN
+				SET @ErrMsg = 'Need Operations Manager Approval';
+				SELECT @ErrMsg;
+		 END
+	     ELSE
+	     BEGIN
 		 UPDATE WRBHBPettyCashStatus SET Flag=0 
 		 WHERE UserId=@UserId AND PropertyId=@PropertyId AND 
 		 CONVERT(NVARCHAR,CAST(CreatedDate AS Date),103)=CONVERT(NVARCHAR,@Str,103)
@@ -197,7 +210,7 @@ END
 		 CONVERT(NVARCHAR(100),Date,103)=S.Status AND S.IsActive=1 AND S.IsDeleted=0
 		 WHERE S.UserId=@UserId AND S.PropertyId=@PropertyId AND 
 		 CONVERT(NVARCHAR,CAST(S.CreatedDate AS Date),103)=CONVERT(NVARCHAR,@Str,103))
-		 
+		END 
 		 
 	END
 	

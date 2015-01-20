@@ -55,6 +55,7 @@ IF @Action ='PAGELOAD'
   Declare @TinNumber Nvarchar(100);
   Declare @CinNumber Nvarchar(100);
   Declare @Propcity  Nvarchar(100);
+  Declare @prtyTye Nvarchar(100),@CkId Bigint;
 if(@Str2='Tac')
 Begin
 DECLARE @id VARCHAR(MAX)
@@ -177,10 +178,28 @@ END
 			JOIN WRBHBCity CC WITH(NOLOCK) ON CC.Id=P.CityId and cc.IsActive=1  
 			where    InVoiceNo!='0' and  InVoiceNo!=''  and f.Id=@Chkid
 			ORDER BY   f.Id desc  
+			
+		   INSERT INTO #Annuxer(InvoiceNumber,BookingCode,Property,ClientName,CityName,GuestNam,
+			CheckInDate,CheckOutDate,NoOfDays,LT,ST,Cess,Hecess,NetAmt,selectRadio,ChkoutId,PrtyId,STPerCent,LTPerCent)
+		
+			SELECT  InVoiceNo InvoiceNumber,BookingCode,S.HotalName+'-'+cc.CityName Property,
+			F.ClientName ClientName,cc.CityName ,
+			GuestName GuestName,f.CheckInDate CheckInDate,F.CheckOutDate CheckOutDate,F.NoOfDays,
+			F.ChkOutTariffLT,F.ChkOutTariffST1,F.ChkOutTariffCess,F.ChkOutTariffHECess,
+			Round(F.ChkOutTariffLT+F.ChkOutTariffST1+F.ChkOutTariffHECess+F.ChkOutTariffCess+f.ChkOutTariffTotal,0) as NetAmt, 
+			--0 Rate, 0 St,ChkOutTariffTotal Amount,ChkOutTariffNetAmount Amounts,--'Tariff' BillType,
+			0 as selectRadio ,f.Id ChkoutId,s.HotalId,F.ServiceTaxPer,f.LuxuryTaxPer--,'CheckOut'Status,'External Property' as PropertyCat
+			FROM WRBHBChechkOutHdr f
+			JOIN WRBHBBooking  B WITH(NOLOCK) ON f.BookingId=B.Id AND B.IsActive=1	AND B.IsDeleted=0
+			join WRBHBStaticHotels S   WITH(NOLOCK) ON f.PropertyId = S.HotalId and s.IsActive=1 and s.IsDeleted=0 and  F.PropertyType='MMT'
+			JOIN WRBHBCity CC WITH(NOLOCK) ON CC.Id=f.CityId and cc.IsActive=1  
+			where    InVoiceNo!='0' and  InVoiceNo!=''  and f.Id=@Chkid
+			ORDER BY   f.Id desc  
+			
 			dELETE FROM #SepratebyComma WHERE CheckoutId=@Chkid ;
 			  Set @Cnt=(SELECT COUNT(*) FROM #SepratebyComma)
    End
- 
+  --Select * from #Annuxer
 Set @Net=(Select SUM(NetAmt) from #Annuxer )
 Set @BillType='External';
 set @TotalAmt=@Net-(Select SUM(cess)+SUM(Hecess)+SUM(LT)+SUM(ST) from #Annuxer)
@@ -189,38 +208,71 @@ Set @St=(Select SUM(ST) from #Annuxer)
  Set @CEss=(Select SUM(cess) from #Annuxer)
  Set @HCess=(Select SUM(Hecess) from #Annuxer)
 Set @Propcity=(Select Top 1 CityName from #Annuxer) 
+
+Set @CkId=(Select top 1 ChkoutId from #Annuxer)
+Set @prtyTye=(Select Top 1 PropertyType  from WRBHBChechkOutHdr where Id=@CkId)
  insert into #NODays(NoDays,ChkoutId)
  Select  (NoOfDays),ChkoutId  from #Annuxer 
  group by ChkoutId,NoOfDays
   Set @NDays=(Select Top 1 SUM(NoDays) from #NODays )
  --Select @St,@Lt,@CEss,@HCess,@Net,@TotalAmt,@NDays;
-           Select Distinct CONVERT(Nvarchar(100),GETDATE(),103) as BillDate,InvoiceNumber,BookingCode BookingId,
-            Property PropertyName,ClientName,CityName City,GuestNam GuestName,
+if(@prtyTye!='MMT')
+BEGIN
+			Select Distinct CONVERT(Nvarchar(100),GETDATE(),103) as BillDate,InvoiceNumber,BookingCode BookingId,
+			Property PropertyName,ClientName,CityName City,GuestNam GuestName,
 			CheckInDate ChkInDt,CheckOutDate ChkOutDt,NoOfDays,CEss+Hecess Rate,ST+LT as TaxNo,
 			Round(NetAmt-(CEss+Hecess+ST+LT),0) Amount,Round(@TotalAmt,0) as TotalTariff,
 			Round(NetAmt,0) TotalAmount,0 as selectRadio,ChkoutId,PrtyId,--@Net As Logo,
-			'Rupees : '+dbo.fn_NtoWord(ROUND(@Net,0),'','') AS Name,
-			Round(@TotalAmt,0) as TotalAmt,@Net as NetAmount,
-@CEss Cess,@HCess HCess,@Lt LuxuryTax,@St SerivceTax,0 as Vat,'2.00'CessPercent,'1.00'HECessPercent,
- PrtyId ,p.Phone as Phone,@NDays as Stay,  
-P.City City,p.Propertaddress Propertaddress,p.Postal
-,p.Email as Email,@BillType,@LOGO AS logo,@Propcity Propcity,
- 'Regd Office : No. 122, Amarjyothi Layout, Domlur, Bangalore - 560071'+'.'+'www.hummingbirdindia.com'  AS CompanyAddress,
-	 'INVOICE : For any invoice clarification revert within 7 days from the date of receipt' as Invoice,  
-	 'All cheque or demand drafts in payment of bills should be drawn in favor of Hummingbird Travel and stay pvt.ltd.  
-	 and should be crossed A/C PAYEE ONLY.' as Cheque,'PAN NO :'+@PanCardNo+'   |   '+'TIN : 29340489869'+'   |   '+'L Tax No : L00100571'+'  |  '
-	 +'CIN No: U72900KA2005PTC035942' as CINNo,  
-	 'LATE PAYMENT : Interest @18% per annum will be charged on all outstanding bill after due date.' as Latepay ,  
-	 'TIN : 29340489869' as Tin,'Taxable Category : Accommodation Service,Business Support Services and Restaurant Services' as Taxablename,  
-	 'Service Tax Regn. No : AABCH5874RST001' as ServiceTaxNo,
-	 isnull(STPerCent,0) STPerCent,isnull(LTPerCent,0) LTPerCent,
-	 --'Luxury Tax @ '+CAST(0 AS NVARCHAR)+'%' LTPer, 'Service Tax @ '+CAST(0 AS NVARCHAR)+'%' STPer,
-	 'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),GETDATE(),103) as InVoicedate
+			'Rupees : '+dbo.fn_NtoWord(ROUND(@Net,0),'','') AS Name,Round(@TotalAmt,0) as TotalAmt,@Net as NetAmount,
+			@CEss Cess,@HCess HCess,@Lt LuxuryTax,@St SerivceTax,0 as Vat,'2.00'CessPercent,'1.00'HECessPercent,
+			PrtyId ,p.Phone as Phone,@NDays as Stay, P.City City,p.Propertaddress Propertaddress,p.Postal
+			,p.Email as Email,@BillType,@LOGO AS logo,@Propcity Propcity,
+			'Regd Office : No. 122, Amarjyothi Layout, Domlur, Bangalore - 560071'+'.'+'www.hummingbirdindia.com'  AS CompanyAddress,
+			'INVOICE : For any invoice clarification revert within 7 days from the date of receipt' as Invoice,  
+			'All cheque or demand drafts in payment of bills should be drawn in favor of Hummingbird Travel and stay pvt.ltd.  
+			and should be crossed A/C PAYEE ONLY.' as Cheque,'PAN NO :'+@PanCardNo+'   |   '+'TIN : 29340489869'+'   |   '+'L Tax No : L00100571'+'  |  '
+			+'CIN No: U72900KA2005PTC035942' as CINNo,  
+			'LATE PAYMENT : Interest @18% per annum will be charged on all outstanding bill after due date.' as Latepay ,  
+			'TIN : 29340489869' as Tin,'Taxable Category : Accommodation Service,Business Support Services and Restaurant Services' as Taxablename,  
+			'Service Tax Regn. No : AABCH5874RST001' as ServiceTaxNo,
+			isnull(STPerCent,0) STPerCent,isnull(LTPerCent,0) LTPerCent,
+			--'Luxury Tax @ '+CAST(0 AS NVARCHAR)+'%' LTPer, 'Service Tax @ '+CAST(0 AS NVARCHAR)+'%' STPer,
+			'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),GETDATE(),103) as InVoicedate
 			FROM #Annuxer A
 			join WRBHBProperty p on p.Id=a.PrtyId and p.IsActive=1 
-          group by Property,ClientName,CityName,PrtyId ,p.Phone, P.City ,p.Propertaddress ,p.Postal,p.Email,
-          InvoiceNumber,BookingCode,GuestNam,CheckInDate,CheckOutDate,NoOfDays,CEss,Hecess,ST,LT,NetAmt,ChkoutId,
-           STPerCent,LTPerCent 
+			--where  @prtyTye!='MMT'
+			group by Property,ClientName,CityName,PrtyId ,p.Phone, P.City ,p.Propertaddress ,p.Postal,p.Email,
+			InvoiceNumber,BookingCode,GuestNam,CheckInDate,CheckOutDate,NoOfDays,CEss,Hecess,ST,LT,NetAmt,ChkoutId,
+			STPerCent,LTPerCent 
+	END
+	Else
+	BEGIN		
+			Select Distinct CONVERT(Nvarchar(100),GETDATE(),103) as BillDate,InvoiceNumber,BookingCode BookingId,
+			Property PropertyName,ClientName,CityName City,GuestNam GuestName,
+			CheckInDate ChkInDt,CheckOutDate ChkOutDt,NoOfDays,CEss+Hecess Rate,ST+LT as TaxNo,
+			Round(NetAmt-(CEss+Hecess+ST+LT),0) Amount,Round(@TotalAmt,0) as TotalTariff,
+			Round(NetAmt,0) TotalAmount,0 as selectRadio,ChkoutId,PrtyId,--@Net As Logo,
+			'Rupees : '+dbo.fn_NtoWord(ROUND(@Net,0),'','') AS Name,Round(@TotalAmt,0) as TotalAmt,@Net as NetAmount,
+			@CEss Cess,@HCess HCess,@Lt LuxuryTax,@St SerivceTax,0 as Vat,'2.00'CessPercent,'1.00'HECessPercent,
+			PrtyId ,p.Phone as Phone,@NDays as Stay, P.City City,p.Line1,p.State Propertaddress,p.Pincode
+			,p.Email as Email,@BillType,@LOGO AS logo,@Propcity Propcity,
+			'Regd Office : No. 122, Amarjyothi Layout, Domlur, Bangalore - 560071'+'.'+'www.hummingbirdindia.com'  AS CompanyAddress,
+			'INVOICE : For any invoice clarification revert within 7 days from the date of receipt' as Invoice,  
+			'All cheque or demand drafts in payment of bills should be drawn in favor of Hummingbird Travel and stay pvt.ltd.  
+			and should be crossed A/C PAYEE ONLY.' as Cheque,'PAN NO :'+@PanCardNo+'   |   '+'TIN : 29340489869'+'   |   '+'L Tax No : L00100571'+'  |  '
+			+'CIN No: U72900KA2005PTC035942' as CINNo,  
+			'LATE PAYMENT : Interest @18% per annum will be charged on all outstanding bill after due date.' as Latepay ,  
+			'TIN : 29340489869' as Tin,'Taxable Category : Accommodation Service,Business Support Services and Restaurant Services' as Taxablename,  
+			'Service Tax Regn. No : AABCH5874RST001' as ServiceTaxNo,
+			isnull(STPerCent,0) STPerCent,isnull(LTPerCent,0) LTPerCent,
+			--'Luxury Tax @ '+CAST(0 AS NVARCHAR)+'%' LTPer, 'Service Tax @ '+CAST(0 AS NVARCHAR)+'%' STPer,
+			'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),GETDATE(),103) as InVoicedate
+			FROM #Annuxer A
+			join WRBHBStaticHotels p  WITH(NOLOCK) ON A.PrtyId = p.HotalId and p.IsActive=1
+			group by Property,ClientName,CityName,PrtyId ,p.Phone, P.City ,p.state,p.Line1 ,p.Pincode,p.Email,
+			InvoiceNumber,BookingCode,GuestNam,CheckInDate,CheckOutDate,NoOfDays,CEss,Hecess,ST,LT,NetAmt,ChkoutId,
+			STPerCent,LTPerCent 
+		END
 End
 End
  

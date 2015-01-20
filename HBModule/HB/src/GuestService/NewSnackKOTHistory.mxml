@@ -56,7 +56,7 @@
 				GlobalXml += "<ROOT>";
 				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
 				GlobalXml += "</ROOT>";
-				useWeb("SnackKOTHistory","PAGELOAD_CUSTOM",[GlobalXml,'PAGELOAD',0,'','',0,0]);
+				useWeb("SnackKOTHistory","PAGELOAD_CUSTOM",[GlobalXml,'PAGELOAD',Global_AC[0].UsrId,'','',0,0]);
 				Str_KOT="http://localhost:6236/NewSnackKOTEntry.aspx?";
 				//Str_KOT="http://sstage.in/HBReport/NewSnackKOTEntry.aspx?";
 			}

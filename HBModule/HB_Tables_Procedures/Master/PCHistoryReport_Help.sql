@@ -43,7 +43,7 @@ CREATE PROCEDURE dbo.[SP_PCHistoryReport_Help]
 		AND P.Category IN('Internal Property','Managed G H')
 	
     	--table gridload
-		SELECT  DISTINCT (U.FirstName+' '+U.LastName) AS Requestedby,P.PropertyName AS PCAccount,
+		SELECT (U.FirstName+' '+U.LastName) AS Requestedby,P.PropertyName AS PCAccount,
 		PC.RequestedStatus AS RequestedStatus,PC.ProcessedStatus AS Status,PC.Comments AS Comments,
 		CONVERT(NVARCHAR(100),PC.RequestedOn,105) AS RequestedOn,0 AS Process,
 		PC.RequestedAmount AS RequestedAmount,
@@ -56,6 +56,10 @@ CREATE PROCEDURE dbo.[SP_PCHistoryReport_Help]
 		JOIN WRBHBUser U ON  PC.RequestedUserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
 		JOIN WRBHBUser US ON PC.UserId=US.Id AND US.IsActive=1 AND US.IsDeleted=0
 		WHERE PC.IsActive=1 AND PC.IsDeleted=0 AND PU.UserId=@UserId
+		GROUP BY  U.FirstName,U.LastName,P.PropertyName,PC.RequestedStatus,PC.ProcessedStatus,
+		PC.Comments,PC.RequestedOn,PC.RequestedAmount,PC.LastProcessedon,PC.RequestedUserId,
+		PC.Id,PC.PropertyId,US.FirstName,US.LastName
+		ORDER BY CONVERT(DATE,PC.RequestedOn,103) DESC
 		
 		
 		
@@ -77,7 +81,7 @@ IF(@Action='GRIDLOAD')
 			INSERT INTO #Request(Requestedby,PCAccount,RequestedStatus,ProcessedStatus,Comments,
 			RequestedOn,Process,RequestedAmount,Processedon,Processedby,RequestedUserId,Id,PropertyId)
 			
-			SELECT  DISTINCT (U.FirstName+' '+U.LastName) AS Requestedby,P.PropertyName AS PCAccount,PC.RequestedStatus AS RequestedStatus,
+			SELECT (U.FirstName+' '+U.LastName) AS Requestedby,P.PropertyName AS PCAccount,PC.RequestedStatus AS RequestedStatus,
 			PC.ProcessedStatus,PC.Comments AS Comments,
 			CONVERT(NVARCHAR(100),PC.RequestedOn,105) AS RequestedOn,0 AS Process,
 			PC.RequestedAmount AS RequestedAmount,
@@ -90,11 +94,15 @@ IF(@Action='GRIDLOAD')
 			JOIN WRBHBUser US ON PC.UserId=US.Id AND US.IsActive=1 AND US.IsDeleted=0
 			WHERE PC.IsActive=1 AND PC.IsDeleted=0 AND PC.PropertyId=@Id AND PC.RequestedUserId=@UserId
 			AND  PC.ProcessedStatus=@Str
+			GROUP BY  U.FirstName,U.LastName,P.PropertyName,PC.RequestedStatus,PC.ProcessedStatus,
+			PC.Comments,PC.RequestedOn,PC.RequestedAmount,PC.LastProcessedon,PC.RequestedUserId,
+			PC.Id,PC.PropertyId,US.FirstName,US.LastName
+			ORDER BY CONVERT(DATE,PC.RequestedOn,103) DESC
 			
 			INSERT INTO #Request(Requestedby,PCAccount,RequestedStatus,ProcessedStatus,Comments,
 			RequestedOn,Process,RequestedAmount,Processedon,Processedby,RequestedUserId,Id,PropertyId)
 			
-			SELECT DISTINCT (U.FirstName+' '+U.LastName) AS Requestedby,P.PropertyName AS PCAccount
+			SELECT (U.FirstName+' '+U.LastName) AS Requestedby,P.PropertyName AS PCAccount
 			,PC.Status AS RequestedStatus,'Waiting For Operation Manager Approval' AS ProcessedStatus,'Processing' AS Comments,
 			CONVERT(NVARCHAR(100),PH.Date,103) AS RequestedOn,0 AS Process,
 			SUM(PC.ApprovedAmount) AS RequestedAmount,CONVERT(NVARCHAR(100),GETDATE(),103) AS Processedon,
@@ -111,13 +119,15 @@ IF(@Action='GRIDLOAD')
 			AND PU.UserType IN('Resident Managers','Assistant Resident Managers','Operations Managers',
 			'Ops Head','Finance')
 			group by  U.FirstName,U.LastName,P.PropertyName,PC.Status,PH.Date,PH.UserId,PH.PropertyId
+			
+			ORDER BY CONVERT(Date,PH.Date,103) DESC
 		END
 		ELSE
 		BEGIN
 			INSERT INTO #Request(Requestedby,PCAccount,RequestedStatus,ProcessedStatus,Comments,
 			RequestedOn,Process,RequestedAmount,Processedon,Processedby,RequestedUserId,Id,PropertyId)
 			
-			SELECT  DISTINCT (U.FirstName+' '+U.LastName) AS Requestedby,P.PropertyName AS PCAccount,PC.RequestedStatus AS RequestedStatus,
+			SELECT  (U.FirstName+' '+U.LastName) AS Requestedby,P.PropertyName AS PCAccount,PC.RequestedStatus AS RequestedStatus,
 			PC.ProcessedStatus,PC.Comments AS Comments,
 			CONVERT(NVARCHAR(100),PC.RequestedOn,105) AS RequestedOn,0 AS Process,
 			PC.RequestedAmount AS RequestedAmount,
@@ -129,12 +139,15 @@ IF(@Action='GRIDLOAD')
 			JOIN WRBHBUser U ON  PC.RequestedUserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
 			JOIN WRBHBUser US ON PC.UserId=US.Id AND US.IsActive=1 AND US.IsDeleted=0
 			WHERE PC.IsActive=1 AND PC.IsDeleted=0 AND  PC.ProcessedStatus=@Str
-			
+			GROUP BY  U.FirstName,U.LastName,P.PropertyName,PC.RequestedStatus,PC.ProcessedStatus,
+			PC.Comments,PC.RequestedOn,PC.RequestedAmount,PC.LastProcessedon,PC.RequestedUserId,
+			PC.Id,PC.PropertyId,US.FirstName,US.LastName
+			ORDER BY CONVERT(DATE,PC.RequestedOn,103) DESC
 		
 			INSERT INTO #Request(Requestedby,PCAccount,RequestedStatus,ProcessedStatus,Comments,
 			RequestedOn,Process,RequestedAmount,Processedon,Processedby,RequestedUserId,Id,PropertyId)
 			
-			SELECT DISTINCT (U.FirstName+' '+U.LastName) AS Requestedby,P.PropertyName AS PCAccount
+			SELECT (U.FirstName+' '+U.LastName) AS Requestedby,P.PropertyName AS PCAccount
 			,PC.Status AS RequestedStatus,'Waiting For Operation Manager Approval' AS ProcessedStatus,'Processing' AS Comments,
 			CONVERT(NVARCHAR(100),PH.Date,103) AS RequestedOn,0 AS Process,
 			SUM(PC.ApprovedAmount) AS RequestedAmount,CONVERT(NVARCHAR(100),GETDATE(),103) AS Processedon,
@@ -151,7 +164,7 @@ IF(@Action='GRIDLOAD')
 			AND PU.UserType IN('Resident Managers','Assistant Resident Managers','Operations Managers',
 			'Ops Head','Finance')
 			group by  U.FirstName,U.LastName,P.PropertyName,PC.Status,PH.Date,PH.UserId,PH.PropertyId
-		 
+			ORDER BY CONVERT(Date,PH.Date,103) DESC
 		END
 		
 		SELECT Requestedby,PCAccount,RequestedStatus,ProcessedStatus AS Status,Comments,

@@ -39,7 +39,10 @@ CREATE PROCEDURE dbo.[SP_SnackKOTHistory_Help]
 		SELECT DISTINCT P.PropertyName AS Property,P.Id AS PropertyId
 		FROM WRBHBCheckInHdr C
 		JOIN WRBHBProperty  P ON C.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
+		JOIN WRBHBPropertyUsers PU ON P.Id=PU.PropertyId AND PU.IsActive=1 AND PU.IsDeleted=0
 		WHERE C.IsActive=1 AND C.IsDeleted=0 AND  P.Category IN('Internal Property','Managed G H')
+		AND PU.UserId=@PropertyId
+		ORDER BY P.PropertyName ASC
 		
 		SELECT DISTINCT CH.BookingId,CH.ChkoutDate,'Guest' AS Type,KH.GuestName,CH.RoomNo,
 	    SUM(CAST(ISNULL(KD.Amount,0)as DECIMAL(27,2))) AS Amount,'Raised' as Status,
@@ -69,7 +72,7 @@ CREATE PROCEDURE dbo.[SP_SnackKOTHistory_Help]
 		AND CH.IsActive=1 AND CH.IsDeleted=0
 		WHERE KH.PropertyId=@PropertyId  AND KH.IsActive=1 And KH.IsDeleted=0
 		AND KH.Date BETWEEN CONVERT(Date,@Str1 ,103)
-		AND CONVERT(Date,@Str2,103) AND ISNULL(KH.ChkoutServiceFlag,0)=0
+		AND CONVERT(Date,@Str2,103) AND ISNULL(KH.ChkoutServiceFlag,0)!=0
 				 
 		END	
   	
@@ -108,7 +111,7 @@ CREATE PROCEDURE dbo.[SP_SnackKOTHistory_Help]
 	FROM  WRBHBNewKOTEntryHdr H
 	JOIN WRBHBNewKOTEntryDtl D ON H.Id=D.NewKOTEntryHdrId AND D.IsActive = 1 AND D.IsDeleted=0
 	WHERE H.GuestId =@GuestId  AND H.PropertyId=@PropertyId AND Price !=0 
-	AND ISNULL(H.ChkoutServiceFlag,0)=0 AND H.IsActive=1 AND H.IsDeleted=0
+	AND ISNULL(H.ChkoutServiceFlag,0)!=0 AND H.IsActive=1 AND H.IsDeleted=0
 	AND H.BookingId=@BookingId AND H.Date=@Str2
 	group by  ServiceItem,Price,PropertyId
 	
@@ -118,7 +121,7 @@ CREATE PROCEDURE dbo.[SP_SnackKOTHistory_Help]
 	FROM  WRBHBNewKOTEntryHdr H
 	JOIN WRBHBNewKOTEntryDtl D  ON D.NewKOTEntryHdrId=H.Id AND H.IsActive = 1 AND H.IsDeleted=0
 	WHERE H.GuestId =@GuestId  AND H.PropertyId=@PropertyId 
-	AND ISNULL(H.ChkoutServiceFlag,0)=0  AND H.IsActive=1 AND H.IsDeleted=0
+	AND ISNULL(H.ChkoutServiceFlag,0)!=0  AND H.IsActive=1 AND H.IsDeleted=0
 	AND H.BookingId=@BookingId  AND Price =0 AND H.Date=@Str2
 	group by  ServiceItem,Price,PropertyId,Amount
 	

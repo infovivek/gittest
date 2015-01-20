@@ -59,6 +59,7 @@
 				var a3:ArrayCollection=new ArrayCollection();
 				Grd_Property.dataProvider=a3;
 				Tcl_Time.setTime=new Date("11/11/11,12:00:00");
+				Ddl_AMPM.selectedItem="PM";
 				Txt_Result.visible = false;
 				//
 				FnHelp_PageLoad();FnHelp_Title();
@@ -1042,6 +1043,7 @@
 				Dt_ChkOutDt.selectedDate=new Date();
 				Grd_Guest._clear();Lbl_Sales.text="Sales Person";Lbl_CRM.text="CRM Person";
 				Tcl_Time.setTime=new Date("11/11/11,12:00:00");
+				Ddl_AMPM.selectedItem="PM";
 				Lbl_ClientName.text="";
 				// tab 2
 				var sgf:ArrayCollection=new ArrayCollection();

@@ -224,7 +224,7 @@
 						Txt_PropertyType.text=Ds_Objects.result.Tables.Table.Rows[0].PropertyType;
 						txt_Email.text = Ds_Objects.result.Tables.Table.Rows[0].EmailId;
 						
-						if((Txt_PropertyType.text == "Managed G H")||(Txt_PropertyType.text == "MMT")||(Txt_PropertyType.text == "CPP"))
+						if((Txt_PropertyType.text == "Managed G H")||(Txt_PropertyType.text == "MMT")||(Txt_PropertyType.text == "CPP")||(Txt_PropertyType.text == "DdP"))
 						{
 							Checkout.selected =true;
 							Intermediate.selected=false;
@@ -382,7 +382,7 @@
 								}
 							}
 						}
-						if(Txt_PropertyType.text == 'Managed G H')
+						if((Txt_PropertyType.text == 'Managed G H')||(Txt_PropertyType.text== 'DdP'))
 						{
 							if(RB1!="")
 							{
@@ -543,7 +543,7 @@
 									DT_BillTo.enabled=true;
 								}
 							}
-							if((Txt_PropertyType.text == 'Managed G H')||(Txt_PropertyType.text == 'MMT')||(Txt_PropertyType.text == "CPP"))
+							if((Txt_PropertyType.text == 'Managed G H')||(Txt_PropertyType.text == 'MMT')||(Txt_PropertyType.text == "CPP")||(Txt_PropertyType.text == "DdP"))
 							{
 								if(Checkout.selected=true)
 								{
@@ -688,7 +688,7 @@
 								}
 							}
 						}
-						if(Txt_PropertyType.text == 'Managed G H')
+						if((Txt_PropertyType.text == 'Managed G H')||(Txt_PropertyType.text == "CPP"))
 						{
 							if(RB1!="")
 							{
@@ -2029,7 +2029,7 @@
 							
 						}
 					}
-					if(Txt_PropertyType.text == 'Managed G H')
+					if((Txt_PropertyType.text == 'Managed G H')||(Txt_PropertyType.text == 'DdP'))
 					{
 						if(Chk_PrintInvoice.selected == true)
 						{
@@ -3442,7 +3442,7 @@
 							if(Intermediate.selected == true)
 							{
 								
-								if(Txt_PropertyType.text == 'Managed G H')
+								if((Txt_PropertyType.text == 'Managed G H')||(Txt_PropertyType.text == 'DdP'))
 								{
 									PrintChkOutId=0;
 									if (Ds_Objects.result.Tables.Table.Rows.length > 0)
@@ -3513,7 +3513,7 @@
 							}
 							else
 							{
-								if(Txt_PropertyType.text == 'Managed G H')
+								if((Txt_PropertyType.text == 'Managed G H')||(Txt_PropertyType.text == 'DdP'))
 								{
 									PrintChkOutId=0;
 									if (Ds_Objects.result.Tables.Table.Rows.length > 0)

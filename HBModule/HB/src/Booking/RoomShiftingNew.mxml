@@ -38,8 +38,8 @@
 				//RadioGroup_changeHandler();
 				FnHelp_PageLoad();
 				//Dt_ChkInDt.selectedDate = new Date("29/10/2014","DD/MM/YYYY");
-				//UsrId = Global_AC[0].UsrId;
-				UsrId = 21;
+				UsrId = Global_AC[0].UsrId;
+				//UsrId = 21;
 			}
 			
 			protected function FnHelp_PageLoad():void
@@ -109,21 +109,22 @@
 						}
 						Txt_Status.text = Ds_Objects.result.Tables.Table.Rows[0].CurrentStatus;
 						MOPCount = Ds_Objects.result.Tables.Table.Rows[0].MOPCount;
+						//
+						PropertyType = Ds_Objects.result.Tables.Table.Rows[0].PropertyType;
+						Ddl_TariffPM.prompt = Ds_Objects.result.Tables.Table.Rows[0].TariffPaymentMode;
+						Ddl_ServicePM.prompt = Ds_Objects.result.Tables.Table.Rows[0].ServicePaymentMode;
+						TariffPM = Ds_Objects.result.Tables.Table.Rows[0].TariffPaymentMode;
+						ServicePM = Ds_Objects.result.Tables.Table.Rows[0].ServicePaymentMode;
+						OldTariffPM = Ds_Objects.result.Tables.Table.Rows[0].TariffPaymentMode;
+						OldServicePM = Ds_Objects.result.Tables.Table.Rows[0].ServicePaymentMode;
 					}		
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Ddl_TariffPM.dataProvider = Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
 					if (Ds_Objects.result.Tables.Table2.Rows.length > 0)
 					{
 						Ddl_ServicePM.dataProvider = Ds_Objects.result.Tables.Table2.Rows as ArrayCollection;
-						Ddl_TariffPM.dataProvider = Ds_Objects.result.Tables.Table2.Rows as ArrayCollection;
-					}
-					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
-					{
-						PropertyType = Ds_Objects.result.Tables.Table1.Rows[0].PropertyType;
-						Ddl_TariffPM.prompt = Ds_Objects.result.Tables.Table1.Rows[0].TariffPaymentMode;
-						Ddl_ServicePM.prompt = Ds_Objects.result.Tables.Table1.Rows[0].ServicePaymentMode;
-						TariffPM = Ds_Objects.result.Tables.Table1.Rows[0].TariffPaymentMode;
-						ServicePM = Ds_Objects.result.Tables.Table1.Rows[0].ServicePaymentMode;
-						OldTariffPM = Ds_Objects.result.Tables.Table1.Rows[0].TariffPaymentMode;
-						OldServicePM = Ds_Objects.result.Tables.Table1.Rows[0].ServicePaymentMode;
 					}
 					if(Rdb_Shift.selected == true)
 					{
@@ -168,7 +169,7 @@
 						}
 					}					
 				}
-				if (Ds_Objects.currentTarget.description.toString() == "DateLoad_CUSTOM")
+				/*if (Ds_Objects.currentTarget.description.toString() == "DateLoad_CUSTOM")
 				{
 					Dt_ChkInDtExists.selectedDate = new Date();
 					Dt_ChkOutDtExists.selectedDate = new Date();
@@ -201,7 +202,7 @@
 						OldTariffPM = Ds_Objects.result.Tables.Table1.Rows[0].TariffPaymentMode;
 						OldServicePM = Ds_Objects.result.Tables.Table1.Rows[0].ServicePaymentMode;
 					}					
-				}
+				}*/
 				if (Ds_Objects.currentTarget.description.toString() == "AvaliableRooms_CUSTOM")
 				{
 					var sda:ArrayCollection=new ArrayCollection();ToRoomId=0;ToRoomNo="";
@@ -275,12 +276,12 @@
 					if(Rdb_Shift.selected == true)
 					{
 						useWeb("RoomShifting","DtLoad_CUSTOM",
-							[GlobalXml,'DateLoad','Shift','','','',BookingId,FromRoomId,RoomCaptured,UsrId]);
+							[GlobalXml,'DateLoad','Shift',BookingLevel,'','',BookingId,FromRoomId,RoomCaptured,UsrId]);
 					}
 					else
 					{
 						useWeb("RoomShifting","DtLoad_CUSTOM",
-							[GlobalXml,'DateLoad','Stay','','','',BookingId,FromRoomId,RoomCaptured,UsrId]);
+							[GlobalXml,'DateLoad','Stay',BookingLevel,'','',BookingId,FromRoomId,RoomCaptured,UsrId]);
 					}
 					
 				}
@@ -311,7 +312,7 @@
 				var TD:String = TDt.substr(0,2);
 				var ChkOutDt:String=TY+'-'+TM+'-'+TD+' '+'11:59:00 AM';
 				useWeb("RoomShifting","AvaliableRooms_CUSTOM",[GlobalXml,'AvaliableRooms',
-					BookingLevel,'',ChkInDt,ChkOutDt,BookingId,FromRoomId,RoomCaptured,0]);
+					'',BookingLevel,ChkInDt,ChkOutDt,BookingId,FromRoomId,RoomCaptured,0]);
 			}
 			
 			protected function Dt_ChkInDt_changeHandler(event:CalendarLayoutChangeEvent):void
@@ -550,7 +551,7 @@
 							var TD:String = TDt.substr(0,2);
 							var ChkOutDt:String = TY+'-'+TM+'-'+TD+' '+'11:59:00 AM';
 							useWeb("RoomShifting","AvaliableFromRooms_CUSTOM",[GlobalXml,'AvaliableFromRoom',
-								BookingLevel,'',ChkInDt,ChkOutDt,BookingId,FromRoomId,RoomCaptured,0]);
+								'',BookingLevel,ChkInDt,ChkOutDt,BookingId,FromRoomId,RoomCaptured,0]);
 						}
 						else
 						{

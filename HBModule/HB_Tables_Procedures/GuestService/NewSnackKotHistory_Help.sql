@@ -35,10 +35,12 @@ CREATE PROCEDURE dbo.[SP_NewSnackKOTEntryHistory_Help]
  IF @Action='PAGELOAD'
  BEGIN
 	   --Property
-		SELECT DISTINCT P.PropertyName,PropertyId
+		SELECT DISTINCT P.PropertyName,C.PropertyId
 		FROM WRBHBCheckInHdr C
 		JOIN WRBHBProperty P ON C.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
+		JOIN WRBHBPropertyUsers PU ON P.Id=PU.PropertyId AND PU.IsActive=1 AND PU.IsDeleted=0
 		WHERE C.IsActive=1 AND C.IsDeleted=0 AND  P.Category IN('Internal Property','Managed G H')
+		AND PU.UserId=@PropertyId
 		ORDER BY P.PropertyName ASC
 			
  END

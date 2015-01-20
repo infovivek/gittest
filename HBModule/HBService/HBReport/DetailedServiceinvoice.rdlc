@@ -356,6 +356,14 @@
           <DataField>Location</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
+        <Field Name="AmtWords">
+          <DataField>AmtWords</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="ToDate">
+          <DataField>ToDate</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
       </Fields>
       <Query>
         <DataSourceName>HBDataSet1</DataSourceName>
@@ -675,7 +683,11 @@
           <Paragraph>
             <TextRuns>
               <TextRun>
-                <Value>=Fields!BillDate.Value</Value>
+                <Value>=Fields!ToDate.Value</Value>
+                <Style />
+              </TextRun>
+              <TextRun>
+                <Value xml:space="preserve"> </Value>
                 <Style />
               </TextRun>
             </TextRuns>
@@ -686,9 +698,9 @@
         </Paragraphs>
         <rd:DefaultName>Textbox23</rd:DefaultName>
         <Top>0.03334in</Top>
-        <Left>6.01851in</Left>
+        <Left>6.02239in</Left>
         <Height>0.25in</Height>
-        <Width>0.91479in</Width>
+        <Width>0.91091in</Width>
         <ZIndex>9</ZIndex>
         <Style>
           <Border>

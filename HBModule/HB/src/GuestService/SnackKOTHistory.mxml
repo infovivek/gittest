@@ -55,7 +55,7 @@
 				GlobalXml += "<ROOT>";
 				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
 				GlobalXml += "</ROOT>";
-				useWeb("NewSnackKOTHistory","PAGELOAD_CUSTOM",[GlobalXml,'PAGELOAD',0,'','','']);
+				useWeb("NewSnackKOTHistory","PAGELOAD_CUSTOM",[GlobalXml,'PAGELOAD',Global_AC[0].UsrId,'','','']);
 			}
 			private function Custom_WebSer_Result (Ds_Objects:Object):void
 			{

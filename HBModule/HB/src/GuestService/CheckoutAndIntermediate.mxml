@@ -86,9 +86,9 @@
 				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
 				GlobalXml += "</ROOT>";
 				// Rdlc Print
-				Str_ChkOut="http://localhost:6236/GuestCheckOutTariff.aspx?";
-				Str_Serv="http://localhost:6236/GuestCheckOutService.aspx?";
-				Str_Settle="http://localhost:6236/GuestCheckOutConsolidate.aspx?";
+//				Str_ChkOut="http://localhost:6236/GuestCheckOutTariff.aspx?";
+//				Str_Serv="http://localhost:6236/GuestCheckOutService.aspx?";
+//				Str_Settle="http://localhost:6236/GuestCheckOutConsolidate.aspx?";
 //				
 //				Str_InChkTar="http://localhost:6236/IntermediateCheckoutTariff.aspx?";
 //				Str_InChkSer="http://localhost:6236/IntermediateCheckoutService.aspx?";
@@ -104,9 +104,9 @@
 //				Str_InChkSett="http://warsoft.in/HBReport/IntermediateCheckoutConsolidate.aspx?";
 				
 				
-//				Str_ChkOut="http://sstage.in/HBReport/GuestCheckOutTariff.aspx?";
-//				Str_Serv="http://sstage.in/HBReport/GuestCheckOutService.aspx?";
-//				Str_Settle="http://sstage.in/HBReport/GuestCheckOutConsolidate.aspx?";
+				Str_ChkOut="http://sstage.in/HBReport/GuestCheckOutTariff.aspx?";
+				Str_Serv="http://sstage.in/HBReport/GuestCheckOutService.aspx?";
+				Str_Settle="http://sstage.in/HBReport/GuestCheckOutConsolidate.aspx?";
 				
 				Str_InChkTar="http://sstage.in/HBReport/IntermediateCheckoutTariff.aspx?";
 				Str_InChkSer="http://sstage.in/HBReport/IntermediateCheckoutService.aspx?";
@@ -152,8 +152,8 @@
 			protected function Help():void
 			{				
 				
-		//		useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId,0]);
-			 	useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,19,0]);
+				useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId,0]);
+		//	 	useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65,0]);
 				Txt_ServiceBillAmt.editable=false;
 				Txt_ServiceVat.editable=false;
 				Txt_SerivceTax.editable=false;
@@ -263,6 +263,7 @@
 						Txt_Bed.text=Ds_Objects.result.Tables.Table.Rows[0].BedType;
 						Txt_PropertyType.text=Ds_Objects.result.Tables.Table.Rows[0].PropertyType;
 						txt_Email.text = Ds_Objects.result.Tables.Table.Rows[0].EmailId;
+						txt_BookingType.text = Ds_Objects.result.Tables.Table.Rows[0].Type;
 						
 						
 					}
@@ -352,6 +353,7 @@
 							chk_ServiceCharge.selected=false;
 							
 						}
+						txt_TariffPaymentMode.text=Ds_Objects.result.Tables.Table3.Rows[0].TariffPaymentMode;
 						var RB:String=Ds_Objects.result.Tables.Table3.Rows[0].TariffPaymentMode;
 						//		var RB:String = "true";
 						var RB1:Boolean = RB == Ds_Objects.result.Tables.Table3.Rows[0].TariffPaymentMode;
@@ -526,6 +528,7 @@
 							chk_ServiceCharge.enabled=true;
 							chk_ServiceCharge.selected=false;
 						}
+						txt_TariffPaymentMode.text=Ds_Objects.result.Tables.Table3.Rows[0].TariffPaymentMode;
 						var RB:String=Ds_Objects.result.Tables.Table3.Rows[0].TariffPaymentMode;
 						//		var RB:String = "true";
 						var RB1:Boolean = RB == Ds_Objects.result.Tables.Table3.Rows[0].TariffPaymentMode;
@@ -2775,13 +2778,18 @@
 						
 					}
 					
+					var Misc:String=NF_Two.format(txt_MiscellaneousAmount.text);
+					
+					
+			//		var Final_Miscellaneous:Number=Number(Misc.replace(",",""))
+						
 					var Final_ServiceBillAmt:Number=Number(Food_ServiceBillAmt.replace(",",""))+Number(Laundry_ServiceBillAmt.replace(",",""));
 					var Final_ServiceVat:Number=Number(Food_ServiceVat.replace(",",""))+Number(Laundry_ServiceVat.replace(",",""));
 					var Final_SerivceTax:Number=Number(Food_SerivceTax.replace(",",""))
 					var Final_ServiceEcess:Number=Number(Food_ServiceEcess.replace(",",""))+Number(Laundry_ServiceEcess.replace(",",""));
 					var Final_serviceHECess:Number=Number(Food_serviceHECess.replace(",",""))+Number(Laundry_serviceHECess.replace(",",""));
 					var Final_BST:Number=Number(Laundry_BST);
-					var Final_ServiceNetAmount:Number=Number(Food_ServiceNetAmount.replace(",",""))+Number(Laundry_ServiceNetAmount.replace(",",""));
+					var Final_ServiceNetAmount:Number=Number(Food_ServiceNetAmount.replace(",",""))+Number(Laundry_ServiceNetAmount.replace(",",""))+Number(Misc.replace(",",""));
 					
 					
 					Txt_ServiceBillAmt.text=NF_Two.format(Final_ServiceBillAmt);
@@ -2790,7 +2798,8 @@
 					Txt_ServiceEcess.text=NF_Two.format(Final_ServiceEcess);
 					Txt_serviceHECess.text=NF_Two.format(Final_serviceHECess);
 					Txt_BST.text=Laundry_BST;
-					Txt_ServiceNetAmount.text=NF_Two.format(Final_ServiceNetAmount);
+					Txt_ServiceNetAmount.text=(NF_Two.format(Final_ServiceNetAmount));
+			
 					
 					Grp_Service.visible=false;
 					hlp_item.text="";
@@ -3042,7 +3051,8 @@
 									VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 									ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk,
 									BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"",
-									Preformainvoice:Chk_PIInvoice.selected,Email:txt_Email.text
+									Preformainvoice:Chk_PIInvoice.selected,Email:txt_Email.text,TariffPaymentMode:txt_TariffPaymentMode.text,
+									BookingType:txt_BookingType.text
 									//Flag:Flag1
 								}]);
 							var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
@@ -3078,7 +3088,8 @@
 									VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 									ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk,
 									BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"",
-									Preformainvoice:Chk_PIInvoice.selected,Email:txt_Email.text
+									Preformainvoice:Chk_PIInvoice.selected,Email:txt_Email.text,TariffPaymentMode:txt_TariffPaymentMode.text,
+									BookingType:txt_BookingType.text
 									//Flag:Flag1
 								}]);
 							var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
@@ -3114,7 +3125,8 @@
 									VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 									ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk,
 									BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"",
-									Preformainvoice:Chk_PIInvoice.selected,Email:txt_Email.text
+									Preformainvoice:Chk_PIInvoice.selected,Email:txt_Email.text,TariffPaymentMode:txt_TariffPaymentMode.text,
+									BookingType:txt_BookingType.text
 									//Flag:Flag1
 								}]);
 							var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
@@ -3154,7 +3166,8 @@
 										VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 										ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk,
 										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate",
-										Preformainvoice:Chk_PIInvoice.selected
+										Preformainvoice:Chk_PIInvoice.selected,TariffPaymentMode:txt_TariffPaymentMode.text,
+										BookingType:txt_BookingType.text
 										//Flag:Flag1
 									}]);
 								var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
@@ -3189,7 +3202,8 @@
 										VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 										ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk,
 										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate",
-										Preformainvoice:Chk_PIInvoice.selected,Email:txt_Email.text
+										Preformainvoice:Chk_PIInvoice.selected,Email:txt_Email.text,TariffPaymentMode:txt_TariffPaymentMode.text,
+										BookingType:txt_BookingType.text
 										//Flag:Flag1
 									}]);
 								var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
@@ -3225,7 +3239,8 @@
 										VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 										ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk,
 										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate",
-										Preformainvoice:Chk_PIInvoice.selected,Email:txt_Email.text
+										Preformainvoice:Chk_PIInvoice.selected,Email:txt_Email.text,TariffPaymentMode:txt_TariffPaymentMode.text,
+										BookingType:txt_BookingType.text
 										//Flag:Flag1
 									}]);
 								var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
@@ -3264,7 +3279,8 @@
 										VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 										ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk,
 										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate",
-										Preformainvoice:Chk_PIInvoice.selected,Email:txt_Email.text
+										Preformainvoice:Chk_PIInvoice.selected,Email:txt_Email.text,TariffPaymentMode:txt_TariffPaymentMode.text,
+										BookingType:txt_BookingType.text
 										//Flag:Flag1
 									}]);
 								var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
@@ -3299,7 +3315,8 @@
 										VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 										ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk,
 										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate",
-										Preformainvoice:Chk_PIInvoice.selected,Email:txt_Email.text
+										Preformainvoice:Chk_PIInvoice.selected,Email:txt_Email.text,TariffPaymentMode:txt_TariffPaymentMode.text,
+										BookingType:txt_BookingType.text
 										//Flag:Flag1
 									}]);
 								var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
@@ -3335,7 +3352,8 @@
 										VAT:lbl_ServiceVAT.text,RestaurantST:lbl_ST.text,BusinessSupportST:lbl_BST.text,
 										ClientId:ClientId,CityId:CityId,ServiceChargeChk:ServiceChargeChk,
 										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate",
-										Preformainvoice:Chk_PIInvoice.selected,Email:txt_Email.text
+										Preformainvoice:Chk_PIInvoice.selected,Email:txt_Email.text,TariffPaymentMode:txt_TariffPaymentMode.text,
+										BookingType:txt_BookingType.text
 										//Flag:Flag1
 									}]);
 								var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
@@ -3396,7 +3414,7 @@
 					ExtraMaters=0;
 					
 					useWeb("CheckoutAndIntermediate","GuestDetail_CUSTOM",[GlobalXml,"GuestDetails","","","",CheckInHdrId,0,0,Global_AC[0].UsrId,ExtraMaters]);
-		//			useWeb("CheckoutAndIntermediate","GuestDetail_CUSTOM",[GlobalXml,"GuestDetails","","","",CheckInHdrId,0,0,19,ExtraMaters]);
+		//			useWeb("CheckoutAndIntermediate","GuestDetail_CUSTOM",[GlobalXml,"GuestDetails","","","",CheckInHdrId,0,0,65,ExtraMaters]);
 		//			useWeb("GuestCheckOut","Guest_CUSTOM",[GlobalXml,"CHKINROOMDETAILS","",CheckInHdrId,StateId,0,0,ExtraMaters]);
 					//		useWeb("CheckOutServiceHdr","TariffLoad_CUSTOM",[GlobalXml,"ProductLoad",CheckInHdrId,GuestId,StateId,0,0,0]);
 					
@@ -4271,7 +4289,8 @@
 				lbl_ConPaymode.text="";
 				txt_Email.text="";
 				txt_EmailId.text="";
-				
+				txt_TariffPaymentMode.text="";
+				txt_BookingType.text="";
 				
 			}
 			protected function AllClear():void
@@ -4362,6 +4381,8 @@
 				lbl_ConPaymode.text="";
 				txt_Email.text="";
 				txt_EmailId.text="";
+				txt_TariffPaymentMode.text="";
+				txt_BookingType.text="";
 			}
 			
 			protected function Chk_Select_clickHandler(event:MouseEvent):void
@@ -4534,13 +4555,15 @@
 					
 				}
 				
+				var Misc:String=NF_Two.format(txt_MiscellaneousAmount.text);
+				
 				Txt_ServiceBillAmt.text=String(Number(Food_ServiceBillAmt)+Number(Laundry_ServiceBillAmt));
 				Txt_ServiceVat.text=String(Number(Food_ServiceVat)+Number(Laundry_ServiceVat));
 				Txt_SerivceTax.text=String(Number(Food_SerivceTax)+Number(Laundry_SerivceTax));
 				Txt_ServiceEcess.text=String(Number(Food_ServiceEcess)+Number(Laundry_ServiceEcess));
 				Txt_serviceHECess.text=String(Number(Food_serviceHECess)+Number(Laundry_serviceHECess));
 				Txt_BST.text=Laundry_BST;
-				Txt_ServiceNetAmount.text=String(Number(Food_ServiceNetAmount.replace(",",""))+Number(Laundry_ServiceNetAmount.replace(",","")));
+				Txt_ServiceNetAmount.text=String(Number(Food_ServiceNetAmount.replace(",",""))+Number(Laundry_ServiceNetAmount.replace(",",""))+Number(Misc.replace(",","")));
 				
 				//				Grp_Service.visible=false;
 				//				hlp_item.text="";
@@ -7847,12 +7870,16 @@
 			public static var misValue:Number;
 			protected function checkbox1_changeHandler(event:Event):void
 			{
-				misValue=Number(txt_MiscellaneousAmount.text)
+				var misValue:String=NF_Two.format(txt_MiscellaneousAmount.text)
+				var Service:String=NF_Two.format(Txt_ServiceNetAmount.text);
+				
 				txt_MiscellaneousAmount.visible=Chk_Miscellaneous.selected;
 				txt_MiscellaneousRemarks.visible=Chk_Miscellaneous.selected	
 				if(Chk_Miscellaneous.selected==false)
 				{
-					Txt_ServiceNetAmount.text=String(Number(Txt_ServiceNetAmount.text)-misValue)
+					
+					
+					Txt_ServiceNetAmount.text=String(Number(Service.replace(",",""))-Number(misValue.replace(",","")))
 					txt_MiscellaneousRemarks.text="";
 					txt_MiscellaneousAmount.text="";
 					txt_MiscellaneousAmount.enabled=true;
@@ -9079,6 +9106,8 @@
 				<WrbComp:Button_HB x="153" y="464" id="ProcessClear" Lable_val="Clear" click="ProcessClear_clickHandler(event)">
 				</WrbComp:Button_HB>
 				<s:TextInput x="76" y="438" id="txt_Email" width="100" visible="false"/>
+				<s:TextInput x="123" y="436" id="txt_TariffPaymentMode" visible="false"/>
+				<s:TextInput x="35" y="436" id="txt_BookingType" visible="false"/>
 				
 				
 			</s:Group>
