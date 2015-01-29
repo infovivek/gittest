@@ -32,7 +32,8 @@ namespace HB.Dao
             }
             else
             {
-                message.From = new System.Net.Mail.MailAddress("stay@staysimplyfied.com", "", System.Text.Encoding.UTF8);
+                //message.From = new System.Net.Mail.MailAddress("stay@staysimplyfied.com", "", System.Text.Encoding.UTF8);
+                message.From = new System.Net.Mail.MailAddress("stay@hummingbirdindia.com", "", System.Text.Encoding.UTF8);
             }
             message.To.Add(new System.Net.Mail.MailAddress("stay@staysimplyfied.com"));
             message.CC.Add(new System.Net.Mail.MailAddress("shiv@hummingbirdindia.com"));

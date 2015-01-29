@@ -698,8 +698,8 @@
 							}
 							else
 							{
-								dd_CheckIn.selectedIndex=11
-								dd_CheckOut.selectedIndex=11
+								dd_CheckIn.selectedIndex=Ds_Objects.result.Tables.Table.Rows[0].CheckIn-1;
+								dd_CheckOut.selectedIndex=Ds_Objects.result.Tables.Table.Rows[0].CheckOut-1;
 								dd_CheckInType.selectedIndex=2
 								dd_CheckOutType.selectedIndex=2
 								dd_gracetime.selectedIndex=0
@@ -708,7 +708,11 @@
 //							dd_CheckOutType.selectedItem=Ds_Objects.result.Tables.Table.Rows[0].CheckOutType;
 //							dd_gracetime.selectedItem=Ds_Objects.result.Tables.Table.Rows[0].GraceTime;
 							CategoryChange();
-							
+							Lst_DSOM.dataProvider=Ac_Clear;
+							Lst_DSRM.dataProvider=Ac_Clear1;				
+							Lst_DSARM.dataProvider=Ac_Clear2;				
+							Lst_DSPM.dataProvider=Ac_Clear3;				
+							Lst_DSOR.dataProvider=Ac_Clear4;
 							if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
 							{
 								Lst_DSOM.dataProvider=Ds_Objects.result.Tables.Table1.Rows;							
@@ -4895,7 +4899,7 @@
 			<s:Label x="103" y="122.5" text="*" color="red"/>
 			<s:Label x="94" y="163.5" text="*" color="red"/>
 			<s:Label x="127" y="205.5" text="*" color="red"/>
-			<s:TextInput id="Txt_RoomNo_RB" x="145" y="163.5" width="220" height="21" restrict="0-9a-zA-Z"
+			<s:TextInput id="Txt_RoomNo_RB" x="145" y="163.5" width="220" height="21"  
 						 tabIndex="60" prompt="Room No"/>
 			<s:HGroup x="75" y="242" width="781" height="175" horizontalAlign="center" verticalAlign="middle" id="Grp_BedInternal">
 			<WrbComp:ProDGrid1 x="0" y="0" width="600" height="171" id="Grd_RoomBed"

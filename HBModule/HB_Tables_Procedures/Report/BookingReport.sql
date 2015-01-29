@@ -9,7 +9,7 @@ GO
 -- ===============================================================================
 -- Author:Sakthi
 -- Create date:
--- ModifiedBy :Sakthi, ModifiedDate:14/07/2014
+-- ModifiedBy :Anbu, ModifiedDate:01/01/2015
 -- Description:	BOOKING
 -- =================================================================================
 CREATE PROCEDURE [dbo].[BookingReport](@Action NVARCHAR(100),  
@@ -92,6 +92,7 @@ IF @Action = 'BookingDtls'
     ISNULL(BG.Column4,''),ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),
     ISNULL(BG.Column7,''),ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),
     ISNULL(BG.Column10,''),B.BookingLevel;
+    
     -- Property & Contract - Canceled & No Show - Room
     INSERT INTO #TMP(BookingCode,BookingId,MasterClientName,ClientName,ClientId,
     CRMName,PropertyName,PropertyType,PropertyId,CityName,CityId,GuestName,
@@ -428,9 +429,13 @@ IF @Action = 'BookingDtls'
     T.TariffPaymentMode,T1.RoomCaptured,T.CurrentStatus,T.BookerName,
     T.BookedDt,T.Column1,T.Column2,T.Column3,T.Column4,T.Column5,T.Column6,
     T.Column7,T.Column8,T.Column9,T.Column10,T.BookingLevel;
+     
+   
    END
+  
   ELSE
    BEGIN
+   
     -- Property & Contract - CheckOut,Booked & CheckIn - Room
     INSERT INTO #TMP(BookingCode,BookingId,MasterClientName,ClientName,ClientId,
     CRMName,PropertyName,PropertyType,PropertyId,CityName,CityId,GuestName,
@@ -727,6 +732,8 @@ IF @Action = 'BookingDtls'
     ISNULL(BG.Column4,''),ISNULL(BG.Column5,''),ISNULL(BG.Column6,''),
     ISNULL(BG.Column7,''),ISNULL(BG.Column8,''),ISNULL(BG.Column9,''),
     ISNULL(BG.Column10,''),B.BookingLevel;
+    
+   
     -- API - Canceled & No Show - Room
     INSERT INTO #TMP(BookingCode,BookingId,MasterClientName,ClientName,ClientId,
     CRMName,PropertyName,PropertyType,PropertyId,CityName,CityId,GuestName,
@@ -845,6 +852,8 @@ IF @Action = 'BookingDtls'
   WHERE R.PropertyType='External' AND R.TariffPaymentMode='Direct' AND BG.Occupancy='Single'
   ORDER BY BookingCode,RoomCaptured;
   
+  
+  
   INSERT INTO #Final(BookingCode,BookingId,MasterClientName,ClientName,ClientId,
   CRMName,PropertyName,PropertyType,PropertyId,CityName,CityId,GuestName,
   GuestId,ChkInDt,ChkOutDt,Tariff,Markup,StayDays,TotTarif,TariffPaymentMode,
@@ -902,8 +911,8 @@ IF @Action = 'BookingDtls'
   CRMName AS CRMName,R.PropertyName AS PropertyName,
   R.PropertyType,R.PropertyId,CityName AS City,CityId,
   ISNULL(GuestName,'') AS GuestName,R.GuestId,
-  R.ChkInDt AS CheckInDt,R.ChkOutDt AS CheckOutDt,R.Tariff+R.Tariff*BG.LTonAgreed/100+R.Tariff*BG.STonAgreed/100
-  +R.Tariff*BG.STonAgreed/100,
+  R.ChkInDt AS CheckInDt,R.ChkOutDt AS CheckOutDt,
+  (R.Tariff+R.Tariff*BG.LTonAgreed/100+R.Tariff*BG.LTonRack/100+R.Tariff*BG.STonAgreed/100),
   (BP.SingleandMarkup1-BP.SingleTariff) AS Markup,
   StayDays AS StayDays,TotTarif AS TotalTariff,
   R.TariffPaymentMode AS TariffPaymentMode,R.RoomCaptured,R.CurrentStatus AS Status,
@@ -912,8 +921,34 @@ IF @Action = 'BookingDtls'
   BookingLevel AS BookingLevel,BG.Occupancy  FROM #Result R
   LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG ON R.BookingId=BG.BookingId AND R.GuestId=BG.GuestId AND BG.IsActive=1
   LEFT OUTER JOIN WRBHBBookingProperty BP ON R.BookingId=BP.BookingId AND BG.RoomType=BP.RoomType AND BP.IsActive=1
-  WHERE R.PropertyType='External' AND R.TariffPaymentMode='Bill to Company (BTC)' AND BG.Occupancy='Single'
+  WHERE R.PropertyType='External' AND R.TariffPaymentMode='Bill to Company (BTC)' AND BG.Occupancy='Single' AND ISNULL(BP.ExpWithTax,0)=0
   ORDER BY BookingCode,RoomCaptured;
+  
+   
+  INSERT INTO #Final(BookingCode,BookingId,MasterClientName,ClientName,ClientId,
+  CRMName,PropertyName,PropertyType,PropertyId,CityName,CityId,GuestName,
+  GuestId,ChkInDt,ChkOutDt,Tariff,Markup,StayDays,TotTarif,TariffPaymentMode,
+  RoomCaptured,CurrentStatus,BookerName,BookedDt,Column1,Column2,Column3,
+  Column4,Column5,Column6,Column7,Column8,Column9,Column10,BookingLevel,Occupancy)
+   
+  SELECT DISTINCT BookingCode AS BookingCode,R.BookingId,
+  MasterClientName AS MasterClientName,ClientName AS ClientName,ClientId,
+  CRMName AS CRMName,R.PropertyName AS PropertyName,
+  R.PropertyType,R.PropertyId,CityName AS City,CityId,
+  ISNULL(GuestName,'') AS GuestName,R.GuestId,
+  R.ChkInDt AS CheckInDt,R.ChkOutDt AS CheckOutDt,
+  R.Tariff,(BP.SingleandMarkup1-BP.SingleTariff) AS Markup,
+  StayDays AS StayDays,TotTarif AS TotalTariff,
+  R.TariffPaymentMode AS TariffPaymentMode,R.RoomCaptured,R.CurrentStatus AS Status,
+  BookerName AS UserName,CONVERT(VARCHAR(100),BookedDt,103) AS BookingDate,
+  R.Column1,R.Column2,R.Column3,R.Column4,R.Column5,R.Column6,R.Column7,R.Column8,R.Column9,R.Column10,
+  BookingLevel AS BookingLevel,BG.Occupancy  FROM #Result R
+  LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG ON R.BookingId=BG.BookingId AND R.GuestId=BG.GuestId AND BG.IsActive=1
+  LEFT OUTER JOIN WRBHBBookingProperty BP ON R.BookingId=BP.BookingId AND BG.RoomType=BP.RoomType AND BP.IsActive=1
+  WHERE R.PropertyType='External' AND R.TariffPaymentMode='Bill to Company (BTC)' AND BG.Occupancy='Single' AND ISNULL(BP.ExpWithTax,0)=1
+  ORDER BY BookingCode,RoomCaptured;
+ 
+ 
   
   INSERT INTO #Final(BookingCode,BookingId,MasterClientName,ClientName,ClientId,
   CRMName,PropertyName,PropertyType,PropertyId,CityName,CityId,GuestName,
@@ -926,7 +961,7 @@ IF @Action = 'BookingDtls'
   CRMName AS CRMName,R.PropertyName AS PropertyName,
   R.PropertyType,R.PropertyId,CityName AS City,CityId,
   ISNULL(GuestName,'') AS GuestName,R.GuestId,
-  R.ChkInDt AS CheckInDt,R.ChkOutDt AS CheckOutDt,R.Tariff+R.Tariff*BG.LTonAgreed/100+R.Tariff*BG.STonAgreed/100
+  R.ChkInDt AS CheckInDt,R.ChkOutDt AS CheckOutDt,R.Tariff+R.Tariff*BG.LTonAgreed/100+R.Tariff*BG.LTonRack/100
   +R.Tariff*BG.STonAgreed/100 AS Tariff,
   (BP.DoubleandMarkup1-BP.DoubleTariff) AS Markup,
   StayDays AS StayDays,TotTarif AS TotalTariff,
@@ -936,7 +971,7 @@ IF @Action = 'BookingDtls'
   BookingLevel AS BookingLevel,BG.Occupancy  FROM #Result R
   LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG ON R.BookingId=BG.BookingId AND R.GuestId=BG.GuestId AND BG.IsActive=1
   LEFT OUTER JOIN WRBHBBookingProperty BP ON R.BookingId=BP.BookingId AND BG.RoomType=BP.RoomType AND BP.IsActive=1
-  WHERE R.PropertyType='External' AND R.TariffPaymentMode='Bill to Company (BTC)' AND BG.Occupancy='Double'
+  WHERE R.PropertyType='External' AND R.TariffPaymentMode='Bill to Company (BTC)' AND BG.Occupancy='Double' AND ISNULL(BP.ExpWithTax,0)=0
   AND R.RoomCaptured=BG.RoomCaptured
   ORDER BY BookingCode,RoomCaptured;
   
@@ -951,7 +986,31 @@ IF @Action = 'BookingDtls'
   CRMName AS CRMName,R.PropertyName AS PropertyName,
   R.PropertyType,R.PropertyId,CityName AS City,CityId,
   ISNULL(GuestName,'') AS GuestName,R.GuestId,
-  R.ChkInDt AS CheckInDt,R.ChkOutDt AS CheckOutDt,R.Tariff+R.Tariff*BG.LTonAgreed/100+R.Tariff*BG.STonAgreed/100
+  R.ChkInDt AS CheckInDt,R.ChkOutDt AS CheckOutDt,R.Tariff,
+  (BP.DoubleandMarkup1-BP.DoubleTariff) AS Markup,
+  StayDays AS StayDays,TotTarif AS TotalTariff,
+  R.TariffPaymentMode AS TariffPaymentMode,R.RoomCaptured,R.CurrentStatus AS Status,
+  BookerName AS UserName,CONVERT(VARCHAR(100),BookedDt,103) AS BookingDate,
+  R.Column1,R.Column2,R.Column3,R.Column4,R.Column5,R.Column6,R.Column7,R.Column8,R.Column9,R.Column10,
+  BookingLevel AS BookingLevel,BG.Occupancy  FROM #Result R
+  LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG ON R.BookingId=BG.BookingId AND R.GuestId=BG.GuestId AND BG.IsActive=1
+  LEFT OUTER JOIN WRBHBBookingProperty BP ON R.BookingId=BP.BookingId AND BG.RoomType=BP.RoomType AND BP.IsActive=1
+  WHERE R.PropertyType='External' AND R.TariffPaymentMode='Bill to Company (BTC)' AND BG.Occupancy='Double' AND ISNULL(BP.ExpWithTax,0)=1
+  AND R.RoomCaptured=BG.RoomCaptured
+  ORDER BY BookingCode,RoomCaptured;
+  
+  INSERT INTO #Final(BookingCode,BookingId,MasterClientName,ClientName,ClientId,
+  CRMName,PropertyName,PropertyType,PropertyId,CityName,CityId,GuestName,
+  GuestId,ChkInDt,ChkOutDt,Tariff,Markup,StayDays,TotTarif,TariffPaymentMode,
+  RoomCaptured,CurrentStatus,BookerName,BookedDt,Column1,Column2,Column3,
+  Column4,Column5,Column6,Column7,Column8,Column9,Column10,BookingLevel,Occupancy)
+   
+  SELECT DISTINCT BookingCode AS BookingCode,R.BookingId,
+  MasterClientName AS MasterClientName,ClientName AS ClientName,ClientId,
+  CRMName AS CRMName,R.PropertyName AS PropertyName,
+  R.PropertyType,R.PropertyId,CityName AS City,CityId,
+  ISNULL(GuestName,'') AS GuestName,R.GuestId,
+  R.ChkInDt AS CheckInDt,R.ChkOutDt AS CheckOutDt,R.Tariff+R.Tariff*BG.LTonAgreed/100+R.Tariff*BG.LTonRack/100
   +R.Tariff*BG.STonAgreed/100 AS Tariff,(BP.TripleandMarkup1-Bp.TripleTariff) AS Markup,
   StayDays AS StayDays,TotTarif AS TotalTariff,
   R.TariffPaymentMode AS TariffPaymentMode,R.RoomCaptured,R.CurrentStatus AS Status,
@@ -960,7 +1019,30 @@ IF @Action = 'BookingDtls'
   BookingLevel AS BookingLevel,BG.Occupancy  FROM #Result R
   LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG ON R.BookingId=BG.BookingId AND R.GuestId=BG.GuestId AND BG.IsActive=1
   LEFT OUTER JOIN WRBHBBookingProperty BP ON R.BookingId=BP.BookingId AND BG.RoomType=BP.RoomType AND BP.IsActive=1
-  WHERE R.PropertyType='External' AND R.TariffPaymentMode='Bill to Company (BTC)' AND BG.Occupancy='Triple'
+  WHERE R.PropertyType='External' AND R.TariffPaymentMode='Bill to Company (BTC)' AND BG.Occupancy='Triple' AND ISNULL(BP.ExpWithTax,0)=0
+  AND R.RoomCaptured=BG.RoomCaptured
+  ORDER BY BookingCode,RoomCaptured;
+  
+  INSERT INTO #Final(BookingCode,BookingId,MasterClientName,ClientName,ClientId,
+  CRMName,PropertyName,PropertyType,PropertyId,CityName,CityId,GuestName,
+  GuestId,ChkInDt,ChkOutDt,Tariff,Markup,StayDays,TotTarif,TariffPaymentMode,
+  RoomCaptured,CurrentStatus,BookerName,BookedDt,Column1,Column2,Column3,
+  Column4,Column5,Column6,Column7,Column8,Column9,Column10,BookingLevel,Occupancy)
+   
+  SELECT DISTINCT BookingCode AS BookingCode,R.BookingId,
+  MasterClientName AS MasterClientName,ClientName AS ClientName,ClientId,
+  CRMName AS CRMName,R.PropertyName AS PropertyName,
+  R.PropertyType,R.PropertyId,CityName AS City,CityId,
+  ISNULL(GuestName,'') AS GuestName,R.GuestId,
+  R.ChkInDt AS CheckInDt,R.ChkOutDt AS CheckOutDt,R.Tariff,(BP.TripleandMarkup1-Bp.TripleTariff) AS Markup,
+  StayDays AS StayDays,TotTarif AS TotalTariff,
+  R.TariffPaymentMode AS TariffPaymentMode,R.RoomCaptured,R.CurrentStatus AS Status,
+  BookerName AS UserName,CONVERT(VARCHAR(100),BookedDt,103) AS BookingDate,
+  R.Column1,R.Column2,R.Column3,R.Column4,R.Column5,R.Column6,R.Column7,R.Column8,R.Column9,R.Column10,
+  BookingLevel AS BookingLevel,BG.Occupancy  FROM #Result R
+  LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG ON R.BookingId=BG.BookingId AND R.GuestId=BG.GuestId AND BG.IsActive=1
+  LEFT OUTER JOIN WRBHBBookingProperty BP ON R.BookingId=BP.BookingId AND BG.RoomType=BP.RoomType AND BP.IsActive=1
+  WHERE R.PropertyType='External' AND R.TariffPaymentMode='Bill to Company (BTC)' AND BG.Occupancy='Triple' AND ISNULL(BP.ExpWithTax,0)=1
   AND R.RoomCaptured=BG.RoomCaptured
   ORDER BY BookingCode,RoomCaptured;
   
@@ -984,11 +1066,32 @@ IF @Action = 'BookingDtls'
   R.Column1,R.Column2,R.Column3,R.Column4,R.Column5,R.Column6,R.Column7,R.Column8,R.Column9,R.Column10,
   BookingLevel AS BookingLevel,BG.Occupancy  FROM #Result R
   JOIN WRBHBBookingPropertyAssingedGuest BG ON R.BookingId=BG.BookingId AND R.GuestId=BG.GuestId AND BG.IsActive=1
-  JOIN WRBHBContractClientPref_Header CH ON R.ClientId=CH.ClientId AND CH.IsActive=1
-  JOIN WRBHBContractClientPref_Details CP ON CH.Id=CP.HeaderId AND CP.IsActive=1
-  AND BG.RoomType=CP.RoomType
-  WHERE R.PropertyType='C P P' 
+  JOIN WRBHBBookingProperty BP ON R.BookingId=BP.BookingId AND BG.RoomType=BP.RoomType AND BP.IsActive=1
+  WHERE R.PropertyType='C P P' AND ISNULL(BP.ExpWithTax,0)=0
   ORDER BY BookingCode,RoomCaptured;
+  
+  INSERT INTO #Final(BookingCode,BookingId,MasterClientName,ClientName,ClientId,
+  CRMName,PropertyName,PropertyType,PropertyId,CityName,CityId,GuestName,
+  GuestId,ChkInDt,ChkOutDt,Tariff,Markup,StayDays,TotTarif,TariffPaymentMode,
+  RoomCaptured,CurrentStatus,BookerName,BookedDt,Column1,Column2,Column3,
+  Column4,Column5,Column6,Column7,Column8,Column9,Column10,BookingLevel,Occupancy)
+  
+  SELECT DISTINCT BookingCode AS BookingCode,R.BookingId,
+  MasterClientName AS MasterClientName,R.ClientName AS ClientName,R.ClientId,
+  CRMName AS CRMName,R.PropertyName AS PropertyName,
+  R.PropertyType,R.PropertyId,CityName AS City,CityId,
+  ISNULL(GuestName,'') AS GuestName,R.GuestId,
+  R.ChkInDt AS CheckInDt,R.ChkOutDt AS CheckOutDt,R.Tariff,0 AS Markup,
+  StayDays AS StayDays,TotTarif AS TotalTariff,
+  R.TariffPaymentMode AS TariffPaymentMode,R.RoomCaptured,R.CurrentStatus AS Status,
+  BookerName AS UserName,CONVERT(VARCHAR(100),BookedDt,103) AS BookingDate,
+  R.Column1,R.Column2,R.Column3,R.Column4,R.Column5,R.Column6,R.Column7,R.Column8,R.Column9,R.Column10,
+  BookingLevel AS BookingLevel,BG.Occupancy  FROM #Result R
+  JOIN WRBHBBookingPropertyAssingedGuest BG ON R.BookingId=BG.BookingId AND R.GuestId=BG.GuestId AND BG.IsActive=1
+  JOIN WRBHBBookingProperty BP ON R.BookingId=BP.BookingId AND BG.RoomType=BP.RoomType AND BP.IsActive=1
+  WHERE R.PropertyType='C P P' AND ISNULL(BP.ExpWithTax,0)=1
+  ORDER BY BookingCode,RoomCaptured;
+  
   
   
   
@@ -1003,8 +1106,7 @@ IF @Action = 'BookingDtls'
   CRMName AS CRMName,R.PropertyName AS PropertyName,
   R.PropertyType,R.PropertyId,CityName AS City,CityId,
   ISNULL(GuestName,'') AS GuestName,R.GuestId,
-  R.ChkInDt AS CheckInDt,R.ChkOutDt AS CheckOutDt,R.Tariff+R.Tariff*BG.LTonAgreed/100+R.Tariff*BG.STonAgreed/100
-  +R.Tariff*BG.STonAgreed/100,(BP.SingleandMarkup1-BP.SingleTariff) AS Markup,
+  R.ChkInDt AS CheckInDt,R.ChkOutDt AS CheckOutDt,R.Tariff,(BP.SingleandMarkup1-BP.SingleTariff) AS Markup,
   StayDays AS StayDays,TotTarif AS TotalTariff,
   R.TariffPaymentMode AS TariffPaymentMode,R.RoomCaptured,R.CurrentStatus AS Status,
   BookerName AS UserName,CONVERT(VARCHAR(100),BookedDt,103) AS BookingDate,
@@ -1015,7 +1117,9 @@ IF @Action = 'BookingDtls'
   LEFT OUTER JOIN WRBHBStaticHotels ST ON Bp.PropertyId=ST.Id AND ST.IsActive=1
   WHERE R.PropertyType='M M T' AND BG.Occupancy='Single'
   ORDER BY BookingCode,RoomCaptured;
+ 
   
+   
   INSERT INTO #Final(BookingCode,BookingId,MasterClientName,ClientName,ClientId,
   CRMName,PropertyName,PropertyType,PropertyId,CityName,CityId,GuestName,
   GuestId,ChkInDt,ChkOutDt,Tariff,Markup,StayDays,TotTarif,TariffPaymentMode,
@@ -1027,8 +1131,7 @@ IF @Action = 'BookingDtls'
   CRMName AS CRMName,R.PropertyName AS PropertyName,
   R.PropertyType,R.PropertyId,CityName AS City,CityId,
   ISNULL(GuestName,'') AS GuestName,R.GuestId,
-  R.ChkInDt AS CheckInDt,R.ChkOutDt AS CheckOutDt,R.Tariff+R.Tariff*BG.LTonAgreed/100+R.Tariff*BG.STonAgreed/100
-  +R.Tariff*BG.STonAgreed/100 AS Tariff,
+  R.ChkInDt AS CheckInDt,R.ChkOutDt AS CheckOutDt,R.Tariff,
   (BP.DoubleandMarkup1-Bp.DoubleTariff) AS Markup,
   StayDays AS StayDays,TotTarif AS TotalTariff,
   R.TariffPaymentMode AS TariffPaymentMode,R.RoomCaptured,R.CurrentStatus AS Status,
@@ -1052,8 +1155,7 @@ IF @Action = 'BookingDtls'
   CRMName AS CRMName,R.PropertyName AS PropertyName,
   R.PropertyType,R.PropertyId,CityName AS City,CityId,
   ISNULL(GuestName,'') AS GuestName,R.GuestId,
-  R.ChkInDt AS CheckInDt,R.ChkOutDt AS CheckOutDt,R.Tariff+R.Tariff*BG.LTonAgreed/100+R.Tariff*BG.STonAgreed/100
-  +R.Tariff*BG.STonAgreed/100 AS Tariff,(BP.TripleandMarkup1-BP.TripleTariff) AS Markup,
+  R.ChkInDt AS CheckInDt,R.ChkOutDt AS CheckOutDt,R.Tariff,(BP.TripleandMarkup1-BP.TripleTariff) AS Markup,
   StayDays AS StayDays,TotTarif AS TotalTariff,
   R.TariffPaymentMode AS TariffPaymentMode,R.RoomCaptured,R.CurrentStatus AS Status,
   BookerName AS UserName,CONVERT(VARCHAR(100),BookedDt,103) AS BookingDate,
@@ -1263,8 +1365,8 @@ IF @Action = 'BookingDtls'
   CRMName AS CRMName,R.PropertyName AS PropertyName,
   R.PropertyType AS PropertyCategory,R.PropertyId,CityName AS City,CityId,
   ISNULL(GuestName,'') AS GuestName,R.GuestId,
-  CONVERT(NVARCHAR,R.ChkInDt,103) AS CheckInDt,CONVERT(NVARCHAR,R.ChkOutDt,103) AS CheckOutDt,R.Tariff,
-  ISNULL(Markup,0) AS MarkUp,StayDays AS StayDays,R.Tariff*R.StayDays AS TotalTariff,
+  CONVERT(NVARCHAR,R.ChkInDt,103) AS CheckInDt,CONVERT(NVARCHAR,R.ChkOutDt,103) AS CheckOutDt,ROUND(R.Tariff,0) AS Tariff,
+  ISNULL(Markup,0) AS MarkUp,StayDays AS StayDays,ROUND(R.Tariff,0)*R.StayDays AS TotalTariff,
   R.TariffPaymentMode AS TariffPaymentMode,R.RoomCaptured,R.CurrentStatus AS Status,
   BookerName AS UserName,CONVERT(VARCHAR(100),BookedDt,103) AS BookingDate,
   R.Column1,R.Column2,R.Column3,R.Column4,R.Column5,R.Column6,R.Column7,R.Column8,R.Column9,R.Column10,

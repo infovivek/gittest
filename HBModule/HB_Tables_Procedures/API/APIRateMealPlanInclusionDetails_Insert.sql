@@ -33,7 +33,7 @@ BEGIN
  RatePlanCode = @RatePlanCode)
   BEGIN
    UPDATE WRBHBAPIRateMealPlanInclusionDtls SET RatePlanType = @RatePlanType,
-   MealPlanCode = @MealPlanCode,MealPlan = @MealPlan,
+   MealPlanCode = @MealPlanCode,MealPlan = @MealPlan,Dt = GETDATE(),
    InclusionCode = @InclusionCode WHERE HotelId = @HotelId AND 
    HeaderId = @HeaderId AND RatePlanCode = @RatePlanCode;
    SELECT Id FROM WRBHBAPIRateMealPlanInclusionDtls
@@ -43,10 +43,10 @@ BEGIN
  ELSE
   BEGIN
    INSERT INTO WRBHBAPIRateMealPlanInclusionDtls(HeaderId,HotelId,
-   RatePlanType,RatePlanCode,MealPlanCode,MealPlan,InclusionCode)
+   RatePlanType,RatePlanCode,MealPlanCode,MealPlan,InclusionCode,Dt)
    VALUES(@HeaderId,@HotelId,dbo.TRIM(@RatePlanType),
    dbo.TRIM(@RatePlanCode),dbo.TRIM(@MealPlanCode),dbo.TRIM(@MealPlan),
-   dbo.TRIM(@InclusionCode));
+   dbo.TRIM(@InclusionCode),GETDATE());
    SELECT Id FROM WRBHBAPIRateMealPlanInclusionDtls WHERE Id=@@IDENTITY;
   END
 END

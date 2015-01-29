@@ -69,7 +69,7 @@
 					}
 					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
 					{
-						hlp_Location.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+						hlp_Location.dataProvider=Ds_Objects.result.Tables.Table2.Rows as ArrayCollection;
 						
 					}
 					else
@@ -134,7 +134,7 @@
 			{
 				if(hlp_Location.selected())
 				{
-					hlp_Location.text=hlp_Location.Select_Row.CityName
+					hlp_Location.text=hlp_Location.Select_Row.ClientName
 					LocationId=hlp_Location.Select_Row.Id
 					//dt_From.setFocus();
 				}
@@ -255,7 +255,7 @@
 							xlsFile = new ExcelFile();
 							sheet = new Sheet();
 							
-							sheet.resize(arrExportResult.length+2,28);
+							sheet.resize(arrExportResult.length+2,27);
 							
 							if(Rd_Bill.selected==true)
 							{
@@ -276,7 +276,7 @@
 							sheet.setCell(1,7,'Guest Name');
 							sheet.setCell(1,8,'Total Amount');							
 							sheet.setCell(1,9,'Total Tariff');
-							sheet.setCell(1,10,'Discount Amount');
+							sheet.setCell(1,10,'VAT');
 							sheet.setCell(1,11,'BroadBand');
 							sheet.setCell(1,12,'Food Beverages');
 							sheet.setCell(1,13,'Laundry');
@@ -293,7 +293,7 @@
 							sheet.setCell(1,24,'Location');
 							sheet.setCell(1,25,'Bill Start Date');
 							sheet.setCell(1,26,'Bill End Date');
-							sheet.setCell(1,27,'VAT');							
+														
 							for(var i:int=0;i<arrExportResult.length;i++)
 							{
 								sheet.setCell(i+2, 0, arrExportResult[i].CreatedDate);
@@ -306,7 +306,7 @@
 								sheet.setCell(i+2, 7, arrExportResult[i].GuestName);
 								sheet.setCell(i+2, 8, arrExportResult[i].TotalAmount);
 								sheet.setCell(i+2, 9, arrExportResult[i].TariffAmount);
-								sheet.setCell(i+2, 10, arrExportResult[i].DiscountAmount);
+								sheet.setCell(i+2, 10, arrExportResult[i].VAT);
 								sheet.setCell(i+2, 11, arrExportResult[i].Broadband);
 								sheet.setCell(i+2, 12, arrExportResult[i].FOODANDBeverages);
 								sheet.setCell(i+2, 13, arrExportResult[i].Laundry);
@@ -323,7 +323,7 @@
 								sheet.setCell(i+2, 24, arrExportResult[i].Location);
 								sheet.setCell(i+2, 25, arrExportResult[i].BillStartDate);
 								sheet.setCell(i+2, 26, arrExportResult[i].BillEndDate);
-								sheet.setCell(i+2, 27, arrExportResult[i].VAT);								
+																
 								
 							}						
 							
@@ -335,29 +335,15 @@
 							FileName = "";
 							if(Rd_Bill.selected==true)
 							{
-								if(Drp_Category.selectedIndex!=0)
-								{		
-									FileName="Bills"+Drp_Category.selectedItem+".xlsx";
+									FileName="Bills"+Drp_Category.selectedItem+".xls";
 									fr.save(bytes,FileName);
-								}
-								else
-								{
-									FileName="Bills.xls";
-									fr.save(bytes,FileName);
-								}
+								
 							}
 							else
 							{
-								if(Drp_Category.selectedIndex!=0)
-								{		
-									FileName="UnSettledBills"+Drp_Category.selectedItem+".xlsx";
+									FileName="UnSettledBills"+Drp_Category.selectedItem+".xls";
 									fr.save(bytes,FileName);
-								}
-								else
-								{
-									FileName="UnSettledBills.xls";
-									fr.save(bytes,FileName);
-								}
+								
 							}
 								
 								
@@ -560,8 +546,8 @@
 				<mx:Label x="277" y="47" width="13" height="21" id="Lbl_TdStar" color="red" fontSize="18" text="*" fontWeight="bold"/>
 				<WrbHelpComp:HelpText x="464" y="55.5" depth="9" pxTabIndex="4"  width="303" id="hlp_Property" onselection="{fnGetProperty()}" pxSetColumnsWidth="300,150,150">
 				</WrbHelpComp:HelpText>
-				<mx:Label x="395" y="15" text="Location" id="lbl_PricingModel0" />
-				<WrbHelpComp:HelpText x="464" y="15.5" width="303" depth="10" pxTabIndex="3" id="hlp_Location" pxSetColumnsWidth="300,0" onselection="{fnGetLocation()}">
+				<mx:Label x="395" y="15" text="Client Wise" id="lbl_PricingModel0" />
+				<WrbHelpComp:HelpText x="464" y="15.5" width="303" depth="100" pxTabIndex="3" id="hlp_Location" pxSetColumnsWidth="300,0" onselection="{fnGetLocation()}">
 				</WrbHelpComp:HelpText>
 				<mx:DateField x="130" y="54" id="DT_From" change="Change('DT_From')" formatString="DD/MM/YYYY"/>
 				<mx:Label x="229" y="55" text="To Date" id="lbl_TD"/>
@@ -597,7 +583,7 @@
 							<mx:DataGridColumn dataField="GuestName" headerText="Guest Name" textAlign="left" editable="false" width="130"/>					
 							<mx:DataGridColumn dataField="TotalAmount" headerText="Total Amount" textAlign="right"  editable="false" width="100"/>
 							<mx:DataGridColumn dataField="TariffAmount" headerText="Total Tariff" textAlign="right"  editable="false" width="100"/>
-							<mx:DataGridColumn dataField="DiscountAmount" headerText="Discount Amount" textAlign="right"  editable="false" width="100"/>
+							<mx:DataGridColumn dataField="DiscountAmount" headerText="Discount Amount" textAlign="right" visible="false"  editable="false" width="100"/>
 							<mx:DataGridColumn dataField="Broadband" headerText="BroadBand" textAlign="right"  editable="false" width="100"/>
 							<mx:DataGridColumn dataField="FOODANDBeverages" headerText="Food Beverages" textAlign="right"  editable="false" width="100"/>
 							<mx:DataGridColumn dataField="Laundry" headerText="Laundry" textAlign="right"  editable="false" width="100"/>
@@ -610,12 +596,13 @@
 							
 							<mx:DataGridColumn dataField="Cess" headerText="Cess" textAlign="right"  editable="false" width="100"/>
 							<mx:DataGridColumn dataField="Hcess" headerText="Hcess" textAlign="right"  editable="false" width="100"/>
+							<mx:DataGridColumn dataField="VAT" headerText="VAT Amount" textAlign="right"  editable="false" width="100"/>
 							<mx:DataGridColumn dataField="CheckInDate" headerText="Check-In Date" textAlign="right"  editable="false" width="80"/>
 							<mx:DataGridColumn dataField="CheckOutDate" headerText="Check-Out Date" textAlign="right"  editable="false" width="80"/>
 							<mx:DataGridColumn dataField="Location" headerText="Location" textAlign="left"  editable="false" width="100"/>
 							<mx:DataGridColumn dataField="BillStartDate" headerText="Bill Start Date" textAlign="right"  editable="false" width="80"/>
 							<mx:DataGridColumn dataField="BillEndDate" headerText="Bill End Date" textAlign="right"  editable="false" width="80"/>
-							<mx:DataGridColumn dataField="VAT" headerText="VAT Amount" textAlign="right"  editable="false" width="100"/>							
+														
 						</mx:columns>
 					</mx:DataGrid>
 				</s:VGroup>

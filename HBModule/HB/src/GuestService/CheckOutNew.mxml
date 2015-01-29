@@ -6127,7 +6127,7 @@
 				</s:HGroup>
 <!-- Service -->
 				<s:BorderContainer x="259" y="45" width="645" height="474" id="bdr_Service" backgroundColor="#fbf9f9" borderVisible="false" 
-								   visible="false" depth="200">
+								   visible="true" depth="200">
 					<s:BorderContainer x="4" y="0" width="641" height="393" backgroundColor="#fbf9f9">
 						<s:Scroller x="-10" y="0" width="100%" height="100%" depth="1">
 							<s:Group x="134" y="352" width="100%" height="100%" depth="100">

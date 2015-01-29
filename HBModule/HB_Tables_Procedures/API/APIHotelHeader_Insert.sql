@@ -25,15 +25,15 @@ BEGIN
  IF EXISTS (SELECT NULL FROM WRBHBAPIHotelHeader WHERE HotelId = @HotelId AND
  HeaderId = @HeaderId)
   BEGIN
-   UPDATE WRBHBAPIHotelHeader SET StarRating = @StarRating
+   UPDATE WRBHBAPIHotelHeader SET StarRating = @StarRating,Dt = GETDATE()
    WHERE HotelId = @HotelId AND HeaderId = @HeaderId;
    SELECT Id FROM WRBHBAPIHotelHeader
    WHERE HotelId = @HotelId AND HeaderId = @HeaderId
   END
  ELSE
   BEGIN
-   INSERT INTO WRBHBAPIHotelHeader(HeaderId,HotelId,StarRating,HotelCount)
-   VALUES(@HeaderId,@HotelId,@StarRating,@HotelCount);
+   INSERT INTO WRBHBAPIHotelHeader(HeaderId,HotelId,StarRating,HotelCount,Dt)
+   VALUES(@HeaderId,@HotelId,@StarRating,@HotelCount,GETDATE());
    SELECT Id FROM WRBHBAPIHotelHeader WHERE Id=@@IDENTITY;
   END
 END

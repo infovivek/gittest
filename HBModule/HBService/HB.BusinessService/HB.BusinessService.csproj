@@ -84,6 +84,8 @@
     <Compile Include="BusinessService\ContractNonDedicatedService.cs" />
     <Compile Include="BusinessService\ContractProductMasterService.cs" />
     <Compile Include="BusinessService\CreateLogFilesService.cs" />
+    <Compile Include="BusinessService\CreditNoteService.cs" />
+    <Compile Include="BusinessService\CreditNoteTariffService.cs" />
     <Compile Include="BusinessService\DepositeService.cs" />
     <Compile Include="BusinessService\ExpenseMasterService.cs" />
     <Compile Include="BusinessService\ExportUnsettledService.cs" />

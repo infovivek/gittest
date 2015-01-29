@@ -573,8 +573,8 @@ IF @Action = 'RoomBookingConfirmed'
   WITH(NOLOCK)ON BG.BookingPropertyTableId=BP.Id 
   WHERE BG.BookingId=@Id 
   GROUP BY B.ClientBookerEmail,BP.PropertyType,B.ExtraCCEmail;
-  -- Dataset Table 9 Email Address Begin
-  CREATE TABLE #Mail(Id INT,Email NVARCHAR(100));
+  /*-- Dataset Table 9 Email Address Begin
+  CREATE TABLE #Mail(Id INT,Email VARCHAR(max));
   -- Guest Email
   INSERT INTO #Mail(Id,Email)
   SELECT 0,ISNULL(G.EmailId,'') FROM WRBHBBooking B
@@ -602,10 +602,11 @@ IF @Action = 'RoomBookingConfirmed'
     LEFT OUTER JOIN WRBHBContractClientPref_Details D
     WITH(NOLOCK)ON D.HeaderId=H.Id
     WHERE H.IsActive=1 AND H.IsDeleted=0 AND D.IsActive=1 AND
-    D.IsDeleted=0 AND 
+    D.IsDeleted=0 AND ISNULL(D.Email,'') != '' AND
     H.ClientId = (SELECT ClientId FROM WRBHBBooking WHERE Id=@Id) AND
     D.PropertyId IN (SELECT BookingPropertyId 
-    FROM WRBHBBookingPropertyAssingedGuest WHERE BookingId=@Id); 
+    FROM WRBHBBookingPropertyAssingedGuest WHERE BookingId=@Id)
+    GROUP BY D.Email; 
    END
   ELSE
    BEGIN
@@ -614,9 +615,77 @@ IF @Action = 'RoomBookingConfirmed'
     WHERE Id=@BookingPropertyId AND ISNULL(Email,'') != '');
     INSERT INTO #Mail(Id,Email)
     SELECT * FROM dbo.Split(@PropertyEmail, ',');
-   END  
+   END
+  --select * from #Mail;return;  
   -- Final Select
-  SELECT Email FROM #Mail WHERE Email != '' GROUP BY Email;
+  /*SELECT Email FROM #Mail 
+  WHERE Email != '' AND Email > ''
+  GROUP BY Email;*/
+  --
+  ;with tmp(Id,DataItem, Email) as (
+select Id,LEFT(Email, CHARINDEX(',',Email+',')-1),
+    STUFF(Email, 1, CHARINDEX(',',Email+','), '')
+from #mail
+union all
+select Id,LEFT(Email, CHARINDEX(',',Email+',')-1),
+    STUFF(Email, 1, CHARINDEX(',',Email+','), '')
+from tmp
+where Email > ''
+)
+select Id,DataItem
+from tmp
+  -- Dataset Table 9 Email Address End*/
+  -- Dataset Table 9 Email Address Begin
+  CREATE TABLE #Mail(Email VARCHAR(MAX));
+  -- Guest Email
+  INSERT INTO #Mail(Email)
+  SELECT ISNULL(G.EmailId,'') FROM WRBHBBooking B
+  LEFT OUTER JOIN WRBHBBookingGuestDetails G WITH(NOLOCK)ON
+  G.BookingId=B.Id
+  WHERE B.EmailtoGuest=1 AND B.Id=@Id AND ISNULL(G.EmailId,'') != '';
+  -- Booker Email
+  INSERT INTO #Mail(Email)
+  SELECT ISNULL(ClientBookerEmail,'') FROM WRBHBBooking 
+  WHERE Id=@Id AND ISNULL(ClientBookerEmail,'') != '';
+  -- Extra CC Email
+  INSERT INTO #Mail(Email)
+  SELECT ISNULL(Email,'') FROM dbo.WRBHBClientManagementAddNewClient 
+  WHERE IsActive=1 AND IsDeleted=0 AND ContactType='Extra C C' AND
+  CltmgntId=(SELECT ClientId FROM WRBHBBooking B WHERE B.Id=@Id);    
+  --
+  IF EXISTS(SELECT NULL FROM WRBHBBookingProperty BP
+  LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
+  BP.BookingId=BG.BookingId AND BP.Id=BG.BookingPropertyTableId AND
+  BP.PropertyId=BG.BookingPropertyId
+  WHERE BG.BookingId=@Id AND BP.PropertyType IN ('CPP'))
+   BEGIN
+    INSERT INTO #Mail(Email)
+    SELECT ISNULL(D.Email,'') FROM WRBHBContractClientPref_Header H
+    LEFT OUTER JOIN WRBHBContractClientPref_Details D
+    WITH(NOLOCK)ON D.HeaderId=H.Id
+    WHERE H.IsActive=1 AND H.IsDeleted=0 AND D.IsActive=1 AND
+    D.IsDeleted=0 AND ISNULL(D.Email,'') != '' AND
+    H.ClientId = (SELECT ClientId FROM WRBHBBooking WHERE Id=@Id) AND
+    D.PropertyId IN (SELECT BookingPropertyId 
+    FROM WRBHBBookingPropertyAssingedGuest WHERE BookingId=@Id)
+    GROUP BY D.Email; 
+   END
+  ELSE
+   BEGIN
+    INSERT INTO #Mail(Email)
+    SELECT ISNULL(Email,'') FROM WRBHBProperty 
+    WHERE Id=@BookingPropertyId AND ISNULL(Email,'') != '';
+   END
+  ;WITH tmp(DataItem,Email) AS 
+  (
+    SELECT LEFT(Email, CHARINDEX(',',Email+',')-1),
+    STUFF(Email, 1, CHARINDEX(',',Email+','), '') FROM #Mail
+    UNION ALL
+    SELECT LEFT(Email, CHARINDEX(',',Email+',')-1),
+    STUFF(Email, 1, CHARINDEX(',',Email+','), '') FROM tmp
+    WHERE Email > ''
+   )
+   SELECT dbo.TRIM(DataItem) AS Email FROM tmp WHERE DataItem != '' GROUP BY DataItem;
   -- Dataset Table 9 Email Address End
   -- Dataset Table 10 Begin
   SELECT MasterClientId FROM WRBHBClientSMTP
@@ -749,7 +818,7 @@ IF @Action = 'BedBookingConfirmed'
   WHERE Id IN (SELECT TOP 1 BookingPropertyTableId 
   FROM WRBHBBedBookingPropertyAssingedGuest WHERE BookingId = @Id);
   -- Dataset Table 5
-  SELECT EmailId,@BedBookingPropertyType FROM WRBHBBookingGuestDetails 
+  SELECT dbo.TRIM(EmailId),@BedBookingPropertyType FROM WRBHBBookingGuestDetails 
   WHERE BookingId=@Id;
   -- Dataset Table 6
   IF EXISTS (SELECT NULL FROM WRBHBClientwisePricingModel 
@@ -768,7 +837,7 @@ IF @Action = 'BedBookingConfirmed'
     WHERE IsActive=1 AND IsDeleted=0;
    END
   -- Dataset table 7
-  SELECT Email FROM dbo.WRBHBClientManagementAddNewClient 
+  SELECT dbo.TRIM(Email) FROM dbo.WRBHBClientManagementAddNewClient 
   WHERE IsActive=1 AND IsDeleted=0 AND ContactType='Extra C C' AND
   CltmgntId=(SELECT ClientId FROM WRBHBBooking B WHERE B.Id=@Id);
   -- Dataset Table 8
@@ -801,7 +870,7 @@ IF @Action = 'BedBookingConfirmed'
   INSERT INTO #BedMail(Id,Email)
   SELECT * FROM dbo.Split(@PropertyEmail, ',');
   -- Final Select
-  SELECT Email FROM #BedMail WHERE Email != '';
+  SELECT dbo.TRIM(Email) FROM #BedMail WHERE Email != '';
   -- Dataset Table 9 Email Address End
   -- Dataset Table 10 Begin
   SELECT MasterClientId FROM WRBHBClientSMTP
@@ -905,7 +974,7 @@ IF @Action = 'ApartmentBookingConfirmed'
   @SecurityPolicy,@CancelationPolicy,@Stay,@Uniglobe FROM WRBHBBooking 
   WHERE Id=@Id;
   -- Dataset Table 5
-  SELECT EmailId FROM WRBHBBookingGuestDetails WHERE BookingId=@Id;
+  SELECT dbo.TRIM(EmailId) FROM WRBHBBookingGuestDetails WHERE BookingId=@Id;
   -- Dataset Table 6
   IF EXISTS (SELECT NULL FROM WRBHBClientwisePricingModel 
   WHERE IsActive=1 AND IsDeleted=0 AND 
@@ -923,7 +992,7 @@ IF @Action = 'ApartmentBookingConfirmed'
     WHERE IsActive=1 AND IsDeleted=0;
    END
   -- Dataset table 7
-  SELECT Email FROM dbo.WRBHBClientManagementAddNewClient 
+  SELECT dbo.TRIM(Email) FROM dbo.WRBHBClientManagementAddNewClient 
   WHERE IsActive=1 AND IsDeleted=0 AND ContactType='Extra C C' AND
   CltmgntId=(SELECT ClientId FROM WRBHBBooking B WHERE B.Id=@Id);
   -- Dataset Table 8
@@ -957,7 +1026,7 @@ IF @Action = 'ApartmentBookingConfirmed'
   INSERT INTO #AMail(Id,Email)
   SELECT * FROM dbo.Split(@PropertyEmail, ',');
   -- Final Select
-  SELECT Email FROM #AMail WHERE Email != '';
+  SELECT dbo.TRIM(Email) FROM #AMail WHERE Email != '';
   -- Dataset Table 9 Email Address End
   -- Dataset Table 10 Begin
   SELECT MasterClientId FROM WRBHBClientSMTP
@@ -1072,7 +1141,7 @@ IF @Action = 'MMTBookingConfirmed'
   /*SELECT EmailId,'Including Tax' FROM WRBHBBookingGuestDetails 
   WHERE BookingId=@Id GROUP BY EmailId;*/
   --SELECT EmailId,'Taxes as applicable',@Stay,@Uniglobe 
-  SELECT EmailId,'Including Tax',@Stay,@Uniglobe
+  SELECT dbo.TRIM(EmailId),'Including Tax',@Stay,@Uniglobe
   FROM WRBHBBookingGuestDetails 
   WHERE BookingId=@Id GROUP BY EmailId;
   -- Dataset Table 4

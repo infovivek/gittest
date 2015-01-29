@@ -79,20 +79,20 @@
 				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
 				GlobalXml += "</ROOT>";
 				// Rdlc Print
-//				Str_ChkOut="http://localhost:6236/ExternalCheckOutTariff.aspx?";
-//				Str_Serv="http://localhost:6236/GuestCheckOutService1.aspx?";
-//				Str_Settle="http://localhost:6236/GuestCheckOutConsolidate1.aspx?";
-//				Str_ChkOutEXT ="http://localhost:6236/ExternalCheckoutTACMail.aspx?";
+				Str_ChkOut="http://localhost:6236/ExternalCheckOutTariff.aspx?";
+				Str_Serv="http://localhost:6236/GuestCheckOutService1.aspx?";
+				Str_Settle="http://localhost:6236/GuestCheckOutConsolidate1.aspx?";
+				Str_ChkOutEXT ="http://localhost:6236/ExternalCheckoutTACMail.aspx?";
 //				
 //				Str_ExIntTar="http://localhost:4171/ExternalIntermediateCheckOutTariff.aspx?";
 //				Str_ExIntServ="http://localhost:4171/ExternalIntermediateCheckoutService.aspx?";
 //				Str_ExIntSettle="http://localhost:4171/ExternalIntermediateCheckoutConsolidate.aspx?";
 //				Str_ExIntTAC ="http://localhost:4171/ExternalIntermediateTAC.aspx?";
 				
-				Str_ChkOut="http://sstage.in/HBReport/ExternalCheckOutTariff.aspx?";
-				Str_Serv="http://sstage.in/HBReport/GuestCheckOutService1.aspx?";
-				Str_Settle="http://sstage.in/HBReport/GuestCheckOutConsolidate1.aspx?";
-				Str_ChkOutEXT ="http://sstage.in/HBReport/ExternalCheckoutTACMail.aspx?";
+//				Str_ChkOut="http://sstage.in/HBReport/ExternalCheckOutTariff.aspx?";
+//				Str_Serv="http://sstage.in/HBReport/GuestCheckOutService1.aspx?";
+//				Str_Settle="http://sstage.in/HBReport/GuestCheckOutConsolidate1.aspx?";
+//				Str_ChkOutEXT ="http://sstage.in/HBReport/ExternalCheckoutTACMail.aspx?";
 				
 				Str_ExIntTar="http://sstage.in/HBReport/ExternalIntermediateCheckOutTariff.aspx?";
 				Str_ExIntServ="http://sstage.in/HBReport/ExternalIntermediateCheckoutService.aspx?";
@@ -121,8 +121,8 @@
 			
 			protected function Help():void
 			{				
-				useWeb("ExterIntermediateChkoutService","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId]);
-		//		useWeb("ExterIntermediateChkoutService","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65]);
+		//		useWeb("ExterIntermediateChkoutService","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId]);
+				useWeb("ExterIntermediateChkoutService","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65]);
 				//			useWeb("GuestCheckOut","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,0]);
 				Txt_ServiceBillAmt.editable=false;
 				Txt_ServiceVat.editable=false;
@@ -6872,7 +6872,7 @@
 					Txt_CheckInType.text==hlp_GuestName.Select_Row.Type;
 					//	PropertyId=hlp_GuestName.Select_Row.PropertyId;
 					
-			//		useWeb("ExterIntermediateChkoutService","GuestDetail_CUSTOM",[GlobalXml,"GuestDetails","","","",CheckInHdrId,0,0,0]);
+			//		useWeb("ExterIntermediateChkoutService","GuestDetail_CUSTOM",[GlobalXml,"GuestDetails","","","",CheckInHdrId,0,0,65]);
 					useWeb("ExterIntermediateChkoutService","GuestDetail_CUSTOM",[GlobalXml,"GuestDetails","","","",CheckInHdrId,0,0,Global_AC[0].UsrId]);
 //					useWeb("ExternalCheckOut","Guest_CUSTOM",[GlobalXml,"CHKINROOMDETAILS","",CheckInHdrId,StateId,0,0]);
 //					useWeb("CheckOutServiceHdr","TariffLoad_CUSTOM",[GlobalXml,"ProductLoad","",GuestId,StateId,0,0]);
@@ -8202,7 +8202,14 @@
 								ErrStr=ErrStr+"*   Card Number is Required.\n";					
 							}
 							
-							
+							if(Txt_PaymentSoc.text=="")
+							{
+								if(Flag==true)
+								{
+									Txt_PaymentSoc.setFocus();Flag=false;
+								}
+								ErrStr=ErrStr+"*   SOC Batch Close No is Required.\n";					
+							}
 							
 							if(Txt_PaymentAmountSwip.text=="")
 							{
@@ -8212,6 +8219,8 @@
 								}
 								ErrStr=ErrStr+"*   Amount Swiped for Name is Required.\n";					
 							}
+							
+							
 							if(ErrStr!="")
 							{
 								alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
@@ -8557,7 +8566,14 @@
 								ErrStr=ErrStr+"*   Card Number is Required.\n";					
 							}
 							
-							
+							if(Txt_PaymentSoc.text=="")
+							{
+								if(Flag==true)
+								{
+									Txt_PaymentSoc.setFocus();Flag=false;
+								}
+								ErrStr=ErrStr+"*   SOC Batch Close No is Required.\n";					
+							}
 							
 							if(Txt_PaymentAmountSwip.text=="")
 							{
@@ -8912,7 +8928,14 @@
 								ErrStr=ErrStr+"*   Card Number is Required.\n";					
 							}
 							
-							
+							if(Txt_PaymentSoc.text=="")
+							{
+								if(Flag==true)
+								{
+									Txt_PaymentSoc.setFocus();Flag=false;
+								}
+								ErrStr=ErrStr+"*   SOC Batch Close No is Required.\n";					
+							}
 							
 							if(Txt_PaymentAmountSwip.text=="")
 							{
@@ -9265,14 +9288,14 @@
 							}
 							
 							
-							//					if(Txt_ServicePaymentRoc.text=="")
-							//					{
-							//						if(Flag==true)
-							//						{
-							//							Txt_ServicePaymentRoc.setFocus();Flag=false;
-							//						}
-							//						ErrStr=ErrStr+"*   ROC is Required.\n";					
-							//					}
+							if(Txt_ServicePaymentSoc.text=="")
+							{
+								if(Flag==true)
+								{
+									Txt_ServicePaymentSoc.setFocus();Flag=false;
+								}
+								ErrStr=ErrStr+"*   SOC Batch Close No is Required.\n";					
+							}
 							
 							if(Txt_ServicePaymentAmountSwip.text=="")
 							{
@@ -9606,14 +9629,14 @@
 							}
 							
 							
-							//					if(Txt_ServicePaymentRoc.text=="")
-							//					{
-							//						if(Flag==true)
-							//						{
-							//							Txt_ServicePaymentRoc.setFocus();Flag=false;
-							//						}
-							//						ErrStr=ErrStr+"*   ROC is Required.\n";					
-							//					}
+							if(Txt_ServicePaymentSoc.text=="")
+							{
+								if(Flag==true)
+								{
+									Txt_ServicePaymentSoc.setFocus();Flag=false;
+								}
+								ErrStr=ErrStr+"*   SOC Batch Close No is Required.\n";					
+							}
 							
 							if(Txt_ServicePaymentAmountSwip.text=="")
 							{
@@ -9948,14 +9971,14 @@
 							}
 							
 							
-							//					if(Txt_ServicePaymentRoc.text=="")
-							//					{
-							//						if(Flag==true)
-							//						{
-							//							Txt_ServicePaymentRoc.setFocus();Flag=false;
-							//						}
-							//						ErrStr=ErrStr+"*   ROC is Required.\n";					
-							//					}
+							if(Txt_ServicePaymentSoc.text=="")
+							{
+								if(Flag==true)
+								{
+									Txt_ServicePaymentSoc.setFocus();Flag=false;
+								}
+								ErrStr=ErrStr+"*   SOC Batch Close No is Required.\n";					
+							}
 							
 							if(Txt_ServicePaymentAmountSwip.text=="")
 							{
@@ -10288,6 +10311,14 @@
 								ErrStr=ErrStr+"*   Card Number is Required.\n";					
 							}
 							
+							if(Txt_ConPaymentSoc.text=="")
+							{
+								if(Flag==true)
+								{
+									Txt_ConPaymentSoc.setFocus();Flag=false;
+								}
+								ErrStr=ErrStr+"*   SOC Batch Close No is Required.\n";					
+							}
 							
 							if(Txt_ConPaymentAmountSwip.text=="")
 							{
@@ -10297,6 +10328,8 @@
 								}
 								ErrStr=ErrStr+"*   Amount Swiped is Required.\n";					
 							}
+							
+							
 							if(ErrStr!="")
 							{
 								alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
@@ -10612,6 +10645,14 @@
 								ErrStr=ErrStr+"*   Card Number is Required.\n";					
 							}
 							
+							if(Txt_ConPaymentSoc.text=="")
+							{
+								if(Flag==true)
+								{
+									Txt_ConPaymentSoc.setFocus();Flag=false;
+								}
+								ErrStr=ErrStr+"*   SOC Batch Close No is Required.\n";					
+							}
 							
 							if(Txt_ConPaymentAmountSwip.text=="")
 							{
@@ -10937,6 +10978,14 @@
 								ErrStr=ErrStr+"*   Card Number is Required.\n";					
 							}
 							
+							if(Txt_ConPaymentSoc.text=="")
+							{
+								if(Flag==true)
+								{
+									Txt_ConPaymentSoc.setFocus();Flag=false;
+								}
+								ErrStr=ErrStr+"*   SOC Batch Close No is Required.\n";					
+							}
 							
 							if(Txt_ConPaymentAmountSwip.text=="")
 							{
@@ -12612,7 +12661,7 @@
 				
 				FnClear1();
 				FnServiceClr();
-				bdr_Tariff.enabled=false;
+//				bdr_Tariff.enabled=false;
 			}
 			
 			protected function Intermediate_clickHandler(event:MouseEvent):void
@@ -12675,7 +12724,7 @@
 				
 				FnClear1();
 				FnServiceClr();
-				bdr_Tariff.enabled=false;
+//				bdr_Tariff.enabled=false;
 			}
 			
 		]]>
@@ -12694,7 +12743,7 @@
 				<mx:Label x="5" y="199" text="Room No"/>
 				<s:TextInput x="96" y="199" width="160" id="Txt_bookinlevel" editable="false"/>
 				<mx:Label x="5" y="311" text="Client"/>
-				<s:TextInput x="89" y="311" width="160" id="Txt_Client" editable="false"/>
+				<s:TextInput x="96" y="311" width="160" id="Txt_Client" editable="false"/>
 				<mx:Label x="5" y="393" text="Property" visible="false"/>
 				<s:TextInput x="96" y="392" width="160" id="Txt_Property" editable="false" visible="false"/>
 				

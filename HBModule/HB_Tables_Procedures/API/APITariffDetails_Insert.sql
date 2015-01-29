@@ -32,7 +32,7 @@ BEGIN
  HotelId = @HotelId AND RoomRateHdrId = @RoomRateHdrId AND 
  RoomTariffroomNumber = @RoomTariffroomNumber AND Tariffgroup = @Tariffgroup)
   BEGIN
-   UPDATE WRBHBAPITariffDtls SET Tariffamount = @Tariffamount
+   UPDATE WRBHBAPITariffDtls SET Tariffamount = @Tariffamount,Dt = GETDATE()
    WHERE HeaderId = @HeaderId AND HotelId = @HotelId AND 
    RoomRateHdrId = @RoomRateHdrId AND 
    RoomTariffroomNumber = @RoomTariffroomNumber AND Tariffgroup = @Tariffgroup;
@@ -44,9 +44,9 @@ BEGIN
  ELSE
   BEGIN
    INSERT INTO WRBHBAPITariffDtls(HeaderId,HotelId,RoomRateHdrId,
-   Tarifftype,Tariffgroup,Tariffamount,RoomTariffroomNumber)
+   Tarifftype,Tariffgroup,Tariffamount,RoomTariffroomNumber,Dt)
    VALUES(@HeaderId,@HotelId,@RoomRateHdrId,dbo.TRIM(@Tarifftype),
-   dbo.TRIM(@Tariffgroup),@Tariffamount,dbo.TRIM(@RoomTariffroomNumber));
+   dbo.TRIM(@Tariffgroup),@Tariffamount,dbo.TRIM(@RoomTariffroomNumber),GETDATE());
    SELECT Id FROM WRBHBAPITariffDtls WHERE Id=@@IDENTITY;
   END
 END

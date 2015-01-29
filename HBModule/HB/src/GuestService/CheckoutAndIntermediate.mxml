@@ -86,9 +86,9 @@
 				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
 				GlobalXml += "</ROOT>";
 				// Rdlc Print
-//				Str_ChkOut="http://localhost:6236/GuestCheckOutTariff.aspx?";
-//				Str_Serv="http://localhost:6236/GuestCheckOutService.aspx?";
-//				Str_Settle="http://localhost:6236/GuestCheckOutConsolidate.aspx?";
+				Str_ChkOut="http://localhost:6236/GuestCheckOutTariff.aspx?";
+				Str_Serv="http://localhost:6236/GuestCheckOutService.aspx?";
+				Str_Settle="http://localhost:6236/GuestCheckOutConsolidate.aspx?";
 //				
 //				Str_InChkTar="http://localhost:6236/IntermediateCheckoutTariff.aspx?";
 //				Str_InChkSer="http://localhost:6236/IntermediateCheckoutService.aspx?";
@@ -104,9 +104,9 @@
 //				Str_InChkSett="http://warsoft.in/HBReport/IntermediateCheckoutConsolidate.aspx?";
 				
 				
-				Str_ChkOut="http://sstage.in/HBReport/GuestCheckOutTariff.aspx?";
-				Str_Serv="http://sstage.in/HBReport/GuestCheckOutService.aspx?";
-				Str_Settle="http://sstage.in/HBReport/GuestCheckOutConsolidate.aspx?";
+//				Str_ChkOut="http://sstage.in/HBReport/GuestCheckOutTariff.aspx?";
+//				Str_Serv="http://sstage.in/HBReport/GuestCheckOutService.aspx?";
+//				Str_Settle="http://sstage.in/HBReport/GuestCheckOutConsolidate.aspx?";
 				
 				Str_InChkTar="http://sstage.in/HBReport/IntermediateCheckoutTariff.aspx?";
 				Str_InChkSer="http://sstage.in/HBReport/IntermediateCheckoutService.aspx?";
@@ -152,8 +152,8 @@
 			protected function Help():void
 			{				
 				
-				useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId,0]);
-		//	 	useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65,0]);
+		//		useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId,0]);
+			 	useWeb("CheckoutAndIntermediate","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65,0]);
 				Txt_ServiceBillAmt.editable=false;
 				Txt_ServiceVat.editable=false;
 				Txt_SerivceTax.editable=false;
@@ -5010,6 +5010,15 @@
 							}
 							ErrStr=ErrStr+"*   Amount Swiped is Required.\n";					
 						}
+						
+						if(Txt_PaymentSoc.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_PaymentSoc.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*   SOC Batch Close No is Required.\n";					
+						}
 						if(ErrStr!="")
 						{
 							alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
@@ -5387,6 +5396,16 @@
 							}
 							ErrStr=ErrStr+"*   Amount Swiped is Required.\n";					
 						}
+						
+						if(Txt_PaymentSoc.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_PaymentSoc.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*   SOC Batch Close No is Required.\n";					
+						}
+						
 						if(ErrStr!="")
 						{
 							alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
@@ -5752,14 +5771,14 @@
 						}
 						
 						
-						//					if(Txt_ServicePaymentRoc.text=="")
-						//					{
-						//						if(Flag==true)
-						//						{
-						//							Txt_ServicePaymentRoc.setFocus();Flag=false;
-						//						}
-						//						ErrStr=ErrStr+"*   ROC is Required.\n";					
-						//					}
+						if(Txt_ServicePaymentSoc.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_ServicePaymentSoc.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*   SOC Batch Close No is Required.\n";					
+						}
 						
 						if(Txt_ServicePaymentAmountSwip.text=="")
 						{
@@ -6092,14 +6111,14 @@
 						}
 						
 						
-						//					if(Txt_ServicePaymentRoc.text=="")
-						//					{
-						//						if(Flag==true)
-						//						{
-						//							Txt_ServicePaymentRoc.setFocus();Flag=false;
-						//						}
-						//						ErrStr=ErrStr+"*   ROC is Required.\n";					
-						//					}
+						if(Txt_ServicePaymentRoc.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_ServicePaymentRoc.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*   ROC is Required.\n";					
+						}
 						
 						if(Txt_ServicePaymentAmountSwip.text=="")
 						{
@@ -6441,6 +6460,15 @@
 							}
 							ErrStr=ErrStr+"*   Amount Swiped is Required.\n";					
 						}
+						
+						if(Txt_ConPaymentSoc.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_ConPaymentSoc.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*   SOC Batch Close No is Required.\n";					
+						}
 						if(ErrStr!="")
 						{
 							alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
@@ -6776,6 +6804,15 @@
 								Txt_ConPaymentAmountSwip.setFocus();Flag=false;
 							}
 							ErrStr=ErrStr+"*   Amount Swiped is Required.\n";					
+						}
+						
+						if(Txt_ConPaymentSoc.text=="")
+						{
+							if(Flag==true)
+							{
+								Txt_ConPaymentSoc.setFocus();Flag=false;
+							}
+							ErrStr=ErrStr+"*   SOC Batch Close No is Required.\n";					
 						}
 						if(ErrStr!="")
 						{
@@ -7364,6 +7401,7 @@
 				Txt_PaymentAmountSwip.text="";
 				if(Direct.selected==true)
 				{
+					CheckOutHdrId=0;
 					Cash.selected="";
 					CreditCard.selected="";
 					CompanyInvoice.selected="";
@@ -7383,6 +7421,7 @@
 				}
 				else
 				{
+					CheckOutHdrId=0;
 					Cash.selected="";
 					CreditCard.selected="";
 					CompanyInvoice.selected="";
@@ -7415,6 +7454,7 @@
 			protected function ServicePayClr():void
 			{
 				// TODO Auto-generated method stub
+				CheckOutHdrId=0;
 				Txt_ServiPayCash.text="";
 				ddl_ServiPayCashRecBy.selectedItem="";
 				Txt_ServicePaymentCardDtl.text="";
@@ -7497,6 +7537,7 @@
 			protected function ConsolidatePayClr():void
 			{
 				// TODO Auto-generated method stub
+				CheckOutHdrId=0;
 				Txt_ConsoPayCash.text="";
 				DT_ConPayCashDate.text="";
 				ddl_ConsoPayCashRecBy.selectedItem="";
@@ -7546,6 +7587,7 @@
 				
 				if(Direct.selected==true)
 				{
+					CheckOutHdrId=0;
 					Cash2.selected="";
 					CreditCard2.selected="";
 					CompanyInvoice2.selected="";
@@ -7566,6 +7608,7 @@
 				}
 				else
 				{
+					CheckOutHdrId=0;
 					Cash2.selected="";
 					CreditCard2.selected="";
 					CompanyInvoice2.selected="";
@@ -8081,10 +8124,11 @@
 						var BillFrom:String="";
 						var BillTo:String="";
 						var BillTo2:String="";
+						var BillTo3:String="";
 						BillFrom=DT_BillFromDate.text;
 						BillTo=DT_BillTo.text;
 						BillTo2=ExpChkoutDT;
-						
+						BillTo3=Txt_Billdate.text;
 						
 						var BillTo=DT_BillTo.text;	
 						//var TodayDate:String=TodayDate;
@@ -8103,13 +8147,16 @@
 						var D3:String=BillFrom.substr(0,2);
 						var M3:String=BillFrom.substr(3,2);
 						var Y3:String=BillFrom.substr(6,10);
-						var RangeMiddle:String=Y3+'/'+M3+'/'+D3;
+						var D4:String=BillTo3.substr(0,2);
+						var M4:String=BillTo3.substr(3,2);
+						var Y4:String=BillTo3.substr(6,10);
+						var RangeMiddle:String=Y4+'/'+M4+'/'+D4;
 						var RangeEnd:String=Y2+'/'+M2+'/'+D2;
 						var RangeStart:String=Y+'/'+M+'/'+D;
 						//					var BillTo1 = 
 						//						{rangeStart:new Date(RangeStart),rangeEnd:new Date(RangeEnd)};
 						//					BillTo1=new Date(RangeEnd);
-						if(RangeStart  == RangeEnd)
+						if(RangeStart  == RangeMiddle)
 						{
 							alignAlert(Alert.show("Can't be Process Intermediate for Checkout Date","Alert Message !",
 								Alert.OK,null,null,iconWarning,Alert.OK),10,"");
@@ -8659,6 +8706,7 @@
 						<s:Label x="223" y="300" text="*" styleName="ReqLable" color="red"/>
 						<s:TextInput x="236" y="196" width="32" id="Txt_TarCardDateMonth" prompt="MM" restrict="0-9" textAlign="center" maxChars="2"/>
 						<s:TextInput x="271" y="196" width="41" id="Txt_TarCardDateYear" prompt="YYYY" restrict="0-9" textAlign="center" maxChars="4"/>
+						<s:Label x="223" y="270" text="*" styleName="ReqLable" color="red"/>
 					</s:BorderContainer>
 					<WrbComp:Button_HB x="322" y="409" width="120" Lable_val="Clear" click="TariffPayClr()">
 					</WrbComp:Button_HB>

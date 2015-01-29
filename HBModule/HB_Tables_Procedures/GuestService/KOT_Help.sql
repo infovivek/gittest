@@ -104,8 +104,9 @@ BEGIN
 		BreakfastVeg,BreakfastNonVeg,LunchVeg,LunchNonVeg,DinnerVeg,DinnerNonVeg,D.Id,D.CheckInId
 		FROM WRBHBKOTDtls D
 		JOIN WRBHBKOTHdr H ON D.KOTEntryHdrId=H.Id AND H.IsActive=1 AND H.IsDeleted=0
+		JOIN WRBHBBookingPropertyAssingedGuest P ON D.CheckInId = P.CheckInHdrId AND P.IsActive=1 AND P.IsDeleted=0
 		WHERE D.IsActive = 1 AND D.IsDeleted = 0 AND H.PropertyId = @PropertyId AND
-		CONVERT(NVARCHAR,H.Date,103)=@Str2;
+		CONVERT(NVARCHAR,H.Date,103)=@Str2 AND P.CurrentStatus='CheckIn' AND P.RoomShiftingFlag=0
 		--USER
 		SELECT KOTEntryHdrId,U.UserName,U.UserId,BreakfastVeg,BreakfastNonVeg,LunchVeg,
 		LunchNonVeg,DinnerVeg,DinnerNonVeg,U.Id

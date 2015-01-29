@@ -259,6 +259,15 @@ DECLARE @invoice1 NVARCHAR(100),@Length BIGINT;
 		
 		UPDATE WRBHBCheckInHdr SET NewCheckInDate = CONVERT(DATE,@BillEndDate,103) ,ArrivalTime = '12:00:00',TimeType = 'PM'
 		WHERE GuestId = @GuestId AND BookingId =@BookingId 
+		
+		
+		-- this table use to bill no wise		
+
+		INSERT INTO WRBHBCheckOutDtls(CheckOutId,GuestName,BillType,BillAmount,
+		CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId)
+		
+		VALUES(@InsId,@GuestName,'Tariff',@ChkOutTariffNetAmount,@CreatedBy,GETDATE(),@CreatedBy,
+		GETDATE(),1,0,NEWID())
  END
 		--INSERT INTO WRBHBChechkOutHdr(CheckOutNo,GuestName,Stay,Type,BookingLevel,
 		--BillDate,ClientName,Property,ChkOutTariffTotal,ChkOutTariffAdays,
@@ -348,24 +357,33 @@ BEGIN
 		@VATPer,@RestaurantSTPer,@BusinessSupportST,@ClientId,@CityId,
 		@ServiceChargeChk,@BillFromDate,@BillEndDate,@Intermediate,0,0,0,@Email,
 		@TariffPaymentMode,@BookingType)
-
+		
+	
 		SET @InsId=@@IDENTITY;
 		SELECT  Id,RowId FROM WRBHBChechkOutHdr WHERE Id=@InsId;
+		
+-- this table use to bill no wise		
 
-		 --UPDATE WRBHBBookingPropertyAssingedGuest SET CurrentStatus = 'CheckOut' ,
-		 --CheckOutHdrId = @InsId
-		 --WHERE BookingId=@BookingId and 
-		 --RoomCaptured=(SELECT TOP 1 RoomCaptured FROM WRBHBBookingPropertyAssingedGuest
-		 --WHERE BookingId=@BookingId and GuestId=@GuestId
-		 --ORDER BY Id ASC);
-		 
-		 --UPDATE WRBHBBedBookingPropertyAssingedGuest SET CurrentStatus = 'CheckOut' 
-		 --WHERE BookingId=@BookingId and  BedId =@BedId AND -- GuestId=@GuestId and
-		 --IsActive= 1 and IsDeleted = 0;
-		 
-		 --UPDATE WRBHBApartmentBookingPropertyAssingedGuest SET CurrentStatus = 'CheckOut' 
-		 --WHERE BookingId=@BookingId and  ApartmentId =@ApartmentId AND --GuestId=@GuestId and
-		 --IsActive= 1 and IsDeleted = 0;
+		INSERT INTO WRBHBCheckOutDtls(CheckOutId,GuestName,BillType,BillAmount,
+		CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId)
+		
+		VALUES(@InsId,@GuestName,'Tariff',@ChkOutTariffNetAmount,@CreatedBy,GETDATE(),@CreatedBy,
+		GETDATE(),1,0,NEWID())
+
+		UPDATE WRBHBBookingPropertyAssingedGuest SET CurrentStatus = 'CheckOut' ,
+		CheckOutHdrId = @InsId
+		WHERE BookingId=@BookingId and 
+		RoomCaptured=(SELECT TOP 1 RoomCaptured FROM WRBHBBookingPropertyAssingedGuest
+		WHERE BookingId=@BookingId and GuestId=@GuestId
+		ORDER BY Id ASC);
+
+		UPDATE WRBHBBedBookingPropertyAssingedGuest SET CurrentStatus = 'CheckOut' 
+		WHERE BookingId=@BookingId and  BedId =@BedId AND -- GuestId=@GuestId and
+		IsActive= 1 and IsDeleted = 0;
+
+		UPDATE WRBHBApartmentBookingPropertyAssingedGuest SET CurrentStatus = 'CheckOut' 
+		WHERE BookingId=@BookingId and  ApartmentId =@ApartmentId AND --GuestId=@GuestId and
+		IsActive= 1 and IsDeleted = 0;
 END
  
 

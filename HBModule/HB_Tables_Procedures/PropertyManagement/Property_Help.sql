@@ -117,7 +117,9 @@ BEGIN
 END
 IF @PAction='ROOMSANDBEDSDELETE'
 BEGIN
-			UPDATE WRBHBPropertyRooms SET ModifiedBy=@UserId,ModifiedDate=GETDATE(),IsDeleted=1,IsActive=0 WHERE Id=@PropertyId
+			UPDATE WRBHBPropertyRooms SET ModifiedBy=@UserId,ModifiedDate=GETDATE(),IsDeleted=1,IsActive=0 WHERE Id=@PropertyId;
+			
+			UPDATE WRBHBPropertyRoomBeds SET ModifiedBy=@UserId,ModifiedDate=GETDATE(),IsDeleted=1,IsActive=0 WHERE Id=@PropertyId
 END
 IF @PAction ='Block'
 BEGIN

@@ -403,17 +403,17 @@
 					Lbl_InvoiceNo.setStyle("color","red");
 					ErrorFlag=false;
 				}
-				if(FilePath.text=="")
-				{
-					fader.target=LBL_FilePath;				
-					fader.play();
-					LBL_FilePath.setStyle("color","red");
-					ErrorFlag=false;
-				}
-				else
-				{
-					Change('LBL_FilePath')
-				}
+				//if(FilePath.text=="")
+//				{
+//					fader.target=LBL_FilePath;				
+//					fader.play();
+//					LBL_FilePath.setStyle("color","red");
+//					ErrorFlag=false;
+//				}
+//				else
+//				{
+//					Change('LBL_FilePath')
+//				}
 				
 				if(Number(txt_InvoiceAmount.text)>Number(txt_TotalPOAmount.text))
 				{
@@ -716,7 +716,7 @@
 				<mx:Label id="Lbl_Vendor3" x="96" y="27" width="13" text="*" color="red" fontSize="16"/>
 				<mx:Label id="Lbl_Vendor4" x="106" y="69" width="13" text="*" color="red" fontSize="16"/>
 				<mx:Label id="Lbl_Vendor5" x="122" y="114" width="13" text="*" color="red" fontSize="16"/>
-				<mx:Label id="Lbl_Vendor6" x="109" y="203" width="13" text="*" color="red" fontSize="16"/>
+				
 			</s:Group>
 		</s:HGroup>
 		<s:HGroup x="0" y="0" width="100%" height="30" horizontalAlign="right" verticalAlign="middle" depth="5" >

@@ -69,5 +69,7 @@ namespace HB.Entity
         public string NamePrefix { get; set; }
         public string Surname { get; set; }
         public string BookEmail { get; set; }
+        //
+        public string PenaltyDescription { get; set; }
     }
 }

@@ -56,7 +56,7 @@ BEGIN
    UPDATE WRBHBAPIRoomRateDtls SET 
    RoomRateavailableCount = @RoomRateavailableCount,
    RoomRateavailStatus = @RoomRateavailStatus,
-   PenaltyDescription = @TMP2
+   PenaltyDescription = @TMP2,Dt = GETDATE()
    WHERE HeaderId = @HeaderId AND HotelId = @HotelId AND 
    RoomRateratePlanCode = @RoomRateratePlanCode AND
    RoomRateroomTypeCode = @RoomRateroomTypeCode;
@@ -69,10 +69,10 @@ BEGIN
   BEGIN
    INSERT INTO WRBHBAPIRoomRateDtls(HotelId,HeaderId,
    RoomRateroomTypeCode,RoomRateratePlanCode,
-   RoomRateavailableCount,RoomRateavailStatus,PenaltyDescription)
+   RoomRateavailableCount,RoomRateavailStatus,PenaltyDescription,Dt)
    VALUES(@HotelId,@HeaderId,dbo.TRIM(@RoomRateroomTypeCode),
    dbo.TRIM(@RoomRateratePlanCode),dbo.TRIM(@RoomRateavailableCount),
-   dbo.TRIM(@RoomRateavailStatus),dbo.TRIM(@TMP2));
+   dbo.TRIM(@RoomRateavailStatus),dbo.TRIM(@TMP2),GETDATE());
    SELECT Id FROM WRBHBAPIRoomRateDtls WHERE Id=@@IDENTITY;
   END
 END

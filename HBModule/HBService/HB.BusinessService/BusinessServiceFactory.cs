@@ -374,6 +374,12 @@ namespace HB.BusinessService
                 case "CheckOutInterSettleHdr":
                     _businessService = new CheckOutandInterSettleService();
                     break;
+                case "CreditNoteTariff":
+                    _businessService = new CreditNoteTariffService();
+                    break;
+                case "CreditNoteService":
+                    _businessService = new CreditNoteService();
+                    break;
             }
             return _businessService;
         }

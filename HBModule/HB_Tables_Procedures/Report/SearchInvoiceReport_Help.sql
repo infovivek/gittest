@@ -335,6 +335,32 @@ IF @Action ='Pageload'
 		--join WRBHBCheckOutSettleDtl D on h.id=d.CheckOutSettleHdrId
 		
    END  
+   IF @Action ='CreditNote'
+   BEGIN 
+   DECLARE @Cnt INT;
+		BEGIN  
+		SET @Cnt=(SELECT COUNT(*) FROM WRBHBCreditNoteTariff)  
+		IF @Cnt=0 BEGIN SELECT 1 AS CrdInVoiceNo;  
+		END  
+		ELSE   
+		BEGIN  
+			SELECT TOP 1 CAST(CrdInVoiceNo AS INT)+1 AS CrdInVoiceNo FROM WRBHBCreditNoteTariff  
+			where IsActive = 1 and IsDeleted = 0
+			ORDER BY Id DESC;  
+		END 
+	SELECT InVoiceNo FROM WRBHBChechkOutHdr WHERE 
+	Id=@Id1 AND InVoiceNo=@FromDt
+	
+	 SELECT 'Tariff' AS Type,(ChkOutTariffTotal/NoOfDays) AS TariffAmount ,NoOfDays,0 AS Total
+	 FROM WRBHBChechkOutHdr WHERE Id=@Id1 AND InVoiceNo=@FromDt
+	
+	 SELECT ChkOutSerItem AS Item,ChkOutSerAmount AS ServiceAmount,0 AS Amount,0 AS Total
+	 FROM WRBHBCheckOutServiceDtls D 
+	 JOIN WRBHBCheckOutSettleHdr H WITH(NOLOCK)ON D.ServiceHdrId=H.Id AND H.IsActive=1 AND H.IsDeleted=0
+	 JOIN WRBHBChechkOutHdr C WITH(NOLOCK)ON H.ChkOutHdrId=C.Id AND C.IsActive=1 AND C.IsDeleted=0
+	 WHERE C.Id=@Id1 AND C.InVoiceNo=@FromDt
+   END
+   END
 END
 
 

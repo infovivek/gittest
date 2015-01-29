@@ -34,9 +34,12 @@ namespace HB.Dao
             ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
             Err = "";
             string Flag = "true";
-            string pattern = @"^[a-z][a-z|0-9|]*([_][a-z|0-9]+)*([.][a-z|" +
-               @"0-9]+([_][a-z|0-9]+)*)?@[a-z][a-z|0-9|]*\.([a-z]" +
-               @"[a-z|0-9]*(\.[a-z][a-z|0-9]*)?)$";
+            //string pattern = @"^[a-z][a-z|0-9|]*([_][a-z|0-9]+)*([.][a-z|" +
+            //   @"0-9]+([_][a-z|0-9]+)*)?@[a-z][a-z|0-9|]*\.([a-z]" +
+            //   @"[a-z|0-9]*(\.[a-z][a-z|0-9]*)?)$";
+
+            string pattern = "^([0-9a-zA-Z]([-\\.\\w]*[0-9a-zA-Z])*@([0-9a-zA-Z][-\\w]*[0-9a-zA-Z]\\.)+[a-zA-Z]{2,9})$";
+
             for (int j = 0; j < ds.Tables[9].Rows.Count; j++)
             {
                 if (ds.Tables[9].Rows[j][0].ToString() != "")

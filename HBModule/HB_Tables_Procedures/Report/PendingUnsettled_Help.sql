@@ -69,7 +69,7 @@ BEGIN
     	 JOIN WRBHBBookingPropertyAssingedGuest ABPA WITH(NOLOCK) ON H.Id= ABPA.BookingId and ABPA.CurrentStatus='CheckIn' 
     	 AND ABPA.IsActive = 1 AND ABPA.IsDeleted = 0	and C.id=Abpa.CheckInHdrId 	
          where   H.CancelStatus!='Canceled' and isnull(ABPA.CheckOutHdrId,0) =0 
-         and c.isactive=1 and c.isdeleted=0 and ABPA.RoomShiftingFlag=0 -- and ABPA.BookingId=4352
+         and c.isactive=1 and c.isdeleted=0 and ABPA.RoomShiftingFlag=0  --and ABPA.BookingId=7643
          group by C.Id, Property,PropertyId, GuestName,
 		 ABPA.ChkOutDt,c.CityId,H.ClientName,H.ClientId,C.BookingCode,
 		 c.Tariff,ABPA.ChkInDt,c.propertyType,H.Id,C.NewCheckInDate,C.NewCheckoutDate,ABPA.CurrentStatus 
@@ -132,7 +132,7 @@ BEGIN
 			order by C.id
 		
 		
-	 Delete #ExpChkout where  convert(date,CheckInDate,103)< convert(date,'04/08/2014',103);
+	 Delete #ExpChkout where  convert(date,CheckInDate,103)< convert(date,'04/07/2014',103);
 		
 		 --Select Distinct C.id,s.HotalName,S.HotalId,ag.FirstName,'',convert(nvarchar(100),Ag.ChkOutDt,103),
    --         S.City,C.CityId,C.ClientName,C.ClientId,c.bookingCode,0,
@@ -150,8 +150,27 @@ BEGIN
    --         S.City,C.CityId,C.ClientName,C.ClientId,c.bookingCode,
 			--SingleTariff,  Ag.ChkInDt,C1.NewCheckoutDate,C1.NewCheckoutDate 
 			--order by C.id
-			
+	If( @FromDt='') and (@ToDt='')
+	Begin		
 		insert into #FinalChkout(Guest,Property,ClientName,Tariff,BookingNo,ChkOutDate,FirstName,
+		Propertytype,CheckOutNo,CityName,CheckInDate,CheckOutDate,NoOfDays,Discount,ChkOutTariffNetAmount,PId,BookedId,
+		NewCheckInDate,NewCheckoutDate,LastBillDate,CheckInHdrId)
+           
+		Select GuestName,PropertyName,ClientName,Tariff ,BookingCode,ExpDate,GuestName,
+		PropertyType,'',c.CityName,CheckInDate,ExpDate,
+		 DateDiff(day,convert(date,CheckInDate,103),convert(date,ExpDate,103)) as nodays,0,
+		 DateDiff(day,convert(date,CheckInDate,103),convert(date,ExpDate,103))* Tariff ChkOutTariffNetAmount,
+		--DateDiff(day,convert(date,NewCheckInDate,103),convert(date,GETDATE(),103)) as nodays,0,
+		--DateDiff(day,convert(date,NewCheckInDate,103),convert(date,GETDATE(),103))* Tariff ChkOutTariffNetAmount,
+		PropertyId,p.BookedId ,NewCheckInDate,NewCheckoutDate,''LastBillDate,CheckInHdrId
+		from #ExpChkout P
+		join WRBHBCity C  WITH(NOLOCK) ON C.Id = P.CityId and C.IsActive = 1
+		 
+		End
+		Else
+		Begin 
+		 
+		 insert into #FinalChkout(Guest,Property,ClientName,Tariff,BookingNo,ChkOutDate,FirstName,
 		Propertytype,CheckOutNo,CityName,CheckInDate,CheckOutDate,NoOfDays,Discount,ChkOutTariffNetAmount,PId,BookedId,
 		NewCheckInDate,NewCheckoutDate,LastBillDate,CheckInHdrId)
            
@@ -167,11 +186,9 @@ BEGIN
 		where-- p.CheckInHdrId in(Select Top 1 ChkInHdrId from WRBHBChechkOutHdr where IsActive=1) 
 		   --Convert(date,ExpDate,103)>= CONVERT(date,'01/09/2014',103)
 		    Convert(date,CheckInDate,103)between CONVERT(date,@FromDt,103) and  CONVERT(DATE,@ToDt,103) 
-		    --and CONVERT(NVARCHAR,DATEADD(DAY,1,CONVERT(DATE,@ToDt,103)))
-		 
+		End    --and CONVERT(NVARCHAR,DATEADD(DAY,1,CONVERT(DATE,@ToDt,103)))
 		  
- --Select * from WRBHBChechkOutHdr where CHKINHDRiD=2105 IntermediateFlag=1 AND ISACTIVE=1 
- --order by Id desc
+
       UPDATE #FinalChkout SET Property = P.PropertyName 
 	   FROM #FinalChkout F 
 	   JOIN WRBHBProperty p WITH(NOLOCK) ON p.Id=F.PId AND P.IsActive=1 
@@ -185,16 +202,25 @@ BEGIN
 	  -- JOIN WRBHBChechkOutHdr p WITH(NOLOCK) ON p.ChkInHdrId=f.CheckInHdrId AND P.IsActive=1 
 	  -- AND IsDeleted=0  -- 09742264268
 		
+		--Select Guest,ChkOutDate,FirstName,CheckInDate,CheckOutdate,Noofdays,
+		--LastBillDate,NewCheckInDate,NewCheckOutDate 
+		--from #FinalChkout
+		--where BookingNo=5759
+		--order by LastBillDate
 		
-		
+	  UPDATE #FinalChkout SET CheckInDate = convert(nvarchar(100),p.ArrivalDate,103)
+      from #FinalChkout F 
+	   JOIN WRBHBCheckInHdr p WITH(NOLOCK) ON p.Id=f.CheckInHdrId AND P.IsActive=1 
+	   AND IsDeleted=0 
+	   
       UPDATE #FinalChkout SET LastBillDate =  p.BillEndDate
       from #FinalChkout F 
 	   JOIN WRBHBChechkOutHdr p WITH(NOLOCK) ON p.ChkInHdrId=f.CheckInHdrId AND P.IsActive=1 
-	   AND IsDeleted=0 and  convert(date, p.BillEndDate,103) > convert(date,'04/08/2014',103);
+	   AND IsDeleted=0 and  convert(date, p.BillEndDate,103) > convert(date,'04/07/2014',103);
 	   
 	   
 	   UPDATE #FinalChkout SET  LastBillDate  =  Convert(nvarchar(100),CheckInDate,103)
-	   where LastBillDate='' and  Convert(date,CheckOutDate,103)  >=Convert(date,@ToDt,103)
+	   where LastBillDate='' and  Convert(date,CheckOutDate,103)  >=Convert(date,GETDATE(),103)
 	-- Select * from #FinalChkout
 	--	 where propertyType='Internal Property'
 		--order by BookingNo
@@ -202,22 +228,21 @@ BEGIN
 		 --UPDATE #FinalChkout set NoOfDays= DateDiff(day,convert(date,LastBillDate,103),convert(date,@ToDt,103))
 		--  where LastBillDate!=''
 		  
-		   UPDATE #FinalChkout set NoOfDays= DateDiff(day,convert(date,LastBillDate,103),convert(date,@ToDt,103))
-		  where   Convert(date,CheckOutDate,103)  >Convert(date,@ToDt,103)
+		   UPDATE #FinalChkout set NoOfDays= DateDiff(day,convert(date,LastBillDate,103),convert(date,GETDATE(),103))
+		  where   Convert(date,CheckOutDate,103)  >Convert(date,GETDATE(),103)
 		  
-		update #FinalChkout  set NoOfDays=1 WHERE  NoOfDays=0;
+		update #FinalChkout  set NoOfDays=1 WHERE  NoOfDays<=0;
 		
 		 update #FinalChkout  set ChkOutTariffNetAmount=NoOfDays*Tariff;
-		 
-		  Delete #FinalChkout where
-		 -- Select * from #FinalChkout where
-		    Convert(date,@ToDt,103)<CONVERT(date,LastBillDate,103)-- and CONVERT(date,@ToDt,103)
-		  and LastBillDate!=''
-		-- Select * from #FinalChkout
-		-- where LastBillDate!=''
-		--order by BookingNo
-		--return; 
+
+		  --Update #FinalChkout set LastBillDate ='' where 
+		  --  Convert(date,CheckOutDate,103)=CONVERT(date,LastBillDate,103)-- and CONVERT(date,@ToDt,103)
+		  --and LastBillDate!='' 
+		  
 		 Delete #FinalChkout where   NoOfDays=0 or ClientName='';
+		 
+--   Select * from #FinalChkout   where Property like '%NAga%'
+ --return
 		if(@Str1='Internal Property')
 		BEGIN
 		insert into #FinalChk(PropertyName,ClientName,ChkOutTariffNetAmount,BookingCode,LastBillDate,FirstName,Propertytype,
@@ -238,12 +263,14 @@ BEGIN
 				select PropertyName,ClientName,ChkOutTariffNetAmount,BookingCode,LastBillDate,FirstName,Propertytype,
 				CheckOutNo,CityName,CheckInDate,CheckOutDate,NoOfDays,Discount,Tariff,Guest,Sno 
 				from  #FinalChk
+				Select Convert(Nvarchar(100),Getdate(),103) as TodayDate;
 			 end
 		    else
 		    Begin
 				select PropertyName,ClientName,ChkOutTariffNetAmount,BookingCode,LastBillDate,FirstName,Propertytype,
 				CheckOutNo,CityName,CheckInDate,CheckOutDate,NoOfDays,Discount,Tariff,Guest,Sno 
 				from  #FinalChk 
+				Select Convert(Nvarchar(100),Getdate(),103) as TodayDate;
 		--    where Convert(date,CheckInDate,103)between CONVERT(date,@FromDt,103) and CONVERT(date,@ToDt,103)
 		    End
 		End
@@ -271,12 +298,14 @@ BEGIN
 				select PropertyName ,ClientName,ChkOutTariffNetAmount,BookingCode,LastBillDate,FirstName,Propertytype,
 				CheckOutNo,CityName,CheckInDate,CheckOutDate,NoOfDays,Discount,Tariff,Guest,Sno 
 				from  #FinalChk
+				Select Convert(Nvarchar(100),Getdate(),103) as TodayDate;
 			 end
 		    else
 		    Begin
 				select PropertyName,ClientName,ChkOutTariffNetAmount,BookingCode,LastBillDate,FirstName,Propertytype,
 				CheckOutNo,CityName,CheckInDate,CheckOutDate,NoOfDays,Discount,Tariff,Guest,Sno 
 				from  #FinalChk 
+				Select Convert(Nvarchar(100),Getdate(),103) as TodayDate;
 			--	where Convert(date,CheckInDate,103)between CONVERT(date,@FromDt,103) and CONVERT(date,@ToDt,103)
 		    End
 		End
@@ -300,12 +329,14 @@ BEGIN
 				select PropertyName ,ClientName,ChkOutTariffNetAmount,BookingCode,LastBillDate,FirstName,Propertytype,
 				CheckOutNo,CityName,CheckInDate,CheckOutDate,NoOfDays,Discount,Tariff,Guest,Sno 
 				from  #FinalChk
+				Select Convert(Nvarchar(100),Getdate(),103)as TodayDate;
 		    end
 		    else
 		    Begin
 				select PropertyName,ClientName,ChkOutTariffNetAmount,BookingCode,LastBillDate,FirstName,Propertytype,
 				CheckOutNo,CityName,CheckInDate,CheckOutDate,NoOfDays,Discount,Tariff,Guest,Sno 
 				from  #FinalChk 
+				Select Convert(Nvarchar(100),Getdate(),103) as TodayDate;
 			--	where Convert(date,CheckInDate,103)between CONVERT(date,@FromDt,103) and CONVERT(date,@ToDt,103)
 		    End
 		    

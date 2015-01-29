@@ -708,7 +708,14 @@ IF @Action = 'AvaliableFromRoom'
     @PropertyId1=PropertyId FROM WRBHBBookingProperty
     WHERE Id IN (SELECT BookingPropertyTableId
     FROM WRBHBBookingPropertyAssingedGuest WHERE BookingId=@BookingId
-    GROUP BY BookingPropertyTableId);  
+    GROUP BY BookingPropertyTableId);
+    --
+    /*SELECT TOP 1 @ChkInDt = CAST(CAST(ChkInDt AS VARCHAR)+' '+
+    CAST(ExpectChkInTime+' '+AMPM AS VARCHAR) AS DATETIME) 
+    FROM WRBHBBookingPropertyAssingedGuest 
+    WHERE BookingId=@BookingId AND IsActive = 1 AND IsDeleted = 0 AND 
+    RoomId = @RoomId AND RoomCaptured = @Id1 AND 
+    ISNULL(RoomShiftingFlag,0) = 0;*/
    END
   IF @BookingLevel = 'Bed'
    BEGIN
@@ -718,6 +725,13 @@ IF @Action = 'AvaliableFromRoom'
     WHERE Id IN (SELECT BookingPropertyTableId
     FROM WRBHBBedBookingPropertyAssingedGuest WHERE BookingId=@BookingId
     GROUP BY BookingPropertyTableId);
+    --
+    /*SELECT TOP 1 @ChkInDt = CAST(CAST(ChkInDt AS VARCHAR)+' '+
+    CAST(ExpectChkInTime+' '+AMPM AS VARCHAR) AS DATETIME) 
+    FROM WRBHBBedBookingPropertyAssingedGuest 
+    WHERE BookingId=@BookingId AND IsActive = 1 AND IsDeleted = 0 AND 
+    BedId = @RoomId AND RoomCaptured = @Id1 AND 
+    ISNULL(RoomShiftingFlag,0) = 0;*/
    END
   IF @BookingLevel = 'Apartment'
    BEGIN
@@ -726,7 +740,14 @@ IF @Action = 'AvaliableFromRoom'
     @PropertyId1=PropertyId FROM WRBHBApartmentBookingProperty   
     WHERE Id IN (SELECT BookingPropertyTableId  
     FROM WRBHBApartmentBookingPropertyAssingedGuest WHERE BookingId=@BookingId  
-    GROUP BY BookingPropertyTableId);  
+    GROUP BY BookingPropertyTableId);
+    --
+    /*SELECT TOP 1 @ChkInDt = CAST(CAST(ChkInDt AS VARCHAR)+' '+
+    CAST(ExpectChkInTime+' '+AMPM AS VARCHAR) AS DATETIME) 
+    FROM WRBHBApartmentBookingPropertyAssingedGuest 
+    WHERE BookingId=@BookingId AND IsActive = 1 AND IsDeleted = 0 AND 
+    ApartmentId = @RoomId AND RoomCaptured = @Id1 AND 
+    ISNULL(RoomShiftingFlag,0) = 0;*/  
    END
   CREATE TABLE #AgedGst(Id BIGINT);
   CREATE TABLE #DedicatedRoom(RoomId BIGINT);

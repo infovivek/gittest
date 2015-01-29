@@ -88,7 +88,14 @@
 				{
 					Type="Checkout"; 
 				} 
-				 
+				else if(Modes.selectedValue==2)
+				{
+					Type="All"; 
+				} 
+				else if(Modes.selectedValue==3)
+				{
+					Type="Booking"; 
+				} 
 				else
 				{
 					alignAlert(Alert.show("Select Category","Alert Message !",
@@ -156,6 +163,7 @@
 				Grd_ListClient1.dataProvider= null;
 				Hlp_ClientName.dataProvider= null;
 				PageLoad(); 
+				Hlp_ClientName.text="";
 			}  
 			protected function CourierChange()
 			{
@@ -172,6 +180,15 @@
 				{
 					Type="Checkout";
 				}
+				if(Modes.selectedValue==2)
+				{
+					Type="All";
+				}
+				if(Modes.selectedValue==3)
+				{
+					Type="Booking";
+				}
+				
 				 
 			}
 			protected function ExportExcel(event:MouseEvent):void
@@ -184,7 +201,7 @@
 						xlsFile = new ExcelFile();
 						var sheet:Sheet = new Sheet();
 						
-						sheet.resize(arrExportResult.length+2,10);
+						sheet.resize(arrExportResult.length+2,15);
 						
 						//sheet.setCell(0,5,Type+" Report");
 						sheet.setCell(1,0,'S.NO');
@@ -198,7 +215,11 @@
 						sheet.setCell(1,8,'Mobile');
 						sheet.setCell(1,9,'Email Id');
 						
-						
+						sheet.setCell(1,10,'BookingLevel');
+						sheet.setCell(1,11,'Category'); 
+						sheet.setCell(1,12,'StayDays');
+						sheet.setCell(1,13,'BookedDate'); 
+						sheet.setCell(1,14,'Status');
 						
 						for(var i:int=0;i<arrExportResult.length;i++)
 						{
@@ -212,6 +233,12 @@
 							sheet.setCell(i+2, 7, arrExportResult[i].ChkoutDate);
 							sheet.setCell(i+2, 8, arrExportResult[i].MobileNo); 
 							sheet.setCell(i+2, 9, arrExportResult[i].EmailId); 
+							
+							sheet.setCell(i+2, 10, arrExportResult[i].BookingLevel);
+							sheet.setCell(i+2, 11, arrExportResult[i].Category);
+							sheet.setCell(i+2, 12, arrExportResult[i].StayDays); 
+							sheet.setCell(i+2, 13, arrExportResult[i].BookedDate); 
+							sheet.setCell(i+2, 14, arrExportResult[i].Statues);
 						}		 
 						Grd_ListClient1.dataProvider = arrExportResult;
 						xlsFile.sheets.addItem(sheet);      
@@ -225,6 +252,14 @@
 						if(Type=="Checkout")
 						{
 							fr.save(bytes,'CheckOut Details.xls');
+						}
+						if(Type=="All")
+						{
+							fr.save(bytes,'All Details.xls');
+						}
+						if(Type=="Booking")
+						{
+							fr.save(bytes,'Booking Details.xls');
 						}
 						
 					}
@@ -316,12 +351,17 @@
 				<mx:Label x="128" y="47" text="To Date" id="Lbl_TDT" />
 				<mx:Label   x="432" y="5" width="13" text="*" color="red" fontSize="16"/>
 				<mx:Label   x="380" y="14" text="Category"/>
-				<s:HGroup id="type" x="466" y="6" width="200" height="28" gap="17"
+				<s:HGroup id="type" x="466" y="6" width="289" height="28" gap="17"
 						  horizontalAlign="center" verticalAlign="middle">
+					<s:RadioButton label="Booking" groupName="Modes"  value="3"
+								   id="Booking" buttonMode="true"  />
 					<s:RadioButton label="Checkin" groupName="Modes" value="0"
 								   id="Checkin" buttonMode="true"  />
 					<s:RadioButton label="Checkout" groupName="Modes"  value="1"
 								   id="Checkout" buttonMode="true"  /> 
+					<s:RadioButton label="All" groupName="Modes"  value="2"
+								   id="All" buttonMode="true"  />
+					
 				</s:HGroup>
 			</s:Group>
 		</s:HGroup>
@@ -341,6 +381,11 @@
 					<mx:DataGridColumn dataField="ChkoutDate" width="91" headerText="CheckOut Date"  textAlign="center"/>
 					<mx:DataGridColumn dataField="MobileNo" width="130" textAlign="left" />
 					<mx:DataGridColumn dataField="EmailId" headerText="Email" width="120" />
+					<mx:DataGridColumn dataField="BookingLevel" headerText="BookingLevel" width="120" />
+					<mx:DataGridColumn dataField="Category" headerText="Category" width="120" />
+					<mx:DataGridColumn dataField="StayDays" headerText="StayDays" width="120" />
+					<mx:DataGridColumn dataField="BookedDate" headerText="BookedDate" width="120" />
+					<mx:DataGridColumn dataField="Statues" headerText="Status"   width="120"/>
 				</mx:columns>
 			</mx:DataGrid> 
 			

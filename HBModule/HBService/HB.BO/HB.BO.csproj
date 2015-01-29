@@ -89,6 +89,8 @@
     <Compile Include="CloneClientBO.cs" />
     <Compile Include="CompanyMasterBO.cs" />
     <Compile Include="ContractBillBO.cs" />
+    <Compile Include="CreditNoteServiceBO.cs" />
+    <Compile Include="CreditNoteTariffBO.cs" />
     <Compile Include="DepositBO.cs" />
     <Compile Include="ExpenseMasterBO.cs" />
     <Compile Include="ExportUnsettledBO.cs" />

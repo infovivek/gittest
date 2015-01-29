@@ -47,6 +47,10 @@ namespace HB.BusinessService.BusinessService
             {
                 ds = new APIStaticDataDAO().FnstaticData(user);
             }
+            if (data[1].ToString() == "GetAPIdataJson")
+            {
+                ds = new APIDynamicJson().FnDynamicData(data, user);
+            }
             return ds;
         }
     }

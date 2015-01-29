@@ -32,11 +32,11 @@ BEGIN
    FROM WRBHBPropertyRooms R
    LEFT OUTER JOIN WRBHBPropertyBlocks B WITH(NOLOCK)ON R.BlockId=B.Id
    LEFT OUTER JOIN WRBHBPropertyApartment A WITH(NOLOCK)ON R.ApartmentId=A.Id
-   WHERE R.Id=@Pram1;
+   WHERE R.Id=@Pram1  AND R.IsActive=1  AND B.IsActive=1; 
    
    SELECT B.BedRackTarrif,B.DiscountAllowed,B.DiscountModePer,
    B.DiscountModeRS,B.Id,B.BedNO BedName FROM WRBHBPropertyRoomBeds B
-   WHERE RoomId=@Pram1;
+   WHERE RoomId=@Pram1 AND IsActive=1;
       
   END	
  IF @Pram1 = 0

@@ -40,8 +40,9 @@
 			public var DateWiseOccupancyDD_AC:ArrayCollection=new ArrayCollection();
 			public var DateWiseNOGuest_AC:ArrayCollection=new ArrayCollection();
 			public var BookingId:String="";
-			public var Status:String="";
+			public var Status:String="",RangeEnd:String="";
 			public var GradeId:String="";
+			public var PropertyType:String="";
 			private function page_Load():void
 			{
 				Global_AC = funLoginInfo("<gScrId>1</gScrId><gUsrFk>1</gUsrFk>");				
@@ -156,6 +157,15 @@
 					else
 					{
 						Occupancy_AC=new ArrayCollection();
+					}
+					if (Ds_Objects.result.Tables.Table9.Rows.length > 0)
+					{
+						PropertyType=Ds_Objects.result.Tables.Table9.Rows[0].PropertyType
+							
+					}
+					else
+					{
+						PropertyType="";
 					}
 					
 					OccupancyChart();
@@ -596,14 +606,14 @@
 					{
 						for(var N:int=0;N<DateWiseOccupancyDD_AC.length;N++)
 						{
-							if(Date_AC[M].Date==DateWiseOccupancyNDD_AC[N].DT)
+							if(Date_AC[M].Date==DateWiseOccupancyDD_AC[N].DT)
 							{
-								Date_AC[M].DDCount=DateWiseOccupancyNDD_AC[N].DDCount
+								Date_AC[M].DDCount=DateWiseOccupancyDD_AC[N].DDCount
 								if(DateWiseOccupancyDD_AC.length!=1)
 								{
 									DateWiseOccupancyDD_AC.removeItemAt(N)
 								}								
-								M=DateWiseOccupancyDD_AC.length
+								N=DateWiseOccupancyDD_AC.length
 							}
 						}
 					}					
@@ -787,9 +797,15 @@
 					TopCntl.addElement(NewControl as OccupancyData)
 						
 					NoOfGuest+=Number(Date_AC[k].NOGuest);
-						
-					var TPer:String=Round2.format(((Number(RoomNigths1DD)+Number(RoomNigthsNDD))/(PropertyNDDCount+Number(PropertyDDCount)))*100);
-					
+					var TPer:String="";	
+					if(PropertyType=="Internal Property")
+					{
+						var TPer=Round2.format(((Number(RoomNigths1DD)+Number(RoomNigthsNDD))/(PropertyNDDCount+Number(PropertyDDCount)))*100);
+					}
+					else
+					{
+						var TPer=DDPer;
+					}
 					NewControl = new OccupancyData(); 
 					NewControl.id = "lbl" + i;
 					NewControl._LabelData= TPer;					
@@ -889,9 +905,9 @@
 				NewControl._BColor= "";	
 				NewControl.x =_x;
 				NewControl.y=_y+(32*10);	
-				TopCntl.addElement(NewControl as OccupancyData)
-					
-				var TotalPer:Number=Number(Round2.format(((OccupancyND+OccupancyDD)/(NoOfRoomNightsDD+NoOfRoomNights))*100));
+				TopCntl.addElement(NewControl as OccupancyData)				
+				
+				var TotalPer:Number=Number(Round2.format(((OccupancyND+OccupancyDD)/(NoOfRoomNightsDD+NoOfRoomNights))*100));			
 					
 				NewControl = new OccupancyData(); 
 				NewControl.id = "lbl" + i;
@@ -1044,19 +1060,29 @@
 			}
 			protected function dt_From_changeHandler(event:CalendarLayoutChangeEvent):void
 			{
+				
 				if(dt_From.selectedDate)
 				{
-					var asd:String = dt_From.text;										
-					var Y:String = asd.substr(6,10);
-					var M:String = asd.substr(3,2);
-					var D:String = asd.substr(0,2);
+					var Dt:String = dt_From.text;					
+					var Y:String = Dt.substr(6,10);
+					var M:String = Dt.substr(3,2);
+					var D:String = Dt.substr(0,2);
 					var RangeStart:String = Y+'/'+M+'/'+D;
-					dt_To.selectableRange = {rangeStart:new Date(RangeStart)};
-					dt_To.selectedDate = new Date(RangeStart);
-					
-					dt_To.selectableRange = {rangeStart:new Date(RangeStart)};
-					dt_To.selectedDate = new Date(RangeStart);
-					dt_To.setFocus();
+					var sda:String=dt_To.text;
+					var Y1:String = sda.substr(6,10);
+					var M1:String = sda.substr(3,2);
+					var D1:String = sda.substr(0,2);
+					//var D:String =String(Number(Dt.substr(0,2))+1);
+					var ToDt:String = Y1+'/'+M1+'/'+D1;
+					dt_To.selectableRange = {rangeStart:new Date(RangeStart),rangeEnd:new Date(RangeEnd)};
+					if(new Date(RangeStart) > new Date(ToDt))
+					{
+						dt_To.selectedDate = new Date(RangeStart);
+					}
+					else
+					{
+						dt_To.selectedDate = new Date(ToDt);
+					}
 				}
 			}
 			//Booking Modification

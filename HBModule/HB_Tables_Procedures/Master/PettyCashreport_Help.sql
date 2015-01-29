@@ -58,7 +58,9 @@ BEGIN
 		JOIN WRBHBPettyCashStatus U ON PC.Id=U.PettyCashStatusHdrId  AND PC.IsActive=1 AND PC.IsDeleted=0
 		JOIN WRBHBUser S ON U.UserId=S.Id AND S.IsActive=1 AND S.IsDeleted=0
 		JOIN WRBHBProperty P ON U.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
-		WHERE  U.IsActive=1 AND U.IsDeleted=0 AND MONTH(CONVERT (date,PC.CreatedDate,103))=MONTH(Convert(date,GETDATE(),103))
+		JOIN WRBHBPropertyUsers PU ON PU.PropertyId=P.Id AND PU.IsActive=1 AND PU.IsDeleted=0
+		WHERE  U.IsActive=1 AND U.IsDeleted=0 AND PU.UserId=@UserId
+		AND MONTH(CONVERT (date,PC.CreatedDate,103))=MONTH(Convert(date,GETDATE(),103))
 		group by S.FirstName,S.LastName,P.PropertyName,PC.CreatedDate,PC.PropertyId,PC.UserId
 		
 		INSERT INTO #Pageload(Submittedby,Property,SubmittedOn,Amount,FortNight,Month,PropertyId,UserId
@@ -73,7 +75,9 @@ BEGIN
 		JOIN WRBHBPettyCashStatus U ON PC.Id=U.PettyCashStatusHdrId  AND PC.IsActive=1 AND PC.IsDeleted=0
 		JOIN WRBHBUser S ON U.UserId=S.Id AND S.IsActive=1 AND S.IsDeleted=0
 		JOIN WRBHBProperty P ON U.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
-		WHERE  U.IsActive=1 AND U.IsDeleted=0 AND MONTH(CONVERT (date,PC.CreatedDate,103))=MONTH(Convert(date,GETDATE(),103))
+		JOIN WRBHBPropertyUsers PU ON PU.PropertyId=P.Id AND PU.IsActive=1 AND PU.IsDeleted=0
+		WHERE  U.IsActive=1 AND U.IsDeleted=0 AND PU.UserId=@UserId AND 
+		MONTH(CONVERT (date,PC.CreatedDate,103))=MONTH(Convert(date,GETDATE(),103))
 		group by S.FirstName,S.LastName,P.PropertyName,PC.CreatedDate,PC.PropertyId,PC.UserId
 		
 		CREATE TABLE #FinalPageLoad(Submittedby NVARCHAR(100),Property NVARCHAR(100),SubmittedOn NVARCHAR(100),
@@ -116,6 +120,7 @@ BEGIN
 		FROM WRBHBPropertyUsers  PU 
 		JOIN WRBHBProperty P ON PU.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
 		WHERE P.Category IN('Internal Property','Managed G H') AND PU.IsActive=1 AND PU.IsDeleted=0 
+		AND PU.UserId=@UserId
 	
 END
 IF @Action='UserLoad'
@@ -647,23 +652,30 @@ BEGIN
 		WHERE U.Id=@UserId AND P.Id=@Id AND P.IsActive=1 AND P.IsDeleted=0
 		
 		INSERT INTO #PettyCash1(SNo,Date,ExpenseHead,Description,ApprovedAmount,PaidAmount,Bill)
-		SELECT '' AS SNo,'' AS Date,'' AS ExpenseHead,'' AS Description,'' AS ApprovedAmount,'' AS PaidAmount,
-		'' AS Bill
+		SELECT DISTINCT '' AS SNo,'' AS Date,'RequestedOn' AS ExpenseHead,CONVERT(NVARCHAR(100),PC.CreatedDate,103) AS Description,
+		'' AS ApprovedAmount,'' AS PaidAmount,'' AS Bill FROM WRBHBPettyCashStatusHdr PC
+		JOIN WRBHBPettyCashStatus P ON PC.Id=P.PettyCashStatusHdrId AND P.IsActive=1 AND P.IsDeleted=0
+		WHERE PC.UserId =@UserId AND PC.PropertyId=@Id AND 
+		CONVERT(Date,PC.CreatedDate,103)=CONVERT(Date,@Str,103) AND PC.IsActive=1 AND PC.IsDeleted=0
 		
 		INSERT INTO #PettyCash1(SNo,Date,ExpenseHead,Description,ApprovedAmount,PaidAmount,Bill)
-		SELECT DISTINCT '' AS SNo,'FortNight' AS Date,'1st FortNight' AS ExpenseHead,'' AS Description,'Period' AS 
+		SELECT  '' AS SNo,'' AS Date,'' AS ExpenseHead,'' AS Description,
+		'' AS ApprovedAmount,'' AS PaidAmount,'' AS Bill 
+		
+		INSERT INTO #PettyCash1(SNo,Date,ExpenseHead,Description,ApprovedAmount,PaidAmount,Bill)
+		SELECT DISTINCT '' AS SNo,'' AS Date,'FortNight' AS ExpenseHead,'1st FortNight' AS Description,'Period' AS 
 		ApprovedAmount,(Description+' To '+ApprovedAmount) AS PaidAmount,'' AS Bill FROM
 		#PettyCash2
 		WHERE ExpenseHead='1st FortNight' AND (day(Convert(datetime,Date,103)-1) / 16) + 1=1  
 		
 		INSERT INTO #PettyCash1(SNo,Date,ExpenseHead,Description,ApprovedAmount,PaidAmount,Bill)
-		SELECT DISTINCT '' AS SNo,'FortNight' AS Date,'2nd FortNight' AS ExpenseHead,'' AS Description,'Period' AS 
+		SELECT DISTINCT '' AS SNo,'' AS Date,'FortNight' AS ExpenseHead,'2nd FortNight' AS Description,'Period' AS 
 		ApprovedAmount,(Description+' To '+ApprovedAmount) AS PaidAmount,'' AS Bill FROM
 		#PettyCash2
 		WHERE ExpenseHead='2nd FortNight' AND (day(Convert(datetime,Date,103)-1) / 15) + 1=2  
 		
 		INSERT INTO #PettyCash1(SNo,Date,ExpenseHead,Description,ApprovedAmount,PaidAmount,Bill)
-		SELECT DISTINCT '' AS SNo,'FortNight' AS Date,'2nd FortNight' AS ExpenseHead,'' AS Description,'Period' AS 
+		SELECT DISTINCT '' AS SNo,'' AS Date,'FortNight' AS ExpenseHead,'2nd FortNight' AS Description,'Period' AS 
 		ApprovedAmount,(Description+' To '+ApprovedAmount) AS PaidAmount,'' AS Bill FROM
 		#PettyCash2
 		WHERE ExpenseHead='2nd FortNight' AND (day(Convert(datetime,Date,103)-1) / 15) + 1=3  

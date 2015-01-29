@@ -250,27 +250,26 @@
 		]]>
 	</fx:Script>
 	<s:BorderContainer x="0" y="30" width="100%" height="84" borderVisible="false" backgroundColor="#f4efef" depth="10">
-		<s:HGroup x="0" y="0" width="100%" height="90" horizontalAlign="center" verticalAlign="middle">
-			<s:Group x="132" y="5" width="100%" height="80">
-				<mx:DateField id="DT_From" x="148" y="6" width="90" formatString="DD/MM/YYYY"  tabIndex="1"  
+		 	<s:Group x="-10" y="5" width="100%" height="80">
+				<mx:DateField id="DT_From" x="138" y="6" width="90" formatString="DD/MM/YYYY"  tabIndex="1"  
 							  yearNavigationEnabled="true" selectableRange="{{rangeEnd: new Date()}}"  />
-				<mx:DateField id="DT_To" x="148" y="46" width="90" formatString="DD/MM/YYYY"
+				<mx:DateField id="DT_To" x="138" y="46" width="90" formatString="DD/MM/YYYY"
 							  tabIndex="2" yearNavigationEnabled="true"      />
 				
-				<s:Image x="831" y="20" source="assets/a1.png" toolTip="Search" click="btn_Search_clickHandler()" tabIndex="5"/>
-				<s:Image x="900" y="20" click="Clear()" source="assets/dust_bin1.png" toolTip="Clear"/>
-				<WrbComp:Button_HB  x="1040" y="20" Lable_val="Export" id="btn_Excel"  click="ExportExcel(event)"> 
+				<s:Image x="751" y="20" source="assets/a1.png" toolTip="Search" click="btn_Search_clickHandler()" tabIndex="5"/>
+				<s:Image x="820" y="20" click="Clear()" source="assets/dust_bin1.png" toolTip="Clear"/>
+				<WrbComp:Button_HB  x="880" y="28" Lable_val="Export" id="btn_Excel"  click="ExportExcel(event)"> 
 				</WrbComp:Button_HB> 
 				<!--mx:Label id="Lbl_Vendor1" x="223" y="2" width="13" text="*" color="red" fontSize="16"/>
 				<mx:Label id="Lbl_Vendor0" x="222" y="42" width="13" text="*" color="red" fontSize="16"/-->
-				<mx:Label   x="342" y="2" width="13" text="*" color="red" fontSize="16"/>
-				<s:Label   x="293" y="14" text="Category"/>
-				<s:Label   x="53" y="14" text="From Date"/>
-				<s:Label   x="53" y="52" text="To Date"/>
-				<s:Label x="293" y="45" height="29" text="Filter by &#xd;Property"/>
-				<s:TextInput id="txtProperty" x="366" y="44" width="141" height="25"
+				<mx:Label   x="322" y="2" width="13" text="*" color="red" fontSize="16"/>
+				<s:Label   x="273" y="14" text="Category"/>
+				<s:Label   x="43" y="14" text="From Date"/>
+				<s:Label   x="43" y="52" text="To Date"/>
+				<s:Label x="273" y="45" height="29" text="Filter by &#xd;Property"/>
+				<s:TextInput id="txtProperty" x="346" y="44" width="141" height="25"
 							 change="filterss('PropertyName')" prompt="Property Name"/>
-				<s:HGroup x="367" y="6" width="260" horizontalAlign="center" verticalAlign="middle" gap="17"  id="type">
+				<s:HGroup x="347" y="6" width="260" horizontalAlign="center" verticalAlign="middle" gap="17"  id="type">
 					<s:RadioButton label="Internal" groupName="Modes" value="0"
 								   id="Internal" buttonMode="true"  />
 					<s:RadioButton label="External" groupName="Modes"  value="1"
@@ -278,11 +277,10 @@
 					<s:RadioButton label="Managed GH" groupName="Modes"  value="2"
 								   id="Managed" buttonMode="true"  />
 				</s:HGroup>
-				<s:Label x="534" y="44" height="29" text="Filter by &#xd;BookingCode"/>
-				<s:TextInput id="txtBookingCode" x="646" y="44" width="109" height="25"
+				<s:Label x="514" y="44" height="29" text="Filter by &#xd;BookingCode"/>
+				<s:TextInput id="txtBookingCode" x="626" y="44" width="109" height="25"
 							 change="filter('BookingCode')" prompt="BookingCode" restrict="0-9" maxChars="6"/>
-			</s:Group>
-		</s:HGroup>
+			</s:Group> 
 	</s:BorderContainer>
 	
 	<s:BorderContainer x="0" y="130" width="100%" height="354" id="bdr_Scroll" visible="true" borderVisible="false">

@@ -49,9 +49,12 @@ IF @Action = 'GetAPIData'
   /*SELECT TOP 1 Id,citycode FROM WRBHBAPIHeader
   WHERE IsActive=1 AND IsDeleted=0 AND CityId=@CityId AND
   ISNULL(citycode,'') != '' ORDER BY Id DESC;*/
+  --
+  --SELECT 0 AS Id,'' AS citycode;
+  --
   SELECT Id,citycode FROM WRBHBAPIHeader
   WHERE IsActive=1 AND IsDeleted=0 AND 
-  CityCode = (SELECT ISNULL(CityCode,'') FROM WRBHBCity WHERE Id = @CityId)
+  CityCode = (SELECT ISNULL(CityCode,'') FROM WRBHBCity WHERE Id = @CityId);
  END
 IF @Action = 'Tab1_Next'
  BEGIN
@@ -193,7 +196,9 @@ IF @Action = 'Tab1_Next'
   WHERE GuestId IN (SELECT GuestId FROM #GstId)
   GROUP BY GuestId,Sts,ChkInDt,ChkOutDt;
   --
-  DECLARE @Cnt INT = (SELECT COUNT(*) FROM #GUEST);
+  --select * from #GUEST;return;
+  --
+  DECLARE @Cnt INT = (SELECT COUNT(*) FROM #GUEST WHERE GuestId != 0);
   IF @Cnt > 0
    BEGIN
     SELECT 'Guest Name : '+dbo.TRIM(ISNULL(C.FirstName,''))+' '+
@@ -209,7 +214,7 @@ IF @Action = 'Tab1_Next'
    END
   ELSE
    BEGIN
-    SELECT * FROM #GUEST;
+    SELECT * FROM #GUEST WHERE GuestId != 0;
    END
   -- Guest Exists End
  END
@@ -419,13 +424,10 @@ IF @Action = 'Property'
     DELETE FROM WRBHBBookingGuestDetails WHERE BookingId=@Id1;
     DELETE FROM WRBHBBookingProperty WHERE BookingId=@Id1;
     DELETE FROM WRBHBBookingPropertyAssingedGuest WHERE BookingId=@Id1;*/
-    UPDATE WRBHBBooking SET IsActive = 0, IsDeleted = 1 WHERE Id=@Id1;
-    UPDATE WRBHBBookingGuestDetails SET IsActive = 0, IsDeleted = 1 
-    WHERE BookingId=@Id1;
-    UPDATE WRBHBBookingProperty SET IsActive = 0, IsDeleted = 1 
-    WHERE BookingId=@Id1;
-    UPDATE WRBHBBookingPropertyAssingedGuest SET IsActive = 0, IsDeleted = 1 
-    WHERE BookingId=@Id1;
+    UPDATE WRBHBBooking SET IsActive = 0 WHERE Id=@Id1;
+    UPDATE WRBHBBookingGuestDetails SET IsActive = 0 WHERE BookingId=@Id1;
+    UPDATE WRBHBBookingProperty SET IsActive = 0 WHERE BookingId=@Id1;
+    UPDATE WRBHBBookingPropertyAssingedGuest SET IsActive = 0 WHERE BookingId=@Id1;
    END
   DECLARE @StarFlag BIT=0,@StarId INT=0;
   DECLARE @MinValue DECIMAL(27,2)=0,@MaxValue DECIMAL(27,2)=0;

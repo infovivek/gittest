@@ -239,7 +239,7 @@ IF @Action='PageLoad'
 	join WRBHBBooking b on b.Id = d.BookingId	
 --	join WRBHBTaxMaster t on t.StateId=s.Id   
 	where h.IsActive = 1 and h.IsDeleted = 0 and CS.CheckOutHdrId =  @Id1 
-	AND h.PropertyType = 'Managed G H'
+	AND h.PropertyType in ('Managed G H','DdP')
 	group by h.GuestName ,h.Name,h.Stay,h.Type,h.BookingLevel,
 	BillDate,h.ClientName,h.Id,	h.ChkOutTariffTotal ,h.ChkOutTariffLT ,h.ChkOutTariffNetAmount,
 	h.ChkOutTariffST2 ,h.ChkOutTariffST3 ,h.ChkOutTariffCess ,

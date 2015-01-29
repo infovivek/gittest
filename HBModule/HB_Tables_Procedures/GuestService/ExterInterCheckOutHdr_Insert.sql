@@ -722,6 +722,14 @@ END
 			UPDATE WRBHBChechkOutHdr set CollectVendor = 'CollectVendor'  
 			WHERE Id = @InsId and PropertyType =  'External Property'
 		END
+		
+		-- this table use to bill no wise		
+
+		INSERT INTO WRBHBCheckOutDtls(CheckOutId,GuestName,BillType,BillAmount,
+		CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId)
+		
+		VALUES(@InsId,@GuestName,'Tariff',@ChkOutTariffNetAmount,@CreatedBy,GETDATE(),@CreatedBy,
+		GETDATE(),1,0,NEWID())
  END
  ELSE
  BEGIN
@@ -783,6 +791,14 @@ END
 			UPDATE WRBHBChechkOutHdr set CollectVendor = 'CollectVendor'  
 			WHERE Id = @InsId and PropertyType =  'External Property'
 		END
+		
+-- this table use to bill no wise		
+
+		INSERT INTO WRBHBCheckOutDtls(CheckOutId,GuestName,BillType,BillAmount,
+		CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId)
+		
+		VALUES(@InsId,@GuestName,'Tariff',@ChkOutTariffNetAmount,@CreatedBy,GETDATE(),@CreatedBy,
+		GETDATE(),1,0,NEWID())
  END
  
 

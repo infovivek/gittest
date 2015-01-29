@@ -584,6 +584,12 @@
 						}
 						else{Image.source = "Assets/user.jpg";}		
 						
+						btn_AvlService.enabled=true;
+						if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+						{  
+							//	hlp_Room.text = Ds_Objects.result.Tables.Table1.Rows[0].RoomType1;
+							Grid_Service.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+						}
 					}
 				}
 				

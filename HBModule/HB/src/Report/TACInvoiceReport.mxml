@@ -54,11 +54,8 @@
 				GlobalXml="";
 				GlobalXml += "<ROOT>";
 				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
-				GlobalXml += "</ROOT>";
-
-				//dt_From.selectedDate = new Date();
-				
-				useWeb("TACInvoice","PAGELOAD_CUSTOM",[GlobalXml,'PAGELOAD',0,0]);
+				GlobalXml += "</ROOT>"; 
+				useWeb("TACInvoice","PAGELOAD_CUSTOM",[GlobalXml,'PAGELOAD',0,"","",0,"",0]);
 			}
 			private function Custom_WebSer_Result (Ds_Objects:Object):void				
 			{
@@ -85,37 +82,21 @@
 			
 			protected function Search():void
 			{
-				SearchPopUp.Prc_name="BookingSearch"
+				//SearchPopUp.Prc_name="BookingSearch"
 				var SearchParam:Array =new Array();
-				SearchPopUp.HlpIndex="SEARCH"
+				//SearchPopUp.HlpIndex="SEARCH"
 				SearchParam[0]=GlobalXml;
 				SearchParam[1]=0;
 				SearchParam[2]=PropertyId; 
 				SearchParam[3]=dt_From.text;
 				SearchParam[4]=dt_To.text;
-				SearchParam[5]=Action;
-				SearchPopUp.addEventListener("PopupEnter",funpopupEnter);
-				SearchPopUp.addEventListener("PopupClose",funpopupClose);
+				SearchParam[5]=Action; 
 				var Load:Array = new Array(); 
 				Load[0] = GlobalXml; Load[1] = Id; Load[2]=PropertyId;
 				Load[3]=dt_From.text;Load[4]=dt_To.text;Load[5]=Action;
-				useWeb("TACInvoice","Search_CUSTOM",Load);
-			}
-			private function funpopupClose(event:Event):void
-			{ 
-				
+				useWeb("TACInvoice","Search_CUSTOM",[GlobalXml,'DataLoad',0,dt_From.text,dt_To.text,PropertyId,"",0]);
+				//useWeb("TACInvoice","Search_CUSTOM",Load);
 			} 
-			private function funpopupEnter(event:Event):void
-			{	
-				Searchhb(SearchPopUp.SelectRow.Id,0);	
-			}
-			private function Searchhb(Id:int,_PrdFk:int):void
-			{
-				var Load:Array = new Array(); 
-				Load[0] = GlobalXml; Load[1] = Id; Load[2]=PropertyId;
-				Load[3]=dt_From.text;Load[4]=dt_To.text;Load[5]=Action;
-				useWeb("TACInvoice","Search_CUSTOM",Load);
-			}
 			protected function dt_From_changeHandler(event:CalendarLayoutChangeEvent):void
 			{
 				if(dt_From.selectedDate)
@@ -126,10 +107,8 @@
 					var M:String = String(Dt.substr(3,2));
 					var D:String =String(Number(Dt.substr(0,2))+1);
 					var RangeStart:String = Y+'/'+M+'/'+D;
-					dt_To.selectableRange = {rangeStart:new Date(RangeStart)};
-					//dt_To.selectableRange={rangeEnd: new Date()};//
-					dt_To.selectedDate = new Date(RangeStart);
-					//Txt_StayDays.text="1";
+					dt_To.selectableRange = {rangeStart:new Date(RangeStart)}; 
+					dt_To.selectedDate = new Date(RangeStart); 
 				}
 			}	
 			public function Ddl_Property_changeHandler():void
@@ -143,36 +122,35 @@
 				else
 				{
 					hlp_Property.text="";
-				}
-			//	Drp_PropertyType.enabled=false;
+				} 
 			}	
 			
 			protected function ExportExcel(event:MouseEvent):void
-			{
-				//var arrExportResult:ArrayCollection = new ArrayCollection();	
+			{ 
 				var arrExportResult:ArrayCollection = Grd_Details.dataProvider as ArrayCollection;
 				xlsFile = new ExcelFile();
 				var sheet:Sheet = new Sheet();
 				if((arrExportResult!=null)&&(arrExportResult.length!=0))
 				//if(Grd_Details.dataProvider !=null)
 				{					
-					sheet.resize(arrExportResult.length+1,14);
+					sheet.resize(arrExportResult.length+1,15);
 					
-					sheet.setCell(0,0,'SNo');
-					sheet.setCell(0,1,'Date');
-					sheet.setCell(0,2,'BillId');
-					sheet.setCell(0,3,'InvoiceNo');
-					sheet.setCell(0,4,'Guest');
-					sheet.setCell(0,5,'Client');
-					sheet.setCell(0,6,'Property');
-					sheet.setCell(0,7,'CheckInDate');
-					sheet.setCell(0,8,'CheckOutDate');
-					sheet.setCell(0,9,'TotalDays');
-					sheet.setCell(0,10,'Perday');
-					sheet.setCell(0,11,'Amount');
-					sheet.setCell(0,12,'Tax');
-					sheet.setCell(0,13,'Total Amount');
-					
+						sheet.setCell(0,0,'SNo');
+						sheet.setCell(0,1,'Date');
+						sheet.setCell(0,2,'BillId');
+						sheet.setCell(0,3,'InvoiceNo');
+						sheet.setCell(0,4,'Guest');
+						sheet.setCell(0,5,'Client');
+						sheet.setCell(0,6,'Property');
+						sheet.setCell(0,7,'Location');
+						sheet.setCell(0,8,'CheckInDate');
+						sheet.setCell(0,9,'CheckOutDate');
+						sheet.setCell(0,10,'TotalDays');
+						sheet.setCell(0,11,'Perday');
+						sheet.setCell(0,12,'Amount');
+						sheet.setCell(0,13,'Tax');
+						sheet.setCell(0,14,'Total Amount');
+						
 					for(var i:int=0;i<arrExportResult.length;i++)
 					{
 						sheet.setCell(i+1, 0,  arrExportResult[i].Id);
@@ -182,13 +160,14 @@
 						sheet.setCell(i+1, 4,  arrExportResult[i].Client);
 						sheet.setCell(i+1, 5,  arrExportResult[i].Guests);
 						sheet.setCell(i+1, 6,  arrExportResult[i].Property);
-						sheet.setCell(i+1, 7,  arrExportResult[i].ChkInDate);
-						sheet.setCell(i+1, 8,  arrExportResult[i].ChkOutDate); 
-						sheet.setCell(i+1, 9,  arrExportResult[i].TotalDays);
-						sheet.setCell(i+1, 10, arrExportResult[i].Perday);
-						sheet.setCell(i+1, 11, arrExportResult[i].Amount);
-						sheet.setCell(i+1, 12, arrExportResult[i].Tax);
-						sheet.setCell(i+1, 13, arrExportResult[i].TotalAmount);
+						sheet.setCell(i+1, 7,  arrExportResult[i].Location);
+						sheet.setCell(i+1, 8,  arrExportResult[i].ChkInDate);
+						sheet.setCell(i+1, 9,  arrExportResult[i].ChkOutDate); 
+						sheet.setCell(i+1, 10,  arrExportResult[i].TotalDays);
+						sheet.setCell(i+1, 11, arrExportResult[i].Perday);
+						sheet.setCell(i+1, 12, arrExportResult[i].Amount);
+						sheet.setCell(i+1, 13, arrExportResult[i].Tax);
+						sheet.setCell(i+1, 14, arrExportResult[i].TotalAmount);
 					}
 					Grd_Details.dataProvider = arrExportResult;
 					xlsFile.sheets.addItem(sheet);      
@@ -214,51 +193,74 @@
 				dt_To.text="";
 				PageLoad();
 			}	
-	
+			public var FltPrpty:String="";
+			public function filterss(Filts:String):void
+			{				
+				FltPrpty=Filts;				
+				var tempAC:ArrayCollection=new ArrayCollection(); 
+				tempAC=Grd_Details.dataProvider as ArrayCollection;
+				tempAC.filterFunction = filterMyArrayCollectionss;
+				tempAC.refresh();				
+			}	
+			private function filterMyArrayCollectionss(item:Object):Boolean 
+			{
+				var Itm:Boolean=true;				
+				if(txtLocation.text!="")
+				{
+					var searchString:String = txtLocation.text.toLowerCase();
+					var itemName:String = (item.Location as String).toLowerCase();
+					Itm=itemName.indexOf(searchString) > -1;
+				}				
+				return Itm;		
+			}
 		]]>
 	</fx:Script>
 	<s:VGroup x="0" y="0" width="100%" height="100%" gap="5" horizontalAlign="center" verticalAlign="middle">
 		<s:HGroup x="6" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
 			<s:BorderContainer x="0" y="0" width="100%" height="100%" backgroundColor="#fbf9f9"
 							   borderVisible="false">
-				<s:Label x="19" y="84" text="Property"/>
-				<WrbHelpComp:HelpText id="hlp_Property" x="84" y="74" width="275" height="22" pxSetColumnsWidth="275,0" 
+				<s:Label x="79" y="59" text="Property"/>
+				<WrbHelpComp:HelpText id="hlp_Property" x="144" y="54" width="225" height="22" pxSetColumnsWidth="275,0" 
 									  onselection="{Ddl_Property_changeHandler()}"  pxTabIndex="1" depth="10"
 									  pxSetPrompt="Select Property">
 				</WrbHelpComp:HelpText>
-				<mx:DateField x="460" y="72" width="93" height="21" id="dt_From" tabIndex="16"
+				<s:Label x="79" y="104" text="Filter by &#xd;Location"/>
+				<s:TextInput id="txtLocation" x="144" y="103" width="141" height="25"
+							 change="filterss('Location')" prompt="Location Name"/>
+				<mx:DateField x="500" y="54" width="93" height="22" id="dt_From" tabIndex="16"
 							  selectableRange="{{rangeEnd: new Date()}}" formatString="DD/MM/YYYY" styleName="DisabledDateField" 
 							  yearNavigationEnabled="true" change="dt_From_changeHandler(event)"/>
-				<mx:DateField id="dt_To" x="649" y="70" selectableRange="{{rangeEnd: new Date()}}" formatString="DD/MM/YYYY"
-							  />
-				<s:Label x="379" y="82" text="From Date"/>
-				<s:Label x="585" y="81" text="End Date"/>
-				<s:Button x="482" y="121" height="34" label="Search" click="Search()"/>
-				<WrbComp:Button_BB id="btn_Excel" x="666" y="122" width="138" click="ExportExcel(event)"
+				<mx:DateField id="dt_To" x="689" y="54" height="22" formatString="DD/MM/YYYY"
+							  selectableRange="{{rangeEnd: new Date()}}"/>
+				<s:Label x="419" y="59" text="From Date"/>
+				<s:Label x="625" y="59" text="End Date"/>
+				<s:Button x="522" y="101" height="34" label="Search" click="Search()"/>
+				<WrbComp:Button_BB id="btn_Excel" x="706" y="102" width="138" click="ExportExcel(event)"
 								   Lable_val="Export To Excel">
 				</WrbComp:Button_BB>
 				<mx:DataGrid x="0" y="170"  verticalAlign="middle" editable="true" visible="true"
 							 width="100%" height="100%" tabIndex="4" id="Grd_Details" horizontalScrollPolicy="on">
 					<mx:columns>
-						<mx:DataGridColumn dataField="Id" headerText="S.No" width="80" editable="false"/>
+						<mx:DataGridColumn dataField="Id" headerText="S.No" width="50" editable="false"/>
 						<mx:DataGridColumn dataField="CreatedDate" headerText="Date" width="75" editable="false"/>
 						<mx:DataGridColumn dataField="BillNo" headerText="Bill Id" width="75" editable="false"/>
-						<mx:DataGridColumn dataField="InvoiceNo" headerText="Invoice No" width="100" editable="false"/>
+						<mx:DataGridColumn dataField="InvoiceNo" headerText="Invoice No" width="80" editable="false"/>
 						<mx:DataGridColumn dataField="Client" headerText="Client" width="200" editable="false"/>
 						<mx:DataGridColumn dataField="Guests" headerText="Guest" width="200" editable="false"/>
 						<mx:DataGridColumn dataField="Property" headerText="Property" width="200" editable="false"/>
-						<mx:DataGridColumn dataField="ChkInDate" headerText="Check In Date" width="100" editable="false"/>
-						<mx:DataGridColumn dataField="ChkOutDate" headerText="Check Out Date" width="100" editable="false"/>
-						<mx:DataGridColumn dataField="TotalDays" headerText="Total Days" width="75" editable="false"/>
+						<mx:DataGridColumn dataField="Location" headerText="Location" width="100" editable="false"/>
+						<mx:DataGridColumn dataField="ChkInDate" headerText="Check In Date" width="90" editable="false"/>
+						<mx:DataGridColumn dataField="ChkOutDate" headerText="Check Out Date" width="90" editable="false"/>
+						<mx:DataGridColumn dataField="TotalDays" headerText="Total Days" width="55" editable="false"/>
 						<mx:DataGridColumn dataField="Perday" headerText="Perday Amount" width="75" editable="false" textAlign="right"/>
 						<mx:DataGridColumn dataField="Amount" headerText="Amount" width="75" editable="false" textAlign="right"/>
-						<mx:DataGridColumn dataField="Tax" headerText="Tax" width="75" editable="false" textAlign="right"/>
-						<mx:DataGridColumn dataField="TotalAmount" headerText="TotalAmount" width="75" editable="false" textAlign="right"/>
+						<mx:DataGridColumn dataField="Tax" headerText="Tax" width="55" editable="false" textAlign="right"/>
+						<mx:DataGridColumn dataField="TotalAmount" headerText="TotalAmount" width="70" editable="false" textAlign="right"/>
 						
 					</mx:columns>
 				</mx:DataGrid>
-				<s:Button x="365" y="121" height="34" label="Clear" click="FnClear()"/>
-				<s:Label x="29" y="36" text="TAC Invoice Report" color="red"/>
+				<s:Button x="405" y="101" height="34" label="Clear" click="FnClear()"/>
+				<s:Label x="69" y="16" text="TAC Invoice Report" color="red" visible="false"/>
 				
 			</s:BorderContainer>
 		</s:HGroup>

@@ -28,7 +28,8 @@ BEGIN
  IF EXISTS (SELECT NULL FROM WRBHBAPIRoomTypeDtls WHERE HeaderId = @HeaderId AND
  HotelId = @HotelId AND RoomTypecode = @RoomTypeCode)
   BEGIN
-   UPDATE WRBHBAPIRoomTypeDtls SET RoomTypename = @RoomTypeName
+   UPDATE WRBHBAPIRoomTypeDtls SET RoomTypename = @RoomTypeName,
+   Dt = GETDATE()
    WHERE HeaderId = @HeaderId AND HotelId = @HotelId AND 
    RoomTypecode = @RoomTypeCode;
    SELECT Id FROM WRBHBAPIRoomTypeDtls WHERE HeaderId = @HeaderId AND
@@ -36,8 +37,9 @@ BEGIN
   END
  ELSE
   BEGIN
-   INSERT INTO WRBHBAPIRoomTypeDtls(HeaderId,HotelId,RoomTypeName,RoomTypeCode)
-   VALUES(@HeaderId,@HotelId,dbo.TRIM(@RoomTypeName),dbo.TRIM(@RoomTypeCode));
+   INSERT INTO WRBHBAPIRoomTypeDtls(HeaderId,HotelId,RoomTypeName,RoomTypeCode,Dt)
+   VALUES(@HeaderId,@HotelId,dbo.TRIM(@RoomTypeName),dbo.TRIM(@RoomTypeCode),
+   GETDATE());
    SELECT Id FROM WRBHBAPIRoomTypeDtls WHERE Id=@@IDENTITY;
   END
 END

@@ -46,9 +46,7 @@ SET @ToHId=(Select Id from WRBHBContractClientPref_Header WHERE ClientId=@ToId A
 	
 	CREATE TABLE #TEMP(HeaderId BIGINT,PropertyName NVARCHAR(100),PropertyId BIGINT,RoomType NVARCHAR(100),
 	RoomId BIGINT,TariffSingle DECIMAL(27,2),TariffDouble DECIMAL(27,2),TaxInclusive DECIMAL(27,2),
-	TaxPercentage DECIMAL(27,2),RackTariffSingle DECIMAL(27,2),RackTariffDouble DECIMAL(27,2),RackTariffTriple DECIMAL(27,2),
-	LTAgreed DECIMAL(27,2),LTRack DECIMAL(27,2),STAgreed DECIMAL(27,2),
-	CreatedBy BIGINT,CreatedDate DATETIME,ModifiedBy BIGINT,ModifiedDate DATETIME,
+	TaxPercentage DECIMAL(27,2),CreatedBy BIGINT,CreatedDate DATETIME,ModifiedBy BIGINT,ModifiedDate DATETIME,
 	IsActive BIT,IsDeleted BIT,TariffTriple DECIMAL(27,2),Facility NVARCHAR(100),Email NVARCHAR(100))
 
 	UPDATE WRBHBContractClientPref_Details SET IsActive=0,IsDeleted=1 
@@ -73,14 +71,11 @@ WHILE @Cnt>0
 		WHERE HeaderId=@ToHId AND PropertyId=@PrtyId     
    
 		INSERT INTO #TEMP (HeaderId,PropertyName,PropertyId,RoomType,RoomId,TariffSingle,
-		TariffDouble,TaxInclusive,TaxPercentage,RackTariffSingle,RackTariffDouble,RackTariffTriple,
-		LTAgreed,LTRack,STAgreed,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,
+		TariffDouble,TaxInclusive,TaxPercentage,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,
 		TariffTriple,Facility,Email)
 		
 		SELECT @ToHId,PropertyName,PropertyId,RoomType,RoomId,TariffSingle,
-		TariffDouble,TaxInclusive,TaxPercentage,ISNULL(RTariffSingle,0),ISNULL(RTariffDouble,0),
-		ISNULL(RTariffTriple,0),ISNULL(LTAgreed,0),ISNULL(LTRack,0),ISNULL(STAgreed,0),
-		@UserId,GETDATE(),@UserId,GETDATE(),IsActive,IsDeleted,
+		TariffDouble,TaxInclusive,TaxPercentage,@UserId,GETDATE(),@UserId,GETDATE(),IsActive,IsDeleted,
 		TariffTriple,Facility,Email FROM WRBHBContractClientPref_Details WHERE HeaderId=@FromHId AND PropertyId=@PrtyId 
 		AND IsActive=1
 		
@@ -99,14 +94,11 @@ BEGIN
 	Where HeaderId=@ToHId AND PropertyId=@PrtyId          
 	
 	INSERT INTO WRBHBContractClientPref_Details(HeaderId,PropertyName,PropertyId,RoomType,RoomId,TariffSingle,
-	TariffDouble,TaxInclusive,TaxPercentage,RTariffSingle,RTariffDouble,RTariffTriple,
-	LTAgreed,LTRack,STAgreed,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,
+	TariffDouble,TaxInclusive,TaxPercentage,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,
 	TariffTriple,Facility,Email,RowId)
 	
 	SELECT HeaderId,PropertyName,PropertyId,RoomType,RoomId,TariffSingle,
-	TariffDouble,TaxInclusive,TaxPercentage,RackTariffSingle,RackTariffDouble,RackTariffTriple,
-	LTAgreed,LTRack,STAgreed
-	,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,
+	TariffDouble,TaxInclusive,TaxPercentage,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,
 	TariffTriple,Facility,Email,NEWID() FROM #TEMP
 	
 	SET  @Identity=@@IDENTITY
@@ -115,20 +107,14 @@ END
 ELSE
 BEGIN
 	INSERT INTO WRBHBContractClientPref_Details(HeaderId,PropertyName,PropertyId,RoomType,RoomId,TariffSingle,
-	TariffDouble,TaxInclusive,TaxPercentage,RTariffSingle,RTariffDouble,RTariffTriple,
-	LTAgreed,LTRack,STAgreed,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,
+	TariffDouble,TaxInclusive,TaxPercentage,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,
 	TariffTriple,Facility,Email,RowId)
 	
 	SELECT HeaderId,PropertyName,PropertyId,RoomType,RoomId,TariffSingle,
-	TariffDouble,TaxInclusive,TaxPercentage,RackTariffSingle,RackTariffDouble,RackTariffTriple,
-	LTAgreed,LTRack,STAgreed,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,
+	TariffDouble,TaxInclusive,TaxPercentage,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,
 	TariffTriple,Facility,Email,NEWID() FROM #TEMP
 	
 	SET  @Identity=@@IDENTITY
 	SELECT Id,RowId FROM WRBHBContractClientPref_Details WHERE Id=@Identity;	
 END
 END
-
-
-
-	

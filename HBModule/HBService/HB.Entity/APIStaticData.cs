@@ -86,5 +86,11 @@ namespace HB.Entity
         public string Phone { get; set; }
 
         public int HotelCount { get; set; }
+
+        public int Total { get; set; }
+
+        public string Rows { get; set; }
+
+        public string Offset { get; set; }
     }
 }

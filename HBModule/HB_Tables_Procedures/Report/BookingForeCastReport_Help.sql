@@ -55,7 +55,11 @@ IF @Action ='PropertyAndCity'
 	  
 	  SELECT CityName,Id FROM WRBHBCity  
 	  WHERE IsActive=1 AND IsDeleted=0 
-	  --AND Category in('Internal Property','Managed G H') ;	  
+	  --AND Category in('Internal Property','Managed G H') ;
+	  
+	  SELECT ClientName,Id FROM WRBHBClientManagement
+	  WHERE IsActive=1 AND IsDeleted=0 
+	  ORDER BY ClientName ASC	  
  END 
  IF @Action ='BookingForecast'
  BEGIN 
@@ -424,6 +428,11 @@ INSERT INTO #TFFINALSs( RoomId,Typess,ClientName,Property,PropertyId,PropertyTyp
 			 END 
 			  
      END 
+       UPDATE #TFFINAL SET PropertyType = P.Category 
+	 FROM #TFFINAL F 
+	 left outer JOIN  WRBHBProperty p WITH(NOLOCK) ON p.Id=F.PropertyId  AND P.IsActive=1 AND IsDeleted=0
+	 WHERE F.PropertyType='Managed G H'
+	 
    delete  from #TFFINAL where PropertyType='External Property'-- and TariffPaymentMode='Direct'
    ---For Externals
    	  CREATE TABLE #ExternalForecastNew(BookingId BIGINT,RoomId BIGINT,RoomName NVARCHAR(100),GuestName NVARCHAR(2000),
@@ -637,10 +646,7 @@ truncate table #ExternalForecastNew;
 		--	AND YEAR(CONVERT(DATE,CheckOutDate,103))=2014
   
  
- --Select * from  #TFFINAL  where PropertyType='External property'  
- --  order by BookingId desc
-   
-  -- Return;
+
 	INSERT INTO	#MonthWiseFinal( Property,PropertyType,PropertyId, 
 	Tariff,TariffPaymentMode,Dedicat,Direct,Btc,Onlin,Gtv,Total,PrintInvoice,Bookingid,CityId,GtvAmount)
 	SELECT p.PropertyName,p.Category,p.Id,
@@ -659,6 +665,17 @@ truncate table #ExternalForecastNew;
 	from #MonthWise F
 	left outer join WRBHBProperty p on p.Id=f.PropertyId and p.IsActive=1 and p.IsDeleted=0 and p.Category='Internal Property'
 	where f.PropertyType='Internal Property' and ChkOutTariffTotal!=0 and TariffPaymentMode='Direct' 
+	GROUP BY p.PropertyName,p.Category,p.Id ,f.Bookingid,p.CityId
+	
+	
+	INSERT INTO	#MonthWiseFinal( Property,PropertyType,PropertyId, 
+	Tariff,TariffPaymentMode,Dedicat,Direct,Btc,Onlin,Gtv,Total,PrintInvoice,Bookingid,CityId,GtvAmount)
+	SELECT p.PropertyName,p.Category,p.Id,
+	0  ,''TariffPaymentMode,sum(Tariff) Dedicat,0 Direct,0 Btc,0 Onlin, 0 Gtv,sum(Tariff) Total,
+	''PrintInvoice,f.Bookingid,P.CityId,0
+	from #MonthWise F
+	left outer join WRBHBProperty p on p.Id=f.PropertyId and p.IsActive=1 and p.IsDeleted=0 and p.Category='Internal Property'
+	where f.PropertyType='Internal Property' and ChkOutTariffTotal!=0  and Typess like ' Monthly '  
 	GROUP BY p.PropertyName,p.Category,p.Id ,f.Bookingid,p.CityId
   
 	 
@@ -730,8 +747,8 @@ truncate table #ExternalForecastNew;
 	group by Property,m.PropertyId,m.PropertyType,PrintInvoice,m.Bookingid,P.CityId
 	order by m.PropertyId
 	 
-	 --Select * from #MonthWiseFinal   where PropertyType='External Property'
-	 --Return	
+	 --Select * from #MonthWiseFinal   where PropertyType='Internal Property'
+	--Return	
 	
 	 
 	If(@Pram5='All Properties') 

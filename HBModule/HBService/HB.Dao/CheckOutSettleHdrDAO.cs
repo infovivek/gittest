@@ -75,7 +75,7 @@ namespace HB.Dao
                 {
                     Err = "";
                 }
-                message.Bcc.Add(new System.Net.Mail.MailAddress("vivek@warblerit.com"));
+      //          message.Bcc.Add(new System.Net.Mail.MailAddress("vivek@warblerit.com"));
                 message.Bcc.Add(new System.Net.Mail.MailAddress("shameem@warblerit.com"));
                 //     message.Bcc.Add(new System.Net.Mail.MailAddress("silam@hummingbirdindia.com"));
                 //     message.Bcc.Add(new System.Net.Mail.MailAddress("karthik@hummingbirdindia.com"));

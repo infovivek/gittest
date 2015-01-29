@@ -324,7 +324,7 @@ namespace HB.Dao
                                             CancelAmountPercent = xmlcancel.SelectNodes("//AmountPercent")[cp].Attributes["percent"].Value;
                                         }                                        
                                     }*/
-                                    string PenaltyDescription = xmlcancel.SelectNodes("//PenaltyDescription")[0].InnerText;
+                                    api.PenaltyDescription = xmlcancel.SelectNodes("//PenaltyDescription")[0].InnerText;
                                     //
                                     command = new SqlCommand();
                                     command.CommandText = StoredProcedures.APIRoomRateDetails_Insert;
@@ -335,7 +335,7 @@ namespace HB.Dao
                                     command.Parameters.Add("@RoomRateratePlanCode", SqlDbType.NVarChar).Value = api.RoomRateratePlanCode;
                                     command.Parameters.Add("@RoomRateavailableCount", SqlDbType.NVarChar).Value = api.RoomRateavailableCount;
                                     command.Parameters.Add("@RoomRateavailStatus", SqlDbType.NVarChar).Value = api.RoomRateavailStatus;
-                                    command.Parameters.Add("@PenaltyDescription", SqlDbType.NVarChar).Value = PenaltyDescription;
+                                    command.Parameters.Add("@PenaltyDescription", SqlDbType.NVarChar).Value = api.PenaltyDescription;
                                     DataSet ds3 = new WrbErpConnection().ExecuteDataSet(command, UserData);
                                     api.RoomRateHdrId = Convert.ToInt32(ds3.Tables[0].Rows[0][0].ToString());
                                     //

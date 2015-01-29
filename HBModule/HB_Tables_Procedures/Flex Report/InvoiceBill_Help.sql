@@ -76,47 +76,69 @@ BEGIN
   --LOCATION CHECK  
   IF @Pram1=0   
   BEGIN    
-   INSERT INTO #TempInvoiceBill(CreatedDate,ModifiedDate,BookingCode,InVoiceNo,PropertyName,ClientName,  
-   MasterClientName,GuestName,CheckOutId,SerivceTax7,Servicetax12,ServiceCharge,CheckInDate,CheckOutDate,  
-   BillStartDate,BillEndDate,Location,LuxuryTax,ExtraAmount,PropertyId,Cess,Hcess,NoOfDays,BookingId,CheckInId,
-   PrintInvoic ,Type )  
-   SELECT CONVERT(NVARCHAR,H.CreatedDate,103) CreatedDate,CONVERT(NVARCHAR,H.ModifiedDate,103) ModifiedDate,  
-   BookingCode,H.InVoiceNo,P.PropertyName,C.ClientName,MC.ClientName,H.GuestName,H.Id,  
-   ChkOutTariffST1  SerivceTax7,ChkOutTariffST3 AS Servicetax12,ChkOutTariffSC Servicecharge,  
-   CONVERT(NVARCHAR,H.CheckInDate,103),CONVERT(NVARCHAR,H.CheckOutDate,103),CONVERT(NVARCHAR,BillFromDate,103),  
-   CONVERT(NVARCHAR,BillEndDate,103),CC.CityName,ChkOutTariffLT,ChkOutTariffExtraAmount,P.Id,ChkOutTariffCess,  
-   ChkOutTariffHECess,H.NoOfDays,B.Id,H.ChkInHdrId,H.PrintInvoice,H.Direct  
-   FROM WRBHBChechkOutHdr H  
-   JOIN WRBHBBooking  B WITH(NOLOCK) ON H.BookingId=B.Id AND B.IsActive=1 AND B.IsDeleted=0  
-   JOIN WRBHBProperty P WITH(NOLOCK) ON H.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0  
-   JOIN WRBHBCity CC WITH(NOLOCK) ON CC.Id=P.CityId  
-   JOIN WRBHBClientManagement C WITH(NOLOCK) ON B.ClientId=C.Id AND C.IsActive=1 AND C.IsDeleted=0  
-   JOIN WRBHBMasterClientManagement MC WITH(NOLOCK) ON C.MasterClientId=MC.Id AND MC.IsActive=1 AND MC.IsDeleted=0  
-   WHERE H.IsActive=1 AND H.IsDeleted=0 AND   
-   CONVERT(DATE,H.CreatedDate,103) BETWEEN CONVERT(DATE,@Pram3,103)  
-   AND CONVERT(DATE,@Pram4,103) --AND H.Flag=1   
-  END  
-  ELSE  
-  BEGIN  
-   INSERT INTO #TempInvoiceBill(CreatedDate,ModifiedDate,BookingCode,InVoiceNo,PropertyName,ClientName,  
-   MasterClientName,GuestName,CheckOutId,SerivceTax7,Servicetax12,ServiceCharge,CheckInDate,CheckOutDate,  
-   BillStartDate,BillEndDate,Location,LuxuryTax,ExtraAmount,PropertyId,Cess,Hcess,NoOfDays,BookingId,CheckInId,
-   PrintInvoic ,Type )  
-   SELECT CONVERT(NVARCHAR,H.CreatedDate,103) CreatedDate,CONVERT(NVARCHAR,H.ModifiedDate,103) ModifiedDate,  
-   BookingCode,H.InVoiceNo,P.PropertyName,C.ClientName,MC.ClientName,H.GuestName,H.Id,  
-   ChkOutTariffST1  SerivceTax7,ChkOutTariffST3 AS Servicetax12,ChkOutTariffSC Servicecharge,  
-   CONVERT(NVARCHAR,H.CheckInDate,103),CONVERT(NVARCHAR,H.CheckOutDate,103),CONVERT(NVARCHAR,BillFromDate,103),  
-   CONVERT(NVARCHAR,BillEndDate,103),CC.CityName,ChkOutTariffLT,ChkOutTariffExtraAmount,P.Id,ChkOutTariffCess,  
-   ChkOutTariffHECess,H.NoOfDays,B.Id ,H.ChkInHdrId,H.PrintInvoice,H.Direct   
-   FROM WRBHBChechkOutHdr H  
-   JOIN WRBHBBooking  B WITH(NOLOCK) ON H.BookingId=B.Id AND B.IsActive=1 AND B.IsDeleted=0  
-   JOIN WRBHBProperty P WITH(NOLOCK) ON H.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0  
-   JOIN WRBHBCity CC WITH(NOLOCK) ON CC.Id=P.CityId AND CC.Id=@Pram1  
-   JOIN WRBHBClientManagement C WITH(NOLOCK) ON B.ClientId=C.Id AND C.IsActive=1 AND C.IsDeleted=0  
-   JOIN WRBHBMasterClientManagement MC WITH(NOLOCK) ON C.MasterClientId=MC.Id AND MC.IsActive=1 AND MC.IsDeleted=0  
-   WHERE H.IsActive=1 AND H.IsDeleted=0 AND   
-   CONVERT(DATE,H.CreatedDate,103) BETWEEN CONVERT(DATE,@Pram3,103)  
-   AND CONVERT(DATE,@Pram4,103) --AND H.Flag=1    
+	   INSERT INTO #TempInvoiceBill(CreatedDate,ModifiedDate,BookingCode,InVoiceNo,PropertyName,ClientName,  
+	   MasterClientName,GuestName,CheckOutId,SerivceTax7,Servicetax12,ServiceCharge,CheckInDate,CheckOutDate,  
+	   BillStartDate,BillEndDate,Location,LuxuryTax,ExtraAmount,PropertyId,Cess,Hcess,NoOfDays,BookingId,CheckInId,
+	   PrintInvoic ,Type )  
+	   SELECT CONVERT(NVARCHAR,H.CreatedDate,103) CreatedDate,CONVERT(NVARCHAR,H.ModifiedDate,103) ModifiedDate,  
+	   BookingCode,H.InVoiceNo,P.PropertyName,C.ClientName,MC.ClientName,H.GuestName,H.Id,  
+	   ChkOutTariffST1  SerivceTax7,ChkOutTariffST3 AS Servicetax12,ChkOutTariffSC Servicecharge,  
+	   CONVERT(NVARCHAR,H.CheckInDate,103),CONVERT(NVARCHAR,H.CheckOutDate,103),CONVERT(NVARCHAR,BillFromDate,103),  
+	   CONVERT(NVARCHAR,BillEndDate,103),CC.CityName,ChkOutTariffLT,ChkOutTariffExtraAmount,P.Id,ChkOutTariffCess,  
+	   ChkOutTariffHECess,H.NoOfDays,B.Id,H.ChkInHdrId,H.PrintInvoice,H.Direct  
+	   FROM WRBHBChechkOutHdr H  
+	   JOIN WRBHBBooking  B WITH(NOLOCK) ON H.BookingId=B.Id AND B.IsActive=1 AND B.IsDeleted=0  
+	   JOIN WRBHBProperty P WITH(NOLOCK) ON H.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0  
+	   JOIN WRBHBCity CC WITH(NOLOCK) ON CC.Id=P.CityId  
+	   JOIN WRBHBClientManagement C WITH(NOLOCK) ON B.ClientId=C.Id AND C.IsActive=1 AND C.IsDeleted=0  
+	   JOIN WRBHBMasterClientManagement MC WITH(NOLOCK) ON C.MasterClientId=MC.Id AND MC.IsActive=1 AND MC.IsDeleted=0  
+	   WHERE H.IsActive=1 AND H.IsDeleted=0 AND   
+	   CONVERT(DATE,H.CreatedDate,103) BETWEEN CONVERT(DATE,@Pram3,103)  
+	   AND CONVERT(DATE,@Pram4,103) --AND H.Flag=1   
+	  END  
+	  ELSE  
+	  BEGIN  
+	   INSERT INTO #TempInvoiceBill(CreatedDate,ModifiedDate,BookingCode,InVoiceNo,PropertyName,ClientName,  
+	   MasterClientName,GuestName,CheckOutId,SerivceTax7,Servicetax12,ServiceCharge,CheckInDate,CheckOutDate,  
+	   BillStartDate,BillEndDate,Location,LuxuryTax,ExtraAmount,PropertyId,Cess,Hcess,NoOfDays,BookingId,CheckInId,
+	   PrintInvoic ,Type )  
+	   SELECT CONVERT(NVARCHAR,H.CreatedDate,103) CreatedDate,CONVERT(NVARCHAR,H.ModifiedDate,103) ModifiedDate,  
+	   BookingCode,H.InVoiceNo,P.PropertyName,C.ClientName,MC.ClientName,H.GuestName,H.Id,  
+	   ChkOutTariffST1  SerivceTax7,ChkOutTariffST3 AS Servicetax12,ChkOutTariffSC Servicecharge,  
+	   CONVERT(NVARCHAR,H.CheckInDate,103),CONVERT(NVARCHAR,H.CheckOutDate,103),CONVERT(NVARCHAR,BillFromDate,103),  
+	   CONVERT(NVARCHAR,BillEndDate,103),CC.CityName,ChkOutTariffLT,ChkOutTariffExtraAmount,P.Id,ChkOutTariffCess,  
+	   ChkOutTariffHECess,H.NoOfDays,B.Id ,H.ChkInHdrId,H.PrintInvoice,H.Direct   
+	   FROM WRBHBChechkOutHdr H  
+	   JOIN WRBHBBooking  B WITH(NOLOCK) ON H.BookingId=B.Id AND B.IsActive=1 AND B.IsDeleted=0  
+	   JOIN WRBHBProperty P WITH(NOLOCK) ON H.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0  
+	   JOIN WRBHBCity CC WITH(NOLOCK) ON CC.Id=P.CityId AND CC.Id=P.CityId  
+	   JOIN WRBHBClientManagement C WITH(NOLOCK) ON B.ClientId=C.Id AND C.Id=@Pram1 AND C.IsActive=1 AND C.IsDeleted=0  
+	   JOIN WRBHBMasterClientManagement MC WITH(NOLOCK) ON C.MasterClientId=MC.Id  AND MC.IsActive=1 AND MC.IsDeleted=0  
+	   WHERE H.IsActive=1 AND H.IsDeleted=0 AND   
+	   CONVERT(DATE,H.CreatedDate,103) BETWEEN CONVERT(DATE,@Pram3,103)  
+	   AND CONVERT(DATE,@Pram4,103) --AND H.Flag=1    
+	   
+	   INSERT INTO #TempInvoiceBill(CreatedDate,ModifiedDate,BookingCode,InVoiceNo,PropertyName,ClientName,  
+	   MasterClientName,GuestName,CheckOutId,SerivceTax7,Servicetax12,ServiceCharge,CheckInDate,CheckOutDate,  
+	   BillStartDate,BillEndDate,Location,LuxuryTax,ExtraAmount,PropertyId,Cess,Hcess,NoOfDays,BookingId,CheckInId,
+	   PrintInvoic ,Type )  
+	  
+	   SELECT CONVERT(NVARCHAR,H.CreatedDate,103) CreatedDate,CONVERT(NVARCHAR,H.ModifiedDate,103) ModifiedDate,  
+	   BookingCode,H.InVoiceNo,S.HotalName,C.ClientName,MC.ClientName,H.GuestName,H.Id,  
+	   ChkOutTariffST1  SerivceTax7,ChkOutTariffST3 AS Servicetax12,ChkOutTariffSC Servicecharge,  
+	   CONVERT(NVARCHAR,H.CheckInDate,103),CONVERT(NVARCHAR,H.CheckOutDate,103),CONVERT(NVARCHAR,BillFromDate,103),  
+	   CONVERT(NVARCHAR,BillEndDate,103),CC.CityName,ChkOutTariffLT,ChkOutTariffExtraAmount,CC.Id,ChkOutTariffCess,  
+	   ChkOutTariffHECess,H.NoOfDays,B.Id ,H.ChkInHdrId,H.PrintInvoice,H.Direct   
+	   FROM WRBHBChechkOutHdr H  
+	   JOIN WRBHBBooking  B WITH(NOLOCK) ON H.BookingId=B.Id AND B.IsActive=1 AND B.IsDeleted=0 
+	   join  WRBHBBookingPropertyAssingedGuest AG WITH(NOLOCK) ON B.Id= AG.BookingId AND AG.IsActive = 1 and AG.IsDeleted = 0 
+	   join WRBHBStaticHotels S   WITH(NOLOCK) ON Ag.BookingPropertyId = S.HotalId and s.IsActive=1 and s.IsDeleted=0 
+	   JOIN WRBHBCity CC WITH(NOLOCK) ON CC.Id=B.CityId 
+	   JOIN WRBHBClientManagement C WITH(NOLOCK) ON B.ClientId=C.Id AND C.Id=@Pram1 AND C.IsActive=1 AND C.IsDeleted=0  
+	   JOIN WRBHBMasterClientManagement MC WITH(NOLOCK) ON C.MasterClientId=MC.Id  AND MC.IsActive=1 AND MC.IsDeleted=0  
+	   WHERE H.IsActive=1 AND H.IsDeleted=0 AND   
+	   CONVERT(DATE,H.CreatedDate,103) BETWEEN CONVERT(DATE,@Pram3,103)  
+	   AND CONVERT(DATE,@Pram4,103) 
   END  
  END  
  ELSE  
@@ -161,12 +183,36 @@ BEGIN
    FROM WRBHBChechkOutHdr H  
    JOIN WRBHBBooking  B WITH(NOLOCK) ON H.BookingId=B.Id AND B.IsActive=1 AND B.IsDeleted=0  
    JOIN WRBHBProperty P WITH(NOLOCK) ON H.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0 AND P.Category=@Pram5  
-   JOIN WRBHBCity CC WITH(NOLOCK) ON CC.Id=P.CityId AND CC.Id=@Pram1  
-   JOIN WRBHBClientManagement C WITH(NOLOCK) ON B.ClientId=C.Id AND C.IsActive=1 AND C.IsDeleted=0  
-   JOIN WRBHBMasterClientManagement MC WITH(NOLOCK) ON C.MasterClientId=MC.Id AND MC.IsActive=1 AND MC.IsDeleted=0  
+   JOIN WRBHBCity CC WITH(NOLOCK) ON CC.Id=P.CityId AND CC.Id=P.CityId  
+   JOIN WRBHBClientManagement C WITH(NOLOCK) ON B.ClientId=C.Id AND C.Id=@Pram1 AND C.IsActive=1 AND C.IsDeleted=0  
+   JOIN WRBHBMasterClientManagement MC WITH(NOLOCK) ON C.MasterClientId=MC.Id  AND MC.IsActive=1 AND MC.IsDeleted=0  
    WHERE H.IsActive=1 AND H.IsDeleted=0 AND   
    CONVERT(DATE,H.CreatedDate,103) BETWEEN CONVERT(DATE,@Pram3,103)  
    AND CONVERT(DATE,@Pram4,103) --AND H.Flag=1   
+   
+   INSERT INTO #TempInvoiceBill(CreatedDate,ModifiedDate,BookingCode,InVoiceNo,PropertyName,ClientName,  
+   MasterClientName,GuestName,CheckOutId,SerivceTax7,Servicetax12,ServiceCharge,CheckInDate,CheckOutDate,  
+   BillStartDate,BillEndDate,Location,LuxuryTax,ExtraAmount,PropertyId,Cess,Hcess,NoOfDays,BookingId,CheckInId,
+   PrintInvoic ,Type )  
+   SELECT CONVERT(NVARCHAR,H.CreatedDate,103) CreatedDate,  
+   CONVERT(NVARCHAR,H.ModifiedDate,103) ModifiedDate,  
+   BookingCode,H.InVoiceNo,S.HotalName,C.ClientName,MC.ClientName,H.GuestName,H.Id,  
+   ChkOutTariffST1  SerivceTax7,ChkOutTariffST3 AS Servicetax12,ChkOutTariffSC Servicecharge,  
+   CONVERT(NVARCHAR,H.CheckInDate,103),CONVERT(NVARCHAR,H.CheckOutDate,103),  
+   CONVERT(NVARCHAR,BillFromDate,103),  
+   CONVERT(NVARCHAR,BillEndDate,103),CC.CityName,ChkOutTariffLT,ChkOutTariffExtraAmount,CC.Id,  
+   ChkOutTariffCess,ChkOutTariffHECess,H.NoOfDays,B.Id,H.ChkInHdrId,H.PrintInvoice,H.Direct   
+   FROM WRBHBChechkOutHdr H  
+   JOIN WRBHBBooking  B WITH(NOLOCK) ON H.BookingId=B.Id AND B.IsActive=1 AND B.IsDeleted=0  
+   join  WRBHBBookingPropertyAssingedGuest AG WITH(NOLOCK) ON B.Id= AG.BookingId AND AG.IsActive = 1 and AG.IsDeleted = 0 
+   join WRBHBStaticHotels S   WITH(NOLOCK) ON Ag.BookingPropertyId = S.HotalId and s.IsActive=1 and s.IsDeleted=0 -- AND B.Category=@Pram5  
+   JOIN WRBHBCity CC WITH(NOLOCK) ON CC.Id=B.CityId  
+   JOIN WRBHBClientManagement C WITH(NOLOCK) ON B.ClientId=C.Id AND C.Id=@Pram1 AND C.IsActive=1 AND C.IsDeleted=0  
+   JOIN WRBHBMasterClientManagement MC WITH(NOLOCK) ON C.MasterClientId=MC.Id  AND MC.IsActive=1 AND MC.IsDeleted=0  
+   WHERE H.IsActive=1 AND H.IsDeleted=0 AND   
+   CONVERT(DATE,H.CreatedDate,103) BETWEEN CONVERT(DATE,@Pram3,103)  
+   AND CONVERT(DATE,@Pram4,103)
+   
   END    
  END  
  
@@ -224,17 +270,23 @@ BEGIN
  GROUP BY H.Id,H.CheckOutHdrId  
   
  --FOOD AND Beverages AND SERVICE TAX AND VAT  
- INSERT INTO #TempInvoiceBillFOODANDBeverages(FOODANDBeverages,CheckOutId,CheckOutServiceHdrId,SerivceTax4,VAT)  
- SELECT SUM(ISNULL(D.ChkOutSerAmount,0)),H.CheckOutHdrId,0,SUM(ISNULL(cast(ChkOutServiceST as decimal(27,2)),0)) SerivceTax4,  
- SUM(ISNULL(ChkOutServiceVat,0))  
+ INSERT INTO #TempInvoiceBillFOODANDBeverages(FOODANDBeverages,CheckOutId,CheckOutServiceHdrId,SerivceTax4,VAT)
+ SELECT (ISNULL(H.ChkOutServiceAmtl,0)),H.CheckOutHdrId,0,
+ (ISNULL(cast(ChkOutServiceST as decimal(27,2)),0)) SerivceTax4,  
+ (ISNULL(ChkOutServiceVat,0))  
  FROM #TempInvoiceBill B  
- JOIN WRBHBCheckOutServiceHdr H WITH(NOLOCK) ON B.CheckOutId=H.CheckOutHdrId AND H.IsActive=1 AND H.IsDeleted=0  
- JOIN  WRBHBCheckOutServiceDtls D WITH(NOLOCK) ON B.CheckOutId = D.CheckOutServceHdrId AND D.IsActive=1 AND D.IsDeleted=0  
- JOIN WRBHBContarctProductMaster P WITH(NOLOCK) ON P.Id = D.ProductId AND P.TypeService='Food And Beverages'  
- AND P.IsActive=1 AND P.IsDeleted=0  
- GROUP BY H.CheckOutHdrId   
-  
-  
+ JOIN WRBHBCheckOutServiceHdr H WITH(NOLOCK) ON B.CheckOutId=H.CheckOutHdrId AND H.IsActive=1 AND H.IsDeleted=0
+    
+ --SELECT SUM(ISNULL(D.ChkOutSerAmount,0)),H.CheckOutHdrId,0,
+ --SUM(ISNULL(cast(ChkOutServiceST as decimal(27,2)),0)) SerivceTax4,  
+ --SUM(ISNULL(ChkOutServiceVat,0))  
+ --FROM #TempInvoiceBill B  
+ --JOIN WRBHBCheckOutServiceHdr H WITH(NOLOCK) ON B.CheckOutId=H.CheckOutHdrId AND H.IsActive=1 AND H.IsDeleted=0  
+ --JOIN  WRBHBCheckOutServiceDtls D WITH(NOLOCK) ON B.CheckOutId = D.CheckOutServceHdrId AND D.IsActive=1 AND D.IsDeleted=0  
+ --JOIN WRBHBContarctProductMaster P WITH(NOLOCK) ON P.Id = D.ProductId AND P.TypeService='Food And Beverages'  
+ --AND P.IsActive=1 AND P.IsDeleted=0  
+ --GROUP BY H.CheckOutHdrId   
+ 
  --Laundry  
  INSERT INTO #TempInvoiceBillLaundry(Laundry,CheckOutId,CheckOutServiceHdrId)  
  SELECT SUM(ISNULL(D.ChkOutSerAmount,0)),H.CheckOutHdrId,H.Id  
@@ -258,7 +310,7 @@ BEGIN
   ISNULL(MasterClientName,'') MasterClientName,ISNULL(GuestName,'') GuestName,ISNULL(SerivceTax7,0) SerivceTax7,  
   ISNULL(Servicetax12,0) Servicetax12,ISNULL(ServiceCharge,0) ServiceCharge,ISNULL(CheckInDate,'') CheckInDate,  
   ISNULL(CheckOutDate,'') CheckOutDate,ISNULL(BillStartDate,'') BillStartDate,ISNULL(BillEndDate,'') BillEndDate,  
-  ISNULL(Location,'') Location,ISNULL(LuxuryTax,0) LuxuryTax,ISNULL(TotalAmount,0) TotalAmount,  
+  ISNULL(Location,'') Location,ISNULL(LuxuryTax,0) LuxuryTax,ISNULL(TotalAmount,0) AS TotalAmount,  
   ISNULL(TariffAmount,0) TariffAmount,ISNULL(Broadband,0) Broadband,ISNULL(FOODANDBeverages,0) FOODANDBeverages,  
   ISNULL(SerivceTax4,0) SerivceTax4,ISNULL(VAT,0) VAT,ISNULL(Laundry,0) Laundry,ISNULL(ExtraAmount,0) ExtraAmount,  
   'A',ISNULL(Cess,0),ISNULL(Hcess,0),ISNULL(M.MarkupAmount,0),H.Type,H.CheckOutId  
@@ -301,10 +353,17 @@ BEGIN
     
   SELECT CreatedDate,ModifiedDate,BookingCode,InVoiceNo,PropertyName,ClientName,MasterClientName,  
   GuestName,SerivceTax7,Servicetax12,ServiceCharge,CheckInDate,CheckOutDate,BillStartDate,BillEndDate,Location,LuxuryTax,  
-  TotalAmount,TariffAmount,Broadband,FOODANDBeverages,SerivceTax4,VAT,Laundry,ExtraAmount,  
-  CAST(Cess AS DECIMAL(27,2)) Cess,CAST(Hcess AS DECIMAL(27,2)) Hcess,MarkupAmount AS DiscountAmount  
-  FROM #TempBillFinal   
+ (SerivceTax7+Servicetax12+LuxuryTax+ServiceCharge+TariffAmount+Broadband+FOODANDBeverages+SerivceTax4+VAT+Laundry+ExtraAmount+CAST(Cess AS DECIMAL(27,2))+
+  CAST(Hcess AS DECIMAL(27,2))) AS TotalAmount,TariffAmount,Broadband,
+  FOODANDBeverages,SerivceTax4,VAT,Laundry,ExtraAmount,  
+  CAST(Cess AS DECIMAL(27,2)) Cess,CAST(Hcess AS DECIMAL(27,2)) Hcess,0 AS DiscountAmount  
+  FROM #TempBillFinal 
+   
   ORDER BY OrderBy ,CAST(BookingCode AS BIGINT) ASC   
+  
+   return
+  
+  
  END  
  ELSE  
  BEGIN  
@@ -358,15 +417,25 @@ BEGIN
    SUM(MarkupAmount),'',0  
    FROM #TempBillFinal  
   END  
-  SELECT CreatedDate,ModifiedDate,BookingCode,InVoiceNo,PropertyName,ClientName,MasterClientName,  
+  --SELECT CreatedDate,ModifiedDate,BookingCode,InVoiceNo,PropertyName,ClientName,MasterClientName,  
+  --GuestName,SerivceTax7,Servicetax12,ServiceCharge,CheckInDate,CheckOutDate,BillStartDate,BillEndDate,Location,LuxuryTax,  
+  --TotalAmount,TariffAmount,Broadband,FOODANDBeverages,SerivceTax4,VAT,Laundry,ExtraAmount,  
+  --CAST(Cess AS DECIMAL(27,2)) Cess,CAST(Hcess AS DECIMAL(27,2)) Hcess,MarkupAmount AS DiscountAmount  
+  --FROM #TempBillFinal  
+
+  
+  SELECT CreatedDate,ModifiedDate,BookingCode,InVoiceNo,PropertyName,ClientName,MasterClientName,NoOfDays,PaymentDate,  
   GuestName,SerivceTax7,Servicetax12,ServiceCharge,CheckInDate,CheckOutDate,BillStartDate,BillEndDate,Location,LuxuryTax,  
-  TotalAmount,TariffAmount,Broadband,FOODANDBeverages,SerivceTax4,VAT,Laundry,ExtraAmount,  
-  CAST(Cess AS DECIMAL(27,2)) Cess,CAST(Hcess AS DECIMAL(27,2)) Hcess,MarkupAmount AS DiscountAmount  
-  FROM #TempBillFinal  
+  (SerivceTax7+Servicetax12+LuxuryTax+ServiceCharge+TariffAmount+Broadband+FOODANDBeverages+SerivceTax4+VAT+Laundry+ExtraAmount+CAST(Cess AS DECIMAL(27,2))+
+  CAST(Hcess AS DECIMAL(27,2))) AS TotalAmount,TariffAmount,Broadband,FOODANDBeverages,SerivceTax4,VAT,Laundry,ExtraAmount,PaymentType,  
+  PaymentMode,AcountNo,CAST(Cess AS DECIMAL(27,2)) Cess,CAST(Hcess AS DECIMAL(27,2)) Hcess,0 AS DiscountAmount  
+  FROM #TempBillFinal
   ORDER BY OrderBy ,CAST(BookingCode AS BIGINT) ASC  
     
  END   
 END  
+
+
 IF @Action ='UnSettled'  
 BEGIN  
  IF @Pram5='All Properties'  
@@ -407,12 +476,33 @@ BEGIN
    FROM WRBHBChechkOutHdr H  
    JOIN WRBHBBooking  B WITH(NOLOCK) ON H.BookingId=B.Id AND B.IsActive=1 AND B.IsDeleted=0  
    JOIN WRBHBProperty P WITH(NOLOCK) ON H.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0  
-   JOIN WRBHBCity CC WITH(NOLOCK) ON CC.Id=P.CityId AND CC.Id=@Pram1  
-   JOIN WRBHBClientManagement C WITH(NOLOCK) ON B.ClientId=C.Id AND C.IsActive=1 AND C.IsDeleted=0  
-   JOIN WRBHBMasterClientManagement MC WITH(NOLOCK) ON C.MasterClientId=MC.Id AND MC.IsActive=1 AND MC.IsDeleted=0  
+   JOIN WRBHBCity CC WITH(NOLOCK) ON CC.Id=P.CityId AND CC.Id=P.CityId  
+   JOIN WRBHBClientManagement C WITH(NOLOCK) ON B.ClientId=C.Id AND C.Id=@Pram1 AND C.IsActive=1 AND C.IsDeleted=0  
+   JOIN WRBHBMasterClientManagement MC WITH(NOLOCK) ON C.MasterClientId=MC.Id  AND MC.IsActive=1 AND MC.IsDeleted=0  
    WHERE H.IsActive=1 AND H.IsDeleted=0 AND   
    CONVERT(DATE,H.CreatedDate,103) BETWEEN CONVERT(DATE,@Pram3,103)  
    AND CONVERT(DATE,@Pram4,103) AND H.Status='UnSettled'  
+   
+   INSERT INTO #TempInvoiceBill(CreatedDate,ModifiedDate,BookingCode,InVoiceNo,PropertyName,ClientName,  
+   MasterClientName,GuestName,CheckOutId,SerivceTax7,Servicetax12,ServiceCharge,CheckInDate,CheckOutDate,  
+   BillStartDate,BillEndDate,Location,LuxuryTax,ExtraAmount,PropertyId,Cess,Hcess)  
+   SELECT CONVERT(NVARCHAR,H.CreatedDate,103) CreatedDate,CONVERT(NVARCHAR,H.ModifiedDate,103) ModifiedDate,  
+   BookingCode,H.InVoiceNo,S.HotalName,C.ClientName,MC.ClientName,H.GuestName,H.Id,  
+   ChkOutTariffST1  SerivceTax7,ChkOutTariffST3 AS Servicetax12,ChkOutTariffSC Servicecharge,  
+   CONVERT(NVARCHAR,H.CheckInDate,103),CONVERT(NVARCHAR,H.CheckOutDate,103),CONVERT(NVARCHAR,BillFromDate,103),  
+   CONVERT(NVARCHAR,BillEndDate,103),CC.CityName,ChkOutTariffLT,ChkOutTariffExtraAmount,CC.Id,ChkOutTariffCess,  
+   ChkOutTariffHECess    
+   FROM WRBHBChechkOutHdr H  
+   JOIN WRBHBBooking  B WITH(NOLOCK) ON H.BookingId=B.Id AND B.IsActive=1 AND B.IsDeleted=0  
+   join  WRBHBBookingPropertyAssingedGuest AG WITH(NOLOCK) ON B.Id= AG.BookingId AND AG.IsActive = 1 and AG.IsDeleted = 0 
+   join WRBHBStaticHotels S   WITH(NOLOCK) ON Ag.BookingPropertyId = S.HotalId and s.IsActive=1 and s.IsDeleted=0 -- AND B.Category=@Pram5  
+   JOIN WRBHBCity CC WITH(NOLOCK) ON CC.Id=B.CityId 
+   JOIN WRBHBClientManagement C WITH(NOLOCK) ON B.ClientId=C.Id AND C.Id=@Pram1 AND C.IsActive=1 AND C.IsDeleted=0  
+   JOIN WRBHBMasterClientManagement MC WITH(NOLOCK) ON C.MasterClientId=MC.Id  AND MC.IsActive=1 AND MC.IsDeleted=0  
+   WHERE H.IsActive=1 AND H.IsDeleted=0 AND   
+   CONVERT(DATE,H.CreatedDate,103) BETWEEN CONVERT(DATE,@Pram3,103)  
+   AND CONVERT(DATE,@Pram4,103) AND H.Status='UnSettled'  
+   
   END  
  END  
  ELSE  
@@ -453,12 +543,32 @@ BEGIN
    FROM WRBHBChechkOutHdr H  
    JOIN WRBHBBooking  B WITH(NOLOCK) ON H.BookingId=B.Id AND B.IsActive=1 AND B.IsDeleted=0  
    JOIN WRBHBProperty P WITH(NOLOCK) ON H.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0 AND P.Category=@Pram5  
-   JOIN WRBHBCity CC WITH(NOLOCK) ON CC.Id=P.CityId AND CC.Id=@Pram1  
-   JOIN WRBHBClientManagement C WITH(NOLOCK) ON B.ClientId=C.Id AND C.IsActive=1 AND C.IsDeleted=0  
+   JOIN WRBHBCity CC WITH(NOLOCK) ON CC.Id=P.CityId AND CC.Id=P.CityId  
+   JOIN WRBHBClientManagement C WITH(NOLOCK) ON B.ClientId=C.Id AND C.Id=@Pram1 AND C.IsActive=1 AND C.IsDeleted=0  
    JOIN WRBHBMasterClientManagement MC WITH(NOLOCK) ON C.MasterClientId=MC.Id AND MC.IsActive=1 AND MC.IsDeleted=0  
    WHERE H.IsActive=1 AND H.IsDeleted=0 AND   
    CONVERT(DATE,H.CreatedDate,103) BETWEEN CONVERT(DATE,@Pram3,103)  
    AND CONVERT(DATE,@Pram4,103) AND H.Status='UnSettled'  
+   
+    INSERT INTO #TempInvoiceBill(CreatedDate,ModifiedDate,BookingCode,InVoiceNo,PropertyName,ClientName,  
+   MasterClientName,GuestName,CheckOutId,SerivceTax7,Servicetax12,ServiceCharge,CheckInDate,CheckOutDate,  
+   BillStartDate,BillEndDate,Location,LuxuryTax,ExtraAmount,PropertyId,Cess,Hcess)  
+   SELECT CONVERT(NVARCHAR,H.CreatedDate,103) CreatedDate,CONVERT(NVARCHAR,H.ModifiedDate,103) ModifiedDate,  
+   BookingCode,H.InVoiceNo,S.HotalName,C.ClientName,MC.ClientName,H.GuestName,H.Id,  
+   ChkOutTariffST1  SerivceTax7,ChkOutTariffST3 AS Servicetax12,ChkOutTariffSC Servicecharge,  
+   CONVERT(NVARCHAR,H.CheckInDate,103),CONVERT(NVARCHAR,H.CheckOutDate,103),CONVERT(NVARCHAR,BillFromDate,103),  
+   CONVERT(NVARCHAR,BillEndDate,103),CC.CityName,ChkOutTariffLT,ChkOutTariffExtraAmount,CC.Id,ChkOutTariffCess,  
+   ChkOutTariffHECess    
+   FROM WRBHBChechkOutHdr H  
+   JOIN WRBHBBooking  B WITH(NOLOCK) ON H.BookingId=B.Id AND B.IsActive=1 AND B.IsDeleted=0  
+   join  WRBHBBookingPropertyAssingedGuest AG WITH(NOLOCK) ON B.Id= AG.BookingId AND AG.IsActive = 1 and AG.IsDeleted = 0 
+   join WRBHBStaticHotels S   WITH(NOLOCK) ON Ag.BookingPropertyId = S.HotalId and s.IsActive=1 and s.IsDeleted=0 -- AND B.Category=@Pram5  
+   JOIN WRBHBCity CC WITH(NOLOCK) ON CC.Id=B.CityId 
+   JOIN WRBHBClientManagement C WITH(NOLOCK) ON B.ClientId=C.Id AND C.Id=@Pram1 AND C.IsActive=1 AND C.IsDeleted=0  
+   JOIN WRBHBMasterClientManagement MC WITH(NOLOCK) ON C.MasterClientId=MC.Id  AND MC.IsActive=1 AND MC.IsDeleted=0  
+   WHERE H.IsActive=1 AND H.IsDeleted=0 AND   
+   CONVERT(DATE,H.CreatedDate,103) BETWEEN CONVERT(DATE,@Pram3,103)  
+   AND CONVERT(DATE,@Pram4,103) AND H.Status='UnSettled' 
   END    
  END  
  --SERVICE CESS,HCHESS,VAT AMOUNT ADD  
@@ -564,7 +674,8 @@ BEGIN
   END  
   SELECT CreatedDate,ModifiedDate,BookingCode,InVoiceNo,PropertyName,ClientName,MasterClientName,  
   GuestName,SerivceTax7,Servicetax12,ServiceCharge,CheckInDate,CheckOutDate,BillStartDate,BillEndDate,Location,LuxuryTax,  
-  TotalAmount,TariffAmount,Broadband,FOODANDBeverages,SerivceTax4,VAT,Laundry,ExtraAmount,  
+  (SerivceTax7+Servicetax12+LuxuryTax+ServiceCharge+TariffAmount+Broadband+FOODANDBeverages+SerivceTax4+VAT+Laundry+ExtraAmount+CAST(Cess AS DECIMAL(27,2))+
+  CAST(Hcess AS DECIMAL(27,2))) AS TotalAmount,TariffAmount,Broadband,FOODANDBeverages,SerivceTax4,VAT,Laundry,ExtraAmount,  
   CAST(Cess AS DECIMAL(27,2)) Cess,CAST(Hcess AS DECIMAL(27,2)) Hcess,MarkupAmount AS DiscountAmount  
   FROM #TempBillFinal  
   ORDER BY OrderBy ,CAST(BookingCode AS BIGINT)ASC  
@@ -613,11 +724,12 @@ BEGIN
    FROM #TempBillFinal  
   END  
     
-  SELECT CreatedDate,ModifiedDate,BookingCode,InVoiceNo,PropertyName,ClientName,MasterClientName,  
+ SELECT CreatedDate,ModifiedDate,BookingCode,InVoiceNo,PropertyName,ClientName,MasterClientName,NoOfDays,PaymentDate,  
   GuestName,SerivceTax7,Servicetax12,ServiceCharge,CheckInDate,CheckOutDate,BillStartDate,BillEndDate,Location,LuxuryTax,  
-  TotalAmount,TariffAmount,Broadband,FOODANDBeverages,SerivceTax4,VAT,Laundry,ExtraAmount,  
-  CAST(Cess AS DECIMAL(27,2)) Cess,CAST(Hcess AS DECIMAL(27,2)) Hcess,MarkupAmount AS DiscountAmount  
-  FROM #TempBillFinal  
+  (SerivceTax7+Servicetax12+ServiceCharge+LuxuryTax+TariffAmount+Broadband+FOODANDBeverages+SerivceTax4+VAT+Laundry+ExtraAmount+CAST(Cess AS DECIMAL(27,2))+
+  CAST(Hcess AS DECIMAL(27,2))) AS TotalAmount,TariffAmount,Broadband,FOODANDBeverages,SerivceTax4,VAT,Laundry,ExtraAmount,PaymentType,  
+  PaymentMode,AcountNo,CAST(Cess AS DECIMAL(27,2)) Cess,CAST(Hcess AS DECIMAL(27,2)) Hcess,0 AS DiscountAmount  
+  FROM #TempBillFinal 
   ORDER BY OrderBy ,CAST(BookingCode AS BIGINT)  ASC  
     
  END   
@@ -693,12 +805,32 @@ BEGIN
    FROM WRBHBChechkOutHdr H  
    JOIN WRBHBBooking  B WITH(NOLOCK) ON H.BookingId=B.Id AND B.IsActive=1 AND B.IsDeleted=0  
    JOIN WRBHBProperty P WITH(NOLOCK) ON H.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0  
-   JOIN WRBHBCity CC WITH(NOLOCK) ON CC.Id=P.CityId AND CC.Id=@Pram1  
-   JOIN WRBHBClientManagement C WITH(NOLOCK) ON B.ClientId=C.Id AND C.IsActive=1 AND C.IsDeleted=0  
-   JOIN WRBHBMasterClientManagement MC WITH(NOLOCK) ON C.MasterClientId=MC.Id AND MC.IsActive=1 AND MC.IsDeleted=0  
+   JOIN WRBHBCity CC WITH(NOLOCK) ON CC.Id=P.CityId AND CC.Id=P.CityId  
+   JOIN WRBHBClientManagement C WITH(NOLOCK) ON B.ClientId=C.Id AND C.Id=@Pram1 AND C.IsActive=1 AND C.IsDeleted=0  
+   JOIN WRBHBMasterClientManagement MC WITH(NOLOCK) ON C.MasterClientId=MC.Id  AND MC.IsActive=1 AND MC.IsDeleted=0  
    WHERE H.IsActive=1 AND H.IsDeleted=0 AND   
    CONVERT(DATE,H.CreatedDate,103) BETWEEN CONVERT(DATE,@Pram3,103)  
-   AND CONVERT(DATE,@Pram4,103) AND H.Status='CheckOut'   
+   AND CONVERT(DATE,@Pram4,103) AND H.Status='CheckOut'  
+   
+   INSERT INTO #TempInvoiceBill(CreatedDate,ModifiedDate,BookingCode,InVoiceNo,PropertyName,ClientName,  
+   MasterClientName,GuestName,CheckOutId,SerivceTax7,Servicetax12,ServiceCharge,CheckInDate,CheckOutDate,  
+   BillStartDate,BillEndDate,Location,LuxuryTax,ExtraAmount,PropertyId,Cess,Hcess)  
+   SELECT CONVERT(NVARCHAR,H.CreatedDate,103) CreatedDate,CONVERT(NVARCHAR,H.ModifiedDate,103) ModifiedDate,  
+   BookingCode,H.InVoiceNo,S.HotalName,C.ClientName,MC.ClientName,H.GuestName,H.Id,  
+   ChkOutTariffST1  SerivceTax7,ChkOutTariffST3 AS Servicetax12,ChkOutTariffSC Servicecharge,  
+   CONVERT(NVARCHAR,H.CheckInDate,103),CONVERT(NVARCHAR,H.CheckOutDate,103),CONVERT(NVARCHAR,BillFromDate,103),  
+   CONVERT(NVARCHAR,BillEndDate,103),CC.CityName,ChkOutTariffLT,ChkOutTariffExtraAmount,CC.Id,ChkOutTariffCess,  
+   ChkOutTariffHECess    
+   FROM WRBHBChechkOutHdr H  
+   JOIN WRBHBBooking  B WITH(NOLOCK) ON H.BookingId=B.Id AND B.IsActive=1 AND B.IsDeleted=0  
+   join  WRBHBBookingPropertyAssingedGuest AG WITH(NOLOCK) ON B.Id= AG.BookingId AND AG.IsActive = 1 and AG.IsDeleted = 0 
+   join WRBHBStaticHotels S   WITH(NOLOCK) ON Ag.BookingPropertyId = S.HotalId and s.IsActive=1 and s.IsDeleted=0 -- AND B.Category=@Pram5  
+   JOIN WRBHBCity CC WITH(NOLOCK) ON CC.Id=B.CityId 
+   JOIN WRBHBClientManagement C WITH(NOLOCK) ON B.ClientId=C.Id AND C.Id=@Pram1 AND C.IsActive=1 AND C.IsDeleted=0  
+   JOIN WRBHBMasterClientManagement MC WITH(NOLOCK) ON C.MasterClientId=MC.Id  AND MC.IsActive=1 AND MC.IsDeleted=0  
+   WHERE H.IsActive=1 AND H.IsDeleted=0 AND   
+   CONVERT(DATE,H.CreatedDate,103) BETWEEN CONVERT(DATE,@Pram3,103)  
+   AND CONVERT(DATE,@Pram4,103) AND H.Status='CheckOut'  
   END  
  END  
  ELSE  
@@ -739,9 +871,29 @@ BEGIN
    FROM WRBHBChechkOutHdr H  
    JOIN WRBHBBooking  B WITH(NOLOCK) ON H.BookingId=B.Id AND B.IsActive=1 AND B.IsDeleted=0  
    JOIN WRBHBProperty P WITH(NOLOCK) ON H.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0 AND P.Category=@Pram5  
-   JOIN WRBHBCity CC WITH(NOLOCK) ON CC.Id=P.CityId AND CC.Id=@Pram1  
-   JOIN WRBHBClientManagement C WITH(NOLOCK) ON B.ClientId=C.Id AND C.IsActive=1 AND C.IsDeleted=0  
+   JOIN WRBHBCity CC WITH(NOLOCK) ON CC.Id=P.CityId AND CC.Id=P.CityId  
+   JOIN WRBHBClientManagement C WITH(NOLOCK) ON B.ClientId=C.Id AND C.Id=@Pram1 AND C.IsActive=1 AND C.IsDeleted=0  
    JOIN WRBHBMasterClientManagement MC WITH(NOLOCK) ON C.MasterClientId=MC.Id AND MC.IsActive=1 AND MC.IsDeleted=0  
+   WHERE H.IsActive=1 AND H.IsDeleted=0 AND   
+   CONVERT(DATE,H.CreatedDate,103) BETWEEN CONVERT(DATE,@Pram3,103)  
+   AND CONVERT(DATE,@Pram4,103) AND H.Status='CheckOut'  
+   
+   INSERT INTO #TempInvoiceBill(CreatedDate,ModifiedDate,BookingCode,InVoiceNo,PropertyName,ClientName,  
+   MasterClientName,GuestName,CheckOutId,SerivceTax7,Servicetax12,ServiceCharge,CheckInDate,CheckOutDate,  
+   BillStartDate,BillEndDate,Location,LuxuryTax,ExtraAmount,PropertyId,Cess,Hcess)  
+   SELECT CONVERT(NVARCHAR,H.CreatedDate,103) CreatedDate,CONVERT(NVARCHAR,H.ModifiedDate,103) ModifiedDate,  
+   BookingCode,H.InVoiceNo,S.HotalName,C.ClientName,MC.ClientName,H.GuestName,H.Id,  
+   ChkOutTariffST1  SerivceTax7,ChkOutTariffST3 AS Servicetax12,ChkOutTariffSC Servicecharge,  
+   CONVERT(NVARCHAR,H.CheckInDate,103),CONVERT(NVARCHAR,H.CheckOutDate,103),CONVERT(NVARCHAR,BillFromDate,103),  
+   CONVERT(NVARCHAR,BillEndDate,103),CC.CityName,ChkOutTariffLT,ChkOutTariffExtraAmount,CC.Id,ChkOutTariffCess,  
+   ChkOutTariffHECess    
+   FROM WRBHBChechkOutHdr H  
+   JOIN WRBHBBooking  B WITH(NOLOCK) ON H.BookingId=B.Id AND B.IsActive=1 AND B.IsDeleted=0  
+   join  WRBHBBookingPropertyAssingedGuest AG WITH(NOLOCK) ON B.Id= AG.BookingId AND AG.IsActive = 1 and AG.IsDeleted = 0 
+   join WRBHBStaticHotels S   WITH(NOLOCK) ON Ag.BookingPropertyId = S.HotalId and s.IsActive=1 and s.IsDeleted=0 -- AND B.Category=@Pram5  
+   JOIN WRBHBCity CC WITH(NOLOCK) ON CC.Id=B.CityId 
+   JOIN WRBHBClientManagement C WITH(NOLOCK) ON B.ClientId=C.Id AND C.Id=@Pram1 AND C.IsActive=1 AND C.IsDeleted=0  
+   JOIN WRBHBMasterClientManagement MC WITH(NOLOCK) ON C.MasterClientId=MC.Id  AND MC.IsActive=1 AND MC.IsDeleted=0  
    WHERE H.IsActive=1 AND H.IsDeleted=0 AND   
    CONVERT(DATE,H.CreatedDate,103) BETWEEN CONVERT(DATE,@Pram3,103)  
    AND CONVERT(DATE,@Pram4,103) AND H.Status='CheckOut'  
@@ -844,7 +996,8 @@ BEGIN
     
   SELECT CreatedDate,ModifiedDate,BookingCode,InVoiceNo,PropertyName,ClientName,MasterClientName,NoOfDays,PaymentDate,  
   GuestName,SerivceTax7,Servicetax12,ServiceCharge,CheckInDate,CheckOutDate,BillStartDate,BillEndDate,Location,LuxuryTax,  
-  TotalAmount,TariffAmount,Broadband,FOODANDBeverages,SerivceTax4,VAT,Laundry,ExtraAmount,PaymentType,  
+  (SerivceTax7+Servicetax12+LuxuryTax+ServiceCharge+TariffAmount+Broadband+FOODANDBeverages+SerivceTax4+VAT+Laundry+ExtraAmount+CAST(Cess AS DECIMAL(27,2))+
+  CAST(Hcess AS DECIMAL(27,2))) AS TotalAmount,TariffAmount,Broadband,FOODANDBeverages,SerivceTax4,VAT,Laundry,ExtraAmount,PaymentType,  
   PaymentMode,AcountNo,CAST(Cess AS DECIMAL(27,2)) Cess,CAST(Hcess AS DECIMAL(27,2)) Hcess,MarkupAmount AS DiscountAmount  
   FROM #TempBillFinal  
   ORDER BY OrderBy,CAST(BookingCode AS BIGINT) ASC   
@@ -891,8 +1044,9 @@ BEGIN
     
   SELECT CreatedDate,ModifiedDate,BookingCode,InVoiceNo,PropertyName,ClientName,MasterClientName,NoOfDays,PaymentDate,  
   GuestName,SerivceTax7,Servicetax12,ServiceCharge,CheckInDate,CheckOutDate,BillStartDate,BillEndDate,Location,LuxuryTax,  
-  TotalAmount,TariffAmount,Broadband,FOODANDBeverages,SerivceTax4,VAT,Laundry,ExtraAmount,PaymentType,  
-  PaymentMode,AcountNo,CAST(Cess AS DECIMAL(27,2)) Cess,CAST(Hcess AS DECIMAL(27,2)) Hcess,MarkupAmount AS DiscountAmount  
+  (SerivceTax7+Servicetax12+LuxuryTax+ServiceCharge+TariffAmount+Broadband+FOODANDBeverages+SerivceTax4+VAT+Laundry+ExtraAmount+CAST(Cess AS DECIMAL(27,2))+
+  CAST(Hcess AS DECIMAL(27,2))) AS TotalAmount,TariffAmount,Broadband,FOODANDBeverages,SerivceTax4,VAT,Laundry,ExtraAmount,PaymentType,  
+  PaymentMode,AcountNo,CAST(Cess AS DECIMAL(27,2)) Cess,CAST(Hcess AS DECIMAL(27,2)) Hcess,0 AS DiscountAmount  
   FROM #TempBillFinal  
     
   ORDER BY OrderBy,CAST(BookingCode AS BIGINT)ASC  

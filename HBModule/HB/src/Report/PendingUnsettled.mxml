@@ -46,7 +46,7 @@
 				GlobalXml += "</ROOT>"; 
 				Type="Internal Property";
 				Internal.selected=true;
-				useWeb("PendingUnsettledServiceReport","Reports_CUSTOM",[GlobalXml,"Pageload",FromDate,ToDate,Type,'',0,0,0]);
+				useWeb("PendingUnsettledServiceReport","PageLoad_CUSTOM",[GlobalXml,"Pageload",FromDate,ToDate,'Internal Property','',0,0,0]);
 			}
 			private function Custom_WebSer_Result (Ds_Objects:Object):void
 			{
@@ -59,6 +59,18 @@
 						{
 							Grd_ListClient1.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection
 						}
+					}
+					if (Ds_Objects.currentTarget.description.toString() == "PageLoad_CUSTOM")
+					{
+						if(Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{
+							Grd_ListClient1.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection
+						}
+//						if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+//						{
+//							DT_From.text=Ds_Objects.result.Tables.Table1.Rows[0].TodayDate;
+//							DT_To.text=Ds_Objects.result.Tables.Table1.Rows[0].TodayDate;	
+//						}
 					} 
 				}//try end
 				catch(Exception)
@@ -72,22 +84,22 @@
 			{
 				// TODO Auto-generated method stub 
 				var ErrStr:String="",Flag:Boolean=true;
-				if(DT_From.text=="")
-				{
-					if(Flag == true)
-					{
-						DT_From.setFocus();Flag=false;
-					}
-					ErrStr=ErrStr+"* From Date is Required.\n";;	
-				}
-				if(DT_To.text=="")
-				{
-					if(Flag == true)
-					{
-						DT_To.setFocus();Flag=false;
-					}
-					ErrStr=ErrStr+"* ToDate  is Required.\n";;	
-				}
+//				if(DT_From.text=="")
+//				{
+//					if(Flag == true)
+//					{
+//						DT_From.setFocus();Flag=false;
+//					}
+//					ErrStr=ErrStr+"* From Date is Required.\n";;	
+//				}
+//				if(DT_To.text=="")
+//				{
+//					if(Flag == true)
+//					{
+//						DT_To.setFocus();Flag=false;
+//					}
+//					ErrStr=ErrStr+"* ToDate  is Required.\n";;	
+//				}
 				if(ErrStr !="")
 				{
 					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10,"");
@@ -182,6 +194,7 @@
 				{
 					Type="Managed G H";
 				}
+				useWeb("PendingUnsettledServiceReport","Reports_CUSTOM",[GlobalXml,"Pageload",FromDate,ToDate,Type,'',0,0]);
 			}
 			protected function ExportExcel(event:MouseEvent):void
 			{
@@ -296,15 +309,15 @@
 				{
 					var asd:String = DT_From.text;										
 					var Y:String = asd.substr(6,10);
-					var M:String = asd.substr(3,2);
-					var D:String = asd.substr(0,2);
+					var M:String = String(asd.substr(3,2));
+					var D:String = String(Number(asd.substr(0,2))+1);
 					var RangeStart:String = Y+'/'+M+'/'+D;
-					DT_To.selectableRange = {rangeStart:new Date(RangeStart)};
-					DT_To.selectedDate = new Date(RangeStart);
+				//	DT_To.selectableRange = {rangeStart:new Date(RangeStart)};
+				//	DT_To.selectedDate = new Date(RangeStart);
 					
-					DT_To.selectableRange = {rangeStart:new Date(RangeStart)};
-					DT_To.selectedDate = new Date(RangeStart);
-					DT_To.setFocus();
+				//	DT_To.selectableRange = {rangeStart:new Date(RangeStart)};
+				//	DT_To.selectedDate = new Date(RangeStart);
+				//	DT_To.setFocus();
 				}
 			}
 			public function Changes(LabelName:String):void
@@ -325,7 +338,7 @@
 			<s:Group x="132" y="5" width="100%" height="80">
 				<mx:DateField id="DT_From" x="138" y="6" width="90" formatString="DD/MM/YYYY"  tabIndex="1"  
 							  yearNavigationEnabled="true" selectableRange="{{rangeEnd: new Date()}}"  change="Change('Lbl_FDT')"   />
-				<mx:DateField id="DT_To" x="138" y="46" width="90" formatString="DD/MM/YYYY"
+				<mx:DateField id="DT_To" x="138" y="46" width="90" formatString="DD/MM/YYYY" selectableRange="{{rangeEnd: new Date()}}"
 							  tabIndex="2" yearNavigationEnabled="true"  change="Changes('Lbl_TDT')" />
 				
 				<s:Image x="751" y="20" source="assets/a1.png" toolTip="Search" click="btn_Search_clickHandler()" tabIndex="5"/>
@@ -335,8 +348,8 @@
 				<!--mx:Label id="Lbl_Vendor1" x="223" y="2" width="13" text="*" color="red" fontSize="16"/>
 				<mx:Label id="Lbl_Vendor0" x="222" y="42" width="13" text="*" color="red" fontSize="16"/-->
 				<mx:Label   x="342" y="2" width="13" text="*" color="red" fontSize="16"/>
-				<mx:Label   x="112" y="2" width="13" text="*" color="red" fontSize="16"/>
-				<mx:Label   x="99" y="42" width="13" text="*" color="red" fontSize="16"/>
+				<mx:Label   x="112" y="2" width="13" text="*" color="red" fontSize="16" visible="false"/>
+				<mx:Label   x="99" y="42" width="13" text="*" color="red" fontSize="16" visible="false"/>
 				<s:Label   x="293" y="14" text="Category"/>
 				<s:Label x="253" y="45" height="29" text="Filter by &#xd;Property"/>
 				<s:TextInput id="txtProperty" x="326" y="44" width="141" height="25"

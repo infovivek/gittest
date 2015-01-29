@@ -51,9 +51,15 @@ else
 begin
 	Select 'No data'
 End
-	 End
- End
-  
+	 EnD
+
+ 
+ IF @Action ='DataGrid'
+	BEGIN
+	        Select GuestName Email from WRBHBFeedBckForms
+	        where GuestName!=''
+	End
+  End 
 --exec [dbo].[Sp_CheckOutFeedbackform_Help] @Action=N'Pageload',@FromDt=N'',@ToDt=N'',@Str1=N'C6953DF4-41BB-4BDE-8A34-23B81BA716034',@Str2=N'',@Id1=0,@Id2=0,@UserId=0
 
 --ALTER TABLE WRBHBFeedBckForms

@@ -20,53 +20,25 @@ Section  	: API Header Insert
 */
 CREATE PROCEDURE [dbo].[SP_APIHeader_Insert](
 @FromDt NVARCHAR(100),@ToDt NVARCHAR(100),
-@UsrId BIGINT,@CityId BIGINT) 
+@UsrId BIGINT,@CityCode NVARCHAR(100))
 AS
 BEGIN 
- DECLARE @CityCode NVARCHAR(100) = '';
- SET @CityCode = (SELECT ISNULL(CityCode,'') FROM WRBHBCity WHERE Id=@CityId);
- /*INSERT INTO WRBHBAPIHeader(CityCode,FromDt,ToDt,CreatedBy,CreatedDate,
- ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId,CityId)
- VALUES(dbo.TRIM(@CityCode),@FromDt,@ToDt,@UsrId,GETDATE(),@UsrId,GETDATE(),
- 1,0,NEWID(),@CityId);
- SELECT Id,CityCode,'New' FROM WRBHBAPIHeader WHERE Id=@@IDENTITY;*/
- 
- IF EXISTS (SELECT NULL FROM WRBHBAPIHeader WHERE CityId=@CityId AND
- CityCode=@CityCode AND IsActive=1 AND IsDeleted=0)-- AND
- --CONVERT(DATE,CreatedDate,103)=CONVERT(DATE,GETDATE(),103))
+ IF EXISTS (SELECT NULL FROM WRBHBAPIHeader WHERE CityCode = @CityCode AND 
+ IsActive=1 AND IsDeleted=0)
   BEGIN
-   --SELECT TOP 1 Id,CityCode,'Exists' FROM WRBHBAPIHeader
-   UPDATE WRBHBAPIHeader SET FromDt = @FromDt,ToDt = @ToDt,
-   ModifiedDate = GETDATE() WHERE CityId = @CityId AND
-   CityCode = @CityCode AND IsActive = 1 AND IsDeleted = 0; 
+   UPDATE WRBHBAPIHeader SET FromDt = @FromDt,ToDt = @ToDt,CityId = 0,
+   ModifiedDate = GETDATE() WHERE CityCode = @CityCode AND 
+   IsActive = 1 AND IsDeleted = 0;
    SELECT TOP 1 Id,CityCode,'New','Exists' FROM WRBHBAPIHeader 
-   WHERE CityId=@CityId AND CityCode=@CityCode AND IsActive=1 AND 
-   IsDeleted=0 ORDER BY Id DESC; --AND
-   --CONVERT(DATE,CreatedDate,103)=CONVERT(DATE,GETDATE(),103);
+   WHERE CityCode = @CityCode AND IsActive = 1 AND IsDeleted=0 ORDER BY Id DESC;
   END
  ELSE
   BEGIN
    INSERT INTO WRBHBAPIHeader(CityCode,FromDt,ToDt,CreatedBy,
    CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId,CityId)
-   VALUES(dbo.TRIM(@CityCode),@FromDt,@ToDt,@UsrId,GETDATE(),
-   @UsrId,GETDATE(),1,0,NEWID(),@CityId);
+   VALUES(dbo.TRIM(@CityCode),@FromDt,@ToDt,@UsrId,GETDATE(),@UsrId,GETDATE(),1,0,
+   NEWID(),0);
    SELECT Id,CityCode,'New' FROM WRBHBAPIHeader WHERE Id=@@IDENTITY;
   END
- /*SET @CityCode = (SELECT ISNULL(CityCode,'') FROM WRBHBAPICityCode 
- WHERE Id=@CityId);
- IF EXISTS (SELECT NULL FROM WRBHBAPIHeader WHERE CityId=@CityId AND
- CityCode=@CityCode AND IsActive=1 AND IsDeleted=0)
-  BEGIN
-   SELECT Id,CityCode,'Exists' FROM WRBHBAPIHeader WHERE CityId=@CityId AND
-   CityCode=@CityCode AND IsActive=1 AND IsDeleted=0;
-  END
- ELSE
-  BEGIN
-   INSERT INTO WRBHBAPIHeader(CityCode,FromDt,ToDt,CreatedBy,
-   CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId,CityId)
-   VALUES(dbo.TRIM(@CityCode),@FromDt,@ToDt,@UsrId,GETDATE(),
-   @UsrId,GETDATE(),1,0,NEWID(),@CityId);
-   SELECT Id,CityCode,'New' FROM WRBHBAPIHeader WHERE Id=@@IDENTITY;
-  END*/
 END
 GO

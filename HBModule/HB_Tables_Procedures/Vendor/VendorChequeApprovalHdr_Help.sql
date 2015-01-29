@@ -273,7 +273,7 @@ END
 		    SELECT CONVERT(NVARCHAR(100),VR.Date,103) AS BillDate,
 			VR.Service AS ExpenseHead,VR.VendorName AS VendorName,
 			P.PropertyName AS Property,VR.Duedate AS DueDate,VR.Type,'Cheque' AS PaymentMode,VD.BillNo,
-			VD.Amount AS RequestedAmount,VR.UserId,
+			ROUND(VD.Amount,0) AS RequestedAmount,VR.UserId,
 			VR.PropertyId,VD.Id
 			FROM WRBHBVendorRequest VR
 			JOIN WRBHBVendorRequestDtl VD ON VR.Id=VD.VendorRequestHdrId AND VD.IsActive=1 AND VD.IsDeleted=0
@@ -308,8 +308,9 @@ END
 			RequestedAmount,UserId,PropertyId,Id,ApartmentNo)
 	        
 			SELECT DISTINCT 'RequestedBy' AS BillDate,
-			(U.FirstName+' '+U.LastName) AS ExpenseHead,'' AS VendorName,'Month' AS Property,'',LEFT(DATENAME(MONTH,VR.Date),3),'Property' AS PaymentMode,
-			P.PropertyName ,
+			(U.FirstName+' '+U.LastName) AS ExpenseHead,'' AS VendorName,'Month' AS Property,'',(LEFT(DATENAME(MONTH,VR.Date),3)+'  '+LEFT(DATENAME(YEAR,VR.Date),4)), 
+			P.PropertyName AS PaymentMode,
+			'Property' ,
 			CONVERT(NVARCHAR(100),'',103) AS RequestedAmount,
 			CONVERT(NVARCHAR(100),'',103),'',CONVERT(NVARCHAR(100),'',103),''
 			FROM WRBHBVendorRequest VR
@@ -387,7 +388,7 @@ END
 			SELECT CONVERT(NVARCHAR(100),VR.Date,103) AS BillDate,
 			VR.Service AS ExpenseHead,VR.VendorName AS VendorName,
 			P.PropertyName AS Property,VR.Duedate AS DueDate,VR.Type,'Cheque' AS PaymentMode,VR.BillNo,
-			VR.Amount AS RequestedAmount,VR.UserId,
+			ROUND(VR.Amount,0) AS RequestedAmount,VR.UserId,
 			VR.PropertyId,VR.Id
 			FROM WRBHBVendorRequest VR
 			JOIN WRBHBProperty P ON VR.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
@@ -416,8 +417,8 @@ END
 	        
 			SELECT DISTINCT 'RequestedBy' AS BillDate,
 			(U.FirstName+' '+U.LastName) AS ExpenseHead,'' AS VendorName,'Month' AS Property,'',
-			LEFT(DATENAME(MONTH,VR.Date),3),'Property' AS PaymentMode,
-			P.PropertyName ,
+			(LEFT(DATENAME(MONTH,VR.Date),3)+'  '+LEFT(DATENAME(YEAR,VR.Date),4)),P.PropertyName AS PaymentMode,
+			'Property' ,
 			CONVERT(NVARCHAR(100),'',103) AS RequestedAmount,
 			CONVERT(NVARCHAR(100),'',103),'',CONVERT(NVARCHAR(100),'',103),''
 			FROM WRBHBVendorRequest VR

@@ -1,6 +1,6 @@
 
 GO
-/****** Object:  StoredProcedure [dbo].[Sp_CheckIn_Help]    Script Date: 11/18/2014 12:32:37 ******/
+/****** Object:  StoredProcedure [dbo].[Sp_CheckIn_Help]    Script Date: 01/21/2015 09:46:59 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -469,7 +469,7 @@ IF @SSPId =0
 INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		select  H.Id,ABPA.BookingPropertyId As PropertyId,
 		 (ABPA.FirstName+','+ABPA.LastName) as  ChkInGuest,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,0 as RoomId,
-		 ABPA.ApartmentId,H.BookingLevel,0 as BedId,0 as RoomCaptureId,ABPA.Id
+		 ABPA.ApartmentId,H.BookingLevel,0 as BedId,ABPA.RoomCaptured as RoomCaptureId,ABPA.Id
 		 FROM WRBHBBooking H
 		 join WRBHBApartmentBookingPropertyAssingedGuest ABPA on H.Id = ABPA.BookingId AND
 		 ABPA.IsActive = 1 AND ABPA.IsDeleted = 0
@@ -491,7 +491,7 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 		-- and ABPA.ApartmentId NOT IN (SELECT ApartmentId From WrbHbCheckInHdr WHERE BookingId=ABPA.BookingId) 
 		group by H.Id,ABPA.BookingPropertyId ,
 		 ABPA.FirstName,ABPA.LastName,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,
-		 ABPA.ApartmentId,H.BookingLevel,ABPA.Id
+		 ABPA.ApartmentId,H.BookingLevel,ABPA.Id,ABPA.RoomCaptured
 		 
 -- Table2 ( to check single or double) 
 		
@@ -500,33 +500,37 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) =1)
+	
 		
 		
 		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
-		from #CheckIn1
-		where BookingId  IN (SELECT BookingId From #CheckIn1
-		group by BookingId having COUNT(*) >=2)
+		SELECT Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		FROM #CheckIn1
+		WHERE BookingId  IN (SELECT BookingId From #CheckIn1
+		GROUP BY BookingId having COUNT(*) >=2)
 		
 		-- Table3(Concatinate 2 Guest Name)
 	--	CREATE TABLE #CheckIn3(Id INT,PropertyId INT,ChkInGuest NVARCHAR(100),GuestId NVARCHAR(100),BookingId INT,RoomId INT)
 		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select distinct t2.Id,t2.PropertyId,
+		SELECT DISTINCT t2.Id,t2.PropertyId,
 		(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS ChkInGuest,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS GuestId,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2
+		
+		
+		
 -- to check Bed Level
 INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		 select  H.Id,ABPA.BookingPropertyId As PropertyId,
 		 (ABPA.FirstName+','+ABPA.LastName) as  ChkInGuest,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,ABPA.RoomId,
-		 0 AS ApartmentId,H.BookingLevel,ABPA.BedId as BedId,0 as RoomCaptureId,ABPA.Id
+		 0 AS ApartmentId,H.BookingLevel,ABPA.BedId as BedId,ABPA.RoomCaptured as RoomCaptureId,ABPA.Id
 		 FROM WRBHBBooking H
 		 join WRBHBBedBookingPropertyAssingedGuest ABPA on H.Id = ABPA.BookingId  AND
 		 ABPA.IsActive = 1 AND ABPA.IsDeleted = 0
@@ -547,7 +551,7 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 		-- and ABPA.BedId NOT IN (SELECT BedId From WrbHbCheckInHdr WHERE BookingId=ABPA.BookingId)  
 		 group by H.Id,ABPA.BookingPropertyId ,
 		 ABPA.FirstName,ABPA.LastName,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,ABPA.RoomId,
-		 H.BookingLevel,ABPA.BedId ,ABPA.Id
+		 H.BookingLevel,ABPA.BedId ,ABPA.Id,ABPA.RoomCaptured
 		 
 		 -- Table2 ( to check single or double) 
 		
@@ -921,7 +925,7 @@ ELSE
         INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		select  H.Id,ABPA.BookingPropertyId As PropertyId,
 		 (ABPA.FirstName+','+ABPA.LastName) as  ChkInGuest,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,0 as RoomId,
-		 ABPA.ApartmentId,H.BookingLevel,0 as BedId,0 as RoomCaptureId,ABPA.Id
+		 ABPA.ApartmentId,H.BookingLevel,0 as BedId,ABPA.RoomCaptured as RoomCaptureId,ABPA.Id
 		 FROM WRBHBBooking H
 		 join WRBHBApartmentBookingPropertyAssingedGuest ABPA on H.Id = ABPA.BookingId AND
 		 ABPA.IsActive = 1 AND ABPA.IsDeleted = 0
@@ -942,7 +946,7 @@ ELSE
 	--	 and ABPA.ApartmentId NOT IN (SELECT ApartmentId From WrbHbCheckInHdr WHERE BookingId=ABPA.BookingId) 
 	group by H.Id,ABPA.BookingPropertyId,
 		 ABPA.FirstName,ABPA.LastName,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,
-		 ABPA.ApartmentId,H.BookingLevel,ABPA.Id
+		 ABPA.ApartmentId,H.BookingLevel,ABPA.Id,ABPA.RoomCaptured
 		 
 -- Table2 ( to check single or double) 
 		
@@ -964,20 +968,20 @@ ELSE
 		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		select distinct t2.Id,t2.PropertyId,
 		(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS ChkInGuest,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS GuestId,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2
 -- to check Bed Level
          INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		 select  H.Id,ABPA.BookingPropertyId As PropertyId,
 		 (ABPA.FirstName+','+ABPA.LastName) as  ChkInGuest,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,0 as RoomId,
-		 0 AS ApartmentId,H.BookingLevel,ABPA.BedId as BedId,0 as RoomCaptureId,ABPA.Id
+		 0 AS ApartmentId,H.BookingLevel,ABPA.BedId as BedId,ABPA.RoomCaptured as RoomCaptureId,ABPA.Id
 		 FROM WRBHBBooking H
 		 join WRBHBBedBookingPropertyAssingedGuest ABPA on H.Id = ABPA.BookingId  AND
 		 ABPA.IsActive = 1 AND ABPA.IsDeleted = 0
@@ -998,7 +1002,7 @@ ELSE
 	--	 and ABPA.BedId NOT IN (SELECT BedId From WrbHbCheckInHdr WHERE BookingId=ABPA.BookingId)  
 		group by  H.Id,ABPA.BookingPropertyId,
 		 ABPA.FirstName,ABPA.LastName,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,
-		 H.BookingLevel,ABPA.BedId,ABPA.Id
+		 H.BookingLevel,ABPA.BedId,ABPA.Id,ABPA.RoomCaptured
 		 -- Table2 ( to check single or double) 
 		
 		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
@@ -1379,8 +1383,8 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 		and BP.PropertyType in ('InP')--P.Category in ('Internal Property','Managed G H') 
 		and H.IsActive = 1 and H.IsDeleted = 0  
 	--	select * from WRBHBBookingPropertyAssingedGuest where BookingId = 25
-		and CONVERT(varchar(100),AG.ChkInDt,103) in( CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103), 
-		CONVERT(NVARCHAR,DATEADD(DAY,0,CONVERT(DATE,GETDATE(),103)),103) )
+		AND CONVERT(varchar(100),AG.ChkInDt,103) BETWEEN  CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103) AND
+		CONVERT(NVARCHAR,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) 
 		and AG.BookingPropertyId = @PropertyId and PU.UserId=@UserId
 		and AG.CurrentStatus = 'Booked' and isnull(AG.RoomShiftingFlag,0) = 0
 	--	AND AG.RoomId NOT IN (SELECT RoomId From WrbHbCheckInHdr WHERE BookingId=AG.BookingId) 
@@ -1422,7 +1426,7 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		select distinct H.Id,ABPA.BookingPropertyId As PropertyId,
 		 (ABPA.FirstName+','+ABPA.LastName) as  ChkInGuest,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,0 as RoomId,
-		 ABPA.ApartmentId,H.BookingLevel,0 as BedId,0 as RoomCaptureId,ABPA.Id
+		 ABPA.ApartmentId,H.BookingLevel,0 as BedId,ABPA.RoomCaptured as RoomCaptureId,ABPA.Id
 		 FROM WRBHBBooking H
 		 join WRBHBApartmentBookingPropertyAssingedGuest ABPA on H.Id = ABPA.BookingId AND
 		 ABPA.IsActive = 1 AND ABPA.IsDeleted = 0
@@ -1434,14 +1438,14 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 		 WHERE  H.Status in( 'Booked','Direct Booked')  and isnull(H.CancelStatus,0)!='Canceled'  and
 		 H.IsActive = 1 and H.IsDeleted = 0  
 		 and P.Category in ('Internal Property') 
-		 and  CONVERT(varchar(100),ABPA.ChkInDt,103) in( CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103), 
-		 CONVERT(NVARCHAR,DATEADD(DAY,0,CONVERT(DATE,GETDATE(),103)),103) )
+		 and  CONVERT(varchar(100),ABPA.ChkInDt,103) BETWEEN  CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103) AND 
+		 CONVERT(NVARCHAR,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) 
 		 and ABPA.BookingPropertyId=@PropertyId and PU.UserId=@UserId
 		 and ABPA.CurrentStatus = 'Booked'
 	--	 and ABPA.ApartmentId NOT IN (SELECT ApartmentId From WrbHbCheckInHdr WHERE BookingId=ABPA.BookingId) 
 	group by H.Id,ABPA.BookingPropertyId ,
 		 ABPA.FirstName,ABPA.LastName,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,
-		 ABPA.ApartmentId,H.BookingLevel,ABPA.Id
+		 ABPA.ApartmentId,H.BookingLevel,ABPA.Id,ABPA.RoomCaptured
 		 
 -- Table2 ( to check single or double) 
 		
@@ -1463,20 +1467,20 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		select distinct t2.Id,t2.PropertyId,
 		(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS ChkInGuest,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS GuestId,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2
 -- to check Bed Level Internal Property
 INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		 select distinct H.Id,ABPA.BookingPropertyId As PropertyId,
 		 (ABPA.FirstName+','+ABPA.LastName) as  ChkInGuest,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,ABPA.RoomId,
-		 0 AS ApartmentId,H.BookingLevel,ABPA.BedId as BedId,0 as RoomCaptureId,ABPA.Id
+		 0 AS ApartmentId,H.BookingLevel,ABPA.BedId as BedId,ABPA.RoomCaptured as RoomCaptureId,ABPA.Id
 		 FROM WRBHBBooking H
 		 join WRBHBBedBookingPropertyAssingedGuest ABPA on H.Id = ABPA.BookingId  AND
 		 ABPA.IsActive = 1 AND ABPA.IsDeleted = 0
@@ -1488,14 +1492,14 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 		 WHERE  H.Status in( 'Booked','Direct Booked')  and isnull(H.CancelStatus,0)!='Canceled'  and
 		 H.IsActive = 1 and H.IsDeleted = 0  
 		 and P.Category in ('Internal Property','Managed G H') 
-		 and CONVERT(varchar(100),ABPA.ChkInDt,103) in( CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103), 
-		 CONVERT(NVARCHAR,DATEADD(DAY,0,CONVERT(DATE,GETDATE(),103)),103) )
+		 and CONVERT(varchar(100),ABPA.ChkInDt,103) BETWEEN  CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103) AND 
+		 CONVERT(NVARCHAR,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) 
 		 and ABPA.BookingPropertyId=@PropertyId and PU.UserId=@UserId
 		 and ABPA.CurrentStatus = 'Booked'
 	--	 and ABPA.BedId NOT IN (SELECT BedId From WrbHbCheckInHdr WHERE BookingId=ABPA.BookingId) 
 		group by H.Id,ABPA.BookingPropertyId ,
 		 ABPA.FirstName,ABPA.LastName,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,ABPA.RoomId,
-		 H.BookingLevel,ABPA.BedId ,ABPA.Id
+		 H.BookingLevel,ABPA.BedId ,ABPA.Id,ABPA.RoomCaptured
 		 
 		 -- Table2 ( to check single or double) 
 		
@@ -1853,8 +1857,8 @@ ELSE
 		and BP.PropertyType in ('InP')-- P.Category in ('Internal Property','Managed G H') 
 		and H.IsActive = 1 and H.IsDeleted = 0  and isnull(AG.RoomShiftingFlag,0) = 0
 	--	select * from WRBHBBookingPropertyAssingedGuest where BookingId = 25
-		and CONVERT(varchar(100),AG.ChkInDt,103) in( CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103), 
-		CONVERT(NVARCHAR,DATEADD(DAY,0,CONVERT(DATE,GETDATE(),103)),103) )
+		and CONVERT(varchar(100),AG.ChkInDt,103) between  CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103) and
+		CONVERT(NVARCHAR,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) 
 		and AG.BookingPropertyId = @PropertyId and PU.UserId=@UserId
 		and AG.CurrentStatus = 'Booked'
 	--	AND AG.RoomId NOT IN (SELECT RoomId From WrbHbCheckInHdr WHERE BookingId=AG.BookingId) 
@@ -1897,7 +1901,7 @@ ELSE
         INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		select distinct H.Id,ABPA.BookingPropertyId As PropertyId,
 		 (ABPA.FirstName+','+ABPA.LastName) as  ChkInGuest,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,0 as RoomId,
-		 ABPA.ApartmentId,H.BookingLevel,0 as BedId,0 as RoomCaptureId,ABPA.Id
+		 ABPA.ApartmentId,H.BookingLevel,0 as BedId,ABPA.RoomCaptured as RoomCaptureId,ABPA.Id
 		 FROM WRBHBBooking H
 		 join WRBHBApartmentBookingPropertyAssingedGuest ABPA on H.Id = ABPA.BookingId AND
 		 ABPA.IsActive = 1 AND ABPA.IsDeleted = 0
@@ -1909,14 +1913,14 @@ ELSE
 		 WHERE  H.Status in( 'Booked','Direct Booked')  and isnull(H.CancelStatus,0)!='Canceled'  and
 		 H.IsActive = 1 and H.IsDeleted = 0  
 		 and P.Category in ('Internal Property') 
-		 and  CONVERT(varchar(100),ABPA.ChkInDt,103) in( CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103), 
-		 CONVERT(NVARCHAR,DATEADD(DAY,0,CONVERT(DATE,GETDATE(),103)),103) )
+		 and  CONVERT(varchar(100),ABPA.ChkInDt,103) between  CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103) and 
+		 CONVERT(NVARCHAR,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) 
 		 and ABPA.BookingPropertyId=@PropertyId and PU.UserId=@UserId
 		 and ABPA.CurrentStatus = 'Booked'
 	--	 and ABPA.ApartmentId NOT IN (SELECT ApartmentId From WrbHbCheckInHdr WHERE BookingId=ABPA.BookingId) 
 		 group by H.Id,ABPA.BookingPropertyId ,
 		 ABPA.FirstName,ABPA.LastName,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,
-		 ABPA.ApartmentId,H.BookingLevel,ABPA.Id
+		 ABPA.ApartmentId,H.BookingLevel,ABPA.Id,ABPA.RoomCaptured
 		 
 -- Table2 ( to check single or double) 
 		
@@ -1938,20 +1942,20 @@ ELSE
 		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		select distinct t2.Id,t2.PropertyId,
 		(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS ChkInGuest,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS GuestId,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2
 -- to check Bed Level Internal
          INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		 select distinct H.Id,ABPA.BookingPropertyId As PropertyId,
 		 (ABPA.FirstName+','+ABPA.LastName) as  ChkInGuest,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,0 as RoomId,
-		 0 AS ApartmentId,H.BookingLevel,ABPA.BedId as BedId,0 as RoomCaptureId,ABPA.Id
+		 0 AS ApartmentId,H.BookingLevel,ABPA.BedId as BedId,ABPA.RoomCaptured as RoomCaptureId,ABPA.Id
 		 FROM WRBHBBooking H
 		 join WRBHBBedBookingPropertyAssingedGuest ABPA on H.Id = ABPA.BookingId  AND
 		 ABPA.IsActive = 1 AND ABPA.IsDeleted = 0
@@ -1963,14 +1967,14 @@ ELSE
 		 WHERE  H.Status in( 'Booked','Direct Booked')  and isnull(H.CancelStatus,0)!='Canceled'  and
 		 H.IsActive = 1 and H.IsDeleted = 0  
 		 and P.Category in ('Internal Property') 
-		 and CONVERT(varchar(100),ABPA.ChkInDt,103) in( CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103), 
-		 CONVERT(NVARCHAR,DATEADD(DAY,0,CONVERT(DATE,GETDATE(),103)),103) )
+		 and CONVERT(varchar(100),ABPA.ChkInDt,103) between  CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103) and 
+		 CONVERT(NVARCHAR,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) 
 		 and ABPA.BookingPropertyId=@PropertyId and PU.UserId=@UserId
 		 and ABPA.CurrentStatus = 'Booked'
 	--	 and ABPA.BedId NOT IN (SELECT BedId From WrbHbCheckInHdr WHERE BookingId=ABPA.BookingId)  
 		 group by H.Id,ABPA.BookingPropertyId ,
 		 ABPA.FirstName,ABPA.LastName,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,ABPA.RoomId,
-		 H.BookingLevel,ABPA.BedId ,ABPA.Id
+		 H.BookingLevel,ABPA.BedId ,ABPA.Id,ABPA.RoomCaptured
 		 
 		 -- Table2 ( to check single or double) 
 		
@@ -2777,7 +2781,8 @@ CREATE TABLE #Name(Name NVARCHAR(100),Grade NVARCHAR(100),EmailId NVARCHAR(100),
 				JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON B.Id=GD.BookingId AND B.IsActive=1 AND B.IsDeleted=0
 				AND BPA.GuestId=GD.GuestId			
 				JOIN WRBHBBookingProperty BP ON B.Id =BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0
-				AND BPA.BookingPropertyId=BP.PropertyId AND BP.PropertyType in('InP','ExP','MGH')
+				AND BPA.BookingPropertyId=BP.PropertyId AND BPA.BookingPropertyTableId = BP.Id 
+				AND BP.PropertyType in('InP','ExP','MGH')
 				JOIN WRBHBProperty P on  P.Id = BPA.BookingPropertyId and P.IsActive=1 and P.IsDeleted = 0
 				JOIN WRBHBClientManagement C on C.Id = B.ClientId and C.IsActive = 1 and C.IsDeleted = 0
 				WHERE B.Id=@BookingId AND B.IsActive=1 AND B.IsDeleted=0
@@ -2802,7 +2807,8 @@ CREATE TABLE #Name(Name NVARCHAR(100),Grade NVARCHAR(100),EmailId NVARCHAR(100),
 				JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON B.Id=GD.BookingId AND B.IsActive=1 AND B.IsDeleted=0
 				AND BPA.GuestId=GD.GuestId			
 				JOIN WRBHBBookingProperty BP ON B.Id =BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0
-				AND BPA.BookingPropertyId=BP.PropertyId AND BP.PropertyType in('DdP')
+				AND BPA.BookingPropertyId=BP.PropertyId AND BPA.BookingPropertyTableId = BP.Id
+				AND BP.PropertyType in('DdP')
 				JOIN WRBHBProperty P on  P.Id = BPA.BookingPropertyId and P.IsActive=1 and P.IsDeleted = 0
 				JOIN WRBHBClientManagement C on C.Id = B.ClientId and C.IsActive = 1 and C.IsDeleted = 0
 				WHERE B.Id=@BookingId AND B.IsActive=1 AND B.IsDeleted=0
@@ -2829,7 +2835,8 @@ CREATE TABLE #Name(Name NVARCHAR(100),Grade NVARCHAR(100),EmailId NVARCHAR(100),
 				JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON B.Id=GD.BookingId AND B.IsActive=1 AND B.IsDeleted=0
 				AND BPA.GuestId=GD.GuestId			
 				JOIN WRBHBBookingProperty BP ON B.Id =BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0
-				AND BPA.BookingPropertyId=BP.PropertyId AND BP.PropertyType in('CPP') 
+				AND BPA.BookingPropertyId=BP.PropertyId AND BPA.BookingPropertyTableId = BP.Id
+				AND BP.PropertyType in('CPP') 
 				JOIN WRBHBProperty P on  P.Id = BPA.BookingPropertyId and P.IsActive=1 and P.IsDeleted = 0
 				JOIN WRBHBClientManagement C on C.Id = B.ClientId and C.IsActive = 1 and C.IsDeleted = 0
 				WHERE B.Id=@BookingId AND B.IsActive=1 AND B.IsDeleted=0
@@ -3001,7 +3008,8 @@ ELSE
 				JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON B.Id=GD.BookingId AND B.IsActive=1 AND B.IsDeleted=0
 				AND BPA.GuestId=GD.GuestId			
 				JOIN WRBHBBookingProperty BP ON B.Id =BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0
-				AND BPA.BookingPropertyId=BP.PropertyId AND BP.PropertyType in('InP','ExP','MGH')
+				AND BPA.BookingPropertyId=BP.PropertyId AND BPA.BookingPropertyTableId = BP.Id
+				AND BP.PropertyType in('InP','ExP','MGH')
 				JOIN WRBHBProperty P on  P.Id = BPA.BookingPropertyId and P.IsActive=1 and P.IsDeleted = 0
 				JOIN WRBHBClientManagement C on C.Id = B.ClientId and C.IsActive = 1 and C.IsDeleted = 0
 				WHERE B.Id=@BookingId AND B.IsActive=1 AND B.IsDeleted=0
@@ -3026,7 +3034,8 @@ ELSE
 				JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON B.Id=GD.BookingId AND B.IsActive=1 AND B.IsDeleted=0
 				AND BPA.GuestId=GD.GuestId			
 				JOIN WRBHBBookingProperty BP ON B.Id =BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0
-				AND BPA.BookingPropertyId=BP.PropertyId AND BP.PropertyType in('DdP')
+				AND BPA.BookingPropertyId=BP.PropertyId AND BPA.BookingPropertyTableId = BP.Id
+				AND BP.PropertyType in('DdP')
 				JOIN WRBHBProperty P on  P.Id = BPA.BookingPropertyId and P.IsActive=1 and P.IsDeleted = 0
 				JOIN WRBHBClientManagement C on C.Id = B.ClientId and C.IsActive = 1 and C.IsDeleted = 0
 				WHERE B.Id=@BookingId AND B.IsActive=1 AND B.IsDeleted=0
@@ -3052,7 +3061,8 @@ ELSE
 				JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON B.Id=GD.BookingId AND B.IsActive=1 AND B.IsDeleted=0
 				AND BPA.GuestId=GD.GuestId			
 				JOIN WRBHBBookingProperty BP ON B.Id =BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0
-				AND BPA.BookingPropertyId=BP.PropertyId AND BP.PropertyType in('CPP')
+				AND BPA.BookingPropertyId=BP.PropertyId AND BPA.BookingPropertyTableId = BP.Id
+				AND BP.PropertyType in('CPP')
 				JOIN WRBHBProperty P on  P.Id = BPA.BookingPropertyId and P.IsActive=1 and P.IsDeleted = 0
 				JOIN WRBHBClientManagement C on C.Id = B.ClientId and C.IsActive = 1 and C.IsDeleted = 0
 				WHERE B.Id=@BookingId AND B.IsActive=1 AND B.IsDeleted=0
@@ -3190,6 +3200,17 @@ ELSE
 		CREATE TABLE #SERVICRAMOUNTFinal(Id BIGINT,Complimentary BIT,ServiceName NVARCHAR(100),Price DECIMAL(27,2),
 		Enable BIT,ProductId BIGINT,TypeService NVARCHAR(100),Type NVARCHAR(100))
 		
+		IF @BookingLevel='Room'
+		BEGIN
+		
+			SELECT @SSPID=SSPId,@RoomId1=RoomId FROM WRBHBBookingPropertyAssingedGuest
+			WHERE GuestId=@GuestId AND BookingId=@BookingId;
+		END
+		IF @BookingLevel='Bed'
+		BEGIN
+			SELECT @SSPID=SSPId,@RoomId1=RoomId FROM WRBHBBedBookingPropertyAssingedGuest
+			WHERE GuestId=@GuestId AND BookingId=@BookingId;
+		END
 		IF @BookingLevel='Apartment'
 		BEGIN
 			SELECT @SSPID=SSPId,@ApartmentId1=ApartmentId FROM WRBHBApartmentBookingPropertyAssingedGuest
@@ -3221,6 +3242,7 @@ ELSE
 				 JOIN WRBHBContractManagementServices CS ON H.Id=CS.ContractId AND CS.IsActive=1 AND CS.IsDeleted=0
 				 WHERE  H.ClientId=@ClientId1 AND H.IsActive=1 AND H.IsDeleted=0	
 			END
+			
 			IF @BookingLevel='Bed'
 			BEGIN
 				 INSERT INTO #SERVICRAMOUNT(Id,Complimentary,ServiceName,Price,Enable,ProductId,TypeService,Type)
@@ -3257,23 +3279,42 @@ ELSE
 		
 			--SELECT DISTINCT (ServiceName) AS ServiceItem,Price,ProductId,Complimentary
 			--FROM #SERVICRAMOUNT
-		DECLARE @SERVICRAMOUNT nvarchar(100);
-		set @SERVICRAMOUNT = (select COUNT(*) from #SERVICRAMOUNT);
-			IF(@SERVICRAMOUNT = '')
-			BEGIN
-				INSERT INTO #SERVICRAMOUNTFinal(Id,Complimentary,ServiceName,Price,Enable,ProductId,TypeService,Type)
-				SELECT Id,ISComplimentary,ProductName,PerQuantityprice,Enable,Id,TypeService,'ProductMaster' 
-				FROM WRBHBContarctProductMaster 
-				WHERE IsActive=1 AND IsDeleted=0
+			
+		UPDATE #SERVICRAMOUNT SET Price=0 
+		 WHERE Complimentary=1
+		 
+		INSERT INTO #SERVICRAMOUNTFinal(Id,Complimentary,ServiceName,Price,Enable,ProductId,TypeService,Type)
+		SELECT Id,ISComplimentary,ProductName,PerQuantityprice,Enable,Id,TypeService,'ProductMaster' 
+		FROM WRBHBContarctProductMaster 
+		WHERE IsActive=1 AND IsDeleted=0
+		
+		
+		
+		UPDATE #SERVICRAMOUNTFinal SET Price=S.Price,Type=S.Type,Complimentary=S.Complimentary
+		FROM  #SERVICRAMOUNTFinal O
+		JOIN #SERVICRAMOUNT S ON O.ProductId=S.ProductId
+		
+		SELECT DISTINCT (ServiceName) AS ServiceItem,Price,ProductId,Complimentary
+		FROM #SERVICRAMOUNTFinal
 				
-				SELECT DISTINCT (ServiceName) AS ServiceItem,Price,ProductId,Complimentary
-				FROM #SERVICRAMOUNTFinal  
-			END
-			ELSE
-			BEGIN
-				SELECT DISTINCT (ServiceName) AS ServiceItem,Price,ProductId,Complimentary
-				FROM #SERVICRAMOUNT  
-			END
+					
+		--DECLARE @SERVICRAMOUNT nvarchar(100);
+		--set @SERVICRAMOUNT = (select COUNT(*) from #SERVICRAMOUNT);
+		--	IF(ISNULL(@SERVICRAMOUNT,0) = 0)
+		--	BEGIN
+		--		INSERT INTO #SERVICRAMOUNTFinal(Id,Complimentary,ServiceName,Price,Enable,ProductId,TypeService,Type)
+		--		SELECT Id,ISComplimentary,ProductName,PerQuantityprice,Enable,Id,TypeService,'ProductMaster' 
+		--		FROM WRBHBContarctProductMaster 
+		--		WHERE IsActive=1 AND IsDeleted=0
+				
+		--		SELECT DISTINCT (ServiceName) AS ServiceItem,Price,ProductId,Complimentary
+		--		FROM #SERVICRAMOUNTFinal  
+		--	END
+		--	ELSE
+		--	BEGIN
+		--		SELECT DISTINCT (ServiceName) AS ServiceItem,Price,ProductId,Complimentary
+		--		FROM #SERVICRAMOUNT  
+		--	END
 			
 			
 			

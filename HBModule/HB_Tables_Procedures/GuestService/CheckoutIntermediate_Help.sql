@@ -1,6 +1,6 @@
 
 GO
-/****** Object:  StoredProcedure [dbo].[Sp_CheckoutIntermediate_Help]    Script Date: 12/05/2014 11:51:21 ******/
+/****** Object:  StoredProcedure [dbo].[Sp_CheckoutIntermediate_Help]    Script Date: 01/23/2015 16:59:08 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -986,7 +986,9 @@ If @BookingLevel = 'Apartment'
 		INSERT INTO #LuxuryTax1(LuxuryTax,LuxuryTax1,LuxuryTax2,LuxuryTax3,ServiceTax,FromDT,ToDT,RackTariffFlag,Id,TariffAmtFrom,TariffAmtFrom1,TariffAmtFrom2,  
 		TariffAmtFrom3,TariffAmtTo,TariffAmtTo1,TariffAmtTo2,TariffAmtTo3)  
 		SELECT ISNULL(LTaxPer,0),ISNULL(LTaxPer1,0),ISNULL(LTaxPer2,0),ISNULL(LTaxPer3,0),ISNULL(ServiceTaxOnTariff,0),CONVERT(varchar(100),Date,103),  
-		CONVERT(varchar(100),ISNULL(DateTo,GETDATE()+1),103),ISNULL(RackTariff,0),Id,TariffAmtFrom,TariffAmtFrom1,  
+	--	CONVERT(varchar(100),ISNULL(DateTo,GETDATE()+1),103),
+		CONVERT(varchar(100),@ChkOutDate,103),
+		ISNULL(RackTariff,0),Id,TariffAmtFrom,TariffAmtFrom1,  
 		TariffAmtFrom2,TariffAmtFrom3,TariffAmtTo,TariffAmtTo1,TariffAmtTo2,TariffAmtTo3    
 		FROM WRBHBTaxMaster  
 		WHERE CONVERT(nvarchar(100),Date,103) between CONVERT(nvarchar(100),@NewCheckInDate,103) and  
@@ -996,7 +998,9 @@ If @BookingLevel = 'Apartment'
 		INSERT INTO #LuxuryTax1(LuxuryTax,LuxuryTax1,LuxuryTax2,LuxuryTax3,ServiceTax,FromDT,ToDT,RackTariffFlag,Id,TariffAmtFrom,TariffAmtFrom1,TariffAmtFrom2,  
 		TariffAmtFrom3,TariffAmtTo,TariffAmtTo1,TariffAmtTo2,TariffAmtTo3)  
 		SELECT ISNULL(LTaxPer,0),ISNULL(LTaxPer1,0),ISNULL(LTaxPer2,0),ISNULL(LTaxPer3,0),ISNULL(ServiceTaxOnTariff,0),CONVERT(varchar(100),Date,103),  
-		CONVERT(varchar(100),ISNULL(DateTo,GETDATE()+1),103),ISNULL(RackTariff,0),Id,TariffAmtFrom,TariffAmtFrom1,  
+	--	CONVERT(varchar(100),ISNULL(DateTo,GETDATE()+1),103),
+		CONVERT(varchar(100),@ChkOutDate,103),
+		ISNULL(RackTariff,0),Id,TariffAmtFrom,TariffAmtFrom1,  
 		TariffAmtFrom2,TariffAmtFrom3,TariffAmtTo,TariffAmtTo1,TariffAmtTo2,TariffAmtTo3    
 		FROM WRBHBTaxMaster  
 		WHERE CONVERT(nvarchar(100),DateTo,103) between CONVERT(nvarchar(100),@NewCheckInDate,103) and  
@@ -1006,7 +1010,9 @@ If @BookingLevel = 'Apartment'
 		INSERT INTO #LuxuryTax1(LuxuryTax,LuxuryTax1,LuxuryTax2,LuxuryTax3,ServiceTax,FromDT,ToDT,RackTariffFlag,Id,TariffAmtFrom,TariffAmtFrom1,TariffAmtFrom2,  
 		TariffAmtFrom3,TariffAmtTo,TariffAmtTo1,TariffAmtTo2,TariffAmtTo3)  
 		SELECT ISNULL(LTaxPer,0),ISNULL(LTaxPer1,0),ISNULL(LTaxPer2,0),ISNULL(LTaxPer3,0),ISNULL(ServiceTaxOnTariff,0),CONVERT(varchar(100),Date,103),  
-		CONVERT(varchar(100),ISNULL(DateTo,GETDATE()+1),103),ISNULL(RackTariff,0),Id,TariffAmtFrom,TariffAmtFrom1,  
+	--	CONVERT(varchar(100),ISNULL(DateTo,GETDATE()+1),103),
+		CONVERT(varchar(100),@ChkOutDate,103),
+		ISNULL(RackTariff,0),Id,TariffAmtFrom,TariffAmtFrom1,  
 		TariffAmtFrom2,TariffAmtFrom3,TariffAmtTo,TariffAmtTo1,TariffAmtTo2,TariffAmtTo3    
 		FROM WRBHBTaxMaster  
 		WHERE CONVERT(nvarchar(100),Date,103) <= CONVERT(nvarchar(100),@NewCheckInDate,103)   
@@ -1015,7 +1021,9 @@ If @BookingLevel = 'Apartment'
 		INSERT INTO #LuxuryTax1(LuxuryTax,LuxuryTax1,LuxuryTax2,LuxuryTax3,ServiceTax,FromDT,ToDT,RackTariffFlag,Id,TariffAmtFrom,TariffAmtFrom1,TariffAmtFrom2,  
 		TariffAmtFrom3,TariffAmtTo,TariffAmtTo1,TariffAmtTo2,TariffAmtTo3)  
 		SELECT ISNULL(LTaxPer,0),ISNULL(LTaxPer1,0),ISNULL(LTaxPer2,0),ISNULL(LTaxPer3,0),ISNULL(ServiceTaxOnTariff,0),CONVERT(varchar(100),Date,103),  
-		CONVERT(varchar(100),ISNULL(DateTo,GETDATE()+1),103),ISNULL(RackTariff,0),Id,TariffAmtFrom,TariffAmtFrom1,  
+	--	CONVERT(varchar(100),ISNULL(DateTo,GETDATE()+1),103),
+		CONVERT(varchar(100),@ChkOutDate,103),
+		ISNULL(RackTariff,0),Id,TariffAmtFrom,TariffAmtFrom1,  
 		TariffAmtFrom2,TariffAmtFrom3,TariffAmtTo,TariffAmtTo1,TariffAmtTo2,TariffAmtTo3    
 		FROM WRBHBTaxMaster  
 		WHERE CONVERT(nvarchar(100),@ChkOutDate,103)<= CONVERT(nvarchar(100),DateTo,103)    

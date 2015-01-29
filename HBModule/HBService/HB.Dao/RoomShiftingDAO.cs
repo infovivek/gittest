@@ -73,7 +73,7 @@ namespace HB.Dao
                     //message.From = new System.Net.Mail.MailAddress("stay@hummingbirdindia.com", "", System.Text.Encoding.UTF8);
                     message.From = new System.Net.Mail.MailAddress(ds.Tables[1].Rows[0][1].ToString(), "", System.Text.Encoding.UTF8);
                     //message.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
-                    //message.Subject = "Testing Modification Book # : " + ds.Tables[0].Rows[0][0].ToString();
+                    //message.Subject = "Testing Modification # : " + ds.Tables[0].Rows[0][0].ToString();
                     message.To.Add(new System.Net.Mail.MailAddress(ds.Tables[1].Rows[0][1].ToString()));
                     if (ds.Tables[0].Rows[0][10].ToString() == "False")
                     {
@@ -95,7 +95,8 @@ namespace HB.Dao
                     }
                     if (ds.Tables[9].Rows.Count > 0)
                     {
-                        string pattern = @"\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*";
+                        //string pattern = @"\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*";
+                        string pattern = "^([0-9a-zA-Z]([-\\.\\w]*[0-9a-zA-Z])*@([0-9a-zA-Z][-\\w]*[0-9a-zA-Z]\\.)+[a-zA-Z]{2,9})$";
                         for (int i = 0; i < ds.Tables[9].Rows.Count; i++)
                         {
                             string PropertyMail = ds.Tables[9].Rows[i][0].ToString();
@@ -282,10 +283,8 @@ namespace HB.Dao
                     System.Net.Mail.SmtpClient SMTP = new System.Net.Mail.SmtpClient();
                     SMTP.EnableSsl = true;
                     SMTP.Port = 587;
-                    //SMTP.Host = "smtp.gmail.com";
-                    //SMTP.Credentials = new System.Net.NetworkCredential("stay@staysimplyfied.com", "stay1234");
-                    SMTP.Host = "email-smtp.us-west-2.amazonaws.com";
-                    SMTP.Credentials = new System.Net.NetworkCredential("AKIAIIVF5D5D3CJAX7SQ", "ApmuZkd+L8tissEga8kac3quhhwohEi5CB+dYD36KTq3");
+                    //SMTP.Host = "smtp.gmail.com";SMTP.Credentials = new System.Net.NetworkCredential("stay@staysimplyfied.com", "stay1234");
+                    SMTP.Host = "email-smtp.us-west-2.amazonaws.com";SMTP.Credentials = new System.Net.NetworkCredential("AKIAIIVF5D5D3CJAX7SQ", "ApmuZkd+L8tissEga8kac3quhhwohEi5CB+dYD36KTq3");
                     SMTP.Send(message);
                 }
                 catch (Exception ex)

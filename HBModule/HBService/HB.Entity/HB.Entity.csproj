@@ -73,6 +73,8 @@
     <Compile Include="City.cs" />
     <Compile Include="Citylocality.cs" />
     <Compile Include="ClientColumnEntity.cs" />
+    <Compile Include="CreditNoteService.cs" />
+    <Compile Include="CreditNoteTariff.cs" />
     <Compile Include="ExternalIntermediateCheckOut.cs" />
     <Compile Include="IntermediateCheckoutServiceDtls.cs" />
     <Compile Include="IntermediateCheckoutServiceHdr.cs" />

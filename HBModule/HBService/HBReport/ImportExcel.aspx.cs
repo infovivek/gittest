@@ -34,7 +34,7 @@ namespace HBReport
               //cmd.CommandType = CommandType.Text;
               //DataSet ds = new WrbErpConnection1().ExecuteDataSet(cmd, "");
               //DropDownList1.DataSource = ds.Tables[0];
-              string sqlConnectionString1 = @"Data Source=WARBLERS-AE164B;Initial Catalog=HB14NOV;User ID=sa;Password=sa123";
+              string sqlConnectionString1 = @"Data Source=ANBU-PC;Initial Catalog=HB09JAN;User ID=sa;Password=sa123";
               SqlConnection con = new SqlConnection(sqlConnectionString1);
               SqlCommand cmd = new SqlCommand("select  ClientName as Client,Id as CId from WRBHBClientManagement GROUP BY ClientName,Id	ORDER BY ClientName ASC", con);
               con.Open();
@@ -67,7 +67,7 @@ namespace HBReport
                   DbDataReader dr = command.ExecuteReader();
                   // SQL Server Connection String
                   //string sqlConnectionString = ConfigurationManager.ConnectionStrings["HB"].ToString();
-                  string sqlConnectionString = @"Data Source=WARBLERS-AE164B;Initial Catalog=HB14NOV;User ID=sa;Password=sa123";
+                  string sqlConnectionString = @"Data Source=ANBU-PC;Initial Catalog=HB09JAN;User ID=sa;Password=sa123";
                   // Bulk Copy to SQL Server 
                   SqlBulkCopy bulkInsert = new SqlBulkCopy(sqlConnectionString);
                   bulkInsert.DestinationTableName = "WRBHBImportGuest";

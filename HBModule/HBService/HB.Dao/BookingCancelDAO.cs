@@ -87,9 +87,9 @@ namespace HB.Dao
                 System.Net.Mail.MailMessage message = new System.Net.Mail.MailMessage();
                 //DSBooking.Tables[1].Rows[0][4].ToString()    
 
-                message.From = new System.Net.Mail.MailAddress("stay@hummingbird.com", "", System.Text.Encoding.UTF8);
+                message.From = new System.Net.Mail.MailAddress("stay@hummingbirdIndia.com", "", System.Text.Encoding.UTF8);
                 //message.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
-                message.To.Add(new System.Net.Mail.MailAddress("stay@hummingbird.com"));
+                message.To.Add(new System.Net.Mail.MailAddress("stay@hummingbirdIndia.com"));
                 if (ds.Tables[0].Rows[0][10].ToString() == "False")
                 {
                     Valid = EmailValidate(ds.Tables[4].Rows[0][0].ToString());
@@ -421,9 +421,9 @@ namespace HB.Dao
                             System.Net.Mail.MailMessage message = new System.Net.Mail.MailMessage();
                             //DSBooking.Tables[1].Rows[0][4].ToString()    
 
-                            message.From = new System.Net.Mail.MailAddress("stay@hummingbird.com", "", System.Text.Encoding.UTF8);
+                            message.From = new System.Net.Mail.MailAddress("stay@hummingbirdIndia.com", "", System.Text.Encoding.UTF8);
                             //message.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
-                            message.To.Add(new System.Net.Mail.MailAddress("stay@hummingbird.com"));
+                            message.To.Add(new System.Net.Mail.MailAddress("stay@hummingbirdIndia.com"));
                             if (ds.Tables[0].Rows[0][7].ToString() == "False")
                             {
                                 Valid = EmailValidate(ds.Tables[4].Rows[0][0].ToString());
@@ -653,9 +653,9 @@ namespace HB.Dao
                            System.Net.Mail.MailMessage message = new System.Net.Mail.MailMessage();
                            //DSBooking.Tables[1].Rows[0][4].ToString()    
 
-                           message.From = new System.Net.Mail.MailAddress("stay@hummingbird.com", "", System.Text.Encoding.UTF8);
+                           message.From = new System.Net.Mail.MailAddress("stay@hummingbirdIndia.com", "", System.Text.Encoding.UTF8);
                            //message.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
-                           message.To.Add(new System.Net.Mail.MailAddress("stay@hummingbird.com"));
+                           message.To.Add(new System.Net.Mail.MailAddress("stay@hummingbirdIndia.com"));
                            if (ds.Tables[0].Rows[0][7].ToString() == "False")
                            {
                                Valid = EmailValidate(ds.Tables[4].Rows[0][0].ToString());

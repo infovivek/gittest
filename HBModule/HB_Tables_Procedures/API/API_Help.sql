@@ -96,29 +96,43 @@ IF @Action = 'SingleDoubleRateLoad'
  END
 IF @Action = 'CityCode'
  BEGIN
-  --select 'SRS';
-  select CityCode from WRBHBCity where Id in (2344,2244)
-  /*create table #dffd(cc nvarchar(100));
-  insert into #dffd(cc)
-  select CityCode from WRBHBAPICityCode
-  where CityCode not in (select CityCode from WRBHBStaticHotels123
-  group by CityCode);
-  select cc from #dffd;*/
+  SELECT '';  
+  SELECT dbo.TRIM(CityCode) FROM WRBHBAPICityCode 
+  WHERE ISNULL(CityCode,'') IN ('BLR','BOM','DEL','GOI','JAI','MAA','PNQ','XCR')
+  ORDER BY Id ASC;
+  SELECT dbo.TRIM(CityCode) FROM WRBHBAPICityCode 
+  WHERE ISNULL(CityCode,'') != '' ORDER BY Id ASC;
   /*SELECT dbo.TRIM(CityCode) FROM WRBHBAPICityCode 
-  WHERE ISNULL(CityCode,'') != '' --AND Id > 628
-  ORDER BY Id ASC;*/
-  --SELECT CityCode FROM WRBHBAPICityCode WHERE Id=267;
-  --SELECT 'TCC';
-  --SELECT 'NYT';  
-  --SELECT * FROM WRBHBAPICityCode WHERE CityCode='NYT'
-  --SELECT 'XSL';
+  WHERE ISNULL(CityCode,'') != '' AND
+  ISNULL(CityCode,'') NOT IN ('BLR','BOM','DEL','GOI','JAI','MAA','PNQ','XCR')
+  ORDER BY Id ASC;*/  
+  --SELECT 'BLR';
+  --SELECT 'BOM';
+  --SELECT 'DEL';
+  --SELECT 'GOI';
+  --SELECT 'JAI';
+  --SELECT 'MAA';
+  --SELECT 'PNQ';
+  --SELECT 'XCR';
  END 
+IF @Action = 'GetCityCode'
+ BEGIN
+  SELECT '';
+  --SELECT CityCode FROM WRBHBAPIHeader WHERE IsActive = 1 AND
+  --CityCode NOT IN (SELECT CityCode FROM WRBHBAPIHeader WHERE IsActive = 1 AND 
+  --CityId = 0 AND CityCode NOT IN ('JAI')) GROUP BY CityCode;
+  --SELECT CityCode FROM WRBHBCity WHERE Id IN (0);
+  --SELECT * FROM WRBHBCity WHERE CityCode = 'BOM';
+  --SELECT CityCode FROM WRBHBCity WHERE IsActive = 1 AND IsDeleted = 0 AND
+  --ISNULL(CityCode,'') != '' GROUP BY CityCode ORDER BY CityCode ASC;
+ END
 IF @Action = 'GetCityId'
  BEGIN
   /*SELECT Id FROM WRBHBCity 
   WHERE ISNULL(CityCode,'') != '' AND IsActive = 1 AND IsDeleted = 0
   ORDER BY Id ASC;*/
-  select Id from WRBHBCity where Id in (2344,2244)
+  --select Id from WRBHBCity where Id in (2423)
+  select Id from WRBHBCity where Id in (0)
   --SELECT 1107 AS Id; --BANGLORE
   --SELECT 2423 AS Id; --COIMBATORE
   --SELECT * FROM WRBHBCity WHERE CityCode='CJB'

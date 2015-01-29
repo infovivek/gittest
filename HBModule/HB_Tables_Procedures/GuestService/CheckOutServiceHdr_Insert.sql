@@ -34,7 +34,8 @@ CREATE PROCEDURE [dbo].[SP_CheckOutServiceHdr_Insert](
 
 AS
 BEGIN
-DECLARE @Id1 INT;
+DECLARE @Id1 INT,@GuestName NVARCHAR(100);
+SET @GuestName = (SELECT GuestName FROM WRBHBChechkOutHdr WHERE Id = @CheckOutHdrId)
  -- INSERT
 INSERT INTO WRBHBCheckOutServiceHdr(CheckOutHdrId,ChkOutServiceAmtl,
 ChkOutServiceVat,ChkOutServiceLT,ChkOutServiceST,Cess,HECess,
@@ -49,6 +50,14 @@ VALUES
 
 SET @Id1=@@IDENTITY;
 SELECT CheckOutHdrId as Id,Id RowId FROM WRBHBCheckOutServiceHdr WHERE Id=@Id1;
+
+-- this table use to bill no wise		
+
+		INSERT INTO WRBHBCheckOutDtls(CheckOutId,GuestName,BillType,BillAmount,
+		CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId)
+		
+		VALUES(@CheckOutHdrId,@GuestName,'Service',@CheckOutNetAmount,@CreatedBy,GETDATE(),@CreatedBy,
+		GETDATE(),1,0,NEWID())
 END
 GO
  

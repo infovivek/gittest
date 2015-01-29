@@ -36,7 +36,7 @@ namespace HB.BusinessService.BusinessService
             DataTable dTable = new DataTable("ERRORTBL");
             dTable.Columns.Add("Exception");
 
-            DataSet ds1 = new TACInvoiceBO().Help(data, user);
+            DataSet ds1 = new TACInvoiceDAO().Help(data, user);
             return ds1;
         }
     }

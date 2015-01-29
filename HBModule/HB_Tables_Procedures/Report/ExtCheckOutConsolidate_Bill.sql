@@ -276,7 +276,7 @@ IF @Action='PageLoad'
 	
 	where h.IsActive = 1 and h.IsDeleted = 0
 	--and CSDD.BillType ='Consolidated'
-	 and h.Id = @Id1 and  h.PropertyType = 'Managed G H'
+	 and h.Id = @Id1 and  h.PropertyType in ('Managed G H','DdP')
 	group by h.GuestName ,h.Name,h.Stay,h.Type,h.BookingLevel,
 	BillDate,h.ClientName,h.Id,	h.ChkOutTariffTotal ,h.ChkOutTariffLT ,h.ChkOutTariffNetAmount,
 	h.ChkOutTariffST2 ,h.ChkOutTariffST3 ,h.ChkOutTariffCess ,

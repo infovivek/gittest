@@ -63,7 +63,7 @@ BEGIN
 	 END
 	 ELSE
 	 BEGIN
-		IF ((day(@CDATE)=day(GETDATE()))AND(YEAR(@CDATE)=YEAR(GETDATE()))AND(MONTH(@CDATE)=MONTH(GETDATE())))
+		IF ((day('01/25/2014')=day(GETDATE()))AND(YEAR(@CDATE)=YEAR(GETDATE()))AND(MONTH(@CDATE)=MONTH(GETDATE())))
 		BEGIN		
 			SET @Flage=0
 		END
@@ -559,7 +559,7 @@ BEGIN
      
 	 SELECT TOP 1 @CDATE=DATEADD(month, 1, LastMonth),@Flage=1 FROM WRBHBInvoiceRentMonthGeneratedMaintenance
 	 ORDER BY Id DESC
-	 
+	
 	 IF ISNULL(@CDATE,'')=''
 	 BEGIN
 		 SELECT @CDATE=GETDATE();
@@ -575,9 +575,11 @@ BEGIN
 	    BEGIN	
 			SET @Flage=1
 	    END 
-	 END	
+	 END
+	 
 	 IF @Flage=0
 	 BEGIN
+	
 		 CREATE TABLE #TEMPPROPERTYAPARTMENTMAINTENANCE(AgreementId BIGINT,PropertyId BIGINT,PropertyName NVARCHAR(100),ApartmentNo NVARCHAR(100),
 		 ApartmentId BIGINT,RentelAmount DECIMAL(27,2),RentType NVARCHAR(100),RentStartDate DATE,ExpiryDate DATE,
 		 OwnerName NVARCHAR(100),AgreementOwnerId BIGINT,TDSAMOUNT DECIMAL(27,2),Paid NVARCHAR(100))
@@ -668,6 +670,7 @@ BEGIN
 		 WHERE Category='Internal Property' AND P.IsActive=1 AND P.IsDeleted=0 
 		 
 		 
+		
 		 ---New
 		 --RENT CALCULATION FOR WITHOUT TDS New Entry
 		 INSERT INTO #TEMPMAINTENANCECALCULATION(AgreementId,PropertyId ,PropertyName,ApartmentNo,ApartmentId,RentelAmount,RentType,TDSAMOUNT)

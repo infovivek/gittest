@@ -121,6 +121,8 @@
     <Compile Include="CloneClientDAO.cs" />
     <Compile Include="CompanyMasterDAO.cs" />
     <Compile Include="ContractBillDAO.cs" />
+    <Compile Include="CreditNoteServiceDAO.cs" />
+    <Compile Include="CreditNoteTariffDAO.cs" />
     <Compile Include="DepositDAO.cs" />
     <Compile Include="ExpenseMasterDAO.cs" />
     <Compile Include="ExportUnsettledDAO.cs" />

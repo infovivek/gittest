@@ -39,7 +39,7 @@ namespace HB.BusinessService.BusinessService
                     DataSet ds1 = new WrbErpConnection().ExecuteDataSet(command, "");
                     if (ds1.Tables["DBERRORTBL"].Rows.Count > 0)
                     {
-                        dTable.Rows.Add("Code : " + Code + ", " + ds1.Tables["DBERRORTBL"].Rows[0][0].ToString());
+                        dTable.Rows.Add("Booking Payment Code Error : " + Code + ", " + ds1.Tables["DBERRORTBL"].Rows[0][0].ToString());
                     }
                     ds = new BookingRoomMailDAO().Mail(BookingId, user);
                     if (ds.Tables["DBERRORTBL"].Rows.Count > 0)

@@ -25,6 +25,7 @@
 			public var ErrorFlag:Boolean=true; 
 			public var Id:Number=0; 	public var Str_ChkOut:String="",Str_Serv:String="",Str_Settle:String="";
 			public var Str_ChkOut1:String="",Str_Serv1:String="",Str_Settle1:String="",Str_ChkOutTAC:String="";
+			public var InVoiceNo:String="",ChkOutHdrId:int=0,Statuss:String="";
 			protected function PageLoad():void
 			{
 				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
@@ -383,6 +384,39 @@
 				}				
 				return Itm;		
 			}
+			public function CreditNote(Event):void
+			{ 
+				InVoiceNo=Grd_SearchInvoice.selectedItem.InvoiceNumber;
+				ChkOutHdrId=Grd_SearchInvoice.selectedItem.ChkoutId;
+				Statuss=Grd_SearchInvoice.selectedItem.Status;
+				//useWeb("VendorChequeApproval","Actionload_CUSTOM",[GlobalXml,"Action",InVoiceNo,'','','','',ChkOutHdrId,0,0]);
+				if(Statuss=='UnSettled')
+				{
+					brd_CreditNote.visible=true
+				}
+				else
+				{
+					alignAlert(Alert.show("Select Unsettled Invoice","Alert Message !",
+						Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+					return;
+				}
+			}
+			protected function FnC_clickHandler(event):void
+			{
+				brd_CreditNote.visible=false;				
+			}
+			
+			protected function button1_clickTariff(event:MouseEvent):void
+			{
+				brd_Tariff.visible=true;
+				brd_Service.visible=false;				
+			}
+			protected function button2_clickService(event:MouseEvent):void
+			{
+				brd_Tariff.visible=false;
+				brd_Service.visible=true;
+			}
+			
 		]]>
 	</fx:Script>
 	<s:BorderContainer x="0" y="30" width="100%" height="84" borderVisible="false" backgroundColor="#f4efef" depth="10">
@@ -451,35 +485,93 @@
 					<mx:DataGridColumn dataField="Status"  editable="false" textAlign="center" visible="true" width="80"/> 
 					<mx:DataGridColumn dataField="PropertyCat"  visible="false" /> 
 					<mx:DataGridColumn dataField="ChkoutId" visible="false"/> 
+					<mx:DataGridColumn dataField="CreditNote" headerText="CreditNote" width="100" editable="false"
+									   visible="true">
+						<mx:itemRenderer >
+							<fx:Component>
+								<mx:HBox horizontalAlign="center" verticalAlign="middle">										
+									<mx:Image source="@Embed(source='../Assets/Comment.png')" buttonMode="true"
+											  click="outerDocument.CreditNote(event)"/>
+								</mx:HBox>	
+							</fx:Component>
+						</mx:itemRenderer>
+					</mx:DataGridColumn>
 				</mx:columns>
 			</mx:DataGrid>
 			 
 		</s:HGroup> 
 	</s:BorderContainer> 
-	<!--s:BorderContainer x="0" y="19" width="100%" height="474" id="brd_Popup_reset"
-	borderVisible="true" visible="false" depth="1500">
-	<mx:Label x="23" y="71" text="TransactionId"/>
-	<mx:Label x="354" y="71" text="Date"/>
-	<s:TextInput x="116" y="71" width="163" height="18"  id="Txt_TransID" editable="false"/>
-	<s:TextInput x="406" y="71" width="163" height="18" id="Txt_Date" editable="false"/>
-	<mx:Label x="633" y="71" text="Amount"/>
-	<s:TextInput x="696" y="71" width="163" height="18" id="Txt_Amount" editable="false"/>
-	<mx:DataGrid id="Grd_Popup" x="0" y="110" width="100%" height="100%"  editable="false" tabIndex="3" verticalAlign="middle">
-	<mx:columns> 
-	<mx:DataGridColumn dataField="Invoice"  width="100" textAlign="center" editable="false" visible="true"/>
-	<mx:DataGridColumn dataField="Billtype"  editable="false" textAlign="center" visible="true" width="100"/>						
-	<mx:DataGridColumn dataField="BillAmount"  textAlign="right" visible="true" editable="false" width="150" />
-	<mx:DataGridColumn dataField="ReconciledAmount"  textAlign="right" visible="true"  width="150" />
-	<mx:DataGridColumn dataField="ServiceCharge"  width="100" textAlign="right" editable="false" visible="true"/>
-	<mx:DataGridColumn dataField="TDSAmount"  editable="false" textAlign="right" visible="true" width="100"/>						
-	<mx:DataGridColumn dataField="TransId"  textAlign="right" visible="false"  width="150" />
-	</mx:columns>
-	</mx:DataGrid>
-	<s:BorderContainer x="0" y="0" width="100%" height="36" borderVisible="true"  backgroundColor="#c2c2c2">
-	<s:Image x="950" y="11" buttonMode="true" click="FnClosetariff_clickHandler(event)"
-	source="@Embed(source='../Assets/CrossSmall.png')" toolTip="Close"
-	horizontalAlign="right" verticalAlign="middle"/>
-	<mx:Label x="29" y="8" text="View Reconciled Data" color="red"/> 
+	<s:BorderContainer x="0" y="116" width="100%" height="396" id="brd_CreditNote"	borderVisible="true" visible="false" depth="1500">
+	<mx:Label x="113" y="56" text="CheckOut InVoiceNo"/>
+	<s:TextInput x="266" y="56" width="163" height="18"  id="Txt_ChkInVoiceNo" editable="false"/>
+		<mx:Label x="463" y="56" text="CreditNote InVoiceNo"/>
+		<s:TextInput x="606" y="56" width="163" height="18"  id="Txt_CrdInVoiceNo" editable="false"/>
+	<s:BorderContainer x="69" y="79" width="1174" height="309" id="brd_Tariff"
+						   borderVisible="true" visible="true" depth="1500">
+		<mx:DataGrid id="Grd_Tariff" x="179" y="17" width="789" height="124"  editable="false" tabIndex="3" verticalAlign="middle">
+		<mx:columns> 
+		<mx:DataGridColumn dataField="Type"  editable="false" textAlign="center" visible="true" width="100"/>						
+		<mx:DataGridColumn dataField="TariffAmount"  textAlign="right" visible="true" editable="false" width="150" />
+		<mx:DataGridColumn dataField="NoOfDays"  textAlign="right" visible="true" editable="true"  width="150" />
+		<mx:DataGridColumn dataField="Total"  width="100" textAlign="right" editable="false" visible="true"/>
+		</mx:columns>
+		</mx:DataGrid>
+		<mx:Label x="193" y="167" text="Description"/>
+		<s:TextArea id="txt_Tariff" x="279" y="150" width="322" height="107" maxChars="2000"/>
+		
+		<mx:Label x="49" y="18" text="Tariff Credit Note" color="red"/> 
+		<mx:Label x="633" y="151" text="LuxuryTax @"/>
+		<mx:Label x="633" y="177" text="ServiceTax @"/>
+		<mx:Label x="633" y="203" text="ServiceTax @"/>
+		<mx:Label x="712" y="151" width="39" text="" id="lbl_LT"/>
+		<mx:Label x="713" y="177" width="39" text="" id="lbl_TST"/>
+		<mx:Label x="713" y="203" width="39" text="" id="lbl_TST1"/>
+		<mx:Label x="633" y="242" text="Total Amount"/>
+		<s:TextInput x="832" y="153" width="116" id="Txt_LT"/>
+		<s:TextInput x="832" y="206" width="116" id="Txt_TST"/>
+		<s:TextInput x="832" y="179" width="116" id="Txt_TST1"/>
+		<s:TextInput x="832" y="236" width="116" id="Txt_TTotal"/>
 	</s:BorderContainer>
-	</s:BorderContainer-->
+	<s:BorderContainer x="69" y="79" width="1174" height="309" id="brd_Service"
+						   borderVisible="true" visible="false" depth="1500">
+			<mx:DataGrid id="Grd_Service" x="179" y="17" width="789" height="124"  editable="false" tabIndex="3" verticalAlign="middle">
+				<mx:columns> 
+					<mx:DataGridColumn dataField="Item"  editable="false" textAlign="center" visible="true" width="100"/>						
+					<mx:DataGridColumn dataField="ServiceAmount"  textAlign="right" visible="true" editable="false" width="150" />
+					<mx:DataGridColumn dataField="Amount"  textAlign="right" visible="true" editable="true" width="150" />
+					<mx:DataGridColumn dataField="Tax"  textAlign="right" visible="true"  width="150" />
+					<mx:DataGridColumn dataField="Total"  width="100" textAlign="right" editable="false" visible="true"/>
+				</mx:columns>
+			</mx:DataGrid>
+			<mx:Label x="180" y="175" text="Description"/>
+			<s:TextArea id="txt_Service" x="261" y="148" width="277" height="121" maxChars="2000"/>
+		<mx:Label x="49" y="8" text="Service Credit Note" color="red"/> 
+		<mx:Label x="563" y="145" text="VAT @"/>
+		<mx:Label x="563" y="171" text="ServiceTax @"/>
+		<mx:Label x="563" y="197" text="ServiceTax @"/>
+		<mx:Label x="563" y="224" text="Cess @"/>
+		<mx:Label x="563" y="250" text="HE Cess @"/>
+		<mx:Label x="611" y="145" width="39" text="" id="lbl_Vat"/>
+		<mx:Label x="643" y="171" width="39" text="" id="lbl_STFB"/>
+		<mx:Label x="643" y="197" width="39" text="" id="lbl_ST"/>
+		<mx:Label x="613" y="224" width="39" text="" id="lbl_Cess"/>
+		<mx:Label x="633" y="250" width="39" text="" id="lbl_HECess"/>
+		<mx:Label x="693" y="171" width="151" text="On Food and Beverages"/>
+		<mx:Label x="693" y="197" width="73" text="On Others"/>
+		<mx:Label x="563" y="282" text="Total Amount"/>
+		<s:TextInput x="852" y="145" width="116" id="Txt_Vat"/>
+		<s:TextInput x="852" y="250" width="116" id="Txt_STFB"/>
+		<s:TextInput x="852" y="171" width="116" id="Txt_ST"/>
+		<s:TextInput x="852" y="197" width="116" id="Txt_Cess"/>
+		<s:TextInput x="852" y="224" width="116" id="Txt_HECess"/>
+		<s:TextInput x="852" y="281" width="116" id="Txt_STotal"/>
+	</s:BorderContainer>
+		<s:BorderContainer x="0" y="0" width="100%" height="42" borderVisible="true"  backgroundColor="#c2c2c2">
+			<s:Image x="1335" y="14" source="@Embed(source='../Assets/CrossSmall.png')" 
+					 buttonMode="true" toolTip="Close" click="FnC_clickHandler(event)"/>
+			<mx:Label x="32" y="13" text="Credit Note" color="red"/>
+		</s:BorderContainer>
+		<s:Button x="850" y="54" label="Tariff" click="button1_clickTariff(event)" />
+		<s:Button x="992" y="56" label="Service" click="button2_clickService(event)"/>
+	</s:BorderContainer>
 </s:Application>

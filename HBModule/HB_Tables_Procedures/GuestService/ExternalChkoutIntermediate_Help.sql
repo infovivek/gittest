@@ -861,7 +861,8 @@ BEGIN
 -- Service Tax
 			INSERT INTO #ServiceTax(ServiceTax,BusinessSupportST,FromDT,ToDT,Id)
 			SELECT ISNULL(ServiceTaxOnTariff,0),ISNULL(BusinessSupportST,0),CONVERT(varchar(100),Date,103),
-			CONVERT(varchar(100),ISNULL(DateTo,GETDATE()+1),103),Id		
+		--	CONVERT(varchar(100),ISNULL(DateTo,GETDATE()+1),103)
+			CONVERT(varchar(100),@ChkOutDate,103),Id		
 			FROM WRBHBTaxMaster
 			WHERE CONVERT(nvarchar(100),Date,103) between CONVERT(nvarchar(100),@ChkInDate,103) and
 			CONVERT(nvarchar(100),@ChkOutDate,103)		
@@ -871,16 +872,20 @@ BEGIN
 
 			INSERT INTO #ServiceTax(ServiceTax,BusinessSupportST,FromDT,ToDT,Id)
 			SELECT ISNULL(ServiceTaxOnTariff,0),ISNULL(BusinessSupportST,0),CONVERT(varchar(100),Date,103),
-			CONVERT(varchar(100),ISNULL(DateTo,GETDATE()+1),103),Id		
+		--	CONVERT(varchar(100),ISNULL(DateTo,GETDATE()+1),103)
+			CONVERT(varchar(100),@ChkOutDate,103),Id		
 			FROM WRBHBTaxMaster
 			WHERE CONVERT(nvarchar(100),DateTo,103) between CONVERT(nvarchar(100),@ChkInDate,103) and
 			CONVERT(nvarchar(100),@ChkOutDate,103)		
 			AND IsActive=1 AND IsDeleted=0 
 			AND StateId=@StateId1
+			
+		--	select @ChkOutDate
 
 			INSERT INTO #ServiceTax(ServiceTax,BusinessSupportST,FromDT,ToDT,Id)
 			SELECT ISNULL(ServiceTaxOnTariff,0),ISNULL(BusinessSupportST,0),CONVERT(varchar(100),Date,103),
-			CONVERT(varchar(100),ISNULL(DateTo,GETDATE()+1),103),Id		
+	--		CONVERT(varchar(100),ISNULL(DateTo,GETDATE()+1),103)
+			CONVERT(varchar(100),@ChkOutDate,103),Id		
 			FROM WRBHBTaxMaster
 			WHERE CONVERT(nvarchar(100),Date,103) <= CONVERT(nvarchar(100),@ChkInDate,103)	
 			AND IsActive=1 AND IsDeleted=0 
@@ -889,7 +894,8 @@ BEGIN
 --Select @ChkOutDate;
 			INSERT INTO #ServiceTax(ServiceTax,BusinessSupportST,FromDT,ToDT,Id)
 			SELECT ISNULL(ServiceTaxOnTariff,0),ISNULL(BusinessSupportST,0),CONVERT(varchar(100),Date,103),
-			CONVERT(varchar(100),ISNULL(DateTo,GETDATE()+1),103),Id		
+		--	CONVERT(varchar(100),ISNULL(DateTo,GETDATE()+1),103)
+			CONVERT(varchar(100),@ChkOutDate,103),Id		
 			FROM WRBHBTaxMaster
 			WHERE CONVERT(nvarchar(100),@ChkOutDate,103)<= CONVERT(nvarchar(100),DateTo,103)		
 			AND IsActive=1 AND IsDeleted=0 
@@ -1116,7 +1122,7 @@ BEGIN
 			END			
 		END		
 		
-		--select * from #ExTariff
+	--	select * from #ExTariff
 		--select * from #ServiceTax2
 		
 	--	SELECT @TariffPaymentMode;

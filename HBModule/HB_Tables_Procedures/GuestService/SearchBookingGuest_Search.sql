@@ -75,9 +75,10 @@ SET ANSI_WARNINGS OFF
 			PAG.TariffPaymentMode,PAG.Tariff,DATEDIFF(DAY,PAG.ChkInDt,PAG.ChkOutDt),B.BookingLevel,
 			BP.PropertyType
 			FROM WRBHBBooking B			
-			JOIN WRBHBBookingPropertyAssingedGuest PAG ON B.Id = PAG.BookingId AND PAG.IsActive=1 AND PAG.IsDeleted=0 
+			JOIN WRBHBBookingPropertyAssingedGuest PAG ON B.Id = PAG.BookingId 
+			--AND PAG.IsActive=1 AND PAG.IsDeleted=0 
 			JOIN WRBHBBookingProperty BP ON B.Id=BP.BookingId	AND PAG.BookingPropertyTableId=BP.Id	
-			AND BP.IsActive=1 AND BP.IsDeleted=0
+			--AND BP.IsActive=1 AND BP.IsDeleted=0
 			LEFT OUTER JOIN WRBHBProperty P ON PAG.BookingPropertyId=P.Id			
 			WHERE   B.IsActive=1 AND B.IsDeleted=0			
 			GROUP BY B.BookingCode,PAG.Occupancy,
@@ -100,11 +101,14 @@ SET ANSI_WARNINGS OFF
 			CONVERT(NVARCHAR(100),PAG.ChkOutDt,103) AS CheckOutDate,PAG.CurrentStatus Status,B.CancelStatus,PAG.CurrentStatus,
 			PAG.TariffPaymentMode,PAG.Tariff,DATEDIFF(DAY,PAG.ChkInDt,PAG.ChkOutDt) as Days,B.BookingLevel,BP.PropertyType
 			FROM WRBHBBooking B 			
-			JOIN WRBHBApartmentBookingPropertyAssingedGuest PAG WITH(NOLOCK) ON PAG.BookingId=B.Id AND PAG.IsActive=1 
-			AND PAG.IsDeleted=0
-			JOIN WRBHBApartmentBookingProperty BP ON B.Id =BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0
+			JOIN WRBHBApartmentBookingPropertyAssingedGuest PAG WITH(NOLOCK) ON PAG.BookingId=B.Id 
+			--AND PAG.IsActive=1 
+			--AND PAG.IsDeleted=0
+			JOIN WRBHBApartmentBookingProperty BP ON B.Id =BP.BookingId 
+			--AND BP.IsActive=1 AND BP.IsDeleted=0
 			AND PAG.BookingPropertyTableId=BP.Id
-			LEFT OUTER JOIN WRBHBProperty P on  P.Id = PAG.BookingPropertyId and P.IsActive=1 and P.IsDeleted = 0
+			LEFT OUTER JOIN WRBHBProperty P on  P.Id = PAG.BookingPropertyId 
+			---and P.IsActive=1 and P.IsDeleted = 0
 			WHERE   B.IsActive=1 AND B.IsDeleted=0 
 			
 
@@ -121,11 +125,14 @@ SET ANSI_WARNINGS OFF
 			PAG.TariffPaymentMode,PAG.Tariff,DATEDIFF(DAY,PAG.ChkInDt,PAG.ChkOutDt) as Days,B.BookingLevel,
 			BP.PropertyType
 			FROM WRBHBBooking B 				
-			JOIN WRBHBBedBookingPropertyAssingedGuest PAG WITH(NOLOCK) ON PAG.BookingId=B.Id AND PAG.IsActive=1 
-			AND PAG.IsDeleted=0 
-			JOIN WRBHBBedBookingProperty BP ON B.Id =BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0
+			JOIN WRBHBBedBookingPropertyAssingedGuest PAG WITH(NOLOCK) ON PAG.BookingId=B.Id 
+			--AND PAG.IsActive=1 
+			--AND PAG.IsDeleted=0 
+			JOIN WRBHBBedBookingProperty BP ON B.Id =BP.BookingId 
+			--AND BP.IsActive=1 AND BP.IsDeleted=0
 			AND PAG.BookingPropertyTableId=BP.Id
-			LEFT OUTER JOIN WRBHBProperty P on  P.Id = PAG.BookingPropertyId and P.IsActive=1 and P.IsDeleted = 0
+			LEFT OUTER JOIN WRBHBProperty P on  P.Id = PAG.BookingPropertyId 
+			--and P.IsActive=1 and P.IsDeleted = 0
 			WHERE B.IsActive=1 AND B.IsDeleted=0
 			
 	
@@ -169,11 +176,14 @@ SET ANSI_WARNINGS OFF
 			CONVERT(NVARCHAR(100),PAG.ChkOutDt,103) AS CheckOutDate,PAG.CurrentStatus Status,B.CancelStatus,PAG.CurrentStatus,
 			PAG.TariffPaymentMode,PAG.Tariff,DATEDIFF(DAY,PAG.ChkInDt,PAG.ChkOutDt) as Days,B.BookingLevel,BP.PropertyType
 			FROM WRBHBBooking B 			
-			JOIN WRBHBApartmentBookingPropertyAssingedGuest PAG WITH(NOLOCK) ON PAG.BookingId=B.Id AND PAG.IsActive=1 
-			AND PAG.IsDeleted=0
-			JOIN WRBHBApartmentBookingProperty BP ON B.Id =BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0
+			JOIN WRBHBApartmentBookingPropertyAssingedGuest PAG WITH(NOLOCK) ON PAG.BookingId=B.Id 
+			--AND PAG.IsActive=1 
+			--AND PAG.IsDeleted=0
+			JOIN WRBHBApartmentBookingProperty BP ON B.Id =BP.BookingId 
+			--AND BP.IsActive=1 AND BP.IsDeleted=0
 			AND PAG.BookingPropertyTableId=BP.Id
-			LEFT OUTER JOIN WRBHBProperty P on  P.Id = PAG.BookingPropertyId and P.IsActive=1 and P.IsDeleted = 0
+			LEFT OUTER JOIN WRBHBProperty P on  P.Id = PAG.BookingPropertyId 
+			--and P.IsActive=1 and P.IsDeleted = 0
 			WHERE   B.IsActive=1 AND B.IsDeleted=0 
 			AND CONVERT(DATETIME,B.CreatedDate,103) between CONVERT(DATETIME,@FromDate,103) and
 			CONVERT(DATETIME,@ToDate,103)
@@ -191,11 +201,14 @@ SET ANSI_WARNINGS OFF
 			PAG.TariffPaymentMode,PAG.Tariff,DATEDIFF(DAY,PAG.ChkInDt,PAG.ChkOutDt) as Days,B.BookingLevel,
 			BP.PropertyType
 			FROM WRBHBBooking B 				
-			JOIN WRBHBBedBookingPropertyAssingedGuest PAG WITH(NOLOCK) ON PAG.BookingId=B.Id AND PAG.IsActive=1 
-			AND PAG.IsDeleted=0 
-			JOIN WRBHBBedBookingProperty BP ON B.Id =BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0
+			JOIN WRBHBBedBookingPropertyAssingedGuest PAG WITH(NOLOCK) ON PAG.BookingId=B.Id 
+			--AND PAG.IsActive=1 
+			--AND PAG.IsDeleted=0 
+			JOIN WRBHBBedBookingProperty BP ON B.Id =BP.BookingId 
+			--AND BP.IsActive=1 AND BP.IsDeleted=0
 			AND PAG.BookingPropertyTableId=BP.Id
-			LEFT OUTER JOIN WRBHBProperty P on  P.Id = PAG.BookingPropertyId and P.IsActive=1 and P.IsDeleted = 0
+			LEFT OUTER JOIN WRBHBProperty P on  P.Id = PAG.BookingPropertyId 
+			--and P.IsActive=1 and P.IsDeleted = 0
 			WHERE B.IsActive=1 AND B.IsDeleted=0
 			AND CONVERT(DATETIME,B.CreatedDate,103) BETWEEN CONVERT(DATETIME,@FromDate,103) and
 			CONVERT(DATETIME,@ToDate,103)
@@ -217,7 +230,7 @@ SET ANSI_WARNINGS OFF
 		PAG.TariffPaymentMode,PAG.Tariff,DATEDIFF(DAY,PAG.ChkInDt,PAG.ChkOutDt),B.BookingLevel,
 		BP.PropertyType
 		FROM WRBHBBooking B			
-		JOIN WRBHBBookingPropertyAssingedGuest PAG ON B.Id = PAG.BookingId
+		JOIN WRBHBBookingPropertyAssingedGuest PAG ON B.Id = PAG.BookingId 
 		JOIN WRBHBBookingProperty BP ON B.Id=BP.BookingId	AND PAG.BookingPropertyTableId=BP.Id	
 		LEFT OUTER JOIN WRBHBProperty P ON PAG.BookingPropertyId=P.Id			
 		WHERE  B.IsActive=1 AND B.IsDeleted=0 
@@ -239,9 +252,11 @@ SET ANSI_WARNINGS OFF
 		CONVERT(NVARCHAR(100),PAG.ChkOutDt,103) AS CheckOutDate,PAG.CurrentStatus Status,B.CancelStatus,PAG.CurrentStatus,
 		PAG.TariffPaymentMode,PAG.Tariff,DATEDIFF(DAY,PAG.ChkInDt,PAG.ChkOutDt) as Days,B.BookingLevel,BP.PropertyType
 		FROM WRBHBBooking B 			
-		JOIN WRBHBApartmentBookingPropertyAssingedGuest PAG WITH(NOLOCK) ON PAG.BookingId=B.Id AND PAG.IsActive=1 
-		AND PAG.IsDeleted=0
-		JOIN WRBHBApartmentBookingProperty BP ON B.Id =BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0
+		JOIN WRBHBApartmentBookingPropertyAssingedGuest PAG WITH(NOLOCK) ON PAG.BookingId=B.Id 
+		--AND PAG.IsActive=1 
+		--AND PAG.IsDeleted=0
+		JOIN WRBHBApartmentBookingProperty BP ON B.Id =BP.BookingId 
+		--AND BP.IsActive=1 AND BP.IsDeleted=0
 		AND PAG.BookingPropertyTableId=BP.Id
 		LEFT OUTER JOIN WRBHBProperty P on  P.Id = PAG.BookingPropertyId and P.IsActive=1 and P.IsDeleted = 0
 		WHERE   B.IsActive=1 AND B.IsDeleted=0 
@@ -260,9 +275,11 @@ SET ANSI_WARNINGS OFF
 		PAG.TariffPaymentMode,PAG.Tariff,DATEDIFF(DAY,PAG.ChkInDt,PAG.ChkOutDt) as Days,B.BookingLevel,
 		BP.PropertyType
 		FROM WRBHBBooking B 				
-		JOIN WRBHBBedBookingPropertyAssingedGuest PAG WITH(NOLOCK) ON PAG.BookingId=B.Id AND PAG.IsActive=1 
-		AND PAG.IsDeleted=0 
-		JOIN WRBHBBedBookingProperty BP ON B.Id =BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0
+		JOIN WRBHBBedBookingPropertyAssingedGuest PAG WITH(NOLOCK) ON PAG.BookingId=B.Id 
+		--AND PAG.IsActive=1 
+		--AND PAG.IsDeleted=0 
+		JOIN WRBHBBedBookingProperty BP ON B.Id =BP.BookingId 
+		--AND BP.IsActive=1 AND BP.IsDeleted=0
 		AND PAG.BookingPropertyTableId=BP.Id
 		LEFT OUTER JOIN WRBHBProperty P on  P.Id = PAG.BookingPropertyId and P.IsActive=1 and P.IsDeleted = 0
 		WHERE B.IsActive=1 AND B.IsDeleted=0
@@ -308,9 +325,10 @@ SET ANSI_WARNINGS OFF
 		CONVERT(NVARCHAR(100),PAG.ChkOutDt,103) AS CheckOutDate,PAG.CurrentStatus Status,B.CancelStatus,PAG.CurrentStatus,
 		PAG.TariffPaymentMode,PAG.Tariff,DATEDIFF(DAY,PAG.ChkInDt,PAG.ChkOutDt) as Days,B.BookingLevel,BP.PropertyType
 		FROM WRBHBBooking B 			
-		JOIN WRBHBApartmentBookingPropertyAssingedGuest PAG WITH(NOLOCK) ON PAG.BookingId=B.Id AND PAG.IsActive=1 
-		AND PAG.IsDeleted=0
-		JOIN WRBHBApartmentBookingProperty BP ON B.Id =BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0
+		JOIN WRBHBApartmentBookingPropertyAssingedGuest PAG WITH(NOLOCK) ON PAG.BookingId=B.Id 
+		--AND PAG.IsActive=1 AND PAG.IsDeleted=0
+		JOIN WRBHBApartmentBookingProperty BP ON B.Id =BP.BookingId 
+		--AND BP.IsActive=1 AND BP.IsDeleted=0
 		AND PAG.BookingPropertyTableId=BP.Id
 		LEFT OUTER JOIN WRBHBProperty P on  P.Id = PAG.BookingPropertyId and P.IsActive=1 and P.IsDeleted = 0
 		WHERE   B.IsActive=1 AND B.IsDeleted=0  
@@ -330,9 +348,11 @@ SET ANSI_WARNINGS OFF
 		PAG.TariffPaymentMode,PAG.Tariff,DATEDIFF(DAY,PAG.ChkInDt,PAG.ChkOutDt) as Days,B.BookingLevel,
 		BP.PropertyType
 		FROM WRBHBBooking B 				
-		JOIN WRBHBBedBookingPropertyAssingedGuest PAG WITH(NOLOCK) ON PAG.BookingId=B.Id AND PAG.IsActive=1 
-		AND PAG.IsDeleted=0 
-		JOIN WRBHBBedBookingProperty BP ON B.Id =BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0
+		JOIN WRBHBBedBookingPropertyAssingedGuest PAG WITH(NOLOCK) ON PAG.BookingId=B.Id 
+		--AND PAG.IsActive=1 
+		--AND PAG.IsDeleted=0 
+		JOIN WRBHBBedBookingProperty BP ON B.Id =BP.BookingId 
+		--AND BP.IsActive=1 AND BP.IsDeleted=0
 		AND PAG.BookingPropertyTableId=BP.Id
 		LEFT OUTER JOIN WRBHBProperty P on  P.Id = PAG.BookingPropertyId and P.IsActive=1 and P.IsDeleted = 0
 		WHERE B.IsActive=1 AND B.IsDeleted=0
@@ -340,7 +360,8 @@ SET ANSI_WARNINGS OFF
 		CONVERT(DATETIME,@ToDate,103)	
 	END	
 	END
-	
+	--select * from #TEMPFINAL
+	--order by BookingCode
 	---UPDATE MMT PROPERTY NAME
 	UPDATE #TEMPFINAL SET PropertyName=S.HotalName,Category='MMT' FROM #TEMPFINAL A
 	JOIN dbo.WRBHBStaticHotels S ON A.PropertyId=S.HotalId

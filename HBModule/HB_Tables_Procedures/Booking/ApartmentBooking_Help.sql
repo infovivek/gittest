@@ -24,13 +24,11 @@ IF @Action = 'Apartment_Property'
  BEGIN
   IF @Id2 = 123
    BEGIN
-    UPDATE WRBHBBooking SET IsActive = 0,IsDeleted = 1 WHERE Id=@Id1;
-    UPDATE WRBHBBookingGuestDetails SET IsActive = 0,IsDeleted = 1 
-    WHERE BookingId=@Id1;
-    UPDATE WRBHBApartmentBookingProperty SET IsActive = 0,IsDeleted = 1 
-    WHERE BookingId=@Id1;
+    UPDATE WRBHBBooking SET IsActive = 0 WHERE Id=@Id1;
+    UPDATE WRBHBBookingGuestDetails SET IsActive = 0 WHERE BookingId=@Id1;
+    UPDATE WRBHBApartmentBookingProperty SET IsActive = 0 WHERE BookingId=@Id1;
     UPDATE WRBHBApartmentBookingPropertyAssingedGuest 
-    SET IsActive = 0,IsDeleted = 1 WHERE BookingId=@Id1;    
+    SET IsActive = 0 WHERE BookingId=@Id1;    
    END
   -- Existing Begin
   CREATE TABLE #BookedApartment(ApartmentId BIGINT,BookingLevel NVARCHAR(100));
