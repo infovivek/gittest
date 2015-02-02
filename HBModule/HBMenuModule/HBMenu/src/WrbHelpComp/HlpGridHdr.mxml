@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Ofir Shemesh - http://shemesh.wordpress.com
+BMC Software, 2008
+-->
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+		   implements="mx.controls.listClasses.IDropInListItemRenderer"
+		   creationComplete="onComplete()" >	
+	<mx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.controls.DataGrid;
+			import mx.controls.dataGridClasses.DataGridColumn;
+			import mx.controls.dataGridClasses.DataGridListData;
+			import mx.controls.listClasses.BaseListData;
+			import mx.events.CollectionEvent;
+			import mx.events.FlexEvent;
+			import mx.managers.IFocusManager;
+			private var Ncols:Array;
+			private var _listData:BaseListData;
+			private var _dataGrid:DataGrid;
+			private var _dataField:String;
+			
+			[Bindable] private var _CBselected:Boolean;
+			[Bindable] private var _headerLabel:String;
+			private var StrSrch:String="";
+			private function onComplete():void {
+			}
+			
+			[Bindable]
+			private var NcollectionData:ArrayCollection;
+			[Bindable]
+			private var OcollectionData:ArrayCollection;
+			[Bindable("dataChange")]
+			public function get listData():BaseListData{
+				return _listData;
+			}
+			
+
+			public function set listData(value:BaseListData):void{
+				_listData = value;
+				_dataGrid = value.owner as DataGrid;
+				_dataField = (value as DataGridListData).dataField;
+				_headerLabel = value.label;
+				OcollectionData=ArrayCollection(_dataGrid.dataProvider);
+				NcollectionData=OcollectionData;
+				var tmp:DataGrid=new DataGrid();
+				tmp.dataProvider=_dataGrid.dataProvider; 
+				Ncols = tmp.columns;
+			}
+			
+			override public function set data(value:Object):void {
+				super.data = value;
+				var column:DataGridColumn = value as DataGridColumn;
+				column.sortable = false;
+				checkForSelectedItems();
+			}
+			
+			private function checkForSelectedItems():void {
+				var dp:ArrayCollection = _dataGrid.dataProvider as ArrayCollection;
+				var n:Number = 0;
+				for(var i:int=0 ; i < dp.length ; i++){
+					if(dp[i][_dataField])
+						n++
+				}
+				if(n == dp.length){
+					_CBselected = true;
+				}
+			}
+			public function filterResults():void{
+				NcollectionData=OcollectionData;
+				NcollectionData.filterFunction = _isortRows;
+				NcollectionData.refresh();
+				/*
+				if(NcollectionData.length>0)
+					_dataGrid.visible=true;
+				else
+					_dataGrid.visible=false;
+				*/
+				
+				//commented by kolanchinathan
+			}
+			
+			private function _isortRows(item:Object):Boolean{
+				var key:String =StrSrch;
+				key = key.toLowerCase();
+				try{
+					if (key != ""){
+						for(var i:int=0; i<Ncols.length; i++){ 		
+							if (Ncols[i].dataField != ""){
+								if(Ncols[i].dataField==lb.text){
+									var value:String = item[Ncols[i].dataField];
+									value = value.toLowerCase();	
+									if (value.indexOf(key) >= 0){
+										return true;
+									}
+								}
+							} 
+							else {
+								for (var o:String in item){
+									value = item[o];
+									if (value.indexOf(key) >= 0){
+										return true;
+									}
+								}
+							}
+						}
+					} else {
+						return true;
+					}
+				}catch(e:Error)
+				{}
+				return false;
+			}
+			
+			private function onCBchange(event:Event):void {
+			}
+			protected function tb_changeHandler(event:Event):void
+			{
+				StrSrch=tb.text;
+				filterResults();
+			}
+			protected function tb_enterHandler(event:FlexEvent):void{
+			}
+			
+			
+			
+			protected function tb_keyDownHandler(event:KeyboardEvent):void
+			{
+				if(event.keyCode==Keyboard.DOWN || event.keyCode==Keyboard.UP){
+					this.stage.focus=this.parent.parent;
+				}
+			}
+			
+		]]>
+	</mx:Script>
+	
+	<!--Modified by kolanchinathan-->
+	<mx:VBox height="52" horizontalScrollPolicy="off" verticalScrollPolicy="off" 
+			 width="100%" horizontalAlign="center" verticalAlign="middle" >
+		<mx:Label id="lb" width="93%" text="{_headerLabel}"/>
+		<mx:TextInput id="tb" width="93%" change="tb_changeHandler(event)" color="#060303" 
+					  enter="tb_enterHandler(event)" keyDown="tb_keyDownHandler(event)"/>
+	</mx:VBox>
+	
+	<!--	 <mx:CheckBox id="cb" horizontalCenter="0" label="{_headerLabel}"
+	change="onCBchange(event)" selected="{_CBselected}" visible="false" />-->
+</mx:Canvas>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:MyComp="myComponents.*" 
+		 backgroundColor="#FFFFFF"
+		 paddingTop="50" paddingBottom="50" paddingLeft="30" paddingRight="30" xmlns:WrbComp="WrbComp.*"
+		 textAlign="center" verticalScrollPolicy="off" horizontalScrollPolicy="off" width="100%">
+	<fx:Style>
+		.headerCustomStyle
+		{
+			fontWeight: "bold";
+			textAlign: "center";
+			color: #0000FF;
+		}		
+		DataGrid {
+			alternating-item-colors: #F4FBFF, #FFFFFF;
+		}		
+	</fx:Style>
+	<fx:Script>
+		<![CDATA[		
+			import mx.collections.ArrayCollection;
+			import mx.controls.DataGrid;
+			import mx.printing.FlexPrintJob;
+			[Bindable]
+			public var pageNumber:Number = 1;
+			[Bindable]
+			public var prodTotal:Number = 0;
+			[Bindable]
+			public var FinancialYear:String = "";
+			[Bindable]
+			public var Category:String = "";
+			[Bindable]
+			public var BranchName:String = "";
+			[Bindable]
+			public var TotalTax:String = "";
+			
+			public function showPage(pageType:String):void {
+				if(pageType == "first" || pageType == "middle") {
+					// Hide the footer.
+					//footer.includeInLayout=false;
+					//footer.visible = false;
+				}
+				if(pageType == "middle" || pageType == "last") {
+					// The header won't be used again; hide it.
+					//header.includeInLayout=false;
+					//header.visible = false;
+				}
+				if(pageType == "last") {
+					// Show the footer.
+					//footer.includeInLayout=true;
+					//footer.visible = true;
+				}
+				//Update the DataGrid layout to reflect the results.
+				validateNow();
+			}
+			public var gapval:int=0;
+			public function buildDG1(Value_AC:ArrayCollection,Dec_FieldName:ArrayCollection,printJob:String,BranchName1:String):void
+			{
+				var thePrintView1:DynamicPrint=new DynamicPrint();
+				var aColumnDef:ArrayCollection = Dec_FieldName;
+				var oColumnDef:Object;				
+				for (var i:int=0;i<aColumnDef.length;i++)  
+				{               
+					oColumnDef = aColumnDef[i];					 
+					var Str:String="";
+					var n:Number=0;
+					n=i+1;
+					Str="label"+n;
+					this[Str].text=oColumnDef.AliseName;
+					this[Str].visible=true;
+					Str="";					
+					Str="Column"+n;
+					this[Str].dataField=oColumnDef.AliseName;
+					this[Str].headerText=oColumnDef.AliseName;
+					this[Str].visible=true;
+				}
+				Grid.dataProvider=Value_AC;
+				FinancialYear=printJob;
+				BranchName=BranchName1;
+				if(aColumnDef.length==1)
+				{
+					GrpId.gap=160
+				}
+				if(aColumnDef.length==2)
+				{
+					GrpId.gap=150
+				}
+				if(aColumnDef.length==3)
+				{
+					GrpId.gap=100
+				}
+				if(aColumnDef.length==4)
+				{
+					GrpId.gap=40
+				}
+				if(aColumnDef.length==5)
+				{
+					GrpId.gap=10
+				}
+				if(aColumnDef.length==6)
+				{
+					GrpId.gap=-10
+				}
+				
+			}
+			
+		]]>
+	</fx:Script>
+	<s:HGroup width="100%" height="70">
+		<s:VGroup width="70" height="70">			
+			<s:Image width="70" height="70" source="@Embed(source = 'Assets/Logo.PNG')"/>
+		</s:VGroup>
+		<s:VGroup width="100%" height="70">
+			<mx:Label height="5"/>
+			<mx:Label text="HUMMING BIRD {BranchName}  PRIVATE  LIMITED" width="100%" color="#2d60df" 
+					  fontSize="12"/>
+			<mx:Label text="{Category}  {FinancialYear} REPORT" width="100%" color="#2d60df" 
+					  fontSize="12"/>
+			<mx:Label height="5"/>
+		</s:VGroup>
+	</s:HGroup>
+	<s:HGroup width="100%" verticalAlign="middle" horizontalAlign="center" id="GrpId">
+		<mx:Label width="100" id="label1"  textAlign="center" fontSize="11" color="#1e4c84" visible="false"/>
+		<mx:Label width="100" id="label2"  textAlign="center" fontSize="11" color="#1e4c84" visible="false"/>
+		<mx:Label width="100" id="label3"  textAlign="center" fontSize="11" color="#1e4c84" visible="false"/>
+		<mx:Label width="100" id="label4"  textAlign="center" fontSize="11" color="#1e4c84" visible="false"/>
+		<mx:Label width="100" id="label5"  textAlign="center" fontSize="11" color="#1e4c84" visible="false"/>
+		<mx:Label width="100" id="label6"  textAlign="center" fontSize="11" color="#1e4c84" visible="false"/>
+	</s:HGroup>
+	<mx:PrintDataGrid id="Grid" width="100%" textAlign="center" showHeaders="false" height="100%" visible="true">		
+		<mx:columns>
+			<mx:DataGridColumn dataField=""  width="90" id="Column1"  visible="false" textAlign="left"/>
+			<mx:DataGridColumn dataField="" width="130" id="Column2"  visible="false" textAlign="left"/>
+			<mx:DataGridColumn dataField="" width="100" id="Column3"  visible="false"/>
+			<mx:DataGridColumn dataField="" width="100" id="Column4"  visible="false"/>
+			<mx:DataGridColumn dataField="" width="100" id="Column5"  visible="false"/>
+			<mx:DataGridColumn dataField="" width="100" id="Column6"  visible="false"/>
+		</mx:columns>
+	</mx:PrintDataGrid>	
+	<mx:Label text="{pageNumber}" width="100%" fontSize="8"/>
+</mx:VBox>

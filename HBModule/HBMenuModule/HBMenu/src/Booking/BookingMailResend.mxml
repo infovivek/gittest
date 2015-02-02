@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   xmlns:WrbComp="WrbComp.*"
+			   width="100%" height="100%"
+			   creationComplete="application1_creationCompleteHandler(event)"
+			   pageTitle="Booking Resend Mail" backgroundColor="#fbf9f9">
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			public static var GlobalXml:String="";
+			public static var Global_AC:ArrayCollection=new ArrayCollection();
+			public var BookingId:int=0,ClientId:int=0,PropertyId:int=0,BookingLevel:String="";
+			public var EmailErrMsg:String="",UsrId:int=0,UsrEmail:String="";
+			protected function application1_creationCompleteHandler(event:FlexEvent):void
+			{
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";
+				UsrId = Global_AC[0].UsrId;
+				FnHelp();
+			}
+			
+			protected function FnHelp():void
+			{
+				useWeb("BookingResendMail","Client_Property_Load_CUSTOM",
+					[GlobalXml,'Client_Property_Load','','','','',UsrId,0,0,0]);				
+			}
+			
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "Client_Property_Load_CUSTOM")
+				{
+					var asd:ArrayCollection=new ArrayCollection();
+					Hlp_Client.dataProvider=asd;Hlp_Client.fnClear();ClientId=0;
+					var sda:ArrayCollection=new ArrayCollection();
+					Hlp_Property.dataProvider=sda;Hlp_Property.fnClear();PropertyId=0;
+					var dsa:ArrayCollection=new ArrayCollection();
+					Hlp_BookingCode.dataProvider=dsa;Hlp_BookingCode.fnClear();BookingId=0;
+					UsrEmail="";Txt_Email.text = "";
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Hlp_Client.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Hlp_Property.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+					if (Ds_Objects.result.Tables.Table2.Rows.length > 0)
+					{
+						UsrEmail = Ds_Objects.result.Tables.Table2.Rows[0].Email;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "BookingLoad_CUSTOM")
+				{
+					var ddd:ArrayCollection=new ArrayCollection();
+					Hlp_BookingCode.dataProvider=ddd;Hlp_BookingCode.fnClear();BookingId=0;
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Hlp_BookingCode.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+					Hlp_BookingCode._setFocus();
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				{
+					alignAlert(Alert.show("Mail Sent Successfully.","Message !",Alert.OK, 
+						null, null, iconTickLarge, Alert.OK),10,"");
+					FnClear();
+				}
+			}
+			
+			protected function Btn_Send_clickHandler(event:MouseEvent):void
+			{
+				var Err:String="";
+				if((BookingId == 0)||(BookingLevel == ""))
+				{
+					Err = Err + "*  Booking Code is Required.\n";
+				}
+				if(Txt_Email.text == "")
+				{
+					Err = Err + "*  Email Id is Required.\n";
+				}
+				if(Err != "")
+				{
+					alignAlert(Alert.show(Err,"Required Field(s) !",Alert.OK, 
+						null, null, iconErrLarge, Alert.OK),10,"");
+					return;
+				}
+				if(Txt_Email.text != "")
+				{
+					var str:String=Txt_Email.text;
+					var ar:Array=str.split(",");
+					for(var i:int = 0; i < ar.length; i++)
+					{
+						EmailValidator.validate(ar[i]);
+						if(EmailErrMsg != "")
+						{
+							Err = Err + "--> "+ ar[i] + " : " + EmailErrMsg + "\n";
+						}
+					}
+				}
+				if(Err != "")
+				{
+					alignAlert(Alert.show(Err,"Error Message !",Alert.OK,
+						null, null, iconErrLarge, Alert.OK),10,"");return;
+				}
+				useWeb("BookingResendMail","Save_CUSTOM",[GlobalXml,BookingLevel,BookingId,Txt_Email.text,
+					UsrEmail]);
+			}
+			
+			protected function FnClear():void
+			{
+				
+				FnHelp();
+			}
+			
+			public function FnOnselection_Client():void
+			{
+				if(Hlp_Client.selected())
+				{
+					Hlp_Client.text=Hlp_Client.Select_Row.ClientName;
+					ClientId=Hlp_Client.Select_Row.Id;
+				}
+				else
+				{
+					Hlp_Client.fnClear();ClientId=0;
+				}
+				Hlp_Property._setFocus();
+			}
+			
+			public function FnOnselection_Property():void
+			{
+				if(Hlp_Property.selected())
+				{
+					Hlp_Property.text=Hlp_Property.Select_Row.PropertyName;
+					PropertyId=Hlp_Property.Select_Row.ZId;
+				}
+				else
+				{
+					Hlp_Property.fnClear();PropertyId=0;
+				}
+				Btn_Show.setFocus();
+			}
+			
+			public function FnOnselection_BookingCode():void
+			{
+				if(Hlp_BookingCode.selected())
+				{
+					Hlp_BookingCode.text=Hlp_BookingCode.Select_Row.BookingCode;
+					BookingLevel=Hlp_BookingCode.Select_Row.BookingLevelId;
+					BookingId=Hlp_BookingCode.Select_Row.Id;
+				}
+				else
+				{
+					Hlp_BookingCode.fnClear();BookingId=0;BookingLevel="";
+				}
+				Txt_Email.setFocus();
+			}
+			
+			protected function Btn_Show_clickHandler(event:MouseEvent):void
+			{
+				useWeb("BookingResendMail","BookingLoad_CUSTOM",
+					[GlobalXml,'BookingLoad','','','','',ClientId,PropertyId,0,0]);
+			}
+			
+			protected function EmailValidator_validHandler(event:ValidationResultEvent):void
+			{
+				EmailErrMsg = "";
+			}
+			
+			protected function EmailValidator_invalidHandler(event:ValidationResultEvent):void
+			{
+				EmailErrMsg = event.message;
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<mx:EmailValidator id="EmailValidator" valid="EmailValidator_validHandler(event)"
+						   invalid="EmailValidator_invalidHandler(event)"/>
+	</fx:Declarations>
+	<fx:Style source = "..\\Common\\ApplicationCSS.css"/>
+	<fx:Script source="..\\Common\\CommonScript.as"/>
+	<fx:Script source="..\\Common\\Functions.as"/>
+	<s:HGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+		<s:BorderContainer x="14" y="66" width="888" height="398" backgroundColor="#fbf9f9"
+						   borderVisible="false">
+			<WrbHelpComp:HelpText x="396" y="104" width="200" height="23" id="Hlp_BookingCode" depth="1"
+								  onselection="{FnOnselection_BookingCode()}" pxSetColumnsWidth="198,0,0"
+								  pxTabIndex="3"/>
+			<WrbHelpComp:HelpText x="111" y="50" width="250" height="23" id="Hlp_Client" depth="1"
+								  onselection="{FnOnselection_Client()}" pxSetColumnsWidth="248,0"
+								  pxTabIndex="1"/>
+			<WrbHelpComp:HelpText x="503" y="50" width="250" height="23" id="Hlp_Property" depth="1"
+								  onselection="{FnOnselection_Property()}" pxSetColumnsWidth="248,0"
+								  pxTabIndex="2"/>
+			<s:TextInput x="396" y="158" width="200" height="23" id="Txt_Email" tabIndex="4"/>
+			<mx:Label x="282" y="105" text="Booking Code" fontWeight="bold"/>
+			<mx:Label x="19" y="51" text="Client Name" fontWeight="bold"/>
+			<mx:Label x="398" y="51" text="Property Name" fontWeight="bold"/>
+			<s:Label x="382" y="109.5" text="*" color="red"/>
+			<mx:Label x="282" y="159" text="Email Id" fontWeight="bold"/>
+			<WrbComp:Button_BB id="Btn_Send" x="396" y="213" click="Btn_Send_clickHandler(event)"
+							   _Label="Send"/>
+			<WrbComp:Button_BB id="Btn_Show" x="786" y="45.5" click="Btn_Show_clickHandler(event)"
+							   _Label="Show"/>
+			<WrbComp:Button_BB id="Btn_Clear" x="512" y="213" click="FnClear()"
+							   _Label="Clear"/>
+		</s:BorderContainer>
+	</s:HGroup>
+</s:Application>

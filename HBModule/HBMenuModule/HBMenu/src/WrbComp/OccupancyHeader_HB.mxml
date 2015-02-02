@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="35" height="40" creationComplete="funOcc()">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			public  var Lable_Date:String="";
+			public  var Lable_Day:String="";
+			public  var Color_Day:String="";
+			
+			public function set _LabelDate(Val:String):void
+			{
+				Lable_Date=Val;
+				
+			}
+			public function set _LabelDay(Val:String):void
+			{
+				Lable_Day= Val;
+			}			
+			public function set _BKColor(Val:String):void
+			{
+				Brd_Occ.setStyle("backgroundColor",Color_Day);
+			}
+			public function set _DateColor(Val:String):void
+			{
+				Color_Day=Val;
+				
+			}
+			public function set _DayColor(Val:String):void
+			{
+				
+			}
+			public function set _RulColor(Val:String):void
+			{
+				rl_1.setStyle("strokeColor",Val);
+				rl_2.setStyle("strokeColor",Val);
+				rl_3.setStyle("strokeColor",Val);
+				rl_4.setStyle("strokeColor",Val);
+				rl_5.setStyle("strokeColor",Val);
+			}
+			public function funOcc():void
+			{
+				lbl_Date.text= Lable_Date;
+				lbl_Day.text=Lable_Day;
+				if(lbl_Day.text=="Sun")
+				{
+					lbl_Day.setStyle("color","Red");
+				}
+				
+			}
+			
+		]]>
+	</fx:Script>
+	<s:BorderContainer x="0" y="0" width="100%" height="100%" id="Brd_Occ" borderVisible="false" backgroundColor="#4F8BBD">
+		
+			<mx:VRule x="35" y="0" width="5" height="98%" strokeColor="#060000" id="rl_1" />
+		
+			<mx:VRule x="-1" y="0" width="5" height="98%" strokeColor="#060000" id="rl_2"/>
+		
+		
+			<mx:HRule x="0" y="-1" width="95%" height="5" strokeColor="#060000" id="rl_3"/>
+		
+			<mx:HRule x="0" y="40" width="95%" height="5" strokeColor="#060000" id="rl_4"/>
+		
+		<s:VGroup x="-2" y="0" width="100%" height="40" horizontalAlign="center" verticalAlign="middle" gap="-2">
+			<mx:Label text="" id="lbl_Date" color="#ffffff"/>
+			<mx:HRule width="85%" height="5"  id="rl_5"/>		
+			<mx:Label text="" id="lbl_Day" color="#ffffff"/>
+		</s:VGroup>	
+	</s:BorderContainer>
+	
+</s:Group>

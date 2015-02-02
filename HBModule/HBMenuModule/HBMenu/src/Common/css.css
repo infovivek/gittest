@@ -1,0 +1,23 @@
+/* CSS file */
+@namespace s "library://ns.adobe.com/flex/spark";
+@namespace mx "library://ns.adobe.com/flex/mx";
+
+global
+{	
+	fontFamily: 						"Arial";
+	rollOverColor:						#CCCCCC;
+	color:								#FFFFFF;
+	textRollOverColor:					#CCCCCC;
+	textSelectedColor:					#333333;
+	focus-color:						#4B6F9E;
+	selection-color: 					#D1E5F2;
+	font-size: 							12pt;
+	backgroundImage:   Embed(source="Assets/metal6.jpg");
+	paddingBottom:20pt;
+	paddingLeft:10pt;
+	left:0pt;
+	right:10pt;
+	bottom:0pt;
+	
+	
+}

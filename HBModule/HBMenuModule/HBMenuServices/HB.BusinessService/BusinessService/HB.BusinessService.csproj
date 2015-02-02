@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{FCE65B90-5B2B-4CB2-A7E6-84310D01539E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>HB.BusinessService</RootNamespace>
+    <AssemblyName>HB.BusinessService</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BusinessServiceFactory.cs" />
+    <Compile Include="BusinessService\ApartmentService.cs" />
+    <Compile Include="BusinessService\BookingDtlsService.cs" />
+    <Compile Include="BusinessService\BookingService.cs" />
+    <Compile Include="BusinessService\Citylocalityservice.cs" />
+    <Compile Include="BusinessService\CityService.cs" />
+    <Compile Include="BusinessService\ClientGradeCityService.cs" />
+    <Compile Include="BusinessService\ClientManagementService.cs" />
+    <Compile Include="BusinessService\ContractClientPreferHdrService.cs" />
+    <Compile Include="BusinessService\ContractManagementService.cs" />
+    <Compile Include="BusinessService\ContractNonDedicatedService.cs" />
+    <Compile Include="BusinessService\ContractProductMasterService.cs" />
+    <Compile Include="BusinessService\CreateLogFilesService.cs" />
+    <Compile Include="BusinessService\IBusinessService.cs" />
+    <Compile Include="BusinessService\ImportExcelService.cs" />
+    <Compile Include="BusinessService\ImportGuestService.cs" />
+    <Compile Include="BusinessService\LocalityService.cs" />
+    <Compile Include="BusinessService\MasterClientManagementServices.cs" />
+    <Compile Include="BusinessService\PettyCashService.cs" />
+    <Compile Include="BusinessService\PropertyAgreementService.cs" />
+    <Compile Include="BusinessService\PropertyImageService.cs" />
+    <Compile Include="BusinessService\PropertyOwnersService.cs" />
+    <Compile Include="BusinessService\PropertyRoomService.cs" />
+    <Compile Include="BusinessService\PropertyService.cs" />
+    <Compile Include="BusinessService\RolesService.cs" />
+    <Compile Include="BusinessService\ScreenMasterService.cs" />
+    <Compile Include="BusinessService\SSPCodeGenerationService.cs" />
+    <Compile Include="BusinessService\TransSubsPriceModelService.cs" />
+    <Compile Include="BusinessService\UserMasterService.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HB.BO\HB.BO.csproj">
+      <Project>{292E7D89-75FD-46EB-A7AD-7F34A6EA6780}</Project>
+      <Name>HB.BO</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\HB.Dao\HB.Dao.csproj">
+      <Project>{C4B66FC8-07BA-4116-8E80-CA912882176B}</Project>
+      <Name>HB.Dao</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\HB.Entity\HB.Entity.csproj">
+      <Project>{CF580ED2-C796-4A0D-AB35-93EDC2C655E7}</Project>
+      <Name>HB.Entity</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

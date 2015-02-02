@@ -1,0 +1,267 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{C4B66FC8-07BA-4116-8E80-CA912882176B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>HB.Dao</RootNamespace>
+    <AssemblyName>HB.Dao</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Office.interop.access.dao, Version=12.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=12.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.Office.Interop.Graph, Version=12.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.WebForms, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Windows.Design.Interaction, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AddUserDAO.cs" />
+    <Compile Include="ApartmentBookingMailDAO.cs" />
+    <Compile Include="ApartmentBookingPropertyAssignedGuestDAO.cs" />
+    <Compile Include="ApartmentBookingPropertyDAO.cs" />
+    <Compile Include="ApartmentBookingResendMailDAO.cs" />
+    <Compile Include="ApartmentDAO.cs" />
+    <Compile Include="APIAvailabilityExistingDataDAO.cs" />
+    <Compile Include="APIBookingMailDAO.cs" />
+    <Compile Include="APIBookingResendMailDAO.cs" />
+    <Compile Include="APICreateReservationDAO.cs" />
+    <Compile Include="APIDynamicDAO.cs" />
+    <Compile Include="APIDynamicJson.cs" />
+    <Compile Include="APIStaticDataDAO.cs" />
+    <Compile Include="ApprovedPettyCasDAO.cs" />
+    <Compile Include="BedBookingMailDAO.cs" />
+    <Compile Include="BedBookingPropertyAssignedGuestDAO.cs" />
+    <Compile Include="BedBookingPropertyDAO.cs" />
+    <Compile Include="BedBookingResendMailDAO.cs" />
+    <Compile Include="BookingCancelDAO.cs" />
+    <Compile Include="BookingCancelMMTDAO.cs" />
+    <Compile Include="BookingCustomFieldsDetailsDAO.cs" />
+    <Compile Include="BookingDtlsDAO.cs" />
+    <Compile Include="BookingGuestDetailsDAO.cs" />
+    <Compile Include="BookingHdrDAO.cs" />
+    <Compile Include="BookingMailResendDAO.cs" />
+    <Compile Include="BookingPaymentEmailDAO.cs" />
+    <Compile Include="BookingPropertyAssignedGuestDAO.cs" />
+    <Compile Include="BookingPropertyDAO.cs" />
+    <Compile Include="BookingRecommendPropertyMailDAO.cs" />
+    <Compile Include="BookingRoomMailDAO.cs" />
+    <Compile Include="BookingRoomResendMailDAO.cs" />
+    <Compile Include="BTCSPaymentDAO.cs" />
+    <Compile Include="BTCSubmissionDAO.cs" />
+    <Compile Include="CheckInDtlsDAO.cs" />
+    <Compile Include="CheckInForecastReportDAO.cs" />
+    <Compile Include="CheckoutAndIntermediateDao.cs" />
+    <Compile Include="CheckOutandInterSettleDtlDao.cs" />
+    <Compile Include="CheckOutandInterSettleHdrDao.cs" />
+    <Compile Include="CheckOutPaymentCardDao.cs" />
+    <Compile Include="CheckOutPaymentCashDao.cs" />
+    <Compile Include="CheckOutPaymentChequeDao.cs" />
+    <Compile Include="CheckOutPaymentCompInvoiceDao.cs" />
+    <Compile Include="CheckOutPaymentDao.cs" />
+    <Compile Include="CheckOutPaymentNEFTDao.cs" />
+    <Compile Include="CheckOutServiceDtlsDAO.cs" />
+    <Compile Include="CheckOutServiceHdrDAO.cs" />
+    <Compile Include="CheckOutSettleDtlDAO.cs" />
+    <Compile Include="CheckOutSettleHdrDAO.cs" />
+    <Compile Include="CheckStatusDao.cs" />
+    <Compile Include="CityDAO.cs" />
+    <Compile Include="CitylocalityDAO.cs" />
+    <Compile Include="ClientColumnDAO.cs" />
+    <Compile Include="ClientGradeCityDAO.cs" />
+    <Compile Include="ClientGradeCityDetailsDAO.cs" />
+    <Compile Include="ClientMgntAddNewClientDAO.cs" />
+    <Compile Include="ClientManagementDAO.cs" />
+    <Compile Include="ClientMgntClientguestDAO.cs" />
+    <Compile Include="ClientMgntCustomFieldsDAO.cs" />
+    <Compile Include="ClientWisePriceDAO.cs" />
+    <Compile Include="CloneClientDAO.cs" />
+    <Compile Include="CompanyMasterDAO.cs" />
+    <Compile Include="ContractBillDAO.cs" />
+    <Compile Include="CreditNoteServiceDAO.cs" />
+    <Compile Include="CreditNoteTariffDAO.cs" />
+    <Compile Include="DepositDAO.cs" />
+    <Compile Include="ExpenseMasterDAO.cs" />
+    <Compile Include="ExportUnsettledDAO.cs" />
+    <Compile Include="ExternalChechkOutTACDao.cs" />
+    <Compile Include="ExternalCheckOutDao.cs" />
+    <Compile Include="ExternalCheckOutMailDao.cs" />
+    <Compile Include="ExternalExpenseReportDAO.cs" />
+    <Compile Include="ExternalIntermediateCheckOutDao.cs" />
+    <Compile Include="IntermediateCheckoutServiceDtlsDAO.cs" />
+    <Compile Include="IntermediateCheckoutServiceHdrDAO.cs" />
+    <Compile Include="InternalExpenseReportDAO.cs" />
+    <Compile Include="ForgotDAO.cs" />
+    <Compile Include="FormatReceiptsDAO.cs" />
+    <Compile Include="GuestCheckInDao.cs" />
+    <Compile Include="GuestCheckOutDao.cs" />
+    <Compile Include="ImportGuestDAO.cs" />
+    <Compile Include="KOTEntryDtlsDao.cs" />
+    <Compile Include="KOTEntryHdrDao.cs" />
+    <Compile Include="KOTEntryUserDAO.cs" />
+    <Compile Include="LaundryServiceDtlDAO.cs" />
+    <Compile Include="LaundryServiceHdrDAO.cs" />
+    <Compile Include="MapPOAndVendorDAO.cs" />
+    <Compile Include="MapVendorDAO.cs" />
+    <Compile Include="MarkUpDAO.cs" />
+    <Compile Include="MenuScreenDAO.cs" />
+    <Compile Include="NewKOTEntryDtlDAO.cs" />
+    <Compile Include="NewKOTEntryHdrDAO.cs" />
+    <Compile Include="NewKOTUserEntryDtlDAO.cs" />
+    <Compile Include="NewKOTUserEntryHdrDAO.cs" />
+    <Compile Include="NewKOTVendorReportDAO.cs" />
+    <Compile Include="NewSnackKOTHistoryDAO.cs" />
+    <Compile Include="NewSnackKOTReportDAO.cs" />
+    <Compile Include="OutsourceKOTDtlDAO.cs" />
+    <Compile Include="OutsourceKOTHdrDAO.cs" />
+    <Compile Include="PaxInOutDAO.cs" />
+    <Compile Include="PaymentWiseServiceDAO.cs" />
+    <Compile Include="PCExpenseApprovalDAO.cs" />
+    <Compile Include="PCHistroryDAO.cs" />
+    <Compile Include="PendingCkinReportDao.cs" />
+    <Compile Include="PendingUnsettledDao.cs" />
+    <Compile Include="PettyCashApprovalDtlDAO.cs" />
+    <Compile Include="PettyCashDAO.cs" />
+    <Compile Include="PettyCashApprovalHdrDAO.cs" />
+    <Compile Include="PettyCashHdrDAO.cs" />
+    <Compile Include="PettyCashReportDAO.cs" />
+    <Compile Include="PettyCashRequiredStatusDAO.cs" />
+    <Compile Include="PettyCashStatusDAO.cs" />
+    <Compile Include="PettyCashStatusHdrDAO.cs" />
+    <Compile Include="PropertyOwnerOtherContactsDAO.cs" />
+    <Compile Include="PropertyReportDAO.cs" />
+    <Compile Include="PropertyWiseServiceDAO.cs" />
+    <Compile Include="ReassignClientDAO.cs" />
+    <Compile Include="ReassignClientDtlDAO.cs" />
+    <Compile Include="ReassignPropertyDAO.cs" />
+    <Compile Include="ReassignPropertyDtlDAO.cs" />
+    <Compile Include="ReconcileDAO.cs" />
+    <Compile Include="ReportDAO.cs" />
+    <Compile Include="ReportsDAO.cs" />
+    <Compile Include="RoomShiftingDAO.cs" />
+    <Compile Include="SearchBookingDAO.cs" />
+    <Compile Include="SearchBookingGuestDAO.cs" />
+    <Compile Include="SearchDetailServiceInvoiceDAO.cs" />
+    <Compile Include="SearchInvoiceReportDao.cs" />
+    <Compile Include="SlabTaxDAO.cs" />
+    <Compile Include="SMSDAO.cs" />
+    <Compile Include="SnackKOTHistoryDAO.cs" />
+    <Compile Include="SSPCodeGenerationApartmentDAO.cs" />
+    <Compile Include="SSPCodeGenerationRoomsDAO.cs" />
+    <Compile Include="SSPCodeGenerationServiceDAO.cs" />
+    <Compile Include="ContractClientPreferDtlDAO.cs" />
+    <Compile Include="ContractClientPreferHdrDAO.cs" />
+    <Compile Include="ContractManagementDao.cs" />
+    <Compile Include="ContractManagementServicesDao.cs" />
+    <Compile Include="ContractManagementTariffAppartmentDao.cs" />
+    <Compile Include="ContractManagementTariffDao.cs" />
+    <Compile Include="ContractNonDedicatedApartmentDAO.cs" />
+    <Compile Include="ContractNonDedicatedDAO.cs" />
+    <Compile Include="ContractNonDedicatedServiceDAO.cs" />
+    <Compile Include="ContractProductMasterDAO.cs" />
+    <Compile Include="CreateLogFiles.cs" />
+    <Compile Include="ImportExcelDAO.cs" />
+    <Compile Include="LocalityDao.cs" />
+    <Compile Include="MasterClientManagementDAO.cs" />
+    <Compile Include="PropertyAgreementDAO.cs" />
+    <Compile Include="PropertyAgreementDetailsDAO.cs" />
+    <Compile Include="PropertyAgreementOwnerDAO.cs" />
+    <Compile Include="PropertyAgreementsRoomChargesDAO.cs" />
+    <Compile Include="PropertyBlockDAO.cs" />
+    <Compile Include="PropertyDAO.cs" />
+    <Compile Include="PropertyImageDAO.cs" />
+    <Compile Include="PropertyOwnerApartmentDAO.cs" />
+    <Compile Include="PropertyOwnersDAO.cs" />
+    <Compile Include="PropertyRoomBedsDAO.cs" />
+    <Compile Include="PropertyRoomDAO.cs" />
+    <Compile Include="PropertyUserDAO.cs" />
+    <Compile Include="RolesDAO.cs" />
+    <Compile Include="RolesDetailsDao.cs" />
+    <Compile Include="ScreenMasterDao.cs" />
+    <Compile Include="SSPCodeGenerationDAO.cs" />
+    <Compile Include="StoredProcedures.cs" />
+    <Compile Include="TACInvoiceDAO.cs" />
+    <Compile Include="TariffBasedReportDao.cs" />
+    <Compile Include="TaxMappingDAO.cs" />
+    <Compile Include="TaxMasterDAO.cs" />
+    <Compile Include="TDSDeclarationDAO.cs" />
+    <Compile Include="TIAandATIADAO.cs" />
+    <Compile Include="TodaysCheckinCheckoutDAO.cs" />
+    <Compile Include="TransSubsPriceModelDAO.cs" />
+    <Compile Include="TravelDeskDao.cs" />
+    <Compile Include="TRLinkDAO.cs" />
+    <Compile Include="UserMasterDao.cs" />
+    <Compile Include="UserRolesDao.cs" />
+    <Compile Include="VendorAdvancePaymentDAO.cs" />
+    <Compile Include="VendorChequeApprovalHdrDAO.cs" />
+    <Compile Include="VendorChequeApprovalDtlDAO.cs" />
+    <Compile Include="VendorCostDAO.cs" />
+    <Compile Include="VendorDao.cs" />
+    <Compile Include="VendorRequestDAO.cs" />
+    <Compile Include="VendorRequestDtlDAO.cs" />
+    <Compile Include="VendorSettlementDAO.cs" />
+    <Compile Include="WrbErpConnection.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="CheckOutTariffDAO.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HB.Entity\HB.Entity.csproj">
+      <Project>{CF580ED2-C796-4A0D-AB35-93EDC2C655E7}</Project>
+      <Name>HB.Entity</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

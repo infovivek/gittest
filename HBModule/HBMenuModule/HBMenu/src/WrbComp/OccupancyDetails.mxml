@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="85" height="34" creationComplete="funOcc()">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			public  var Lable_Room:String="";
+			public  var Lable_RoomId:String="";
+			public  var Color_Day:String="";
+			
+			public function set _LabelRooms(Val:String):void
+			{
+				Lable_Room=Val;
+				
+			}
+			public function set _LabelRoomId(Val:String):void
+			{
+				Lable_RoomId= Val;
+			}			
+			public function set _BKColor(Val:String):void
+			{
+				Brd_Occ.setStyle("backgroundColor",Color_Day);
+			}
+			public function set _DateColor(Val:String):void
+			{
+				Color_Day=Val;
+				
+			}			
+			public function set _RulColor(Val:String):void
+			{
+				rl_1.setStyle("strokeColor",Val);
+				rl_2.setStyle("strokeColor",Val);
+				rl_3.setStyle("strokeColor",Val);
+				rl_4.setStyle("strokeColor",Val);
+				
+			}
+			public function funOcc():void
+			{
+				lbl_Rooms.text= Lable_Room;
+				
+			}
+			
+		]]>
+	</fx:Script>
+	<s:BorderContainer x="0" y="0" width="100%" height="100%" id="Brd_Occ" borderVisible="false">
+		<s:VGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle" visible="true">
+			<mx:Label text="" id="lbl_Rooms"/>			
+		</s:VGroup>	
+		<mx:HRule x="0" y="-1" width="98%" height="5" strokeColor="#060000" id="rl_1"/>
+		<mx:HRule x="0" y="32" width="98%" height="5" strokeColor="#060000" id="rl_2"/>
+		<mx:VRule x="-1" y="0" height="98%" width="5" strokeColor="#060000" id="rl_3"/>
+		<mx:VRule x="83" y="0" height="98%" width="5" strokeColor="#060000" id="rl_4"/>
+	</s:BorderContainer>
+</s:Group>

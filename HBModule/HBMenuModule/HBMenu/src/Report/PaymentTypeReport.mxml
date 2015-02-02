@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:WrbComp="WrbComp.*"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   width="100%" height="100%" creationComplete="PageLoad()"
+			   pageTitle="PaymentWise  Report">
+	<fx:Declarations>
+		<s:Animate id="fader"   duration="500"   repeatBehavior="reverse"   repeatCount="0">
+			<s:SimpleMotionPath property="alpha" valueFrom="1.0" valueTo="0.0" />
+		</s:Animate>
+		<s:Animate id="fader1"  duration="0"  repeatBehavior="reverse"  repeatCount="0">
+			<s:SimpleMotionPath property="alpha" valueFrom="1.0" valueTo="0.0" />
+		</s:Animate>
+		
+	</fx:Declarations>
+	
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
+	<fx:Script>
+		<![CDATA[ 
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = ""; 
+			public var ErrorFlag:Boolean=true; 
+			public var Id:Number=0; 	public var Str_ChkOut:String="",Str_Serv:String="",Str_Settle:String="";
+			public var Str_ChkOut1:String="",Str_Serv1:String="",Str_Settle1:String="",Str_ChkOutTAC:String="";
+			public var InVoiceNo:String="",ClientId:int=0,Statuss:String="";
+			protected function PageLoad():void
+			{
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				GlobalXml="";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";
+				useWeb("PaymentWiseService","Pageload_Load",[GlobalXml,"PageLoad1",'','','',0]);
+				
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{ 
+				if (Ds_Objects.currentTarget.description.toString() == "Pageload_Load")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						hlp_Client.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					} 
+				}
+				
+				Grd_PaymentWise.dataProvider= null;
+				try
+				{
+					if (Ds_Objects.currentTarget.description.toString() == "Report_CUSTOM")
+					{
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{
+							Grd_PaymentWise.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						} 
+					}
+					
+				}
+				catch(Exception)
+				{
+					
+				}
+			}
+			
+			public var 	FromDate:String="",ToDate:String="",ChkoutId:String="",Status:String="";
+			public function Clear():void
+			{
+				
+			
+			}  
+			public var InvoiceNum:String="";
+			protected function btn_Search_clickHandler():void
+			{
+							
+				if(DT_From.text !='')
+				{
+					if(DT_To.text =='')
+					{
+						alignAlert(Alert.show("Select Valid From and ToDate","Alert Message !",
+							Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+						return;
+					}
+				}
+				if(DT_To.text !='')
+				{
+					if(DT_From.text =='')
+					{
+						alignAlert(Alert.show("Select Valid From and ToDate","Alert Message !",
+							Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+						return;
+					}
+				}
+				if(ErrorFlag==true)
+				{			
+					FromDate=DT_From.text;
+					ToDate=DT_To.text;
+				
+					if (Status==null)
+					{
+						Status='';
+					}
+					useWeb("PaymentWiseService","Report_CUSTOM",[GlobalXml,"Pageload",'',FromDate,ToDate,ClientId]);
+				} 
+			}
+			
+			public function Change(LabelName:String):void
+			{
+				
+				fader1.target=this[LabelName];				
+				fader1.play();					
+				this[LabelName].setStyle("color","#565454");
+				if(DT_From.selectedDate)
+				{
+					var asd:String = DT_From.text;										
+					var Y:String = asd.substr(6,10);
+					var M:String = asd.substr(3,2);
+					var D:String = asd.substr(0,2);
+					var RangeStart:String = Y+'/'+M+'/'+D;
+					DT_To.selectableRange = {rangeStart:new Date(RangeStart)};
+					DT_To.selectedDate = new Date(RangeStart);
+					
+					DT_To.selectableRange = {rangeStart:new Date(RangeStart)};
+					DT_To.selectedDate = new Date(RangeStart);
+					DT_To.setFocus();
+				}
+				
+				
+			}
+			private function fnGetBooking():void
+			{
+				if(hlp_Client.selected())
+				{
+					hlp_Client.text = hlp_Client.Select_Row.ClientName;
+					ClientId = hlp_Client.Select_Row.Id;
+					
+					//useWeb("PaymentWiseService","Report_CUSTOM", [GlobalXml,"Pageload",hlp_Client.text,FromDate,ToDate,ClientId]);
+									
+				}
+				else
+				{
+					hlp_Client.text ="";
+					ClientId =0;
+				}
+			}
+			
+			
+			
+		]]>
+	</fx:Script>
+	<s:BorderContainer x="0" y="30" width="100%" height="84" borderVisible="false" backgroundColor="#f4efef" depth="10">
+		<s:HGroup x="0" y="0" width="100%" height="90" horizontalAlign="center" verticalAlign="middle">
+			<s:Group x="132" y="5" width="100%" height="80">
+				<mx:Label x="522" y="37" width="64" height="16" text="From Date" id="Lbl_FDT"/>
+				<mx:Label x="162" y="37" width="76" height="16" text="	ClientWise" id="Lbl_Client"/>
+				<mx:Label x="708" y="37" text="To Date" id="Lbl_TDT"/>
+				
+				<mx:DateField id="DT_From" x="608" y="36" width="90" height="23"
+							  change="Change('Lbl_FDT')" formatString="DD/MM/YYYY"
+							  selectableRange="{{rangeEnd: new Date()}}" tabIndex="1"
+							  yearNavigationEnabled="true"/>
+				<mx:DateField id="DT_To" x="778" y="36" width="90" formatString="DD/MM/YYYY"
+							  tabIndex="2" yearNavigationEnabled="true" />
+				
+				<s:Image x="911" y="20" source="assets/a1.png" toolTip="Search" click="btn_Search_clickHandler()" tabIndex="5"/>
+				<s:Image x="1010" y="20" click="Clear()" source="assets/dust_bin1.png" toolTip="Clear"/>
+				<WrbHelpComp:HelpText x="260" y="36" width="225" height="23" id="hlp_Client" onselection="{fnGetBooking()}" pxSetColumnsWidth="100,0">
+				</WrbHelpComp:HelpText>
+				<!--mx:Label id="Lbl_Vendor1" x="223" y="2" width="13" text="*" color="red" fontSize="16"/>
+				<mx:Label id="Lbl_Vendor0" x="222" y="42" width="13" text="*" color="red" fontSize="16"/-->
+			</s:Group>
+		</s:HGroup>
+	</s:BorderContainer>
+	
+	<s:BorderContainer x="0" y="115" width="100%" height="354" id="bdr_Scroll" visible="true" borderVisible="false">
+		
+		<s:Scroller x="0" y="29" width="100%" height="341" id="Scr_Grid" visible="true">
+		<s:VGroup width="100%" height="100%">
+		<s:HGroup  width="100%" height="100%">
+		<mx:DataGrid id="Grd_PaymentWise" x="0" y="150" width="2100" height="100%"  editable="false" tabIndex="3" verticalAlign="middle">
+				<mx:columns>
+					<mx:DataGridColumn dataField="City" headerText="City" width="100" editable="false" visible="true"/>
+					<mx:DataGridColumn dataField="Property"  headerText="Property / Hotal Name" editable="false" width="100" textAlign="center"/>	
+					<mx:DataGridColumn dataField="Direct"   editable="false" width="100" textAlign="center"/>	
+					<mx:DataGridColumn dataField="BTC"   editable="false" width="100" textAlign="center"/>	
+					<mx:DataGridColumn dataField="Bill To Company"  textAlign="center" visible="true" width="100" editable="false"/> 
+					<mx:DataGridColumn dataField="Direct"   editable="false" width="100" textAlign="center"/>	
+					<mx:DataGridColumn dataField="BTC"   editable="false" width="100" textAlign="center"/>	
+					<mx:DataGridColumn dataField="Bill To Company"  textAlign="center" visible="true" width="100" editable="false"/> 
+					<mx:DataGridColumn dataField="Direct"   editable="false" width="100" textAlign="center"/>	
+					<mx:DataGridColumn dataField="BTC"   editable="false" width="100" textAlign="center"/>	
+					<mx:DataGridColumn dataField="Bill To Company"  textAlign="center" visible="true" width="100" editable="false"/> 
+					<mx:DataGridColumn dataField="Direct"   editable="false" width="100" textAlign="center"/>	
+					<mx:DataGridColumn dataField="BTC"   editable="false" width="100" textAlign="center"/>	
+					<mx:DataGridColumn dataField="Bill To Company"  textAlign="center" visible="true" width="100" editable="false"/> 
+					<mx:DataGridColumn dataField="Direct"   editable="false" width="100" textAlign="center"/>	
+					<mx:DataGridColumn dataField="BTC"   editable="false" width="100" textAlign="center"/>	
+					<mx:DataGridColumn dataField="Bill To Company"  textAlign="center" visible="true" width="100" editable="false"/> 
+					<mx:DataGridColumn dataField="Direct"   editable="false" width="100" textAlign="center"/>	
+					<mx:DataGridColumn dataField="BTC"   editable="false" width="100" textAlign="center"/>	
+					<mx:DataGridColumn dataField="Bill To Company"  textAlign="center" visible="true" width="100" editable="false"/> 
+					<mx:DataGridColumn dataField="GrandTotal"  textAlign="center" visible="true" width="100" editable="false"/> 
+				</mx:columns>
+			</mx:DataGrid>
+			</s:HGroup> 
+			</s:VGroup>
+			</s:Scroller>
+		
+	</s:BorderContainer> 
+	
+		
+		
+
+</s:Application>

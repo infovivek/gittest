@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="84" height="32">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>	
+	<fx:Script>
+		<![CDATA[
+			public  var Lable_val:String="";
+			public function set _Label(Val:String):void
+			{
+				Lable_val= Val;
+			}
+			public function set _Label1(Val:String):void
+			{
+				lbl_Val.text= Val;
+			}
+			public  var TabIndex_val:int=0;
+			public function set _TabIndex(Val1:int):void
+			{
+				Button_B.tabIndex= Val1;
+				this.tabIndex= Val1;
+			}
+				
+			protected function Button_B_mouseOutHandler(event:MouseEvent):void
+			{
+				Button_B.setStyle("backgroundColor","#808080");
+				lbl_Val.setStyle("color","#ffffff");
+			}
+			
+			protected function Button_B_mouseOverHandler(event:MouseEvent):void
+			{
+				Button_B.setStyle("backgroundColor","#eb1c24");
+				lbl_Val.setStyle("color","#ffffff");
+			}
+			public function funlbl():void
+			{
+				lbl_Val.text=Lable_val;
+				//Button_B.tabIndex=TabIndex_val;
+				
+			}
+			
+		]]>
+	</fx:Script>	
+	<s:BorderContainer x="0" y="0" id="Button_B" width="100%" height="100%" backgroundColor="#808080" borderVisible="false"
+					   cornerRadius="5"
+					   mouseOut="Button_B_mouseOutHandler(event)" mouseOver="Button_B_mouseOverHandler(event)">
+		<s:VGroup width="100%" height="100%" verticalAlign="middle" horizontalAlign="center">
+			<s:Label id="lbl_Val" color="white" text="Label" creationComplete="funlbl();">
+				
+			</s:Label>
+		</s:VGroup>		
+	</s:BorderContainer>
+</s:Group>

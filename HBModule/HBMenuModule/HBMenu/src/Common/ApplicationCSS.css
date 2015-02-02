@@ -1,0 +1,330 @@
+/* CSS file */
+@namespace s "library://ns.adobe.com/flex/spark";
+@namespace mx "library://ns.adobe.com/flex/mx";
+@namespace ProComp "ProComp.*";
+
+
+/*************************************************************
+**	Author: Pei Peng
+**	Date: 10/10/2008
+**	Email: info@skydesign.co.nz
+**	Web: www.skydesign.co.nz
+**  License: Free~~
+**************************************************************/
+global
+{
+	
+}
+
+mx|ToolTip
+{
+	backgroundColor: #eeeeee;
+	color:#585656;
+	fontWeight:bold;
+	fontSize:15;
+
+}
+mx|AccordionHeader
+{
+	fillColors: #7C7C7C, #7C7C7C;
+	fillAlphas: 1.0, 0.5;
+	color:#ffffff;
+	chromeColor:#7C7C7C;
+	focusColor:#7C7C7C;
+	accentColor:#7C7C7C;
+	textRollOverColor:#eb1c24;
+	textSelectedColor:#eb1c24;
+	
+	
+}
+mx|Label
+{
+	color:#565454;
+	/*fontFamily:"FontAwesome";*/
+}
+
+s|Button
+{
+	color: #ffffff;
+	chromeColor:#7C7C7C;
+}
+mx|Button
+{
+	color: #ffffff;
+	chromeColor:#7C7C7C;
+}
+mx|CheckBox
+{
+	
+	color: #000000;
+	useRollOver: true;	
+	themeColor: #FFFFFF;
+	textRollOverColor: #DCDCDC;
+	textSelectedColor: #9A9A9A;
+	chromeColor:#FFFFFF;
+	accentColor:#FFFFFF;
+	focusColor:#9A9A9A;
+	symbolColor:#eb1c24;
+}
+s|CheckBox
+{
+	
+	color: #585656;
+	useRollOver: true;	
+	themeColor: #FFFFFF;
+	textRollOverColor: #DCDCDC;
+	textSelectedColor: #9A9A9A;
+	chromeColor:#eeeeee;
+	accentColor:#FFFFFF;
+	focusColor:#7C7C7C;
+	symbolColor:#eb1c24;
+	
+}
+
+s|ComboBox
+{
+	contentBackgroundColor: #c2c2c2;
+	rollOverColor:#eb1c24;
+	color:#FFFFFF;
+	focusColor:#c2c2c2;
+	selectionColor:#BB9090;	
+	contentBackgroundAlpha:5;	
+	symbolColor:#eb1c24;
+}
+s|DropDownList
+{
+	contentBackgroundColor: #c2c2c2;
+	rollOverColor:#eb1c24;
+	color:#ffffff;
+	focusColor:#c2c2c2;
+	selectionColor:#BB9090;	
+	contentBackgroundAlpha:5;	
+	symbolColor:#eb1c24;
+	
+}
+
+mx|DataGrid
+{
+	color: #585656;
+	selectionColor: #606060;
+	alternatingItemColors:#eeeeee,#ffffff;
+	rollOverColor: #eb1c24;
+	textSelectedColor: #DCDCDC;
+	fontWeight: normal;
+	textRollOverColor: #CECECE;	
+	headerStyleName: dataGridHeader;
+	chromeColor:#7C7C7C;
+	/*headerBackgroundSkin: Embed(skinClass='boxBtn');*/
+	textAlign: center;
+}
+.dataGridHeader
+{
+	headerColors:#7C7C7C;
+	chromeColor:#7C7C7C;
+	color: #FFFFFF;
+	fontWeight: bold;
+	textAlign: center;
+} 
+mx|CursorManager
+/*{
+	busyCursor: Embed(skinClass="CursorManager_busyCursor");
+}
+mx|DateChooser
+{
+	nextMonthSkin: Embed(skinClass="DateChooser_nextMonthSkin");
+	nextYearSkin: Embed(skinClass="DateChooser_nextYearSkin");
+	prevMonthSkin: Embed(skinClass="DateChooser_prevMonthSkin");
+	prevYearSkin: Embed(skinClass="DateChooser_prevYearSkin");	
+	
+	focusColor:#7C7C7C;
+	todayStyleName: dateChooserToday;
+	disabledColor: #414141;
+	selectionColor: #7C7C7C;
+	rollOverColor: #eb1c24;
+	
+	todayColor: #BB9090;
+	headerStyleName: dateChooserHeader;
+	fontFamily: Arial;
+	weekDayStyleName: dateChooserWeekDay;
+	backgroundColor: #c2c2c2;
+	contentBackgroundColor:#c2c2c2;
+	cornerRadius: 5;
+	borderColor: #BD0000;
+	color:#585656;
+	borderVisible:false;
+	chromeColor:#eb1c24;
+	headerColors:#eb1c24;
+}*/
+
+
+s|RadioButton
+{
+	color: #585656;
+	symbolColor:#eb1c24;
+	focusColor:#585656;
+	chromeColor:#eeeeee;
+	
+}
+
+mx|TabBar
+{
+	color:#ffffff;
+	chromeColor:#7C7C7C;
+	focusColor:#7C7C7C;
+	accentColor:#7C7C7C;
+	textRollOverColor:#eb1c24;
+	textSelectedColor:#eb1c24;
+	tabStyleName:"tabBarTab";
+	selectedTabTextStyleName: 			"selectedTabTextStyle";
+}
+.tabBarTab
+{
+	chromeColor:#7C7C7C;
+	focusColor:#7C7C7C;
+	textRollOverColor:#eb1c24;
+	textSelectedColor:#7C7C7C;;
+}
+.selectedTabTextStyle
+{
+	color: 								#ffffff;
+	textRollOverColor:					#333333;
+	chromeColor: #7C7C7C;
+}
+mx|TabNavigator
+{
+	padding-top: 0;
+	borderColor: #999999;
+}
+
+.myTabNavigatorText
+{
+	font-weight: normal;	
+	font-size: 11;
+}
+s|TextArea
+{
+	contentBackgroundColor: #eeeeee;
+	borderColor: #7C7C7C;
+	chromeColor: #7C7C7C;
+	focusColor:#7C7C7C;
+	borderVisible:false;
+	color:#585656;
+	
+}
+s|TextInput
+{
+	contentBackgroundColor: #eeeeee;
+	borderColor: #7C7C7C;
+	chromeColor: #7C7C7C;
+	focusColor:#7C7C7C;
+	borderVisible:false;
+	color:#585656;
+}
+
+.panelTitle
+{
+	fontFamily: Verdana;
+	fontSize: 11;
+	fontWeight: bold;
+}
+mx|PopUpButton
+{
+	popUpStyleName: popUpButtonStyle;
+}
+.popUpButtonStyle
+{
+	fontWeight: normal;
+	textAlign: left;
+}
+mx|DateChooser
+{
+	headerColors: #eb1c24, #eb1c24;
+	color: #ffffff;
+	headerStyleName:"HEDSTY"
+	
+}
+.HEDSTY
+{
+	headerColors:#eb1c24, #eb1c24;
+}
+mx|DateField
+{
+	disabledSkin: Embed(source="flekristal_skin.swf",symbol="DateField_disabledSkin"); 
+	downSkin: Embed(source="flekristal_skin.swf",symbol="DateField_downSkin"); 
+	overSkin: Embed(source="flekristal_skin.swf",symbol="DateField_overSkin"); 
+	upSkin: Embed(source="flekristal_skin.swf",symbol="DateField_upSkin"); 
+}
+s|Scroller
+{
+	
+	cornerRadius: 16;
+	highlightAlphas: 0, 0;
+	fillColors: #0099ff, #0033ff, #000000, #ffffff;
+	trackColors: #000000, #ffffff;
+	themeColor: #009dff;
+}
+
+mx|HSlider
+{
+	showTrackHighlight: true;
+}
+mx|VSlider
+{
+	showTrackHighlight: true;
+}
+mx|LinkButton
+{
+	textRollOverColor:#ffffff;
+	rollOverColor:#eb1c24;
+	backgroundColor: #c2c2c2;
+	color:#585656;
+}
+mx|Alert {
+	
+	titleBackgroundSkin: Embed(source="assets/Panel_titleBackgroundSkin.png",
+		scaleGridTop="7",
+		scaleGridLeft="7",
+		scaleGridRight="264",
+		scaleGridBottom="18");
+	
+	titleStyleName: 					"titleStyle";
+	backgroundColor: 					#c2c2c2;
+	controlBarStyleName: 				"controlBarStyle";
+	buttonStyleName:					"alertButtonStyle";
+	headerHeight: 						32;
+	color:								#585656;
+	padding-top: 10;
+	padding-left: 10;
+	padding-right: 10;
+	padding-bottom: 4;
+	background-color:#c2c2c2;
+	contentBackgroundColor:#c2c2c2;
+	focusColor:#c2c2c2;
+	titleStyleName: "titlebarsty"
+}
+.alertButtonStyle
+{
+	chromeColor:                        #c2c2c2;
+	color: 								#000000;
+	textRollOverColor: 					#ffffff;
+	textSelectedColor: 					#000000;
+	contentBackgroundColor: #eb1c24;
+	backgroundColor: #eb1c24;
+	borderColor: #eb1c24;
+	
+}
+.controlBarStyle
+{
+	backgroundColor:#c2c2c2;
+	contentBackgroundColor:#c2c2c2;
+	chromeColor:#c2c2c2;
+	color:#585656;
+}
+.titlebarsty
+{
+	color:#ffffff;
+}
+global
+{
+	chrome-color: #F78787;
+}

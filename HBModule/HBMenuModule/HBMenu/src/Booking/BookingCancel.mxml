@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   xmlns:WrbComp="WrbComp.*"
+			   width="100%" height="100%" backgroundColor="#fbf9f9" creationComplete="Page_Load()">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
+	<fx:Script>
+		<![CDATA[
+			import mx.events.CloseEvent;
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "";
+			public var DtlsId:int = 0,BookingId:int = 0,Status:String = "",PropertyType:String = "";
+			private function Page_Load():void
+			{
+				Global_AC = funLoginInfo("<gScrId>1</gScrId><gUsrFk>1</gUsrFk>");				
+				GlobalXml = "";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";					
+				SCtrl.setButtonRights("Delete",true);
+				SCtrl.setButtonRights("Clear",true);
+				SCtrl.setButtonRights("Save",true);
+				SCtrl.setButtonRights("Search",true);
+				hlp_BookingCode._setFocus();
+				help();
+				//Chk_Mail.selected = true;
+				//useWeb("BookingMail","MMTBookingCancel_CUSTOM",[GlobalXml,"BookingCancelMMT",4661,"Test Cancelation",Chk_Mail.selected]);
+			}
+			private function help():void
+			{				
+				useWeb("BookingCancel","BookingCode_CUSTOM", [GlobalXml, "BookingCodeCancel","", 0, Global_AC[0].UsrId]);
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void				
+			{
+				
+				if (Ds_Objects.currentTarget.description.toString() == "BookingCode_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						hlp_BookingCode.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
+					else
+					{
+						hlp_BookingCode.dataProvider=null;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "BookingGuest_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						txt_Property.text=Ds_Objects.result.Tables.Table.Rows[0].PropertyName;
+						Status=Ds_Objects.result.Tables.Table.Rows[0].CheckIn;
+						
+					}
+					else
+					{
+						txt_Property.text="";
+					}
+					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					{
+						Grd_Property.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+						
+						myArrayCollection=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+					else
+					{
+						Grd_Property.dataProvider=null;
+					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "BookingGuestDelete_CUSTOM")
+				{
+					
+					alignAlert(Alert.show("Guest Deleted Successfully.","Message !",Alert.OK,null,null,iconTickLarge, Alert.OK),10,"");
+					Clear();
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "BookingDelete_CUSTOM")
+				{
+					
+					alignAlert(Alert.show("Booking Canceled Successfully.","Message !",Alert.OK,null,null,iconTickLarge, Alert.OK),10,"");
+					Clear();
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "MMTBookingCancel_CUSTOM")
+				{
+					if(Ds_Objects.result.Tables.Table.Rows[0].Success == "No")
+					{
+						alignAlert(Alert.show(Ds_Objects.result.Tables.Table.Rows[0].Msg,"Alert Message !",
+							Alert.OK,null,null,iconWarning, Alert.OK),10,"");
+					}
+					if(Ds_Objects.result.Tables.Table.Rows[0].Success == "Yes")
+					{
+						alignAlert(Alert.show("Booking Canceled Successfully.","Message !",
+							Alert.OK,null,null,iconTickLarge, Alert.OK),10,"");
+						Clear();
+					}					
+				}			
+			}
+			public function Clear():void
+			{
+				txt_Remarks.text="";
+				Grd_Property.dataProvider=null;
+				hlp_BookingCode.text="";
+				txt_Client.text="";
+				txt_Property.text="";
+				BookingId=0;
+				DtlsId=0;
+				GuestFlag=false;
+				hlp_BookingCode._setFocus();
+				help();
+			}
+			public var Ac_Guest:ArrayCollection=new ArrayCollection();	
+			public var selectedindex:int=0;
+			public function DeleteGrid1():void
+			{
+				if(PropertyType == "")
+				{
+					Ac_Guest=Grd_Property.dataProvider as ArrayCollection;
+					for(var i:int=0;i<Ac_Guest.length;i++)
+					{
+						var sDate1:Date=DateField.stringToDate(Ac_Guest[i].ChkInDt,"DD/MM/YYYY");
+						var sDate2:Date=DateField.stringToDate(Ac_Guest[i].ChkOutDt,"DD/MM/YYYY");					
+						//Date Differance
+						var MS_PER_DAY:uint = 1000 * 60 * 60 * 24;
+						var tempDate:Date = new Date(sDate2.time - sDate1.time);
+						var difference:Number = 
+							Math.abs(Math.round((tempDate.time / MS_PER_DAY)));
+						
+						Ac_Guest[i].DateDiffs=difference;
+						if(Ac_Guest[i].Tick=="1")
+						{
+							GuestFlag=true;
+						}
+					}
+					//var selectedindex:int=Grd_Property.selectedIndex;
+					//DtlsId=Ac_Guest[selectedindex].Id;
+					if(GuestFlag==false)
+					{
+						alignAlert(Alert.show("This is an Invalid Process.Select Any Guest to Delete.","Error !",Alert.OK, 
+							null, null, iconCrossSmall, Alert.OK),10,"");
+						return;
+					}
+					if(txt_Remarks.text=="")
+					{
+						alignAlert(Alert.show("* Remarks is Required.","Error !",Alert.OK, 
+							null, null, iconCrossSmall, Alert.OK),10,"");
+						return;
+					}
+					else
+					{
+						alignAlert(Alert.show("Do you want to delete this Guest?", "Warning",Alert.YES | Alert.NO, null,
+							removeDgridItem1, iconWarning, Alert.NO),10,"");
+					}
+				}
+				else
+				{
+					alignAlert(Alert.show("* Guest Cancelation is not allowed in MMT.","Alert Message !",
+						Alert.OK,null, null, iconWarning, Alert.OK),10,"");
+					return;
+				}
+				
+					
+			}
+			protected function Grd_POS_keyDownHandler(event:KeyboardEvent):void
+			{
+				
+//				//selectedindex=event.currentTarget.selectedIndex;
+//				DtlsId=event.currentTarget.selectedItem.Id;
+//				if(event.keyCode == Keyboard.DELETE)
+//				{
+//					alignAlert(Alert.show("Do you want to delete this item?", "Warning",Alert.YES | Alert.NO, null,
+//						removeDgridItem1, iconWarning, Alert.NO),10,"");
+//				}	
+				
+			}
+			private function removeDgridItem1(event:CloseEvent):void 
+			{	
+					
+					//Ac_Guest.removeItemAt(selectedindex);
+					//Grd_Property.dataProvider=Ac_Guest;
+				if (event.detail == Alert.YES) 
+				{
+					var HdrXml:String = "";
+					HdrXml += "<ROOT>";
+					HdrXml += ObjToXmlStr_Comm(Grd_Property.dataProvider as ArrayCollection,"HdrXml")
+					HdrXml += "</ROOT>";
+					if(txt_BookingLevel.text=="Room")
+					{
+						useWeb("BookingCancel","BookingGuestDelete_CUSTOM", [GlobalXml, "BookingGuestRoomDelete",HdrXml, BookingId,txt_Remarks.text,Chk_Mail.selected]);
+					}
+					else if(txt_BookingLevel.text=="Bed")
+					{
+						useWeb("BookingCancel","BookingGuestDelete_CUSTOM", [GlobalXml, "BookingGuestBedDelete",HdrXml, BookingId,txt_Remarks.text,Chk_Mail.selected]);
+					}
+					else
+					{
+						useWeb("BookingCancel","BookingGuestDelete_CUSTOM", [GlobalXml, "BookingGuestApartmentDelete",HdrXml, BookingId,txt_Remarks.text,Chk_Mail.selected]);
+					}
+					
+				}
+					
+				
+			}
+			private function fnGetBooking():void
+			{
+				if(hlp_BookingCode.selected())
+				{
+					hlp_BookingCode.text = hlp_BookingCode.Select_Row.BookingCode;
+					BookingId = hlp_BookingCode.Select_Row.Id;
+					txt_Client.text = hlp_BookingCode.Select_Row.ZClientNameId;					
+					txt_BookingLevel.text = hlp_BookingCode.Select_Row.ZBookingLevelId;
+					PropertyType = hlp_BookingCode.Select_Row.ZPropertyTypeId;
+					if(PropertyType == "MMT")
+					{
+						useWeb("BookingCancel","BookingGuest_CUSTOM",
+							[GlobalXml,"BookingGuestMMT","",BookingId,0]);
+					}
+					else
+					{
+						useWeb("BookingCancel","BookingGuest_CUSTOM", [GlobalXml,"BookingGuest",
+							txt_BookingLevel.text,BookingId,Global_AC[0].UsrId]);
+					}					
+				}
+				else
+				{
+					hlp_BookingCode.text = ""; hlp_BookingCode.fnClear(); BookingId = 0;
+					txt_Client.text = ""; txt_BookingLevel.text = ""; PropertyType = "";
+				}
+			}
+			
+			protected function button_hb1_clickHandler(event:MouseEvent):void
+			{
+				if(BookingId == 0)
+				{
+					alignAlert(Alert.show("This is an Invalid Process","Error !",Alert.OK, 
+						null, null, iconCrossSmall, Alert.OK),10,"");
+				}
+				else
+				{
+					if(txt_Remarks.text == "")
+					{
+						alignAlert(Alert.show("* Remarks is Required.","Error !",Alert.OK, 
+							null, null, iconCrossSmall, Alert.OK),10,"");
+						
+					}
+					else
+					{
+						alignAlert(Alert.show("Do you want to Cancel this Booking?", "Warning",Alert.YES | Alert.NO, null,
+						removeDgridItem2, iconWarning, Alert.NO),10,"");
+					}					
+				}
+				
+			}
+			private function removeDgridItem2(event:CloseEvent):void 
+			{	
+				if (event.detail == Alert.YES) 
+				{
+					if(BookingId != 0)
+					{
+						if(PropertyType == "")
+						{
+							Ac_Guest=new ArrayCollection();
+							Ac_Guest=Grd_Property.dataProvider as ArrayCollection;
+							for(var i:int=0;i<Ac_Guest.length;i++)
+							{
+								var sDate1:Date=DateField.stringToDate(Ac_Guest[i].ChkInDt,"DD/MM/YYYY");
+								var sDate2:Date=DateField.stringToDate(Ac_Guest[i].ChkOutDt,"DD/MM/YYYY");					
+								//Date Differance
+								var MS_PER_DAY:uint = 1000 * 60 * 60 * 24;
+								var tempDate:Date = new Date(sDate2.time - sDate1.time);
+								var difference:Number = 
+									Math.abs(Math.round((tempDate.time / MS_PER_DAY)));
+								
+								Ac_Guest[i].DateDiffs=difference;							
+							}
+							var HdrXml:String = "";
+							HdrXml += "<ROOT>";
+							HdrXml += ObjToXmlStr_Comm(Grd_Property.dataProvider as ArrayCollection,"HdrXml")
+							HdrXml += "</ROOT>";
+							useWeb("BookingCancel","BookingDelete_CUSTOM", [GlobalXml, "BookingDelete",HdrXml,BookingId, txt_Remarks.text,Chk_Mail.selected]);
+						}
+						else
+						{
+							useWeb("BookingMail","MMTBookingCancel_CUSTOM",
+								[GlobalXml,"BookingCancelMMT",BookingId,txt_Remarks.text,Chk_Mail.selected]);
+						}				
+					}
+					else
+					{
+						alignAlert(Alert.show("This is an Invalid Process","Error !",Alert.OK, 
+							null, null, iconCrossSmall, Alert.OK),10,"");						
+					}
+				}
+				
+			}
+			public var GuestFlag:Boolean=false;
+			public function FnChkChange(event:Event):void
+			{
+				
+				var Ac:ArrayCollection=new ArrayCollection();				
+				Ac=Grd_Property.dataProvider as ArrayCollection;				
+				var Index:int=Grd_Property.selectedIndex;				
+				if(Ac[Index].Tick==0)
+				{
+					Ac[Index].Tick=1;
+				}
+				else
+				{
+					Ac[Index].Tick=0;
+				}
+			}
+			public var myArrayCollection:ArrayCollection=new ArrayCollection();
+			public var FltNm:String="";
+			private function filter(Filt:String):void
+			{				
+				FltNm=Filt;				
+				var tempAC:ArrayCollection=new ArrayCollection();	
+				tempAC=myArrayCollection
+				tempAC.filterFunction = filterMyArrayCollection;
+				tempAC.refresh();				
+			}			
+			private function filterMyArrayCollection(item:Object):Boolean 
+			{
+				var Itm:Boolean=true;				
+				if(FiltFirstName.text!="")
+				{
+					var searchString:String = FiltFirstName.text.toLowerCase();
+					var itemName:String = (item.FirstName as String).toLowerCase();
+					Itm=itemName.indexOf(searchString) > -1;
+				}				
+				return Itm;		
+			}
+			
+		]]>
+	</fx:Script>
+	<mx:Label x="37" y="36" text="Booking No"/>
+	<mx:Label x="74" y="76" text="Filter"/>
+	<mx:Label x="295" y="36" text="Client"/>
+	<mx:Label x="85" y="346" text="Remarks"/>
+	<mx:Label x="581" y="36" text="Property"/>
+	<mx:Label x="818" y="66" text="Payment Mode"/>
+	<WrbHelpComp:HelpText x="110" y="36.5" width="135" depth="2" id="hlp_BookingCode" tabIndex="1" 
+						  onselection="{fnGetBooking()}" pxSetColumnsWidth="100,200,0,300">
+	</WrbHelpComp:HelpText>
+	<s:TextInput x="339" y="36.5" width="221" id="txt_Client"/>
+	<s:TextInput x="644" y="36.5" width="262" id="txt_Property"/>
+	<mx:DataGrid id="Grd_Property" x="35.35" y="106" width="925" height="223"
+				 editable="true"  keyDown="Grd_POS_keyDownHandler(event)" depth="1">
+		<mx:columns>
+			<mx:DataGridColumn dataField="Tick" headerText="Delete" width="50"  editable="false">
+				<mx:itemRenderer>
+					<fx:Component>
+						<mx:HBox horizontalAlign="center" verticalAlign="middle">
+							<mx:CheckBox selected="{data.Tick}" enabled="true" 
+										 change="outerDocument.FnChkChange(event);"/>
+						</mx:HBox>
+					</fx:Component>
+				</mx:itemRenderer>
+			</mx:DataGridColumn>
+			<mx:DataGridColumn width="100" dataField="FirstName" visible="true" editable="false"/>								
+			<mx:DataGridColumn width="100" dataField="LastName" editable="false" />								
+			<mx:DataGridColumn width="80" dataField="Occupancy" editable="false"/>								
+			<mx:DataGridColumn width="80" dataField="RoomType" editable="false" />
+			<mx:DataGridColumn width="50" dataField="Tariff" editable="false" />
+			<mx:DataGridColumn width="90" dataField="ChkInDt" editable="false" headerText="Check In Date"/>
+			<mx:DataGridColumn width="90" dataField="ChkOutDt" editable="false" headerText="Check Out Date"/>			
+			<mx:DataGridColumn width="80" dataField="TariffPaymentMode" editable="false" headerText="Tariff"/>
+			<mx:DataGridColumn width="80" dataField="ServicePaymentMode" editable="false" headerText="Service"/>			
+			<mx:DataGridColumn width="0" dataField="GuestId" visible="false"/>
+			<mx:DataGridColumn width="0" dataField="RoomId" visible="false"/>
+			<mx:DataGridColumn width="0" dataField="BookingPrTariffPaymentModeopertyId" visible="false"/>			
+			<mx:DataGridColumn width="0" dataField="Id" visible="false"/>
+			<mx:DataGridColumn width="0" dataField="DateDiffs" visible="false"/>
+		</mx:columns>
+	</mx:DataGrid>
+	<mx:HRule x="0" y="417" width="100%" strokeColor="#eb1c24"/>
+	<s:HGroup x="0" y="422" width="100%" height="30" horizontalAlign="center" verticalAlign="top">
+		<WrbComp:SaveControl id="SCtrl" docRefresh="Clear()">
+		</WrbComp:SaveControl>
+		<WrbComp:Button_HB width="130" _Label="Cancel Guest" click="DeleteGrid1()" id="Btn_Cancel">
+		</WrbComp:Button_HB>
+		<WrbComp:Button_HB x="660" width="130" _Label="Cancel Booking "
+						   click="button_hb1_clickHandler(event)" id="Btn_CancelBooking">
+		</WrbComp:Button_HB>
+		
+	</s:HGroup>
+	<s:TextArea x="152" y="344" width="299" height="66" id="txt_Remarks" tabIndex="2"/>
+	<s:TextInput x="110" y="77" width="135" height="22" prompt="First Name" id="FiltFirstName" change="filter('GuestName')"/>
+	<mx:Label x="250" y="76" text="Booking Level"/>
+	<s:TextInput x="339" y="76.5" width="135" id="txt_BookingLevel" enabled="false"/>
+	<s:CheckBox x="644" y="344" label="Send Mail" id="Chk_Mail" tabIndex="3"/>
+</s:Application>

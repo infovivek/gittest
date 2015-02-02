@@ -1,0 +1,1185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		 xmlns:s="library://ns.adobe.com/flex/spark"
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 creationComplete="group1_creationCompleteHandler(event)" 
+		 xmlns:WrbComp="WrbComp.*" xmlns:WrbHelpComp="WrbHelpComp.*" width="200" height="80">
+	
+	<fx:Script source="..\\Common\\CommonScript.as"/>
+	<fx:Script source="..\\Common\\Functions.as"/>
+	
+	<fx:Metadata>
+		[Event(name="_getHlpTxtData")]	
+		[Event(name="_getVal")]	
+		[Event(name="_getFouceOut")]
+		
+	</fx:Metadata>
+	
+	<fx:Script>
+		<![CDATA[
+			
+			
+			import WrbHelpComp.HelpText;
+			
+			import flashx.textLayout.formats.TextAlign;
+			
+			import mx.collections.ArrayCollection;
+			import mx.collections.ArrayList;
+			import mx.controls.Alert;
+			import mx.controls.Button;
+			import mx.controls.CheckBox;
+			import mx.controls.DataGrid;
+			import mx.controls.DateField;
+			import mx.controls.TextInput;
+			import mx.controls.dataGridClasses.DataGridColumn;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.events.ListEvent;
+			import mx.states.OverrideBase;
+			
+			import spark.components.ComboBox;
+			import spark.components.Label;
+			import spark.components.TextInput;
+			
+			[Bindable] public var colsProperty:ArrayCollection = new ArrayCollection()
+			
+			private var DGrid:DataGrid = new DataGrid();
+			private var ColNos:int=0,ColType:String="",ColHdrText:String="",ColDataField:String="",ColWidth:String="";
+			private var Restrict:String="",Required:String="";
+			private var ctrlIDs:ArrayCollection=new ArrayCollection();
+			private var TabIndex:int=1;
+			private var DuplChk:Boolean=true;
+			private var Scrollneed:Boolean=true;
+			private var doubleClick:Boolean=true;
+			private var spltChar:String=":";
+			private var Editable:String="";
+			private var RollOut:Boolean =false;
+			private var hlpTextGridWidth:ArrayCollection;
+			private var Help_AC:ArrayCollection;
+			public	var ID:String;
+			public static var tabIndexVal:Number=0;
+			private var colVisible:String="";
+			private var textAlignment:String="left";
+			private var headerlblAlign:String="center";			
+			[Embed(source="//Assets/Warning1.png")]
+			private var alertIcon:Class;
+			public function set _borderVisible(value:Boolean):void
+			{
+				if(value)
+					this.borderContainer.setStyle("borderVisible","true");
+				else
+					this.borderContainer.setStyle("borderVisible","false");
+				
+			}
+			
+			public function _refresh():void
+			{
+				PrepareColumns();
+				//DGrid.toolTip = "If you want to delete the item Press 'Delete' Key or\n edit to 'double click'";
+			}
+			private function funAfterDbConExec()
+			{
+				
+			}
+			
+			
+			public function set _hlpTextGridWidth(value:ArrayCollection):void
+			{
+				hlpTextGridWidth = new ArrayCollection();
+				hlpTextGridWidth = value;
+			}
+			
+			public function set _headerlblAlign(value:String):void
+			{
+				headerlblAlign = value;
+			}
+			public function set _DuplChk(value:Boolean):void
+			{
+				DuplChk = value;
+			}
+			public function set _DoubleClick(value:Boolean):void
+			{
+				doubleClick = value;
+			}
+			public function set _Scrollneed(value:Boolean):void
+			{
+				Scrollneed = value;				
+			}			
+			public function set _spltChar(value:String):void
+			{
+				spltChar = value;
+			}
+			
+			public function set _required(value:String):void
+			{
+				Required = value;
+			}
+			
+			public function set _colVisible(value:String):void
+			{
+				colVisible = value;
+			}
+			
+			public function set _editable(value:String):void
+			{
+				Editable = value;
+			}
+			
+			public function set _enabled(value:Boolean):void
+			{
+				this.enabled = value;				
+				this._clearData();	
+			}
+			
+			
+			private var charWidth:String="";
+			public function set _charWidth(value:String):void
+			{
+				charWidth = value;
+			}
+			
+			public function set _restrict(value:String):void
+			{
+				Restrict =value;
+			}
+			
+			public function set _textAlignment(value:String):void
+			{
+				textAlignment = value;
+			}
+			
+			public function set _tabIndex(value:int):void
+			{
+				TabIndex = value;
+			}
+			public function set _width(value:int):void
+			{
+				this.width = value;
+			}
+			
+			public function get gWidth():int
+			{
+				return this.DGrid.width;
+			}
+			
+			public function get gHeight():int
+			{
+				return this.DGrid.height;
+			}
+			
+			public function get gX():int
+			{
+				return this.borderContainer.x;
+			}
+			
+			public function get gY():int
+			{
+				return this.borderContainer.y;
+			}
+			
+			public function set _height(value:int):void
+			{
+				this.height = value;
+			}
+			
+			public function set _visibleColNos(value:int):void
+			{
+				ColNos = value;
+			}
+			public function set _RollOut(value:Boolean):void
+			{
+				RollOut = value;				
+			}
+			[Inspectable(defaultValue="txt")]
+			public function set _ColType(value:String):void
+			{
+				ColType = value;
+			}
+			
+			private var dupliErr:String="";
+			public function set _DuplicateErrMsg(value:String):void
+			{
+				dupliErr = value;
+			}
+			
+			public function set _ColHdrText(value:String):void
+			{
+				ColHdrText = value;
+			}
+			
+			public function set _ColDataField(value:String):void
+			{
+				ColDataField = value;
+			}
+			
+			public function set _ColWidth(value:String):void
+			{
+				ColWidth = value;
+			}
+			
+			public function get _getGridSrc():ArrayCollection
+			{
+				return DGrid.dataProvider as ArrayCollection;
+			}
+			
+			public function set _setGridSrc(value:ArrayCollection):void
+			{
+				DGrid.dataProvider = value.source;
+				arrGrid = value;
+			}
+			
+			public function _setValuetoCtrl(ctrlName:String,value:String):void
+			{
+				var obj:Object = new Object()
+				for (var k:int;k<ctrlIDs.length;k++)
+				{		
+					if(ctrlIDs[k].ID.toString() == ctrlName)
+					{	
+						obj = topCtrls.getElementAt(k);
+						setValueToCtrl(ctrlIDs[k].className.toString(),obj,value);
+						k = ctrlIDs.length; 
+					}
+				}
+			}
+			
+			public var selectedRow:Object;
+			
+			public function _getHlpData(event:Event):void
+			{	
+				selectedRow = new Object();
+				for (var j:int;j<ctrlIDs.length;j++)
+				{		
+					if(ctrlIDs[j].ID.toString() == event.currentTarget.id)
+					{	
+						
+						/*
+						if (event.currentTarget.selected())
+						{
+						ID = event.currentTarget.id;
+						selectedRow = event.currentTarget.Select_Row
+						//hlpTxtAssigned == true;
+						}
+						else
+						{
+						if(hlpTxtAssigned == false)
+						{
+						//hlpTxtAssigned == false;
+						event.currentTarget.text = "";
+						event.currentTarget.Select_Row = null;
+						selectedRow = null;
+						_setFocus(j);
+						}
+						}
+						
+						j = ctrlIDs.length;
+						*/
+						
+						if (event.currentTarget.selected())
+						{
+							ID = event.currentTarget.id;
+							selectedRow = event.currentTarget.Select_Row;
+						}
+						else
+						{	
+							selectedRow = null;
+						}
+						
+						j = ctrlIDs.length;
+					}
+				}
+				
+				var objCnt:int=0;
+				for each(var obj:Object in selectedRow)
+				{
+					objCnt ++;
+				}
+				
+				if(objCnt>0)
+					dispatchEvent(new Event("_getHlpTxtData"));
+			}
+			
+			public function _clear():void
+			{
+				DGrid.dataProvider = null;
+				arrGrid = new ArrayCollection();
+				GridEdit=false;
+				hlpTxtAssigned = false;
+				
+				var obj:Object = new Object()
+				for(var i:int;i<ctrlIDs.length;i++)
+				{
+					obj = topCtrls.getElementAt(i);
+					setValueToCtrl(ctrlIDs[i].className,obj,"");
+				}
+			}
+			public function _SetValue(arrcol:ArrayCollection):void
+			{
+				DGrid.dataProvider = arrcol;
+			}
+			public function _clearData():void
+			{
+				arrGrid = new ArrayCollection();
+				DGrid.dataProvider = null;
+				GridEdit=false;
+				hlpTxtAssigned = false;
+				
+				var obj:Object = new Object()
+				for(var i:int;i<ctrlIDs.length;i++)
+				{
+					obj = topCtrls.getElementAt(i);
+					setValueToCtrl(ctrlIDs[i].className,obj,"");
+				}
+			}
+			private function GetValToGrid(event:Event):void
+			{
+				var obj1:Object = new Object();
+				var obj2:Object = new Object();
+				obj2=event;
+				var Validate:String="";	
+				obj1 = topCtrls.getElementAt(ColNos - 1)				
+				var arrObj1:Object = new Object();
+				var arrGetVal:ArrayCollection=new ArrayCollection();
+				arrGetVal=ctrlIDs;				
+				var errStr:String="";					
+				for (var j:int;j<arrGetVal.length;j++)
+				{						
+					var value:String;
+					obj1 = topCtrls.getElementAt(j);
+					value = getValueFrmCtrl1(arrGetVal[j].className.toString(),obj1)						
+					arrObj1[arrGetVal[j].GridID.toString()] = value;
+					
+				}	
+				
+				try{
+					if(Scrollneed==true)
+					{
+						if(obj2.shiftKey==false)
+						{
+							ScrollId.horizontalScrollPosition=ScrollId.horizontalScrollPosition+event.currentTarget.width;
+							tabIndexVal=event.currentTarget.width;
+						}
+						else
+						{
+							ScrollId.horizontalScrollPosition=ScrollId.horizontalScrollPosition-tabIndexVal;
+							tabIndexVal=event.currentTarget.width;
+						}
+					}					
+					this.parentApplication.Custom_Grid_Tab(event,arrObj1, true, 1);
+				}catch(e:Error){}
+				obj1 = null;
+				arrObj1 = null;				
+			}
+			private function getValueFrmCtrl1(_className:String,_obj:Object):String
+			{
+				var str:String="";
+				switch(_className)
+				{	
+					case "cmb":
+						try
+						{
+							str = _obj.dataProvider[_obj.selectedIndex].label;	
+						}catch(er:Error)
+						{
+							str = _obj.selectedItem	
+						}						
+						break;
+					case "Chk":
+						try
+						{
+							str = _obj.dataProvider[_obj.selectedIndex].label;	
+						}catch(er:Error)
+						{
+							str = _obj.selected	
+						}
+						break;	
+					default: // ntxt,txt,hlp
+						str = _obj.text;						
+						break;
+				}
+				return str;
+			}
+			public var TabArry:Object = new Object();	
+			private function Ctrl_KeyDown(event:KeyboardEvent):void
+			{				
+				if(event.keyCode == Keyboard.ENTER)
+				{
+					GetValToGrid(event);
+					
+					//try{this.parentApplication.Custom_Grid_Tab(TabArry, true, 1);}catch(e:Error){}
+					var obj:Object = new Object()
+					obj = topCtrls.getElementAt(ColNos - 1)											
+					var arrObj:Object = new Object();
+					if(obj.id == event.currentTarget.id)
+					{
+						AddToGrid(event);
+					}
+					else
+					{						
+						for (var j:int;j<ctrlIDs.length;j++)
+						{		
+							if(ctrlIDs[j].ID.toString() == event.currentTarget.id)
+							{
+								if(ctrlIDs[j].className.toString() == "hlp")
+								{
+									if(event.currentTarget.selected())
+									{
+										hlpTxtAssigned == true;
+										_setFocus(j+1);
+									}
+									else
+									{
+										if(hlpTxtAssigned == true)
+										{
+											hlpTxtAssigned = false;
+											_setFocus(j+1);
+										}else
+										{
+											event.currentTarget.text = "";
+											event.currentTarget.Select_Row = null;
+											hlpTxtAssigned = false;
+											_setFocus(j);
+										}
+									}
+								}else
+								{
+									_setFocus(j+1);	
+								}
+								j = ctrlIDs.length;
+							}
+						}
+					}
+					
+				}
+				if(event.keyCode == Keyboard.TAB)
+				{
+					GetValToGrid(event);
+					//TabArry=event;
+					//try{this.parentApplication.Custom_Grid_Tab(TabArry, true, 1);}catch(e:Error){}
+				}			
+				
+			}
+			
+			
+			private function AddEvent(obj:Object):void
+			{	
+				obj.addEventListener(KeyboardEvent.KEY_DOWN,Ctrl_KeyDown);
+			}
+			
+			private var arrGrid:ArrayCollection = new ArrayCollection();
+			
+			public var dProvider:ArrayCollection = new ArrayCollection([{label:"Item 1"},{label:"Item 2"},{label:"Item 3"}]);
+			
+			private function getValueFrmCtrl(_className:String,_obj:Object):String
+			{
+				var str:String="";
+				switch(_className)
+				{	
+					case "cmb":
+						try
+						{
+							str = _obj.dataProvider[_obj.selectedIndex].label;	
+						}catch(er:Error)
+						{
+							str = _obj.selectedItem	
+						}
+						_obj.selectedIndex = -1;
+						break;
+					case "Chk":
+						try
+						{
+							str = _obj.dataProvider[_obj.selectedIndex].label;	
+						}catch(er:Error)
+						{
+							str = _obj.selected	
+						}
+						_obj.selected =false;
+						break;	
+					default: // ntxt,txt,hlp
+						str = _obj.text;
+						_obj.text = "";	
+						break;
+				}
+				return str;
+			}
+			
+			private var index:int;
+			
+			private function setValueToCtrl(_className:String,_obj:Object,value:String):void
+			{
+				
+				switch(_className)
+				{		
+					case "cmb":
+						_obj.selectedItem = value;
+						break;
+					case "Chk":	
+						if(value=="false")
+						{
+							_obj.selected=false;
+						}
+						else
+						{
+							_obj.selected= value;	
+						}
+						break;
+					case "hlp":
+						_obj.text = value;
+						_obj.Select_Row = null;
+						hlpTxtAssigned = true;
+						break;									
+					default: // ntxt,txt						
+						_obj.text = value;
+						break;
+				}
+			}
+			
+			private var hlpTxtAssigned:Boolean = false;
+			private var GridEdit:Boolean = false;
+			
+			protected function GridItem_DoubleClickHandler(event:ListEvent):void               
+			{
+				if(doubleClick==true)
+				{
+					if(GridEdit) 
+					{
+						alignAlert(Alert.show("Please Add previous Entry \n","Warning",Alert.OK,this,null,iconWarning),10,"");					
+						return;
+					}
+					arrGrid=DGrid.dataProvider as ArrayCollection
+					index = DGrid.selectedIndex;
+					GridEdit = true;
+					var obj:Object = new Object();
+					for(var k:int;k<ctrlIDs.length;k++)
+					{
+						obj = topCtrls.getElementAt(k);
+						setValueToCtrl(ctrlIDs[k].className.toString(),obj, DGrid.dataProvider[index][ctrlIDs[k].GridID.toString()]);
+					}				
+					arrGrid.removeItemAt(index)				
+					DGrid.dataProvider = arrGrid.source;
+					_setFocus(0);
+					/*
+					obj = topCtrls.getElementAt(0)
+					obj.setFocus();
+					*/
+				}
+				
+			}
+			protected function Grid_RollOver(event:ListEvent):void               
+			{
+				if(RollOut==true)
+				{
+				this.parentApplication.Custom_Grid_RollOut(event);
+				}
+				//DGrid.toolTip=event.itemRenderer.data.eCode;
+
+			}
+			protected function Grid_RollOut(event:ListEvent):void               
+			{
+				DGrid.toolTip=null;
+				
+			}
+			private function AssignValueIfErrorExists(_arrObj:Object):void
+			{
+				for(var i:int;i<ctrlIDs.length;i++)
+				{
+					var obj:Object = new Object();
+					obj = topCtrls.getElementAt(i);
+					setValueToCtrl(ctrlIDs[i].className.toString(),obj, _arrObj[ctrlIDs[i].GridID.toString()] )
+					obj = null;
+				}
+				_arrObj = null;
+			}
+			
+			private function AddToGrid(event:Event):void
+			{
+				var obj:Object = new Object()
+				var Validate:String="";	
+				obj = topCtrls.getElementAt(ColNos - 1)
+				
+				var arrObj:Object = new Object();
+				
+				if(obj.id == event.currentTarget.id)
+				{
+					var errStr:String="";
+					
+					for (var j:int;j<ctrlIDs.length;j++)
+					{						
+						var value:String;
+						obj = topCtrls.getElementAt(j);
+						value = getValueFrmCtrl(ctrlIDs[j].className.toString(),obj)
+						
+						if((value == "" || value == null) && ctrlIDs[j].required == true && ctrlIDs[j].visible == true 
+							&& ctrlIDs[j].className.toString() != "ntxt")
+						{
+							obj = topLbl.getElementAt(j);
+							errStr += "  * " + obj.text + "\n";							
+						}
+						if((value == "" || value == null || Number(value) == 0) && ctrlIDs[j].required == true 
+							&& ctrlIDs[j].visible == true && ctrlIDs[j].className.toString() == "ntxt")
+						{
+							obj = topLbl.getElementAt(j);
+							errStr += "  * " + obj.text + " can't be Empty/Zero\n";
+						}
+						
+						if(ctrlIDs[j].visible == true && ctrlIDs[j].className.toString() == "ntxt" && j == ColNos - 2)
+						{
+							//if(!isNumber((event))) //errStr += " * Multiple Decimal places are not allowed";
+						}
+						
+						
+						arrObj[ctrlIDs[j].GridID.toString()] = value;
+						if( ctrlIDs[j].className.toString() == "Chk")
+						{
+							obj.selected=false;
+						}
+					}
+					
+					if (errStr != "")
+					{	
+						AssignValueIfErrorExists(arrObj);
+						alignAlert(Alert.show("The following field(s) are required\n"+ errStr,"Alert",Alert.OK,this,null,iconWarning),10,"");					
+						return;
+					}
+					var arrGrid:ArrayCollection=new ArrayCollection();
+					arrGrid=DGrid.dataProvider as ArrayCollection					
+					if((arrGrid==null)||(arrGrid.length==0))
+					{
+						var arrGrid:ArrayCollection=new ArrayCollection();
+					}
+					if(DGrid.dataProvider!=null)
+					{
+						if(DuplChk==true)
+							var xReturnStatus:Boolean = this.GridData_Duplicate_Entry_Check(arrObj, index);
+						else
+							xReturnStatus=true;
+						
+						
+						if (xReturnStatus == true)
+						{
+							try{ScrollId.horizontalScrollPosition=0;
+								Validate=this.parentApplication.Custom_Grid_Enter(arrObj, GridEdit, index);}catch(e:Error){}
+							if (Validate != "")
+							{	
+								AssignValueIfErrorExists(arrObj);
+								Alert.show( Validate,"Error",Alert.OK, null, null, alertIcon, Alert.OK);						
+								return;
+							}
+							if(GridEdit)
+							{
+								
+								arrGrid.addItemAt(arrObj,index);GridEdit = false;
+								
+							}
+							else
+							{
+								
+								arrGrid.addItem(arrObj);
+								
+							}
+						}
+					}
+					else
+					{
+						if(DuplChk==true)
+							var xReturnStatus:Boolean = this.GridData_Duplicate_Entry_Check(arrObj, index);
+						
+						try{Validate=this.parentApplication.Custom_Grid_Enter(arrObj, GridEdit, index)}catch(e:Error){}
+						if (Validate != "")
+						{	
+							AssignValueIfErrorExists(arrObj);
+							Alert.show( Validate,"Error",Alert.OK, null, null, alertIcon, Alert.OK);						
+							return;
+						}
+						if(GridEdit)
+						{
+							
+							arrGrid.addItemAt(arrObj,index);GridEdit = false;
+							
+							
+							
+						}
+						else
+						{
+							
+							arrGrid.addItem(arrObj)
+							
+						}						
+					}
+					
+					DGrid.dataProvider = arrGrid.source;
+					
+				}
+				
+				obj = null;
+				arrObj = null;
+				GridEdit = false;
+				hlpTxtAssigned = false;
+				_setFocus(0);
+				dispatchEvent(new Event("_getVal"));
+				
+				
+			}
+			
+			private var ctrlLoc:int=0;
+			
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				if (Ds_Objects.result.Tables.ERRORTBL.Rows.length >= 1)
+				{
+					Alert.show(	Ds_Objects.result.Tables.ERRORTBL.Rows[0].Exception.toString(),"Fault");
+					return;
+				}
+				
+				if (Ds_Objects.currentTarget.description.toString()== ID + "_CUSTOM")
+				{
+					var obj:Object = new Object();
+					
+					for (var j:int;j<ctrlIDs.length;j++)
+					{
+						if(ctrlIDs[j].ID.toString() == ID)
+						{
+							obj = topCtrls.getElementAt(j);
+							
+							obj.pxSetColumnsWidth = grdWidth;
+							obj.dataProvider1 = Ds_Objects.result.Tables.Table;
+							j = ctrlIDs.length;
+							if(arrIndex < arrParam.length - 1)
+							{
+								arrIndex +=1
+								callWebservice(arrIndex,arrParam);
+							}
+							
+						}
+					}
+					
+					//arrIndex
+				}
+			}
+			
+			//private var ctrlNm:String;
+			private var arrParam:ArrayCollection = new ArrayCollection()
+			private var arrIndex:int=0;
+			private var grdWidth:String="";
+			public function _bindHlpTextData(arr:ArrayCollection):void
+			{
+				arrParam = arr;
+				arrIndex = 0;
+				callWebservice(arrIndex,arrParam);
+			}
+			public function _bindHelpTextDataPurchase(arr:ArrayCollection):void
+			{
+				arrParam = arr;
+				arrIndex = 0;
+				callWebservicePurchase(arrIndex,arrParam);
+			}			
+			private function callWebservice(_arrIndex:int,arr:ArrayCollection):void
+			{	
+				var tmpArr:Array = new Array();
+				tmpArr[0] = arr[_arrIndex].Action;
+				tmpArr[1] = arr[_arrIndex].Param1;
+				tmpArr[2] = arr[_arrIndex].Param2;
+				tmpArr[3] = arr[_arrIndex].Param3;
+				tmpArr[4] = arr[_arrIndex].Param4;
+				
+				grdWidth = arr[_arrIndex].grdWidth;
+				if(grdWidth == null) grdWidth ="";
+				ID = arr[_arrIndex].ctrlName;
+				useWeb(arr[_arrIndex].prcName,ID + "_CUSTOM",tmpArr);	
+				
+			}
+			private function callWebservicePurchase(_arrIndex:int,arr:ArrayCollection):void
+			{	
+				var tmpArr:Array = new Array();
+				tmpArr[0] = arr[_arrIndex].Action;
+				tmpArr[1] = arr[_arrIndex].Param1;
+				tmpArr[2] = arr[_arrIndex].Param2;
+				tmpArr[3] = arr[_arrIndex].Param3;				
+				tmpArr[4] = arr[_arrIndex].Param4;
+				
+				grdWidth = arr[_arrIndex].grdWidth;
+				if(grdWidth == null) grdWidth ="";
+				ID = arr[_arrIndex].ctrlName;
+			//	PurchaseWebService(arr[_arrIndex].prcName,ID + "_CUSTOM",tmpArr);	
+			}
+			
+			public var dupCheckColNo:int=0;			
+			public function set _dupCheckColNo(value:int):void
+			{
+				dupCheckColNo = value;
+			}
+			
+			public function  _setFocusFlag(value:Boolean):void
+			{
+				setFocusFlag = value;
+			}	
+			public var setFocusFlag:Boolean=true;	
+			public function _setFocus(index:int=0):void
+			{
+				var colObj:Object = topCtrls.getElementAt(index)
+				if(setFocusFlag==true)
+				{
+					try
+					{
+						colObj.Focus = true;
+						//colObj.focusRect = true;
+						//colObj.drawFocus(true);
+						//colObj.setFocus();
+						//callLater(colObj.setFocus);
+					}catch(er:Error)
+					{	//colObj.Focus = true;
+						colObj.setFocus();
+						callLater(colObj.setFocus);
+					}
+				}
+				else
+				{
+					setFocusFlag=true;
+				}
+				
+			}
+			private function GridData_Duplicate_Entry_Check(_arrObj:Object,Index:int):Boolean
+			{
+				
+				var Cond:Boolean = true;
+				var errMsg:String = "";
+				try
+				{
+					var colObj:Object = ctrlIDs[dupCheckColNo].GridID;
+					
+					for(var i:int=0; i<DGrid.dataProvider.source.length;i++)
+					{
+						if(DGrid.dataProvider[i][colObj] == _arrObj[colObj])
+						{
+							Cond = false;
+							colObj = topLbl.getElementAt(dupCheckColNo);
+							
+							if(dupliErr=="")
+								errMsg += "  * " + colObj.text + " is Already Exists.\n";
+							else
+								errMsg += dupliErr + "\n";
+							
+							//SetFocus To Error exists control
+							_setFocus(dupCheckColNo);
+							
+							i = DGrid.dataProvider.source.length;
+						}
+					}
+					if (!Cond)
+					{	
+						AssignValueIfErrorExists(_arrObj);
+						Alert.show(errMsg,"Error",Alert.OK, null, null, alertIcon, Alert.OK);
+					}
+				}catch(er:Error){}
+				colObj = null;
+				return Cond;
+			}
+			var Flag:String ="true";
+			public function _getinputvalue(event:Event):void
+			{
+				var obj1:Object = new Object();				
+				obj1 = topCtrls.getElementAt(ColNos - 1)				
+				var arrObj1:Object = new Object();				
+				var errStr:String="";				
+				
+				//	try{this.parentApplication.Custom_Grid_Enter(arrObj1, GridEdit, index);}catch(e:Error){}				
+				
+				dispatchEvent(new Event("_getFouceOut"));
+			}
+			
+			
+			private var arrGridHeader:Array;
+			private var arrGridWidth:Array;
+			private var arrGriddataField:Array;
+			private var arrHdrCtrl:Array;
+			private var arrRestrict:Array;
+			private var arrEditable:Array;
+			private var arrCharWidth:Array;
+			
+			private function createControls(_CtrlType:String,Width:Number,DataField:String,i:int,_restrict:String="",
+															 _editable:Boolean=true,_visible:Boolean=true,_required:Boolean=false,_charWidth:Number=0):void
+			{
+				var ctrlObj:Object;
+				switch(_CtrlType)
+				{	
+					case "hlp":
+						
+						//Add Helptext to top of the Datagrid
+						ctrlObj = new HelpText()
+						ctrlObj.id = "hlp" + DataField;
+						ctrlObj.width = Width - 1;
+						//if(_charWidth !=0) ctrlObj.maxChars = _charWidth; 
+						//ctrlObj.editable = _editable
+						ctrlObj.visible = _visible
+						ctrlObj.setStyle("textAlign",textAlignment);
+						ctrlObj.showDataTip = true;
+						ctrlObj.height = 23;
+						ctrlObj.pxTabIndex = TabIndex + i+1;
+						ctrlObj.x = _x;
+						_x += Width
+						AddEvent(ctrlObj);
+						ctrlObj.addEventListener("onselection", _getHlpData)
+						ctrlObj.addEventListener("focusOut", _getinputvalue)
+						topCtrls.addElement(ctrlObj as HelpText)
+						break;
+					
+					case "dtf":
+						ctrlObj = new DateField();
+						ctrlObj.id = "dt" + DataField;
+						//if(_restrict != "")
+						//ctrlObj.restrict = _restrict;
+						//ctrlObj.editable = _editable
+						ctrlObj.yearNavigationEnabled=true
+						ctrlObj.visible = _visible
+						ctrlObj.width = Width - 1;						
+						ctrlObj.yearNavigationEnabled = true
+						ctrlObj.formatString="DD/MM/YYYY";
+						ctrlObj.tabIndex = TabIndex + i+1;
+						ctrlObj.x = _x;
+						_x += Width
+						AddEvent(ctrlObj);				
+						topCtrls.addElement(ctrlObj as DateField)
+						break;
+					case "cmb":
+						ctrlObj = new ComboBox();
+						ctrlObj.id = "cb" + DataField;
+						ctrlObj.dataProvider = dProvider;
+						ctrlObj.restrict = _restrict;
+						ctrlObj.visible = _visible
+						ctrlObj.width = Width - 1;
+						ctrlObj.tabIndex = TabIndex + i+1;
+						ctrlObj.x = _x;
+						_x += Width
+						AddEvent(ctrlObj);						
+						topCtrls.addElement(ctrlObj as ComboBox)
+						break;
+					case "Chk":						
+						ctrlObj = new CheckBox();
+						ctrlObj.id =  "Chk" + DataField;
+						//ctrlObj.label= LblName;
+						ctrlObj.visible = _visible
+						ctrlObj.width = Width - 1;
+						//NewControl1.yearNavigationEnabled = true
+						//NewControl.formatString="DD/MM/YYYY";
+						ctrlObj.x =_x+(Width/2);
+						ctrlObj.tabIndex = TabIndex + i+1;
+						_x += Width	
+						AddEvent(ctrlObj);						
+						topCtrls.addElement(ctrlObj as CheckBox)
+						break;	
+					case "btn":
+						ctrlObj = new Button();
+						ctrlObj.id = "btn" + DataField;
+						//ctrlObj.dataProvider = dProvider;
+						//ctrlObj.restrict = _restrict;
+						
+						ctrlObj.visible = _visible
+						ctrlObj.width = Width - 1;
+						ctrlObj.tabIndex = TabIndex + i+1;
+						ctrlObj.x = _x;
+						_x += Width
+						AddEvent(ctrlObj);						
+						topCtrls.addElement(ctrlObj as Button)
+						break;					
+					default: // ntxt,txt
+						//Add TextInput to top of the Datagrid
+						ctrlObj = new spark.components.TextInput();
+						ctrlObj.id = "txt" + DataField;
+						
+						if(_CtrlType == "ntxt") 
+						{
+							ctrlObj.restrict = "0-9,.";	
+							ctrlObj.maxChars = 10;
+							ctrlObj.addEventListener(FocusEvent.FOCUS_OUT,isNumber);
+						}
+						
+						ctrlObj.editable = _editable
+						ctrlObj.visible = _visible
+						ctrlObj.width = Width - 1;
+						//if(_charWidth !=0) ctrlObj.maxChars = _charWidth;
+						ctrlObj.height = 23;
+						ctrlObj.setStyle("textAlign", (_CtrlType == "ntxt") ? "right" : textAlignment);
+						ctrlObj.tabIndex = TabIndex + i+1;
+						//if(_x != 0)_x += Width else _x = _x;
+						ctrlObj.x = _x;
+						_x += Width
+						AddEvent(ctrlObj);
+						ctrlObj.addEventListener("focusOut", _getinputvalue)
+						topCtrls.addElement(ctrlObj as spark.components.TextInput)
+						break;
+				}
+				
+				ctrlIDs.addItem({ID:ctrlObj.id , className:_CtrlType,GridID:DataField,required:_required,visible:_visible});
+				
+				//tmpobj[headerDataField] = "";
+				
+			}
+			
+			private var arrCtrlType:Array = ["txt","ntxt","hlp" ,"dtf" ,"cmb","Chk"];
+			private var _x:int=0;
+			private var arrVisible:Array;
+			private var arrRequired:Array;
+			
+			private function PrepareColumns():void
+			{   
+				
+				if (ColHdrText == "" || ColDataField == "" || ColType == "" ) return;
+				arrGridHeader = ColHdrText.split(spltChar);
+				arrGridWidth = ColWidth.split(spltChar);
+				arrGriddataField = ColDataField.split(spltChar);
+				arrHdrCtrl = ColType.split(spltChar);
+				arrRestrict = Restrict.split(spltChar);
+				arrEditable = Editable.split(spltChar);
+				arrVisible = colVisible.split(spltChar);
+				arrRequired = Required.split(spltChar);
+				arrCharWidth = charWidth.split(spltChar);
+				
+				var colCnt:int = arrGridHeader.length;
+				if(colCnt != arrGriddataField.length)
+				{                   
+					DGrid.visible = false;DGrid.dataProvider = null;
+					throw new Error("You have entered invalid String in property");
+				}
+				
+				var gridColumn:DataGridColumn;
+				DGrid.columns = new Array;
+				var dgColumn = DGrid.columns;
+				
+				
+				var headerText:String;
+				var headerWidth:Number;
+				var headerDataField:String;
+				var ctrlType:String;
+				var restrict:String;
+				var editable:Boolean=true;
+				var visible:Boolean=true;
+				var required:Boolean=false;
+				var _charWidth:Number=0;
+				
+				for(var i:int;i<colCnt;i++)
+				{       
+					
+					headerText = (arrGridHeader[i].toString() == "")?"null":arrGridHeader[i].toString();
+					headerWidth = (arrGridWidth[i].toString() == "")? 0: arrGridWidth[i].toString();
+					headerDataField = (arrGriddataField[i].toString() == "")?"null":arrGriddataField[i].toString()
+					ctrlType = (arrHdrCtrl[i].toString() == "")?"txt":arrHdrCtrl[i].toString();
+					if( arrRestrict.length >1) restrict = arrRestrict[i].toString();
+					if( arrEditable.length >1) editable = (arrEditable[i] == "1")? true :false
+					if( arrVisible.length >1) visible = (arrVisible[i] == "1")? true :false 
+					if( arrRequired.length >1) required = (arrRequired[i] == "1")? true :false
+					if(arrCharWidth.length >1) _charWidth = (arrCharWidth[i] == "0" || arrCharWidth[i] == "") ? 0 : Number(arrCharWidth[i]);
+					
+					//Add Column to DataGrid
+					gridColumn = new DataGridColumn();
+					gridColumn.dataField = headerDataField;
+					gridColumn.headerText = headerText;
+					gridColumn.visible = visible;
+					gridColumn.width = headerWidth //( ColNos == i+1)? headerWidth - 20 : headerWidth ;
+					gridColumn.setStyle("textAlign",(ctrlType == "ntxt") ? "right" : textAlignment);
+					dgColumn.push(gridColumn);
+					
+					
+					//Add Label to top of the Datagrid
+					if(visible)
+					{
+						var lbl:Label = new Label()
+						lbl.id = "lbl" + headerDataField;
+						lbl.text = headerText;
+						lbl.width = headerWidth - 1;
+						lbl.setStyle("textAlign",headerlblAlign);
+						lbl.setStyle("fontWeight","bold");
+						//lbl.tabIndex = i+1;
+						topLbl.addElement(lbl)
+					}
+					
+					// Input controls
+					if(!ctrlType in arrCtrlType)
+					{
+						throw new Error("Invalid Header Controls");
+					}
+					else
+					{
+						createControls(ctrlType,headerWidth,headerDataField,i,restrict,editable,visible,required,_charWidth);	
+					}
+					
+					
+				}
+				//DGrid.headerHeight = 56;
+				
+				DGrid.columns = dgColumn;
+				//DGrid.height = 500;
+				DGrid.percentHeight = 100;
+				
+				//DGrid.percentWidth = 100;
+				//DGrid.setStyle("draggableColumns","false");
+				DGrid.draggableColumns = false;
+				DGrid.editable = false;
+				DGrid.resizableColumns = false;
+				DGrid.doubleClickEnabled = true;
+				DGrid.showDataTips=true;
+				//DGrid.horizontalScrollPolicy = "on";
+				DGrid.addEventListener(ListEvent.ITEM_DOUBLE_CLICK,GridItem_DoubleClickHandler)
+				DGrid.addEventListener(KeyboardEvent.KEY_DOWN,Grid_KeyDownHandler);
+				DGrid.addEventListener(ListEvent.ITEM_ROLL_OVER,Grid_RollOver);
+				DGrid.addEventListener(ListEvent.ITEM_ROLL_OUT,Grid_RollOut);
+				
+				//DGrid.addEventListener(,Grid_KeyDownHandler);
+				
+				DGrid.y = topCtrl.height;
+				//DGrid.setStyle("textAlign",textAlignment);
+				
+				grpGrid.addElement(DGrid);
+				
+				headerText = null
+				headerWidth = null
+				headerDataField = null
+				ctrlType = null
+				restrict = null
+				gridColumn = null
+				dgColumn = null
+				
+			}
+			
+			protected function Grid_KeyDownHandler(event:KeyboardEvent):void
+			{
+				if(event.keyCode == Keyboard.DELETE)
+				{
+					Alert.show("Do you want to delete this item?", "Warning",Alert.YES | Alert.NO, null,
+						removeDgridItem, alertIcon, Alert.NO);
+				}
+			}
+			
+			private function removeDgridItem(event:CloseEvent):void 
+			{	
+				var arrGrid:ArrayCollection=new ArrayCollection();
+				arrGrid=DGrid.dataProvider as ArrayCollection	
+				if (event.detail==Alert.YES) 
+				{	
+					index = DGrid.selectedIndex;					
+					arrGrid.removeItemAt(index);
+					DGrid.dataProvider = arrGrid.source;
+					try{this.parentApplication.Custom_Grid_Delete(index)}catch(e:Error){}
+					index = -1;
+				}
+			}
+			
+			protected function group1_creationCompleteHandler(event:FlexEvent):void
+			{   
+				//funLoginInfo("<FlexServiceUrl>http://testingserver/IBASDataService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://pro64/IBASflex/</FlexSwfUrl><gVchTypCd>SO-CNTRCT</gVchTypCd><gVchTypDesc>Sales Contract</gVchTypDesc><gVchTypFk>318</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>1</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>654810</gScrId><gCPRights>10101111</gCPRights>")
+				_refresh();				
+			}
+			
+		]]>
+	</fx:Script>
+	<s:Scroller x="0" y="0" width="{this.width}" height="{this.height}" depth="1" >
+		<s:Group left="25" right="25" top="25" bottom="25" id="ScrollId" width="{this.width}" height="{this.height}" horizontalScrollPosition="0">
+			<s:BorderContainer id="borderContainer" width="{DGrid.width}" height="52" 
+							   cornerRadius="2" borderVisible="false"  depth="2">
+				<s:VGroup id="topCtrl" width="100%" height="50" gap="2" top="5">
+					<s:HGroup id="topLbl" width="100%" height="15" gap="1"/>
+					<s:Group id="topCtrls" width="100%" height="25"/> <!--gap="1"-->
+				</s:VGroup>         
+			</s:BorderContainer>
+			<s:Group id="grpGrid" width="100%" height="{this.height}" depth="1" /> <!--width="{DGrid.width}" height="{DGrid.height}"-->
+		</s:Group>
+	</s:Scroller>	
+</s:Group>
