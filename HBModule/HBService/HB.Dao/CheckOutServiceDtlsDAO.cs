@@ -70,6 +70,9 @@ namespace HB.Dao
                     //}
                     //else
                     //{
+                    UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                  "', SctId:" + user.SctId + ", Service:CheckOutHdrServiceDtl_Insert" + ", ProcName:'" + StoredProcedures.CheckOutHdrServiceDtl_Insert;
+
                     command.CommandText = StoredProcedures.CheckOutHdrServiceDtl_Insert;
                     //}
                     command.CommandType = CommandType.StoredProcedure;
@@ -87,7 +90,7 @@ namespace HB.Dao
                     command.Parameters.Add("@Quantity", SqlDbType.Decimal).Value = ChkOutSerDtl.Quantity;
                     command.Parameters.Add("@CreatedBy", SqlDbType.BigInt).Value = user.Id;
                     command.Parameters.Add("@ServiceHdrId", SqlDbType.Int).Value = CheckOutHdrRowId;
-                    ds = new WrbErpConnection().ExecuteDataSet(command, "");
+                    ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
                 }
             }
             if (n == 0)

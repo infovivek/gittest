@@ -59,9 +59,28 @@ BEGIN
 		JOIN WRBHBUser S ON U.UserId=S.Id AND S.IsActive=1 AND S.IsDeleted=0
 		JOIN WRBHBProperty P ON U.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
 		JOIN WRBHBPropertyUsers PU ON PU.PropertyId=P.Id AND PU.IsActive=1 AND PU.IsDeleted=0
-		WHERE  U.IsActive=1 AND U.IsDeleted=0 AND PU.UserId=@UserId
+		WHERE  U.IsActive=1 AND U.IsDeleted=0 AND PU.UserId=@UserId AND PC.NewEntry=0
 		AND MONTH(CONVERT (date,PC.CreatedDate,103))=MONTH(Convert(date,GETDATE(),103))
 		group by S.FirstName,S.LastName,P.PropertyName,PC.CreatedDate,PC.PropertyId,PC.UserId
+		
+		
+		INSERT INTO #Pageload(Submittedby,Property,SubmittedOn,Amount,FortNight,Month,PropertyId,UserId
+		,LastProcessedBy,Submitted,LastProcessedOn)
+		
+		SELECT (S.FirstName+''+S.LastName) AS Submittedby,P.PropertyName AS Property,
+		PC.RequestedOn AS SubmittedOn,Pc.ExpenseAmount AS Amount,
+		'1st FortNight' AS FortNight,LEFT(DATENAME(MONTH,PC.CreatedDate),3) AS Month,
+		PC.PropertyId,PC.RequestedUserId,(SS.FirstName+''+SS.LastName) AS LastProcessedBy,ProcessedStatus,
+		PC.LastProcessedon AS LastProcessedOn   
+		FROM WRBHBPCExpenseApproval  PC
+		JOIN WRBHBUser S ON PC.RequestedUserId=S.Id AND S.IsActive=1 AND S.IsDeleted=0
+		JOIN WRBHBUser SS ON PC.UserId=SS.Id AND SS.IsActive=1 AND SS.IsDeleted=0
+		JOIN WRBHBProperty P ON PC.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
+		JOIN WRBHBPropertyUsers PU ON PU.PropertyId=P.Id AND PU.IsActive=1 AND PU.IsDeleted=0
+		WHERE  PC.IsActive=1 AND PC.IsDeleted=0 AND PU.UserId=@UserId
+		AND MONTH(CONVERT (date,PC.CreatedDate,103))=MONTH(Convert(date,GETDATE(),103))
+		group by S.FirstName,S.LastName,SS.FirstName,SS.LastName,P.PropertyName,PC.CreatedDate,
+		PC.PropertyId,PC.RequestedUserId,Pc.ExpenseAmount,ProcessedStatus,PC.RequestedOn,PC.LastProcessedon
 		
 		INSERT INTO #Pageload(Submittedby,Property,SubmittedOn,Amount,FortNight,Month,PropertyId,UserId
 		,LastProcessedBy,Submitted,LastProcessedOn)
@@ -76,9 +95,27 @@ BEGIN
 		JOIN WRBHBUser S ON U.UserId=S.Id AND S.IsActive=1 AND S.IsDeleted=0
 		JOIN WRBHBProperty P ON U.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
 		JOIN WRBHBPropertyUsers PU ON PU.PropertyId=P.Id AND PU.IsActive=1 AND PU.IsDeleted=0
-		WHERE  U.IsActive=1 AND U.IsDeleted=0 AND PU.UserId=@UserId AND 
+		WHERE  U.IsActive=1 AND U.IsDeleted=0 AND PU.UserId=@UserId AND  PC.NewEntry=0 AND
 		MONTH(CONVERT (date,PC.CreatedDate,103))=MONTH(Convert(date,GETDATE(),103))
 		group by S.FirstName,S.LastName,P.PropertyName,PC.CreatedDate,PC.PropertyId,PC.UserId
+		
+		INSERT INTO #Pageload(Submittedby,Property,SubmittedOn,Amount,FortNight,Month,PropertyId,UserId
+		,LastProcessedBy,Submitted,LastProcessedOn)
+		
+		SELECT (S.FirstName+''+S.LastName) AS Submittedby,P.PropertyName AS Property,
+		PC.RequestedOn  AS SubmittedOn,Pc.ExpenseAmount AS Amount,
+		'2nd FortNight' AS FortNight,LEFT(DATENAME(MONTH,PC.CreatedDate),3) AS Month,
+		PC.PropertyId,PC.RequestedUserId,(SS.FirstName+''+SS.LastName) AS LastProcessedBy,ProcessedStatus,
+		PC.LastProcessedon AS LastProcessedOn   
+		FROM WRBHBPCExpenseApproval  PC
+		JOIN WRBHBUser S ON PC.RequestedUserId=S.Id AND S.IsActive=1 AND S.IsDeleted=0
+		JOIN WRBHBUser SS ON PC.UserId=SS.Id AND SS.IsActive=1 AND SS.IsDeleted=0
+		JOIN WRBHBProperty P ON PC.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
+		JOIN WRBHBPropertyUsers PU ON PU.PropertyId=P.Id AND PU.IsActive=1 AND PU.IsDeleted=0
+		WHERE  PC.IsActive=1 AND PC.IsDeleted=0 AND PU.UserId=@UserId
+		AND MONTH(CONVERT (date,PC.CreatedDate,103))=MONTH(Convert(date,GETDATE(),103))
+		group by S.FirstName,S.LastName,SS.FirstName,SS.LastName,P.PropertyName,PC.CreatedDate,
+		PC.PropertyId,PC.RequestedUserId,Pc.ExpenseAmount,ProcessedStatus,PC.RequestedOn,PC.LastProcessedon
 		
 		CREATE TABLE #FinalPageLoad(Submittedby NVARCHAR(100),Property NVARCHAR(100),SubmittedOn NVARCHAR(100),
 		Amount DECIMAL(27,2),FortNight NVARCHAR(100),Month NVARCHAR(100),PropertyId INT,UserId INT,
@@ -575,7 +612,7 @@ BEGIN
 		FROM WRBHBPettyCashStatus U 
 		JOIN WRBHBUser S ON U.UserId=S.Id AND S.IsActive=1 AND S.IsDeleted=0
 		WHERE U.UserId =@UserId AND U.PropertyId=@Id AND U.IsActive=1 AND U.IsDeleted=0
-		AND CONVERT(NVARCHAR,CAST(U.CreatedDate AS Date),103)=CONVERT(NVARCHAR(100),@Str,103) 
+		AND CONVERT(NVARCHAR,CAST(U.ModifiedDate AS Date),103)=CONVERT(NVARCHAR(100),@Str,103) 
 		
 		SELECT Id AS SNo,Date,ExpenseHead,Description,ApprovedAmount,PaidAmount,Bill,ExpenseId AS Id
 		FROM #PettyCash  
@@ -597,7 +634,7 @@ BEGIN
 		FROM WRBHBPettyCashStatus U 
 		JOIN WRBHBUser S ON U.UserId=S.Id AND S.IsActive=1 AND S.IsDeleted=0
 		WHERE U.UserId =@UserId AND U.PropertyId=@Id AND U.IsActive=1 AND U.IsDeleted=0
-		AND CONVERT(NVARCHAR,CAST(U.CreatedDate AS Date),103)=CONVERT(NVARCHAR(100),@Str,103)
+		AND CONVERT(NVARCHAR,CAST(U.ModifiedDate AS Date),103)=CONVERT(NVARCHAR(100),@Str,103)
 		
 		INSERT INTO #PettyCash2(Date,ExpenseHead,Description,ApprovedAmount,PaidAmount,Bill,Flag)
 		SELECT DISTINCT CONVERT (NVARCHAR,CreatedDate,103) AS Date,'1st FortNight' AS ExpenseHead,
@@ -605,7 +642,7 @@ BEGIN
 		CONVERT(NVARCHAR,DATEADD(d,+15,DATEADD(mm, DATEDIFF(m,0,CreatedDate),0)),103) AS ApprovedAmount,'' AS PaidAmount,
 		'' AS Bill,2 FROM WRBHBPettyCashStatusHdr
 		WHERE UserId =@UserId AND PropertyId=@Id AND IsActive=1 AND IsDeleted=0
-		AND CONVERT (date,CreatedDate,103)=Convert(date,@Str,103)
+		AND CONVERT (date,ModifiedDate,103)=Convert(date,@Str,103)
 		
 		
 		INSERT INTO #PettyCash2(Date,ExpenseHead,Description,ApprovedAmount,PaidAmount,Bill,Flag)
@@ -614,7 +651,7 @@ BEGIN
 		CONVERT(NVARCHAR,DATEADD(MONTH, DATEDIFF(MONTH, -1, CreatedDate), -1),103) AS ApprovedAmount,'' AS PaidAmount,
 		'' AS Bill,2 FROM WRBHBPettyCashStatusHdr
 		WHERE UserId =@UserId AND PropertyId=@Id AND IsActive=1 AND IsDeleted=0
-		AND CONVERT (date,CreatedDate,103)=Convert(date,@Str,103)
+		AND CONVERT (date,ModifiedDate,103)=Convert(date,@Str,103)
 		
 		
 		INSERT INTO #PettyCash2(Date,ExpenseHead,Description,ApprovedAmount,PaidAmount,Bill,Flag)
@@ -623,7 +660,7 @@ BEGIN
 		CONVERT(NVARCHAR,DATEADD(MONTH, DATEDIFF(MONTH, -1, CreatedDate), -1),103)AS ApprovedAmount,'' AS PaidAmount,
 		'' AS Bill,2 FROM WRBHBPettyCashStatusHdr
 		WHERE UserId =@UserId AND PropertyId=@Id AND IsActive=1 AND IsDeleted=0
-		AND CONVERT (date,CreatedDate,103)=Convert(date,@Str,103)
+		AND CONVERT (date,ModifiedDate,103)=Convert(date,@Str,103)
 		
 		
 		CREATE TABLE #PettyCash1(SNo NVARCHAR(100),
@@ -689,7 +726,7 @@ BEGIN
 		SUM(P.Amount) AS PaidAmount,'' AS Bill FROM WRBHBPettyCashStatusHdr PC
 		JOIN WRBHBPettyCashStatus P ON PC.Id=P.PettyCashStatusHdrId AND P.IsActive=1 AND P.IsDeleted=0
 		WHERE PC.UserId =@UserId AND PC.PropertyId=@Id AND 
-		CONVERT(Date,PC.CreatedDate,103)=CONVERT(Date,@Str,103) AND PC.IsActive=1 AND PC.IsDeleted=0
+		CONVERT(Date,PC.ModifiedDate,103)=CONVERT(Date,@Str,103) AND PC.IsActive=1 AND PC.IsDeleted=0
 		
 		INSERT INTO #PettyCash1(SNo,Date,ExpenseHead,Description,ApprovedAmount,PaidAmount,Bill)
 		SELECT 'SNo' AS SNo,'BillDate' AS Date,'ExpenseHead' AS ExpenseHead,'Description' AS Description,'ApprovedAmount' AS ApprovedAmount,
@@ -701,7 +738,7 @@ BEGIN
 		JOIN WRBHBPettyCashStatus D ON D.Status=CONVERT(NVARCHAR(100),H.Date,103) AND
 		H.UserId=D.UserId AND H.PropertyId=D.PropertyId AND D.IsActive=1 AND D.IsDeleted=0
 		WHERE H.UserId =@UserId AND H.PropertyId=@Id AND H.IsActive=1 AND H.IsDeleted=0
-		AND CONVERT(NVARCHAR,CAST(D.CreatedDate AS Date),103)=CONVERT(NVARCHAR(100),@Str,103) 
+		AND CONVERT(NVARCHAR,CAST(D.ModifiedDate AS Date),103)=CONVERT(NVARCHAR(100),@Str,103) 
 
 			
 		INSERT INTO #PettyCash1(SNo,Date,ExpenseHead,Description,ApprovedAmount,PaidAmount,Bill)
@@ -721,14 +758,14 @@ BEGIN
 		JOIN  WRBHBPettyCashHdr H ON D.Status=CONVERT(NVARCHAR(100),H.Date,103) AND
 		H.UserId=D.UserId AND H.PropertyId=D.PropertyId AND D.IsActive=1 AND D.IsDeleted=0
 		WHERE D.UserId =@UserId AND D.PropertyId=@Id AND D.IsActive=1 AND D.IsDeleted=0
-		AND CONVERT(NVARCHAR,CAST(D.CreatedDate AS Date),103)=CONVERT(NVARCHAR(100),@Str,103)
+		AND CONVERT(NVARCHAR,CAST(D.ModifiedDate AS Date),103)=CONVERT(NVARCHAR(100),@Str,103)
 		GROUP BY H.OpeningBalance
 		
 				
 		INSERT INTO #PettyCash1(SNo,Date,ExpenseHead,Description,ApprovedAmount,PaidAmount,Bill)
 		SELECT '' AS SNo,'' AS Date,'' AS ExpenseHead,'ClosingBalance' AS Description,Balance AS ApprovedAmount,'' AS PaidAmount,
 		'' AS Bill FROM WRBHBPettyCashStatusHdr
-		WHERE UserId =@UserId AND PropertyId=@Id AND CONVERT(Date,CreatedDate,103)=CONVERT(Date,@Str,103) AND 
+		WHERE UserId =@UserId AND PropertyId=@Id AND CONVERT(Date,ModifiedDate,103)=CONVERT(Date,@Str,103) AND 
 		IsActive=1 AND IsDeleted=0
 		GROUP BY Balance
 		
@@ -753,11 +790,13 @@ BEGIN
 		JOIN WRBHBPettyCashStatus H ON H.Status=CONVERT(NVARCHAR(100),D.Date,103) AND
 		H.UserId=D.UserId AND H.PropertyId=D.PropertyId AND D.IsActive=1 AND D.IsDeleted=0
 		WHERE H.UserId =@UserId AND H.PropertyId=@Id AND H.IsActive=1 AND H.IsDeleted=0
-		AND CONVERT(NVARCHAR,CAST(H.CreatedDate AS Date),103)=CONVERT(NVARCHAR(100),@Str,103) 
+		AND CONVERT(NVARCHAR,CAST(H.ModifiedDate AS Date),103)=CONVERT(NVARCHAR(100),@Str,103) 
 		
 		SELECT DISTINCT Balance FROM WRBHBPettyCashStatusHdr
 		WHERE UserId =@UserId AND PropertyId=@Id AND IsActive=1 AND IsDeleted=0
-		AND CONVERT(NVARCHAR,CAST(CreatedDate AS Date),103)=CONVERT(NVARCHAR(100),@Str,103)
+		AND CONVERT(NVARCHAR,CAST(ModifiedDate AS Date),103)=CONVERT(NVARCHAR(100),@Str,103)
+		
+		
 		
 END
 IF(@Action='DownloadReport')
@@ -788,7 +827,8 @@ BEGIN
 		JOIN WRBHBExpenseGroup EG ON EX.ExpenseGroupId=EG.Id 
 		JOIN WRBHBUser U ON PC.UserId=U.Id AND U.IsActive=1 AND U.IsDeleted=0
 		JOIN WRBHBProperty P ON PC.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
-		WHERE PC.IsActive=1 AND PC.IsDeleted=0 
+		JOIN WRBHBPropertyUsers PU ON P.Id=PU.PropertyId AND PU.IsActive=1 AND PU.IsDeleted=0
+		WHERE PC.IsActive=1 AND PC.IsDeleted=0 AND PU.UserId=@Id
 		AND	CONVERT(date,PC.CreatedDate,103) BETWEEN CONVERT(date,@Str,103) AND CONVERT(date,@Str1,103)
 		GROUP BY U.FirstName,U.LastName,PC.CreatedDate,EG.ExpenseHead,PC.ExpenseHead,PC.Description,
 		PC.Paid,PC.BillDate,P.PropertyName,PC.Id
@@ -797,7 +837,7 @@ BEGIN
 				
 		SELECT Id as SNo,ISNULL(Requestedby,'') AS Requestedby,ISNULL(RequestedOn,'') AS RequestedOn,
 		ISNULL(ExpenseHead,'') AS ExpenseHead,ISNULL(ExpenseItem,'') AS ExpenseItem,
-		ISNULL(Description,'') AS Description,ISNULL(Amount,'') AS Amount,
+		ISNULL(Description,'') AS Description,ISNULL(Amount,0) AS Amount,
 		ISNULL(BillDate,'') AS BillDate,ISNULL(BillStartDate,'') AS BillStartDate,
 		ISNULL(BillEndDate,'') AS BillEndDate,
 		ISNULL(Property,'') AS	Property

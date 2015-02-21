@@ -39,14 +39,14 @@ CREATE PROCEDURE [dbo].[Sp_BookingGuestDetails_Update](
 AS
 BEGIN
  UPDATE WRBHBBookingGuestDetails SET Designation=@Designation,
- FirstName=@FirstName,LastName=@LastName,EmailId=@EmailId,
+ FirstName=@FirstName,LastName=@LastName,EmailId=dbo.TRIM(@EmailId),
  EmpCode=@EmpCode,ModifiedBy=@UsrId,ModifiedDate=GETDATE(),
  Nationality=@Nationality,MobileNo=dbo.TRIM(@MobileNo),
  Title=@Title WHERE Id=@Id;
  --
  UPDATE WRBHBClientManagementAddClientGuest SET EmpCode=@EmpCode,
  FirstName=@FirstName,LastName=@LastName,GMobileNo=dbo.TRIM(@MobileNo),
- EmailId=@EmailId,Designation=@Designation,Nationality=@Nationality,
+ EmailId=dbo.TRIM(@EmailId),Designation=@Designation,Nationality=@Nationality,
  Title=@Title WHERE Id=@GuestId;
  ---
  SELECT Id,RowId FROM WRBHBBookingGuestDetails WHERE Id=@Id; 

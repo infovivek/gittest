@@ -60,7 +60,7 @@
 				lbl.visible=true;
 				
 				hlp_Property.enabled=true;
-				Help();
+				//Help();
 			}
 			public function Help():void
 			{

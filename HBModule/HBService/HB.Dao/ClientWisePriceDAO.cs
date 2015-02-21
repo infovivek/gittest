@@ -13,6 +13,7 @@ namespace HB.Dao
 {
     public class ClientWisePriceDAO
     {
+        string UserData;
         public DataSet Save(string[] data, Entity.User user)
         {
             ClientWisePriceEntity PE = new ClientWisePriceEntity();
@@ -37,11 +38,19 @@ namespace HB.Dao
                 command = new SqlCommand();
                 if (PE.Id != 0)
                 {
+                    UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                    "', SctId:" + user.SctId + ", Service:ClientWisePrice_Update" +
+                     ", ProcName:'" + StoredProcedures.ClientWisePrice_Update;
+
                     command.CommandText = StoredProcedures.ClientWisePrice_Update;
                     command.Parameters.Add("@Id", SqlDbType.Int).Value = PE.Id;
                 }
                 else
                 {
+                    UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                    "', SctId:" + user.SctId + ", Service:ClientWisePrice_Insert" +
+                     ", ProcName:'" + StoredProcedures.ClientWisePrice_Insert;
+
                     command.CommandText = StoredProcedures.ClientWisePrice_Insert;
                 }
                 
@@ -51,20 +60,24 @@ namespace HB.Dao
                 command.Parameters.Add("@FromDate", SqlDbType.NVarChar).Value = PE.FromDate;
                 command.Parameters.Add("@ToDate", SqlDbType.NVarChar).Value = PE.ToDate;
                 command.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = user.Id;
-                ds = new WrbErpConnection().ExecuteDataSet(command, "");
+                ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
             }
             return ds;
         }
 
         public DataSet HelpResult(string[] data, Entity.User user)
         {
+            UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                    "', SctId:" + user.SctId + ", Service:ClientWisePrice_Help" +
+                     ", ProcName:'" + StoredProcedures.ClientWisePrice_Help;
+
             SqlCommand command = new SqlCommand();
             command.CommandText = StoredProcedures.ClientWisePrice_Help;
             command.CommandType = CommandType.StoredProcedure;
             command.Parameters.Add("@Action", SqlDbType.NVarChar).Value = data[1].ToString();
             command.Parameters.Add("@Str", SqlDbType.NVarChar).Value = data[2].ToString();
             command.Parameters.Add("@Id", SqlDbType.Int).Value = Convert.ToInt32(data[3].ToString());
-            return new WrbErpConnection().ExecuteDataSet(command, "");
+            return new WrbErpConnection().ExecuteDataSet(command, UserData);
         }
     }
 }

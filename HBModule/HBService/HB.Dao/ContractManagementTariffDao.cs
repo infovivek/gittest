@@ -13,6 +13,7 @@ namespace HB.Dao
 {
    public class ContractManagementTariffDao
     {
+       string UserData;
        public DataSet Save(string data, User user, int ContractId)
        {
            DataSet ds = new DataSet();
@@ -43,12 +44,21 @@ namespace HB.Dao
                   }
                command = new SqlCommand();
                if (CMT.Id != 0)
+
                {
+                   UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                   "', SctId:" + user.SctId + ", Service:ContractManagementTariffAppartment_Update" +
+                    ", ProcName:'" + StoredProcedures.ContractManagementTariffAppartment_Update;
+
                    command.CommandText = StoredProcedures.ContractManagementTariffAppartment_Update;
                    command.Parameters.Add("@Id", SqlDbType.BigInt).Value = CMT.Id;
                }
                else
                {
+                   UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                   "', SctId:" + user.SctId + ", Service:ContractManagementTariffAppartment_Insert" +
+                    ", ProcName:'" + StoredProcedures.ContractManagementTariffAppartment_Insert;
+
                    command.CommandText = StoredProcedures.ContractManagementTariffAppartment_Insert;
                }
                command.CommandType = CommandType.StoredProcedure;
@@ -59,7 +69,7 @@ namespace HB.Dao
                command.Parameters.Add("@BookLevel", SqlDbType.NVarChar).Value = CMT.BookLevel;
                command.Parameters.Add("@TarrifPrice", SqlDbType.Decimal).Value = CMT.TarrifPrice;
                command.Parameters.Add("@CreatedBy", SqlDbType.BigInt).Value = user.Id;
-               ds = new WrbErpConnection().ExecuteDataSet(command, "");
+               ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
            }
            if (n == 0)
            {

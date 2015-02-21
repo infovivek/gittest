@@ -13,6 +13,7 @@ namespace HB.Dao
 {
     public class ContractProductMasterDAO
     {
+        string UserData;
         public DataSet Save(string Hdrval, User user)
         {
             DataSet ds = new DataSet();
@@ -37,11 +38,19 @@ namespace HB.Dao
 
             if (CPM.Id != 0)
             {
+                UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                    "', SctId:" + user.SctId + ", Service:ContractProductMaster_Update" +
+                     ", ProcName:'" + StoredProcedures.ContractProductMaster_Update;
+
                 command.CommandText = StoredProcedures.ContractProductMaster_Update;
                 command.Parameters.Add("@Id", SqlDbType.Int).Value = CPM.Id;
             }
             else
             {
+                UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                    "', SctId:" + user.SctId + ", Service:ContractProductMaster_Insert" +
+                     ", ProcName:'" + StoredProcedures.ContractProductMaster_Insert;
+
                 command.CommandText = StoredProcedures.ContractProductMaster_Insert;
             }
             command.CommandType = CommandType.StoredProcedure;
@@ -57,7 +66,7 @@ namespace HB.Dao
             command.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = user.Id;
             command.Parameters.Add("@Enable", SqlDbType.Bit).Value = 0;
             command.Parameters.Add("@AmountChange", SqlDbType.Bit).Value = 1;
-            ds = new WrbErpConnection().ExecuteDataSet(command, "");
+            ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
             return ds;
         }
 

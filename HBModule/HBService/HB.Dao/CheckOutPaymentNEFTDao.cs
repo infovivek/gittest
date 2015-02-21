@@ -55,12 +55,18 @@ namespace HB.Dao
             Cmd = new SqlCommand();
             if (ChkOutNEFT.Id != 0)
             {
+                UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                  "', SctId:" + user.SctId + ", Service:CheckOutPaymentNEFT_Update" + ", ProcName:'" + StoredProcedures.CheckOutPaymentNEFT_Update;
+
                 Mode = "Update";
                 Cmd.CommandText = StoredProcedures.CheckOutPaymentNEFT_Update;
                 Cmd.Parameters.Add("@Id", SqlDbType.Int).Value = ChkOutNEFT.Id;
             }
             else
             {
+                UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                  "', SctId:" + user.SctId + ", Service:CheckOutPaymentNEFT_Insert" + ", ProcName:'" + StoredProcedures.CheckOutPaymentNEFT_Insert;
+
                 Mode = "Save";
                 Cmd.CommandText = StoredProcedures.CheckOutPaymentNEFT_Insert;
 
@@ -79,7 +85,7 @@ namespace HB.Dao
             Cmd.Parameters.Add("@DateNEFTYear", SqlDbType.Int).Value = ChkOutNEFT.DateNEFTYear;
             Cmd.Parameters.Add("@OutStanding", SqlDbType.NVarChar).Value = ChkOutNEFT.OutStanding;
             Cmd.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = user.Id;
-            ds = new WrbErpConnection().ExecuteDataSet(Cmd, "");
+            ds = new WrbErpConnection().ExecuteDataSet(Cmd, UserData);
             return ds;
         }
     }

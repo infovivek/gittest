@@ -126,7 +126,7 @@ IF @Str1!=''
 	DECLARE @id VARCHAR(MAX),@Guestid Bigint,@CityId Bigint, @StateId Bigint,@PropertyId Bigint;
 	Declare @BillFrom nvarchar(100),@BillTo nvarchar(100), @CityName NVARCHAR(100),@Property nvarchar(100);
 	Declare @CessPercent Decimal(27,2),@HECessPercent Decimal(27,2),@STPercent Decimal(27,2),@VATPer Decimal(27,2);
-	Declare @Chkoutid bigint;
+	Declare @Chkoutid bigint,@SServiceTax decimal(27,2);
 	SET @id =  @Str1;--'1152,1153,1154,1155,1159,1160,'--@Str1;--
  
 	WHILE CHARINDEX(',', @id) > 0 
@@ -159,6 +159,7 @@ IF @Str1!=''
 			Set @StateId    =(select top 1 StateId  from WRBHBCity where Id=@CityId )
 			Set @BillFrom   =(select top 1 convert(nvarchar(100),ArrivalDate,103) from WRBHBCheckInHdr where id=@Chkid   order by Id desc )
 			Set @BillTo     =(convert(nvarchar(100),getdate(),103));
+			set @SServiceTax=(select Top 1 BusinessSupportST from WRBHBChechkOutHdr where   Id=@Chkoutid)
 			--Select * from WRBHBTaxMaster
 		 	 --Select @Chkid,@Guestid,@CityId,@CityName,@Property,@StateId,@BillFrom
 			Set @CessPercent='2.00';
@@ -177,7 +178,7 @@ IF @Str1!=''
 			Ck.ChkInHdrId as ChkInHdrId,Ck.GuestId,0 BookingId,
 			Sd.ChkOutSerDate,sd.ChkOutSerItem ServiceItem,Sd.ChkOutSerAmount,1,sd.ProductId,
 			SH.CESS,SH.ChkOutServiceST,SH.HECess,SH.OtherService,0,sH.ChkOutServiceVat,
-		   (SH.MiscellaneousAmount+Sh.OtherService),sd.Id
+		   (SH.MiscellaneousAmount),sd.Id
 			FROM WRBHBChechkOutHdr CK
 			join WRBHBCheckOutServiceHdr SH WITH(NOLOCK) on  Ck.Id=sh.CheckOutHdrId and sh.IsActive=1 and sh.IsDeleted=0
 			 join WRBHBCheckOutServiceDtls SD WITH(NOLOCK) on SH.Id=SD.ServiceHdrId and sd.IsActive=1 and sd.IsDeleted=0 and  SD.ServiceHdrId!=0
@@ -243,13 +244,30 @@ IF @Str1!=''
 			Select ''CheckOutNo,''GuestName,0,'' as InVoiceNo,'' Stay, '' ChkinDT,'' as ChkoutDT, 
 			'',''ClientName,0 ClientId,0 Property,0 PropertyId,
 			'' ChkoutId, PrtyCat PropertyCat,''Status,'Total'BillType,0 ChkInHdrId,0 GuestId,0 as selectRadio,
-			'' BillDate,'Miscellaneous + other Service' as Product,
+			'' BillDate,'Miscellaneous' as Product,
 			SUM(Miscellaneous) as Price,0 Quantity, --Sum(Quantity) as Quantity,
 			'', isnull(SUM(Cess),0), isnull(SUM(ST),0), isnull(SUM(Hcess),0), isnull(SUM(OtherService),0),
 			0 MiscellaneousAmount,isnull(Sum(ChkOutServiceVat),0) ChkOutServiceVat,isnull(SUM(Miscellaneous),0)
 			FROM #Tax
 			group by PrtyCat
-
+			
+			-- insert into #ServiceDtails2(CheckOutNo,GuestName,Amounts,InvoiceNumber,
+   --         Stay,CheckInDate,CheckOutDate,BillDate,ClientName,ClientId,Property,PropertyId,
+   --         ChkoutId,PropertyCat,Status,BillType,ChkInHdrId,GuestId,BookingId,ChkOutSerDate,
+   --         ServiceItem,ChkOutSerAmount,Quantity,ProductId,Cess,ST,Hcess,OtherService,
+   --         MiscellaneousAmount,ChkOutServiceVat,Miscellaneous)
+            
+			--Select ''CheckOutNo,''GuestName,0,'' as InVoiceNo,'' Stay, '' ChkinDT,'' as ChkoutDT, 
+			--'',''ClientName,0 ClientId,0 Property,0 PropertyId,
+			--'' ChkoutId, PrtyCat PropertyCat,''Status,'Totals'BillType,0 ChkInHdrId,0 GuestId,0 as selectRadio,
+			--'' BillDate,'Miscellaneous' as Product,
+			--SUM(Miscellaneous) as Price,0 Quantity, --Sum(Quantity) as Quantity,
+			--'', isnull(SUM(Cess),0), 0, 0, 0,
+			--0 MiscellaneousAmount,0 ChkOutServiceVat,isnull(SUM(Miscellaneous),0)
+			--FROM #Tax
+			--group by PrtyCat
+		--	select * from #ServiceDtails2
+ 
              
        --  SELECT  Cess+ST+Hcess+OtherService  FROM  #ServiceDtails1
        --  where (Cess+ST+Hcess+OtherService)!=0
@@ -257,7 +275,7 @@ IF @Str1!=''
          --Select * from  #ServiceDtails2 ;
        
          DECLARE @TAX DECIMAL(27,2),@TOT DECIMAL(27,2),@NETAMT DECIMAL(27,2),@vAT dECIMAL(27,2),@STtax Decimal(27,2),
-         @OlyAmount DEcimal(27,2),@Todate Nvarchar(100),@Stay Nvarchar(200),@InvoiceDate nvarchar(100) 
+         @OlyAmount DEcimal(27,2),@Todate Nvarchar(100),@Stay Nvarchar(200),@InvoiceDate nvarchar(100) ,@OtherService Decimal(27,2);
          DECLARE @CessTotal Decimal(27,2),@HcessTotal Decimal(27,2),@PrptyAdress nvarchar(900),@MiscellaneousA Decimal(27,2);
          SET @TOT=(SELECT  sum(ChkOutSerAmount)FROM  #ServiceDtails2 )
          SET @TAX=  (SELECT (Cess+ST+Hcess)  FROM  #ServiceDtails2 where  Billtype='Total' )
@@ -266,11 +284,12 @@ IF @Str1!=''
          Set @CessTotal=(SELECT Cess FROM #ServiceDtails2 where isnull(Cess,0)!=0 and Billtype='Total')
          Set @HcessTotal=(SELECT Hcess FROM #ServiceDtails2 where isnull(Hcess,0)!=0  and Billtype='Total')
          Set @MiscellaneousA=(SELECT Miscellaneous FROM #ServiceDtails2 where isnull(Miscellaneous,0)!=0 and Billtype='Total')
+          Set @OtherService=(SELECT OtherService FROM #ServiceDtails2 where isnull(OtherService,0)!=0 and Billtype='Total')
          
          
          Set @Stay =(SELECT top 1 Stay FROM  #ServiceDtails1 )
          
-         Set @OlyAmount =(SELECT MiscellaneousAmount+OtherService FROM WRBHBCheckOutServiceHdr
+         Set @OlyAmount =(SELECT MiscellaneousAmount FROM WRBHBCheckOutServiceHdr
                            where CheckOutHdrId= @Chkid and IsActive=1 and IsDeleted=0 and (Cess+HECess+ChkOutServiceST)=0 )
          Set @Todate=(SELECT CheckOutDate FROM WRBHBChechkOutHdr
                            where Id= @Chkoutid and IsActive=1 and IsDeleted=0 )
@@ -282,12 +301,12 @@ IF @Str1!=''
        --                    where CheckOutHdrId= @Chkoutid and IsActive=1 and IsDeleted=0 
        --                     and RoomShiftingFlag=0 and CurrentStatus='CheckOut'
         --                 order by Id desc )
-                           
+              Update #ServiceDtails2 Set Quantity='' where  ServiceItem='Miscellaneous'           
        Set @PropertyId =(select top 1 PropertyId from WRBHBChechkOutHdr where id=@Chkoutid order by Id desc )                
        Update #ServiceDtails2 set ChkOutSerAmount=(isnull(@OlyAmount,0)+isnull(@MiscellaneousA,0))
        where BillType='Total'
              --  select @TOT,@TAX,@vAT
-         sET @NETAMT=(@TOT+isnull(@TAX,0)+isnull(@vAT,0)+ISNULL(@OlyAmount,0))--+@MiscellaneousA)
+         sET @NETAMT=(@TOT+isnull(@TAX,0)+isnull(@vAT,0)+ISNULL(@OlyAmount,0)+ISNULL(@OtherService,0))--+@MiscellaneousA)
          Set @PrptyAdress=(Select top 1  Propertaddress  from WRBHBProperty where IsActive=1 and IsDeleted=0 and Id=@PropertyId)
         -- [AmtWords]
       -- Select @Propcity,@PrptyAdress,@PropertyId
@@ -300,7 +319,8 @@ IF @Str1!=''
             ChkOutSerDate as BillDate,ServiceItem as Product,ChkOutSerAmount as Price,Quantity as Quantity,ProductId,
             isnull(@CessTotal,0) Cess,isnull(@STtax,0) AS SerivceTax,isnull(@HcessTotal,0) Hcess,rOUND(@NETAMT,0) AS NetAmount,isnull(@vAT,0) AS Vat,
             @CityName AS City,@PrptyAdress as Propertyaddress,  convert(Nvarchar(200),@CessPercent)+' %' CessPercent,
-             convert(Nvarchar(200),@HECessPercent)+' %' HECessPercent,
+             convert(Nvarchar(200),@HECessPercent)+' %' HECessPercent,@SServiceTax as  SServiceTax,
+             isnull(@OtherService,0)  OtherService,
              convert(Nvarchar(200),@VATPer)+' %' as  VATPer,  convert(Nvarchar(200),@STPercent)+' %' as STPercent,
 			 'Regd Office : No. 122, Amarjyothi Layout, Domlur, Bangalore - 560071'+'.'+'www.hummingbirdindia.com'  AS CompanyAddress,
 			 ''+@PanCardNo+'   |   '+'TIN : 29340489869'+'   |   '+'L Tax No : L00100571'+'  |  ' +'CIN No: U72900KA2005PTC035942' as TaxNo,
@@ -322,10 +342,13 @@ IF @Str1!=''
              CheckInDate+' To '+CheckOutDate Stays,BillDate,ClientName,ClientId,Property,PropertyId,
              ChkInHdrId ChkoutId,PropertyCat,Status,BillType,ChkInHdrId,GuestId,BookingId,0 as selectRadio,
              CheckInDate ChkinDT,CheckOutDate as ChkoutDT, CheckInDate as ArrivalDate,@Todate as ToDate,
-              ChkOutSerDate as BillDate,ServiceItem as Product,ChkOutSerAmount as Price,Quantity as Quantity,ProductId,
+              ChkOutSerDate as BillDate,ServiceItem as Product,ChkOutSerAmount as Price,
+               Quantity  as Quantity,ProductId,
              isnull(@CessTotal,0) Cess,isnull(@STtax,0) AS SerivceTax,isnull(@HcessTotal,0) Hcess,rOUND(@NETAMT,0) AS NetAmount,isnull(@vAT,0) AS Vat,
               @CityName AS City,@PrptyAdress as Propertyaddress,convert(Nvarchar(200),@CessPercent)+' %' CessPercent,
-              convert(Nvarchar(200),@HECessPercent)+' %'   HECessPercent,
+              convert(Nvarchar(200),@HECessPercent)+' %'   HECessPercent,  
+              convert(Nvarchar(200),@SServiceTax)+' %'  as  SServiceTax,
+               isnull(@OtherService,0)  OtherService,
               convert(Nvarchar(200),@VATPer)+' %'  as  VATPer,convert(Nvarchar(200),@STPercent)+' %'  as STPercent,
 			 'Regd Office : No. 122, Amarjyothi Layout, Domlur, Bangalore - 560071'+'.'+'www.hummingbirdindia.com'  AS CompanyAddress,
 			 ''+@PanCardNo+'   |   '+'TIN : 29340489869'+'   |   '+'L Tax No : L00100571'+'  |  ' +'CIN No: U72900KA2005PTC035942' as TaxNo,

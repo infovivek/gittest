@@ -713,7 +713,11 @@ namespace HB.Dao
         public const string VendorSettlementPaidAmount_Insert = "Sp_VendorSettlementPaidAmount_Insert";
 
         //SearchInvoiceReport
-        public const string SearchInvoiceReport_Help = "Sp_SearchInvoiceReport_Help";
+        public const string SearchInvoiceReport_Help     = "Sp_SearchInvoiceReport_Help";
+        public const string CreditNoteTariffHdr_Insert   = "SP_CreditNoteTariffHdr_Insert";
+        public const string CreditNoteTariffDtl_Insert   = "SP_CreditNoteTariffDtl_Insert";
+        public const string CreditNoteServiceHdr_Insert = "SP_CreditNoteServiceHdr_Insert";
+        public const string CreditNoteServiceDtl_Insert = "SP_CreditNoteServiceDtl_Insert";
 
         //InternalExpenseReport
         public const string InternalInvoiceReport_Help = "SP_InternalInvoiceReport_Help";
@@ -771,5 +775,13 @@ namespace HB.Dao
         //checkout Inter settlement
         public const string CheckOutInterSettleHdr_Insert = "SP_CheckOutInterSettleHdr_Insert";
         public const string CheckOutInterSettleDtl_Insert = "SP_CheckOutInterSettleDtl_Insert";
+
+
+        //Booking Status Report
+        public const string BookingStatusReport_Help = "BookingReport";
+
+        //chkin rollback
+        public const string CheckInRollback_help = "SP_CheckInRollback_help";
+        public const string CheckInRollback_insert = "SP_CheckInRollback_insert";
     }
 }

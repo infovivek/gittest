@@ -398,6 +398,7 @@ If @Action = 'GuestLoad'
 		--SET @Roles=(SELECT top 1 Roles FROM WRBHBUserRoles  WHERE UserId = 65 AND IsActive = 1 AND IsDeleted = 0 AND Roles = 'Operations Managers' AND Roles = 'Resident Managers')  
 		--SET @Roles=(SELECT Roles FROM WRBHBUserRoles  WHERE UserId = @UserId AND IsActive = 1 AND IsDeleted = 0 AND Roles = 'Resident Managers')  
 		
+		
 IF @Roles = 'Operations Managers' --OR @Roles = 'Resident Managers'
 BEGIN
 IF @SSPId =0
@@ -573,10 +574,10 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		select distinct t2.Id,t2.PropertyId,
 		(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS ChkInGuest,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS GuestId,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
         FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
@@ -600,7 +601,8 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 		join WRBHBUserRoles R on  U.Id =R.UserId  and R.IsActive = 1 and R.IsDeleted = 0
 		WHERE  H.Status IN('Direct Booked','Booked')  and 
 		isnull(H.CancelStatus,0)!='Canceled'  
-		and BP.PropertyType= 'ExP'--P.Category in ('External Property') 
+		and BP.PropertyType= 'ExP'
+		and isnull(AG.RoomShiftingFlag,0) = 0--P.Category in ('External Property') 
 		and H.IsActive = 1 and H.IsDeleted = 0  
 	
 		----and CONVERT(varchar(100),AG.ChkInDt,103) in( CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103), 
@@ -1023,13 +1025,13 @@ ELSE
 		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		select distinct t2.Id,t2.PropertyId,
 		(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS ChkInGuest,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS GuestId,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2
 		
@@ -1051,7 +1053,8 @@ ELSE
 		join WRBHBUserRoles R on  U.Id =R.UserId  and R.IsActive = 1 and R.IsDeleted = 0
 		WHERE  H.Status IN('Direct Booked','Booked')  and 
 		isnull(H.CancelStatus,0)!='Canceled'  
-		and BP.PropertyType='ExP'-- P.Category in ('External Property') 
+		and BP.PropertyType='ExP'
+		and isnull(AG.RoomShiftingFlag,0) = 0-- P.Category in ('External Property') 
 		and H.IsActive = 1 and H.IsDeleted = 0  
 	
 		----and CONVERT(varchar(100),AG.ChkInDt,103) in( CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103), 
@@ -1247,9 +1250,10 @@ ELSE
 		from #CheckIn2 t2 
 		
 		INSERT INTO #CheckInfinal(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		--select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		--from #CheckIn3
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomCaptureId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn3
-		
 		
 		
 		SELECT @NoData=COUNT(*) FROM #CheckInfinal
@@ -1293,6 +1297,7 @@ ELSE
 		
 		Select Id as chekoutId from WRBHBChechkOutHdr where ChkInHdrId = (select Id from #CheckInfinal)
 		
+		
 	END
 END
 
@@ -1301,6 +1306,7 @@ ELSE
 BEGIN
 IF @SSPId =0
 	BEGIN
+	
 	
 -- Room Level For MGH,Ddp	
 	INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
@@ -1521,13 +1527,13 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		select distinct t2.Id,t2.PropertyId,
 		(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS ChkInGuest,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS GuestId,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2
 		
@@ -1604,7 +1610,8 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 		join WRBHBUserRoles R on  U.Id =R.UserId  and R.IsActive = 1 and R.IsDeleted = 0
 		WHERE  H.Status IN('Direct Booked','Booked')  and 
 		isnull(H.CancelStatus,0)!='Canceled'  
-		and BP.PropertyType='ExP'--P.Category in ('External Property') 
+		and BP.PropertyType='ExP'
+		and isnull(AG.RoomShiftingFlag,0) = 0--P.Category in ('External Property') 
 		and H.IsActive = 1 and H.IsDeleted = 0  
 	
 		--and CONVERT(varchar(100),AG.ChkInDt,103) in( CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103), 
@@ -1728,7 +1735,9 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 		
 		
 		INSERT INTO #CheckInfinal(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		--select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		--from #CheckIn3
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomCaptureId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn3
 		
 		
@@ -1736,6 +1745,8 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 		SELECT TOP 1 @BookingId1=BookingId,@RoomId1=RoomId,@AparmentId=ApartmentId,@BedId=BedId,@BookingLevel=BookingLevel,
 		@PId=PId
 		FROM #CheckInfinal	
+		
+		
 		
 		WHILE (ISNULL(@NoData,0)!=0)  
 		BEGIN
@@ -1774,6 +1785,8 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 END
 ELSE
  	BEGIN
+ 	
+ 	
  	 -- To Check Booked and Direct Booked for Room Level MGH,Ddp
         INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		SELECT  distinct
@@ -1996,13 +2009,13 @@ ELSE
 		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		select distinct t2.Id,t2.PropertyId,
 		(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS ChkInGuest,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS GuestId,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2
 		
@@ -2079,7 +2092,8 @@ ELSE
 		join WRBHBUserRoles R on  U.Id =R.UserId  and R.IsActive = 1 and R.IsDeleted = 0
 		WHERE  H.Status IN('Direct Booked','Booked')  and 
 		isnull(H.CancelStatus,0)!='Canceled'  
-		and BP.PropertyType='ExP'-- P.Category in ('External Property') 
+		and BP.PropertyType='ExP'
+		and isnull(AG.RoomShiftingFlag,0) = 0-- P.Category in ('External Property') 
 		and H.IsActive = 1 and H.IsDeleted = 0  
 	
 		--and CONVERT(varchar(100),AG.ChkInDt,103) in( CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103), 
@@ -2203,7 +2217,9 @@ ELSE
 		from #CheckIn2 t2 
 		
 		INSERT INTO #CheckInfinal(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		--select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		--from #CheckIn3
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomCaptureId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn3
 		
 		

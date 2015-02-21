@@ -109,11 +109,11 @@ BEGIN
    WITH(NOLOCK)ON R.AgreementId = A.Id
    WHERE A.PropertyId = @BookingPropertyId AND R.RoomType = @RoomType;   
   END
- IF @PropertyType = 'MGH' OR @PropertyType = 'DdP'
+ /*IF @PropertyType = 'MGH' OR @PropertyType = 'DdP'
   BEGIN
    SELECT @RoomType = RoomNo FROM WRBHBPropertyRooms
    WHERE PropertyId = @BookingPropertyId AND Id = @RoomId;
-  END
+  END*/
  --
  DECLARE @Cnt INT = 0,@BookingCode BIGINT = 0,@PaymentFlag BIT = 0;
  DECLARE @PaymentCode BIGINT = 0,@PaymentCodeCnt BIGINT = 0;

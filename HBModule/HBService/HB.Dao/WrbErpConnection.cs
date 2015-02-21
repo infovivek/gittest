@@ -21,7 +21,10 @@ namespace HB.Dao
 
         public DataSet sqlExecuteScalar(SqlCommand command, string UserData)
         {
-            DataSet dsResult = new DataSet();
+            DataSet dsResult = new DataSet(); 
+            DataTable dT = new DataTable("DTable");
+            DataTable ErrdT1 = new DataTable("DBERRORTBL"); 
+            ErrdT1.Columns.Add("Exception"); 
             using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["HB"].ToString()))
             {
                 connection.Open();
@@ -40,13 +43,20 @@ namespace HB.Dao
                     CreateLogFiles Err = new CreateLogFiles();
                     Err.ErrorLog( ex.Message + UserData);
                     sqlTran.Rollback();
+                }
+                finally
+                {
+                    dsResult.Tables.Add(ErrdT1); ErrdT1.Dispose(); ErrdT1 = null;
                 }
             }
             return dsResult;
         }
         public DataTable sqlExecuteScalarDataTable(SqlCommand command, string UserData)
         {
-            DataTable dsResult = new DataTable();
+           DataTable dsResult = new DataTable(); 
+            DataTable dT = new DataTable("DTable");
+            DataTable ErrdT1 = new DataTable("DBERRORTBL");
+            ErrdT1.Columns.Add("Exception"); 
             using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["HB"].ToString()))
             {
                 connection.Open();
@@ -66,26 +76,42 @@ namespace HB.Dao
                     Err.ErrorLog( ex.Message + UserData);
                     sqlTran.Rollback();
                 }
+                finally
+                {
+                    //dsResult.tables.Add(ErrdT1); 
+                    ErrdT1.Dispose(); ErrdT1 = null;
+                }
             }
             return dsResult;
         }
         public DataSet SqlExecuteDataSet(SqlCommand command, string UserData)
         {
-            DataSet dsResult = new DataSet();
+            DataSet dsResult = new DataSet(); 
+            DataTable dT = new DataTable("DTable");
+            DataTable ErrdT1 = new DataTable("DBERRORTBL");
+            ErrdT1.Columns.Add("Exception"); 
             using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["HB"].ToString()))
             {
                 try
                 {
+                    connection.Open();
                     command.CommandTimeout = 120;
+                    SqlTransaction sqlTran = connection.BeginTransaction();
+                    command.Transaction = sqlTran;
                     command.Connection = connection;
                     SqlDataAdapter adapter = new SqlDataAdapter(command);
                     adapter.Fill(dsResult);
+                    sqlTran.Commit();
+                    connection.Close();
                 }
                 catch (Exception ex)
                 {
                     CreateLogFiles Err = new CreateLogFiles();
-                    Err.ErrorLog( ex.Message + UserData);
-
+                    Err.ErrorLog( ex.Message + UserData); 
+                }
+                finally
+                {
+                    dsResult.Tables.Add(ErrdT1); ErrdT1.Dispose(); ErrdT1 = null;
                 }
             }
             return dsResult;
@@ -93,6 +119,10 @@ namespace HB.Dao
         public string ExecuteScalarUID(SqlCommand command, string UserData)
         {
             string EmpCode = "";
+            DataSet dsResult = new DataSet();
+            DataTable dT = new DataTable("DTable");
+            DataTable ErrdT1 = new DataTable("DBERRORTBL");
+            ErrdT1.Columns.Add("Exception"); 
             using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["HB"].ToString()))
             {
                 connection.Open();
@@ -100,10 +130,10 @@ namespace HB.Dao
                 try
                 {
                     command.Transaction = sqlTran;
-                    command.Connection = connection;
-
+                    command.Connection = connection; 
                     EmpCode = Convert.ToString(command.ExecuteScalar());
-                    sqlTran.Commit();
+                    sqlTran.Commit(); 
+                    connection.Close();
                 }
                 catch (Exception ex)
                 {
@@ -111,33 +141,35 @@ namespace HB.Dao
                     Err.ErrorLog( ex.Message);
                     sqlTran.Rollback();
                 }
+                finally
+                {
+                    dsResult.Tables.Add(ErrdT1); ErrdT1.Dispose(); ErrdT1 = null;
+                }
             }
             return EmpCode;
         }
         public DataSet ExecuteDataSet(SqlCommand command, string UserData)
         {
-            DataSet dsResult = new DataSet();
-
-            DataTable dT = new DataTable("DTable");
-
-            DataTable ErrdT = new DataTable("DBERRORTBL");
-
-            ErrdT.Columns.Add("Exception");
-
+            DataSet dsResult = new DataSet(); 
+            DataTable dT = new DataTable("DTable"); 
+            DataTable ErrdT = new DataTable("DBERRORTBL"); 
+            ErrdT.Columns.Add("Exception"); 
             using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["HB"].ToString()))
             {
                 try
                 {
-                    command.Connection = connection;
-
-                    SqlDataAdapter adapter = new SqlDataAdapter(command);
-
+                    connection.Open();
+                    SqlTransaction sqlTran = connection.BeginTransaction();
+                    command.Transaction = sqlTran;
+                    command.Connection = connection; 
+                    SqlDataAdapter adapter = new SqlDataAdapter(command); 
                     adapter.Fill(dsResult);
+                    sqlTran.Commit();
+                    connection.Close();
                 }
                 catch (Exception Ex)
                 {
-                    CreateLogFiles Err = new CreateLogFiles();
-
+                    CreateLogFiles Err = new CreateLogFiles(); 
                     Err.ErrorLog( Ex.Message);
                     //Err.ErrorLog(ConfigurationManager.ConnectionStrings["Log"].ToString(), Ex.Message, UserData);
                     ErrdT.Rows.Add("Error - " + Ex.Message + " | " + Ex.InnerException);
@@ -154,25 +186,24 @@ namespace HB.Dao
             DataSet dsResult = new DataSet();
 
             using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["HB"].ToString()))
-            {
-
-                DataTable dT = new DataTable("DTable");
-
-                DataTable ErrdT = new DataTable("DBERRORTBL");
-
+            { 
+                DataTable dT = new DataTable("DTable"); 
+                DataTable ErrdT = new DataTable("DBERRORTBL"); 
                 ErrdT.Columns.Add("Exception");
                 try
                 {
-                    command.Connection = connection;
-
-                    SqlDataAdapter adapter = new SqlDataAdapter(command);
-
+                    connection.Open();
+                    SqlTransaction sqlTran = connection.BeginTransaction();
+                    command.Transaction = sqlTran;
+                    command.Connection = connection; 
+                    SqlDataAdapter adapter = new SqlDataAdapter(command); 
                     adapter.Fill(dsResult);
+                    sqlTran.Commit();
+                    connection.Close();
                 }
                 catch (Exception Ex)
                 {
-                    CreateLogFiles Err = new CreateLogFiles();
-
+                    CreateLogFiles Err = new CreateLogFiles(); 
                     Err.ErrorLog(Ex.Message);
                     //Err.ErrorLog(ConfigurationManager.ConnectionStrings["Log"].ToString(), Ex.Message, UserData);
                     ErrdT.Rows.Add("Error - " + Ex.Message + " | " + Ex.InnerException);
@@ -184,25 +215,24 @@ namespace HB.Dao
             }
             using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["HB1"].ToString()))
             {
-                dsResult = new DataSet();
-
-                DataTable dT1 = new DataTable("DTable");
-
-                DataTable ErrdT1 = new DataTable("DBERRORTBL");
-
+                dsResult = new DataSet(); 
+                DataTable dT1 = new DataTable("DTable"); 
+                DataTable ErrdT1 = new DataTable("DBERRORTBL"); 
                 ErrdT1.Columns.Add("Exception");
                 try
                 {
-                    command.Connection = connection;
-
-                    SqlDataAdapter adapter = new SqlDataAdapter(command);
-
+                    connection.Open();
+                    SqlTransaction sqlTran = connection.BeginTransaction();
+                    command.Transaction = sqlTran;
+                    command.Connection = connection; 
+                    SqlDataAdapter adapter = new SqlDataAdapter(command);  
                     adapter.Fill(dsResult);
+                    sqlTran.Commit();
+                    connection.Close();
                 }
                 catch (Exception Ex)
                 {
-                    CreateLogFiles Err = new CreateLogFiles();
-
+                    CreateLogFiles Err = new CreateLogFiles(); 
                     Err.ErrorLog(Ex.Message);
                     //Err.ErrorLog(ConfigurationManager.ConnectionStrings["Log"].ToString(), Ex.Message, UserData);
                     ErrdT1.Rows.Add("Error - " + Ex.Message + " | " + Ex.InnerException);

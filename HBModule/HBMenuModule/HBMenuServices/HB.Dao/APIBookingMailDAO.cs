@@ -32,17 +32,13 @@ namespace HB.Dao
                 ds = new WrbErpConnection().ExecuteDataSet(command, UserData);               
                 if (ds.Tables[5].Rows.Count > 0)
                 {
-                    //message.From = new System.Net.Mail.MailAddress("homestay@uniglobeatb.co.in", "", System.Text.Encoding.UTF8);
                     message.From = new System.Net.Mail.MailAddress(ds.Tables[3].Rows[0][3].ToString(), "", System.Text.Encoding.UTF8);
                 }
                 else
                 {
-                    //message.From = new System.Net.Mail.MailAddress("stay@staysimplyfied.com", "", System.Text.Encoding.UTF8);
-                    //message.From = new System.Net.Mail.MailAddress("stay@hummingbirdindia.com", "", System.Text.Encoding.UTF8);
                     message.From = new System.Net.Mail.MailAddress(ds.Tables[3].Rows[0][2].ToString(), "", System.Text.Encoding.UTF8);
                 }
                 //message.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
-                //message.To.Add(new System.Net.Mail.MailAddress("vivek@warblerit.com"));
                 //message.Subject = "MMT Testing Booking Confirmation - " + ds.Tables[2].Rows[0][0].ToString();
                 message.To.Add(new System.Net.Mail.MailAddress("booking_confirmation@staysimplyfied.com"));
                 if (ds.Tables[2].Rows[0][6].ToString() == "0")

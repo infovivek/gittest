@@ -1074,7 +1074,7 @@
 					var D1:String = sda.substr(0,2);
 					//var D:String =String(Number(Dt.substr(0,2))+1);
 					var ToDt:String = Y1+'/'+M1+'/'+D1;
-					dt_To.selectableRange = {rangeStart:new Date(RangeStart),rangeEnd:new Date(RangeEnd)};
+					dt_To.selectableRange = {rangeStart:new Date(RangeStart)};
 					if(new Date(RangeStart) > new Date(ToDt))
 					{
 						dt_To.selectedDate = new Date(RangeStart);
@@ -1083,6 +1083,7 @@
 					{
 						dt_To.selectedDate = new Date(ToDt);
 					}
+					
 				}
 			}
 			//Booking Modification

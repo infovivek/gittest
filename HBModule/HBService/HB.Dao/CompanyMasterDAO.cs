@@ -13,6 +13,8 @@ namespace HB.Dao
 {
     public class CompanyMasterDAO
     {
+
+        string UserData;
         public DataSet Save(string[] data, Entity.User user)
         {
             DataSet ds = new DataSet();
@@ -36,11 +38,19 @@ namespace HB.Dao
 
             if (Comp.Id != 0)
             {
+                UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                    "', SctId:" + user.SctId + ", Service:CompanyMaster_Update" +
+                     ", ProcName:'" + StoredProcedures.CompanyMaster_Update;
+
                 command.CommandText = StoredProcedures.CompanyMaster_Update;
                 command.Parameters.Add("@Id", SqlDbType.Int).Value = Comp.Id;
             }
             else
             {
+                UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                    "', SctId:" + user.SctId + ", Service:CompanyMaster_Insert" +
+                     ", ProcName:'" + StoredProcedures.CompanyMaster_Insert;
+
                 command.CommandText = StoredProcedures.CompanyMaster_Insert;
             }
 

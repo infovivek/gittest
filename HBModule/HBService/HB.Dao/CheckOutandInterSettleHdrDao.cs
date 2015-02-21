@@ -34,12 +34,18 @@ namespace HB.Dao
             Cmd = new SqlCommand();
             if (ChkOutSet.Id != 0)
             {
+                UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                "', SctId:" + user.SctId + ", Service:CheckOutHdrSettleHdr_Update" + ", ProcName:'" + StoredProcedures.CheckOutHdrSettleHdr_Update;
+
                 Mode = "Update";
                 Cmd.CommandText = StoredProcedures.CheckOutHdrSettleHdr_Update;
                 Cmd.Parameters.Add("@Id", SqlDbType.Int).Value = ChkOutSet.Id;
             }
             else
             {
+                UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                "', SctId:" + user.SctId + ", Service:CheckOutInterSettleHdr_Insert" + ", ProcName:'" + StoredProcedures.CheckOutInterSettleHdr_Insert;
+
                 Mode = "Save";
                 Cmd.CommandText = StoredProcedures.CheckOutInterSettleHdr_Insert;
 
@@ -51,7 +57,7 @@ namespace HB.Dao
             Cmd.Parameters.Add("@Consolidated", SqlDbType.Bit).Value = ChkOutSet.Consolidated;
             Cmd.Parameters.Add("@EmailId", SqlDbType.NVarChar).Value = ChkOutSet.EmailId;
             Cmd.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = user.Id;
-            ds = new WrbErpConnection().ExecuteDataSet(Cmd, "");
+            ds = new WrbErpConnection().ExecuteDataSet(Cmd, UserData);
 
             //if (ChkOutSet.EmailId != "") // Mail 
             //{

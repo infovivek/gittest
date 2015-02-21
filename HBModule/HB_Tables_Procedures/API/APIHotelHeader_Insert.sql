@@ -32,8 +32,8 @@ BEGIN
   END
  ELSE
   BEGIN
-   INSERT INTO WRBHBAPIHotelHeader(HeaderId,HotelId,StarRating,HotelCount,Dt)
-   VALUES(@HeaderId,@HotelId,@StarRating,@HotelCount,GETDATE());
+   INSERT INTO WRBHBAPIHotelHeader(HeaderId,HotelId,StarRating,HotelCount,Dt,IsActive)
+   VALUES(@HeaderId,@HotelId,@StarRating,@HotelCount,GETDATE(),1);
    SELECT Id FROM WRBHBAPIHotelHeader WHERE Id=@@IDENTITY;
   END
 END

@@ -80,19 +80,50 @@ IF @Action = 'BookTrueFlagLoad'
  END
 IF @Action = 'SingleDoubleRateLoad'
  BEGIN
+  --SINGLE ROOM RATE
   SELECT T.Tariffamount FROM WRBHBAPIRoomRateDtls RR
   LEFT OUTER JOIN WRBHBAPITariffDtls T WITH(NOLOCK) ON T.RoomRateHdrId=RR.Id AND
   T.HeaderId=RR.HeaderId AND T.HotelId=RR.HotelId
   WHERE RR.HeaderId=@Id1 AND RR.HotelId=@Str1 AND
   RR.RoomRateratePlanCode=@Str2 AND RR.RoomRateroomTypeCode=@Str3 AND
   T.RoomTariffroomNumber=1 AND T.Tariffgroup='RoomRate';
-  --
+  --DOUBLE ROOM RATE
   SELECT T.Tariffamount FROM WRBHBAPIRoomRateDtls RR
   LEFT OUTER JOIN WRBHBAPITariffDtls T WITH(NOLOCK) ON T.RoomRateHdrId=RR.Id AND
   T.HeaderId=RR.HeaderId AND T.HotelId=RR.HotelId
   WHERE RR.HeaderId=@Id1 AND RR.HotelId=@Str1 AND
   RR.RoomRateratePlanCode=@Str2 AND RR.RoomRateroomTypeCode=@Str3 AND
   T.RoomTariffroomNumber=2 AND T.Tariffgroup='RoomRate';
+  --SINGLE ROOM TAX
+  SELECT T.Tariffamount FROM WRBHBAPIRoomRateDtls RR
+  LEFT OUTER JOIN WRBHBAPITariffDtls T WITH(NOLOCK) ON T.RoomRateHdrId=RR.Id AND
+  T.HeaderId=RR.HeaderId AND T.HotelId=RR.HotelId
+  WHERE RR.HeaderId=@Id1 AND RR.HotelId=@Str1 AND
+  RR.RoomRateratePlanCode=@Str2 AND RR.RoomRateroomTypeCode=@Str3 AND
+  T.RoomTariffroomNumber=1 AND T.Tariffgroup='Taxes';
+  --DOUBLE ROOM TAX
+  SELECT T.Tariffamount FROM WRBHBAPIRoomRateDtls RR
+  LEFT OUTER JOIN WRBHBAPITariffDtls T WITH(NOLOCK) ON T.RoomRateHdrId=RR.Id AND
+  T.HeaderId=RR.HeaderId AND T.HotelId=RR.HotelId
+  WHERE RR.HeaderId=@Id1 AND RR.HotelId=@Str1 AND
+  RR.RoomRateratePlanCode=@Str2 AND RR.RoomRateroomTypeCode=@Str3 AND
+  T.RoomTariffroomNumber=2 AND T.Tariffgroup='Taxes';
+  --SINGLE ROOM DISCOUNT
+  SELECT T.Tariffamount FROM WRBHBAPIRoomRateDtls RR
+  LEFT OUTER JOIN WRBHBAPITariffDtls T WITH(NOLOCK) ON T.RoomRateHdrId=RR.Id AND
+  T.HeaderId=RR.HeaderId AND T.HotelId=RR.HotelId
+  WHERE RR.HeaderId=@Id1 AND RR.HotelId=@Str1 AND
+  RR.RoomRateratePlanCode=@Str2 AND RR.RoomRateroomTypeCode=@Str3 AND
+  T.RoomTariffroomNumber=1 AND T.Tariffgroup='RoomDiscount';
+  --DOUBLE ROOM DISCOUNT
+  SELECT T.Tariffamount FROM WRBHBAPIRoomRateDtls RR
+  LEFT OUTER JOIN WRBHBAPITariffDtls T WITH(NOLOCK) ON T.RoomRateHdrId=RR.Id AND
+  T.HeaderId=RR.HeaderId AND T.HotelId=RR.HotelId
+  WHERE RR.HeaderId=@Id1 AND RR.HotelId=@Str1 AND
+  RR.RoomRateratePlanCode=@Str2 AND RR.RoomRateroomTypeCode=@Str3 AND
+  T.RoomTariffroomNumber=2 AND T.Tariffgroup='RoomDiscount';
+  -- diff
+  SELECT 2;
  END
 IF @Action = 'CityCode'
  BEGIN
@@ -292,5 +323,13 @@ IF @Action = 'MMTDiscountUpdate'
     RR.RoomRateroomTypeCode = @Str3 AND RR.HeaderId = @Str4 AND
     T.Tariffgroup = 'RoomRate' AND RoomTariffroomNumber = '2';
    END
+ END
+IF @Action = 'MMTWindowsService'
+ BEGIN
+  --SELECT '';
+  SELECT CityCode FROM WRBHBCity WHERE ISNULL(CityCode,'') != ''
+  GROUP BY CityCode ORDER BY CityCode ASC;
+  SELECT CAST(CONVERT(DATE,DATEADD(DAY,6,GETDATE()),103) AS VARCHAR),
+  CAST(CONVERT(DATE,DATEADD(DAY,7,GETDATE()),103) AS VARCHAR);
  END
 END

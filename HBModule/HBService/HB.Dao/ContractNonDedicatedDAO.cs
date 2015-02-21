@@ -12,6 +12,7 @@ namespace HB.Dao
 {
     public class ContractNonDedicatedDAO
     {
+        string UserData;
         public DataSet Save(string data, User user)
         {
             DataSet ds = new DataSet();
@@ -37,11 +38,19 @@ namespace HB.Dao
            // ctrNonDd.PropertyId = Convert.ToInt32(document.SelectSingleNode("HdrXml").Attributes["PropertyId"].Value);
             if (ctrNonDd.Id != 0)
             {
+                UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                    "', SctId:" + user.SctId + ", Service:ContractNonDedicated_Update" +
+                     ", ProcName:'" + StoredProcedures.ContractNonDedicated_Update;
+
                 command.CommandText = StoredProcedures.ContractNonDedicated_Update;
                 command.Parameters.Add("@Id", SqlDbType.BigInt).Value = ctrNonDd.Id;
             }
             else
             {
+                UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                    "', SctId:" + user.SctId + ", Service:ContractNonDedicated_Insert" +
+                     ", ProcName:'" + StoredProcedures.ContractNonDedicated_Insert;
+
                 command.CommandText = StoredProcedures.ContractNonDedicated_Insert;
             }
             command.CommandType = CommandType.StoredProcedure;
@@ -58,11 +67,15 @@ namespace HB.Dao
             command.Parameters.Add("@TransId", SqlDbType.BigInt).Value = ctrNonDd.TransId;
             command.Parameters.Add("@Types", SqlDbType.NVarChar).Value = ctrNonDd.Types;
             command.Parameters.Add("@PricingModel", SqlDbType.NVarChar).Value = ctrNonDd.PricingModel;
-            ds = new WrbErpConnection().ExecuteDataSet(command, "");
+            ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
             return ds;
         }
         public DataSet Search(string[] data, User user)
         {
+            UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                    "', SctId:" + user.SctId + ", Service:ContractNonDedicated_Select" +
+                     ", ProcName:'" + StoredProcedures.ContractNonDedicated_Select;
+
             SqlCommand command = new SqlCommand();
             command.CommandText = StoredProcedures.ContractNonDedicated_Select;
             command.CommandType = CommandType.StoredProcedure;
@@ -74,6 +87,10 @@ namespace HB.Dao
         }
         public DataSet Delete(string[] data, User user)
         {
+            UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                    "', SctId:" + user.SctId + ", Service:ContractNonDedicated_Delete" +
+                     ", ProcName:'" + StoredProcedures.ContractNonDedicated_Delete;
+
             SqlCommand command = new SqlCommand();
             command.CommandText = StoredProcedures.ContractNonDedicated_Delete;
             command.CommandType = CommandType.StoredProcedure;
@@ -81,10 +98,14 @@ namespace HB.Dao
             command.Parameters.Add("@Pram1", SqlDbType.VarChar).Value = data[2].ToString();
             command.Parameters.Add("@DeleteId", SqlDbType.BigInt).Value = Convert.ToInt32(data[3].ToString());
             command.Parameters.Add("@UserId", SqlDbType.BigInt).Value = user.Id;
-            return new WrbErpConnection().ExecuteDataSet(command, "");
+            return new WrbErpConnection().ExecuteDataSet(command, UserData);
         }
         public DataSet Help(string[] data, User user)
         {
+            UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                    "', SctId:" + user.SctId + ", Service:ContractNonDedicated_Help" +
+                     ", ProcName:'" + StoredProcedures.ContractNonDedicated_Help;
+
             SqlCommand command = new SqlCommand();
             command.CommandText = StoredProcedures.ContractNonDedicated_Help;
             command.CommandType = CommandType.StoredProcedure;
@@ -93,7 +114,7 @@ namespace HB.Dao
           //  command.Parameters.Add("@Pram1", SqlDbType.BigInt).Value = Convert.ToInt32(data[3].ToString());
             command.Parameters.Add("@Pram2", SqlDbType.NVarChar).Value =data[3].ToString();
             command.Parameters.Add("@UserId", SqlDbType.BigInt).Value = user.Id;
-            return new WrbErpConnection().ExecuteDataSet(command, "");
+            return new WrbErpConnection().ExecuteDataSet(command, UserData);
         }
     }
 }

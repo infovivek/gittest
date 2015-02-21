@@ -57,6 +57,8 @@
     <Content Include="Account\Register.aspx" />
     <Content Include="ContractBill.aspx" />
     <Content Include="ContractBillDedicated.aspx" />
+    <Content Include="CreditNoteServiceBill.aspx" />
+    <Content Include="CreditNoteTariffBill.aspx" />
     <Content Include="DetailedServiceinvoice.aspx" />
     <Content Include="ExternalCheckOutTAC.aspx" />
     <Content Include="ExternalCheckoutTACMail.aspx" />
@@ -135,6 +137,20 @@
     </Compile>
     <Compile Include="ContractBillDedicated.aspx.designer.cs">
       <DependentUpon>ContractBillDedicated.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="CreditNoteServiceBill.aspx.cs">
+      <DependentUpon>CreditNoteServiceBill.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CreditNoteServiceBill.aspx.designer.cs">
+      <DependentUpon>CreditNoteServiceBill.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="CreditNoteTariffBill.aspx.cs">
+      <DependentUpon>CreditNoteTariffBill.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CreditNoteTariffBill.aspx.designer.cs">
+      <DependentUpon>CreditNoteTariffBill.aspx</DependentUpon>
     </Compile>
     <Compile Include="DetailedServiceinvoice.aspx.cs">
       <DependentUpon>DetailedServiceinvoice.aspx</DependentUpon>
@@ -348,6 +364,10 @@
     <EmbeddedResource Include="ExternalIntermediateTAC.rdlc" />
     <EmbeddedResource Include="ExternalCheckoutNewTACMail.rdlc" />
     <EmbeddedResource Include="KOTVendorReport.rdlc" />
+    <EmbeddedResource Include="CreditNoteTariffBill.rdlc" />
+    <EmbeddedResource Include="CreditNoteServiceBill.rdlc" />
+    <EmbeddedResource Include="CreditNoteTariffBill1.rdlc" />
+    <EmbeddedResource Include="CreditNoteServiceBill1.rdlc" />
     <EmbeddedResource Include="TAC Annexure.rdlc" />
     <EmbeddedResource Include="TACAnnuxpage1.rdlc" />
   </ItemGroup>

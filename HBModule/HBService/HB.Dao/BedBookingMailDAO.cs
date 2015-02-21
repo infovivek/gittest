@@ -673,7 +673,7 @@ namespace HB.Dao
                             " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p>Check-In Date / Expected Time</p></th>" +
                             " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p>Check-Out Date</p></th>" +
                             " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p>Room No</p></th>" +
-                            " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p>Tariff / Bed / Day</p></th>" +
+                            /*" <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p>Tariff / Bed / Day</p></th>" +*/
                             " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p>Payment Mode<br>for Tariff</p></th>" +
                             " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #ccc; width:96px;\"><p>Payment Mode<br>for Service</p></th>" +
                             " </tr>";
@@ -685,7 +685,7 @@ namespace HB.Dao
                             " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][1].ToString() + "</p></td>" +
                             " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][2].ToString() + "</p></td>" +
                             " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][6].ToString() + "</p></td>" +
-                            " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p style=\"text-align:center;\">INR " + ds.Tables[0].Rows[i][3].ToString() + "/-</p></td>" +
+                            /*" <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p style=\"text-align:center;\">INR " + ds.Tables[0].Rows[i][3].ToString() + "/-</p></td>" +*/
                             " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666; width:96px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][4].ToString() + "</p></td>" +
                             " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #ccc; width:96px;\"><p style=\"text-align:center;\">" + ds.Tables[0].Rows[i][5].ToString() + "</p></td></tr>";
                         }

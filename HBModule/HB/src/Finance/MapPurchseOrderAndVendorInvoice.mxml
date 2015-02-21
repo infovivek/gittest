@@ -230,11 +230,14 @@
 					ErrorFlag=false;
 				}
 				if(ErrorFlag==true)
-				{	if(dd_Type.selectedIndex==0)	
-					useWeb("MapPOAndVendor","POSerch_CUSTOM", [GlobalXml,"POSerch",PropertyId,DT_From.text,DT_To.text,"ExP",0]);
-				else
-					useWeb("MapPOAndVendor","POSerch_CUSTOM", [GlobalXml,"MMTPOSerch",0,DT_From.text,DT_To.text,PropertyId,0]);
+				{	
+					if(dd_Type.selectedIndex==0)	
 					
+						useWeb("MapPOAndVendor","POSerch_CUSTOM", [GlobalXml,"POSerch",PropertyId,DT_From.text,DT_To.text,"ExP",0]);
+				    else if(dd_Type.selectedIndex==1)	
+					 	useWeb("MapPOAndVendor","POSerch_CUSTOM", [GlobalXml,"MMTPOSerch",0,DT_From.text,DT_To.text,PropertyId,0]);
+//					else	if(dd_Type.selectedIndex==2)	
+//						useWeb("MapPOAndVendor","POSerch_CUSTOM", [GlobalXml,"POSerch",PropertyId,DT_From.text,DT_To.text,"CPP",0]);
 				}
 			}
 			public function Change(LabelName:String):void
@@ -578,8 +581,10 @@
 			{
 				if(dd_Type.selectedIndex==0)
 					useWeb("MapPOAndVendor","Property_CUSTOM", [GlobalXml, "Property",0, "","","",0]);
-				else
+				else if(dd_Type.selectedIndex==1)
 					useWeb("MapPOAndVendor","Property_CUSTOM", [GlobalXml, "MMTProperty",0, "","","",0]);
+//				else if(dd_Type.selectedIndex==2)
+//				useWeb("MapPOAndVendor","Property_CUSTOM", [GlobalXml, "Property",0, "","","",0]);
 			}
 			
 		]]>
@@ -604,7 +609,8 @@
 				<s:DropDownList x="45" y="8" id="dd_Type" selectedItem="External" change="help()">
 					<mx:ArrayCollection>
 						<fx:String>External</fx:String>
-						<fx:String>MMT</fx:String>					
+						<fx:String>MMT</fx:String>
+						<!--fx:String>CPP</fx:String-->	
 					</mx:ArrayCollection>
 				</s:DropDownList>
 			</s:Group>

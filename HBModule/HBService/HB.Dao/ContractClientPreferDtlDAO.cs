@@ -12,6 +12,7 @@ namespace HB.Dao
 {
     public class ContractClientPreferDtlDAO
     {
+        string UserData;
         public DataSet Save(string ContractClientPrefDtls, User user, int ContractClientprefHdrId)
         {
             DataSet ds = new DataSet();
@@ -148,11 +149,19 @@ namespace HB.Dao
                 command = new SqlCommand();
                 if (ctrclpd.Id != 0)
                 {
+                    UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                     "', SctId:" + user.SctId + ", Service:ContractClientpreferDtl_Update" +
+                      ", ProcName:'" + StoredProcedures.ContractClientpreferDtl_Update;
+
                     command.CommandText = StoredProcedures.ContractClientpreferDtl_Update;
                     command.Parameters.Add("@Id", SqlDbType.BigInt).Value = ctrclpd.Id;
                 }
                 else
                 {
+                    UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                    "', SctId:" + user.SctId + ", Service:ContractClientpreferHdr_Update" +
+                    ", ProcName:'" + StoredProcedures.ContractClientpreferDtl_Insert;
+
                     command.CommandText = StoredProcedures.ContractClientpreferDtl_Insert;
                 }
                 command.CommandType = CommandType.StoredProcedure;
@@ -177,7 +186,7 @@ namespace HB.Dao
                 command.Parameters.Add("@PropertyId", SqlDbType.BigInt).Value = ctrclpd.PropertyId;
                 command.Parameters.Add("@RoomId", SqlDbType.BigInt).Value = ctrclpd.RoomId;
                 command.Parameters.Add("@CreatedBy", SqlDbType.BigInt).Value = user.Id;
-                ds = new WrbErpConnection().ExecuteDataSet(command, "");
+                ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
                 }
               if (n == 0)
               {

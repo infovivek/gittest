@@ -59,12 +59,20 @@ namespace HB.Dao
             Cmd = new SqlCommand();
             if (ChkOutCard.Id != 0)
             {
+                UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                "', SctId:" + user.SctId + ", Service:CheckOutPaymentCard_Update" + ", ProcName:'" + StoredProcedures.CheckOutPaymentCard_Update;
+
+
                 Mode = "Update";
                 Cmd.CommandText = StoredProcedures.CheckOutPaymentCard_Update;
                 Cmd.Parameters.Add("@Id", SqlDbType.Int).Value = ChkOutCard.Id;
             }
             else
             {
+                UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+              "', SctId:" + user.SctId + ", Service:CheckOutPaymentCard_Insert" + ", ProcName:'" + StoredProcedures.CheckOutPaymentCard_Insert;
+
+
                 Mode = "Save";
                 Cmd.CommandText = StoredProcedures.CheckOutPaymentCard_Insert;
 
@@ -88,7 +96,7 @@ namespace HB.Dao
             Cmd.Parameters.Add("@ExpiryYear", SqlDbType.Int).Value = ChkOutCard.ExpiryYear;
             Cmd.Parameters.Add("@OutStanding", SqlDbType.NVarChar).Value = ChkOutCard.OutStanding;
             Cmd.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = user.Id;
-            ds = new WrbErpConnection().ExecuteDataSet(Cmd, "");
+            ds = new WrbErpConnection().ExecuteDataSet(Cmd, UserData);
             return ds;
         }
     }

@@ -103,7 +103,8 @@ IF @Action='PageLoad'
 	 'Service Tax Regn. No : AABCH5874RST001' as ServiceTaxNo,'Luxury Tax @ '+CAST(H.LuxuryTaxPer AS NVARCHAR)+'%' LTPer,
 	 'Service Tax @ '+CAST(H.ServiceTaxPer AS NVARCHAR)+'%' STPer,
 	 'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),h.CreatedDate,103) as InVoicedate,
-	 'Rupees : '+dbo.fn_NtoWord(ROUND(h.ChkOutTariffNetAmount,0),'','') AS AmtWords
+	 'Rupees : '+dbo.fn_NtoWord(ROUND(h.ChkOutTariffNetAmount,0),'','') AS AmtWords,
+	  'Extra Matress' ExtraMatr,'Service Charge  @ 2.5% on Tariff' ServChrg,'Service Tax@12.00% on ServiceCharge'ServChrg1
 	   
 	 from WRBHBChechkOutHdr h  
 	 join WRBHBCheckInHdr d on h.ChkInHdrId = d.Id  
@@ -115,6 +116,9 @@ IF @Action='PageLoad'
 	 where h.IsActive = 1 and h.IsDeleted = 0 
 	 and   
 	 h.Id = @Id1  
+	 
+	 
+	 
 END
 END
 

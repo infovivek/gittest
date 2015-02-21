@@ -13,6 +13,7 @@ namespace HB.Dao
 {
    public class ContractManagementDao
     {
+       string UserData;
        public DataSet Save(string data, User user)
        {
            DataSet ds = new DataSet();
@@ -48,11 +49,19 @@ namespace HB.Dao
            ctrmgnt.TransubId = Convert.ToInt32(document.SelectSingleNode("HdrXml").Attributes["TransubId"].Value);
            if (ctrmgnt.Id != 0)
            {
+               UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                   "', SctId:" + user.SctId + ", Service:ContractManagement_Update" +
+                    ", ProcName:'" + StoredProcedures.ContractManagement_Update;
+             
                command.CommandText = StoredProcedures.ContractManagement_Update;
                command.Parameters.Add("@Id", SqlDbType.BigInt).Value =  ctrmgnt.Id;
            }
            else
            {
+               UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                   "', SctId:" + user.SctId + ", Service:ContractManagement_Insert" +
+                    ", ProcName:'" + StoredProcedures.ContractManagement_Insert;
+
                command.CommandText = StoredProcedures.ContractManagement_Insert;
            }
            command.CommandType = CommandType.StoredProcedure;
@@ -78,11 +87,15 @@ namespace HB.Dao
                command.Parameters.Add("@TransubName", SqlDbType.NVarChar).Value = ctrmgnt.TransubName;
                command.Parameters.Add("@TransubId", SqlDbType.BigInt).Value = Convert.ToInt32(ctrmgnt.TransubId);
                command.Parameters.Add("@SalesExecutiveId", SqlDbType.BigInt).Value = Convert.ToInt32(ctrmgnt.SalesExecutiveId);
-           ds = new WrbErpConnection().ExecuteDataSet(command, "");
+               ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
            return ds;
        }
        public DataSet Search(string[] data, User user)
        {
+           UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                   "', SctId:" + user.SctId + ", Service:ContractManagement_Select" +
+                    ", ProcName:'" + StoredProcedures.ContractManagement_Select;
+
            SqlCommand command = new SqlCommand();
            command.CommandText = StoredProcedures.ContractManagement_Select;
            command.CommandType = CommandType.StoredProcedure;
@@ -90,10 +103,14 @@ namespace HB.Dao
            command.Parameters.Add("@Pram1", SqlDbType.BigInt).Value = Convert.ToInt32(data[2].ToString());
            command.Parameters.Add("@Pram2", SqlDbType.VarChar).Value = data[3].ToString();
            command.Parameters.Add("@UserId", SqlDbType.BigInt).Value = user.Id;
-           return new WrbErpConnection().ExecuteDataSet(command, "");
+           return new WrbErpConnection().ExecuteDataSet(command, UserData);
        }
        public DataSet Delete(string[] data, User user)
        {
+           UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                   "', SctId:" + user.SctId + ", Service:ContractManagement_Delete" +
+                    ", ProcName:'" + StoredProcedures.ContractManagement_Delete;
+
            SqlCommand command = new SqlCommand();
            command.CommandText = StoredProcedures.ContractManagement_Delete;
            command.CommandType = CommandType.StoredProcedure;
@@ -101,10 +118,14 @@ namespace HB.Dao
            command.Parameters.Add("@Pram1", SqlDbType.VarChar).Value = data[2].ToString();
            command.Parameters.Add("@DeleteId", SqlDbType.BigInt).Value = Convert.ToInt32(data[3].ToString());
            command.Parameters.Add("@UserId", SqlDbType.BigInt).Value = user.Id;
-           return new WrbErpConnection().ExecuteDataSet(command, "");
+           return new WrbErpConnection().ExecuteDataSet(command, UserData);
        }
        public DataSet Help(string[] data, User user)
        {
+           UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                   "', SctId:" + user.SctId + ", Service:ContractManagement_Help" +
+                    ", ProcName:'" + StoredProcedures.ContractManagement_Help;
+
            SqlCommand command = new SqlCommand();
            command.CommandText = StoredProcedures.ContractManagement_Help;
            command.CommandType = CommandType.StoredProcedure;
@@ -113,7 +134,7 @@ namespace HB.Dao
            //command.Parameters.Add("@Pram1", SqlDbType.BigInt).Value = Convert.ToInt32(data[3].ToString());
            command.Parameters.Add("@Pram2", SqlDbType.NVarChar).Value = data[3].ToString(); 
            command.Parameters.Add("@UserId", SqlDbType.BigInt).Value = user.Id;
-           return new WrbErpConnection().ExecuteDataSet(command, "");
+           return new WrbErpConnection().ExecuteDataSet(command, UserData);
        }
     }
 }

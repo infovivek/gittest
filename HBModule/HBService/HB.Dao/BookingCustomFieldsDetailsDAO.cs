@@ -12,8 +12,13 @@ namespace HB.Dao
 {
     public class BookingCustomFieldsDetailsDAO
     {
+        string UserData = "";
         public DataSet Save(string CustomFieldsDetails, User user, int BookingId)
         {
+            UserData = "UserId : " + user.Id + ", UsreName : " + user.LoginUserName + ", ScreenName : " + user.ScreenName +
+                      ", SctId : " + user.SctId + ", Service : BookingCustomFieldsDetailsDAO" +
+                      ", ProcName: BookingCustomFieldsDetails_Insert";
+
             DataSet ds = new DataSet();
             DataTable dTable = new DataTable("ERRORTBL");
             dTable.Columns.Add("Exception");

@@ -128,26 +128,10 @@
 					}
 					if(Rdb_Shift.selected == true)
 					{
-						//Dt_ChkOutDt.styleName="DisabledDateField";
-						//Dt_ChkOutDt.enabled = false;
 						Dt_ChkInDt.styleName = "";
 						Dt_ChkInDt.enabled = true;
-						/*if(Txt_Status.text == "CheckIn")
-						{
-							Dt_ChkOutDt.styleName="DisabledDateField";
-							Dt_ChkOutDt.enabled = false;
-							//
-							Dt_ChkInDt.styleName = "";
-							Dt_ChkInDt.enabled = true;
-						}
-						if(Txt_Status.text == "Booked")
-						{
-							Dt_ChkOutDt.styleName = "";
-							Dt_ChkOutDt.enabled = true;
-							//
-							Dt_ChkInDt.styleName = "";
-							Dt_ChkInDt.enabled = true;
-						}*/
+						Dt_ChkOutDt.styleName = "";
+						Dt_ChkOutDt.enabled = true;
 					}
 					if(Rdb_Stay.selected == true)
 					{
@@ -166,6 +150,13 @@
 							//
 							Dt_ChkOutDt.styleName = "";
 							Dt_ChkOutDt.enabled = true;
+						}
+						if(Txt_Status.text == "UnSettled")
+						{
+							Dt_ChkInDt.styleName="DisabledDateField";
+							Dt_ChkInDt.enabled = false;
+							Dt_ChkOutDt.styleName = "DisabledDateField";
+							Dt_ChkOutDt.enabled = false;
 						}
 					}					
 				}
@@ -532,46 +523,68 @@
 				}
 				if(Rdb_Stay.selected == true)
 				{
-					if((PropertyType == "InP") ||(PropertyType == "MGH")||(PropertyType == "DdP"))
+					if(Txt_Status.text == "UnSettled")
 					{
-						Dt1 = Dt_ChkOutDtExists.text;
-						Dt2 = Dt_ChkOutDt.text;
-						if((Dt1 != Dt2) || (TariffPM != OldTariffPM) || (ServicePM != OldServicePM) ||
-						(Dt_ChkInDt.text != Dt_ChkInDtExists.text))
-						//if((Dt1 != Dt2) || (TariffPM != OldTariffPM) || (ServicePM != OldServicePM))
+						if((TariffPM != OldTariffPM) || (ServicePM != OldServicePM))
 						{
-							var FDt:String = Dt_ChkInDt.text;					
-							var FY:String = FDt.substr(6,10);
-							var FM:String = FDt.substr(3,2);
-							var FD:String = FDt.substr(0,2);
-							var ChkInDt:String = FY+'-'+FM+'-'+FD+' '+'12:00:00 PM';
-							var TDt:String = Dt_ChkOutDt.text;
-							var TY:String = TDt.substr(6,10);
-							var TM:String = TDt.substr(3,2);
-							var TD:String = TDt.substr(0,2);
-							var ChkOutDt:String = TY+'-'+TM+'-'+TD+' '+'11:59:00 AM';
-							useWeb("RoomShifting","AvaliableFromRooms_CUSTOM",[GlobalXml,'AvaliableFromRoom',
-								'',BookingLevel,ChkInDt,ChkOutDt,BookingId,FromRoomId,RoomCaptured,0]);
+							Type = "Stay";						
+							var Ac_Hder1:ArrayCollection=new ArrayCollection
+								([{BookingId:BookingId,FromRoomId:FromRoomId,ChkInDt:Dt_ChkInDt.text,
+									ChkOutDt:Dt_ChkOutDt.text,ToRoomId:FromRoomId,ToRoomNo:Txt_FromRoom.text,
+									BookingLevel:BookingLevel,Id:Id,RoomCaptured:RoomCaptured,
+									CurrentStatus:CurrentStatus,TariffMode:TariffPM,ServiceMode:ServicePM,
+									Mail:MailSts,Type:Type}]);
+							var HderXml1:String = ObjToXmlStr_Comm(Ac_Hder1,"HdrXml");				
+							useWeb("RoomShifting","Save_CUSTOM",[GlobalXml,HderXml1]);
 						}
 						else
 						{
-							alignAlert(Alert.show("*  Invalid Process.\n","Alert Message !",
+							alignAlert(Alert.show("*  There is no change in Payment Mode.","Alert Message !",
 								Alert.OK,null,null,iconWarning,Alert.OK),10,"");
-							return;
+						}							
+					}
+					else
+					{
+						if((PropertyType == "InP") ||(PropertyType == "MGH")||(PropertyType == "DdP"))
+						{
+							Dt1 = Dt_ChkOutDtExists.text;
+							Dt2 = Dt_ChkOutDt.text;
+							if((Dt1 != Dt2) || (TariffPM != OldTariffPM) || (ServicePM != OldServicePM) ||
+								(Dt_ChkInDt.text != Dt_ChkInDtExists.text))
+							{
+								var FDt:String = Dt_ChkInDt.text;					
+								var FY:String = FDt.substr(6,10);
+								var FM:String = FDt.substr(3,2);
+								var FD:String = FDt.substr(0,2);
+								var ChkInDt:String = FY+'-'+FM+'-'+FD+' '+'12:00:00 PM';
+								var TDt:String = Dt_ChkOutDt.text;
+								var TY:String = TDt.substr(6,10);
+								var TM:String = TDt.substr(3,2);
+								var TD:String = TDt.substr(0,2);
+								var ChkOutDt:String = TY+'-'+TM+'-'+TD+' '+'11:59:00 AM';
+								useWeb("RoomShifting","AvaliableFromRooms_CUSTOM",[GlobalXml,'AvaliableFromRoom',
+									'',BookingLevel,ChkInDt,ChkOutDt,BookingId,FromRoomId,RoomCaptured,0]);
+							}
+							else
+							{
+								alignAlert(Alert.show("*  Invalid Process.\n","Alert Message !",
+									Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+								return;
+							}
+						}
+						if((PropertyType == "ExP") || (PropertyType == "CPP"))
+						{
+							Type = "Stay";						
+							var Ac_Hder:ArrayCollection=new ArrayCollection
+								([{BookingId:BookingId,FromRoomId:FromRoomId,ChkInDt:Dt_ChkInDt.text,
+									ChkOutDt:Dt_ChkOutDt.text,ToRoomId:FromRoomId,ToRoomNo:Txt_FromRoom.text,
+									BookingLevel:BookingLevel,Id:Id,RoomCaptured:RoomCaptured,
+									CurrentStatus:CurrentStatus,TariffMode:TariffPM,ServiceMode:ServicePM,
+									Mail:MailSts,Type:Type}]);
+							var HderXml:String = ObjToXmlStr_Comm(Ac_Hder,"HdrXml");				
+							useWeb("RoomShifting","Save_CUSTOM",[GlobalXml,HderXml]);
 						}
 					}
-					if((PropertyType == "ExP") || (PropertyType == "CPP"))
-					{
-						Type = "Stay";						
-						var Ac_Hder:ArrayCollection=new ArrayCollection
-							([{BookingId:BookingId,FromRoomId:FromRoomId,ChkInDt:Dt_ChkInDt.text,
-								ChkOutDt:Dt_ChkOutDt.text,ToRoomId:FromRoomId,ToRoomNo:Txt_FromRoom.text,
-								BookingLevel:BookingLevel,Id:Id,RoomCaptured:RoomCaptured,
-								CurrentStatus:CurrentStatus,TariffMode:TariffPM,ServiceMode:ServicePM,
-								Mail:MailSts,Type:Type}]);
-						var HderXml:String = ObjToXmlStr_Comm(Ac_Hder,"HdrXml");				
-						useWeb("RoomShifting","Save_CUSTOM",[GlobalXml,HderXml]);
-					}				
 				}							
 			}
 			

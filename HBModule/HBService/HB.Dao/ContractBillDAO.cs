@@ -180,7 +180,7 @@ namespace HB.Dao
         public DataSet Help(string[] data, User user)
         {
             UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
-               "', SctId:" + user.SctId + ", Service:PettyCashDAO Help" + ", ProcName:'" + StoredProcedures.PettyCash_Help;
+               "', SctId:" + user.SctId + ", Service:ContractBill_Help Help" + ", ProcName:'" + StoredProcedures.ContractBill_Help;
 
             SqlCommand command = new SqlCommand();
             command.CommandText = StoredProcedures.ContractBill_Help;

@@ -54,7 +54,7 @@
 			public var LT:Number=0,ST:Number=0;
 			public var Direct1:String="",TypeService:String="",TypeServiceId:String="";
 			public var BTC1:String="";
-			public var new_TariffPaymentMode:String=""; 
+			public var new_TariffPaymentMode:String="",BTCFileUploaded:String=""; 
 			private var fileRef:FileReference = new FileReference();
 			private var fileTypes:Array = new Array();
 			private var imageTypes:FileFilter = new FileFilter("Images ( *.jpg; *.jpeg; *.gif; *.png; *.eml)" ,"*.jpg; *.jpeg; *.gif; *.png; *.eml");
@@ -353,6 +353,8 @@
 							chk_ServiceCharge.selected=false;
 							
 						}
+						BTCFileUploaded=Ds_Objects.result.Tables.Table3.Rows[0].BTCFile;
+						
 						txt_TariffPaymentMode.text=Ds_Objects.result.Tables.Table3.Rows[0].TariffPaymentMode;
 						var RB:String=Ds_Objects.result.Tables.Table3.Rows[0].TariffPaymentMode;
 						//		var RB:String = "true";
@@ -391,6 +393,7 @@
 								Cheque2.enabled=false;
 								NEFT2.enabled=false;
 								CompanyInvoice2.enabled=true;
+								
 							}
 							else if(RB=="Bill to Client")
 							{
@@ -528,6 +531,35 @@
 							chk_ServiceCharge.enabled=true;
 							chk_ServiceCharge.selected=false;
 						}
+						BTCFileUploaded=Ds_Objects.result.Tables.Table3.Rows[0].BTCFile;
+//						FilePath.text=Ds_Objects.result.Tables.Table3.Rows[0].BTCFile;
+//						FilePath2.text=Ds_Objects.result.Tables.Table3.Rows[0].BTCFile;
+						
+						if(lbl_Nettariff.text != "0")
+						{
+							if(BTCFileUploaded != "")
+							{
+								FileUpload1.visible=false;
+							}
+							else
+							{
+								FileUpload1.visible=true;
+								
+							}
+						}
+						if(lbl_Nettariff.text != "0")
+						{
+							if(BTCFileUploaded != "")
+							{
+								FileUpload2.visible=false;
+							}
+							else
+							{
+								FileUpload2.visible=true;
+								
+							}
+						}
+						
 						txt_TariffPaymentMode.text=Ds_Objects.result.Tables.Table3.Rows[0].TariffPaymentMode;
 						var RB:String=Ds_Objects.result.Tables.Table3.Rows[0].TariffPaymentMode;
 						//		var RB:String = "true";
@@ -561,11 +593,13 @@
 								Cheque.enabled=false;
 								NEFT.enabled=false;
 								CompanyInvoice.enabled=true;
+								
 								Cash2.enabled=false;
 								CreditCard2.enabled=false;
 								Cheque2.enabled=false;
 								NEFT2.enabled=false;
 								CompanyInvoice2.enabled=true;
+								
 							}
 							else if(RB=="Bill to Client")
 							{
@@ -2255,7 +2289,7 @@
 							}
 							
 							var Final_ServiceBillAmt:Number=Number(Food_ServiceBillAmt.replace(",",""))+Number(Laundry_ServiceBillAmt.replace(",",""));
-							var Final_ServiceVat:Number=Number(Food_ServiceVat.replace(",",""))+Number(Laundry_ServiceVat.replace(",",""));
+							var Final_ServiceVat:Number=Number(Food_ServiceVat.replace(",",""))+Number(0);
 							var Final_SerivceTax:Number=Number(Food_SerivceTax.replace(",",""))
 							var Final_ServiceEcess:Number=Number(Food_ServiceEcess.replace(",",""))+Number(Laundry_ServiceEcess.replace(",",""));
 							var Final_serviceHECess:Number=Number(Food_serviceHECess.replace(",",""))+Number(Laundry_serviceHECess.replace(",",""));
@@ -2784,7 +2818,7 @@
 			//		var Final_Miscellaneous:Number=Number(Misc.replace(",",""))
 						
 					var Final_ServiceBillAmt:Number=Number(Food_ServiceBillAmt.replace(",",""))+Number(Laundry_ServiceBillAmt.replace(",",""));
-					var Final_ServiceVat:Number=Number(Food_ServiceVat.replace(",",""))+Number(Laundry_ServiceVat.replace(",",""));
+					var Final_ServiceVat:Number=Number(Food_ServiceVat.replace(",",""))+Number(0);
 					var Final_SerivceTax:Number=Number(Food_SerivceTax.replace(",",""))
 					var Final_ServiceEcess:Number=Number(Food_ServiceEcess.replace(",",""))+Number(Laundry_ServiceEcess.replace(",",""));
 					var Final_serviceHECess:Number=Number(Food_serviceHECess.replace(",",""))+Number(Laundry_serviceHECess.replace(",",""));
@@ -4292,6 +4326,10 @@
 				txt_TariffPaymentMode.text="";
 				txt_BookingType.text="";
 				
+				TariffPayClr();
+				ServicePayClr();
+				ConsolidatePayClr();
+				
 			}
 			protected function AllClear():void
 			{
@@ -4558,7 +4596,7 @@
 				var Misc:String=NF_Two.format(txt_MiscellaneousAmount.text);
 				
 				Txt_ServiceBillAmt.text=String(Number(Food_ServiceBillAmt)+Number(Laundry_ServiceBillAmt));
-				Txt_ServiceVat.text=String(Number(Food_ServiceVat)+Number(Laundry_ServiceVat));
+				Txt_ServiceVat.text=String(Number(Food_ServiceVat)+Number(0));
 				Txt_SerivceTax.text=String(Number(Food_SerivceTax)+Number(Laundry_SerivceTax));
 				Txt_ServiceEcess.text=String(Number(Food_ServiceEcess)+Number(Laundry_ServiceEcess));
 				Txt_serviceHECess.text=String(Number(Food_serviceHECess)+Number(Laundry_serviceHECess));
@@ -5144,6 +5182,18 @@
 						F7="CompanyInvoice";
 						var ErrStr:String="";var Flag:Boolean=true;
 						
+//						if(BTCFileUploaded != "")
+//						{
+//							FileUpload1.visible=false;
+//							ErrStr=ErrStr+"*  Company Invoice is Required.\n";
+//						}
+//						else
+//						{
+//							FileUpload1.visible=true;
+//							ErrStr=ErrStr+"*  Company Invoice is Required.\n";
+//						}
+						
+						
 						
 						
 						if(ErrStr!="")
@@ -5530,6 +5580,19 @@
 					{
 						F7="CompanyInvoice";
 						var ErrStr:String="";var Flag:Boolean=true;
+						
+//						if(FilePath.text == "")
+//						{
+//							if(Flag==true)
+//							{
+//								FileUpload1.setFocus();Flag=false;
+//							}
+//							ErrStr=ErrStr+"*  Company Invoice is Required.\n";
+//						}
+//						else
+//						{
+//							FilePath.text = "";
+//						}
 						
 						
 						
@@ -6914,28 +6977,19 @@
 					{
 						F7="CompanyInvoice";
 						var ErrStr:String="";var Flag:Boolean=true;
-						//					if(Txt_ConsolidatePayment.text=="")
-						//					{
-						//						if(Flag==true)
-						//						{
-						//							Txt_ConsolidatePayment.setFocus();Flag=false;
-						//						}
-						//						ErrStr=ErrStr+"*  Amount is Required.\n";					
-						//					}
-						//					if(ErrStr!="")
-						//					{
-						//						alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
-						//						return;					
-						//					}
-						//					
-						//					if(Txt_ConCmpnyAppru.text=="")
-						//					{
-						//						if(Flag==true)
-						//						{
-						//							Txt_ConCmpnyAppru.setFocus();Flag=false;
-						//						}
-						//						ErrStr=ErrStr+"*  Approver is Required.\n";					
-						//					}
+						
+//						if(FilePath.text == "")
+//						{
+//							if(Flag==true)
+//							{
+//								FileUpload1.setFocus();Flag=false;
+//							}
+//							ErrStr=ErrStr+"*  Company Invoice is Required.\n";
+//						}
+//						else
+//						{
+//							FilePath.text = "";
+//						}
 						
 						if(ErrStr!="")
 						{
@@ -7070,7 +7124,7 @@
 				bdr_TariffCash1.visible=false;
 				bdr_TariffCompinvoice1.visible=false;
 				bdr_TariffNEFT1.visible=false;
-				//			
+						
 			}
 			
 			protected function TariffCompanyInvoice_clickHandler(event:MouseEvent):void
@@ -7086,7 +7140,17 @@
 				bdr_PaymentCredit.visible=false;
 				bdr_TariffCash1.visible=false;
 				bdr_TariffNEFT1.visible=false;
-				//				
+				if(BTCFileUploaded != "")
+				{
+					FileUpload1.visible=false;
+					alignAlert(Alert.show("Company Invoice is already submitted","Message !",Alert.OK,
+						null, FnOk,	iconTickLarge, Alert.OK),10,"");
+					
+				}
+				else
+				{
+					FileUpload1.visible=true;
+				}
 			}
 			
 			protected function TariffNEFT_clickHandler(event:MouseEvent):void
@@ -7261,7 +7325,17 @@
 				bdr_ConPaymentCredit.visible=false;
 				ConsolidateCash1.visible=false;
 				bdr_ConsolidateNEFT1.visible=false;
-				//				
+				if(BTCFileUploaded != "")
+				{
+					FileUpload2.visible=false;
+					alignAlert(Alert.show("Company Invoice is already submitted","Message !",Alert.OK,
+						null, FnOk,	iconTickLarge, Alert.OK),10,"");
+					
+				}
+				else
+				{
+					FileUpload2.visible=true;
+				}				
 			}
 			
 			protected function ConNEFT2_clickHandler(event:MouseEvent):void
@@ -7372,6 +7446,7 @@
 			{
 				// TODO Auto-generated method stub
 				CheckOutHdrId=0;
+	//			PrintChkOutId=0;
 				Txt_Cashreceive.text="";
 				DT_TariffCashDate.text="";				
 				ddl_CashReceivedby.selectedItem="";
@@ -7401,6 +7476,7 @@
 				Txt_PaymentAmountSwip.text="";
 				if(Direct.selected==true)
 				{
+		//			PrintChkOutId=0;
 					CheckOutHdrId=0;
 					Cash.selected="";
 					CreditCard.selected="";
@@ -7421,6 +7497,7 @@
 				}
 				else
 				{
+		//			PrintChkOutId=0;
 					CheckOutHdrId=0;
 					Cash.selected="";
 					CreditCard.selected="";
@@ -7455,6 +7532,7 @@
 			{
 				// TODO Auto-generated method stub
 				CheckOutHdrId=0;
+	//			PrintChkOutId=0;
 				Txt_ServiPayCash.text="";
 				ddl_ServiPayCashRecBy.selectedItem="";
 				Txt_ServicePaymentCardDtl.text="";
@@ -7538,6 +7616,7 @@
 			{
 				// TODO Auto-generated method stub
 				CheckOutHdrId=0;
+	//			PrintChkOutId=0;
 				Txt_ConsoPayCash.text="";
 				DT_ConPayCashDate.text="";
 				ddl_ConsoPayCashRecBy.selectedItem="";
@@ -7564,7 +7643,7 @@
 				Txt_ConNEFTDateMonth.text="";
 				Txt_ConNEFTDateYear.text="";
 				Txt_ConNEFTBankName.text="";
-				Txt_ConsolidateLoad.text="";
+		//		Txt_ConsolidateLoad.text="";
 				
 				
 				Cash2.selected="";
@@ -7588,6 +7667,7 @@
 				if(Direct.selected==true)
 				{
 					CheckOutHdrId=0;
+	//				PrintChkOutId=0;
 					Cash2.selected="";
 					CreditCard2.selected="";
 					CompanyInvoice2.selected="";
@@ -7609,6 +7689,7 @@
 				else
 				{
 					CheckOutHdrId=0;
+	//				PrintChkOutId=0;
 					Cash2.selected="";
 					CreditCard2.selected="";
 					CompanyInvoice2.selected="";
@@ -7676,13 +7757,18 @@
 					var OutStanding:String="";
 					BillType=Grid_Settle.selectedItem.BillType;
 					OutStanding=Grid_Settle.selectedItem.OutStanding;
+					Amount=Grid_Settle.selectedItem.OutStanding;
 					if(BillType == "Tariff")
 					{
 						ExternalInterface.call("changeDocumentTitle",Str_ChkOut+PrintChkOutId);
 					}
 					if(BillType == "Service")
 					{
-						ExternalInterface.call("changeDocumentTitle",Str_Serv+PrintChkOutId);
+						if(Amount != 0)
+						{
+							ExternalInterface.call("changeDocumentTitle",Str_Serv+PrintChkOutId);
+						}
+						
 					}
 					if(BillType == "Consolidate")
 					{
@@ -7714,7 +7800,11 @@
 					}
 					if(BillType == "Service")
 					{
-						ExternalInterface.call("changeDocumentTitle",Str_Serv+PrintChkOutId);
+						if(Amount != 0)
+						{
+							ExternalInterface.call("changeDocumentTitle",Str_Serv+PrintChkOutId);
+						}
+						
 			//			ExternalInterface.call("changeDocumentTitle",Str_InChkSer+PrintChkOutId);
 //						if(OutStanding == "0")
 //						{
@@ -8622,7 +8712,7 @@
 						<mx:Label id="lbl_ConPaid" x="161" y="136" width="86" text=""/>
 						<mx:Label x="251" y="136" width="84" text="" id="lbl_ConPaymode"/>
 					</s:BorderContainer>
-					<WrbComp:SaveControl x="325" y="430" id="btn_Sctrl1" docRefresh="btn_Sctrl1_docRefreshHandler()">
+					<WrbComp:SaveControl x="279" y="430" id="btn_Sctrl1" docRefresh="btn_Sctrl1_docRefreshHandler()">
 					</WrbComp:SaveControl>
 				</s:BorderContainer>
 				<mx:Label x="5" y="74" text="Property"/>
@@ -8751,7 +8841,7 @@
 						<mx:Label id="lbl_TariffCmpPhone" visible="true" x="56" y="175" width="156"
 								  text="Phone No                               :"/>
 						
-						<mx:Panel x="59" y="10" height="70" title="File Uploader">
+						<mx:Panel x="59" y="10" height="70" title="File Uploader" id="FileUpload1" visible="false">
 							<mx:ControlBar>
 								<mx:Spacer width="80%"/>
 								<mx:HBox>
@@ -9065,7 +9155,7 @@
 						<s:Label x="205" y="54" text="*" styleName="ReqLable" color="red"/>
 					</s:BorderContainer>
 					<s:BorderContainer x="80" y="198" width="460" height="210" id="bdr_ConsolidateCmpnyInvoice1" visible="false" depth="2000">
-						<mx:Panel x="59" y="10" height="70" title="File Uploader">
+						<mx:Panel x="59" y="10" height="70" title="File Uploader" id="FileUpload2" visible="false">
 							<mx:ControlBar>
 								<mx:Spacer width="80%"/>
 								<mx:HBox>

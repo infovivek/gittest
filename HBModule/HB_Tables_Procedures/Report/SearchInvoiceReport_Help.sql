@@ -34,11 +34,10 @@ CREATE PROCEDURE [dbo].[Sp_SearchInvoiceReport_Help]
 )
 AS
 BEGIN
+DECLARE @Cnt INT;
 IF @Action ='Pageload'
-   BEGIN 
-   
-   
-    --   drop table  #TempInvoiceBillTotalAmount; 
+BEGIN 
+    --drop table  #TempInvoiceBillTotalAmount; 
     --drop table #TempInvoiceBill;
     --drop table #TempInvoiceBillTariffAmount;
     --drop table #TempBillFinal;
@@ -52,7 +51,7 @@ IF @Action ='Pageload'
 	NoOfDays NVARCHAR(100),PaymentDate NVARCHAR(100),Hcess DECIMAL(27,2),Cess DECIMAL(27,2),Discount DECIMAL(27,2),
 	PrintInvoice bigint,Statuss nvarchar(100))
 	
-	CREATE TABLE #TempInvoiceBillTotalAmount1(CheckOutId BIGINT,TotalAmount DECIMAL(27,2),
+    CREATE TABLE #TempInvoiceBillTotalAmount1(CheckOutId BIGINT,TotalAmount DECIMAL(27,2),
 	ChkInHdrId BIGINT,BillType nvarchar(100),BillAmount DECIMAL(27,2))
 		
 	CREATE TABLE #TempInvoiceBillTariffAmount1(CheckOutId BIGINT,TariffAmount DECIMAL(27,2),
@@ -72,8 +71,8 @@ IF @Action ='Pageload'
 	Hcess DECIMAL(27,8),Cess DECIMAL(27,2),Discount DECIMAL(27,2),BillType nvarchar(100),BillAmount DECIMAL(27,2),
 	BillId bigint,PrintInvoice bigint, statuss  NVARCHAR(100))
 	
-	if(@FromDt!='')and(@ToDt!='')
-	Begin
+IF(@FromDt!='')and(@ToDt!='')
+BEGIN
 	        INSERT INTO #TempInvoiceBill1(CreatedDate,ModifiedDate,BookingCode,InVoiceNo,PropertyName,ClientName,
 			MasterClientName,GuestName,CheckOutId,SerivceTax7,Servicetax12,ServiceCharge,CheckInDate,CheckOutDate,
 			BillStartDate,BillEndDate,Location,LuxuryTax,ExtraAmount,PropertyId,Cess,Hcess,PrintInvoice,Statuss )
@@ -115,10 +114,10 @@ IF @Action ='Pageload'
 			and CONVERT(DATE,h.CheckOutDate,103) BETWEEN CONVERT(DATE,@FromDt,103)
 			AND CONVERT(DATE,@ToDt,103)
 			
-	End
-	else
-	Begin
-	      INSERT INTO #TempInvoiceBill1(CreatedDate,ModifiedDate,BookingCode,InVoiceNo,PropertyName,ClientName,
+END
+ELSE
+BEGIN
+	       INSERT INTO #TempInvoiceBill1(CreatedDate,ModifiedDate,BookingCode,InVoiceNo,PropertyName,ClientName,
 			MasterClientName,GuestName,CheckOutId,SerivceTax7,Servicetax12,ServiceCharge,CheckInDate,CheckOutDate,
 			BillStartDate,BillEndDate,Location,LuxuryTax,ExtraAmount,PropertyId,Cess,Hcess,PrintInvoice,Statuss )
 			
@@ -155,9 +154,10 @@ IF @Action ='Pageload'
 			JOIN WRBHBClientManagement C WITH(NOLOCK) ON B.ClientId=C.Id AND C.IsActive=1 AND C.IsDeleted=0
 			--JOIN WRBHBMasterClientManagement MC WITH(NOLOCK) ON C.MasterClientId=MC.Id AND MC.IsActive=1 AND MC.IsDeleted=0
 			WHERE H.IsActive=1 AND H.IsDeleted=0  and H.PropertyType='MMT'
-	End		
+END		
+		
 			
-			
+    			
     INSERT INTO #TempInvoiceBillTotalAmount1(TotalAmount,CheckOutId,ChkInHdrId,BillType,BillAmount)
 	SELECT SUM(CSD.BillAmount),H.Id,H.ChkInHdrId ,CSD.BillType,Csd.BillAmount
 	FROM WRBHBChechkOutHdr H
@@ -204,7 +204,7 @@ IF @Action ='Pageload'
 		--LEFT OUTER JOIN #TempInvoiceBillBroadband D2 ON H.CheckOutId =D2.CheckOutId 
 		--LEFT OUTER JOIN #TempInvoiceBillFOODANDBeverages D3 ON H.CheckOutId =D3.CheckOutId 
 		--LEFT OUTER JOIN #TempInvoiceBillLaundry D4 ON H.CheckOutId =D4.CheckOutId 
-	--	where   InVoiceNo like '%HBE%'
+	 	where  BookingCode!=''
 		GROUP BY CreatedDate, ModifiedDate,BookingCode,InVoiceNo,PropertyName,ClientName,
 		MasterClientName, GuestName,SerivceTax7,Servicetax12,ServiceCharge,CheckInDate,
 		CheckOutDate,BillStartDate,BillEndDate,Location,LuxuryTax,TotalAmount,
@@ -214,9 +214,11 @@ IF @Action ='Pageload'
 		
 		DECLARE @Count INT;
 		SELECT @Count=COUNT(* ) FROM #TempBillFinal1 
-		--Select * from #TempBillFinal1 where InVoiceNo='EXT/7033'
+		-- Select * from #TempBillFinal1 where InVoiceNo='EXT/7027'
 		if(@Str1='')
 		begin
+		Update #TempBillFinal1 Set TariffAmount=BillAmount
+			where BillType='Service'
 		SELECT BookingCode,InVoiceNo InvoiceNumber,p.PropertyName+'-'+Location Property,ClientName ClientName, 
 		GuestName GuestName,CheckInDate CheckInDate,CheckOutDate CheckOutDate,Location,
 		TotalAmount,TariffAmount Amount,BillAmount Amounts,BillType BillType,BillId ChkoutId,
@@ -259,9 +261,9 @@ IF @Action ='Pageload'
 	 0 TotalAmount,ChkOutTariffTotal Amount,ChkOutTariffNetAmount Amounts,'Tariff' BillType,f.Id ChkoutId,
 	0 as selectRadio ,f.Status Status,'External Property' as PropertyCat
 	FROM WRBHBChechkOutHdr f
-	join WRBHBProperty p on f.PropertyId=p.Id and p.IsActive=1 and p.IsDeleted=0 and  p.Category=@Str1
+	join WRBHBProperty p on f.PropertyId=p.Id and p.IsActive=1 and p.IsDeleted=0 and  p.Category=@Str1--'External Property'
 	JOIN WRBHBCity CC WITH(NOLOCK) ON CC.Id=P.CityId and cc.IsActive=1  
-	where    InVoiceNo!='0' and  InVoiceNo!=''
+	where    InVoiceNo!='0' and  InVoiceNo!=''-- and  f.Id=2759
 	ORDER BY   f.Id desc 
 
 	INsert into #ExtData( BookingCode,InvoiceNumber,Property,ClientName,GuestName,CheckInDate,CheckOutDate,Location,
@@ -277,6 +279,19 @@ IF @Action ='Pageload'
 	JOIN WRBHBCity CC WITH(NOLOCK) ON CC.Id=f.CityId and cc.IsActive=1  
 	where    InVoiceNo!='0' and  InVoiceNo!=''
 	ORDER BY   f.Id desc 
+	
+    INsert into #ExtData( BookingCode,InvoiceNumber,Property,ClientName,GuestName,CheckInDate,CheckOutDate,Location,
+	TotalAmount,Amount,Amounts,BillType,ChkoutId,
+	selectRadio ,Status, PropertyCat)
+Select '0'BookingCode,InVoiceNo InvoiceNumber,p.PropertyName+'-'+cc.CityName Property,ClientName ClientName, 
+GuestName GuestName,CheckInDate CheckInDate,CheckOutDate CheckOutDate,''Location,
+0 TotalAmount,h.ChkOutServiceAmtl Amount,H.ChkOutServiceNetAmount Amounts,'Service' BillType,HH.Id ChkoutId,
+0 as selectRadio ,Hh.Status Status,'External Property' as PropertyCat
+from  WRBHBChechkOutHdr HH
+join WRBHBCheckOutServiceHdr H on hh.Id=h.CheckOutHdrId
+join WRBHBProperty p on Hh.PropertyId=p.Id and p.IsActive=1 and p.IsDeleted=0 and  p.Category= @Str1
+JOIN WRBHBCity CC WITH(NOLOCK) ON CC.Id=P.CityId and cc.IsActive=1  
+where Hh.PropertyType='External Property'  and ChkOutServiceNetAmount!=0 and InVoiceNo!='0'
 
 	Select BookingCode,InvoiceNumber,Property,ClientName,GuestName,CheckInDate,CheckOutDate,Location,
 	TotalAmount,Amount,Amounts,BillType,ChkoutId,
@@ -288,6 +303,9 @@ IF @Action ='Pageload'
        end
        if(@Str1='Internal Property')
 		begin
+		Update #TempBillFinal1 Set TariffAmount=BillAmount
+			where BillType='Service'
+			
 		SELECT BookingCode,InVoiceNo InvoiceNumber,p.PropertyName+'-'+Location Property,ClientName ClientName, 
 		GuestName GuestName,CheckInDate CheckInDate,CheckOutDate CheckOutDate,Location,
 		TotalAmount,TariffAmount Amount,BillAmount Amounts,BillType BillType,BillId ChkoutId,
@@ -335,33 +353,277 @@ IF @Action ='Pageload'
 		--join WRBHBCheckOutSettleDtl D on h.id=d.CheckOutSettleHdrId
 		
    END  
-   IF @Action ='CreditNote'
-   BEGIN 
-   DECLARE @Cnt INT;
+
+IF @Action ='CreditNoteTariff'
+BEGIN 
 		BEGIN  
-		SET @Cnt=(SELECT COUNT(*) FROM WRBHBCreditNoteTariff)  
-		IF @Cnt=0 BEGIN SELECT 1 AS CrdInVoiceNo;  
+			SET @Cnt=(SELECT COUNT(*) FROM WRBHBCreditNoteTariffHdr)  
+			IF @Cnt=0 
+			BEGIN 
+			      SELECT 1 AS CreditNoteNo;  
+		     END  
+		    ELSE   
+		BEGIN  
+			SELECT TOP 1 CAST(CreditNoteNo AS INT)+1 AS CreditNoteNo FROM WRBHBCreditNoteTariffHdr  
+			where IsActive = 1 and IsDeleted = 0
+			ORDER BY Id DESC;  
+		END
+	SELECT InVoiceNo,Id AS ChkOutId,PropertyId FROM WRBHBChechkOutHdr WHERE 
+	Id=@Id1 AND InVoiceNo=@FromDt
+
+	 SELECT 'Tariff' AS Type,(ChkOutTariffTotal/NoOfDays) AS TariffAmount ,NoOfDays,(ChkOutTariffTotal/NoOfDays) AS Total
+	 FROM WRBHBChechkOutHdr WHERE Id=@Id1 AND InVoiceNo=@FromDt
+
+	 SELECT LuxuryTaxPer,ServiceTaxPer,VATPer,RestaurantSTPer FROM WRBHBChechkOutHdr
+	 WHERE Id=@Id1 AND InVoiceNo=@FromDt AND IsActive=1 AND IsDeleted=0
+END
+END
+IF @Action ='CreditNoteService'
+BEGIN 
+
+		BEGIN  
+			SET @Cnt=(SELECT COUNT(*) FROM WRBHBCreditNoteServiceHdr)  
+			IF @Cnt=0 BEGIN SELECT 1 AS CreditNoteNo;  
 		END  
 		ELSE   
 		BEGIN  
-			SELECT TOP 1 CAST(CrdInVoiceNo AS INT)+1 AS CrdInVoiceNo FROM WRBHBCreditNoteTariff  
+			SELECT TOP 1 CAST(CreditNoteNo AS INT)+1 AS CreditNoteNo FROM WRBHBCreditNoteServiceHdr  
 			where IsActive = 1 and IsDeleted = 0
 			ORDER BY Id DESC;  
 		END 
-	SELECT InVoiceNo FROM WRBHBChechkOutHdr WHERE 
-	Id=@Id1 AND InVoiceNo=@FromDt
-	
-	 SELECT 'Tariff' AS Type,(ChkOutTariffTotal/NoOfDays) AS TariffAmount ,NoOfDays,0 AS Total
-	 FROM WRBHBChechkOutHdr WHERE Id=@Id1 AND InVoiceNo=@FromDt
-	
-	 SELECT ChkOutSerItem AS Item,ChkOutSerAmount AS ServiceAmount,0 AS Amount,0 AS Total
+	 SELECT InVoiceNo,Id AS ChkOutId,PropertyId FROM WRBHBChechkOutHdr WHERE 
+	 Id=@Id1 AND InVoiceNo=@FromDt
+
+	 SELECT ChkOutSerItem AS Item,ChkOutSerAmount AS ServiceAmount,0 AS Quantity,0 AS Total
 	 FROM WRBHBCheckOutServiceDtls D 
-	 JOIN WRBHBCheckOutSettleHdr H WITH(NOLOCK)ON D.ServiceHdrId=H.Id AND H.IsActive=1 AND H.IsDeleted=0
-	 JOIN WRBHBChechkOutHdr C WITH(NOLOCK)ON H.ChkOutHdrId=C.Id AND C.IsActive=1 AND C.IsDeleted=0
-	 WHERE C.Id=@Id1 AND C.InVoiceNo=@FromDt
-   END
-   END
+	 JOIN WRBHBCheckOutServiceHdr H WITH(NOLOCK)ON D.ServiceHdrId=H.Id AND H.IsActive=1 AND H.IsDeleted=0
+	 JOIN WRBHBChechkOutHdr C WITH(NOLOCK)ON H.CheckOutHdrId=C.Id AND C.IsActive=1 AND C.IsDeleted=0
+	 WHERE C.Id=@Id1 AND C.InVoiceNo=@FromDt AND ChkOutSerAmount !=0
+ 
+	 SELECT LuxuryTaxPer,ServiceTaxPer,VATPer,RestaurantSTPer FROM WRBHBChechkOutHdr
+	 WHERE Id=@Id1 AND InVoiceNo=@FromDt AND IsActive=1 AND IsDeleted=0;
 END
+END
+IF @Action ='PropertyLoad'
+BEGIN 
+    SELECT PropertyName,Id AS ZId FROM WRBHBProperty
+END
+IF @Action ='CreditNoteReport'
+BEGIN 
+    IF @Str1='Tariff'
+    BEGIN
+			   CREATE TABLE #TariffExport(CreatedDate NVARCHAR(100),BookingCode NVARCHAR(100),ChkInVoiceNo NVARCHAR(100),CrdInVoiceNo NVARCHAR(100),
+			   PropertyName NVARCHAR(100),ClientName NVARCHAR(100),GuestName NVARCHAR(100),CheckInDate NVARCHAR(100),
+			   CheckOutDate NVARCHAR(100),Tariff NVARCHAR(100),NoOfDays NVARCHAR(100),TotalAmount NVARCHAR(100),Description NVARCHAR(100),Flag INT)
+			   IF @Id1=0
+		       BEGIN
+				   SELECT CONVERT(NVARCHAR,CH.CreatedDate,103) AS CreatedDate,B.BookingCode,CH.ChkInVoiceNo,
+				   CH.CrdInVoiceNo,C.Property AS PropertyName,C.ClientName,C.GuestName,C.CheckInDate,C.CheckOutDate,
+				   CD.Amount AS  Tariff,CD.NoOfDays,(CD.Total+CH.LuxuryTax+CH.ServiceTax1+CH.ServiceTax2) 
+				   AS TotalAmount,CH.Description,CH.Id
+				   FROM WRBHBCreditNoteTariffDtls CD
+				   JOIN WRBHBCreditNoteTariffHdr CH WITH(NOLOCK)ON CD.CrdTariffHdrId=CH.Id AND CH.IsActive=1
+				   JOIN WRBHBChechkOutHdr C WITH(NOLOCK)ON CH.CheckOutId=C.Id AND C.IsActive=1 
+				   JOIN WRBHBBooking B WITH(NOLOCK)ON C.BookingId=B.Id AND B.IsActive=1
+				   WHERE CD.IsActive=1 AND CONVERT(date,CH.CreatedDate,103) BETWEEN CONVERT(date,@FromDt,103) AND CONVERT(date,@ToDt,103)
+				   
+				   INSERT INTO #TariffExport(CreatedDate,BookingCode,ChkInVoiceNo,CrdInVoiceNo,PropertyName,ClientName,
+				   GuestName,CheckInDate,CheckOutDate,Tariff,NoOfDays,TotalAmount,Description,Flag)
+				   SELECT '' CreatedDate,'' BookingCode,'' ChkInVoiceNo,'' CrdInVoiceNo,'' PropertyName,'' ClientName,
+				   '' GuestName,'' CheckInDate,'' CheckOutDate,'' Tariff,'' NoOfDays,'' TotalAmount,'' Description,1
+				   
+				   INSERT INTO #TariffExport(CreatedDate,BookingCode,ChkInVoiceNo,CrdInVoiceNo,PropertyName,ClientName,
+				   GuestName,CheckInDate,CheckOutDate,Tariff,NoOfDays,TotalAmount,Description,Flag)
+				   SELECT '' CreatedDate,'' BookingCode,'' ChkInVoiceNo,'' CrdInVoiceNo,'' PropertyName,'' ClientName,
+				   'CreditNote Tariff Report' GuestName,'' CheckInDate,'' CheckOutDate,'' Tariff,'' NoOfDays,'' TotalAmount,'' Description,3
+				   
+					INSERT INTO #TariffExport(CreatedDate,BookingCode,ChkInVoiceNo,CrdInVoiceNo,PropertyName,ClientName,
+				   GuestName,CheckInDate,CheckOutDate,Tariff,NoOfDays,TotalAmount,Description,Flag)
+				   SELECT 'CreatedDate' CreatedDate,'BookingCode' BookingCode,'ChkInVoiceNo' ChkInVoiceNo,'CrdInVoiceNo' CrdInVoiceNo,
+				   'PropertyName' PropertyName,'ClientName' ClientName,
+				   'GuestName' GuestName,'CheckInDate' CheckInDate,'CheckOutDate' CheckOutDate,'Tariff' Tariff,'NoOfDays' NoOfDays,
+				   'TotalAmount' TotalAmount,'Description' Description,2
 
+				   INSERT INTO #TariffExport(CreatedDate,BookingCode,ChkInVoiceNo,CrdInVoiceNo,PropertyName,ClientName,
+				   GuestName,CheckInDate,CheckOutDate,Tariff,NoOfDays,TotalAmount,Description,Flag)
+				   			   
+				   SELECT CONVERT(NVARCHAR,CH.CreatedDate,103) AS CreatedDate,B.BookingCode,CH.ChkInVoiceNo,
+				   CH.CrdInVoiceNo,C.Property AS PropertyName,C.ClientName,C.GuestName,C.CheckInDate,C.CheckOutDate,
+				   CD.Amount AS  Tariff,CD.NoOfDays,(CD.Total+CH.LuxuryTax+CH.ServiceTax1+CH.ServiceTax2) 
+				   AS TotalAmount,CH.Description,4
+				   FROM WRBHBCreditNoteTariffDtls CD
+				   JOIN WRBHBCreditNoteTariffHdr CH WITH(NOLOCK)ON CD.CrdTariffHdrId=CH.Id AND CH.IsActive=1
+				   JOIN WRBHBChechkOutHdr C WITH(NOLOCK)ON CH.CheckOutId=C.Id AND C.IsActive=1 
+				   JOIN WRBHBBooking B WITH(NOLOCK)ON C.BookingId=B.Id AND B.IsActive=1
+				   WHERE CD.IsActive=1 AND CONVERT(date,CH.CreatedDate,103) BETWEEN CONVERT(date,@FromDt,103) AND CONVERT(date,@ToDt,103)
+				   
+				   
+				   SELECT CreatedDate,BookingCode,ChkInVoiceNo,CrdInVoiceNo,PropertyName,ClientName,
+				   GuestName,CheckInDate,CheckOutDate,Tariff,NoOfDays,TotalAmount,Description FROM #TariffExport
+				   ORDER BY Flag ASC
+				 END 
+				 ELSE
+				 BEGIN
+				   SELECT CONVERT(NVARCHAR,CH.CreatedDate,103) AS CreatedDate,B.BookingCode,CH.ChkInVoiceNo,
+				   CH.CrdInVoiceNo,C.Property AS PropertyName,C.ClientName,C.GuestName,C.CheckInDate,C.CheckOutDate,
+				   CD.Amount AS  Tariff,CD.NoOfDays,(CD.Total+CH.LuxuryTax+CH.ServiceTax1+CH.ServiceTax2)
+					AS TotalAmount,CH.Description,CH.Id
+				   FROM WRBHBCreditNoteTariffDtls CD
+				   JOIN WRBHBCreditNoteTariffHdr CH WITH(NOLOCK)ON CD.CrdTariffHdrId=CH.Id AND CH.IsActive=1
+				   JOIN WRBHBChechkOutHdr C WITH(NOLOCK)ON CH.CheckOutId=C.Id AND C.IsActive=1 
+				   JOIN WRBHBBooking B WITH(NOLOCK)ON C.BookingId=B.Id AND B.IsActive=1
+				   WHERE CD.IsActive=1 AND CONVERT(date,CH.CreatedDate,103) BETWEEN CONVERT(date,@FromDt,103) AND CONVERT(date,@ToDt,103)
+				   AND CH.PropertyId=@Id1
+				   
+					INSERT INTO #TariffExport(CreatedDate,BookingCode,ChkInVoiceNo,CrdInVoiceNo,PropertyName,ClientName,
+				   GuestName,CheckInDate,CheckOutDate,Tariff,NoOfDays,TotalAmount,Description,Flag)
+				   SELECT '' CreatedDate,'' BookingCode,'' ChkInVoiceNo,'' CrdInVoiceNo,'' PropertyName,'' ClientName,
+				   '' GuestName,'' CheckInDate,'' CheckOutDate,'' Tariff,'' NoOfDays,'' TotalAmount,'' Description,1
+				   
+				   INSERT INTO #TariffExport(CreatedDate,BookingCode,ChkInVoiceNo,CrdInVoiceNo,PropertyName,ClientName,
+				   GuestName,CheckInDate,CheckOutDate,Tariff,NoOfDays,TotalAmount,Description,Flag)
+				   SELECT '' CreatedDate,'' BookingCode,'' ChkInVoiceNo,'' CrdInVoiceNo,'' PropertyName,'' ClientName,
+				   'CreditNote Tariff Report' GuestName,'' CheckInDate,'' CheckOutDate,'' Tariff,'' NoOfDays,'' TotalAmount,'' Description,3
+				   
+					INSERT INTO #TariffExport(CreatedDate,BookingCode,ChkInVoiceNo,CrdInVoiceNo,PropertyName,ClientName,
+				   GuestName,CheckInDate,CheckOutDate,Tariff,NoOfDays,TotalAmount,Description,Flag)
+				   SELECT 'CreatedDate' CreatedDate,'BookingCode' BookingCode,'ChkInVoiceNo' ChkInVoiceNo,'CrdInVoiceNo' CrdInVoiceNo,
+				   'PropertyName' PropertyName,'ClientName' ClientName,
+				   'GuestName' GuestName,'CheckInDate' CheckInDate,'CheckOutDate' CheckOutDate,'Tariff' Tariff,'NoOfDays' NoOfDays,
+				   'TotalAmount' TotalAmount,'Description' Description,2
 
+				   INSERT INTO #TariffExport(CreatedDate,BookingCode,ChkInVoiceNo,CrdInVoiceNo,PropertyName,ClientName,
+				   GuestName,CheckInDate,CheckOutDate,Tariff,NoOfDays,TotalAmount,Description,Flag)
+				   			   
+				   SELECT CONVERT(NVARCHAR,CH.CreatedDate,103) AS CreatedDate,B.BookingCode,CH.ChkInVoiceNo,
+				   CH.CrdInVoiceNo,C.Property AS PropertyName,C.ClientName,C.GuestName,C.CheckInDate,C.CheckOutDate,
+				   CD.Amount AS  Tariff,CD.NoOfDays,(CD.Total+CH.LuxuryTax+CH.ServiceTax1+CH.ServiceTax2) 
+				   AS TotalAmount,CH.Description,4
+				   FROM WRBHBCreditNoteTariffDtls CD
+				   JOIN WRBHBCreditNoteTariffHdr CH WITH(NOLOCK)ON CD.CrdTariffHdrId=CH.Id AND CH.IsActive=1
+				   JOIN WRBHBChechkOutHdr C WITH(NOLOCK)ON CH.CheckOutId=C.Id AND C.IsActive=1 
+				   JOIN WRBHBBooking B WITH(NOLOCK)ON C.BookingId=B.Id AND B.IsActive=1
+				   WHERE CD.IsActive=1 AND CONVERT(date,CH.CreatedDate,103) BETWEEN CONVERT(date,@FromDt,103) AND CONVERT(date,@ToDt,103)
+					AND CH.PropertyId=@Id1
+				   
+				   SELECT CreatedDate,BookingCode,ChkInVoiceNo,CrdInVoiceNo,PropertyName,ClientName,
+				   GuestName,CheckInDate,CheckOutDate,Tariff,NoOfDays,TotalAmount,Description FROM #TariffExport
+				   ORDER BY Flag ASC
+	     		END      
+    END
+    ELSE
+    BEGIN
+			   CREATE TABLE #ServiceExport(CreatedDate NVARCHAR(100),BookingCode NVARCHAR(100),ChkInVoiceNo NVARCHAR(100),CrdInVoiceNo NVARCHAR(100),
+			   PropertyName NVARCHAR(100),ClientName NVARCHAR(100),GuestName NVARCHAR(100),CheckInDate NVARCHAR(100),
+			   CheckOutDate NVARCHAR(100),ServiceAmount NVARCHAR(100),TotalAmount NVARCHAR(100),Description NVARCHAR(100),Flag INT)
+	   IF @Id1=0
+		  BEGIN
+		  	   
+		  	   SELECT CONVERT(NVARCHAR,CH.CreatedDate,103) AS CreatedDate,B.BookingCode,CH.ChkOutInVoiceNo AS ChkInVoiceNo,
+			   CH.CrdInVoiceNo,C.Property AS PropertyName,C.ClientName,C.GuestName,C.CheckInDate,C.CheckOutDate,
+			   SUM(CD.ServiceAmount) ServiceAmount,TotalAmount AS TotalAmount,CH.Description,CH.Id
+			   FROM WRBHBCreditNoteServiceDtls CD
+			   JOIN WRBHBCreditNoteServiceHdr CH WITH(NOLOCK)ON CD.CrdServiceHdrId=CH.Id AND CH.IsActive=1
+			   JOIN WRBHBChechkOutHdr C WITH(NOLOCK)ON CH.CheckOutId=C.Id AND C.IsActive=1 
+			   JOIN WRBHBBooking B WITH(NOLOCK)ON C.BookingId=B.Id AND B.IsActive=1
+			   WHERE CD.IsActive=1 AND 
+			   CONVERT(date,CH.CreatedDate,103) BETWEEN CONVERT(date,@FromDt,103) AND CONVERT(date,@ToDt,103)
+			   AND CD.Quantity !=0
+			   GROUP BY CONVERT(NVARCHAR,CH.CreatedDate,103),B.BookingCode,CH.ChkOutInVoiceNo,TotalAmount,
+			   CH.CrdInVoiceNo,C.Property,C.ClientName,C.GuestName,C.CheckInDate,C.CheckOutDate,CH.Description,CH.Id
+			   
+			  				   
+			   INSERT INTO #ServiceExport(CreatedDate,BookingCode,ChkInVoiceNo,CrdInVoiceNo,PropertyName,ClientName,
+			   GuestName,CheckInDate,CheckOutDate,ServiceAmount,TotalAmount,Description,Flag)
+			   SELECT '' CreatedDate,'' BookingCode,'' ChkInVoiceNo,'' CrdInVoiceNo,'' PropertyName,'' ClientName,
+			   '' GuestName,'' CheckInDate,'' CheckOutDate,'' ServiceAmount,'' TotalAmount,'' Description,1
+			   
+			   INSERT INTO #ServiceExport(CreatedDate,BookingCode,ChkInVoiceNo,CrdInVoiceNo,PropertyName,ClientName,
+			   GuestName,CheckInDate,CheckOutDate,ServiceAmount,TotalAmount,Description,Flag)
+			   SELECT '' CreatedDate,'' BookingCode,'' ChkInVoiceNo,'' CrdInVoiceNo,'' PropertyName,'' ClientName,
+			   'CreditNote Service Report' GuestName,'' CheckInDate,'' CheckOutDate,'' ServiceAmount,'' TotalAmount,'' Description,3
+			   
+				INSERT INTO #ServiceExport(CreatedDate,BookingCode,ChkInVoiceNo,CrdInVoiceNo,PropertyName,ClientName,
+			   GuestName,CheckInDate,CheckOutDate,ServiceAmount,TotalAmount,Description,Flag)
+			   SELECT 'CreatedDate' CreatedDate,'BookingCode' BookingCode,'ChkInVoiceNo' ChkInVoiceNo,'CrdInVoiceNo' CrdInVoiceNo,
+			   'PropertyName' PropertyName,'ClientName' ClientName,
+			   'GuestName' GuestName,'CheckInDate' CheckInDate,'CheckOutDate' CheckOutDate,'ServiceAmount' ServiceAmount,
+			   'TotalAmount' TotalAmount,'Description' Description,2
 
+			   INSERT INTO #ServiceExport(CreatedDate,BookingCode,ChkInVoiceNo,CrdInVoiceNo,PropertyName,ClientName,
+			   GuestName,CheckInDate,CheckOutDate,ServiceAmount,TotalAmount,Description,Flag)
+			   			   
+			    SELECT CONVERT(NVARCHAR,CH.CreatedDate,103) AS CreatedDate,B.BookingCode,CH.ChkOutInVoiceNo AS ChkInVoiceNo,
+			   CH.CrdInVoiceNo,C.Property AS PropertyName,C.ClientName,C.GuestName,C.CheckInDate,C.CheckOutDate,
+			   SUM(CD.ServiceAmount) ServiceAmount,TotalAmount AS TotalAmount,CH.Description,CH.Id
+			   FROM WRBHBCreditNoteServiceDtls CD
+			   JOIN WRBHBCreditNoteServiceHdr CH WITH(NOLOCK)ON CD.CrdServiceHdrId=CH.Id AND CH.IsActive=1
+			   JOIN WRBHBChechkOutHdr C WITH(NOLOCK)ON CH.CheckOutId=C.Id AND C.IsActive=1 
+			   JOIN WRBHBBooking B WITH(NOLOCK)ON C.BookingId=B.Id AND B.IsActive=1
+			   WHERE CD.IsActive=1 AND 
+			   CONVERT(date,CH.CreatedDate,103) BETWEEN CONVERT(date,@FromDt,103) AND CONVERT(date,@ToDt,103)
+			   AND CD.Quantity !=0
+			   GROUP BY CONVERT(NVARCHAR,CH.CreatedDate,103),B.BookingCode,CH.ChkOutInVoiceNo,TotalAmount,
+			   CH.CrdInVoiceNo,C.Property,C.ClientName,C.GuestName,C.CheckInDate,C.CheckOutDate,CH.Description,CH.Id
+			   
+			   SELECT CreatedDate,BookingCode,ChkInVoiceNo,CrdInVoiceNo,PropertyName,ClientName,
+			   GuestName,CheckInDate,CheckOutDate,ServiceAmount,TotalAmount,Description FROM #ServiceExport
+			   ORDER BY Flag ASC
+			   
+			   
+		  END 
+		  ELSE
+		  BEGIN
+			    SELECT CONVERT(NVARCHAR,CH.CreatedDate,103) AS CreatedDate,B.BookingCode,CH.ChkOutInVoiceNo AS ChkInVoiceNo,
+			   CH.CrdInVoiceNo,C.Property AS PropertyName,C.ClientName,C.GuestName,C.CheckInDate,C.CheckOutDate,
+			   SUM(CD.ServiceAmount) ServiceAmount,TotalAmount AS TotalAmount,CH.Description,CH.Id
+			   FROM WRBHBCreditNoteServiceDtls CD
+			   JOIN WRBHBCreditNoteServiceHdr CH WITH(NOLOCK)ON CD.CrdServiceHdrId=CH.Id AND CH.IsActive=1
+			   JOIN WRBHBChechkOutHdr C WITH(NOLOCK)ON CH.CheckOutId=C.Id AND C.IsActive=1 
+			   JOIN WRBHBBooking B WITH(NOLOCK)ON C.BookingId=B.Id AND B.IsActive=1
+			   WHERE CD.IsActive=1 AND 
+			   CONVERT(date,CH.CreatedDate,103) BETWEEN CONVERT(date,@FromDt,103) AND CONVERT(date,@ToDt,103)
+			   AND CD.Quantity !=0 AND CH.PropertyId=@Id1
+			   GROUP BY CONVERT(NVARCHAR,CH.CreatedDate,103),B.BookingCode,CH.ChkOutInVoiceNo,TotalAmount,
+			   CH.CrdInVoiceNo,C.Property,C.ClientName,C.GuestName,C.CheckInDate,C.CheckOutDate,CH.Description,CH.Id
+			   
+			   INSERT INTO #ServiceExport(CreatedDate,BookingCode,ChkInVoiceNo,CrdInVoiceNo,PropertyName,ClientName,
+			   GuestName,CheckInDate,CheckOutDate,ServiceAmount,TotalAmount,Description,Flag)
+			   SELECT '' CreatedDate,'' BookingCode,'' ChkInVoiceNo,'' CrdInVoiceNo,'' PropertyName,'' ClientName,
+			   '' GuestName,'' CheckInDate,'' CheckOutDate,'' ServiceAmount,'' TotalAmount,'' Description,1
+			   
+			   INSERT INTO #ServiceExport(CreatedDate,BookingCode,ChkInVoiceNo,CrdInVoiceNo,PropertyName,ClientName,
+			   GuestName,CheckInDate,CheckOutDate,ServiceAmount,TotalAmount,Description,Flag)
+			   SELECT '' CreatedDate,'' BookingCode,'' ChkInVoiceNo,'' CrdInVoiceNo,'' PropertyName,'' ClientName,
+			   'CreditNote Service Report' GuestName,'' CheckInDate,'' CheckOutDate,'' ServiceAmount,'' TotalAmount,'' Description,3
+			   
+				INSERT INTO #ServiceExport(CreatedDate,BookingCode,ChkInVoiceNo,CrdInVoiceNo,PropertyName,ClientName,
+			   GuestName,CheckInDate,CheckOutDate,ServiceAmount,TotalAmount,Description,Flag)
+			   SELECT 'CreatedDate' CreatedDate,'BookingCode' BookingCode,'ChkInVoiceNo' ChkInVoiceNo,'CrdInVoiceNo' CrdInVoiceNo,
+			   'PropertyName' PropertyName,'ClientName' ClientName,
+			   'GuestName' GuestName,'CheckInDate' CheckInDate,'CheckOutDate' CheckOutDate,'ServiceAmount' ServiceAmount,
+			   'TotalAmount' TotalAmount,'Description' Description,2
+
+			   INSERT INTO #ServiceExport(CreatedDate,BookingCode,ChkInVoiceNo,CrdInVoiceNo,PropertyName,ClientName,
+			   GuestName,CheckInDate,CheckOutDate,ServiceAmount,TotalAmount,Description,Flag)
+			   			   
+			    SELECT CONVERT(NVARCHAR,CH.CreatedDate,103) AS CreatedDate,B.BookingCode,CH.ChkOutInVoiceNo AS ChkInVoiceNo,
+			   CH.CrdInVoiceNo,C.Property AS PropertyName,C.ClientName,C.GuestName,C.CheckInDate,C.CheckOutDate,
+			   SUM(CD.ServiceAmount) ServiceAmount,TotalAmount AS TotalAmount,CH.Description,CH.Id
+			   FROM WRBHBCreditNoteServiceDtls CD
+			   JOIN WRBHBCreditNoteServiceHdr CH WITH(NOLOCK)ON CD.CrdServiceHdrId=CH.Id AND CH.IsActive=1
+			   JOIN WRBHBChechkOutHdr C WITH(NOLOCK)ON CH.CheckOutId=C.Id AND C.IsActive=1 
+			   JOIN WRBHBBooking B WITH(NOLOCK)ON C.BookingId=B.Id AND B.IsActive=1
+			   WHERE CD.IsActive=1 AND 
+			   CONVERT(date,CH.CreatedDate,103) BETWEEN CONVERT(date,@FromDt,103) AND CONVERT(date,@ToDt,103)
+			   AND CD.Quantity !=0 AND CH.PropertyId=@Id1
+			   GROUP BY CONVERT(NVARCHAR,CH.CreatedDate,103),B.BookingCode,CH.ChkOutInVoiceNo,TotalAmount,
+			   CH.CrdInVoiceNo,C.Property,C.ClientName,C.GuestName,C.CheckInDate,C.CheckOutDate,CH.Description,CH.Id
+			   
+			   SELECT CreatedDate,BookingCode,ChkInVoiceNo,CrdInVoiceNo,PropertyName,ClientName,
+			   GuestName,CheckInDate,CheckOutDate,ServiceAmount,TotalAmount,Description FROM #ServiceExport
+			   ORDER BY Flag ASC
+		  END 
+    END
+END
+END

@@ -107,13 +107,13 @@
 				//var num:Number= (end.getUTCFullYear() - start.getUTCFullYear()) * 12 +(end.getUTCMonth() - start.getUTCMonth());								
 				//useWeb("BOOKING","Tab2_to_Tab3_Dtls_CUSTOM",[GlobalXml,'Tab2_to_Tab3_Dtls','','','','',0,0,0,0,0,26,0]);				
 				var ss:String=Global_AC[0].UsrId;				
-				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Room',10709]);
+				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Room',11223]);
 				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,"RoomResend",10709]);				
 				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Bed',9614]);
 				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Apartment',2027]);
 				//useWeb("BookingMail","RecommendMail_CUSTOM",[GlobalXml,'Recommend',5809]);
 				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'MMT',5765]);
-				//useWeb("BookingMail","SendSMS_CUSTOM",[GlobalXml,'SMS',7009]);// S M S
+				//useWeb("BookingMail","SendSMS_CUSTOM",[GlobalXml,'SMS',10564]);// S M S
 				/*var ChkInDt:String="2015-03-01 12:00:00 PM";
 				var ChkOutDt:String="2015-03-02 12:00:00 PM";
 				CityId = 0;
@@ -1279,15 +1279,15 @@
 					Grd_GuestTab3.dataProvider=null;
 					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
 					{
-						Ddl_TariffPaymentMode.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
-						if(PropertyType == "MMT")
+						Ddl_TariffPaymentMode.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;						
+						/*if(PropertyType == "MMT")
 						{
 							Ddl_ServicePaymentMode.dataProvider=Ds_Objects.result.Tables.Table4.Rows as ArrayCollection;
 						}
 						if(PropertyType != "MMT")
 						{
 							Ddl_ServicePaymentMode.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
-						}						
+						}*/						
 					}
 					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
 					{
@@ -1300,7 +1300,15 @@
 					if (Ds_Objects.result.Tables.Table3.Rows.length > 0)
 					{
 						Grd_GuestTab3.dataProvider=Ds_Objects.result.Tables.Table3.Rows as ArrayCollection;
-					}					
+					}
+					if (Ds_Objects.result.Tables.Table4.Rows.length > 0)
+					{
+						Ddl_ServicePaymentMode.dataProvider=Ds_Objects.result.Tables.Table4.Rows as ArrayCollection;
+					}
+					if (Ds_Objects.result.Tables.Table4.Rows.length < 0)
+					{
+						Ddl_ServicePaymentMode.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
 					Lbl_ChkInDt.text=Dt_ChkInDt.text;Lbl_ChkOutDt.text=Dt_ChkOutDt.text;
 				}
 				if (Ds_Objects.currentTarget.description.toString() == "Tab3_to_Tab2_CUSTOM")
@@ -2376,7 +2384,7 @@
 					Txt_PropertyFilter.text="";Txt_LocalityFilter.text="";
 					Txt_RecommendPropertyFilter.text="";Txt_RecommendLocalityFilter.text="";
 					ClientBookerId=0;ClientBookerName="";Txt_BookerEmail.text="";
-					Txt_Note.text="";Chk_EmailtoGuest.selected=false;
+					Txt_Note.text="";
 					var dfsgd:ArrayCollection=new ArrayCollection();
 					Grd_Property.dataProvider=dfsgd;
 					var sdfsf:ArrayCollection=new ArrayCollection();
@@ -2637,12 +2645,13 @@
 				}
 				var sdf:ArrayCollection = new ArrayCollection();
 				sdf = Grd_Guest._getGridSrc;
+				var dssdf:int = Math.round(sdf.length / 2);
 				if((CityCode != "") && (Ac_Prpty[0].PropertyType == "MMT"))
 				{					
 					useWeb("API","AvailabilityExistingData_CUSTOM",
 						[GlobalXml,'AvailabilityExistingData',CityCode,Ac_Prpty[0].PropertyId,
 							Ac_Prpty[0].RatePlanCode,Ac_Prpty[0].RoomTypeCode,ChkInDt,ChkOutDt,
-							Ac_Prpty[0].APIHdrId,sdf.length]);
+							Ac_Prpty[0].APIHdrId,dssdf]);
 				}
 				else
 				{

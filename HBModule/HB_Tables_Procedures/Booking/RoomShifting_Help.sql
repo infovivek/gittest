@@ -47,10 +47,11 @@ IF @Action = 'BookingLoad'
   BG.BookingPropertyId=BP.PropertyId    
   WHERE B.IsActive=1 AND B.IsDeleted=0 AND BP.IsActive=1 AND  
   BP.IsDeleted=0 AND BG.IsActive=1 AND BG.IsDeleted=0 AND  
-  BG.CurrentStatus IN ('CheckIn','Booked') AND B.BookingLevel = 'Room' AND 
-  BP.PropertyType IN ('InP','MGH','DdP','ExP','CPP') AND
+  --BG.CurrentStatus IN ('CheckIn','Booked','UnSettled') AND 
+  BG.CurrentStatus IN ('CheckIn','Booked') AND 
+  B.BookingLevel = 'Room' AND BP.PropertyType IN ('InP','MGH','DdP','ExP','CPP') AND
   ISNULL(RoomShiftingFlag,0) = 0 AND B.BookingCode != 0;
-  /*-- Bed
+  -- Bed
   INSERT INTO #TMP(BookingCode,BookingId,Guest,RoomId,RoomCaptured,  
   CurrentStatus,PropertyName,RoomType,PropertyType,BookingLevel)  
   SELECT B.BookingCode,BG.BookingId,  
@@ -65,8 +66,9 @@ IF @Action = 'BookingLoad'
   BG.BookingPropertyId=BP.PropertyId    
   WHERE B.IsActive=1 AND B.IsDeleted=0 AND BP.IsActive=1 AND  
   BP.IsDeleted=0 AND BG.IsActive=1 AND BG.IsDeleted=0 AND  
-  BG.CurrentStatus IN ('CheckIn','Booked') AND B.BookingLevel = 'Bed' AND 
-  BP.PropertyType IN ('InP','MGH') AND
+  --BG.CurrentStatus IN ('CheckIn','Booked','UnSettled') AND 
+  BG.CurrentStatus IN ('CheckIn','Booked') AND 
+  B.BookingLevel = 'Bed' AND BP.PropertyType IN ('InP','MGH') AND
   ISNULL(RoomShiftingFlag,0) = 0 AND B.BookingCode != 0;
   -- Apartment
   INSERT INTO #TMP(BookingCode,BookingId,Guest,RoomId,RoomCaptured,  
@@ -83,9 +85,10 @@ IF @Action = 'BookingLoad'
   BG.BookingPropertyId=BP.PropertyId    
   WHERE B.IsActive=1 AND B.IsDeleted=0 AND BP.IsActive=1 AND  
   BP.IsDeleted=0 AND BG.IsActive=1 AND BG.IsDeleted=0 AND  
-  BG.CurrentStatus IN ('CheckIn','Booked') AND B.BookingLevel = 'Apartment' AND 
-  BP.PropertyType IN ('InP','DdP') AND
-  ISNULL(RoomShiftingFlag,0) = 0 AND B.BookingCode != 0;*/
+  --BG.CurrentStatus IN ('CheckIn','Booked','UnSettled') AND 
+  BG.CurrentStatus IN ('CheckIn','Booked') AND 
+  B.BookingLevel = 'Apartment' AND BP.PropertyType IN ('InP','DdP') AND
+  ISNULL(RoomShiftingFlag,0) = 0 AND B.BookingCode != 0;
   -- Get Guest in CheckIn & Booked Booking
   CREATE TABLE #TMP1(Guest NVARCHAR(100),BookingCode INT,BookingId INT,  
   RoomId INT,RoomCapturedId INT,BookingLevelId NVARCHAR(100),  
@@ -106,7 +109,8 @@ IF @Action = 'BookingLoad'
    BEGIN
     SELECT T.BookingCode,T.BookingId,T.BookingLevelId,T.CurrentStatus,
     T.Guest,T.PropertyName,T.RoomId,T.RoomCapturedId,T.RoomType AS RoomNoId
-    FROM #TMP1 T WHERE PropertyType IN ('InP','MGH','DdP')
+    FROM #TMP1 T WHERE PropertyType IN ('InP','MGH','DdP') AND
+    T.CurrentStatus NOT IN('UnSettled')
     GROUP BY T.Guest,T.BookingCode,T.BookingId,T.RoomId,T.RoomCapturedId,
     T.BookingLevelId,T.PropertyName,T.RoomType,T.CurrentStatus
     ORDER BY T.BookingCode,T.RoomCapturedId ASC;
@@ -194,7 +198,7 @@ IF @Action = 'DateLoad'
         @AChkInDt = @EChkInDt,@AChkOutDt = @EChkOutDt;
         SET @Flag = 'Yes';
        END
-      IF @CurrentStatus = 'CheckIn'
+      IF @CurrentStatus IN ('CheckIn','UnSettled')
        BEGIN
         SELECT @EChkInDt = MIN(ChkInDt),@EChkOutDt = MAX(ChkOutDt)
         FROM WRBHBBookingPropertyAssingedGuest
@@ -272,7 +276,7 @@ IF @Action = 'DateLoad'
         @AChkInDt = @EChkInDt,@AChkOutDt = @EChkOutDt;
         SET @Flag = 'Yes';
        END
-      IF @CurrentStatus = 'CheckIn'
+      IF @CurrentStatus IN ('CheckIn','UnSettled')
        BEGIN
         SELECT @EChkInDt = MIN(ChkInDt),@EChkOutDt = MAX(ChkOutDt)
         FROM WRBHBBedBookingPropertyAssingedGuest
@@ -348,7 +352,7 @@ IF @Action = 'DateLoad'
         @AChkInDt = @EChkInDt,@AChkOutDt = @EChkOutDt;
         SET @Flag = 'Yes';
        END
-      IF @CurrentStatus = 'CheckIn'
+      IF @CurrentStatus IN ('CheckIn','UnSettled')
        BEGIN
         SELECT @EChkInDt = MIN(ChkInDt),@EChkOutDt = MAX(ChkOutDt)
         FROM WRBHBApartmentBookingPropertyAssingedGuest
@@ -542,7 +546,8 @@ IF @Action = 'AvaliableRooms'
   CREATE TABLE #DedicatedApartmentInP(ApartmentId BIGINT);
   INSERT INTO #DedicatedApartmentInP(ApartmentId)
   SELECT T.ApartmentId FROM WRBHBContractManagementAppartment T
-  WHERE T.IsActive=1 AND T.IsDeleted=0 AND T.ApartmentId != 0;
+  WHERE T.IsActive=1 AND T.IsDeleted=0 AND T.ApartmentId != 0 AND
+  PropertyId = @PropertyId;
   --
   CREATE TABLE #TMPTABLE(label NVARCHAR(100),RoomId BIGINT);  
   --
@@ -608,7 +613,7 @@ IF @Action = 'AvaliableRooms'
       A.Id IN (SELECT D.ApartmentId FROM WRBHBContractManagement H
       LEFT OUTER JOIN WRBHBContractManagementAppartment D
       WITH(NOLOCK)ON D.ContractId=H.Id
-      WHERE H.IsActive=1 AND D.IsDeleted=0 AND D.IsActive=1 AND
+      WHERE H.IsActive=1 AND H.IsDeleted=0 AND D.IsActive=1 AND 
       D.IsDeleted=0 AND H.ClientId=(SELECT ClientId FROM WRBHBBooking 
       WHERE Id = @BookingId) AND H.ContractType=' Dedicated Contracts ' AND
       D.PropertyId = @PropertyId) AND
@@ -648,7 +653,7 @@ IF @Action = 'AvaliableRooms'
      BEGIN
       INSERT INTO #TMPTABLE(label,RoomId)
       SELECT B.BlockName+' - '+A.ApartmentNo+' - '+R.RoomNo+' - '+RB.BedNO AS label,
-      B.Id FROM WRBHBProperty P
+      RB.Id FROM WRBHBProperty P
       LEFT OUTER JOIN WRBHBPropertyBlocks B WITH(NOLOCK)ON B.PropertyId=P.Id
       LEFT OUTER JOIN WRBHBPropertyApartment A WITH(NOLOCK)ON 
       A.PropertyId=P.Id AND A.BlockId = B.Id
@@ -663,7 +668,7 @@ IF @Action = 'AvaliableRooms'
       A.IsActive = 1 AND A.IsDeleted = 0 AND A.Status = 'Active' AND
       A.SellableApartmentType != 'HUB' AND R.RoomStatus = 'Active' AND
       R.Id NOT IN (SELECT RoomId FROM #BokedRoom) AND
-      R.Id NOT IN (SELECT BedId FROM #BokedBed) AND
+      RB.Id NOT IN (SELECT BedId FROM #BokedBed) AND
       A.Id NOT IN (SELECT ApartmentId FROM #BokedApartment) AND
       R.Id NOT IN (SELECT RoomId FROM #DedicatedRoomsInP) AND
       A.Id NOT IN (SELECT ApartmentId FROM #DedicatedApartmentInP)
@@ -689,14 +694,69 @@ IF @Action = 'AvaliableRooms'
       A.Status='Active' AND R.RoomStatus='Active' AND P.Id=@PropertyId AND
       A.Id NOT IN (SELECT ApartmentId FROM #BokedApartment) AND
       R.Id NOT IN (SELECT RoomId FROM #BokedRoom) AND
-      R.Id NOT IN (SELECT BedId FROM #BokedBed) AND
+      RB.Id NOT IN (SELECT BedId FROM #BokedBed) AND
       R.Id NOT IN (SELECT RoomId FROM #DedicatedRoomsInP) AND
       A.Id NOT IN (SELECT ApartmentId FROM #DedicatedApartmentInP)
       ORDER BY B.BlockName,A.ApartmentNo,R.RoomNo ASC;
      END
    END
+  IF @BookingLevel = 'Apartment'
+   BEGIN
+    IF @PropertyType = 'DdP'
+     BEGIN      
+      INSERT INTO #TMPTABLE(label,RoomId)
+      SELECT B.BlockName+' - '+A.ApartmentNo+' - '+A.SellableApartmentType AS label,
+      A.Id FROM WRBHBProperty P
+      LEFT OUTER JOIN WRBHBPropertyBlocks B WITH(NOLOCK)ON B.PropertyId=P.Id 
+      LEFT OUTER JOIN WRBHBPropertyApartment A WITH(NOLOCK)ON A.BlockId=B.Id
+      LEFT OUTER JOIN WRBHBPropertyRooms R WITH(NOLOCK)ON R.ApartmentId=A.Id
+      WHERE P.IsActive=1 AND P.IsDeleted=0 AND B.IsActive=1 AND B.IsDeleted=0 AND 
+      A.IsActive=1 AND A.IsDeleted=0 AND A.SellableApartmentType!='HUB' AND
+      A.Status='Active' AND R.IsActive=1 AND R.IsDeleted=0 AND
+      R.RoomStatus='Active' AND A.PropertyId = @PropertyId AND 
+      A.Id IN (SELECT D.ApartmentId FROM WRBHBContractManagement H
+      LEFT OUTER JOIN WRBHBContractManagementAppartment D
+      WITH(NOLOCK)ON D.ContractId=H.Id
+      WHERE H.IsActive=1 AND H.IsDeleted=0 AND D.IsActive=1 AND
+      D.IsDeleted=0 AND H.ClientId=(SELECT ClientId FROM WRBHBBooking 
+      WHERE Id = @BookingId) AND H.ContractType=' Dedicated Contracts ' AND
+      D.PropertyId = @PropertyId) AND
+      A.Id NOT IN (SELECT ApartmentId FROM #BokedApartment) AND
+      A.Id NOT IN (SELECT ApartmentId FROM WRBHBPropertyRooms
+      WHERE Id IN (SELECT RoomId FROM #BokedRoom)) AND
+      A.Id NOT IN (SELECT ApartmentId FROM WRBHBPropertyRooms
+      WHERE Id IN (SELECT RoomId FROM #BokedBed))
+      ORDER BY B.BlockName,A.ApartmentNo;
+     END    
+    IF @PropertyType = 'InP'  
+     BEGIN  
+      -- Get Property All Rooms   
+      INSERT INTO #TMPTABLE(label,RoomId)
+      SELECT PB.BlockName+' - '+A.ApartmentNo+' - '+A.SellableApartmentType AS 
+      label,A.Id FROM WRBHBProperty P
+      LEFT OUTER JOIN WRBHBPropertyBlocks PB WITH(NOLOCK)ON PB.PropertyId=P.Id
+      LEFT OUTER JOIN WRBHBPropertyApartment A WITH(NOLOCK)ON
+      A.PropertyId=P.Id AND A.BlockId=PB.Id 
+      LEFT OUTER JOIN WRBHBPropertyRooms R WITH(NOLOCK)ON R.ApartmentId = A.Id
+      WHERE P.IsActive=1 AND P.IsDeleted=0 AND PB.IsActive=1 AND
+      PB.IsDeleted=0 AND P.Category='Internal Property' AND 
+      A.SellableApartmentType != 'HUB' AND A.IsActive=1 AND A.IsDeleted=0 AND 
+      A.Status='Active' AND R.IsActive = 1 AND R.IsDeleted = 0 AND
+      R.RoomStatus = 'Active' AND P.Id=@PropertyId AND 
+      A.RackTariff=(SELECT Tariff FROM WRBHBApartmentBookingProperty
+      WHERE BookingId = @BookingId) AND
+      A.Id NOT IN (SELECT ApartmentId FROM #BokedApartment) AND
+      A.Id NOT IN (SELECT ApartmentId FROM WRBHBPropertyRooms
+      WHERE Id IN (SELECT RoomId FROM #BokedRoom)) AND
+      A.Id NOT IN (SELECT ApartmentId FROM WRBHBPropertyRooms
+      WHERE Id IN (SELECT RoomId FROM #BokedBed)) AND
+      A.Id NOT IN (SELECT ApartmentId FROM WRBHBPropertyRooms
+      WHERE Id IN (SELECT RoomId FROM #DedicatedRoomsInP)) AND
+      A.Id NOT IN (SELECT ApartmentId FROM #DedicatedApartmentInP);
+     END
+   END
   -- Avaliable rooms  
-  SELECT label,RoomId FROM #TMPTABLE;  
+  SELECT label,RoomId FROM #TMPTABLE GROUP BY label,RoomId;  
  END  
 IF @Action = 'AvaliableFromRoom'  
  BEGIN
@@ -709,14 +769,22 @@ IF @Action = 'AvaliableFromRoom'
     WHERE Id IN (SELECT BookingPropertyTableId
     FROM WRBHBBookingPropertyAssingedGuest WHERE BookingId=@BookingId
     GROUP BY BookingPropertyTableId);
-    --
-    /*SELECT TOP 1 @ChkInDt = CAST(CAST(ChkInDt AS VARCHAR)+' '+
-    CAST(ExpectChkInTime+' '+AMPM AS VARCHAR) AS DATETIME) 
-    FROM WRBHBBookingPropertyAssingedGuest 
+    -- Room shifting flag = 0 check in date
+    IF EXISTS(SELECT NULL FROM WRBHBBookingPropertyAssingedGuest 
     WHERE BookingId=@BookingId AND IsActive = 1 AND IsDeleted = 0 AND 
-    RoomId = @RoomId AND RoomCaptured = @Id1 AND 
-    ISNULL(RoomShiftingFlag,0) = 0;*/
+    RoomCaptured = @Id1 AND ISNULL(RoomShiftingFlag,0) = 1)
+     BEGIN
+      SELECT TOP 1 @ChkInDt = CAST(CAST(ChkInDt AS VARCHAR)+' '+
+      CAST(ExpectChkInTime+' '+AMPM AS VARCHAR) AS DATETIME) 
+      FROM WRBHBBookingPropertyAssingedGuest 
+      WHERE BookingId=@BookingId AND IsActive = 1 AND IsDeleted = 0 AND 
+      RoomId = @RoomId AND RoomCaptured = @Id1 AND 
+      ISNULL(RoomShiftingFlag,0) = 0;
+     END
    END
+  --
+  --select @PropertyId1,@GetType1,@PropertyType1;return;
+  --
   IF @BookingLevel = 'Bed'
    BEGIN
     -- Get Type & Property Type & Property Id
@@ -725,13 +793,18 @@ IF @Action = 'AvaliableFromRoom'
     WHERE Id IN (SELECT BookingPropertyTableId
     FROM WRBHBBedBookingPropertyAssingedGuest WHERE BookingId=@BookingId
     GROUP BY BookingPropertyTableId);
-    --
-    /*SELECT TOP 1 @ChkInDt = CAST(CAST(ChkInDt AS VARCHAR)+' '+
-    CAST(ExpectChkInTime+' '+AMPM AS VARCHAR) AS DATETIME) 
-    FROM WRBHBBedBookingPropertyAssingedGuest 
+    -- Room shifting flag = 0 check in date
+    IF EXISTS(SELECT NULL FROM WRBHBBedBookingPropertyAssingedGuest
     WHERE BookingId=@BookingId AND IsActive = 1 AND IsDeleted = 0 AND 
-    BedId = @RoomId AND RoomCaptured = @Id1 AND 
-    ISNULL(RoomShiftingFlag,0) = 0;*/
+    RoomCaptured = @Id1 AND ISNULL(RoomShiftingFlag,0) = 1)
+     BEGIN
+      SELECT TOP 1 @ChkInDt = CAST(CAST(ChkInDt AS VARCHAR)+' '+
+      CAST(ExpectChkInTime+' '+AMPM AS VARCHAR) AS DATETIME) 
+      FROM WRBHBBedBookingPropertyAssingedGuest 
+      WHERE BookingId=@BookingId AND IsActive = 1 AND IsDeleted = 0 AND 
+      BedId = @RoomId AND RoomCaptured = @Id1 AND 
+      ISNULL(RoomShiftingFlag,0) = 0;
+     END
    END
   IF @BookingLevel = 'Apartment'
    BEGIN
@@ -741,23 +814,32 @@ IF @Action = 'AvaliableFromRoom'
     WHERE Id IN (SELECT BookingPropertyTableId  
     FROM WRBHBApartmentBookingPropertyAssingedGuest WHERE BookingId=@BookingId  
     GROUP BY BookingPropertyTableId);
-    --
-    /*SELECT TOP 1 @ChkInDt = CAST(CAST(ChkInDt AS VARCHAR)+' '+
-    CAST(ExpectChkInTime+' '+AMPM AS VARCHAR) AS DATETIME) 
-    FROM WRBHBApartmentBookingPropertyAssingedGuest 
+    -- Room shifting flag = 0 check in date
+    IF EXISTS(SELECT NULL FROM WRBHBApartmentBookingPropertyAssingedGuest
     WHERE BookingId=@BookingId AND IsActive = 1 AND IsDeleted = 0 AND 
-    ApartmentId = @RoomId AND RoomCaptured = @Id1 AND 
-    ISNULL(RoomShiftingFlag,0) = 0;*/  
+    RoomCaptured = @Id1 AND ISNULL(RoomShiftingFlag,0) = 1)
+     BEGIN
+      SELECT TOP 1 @ChkInDt = CAST(CAST(ChkInDt AS VARCHAR)+' '+
+      CAST(ExpectChkInTime+' '+AMPM AS VARCHAR) AS DATETIME) 
+      FROM WRBHBApartmentBookingPropertyAssingedGuest 
+      WHERE BookingId=@BookingId AND IsActive = 1 AND IsDeleted = 0 AND 
+      ApartmentId = @RoomId AND RoomCaptured = @Id1 AND 
+      ISNULL(RoomShiftingFlag,0) = 0;
+     END
    END
+  --
+  --select @ChkInDt;return;
+  --
   CREATE TABLE #AgedGst(Id BIGINT);
   CREATE TABLE #DedicatedRoom(RoomId BIGINT);
   INSERT INTO #DedicatedRoom(RoomId)
   SELECT RoomId FROM WRBHBContractManagementTariffAppartment
-  WHERE RoomId != 0 AND PropertyId = @PropertyId1;
+  WHERE RoomId != 0 AND PropertyId = @PropertyId1 AND IsActive = 1 AND IsDeleted = 0;
   CREATE TABLE #DedicatedApartment(ApartmentId BIGINT);
   INSERT INTO #DedicatedApartment(ApartmentId)
   SELECT ApartmentId FROM WRBHBContractManagementAppartment
-  WHERE ApartmentId != 0 AND PropertyId = @PropertyId1;
+  WHERE ApartmentId != 0 AND PropertyId = @PropertyId1 AND IsActive = 1 AND
+  IsDeleted = 0;
   CREATE TABLE #TMPTABLE1(label NVARCHAR(100),RoomId BIGINT);
   DECLARE @AvaRoomCnt INT;
   CREATE TABLE #BookedRoom(RoomId BIGINT,BookingLevel NVARCHAR(100));
@@ -871,6 +953,9 @@ IF @Action = 'AvaliableFromRoom'
   CAST(@ChkOutDt AS DATETIME) AND PG.BookingPropertyId=@PropertyId1  
   GROUP BY PG.ApartmentId;
   -- Booked Apartment End
+  --select @BookingLevel;return;
+  --select @ChkInDt;return;
+  --
   IF @BookingLevel = 'Room'
    BEGIN    
     INSERT INTO #AgedGst(Id)  
@@ -918,7 +1003,9 @@ IF @Action = 'AvaliableFromRoom'
     CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) >=  
     CAST(@ChkOutDt AS DATETIME) AND PG.BookingPropertyId=@PropertyId1 AND  
     PG.Id NOT IN (SELECT Id FROM #AgedGst)  GROUP BY PG.RoomId;
-    -- Booked Room End        
+    -- Booked Room End
+    --select @PropertyType1;return;
+    --        
     IF @PropertyType1 = 'MGH'
      BEGIN
       -- Avaliable Rooms
@@ -962,10 +1049,10 @@ IF @Action = 'AvaliableFromRoom'
       WHERE Id = @BookingId) AND H.ContractType=' Dedicated Contracts ' AND
       D.PropertyId = @PropertyId1) AND
       A.Id NOT IN (SELECT ApartmentId FROM #BookedApartment) AND
-      R.Id NOT IN (SELECT RoomId FROM #BookedRoom) AND
+      R.Id NOT IN (SELECT RoomId FROM #RoomBookedRoom) AND
       R.Id NOT IN (SELECT RoomId FROM #BookedBed);  
       -- Dedicated apartment  
-      INSERT INTO #DdP(label,RoomId)
+      INSERT INTO #DdP1(label,RoomId)
       SELECT B.BlockName+' - '+A.ApartmentNo+' - '+R.RoomNo AS label,
       R.Id FROM WRBHBProperty P
       LEFT OUTER JOIN WRBHBPropertyBlocks B WITH(NOLOCK)ON B.PropertyId=P.Id
@@ -978,12 +1065,12 @@ IF @Action = 'AvaliableFromRoom'
       A.Id IN (SELECT D.ApartmentId FROM WRBHBContractManagement H
       LEFT OUTER JOIN WRBHBContractManagementAppartment D
       WITH(NOLOCK)ON D.ContractId=H.Id
-      WHERE H.IsActive=1 AND D.IsDeleted=0 AND D.IsActive=1 AND
+      WHERE H.IsActive=1 AND H.IsDeleted=0 AND D.IsActive=1 AND
       D.IsDeleted=0 AND H.ClientId=(SELECT ClientId FROM WRBHBBooking 
       WHERE Id = @BookingId) AND H.ContractType=' Dedicated Contracts ' AND
       D.PropertyId = @PropertyId1) AND
       A.Id NOT IN (SELECT ApartmentId FROM #BookedApartment) AND
-      R.Id NOT IN (SELECT RoomId FROM #BookedRoom) AND
+      R.Id NOT IN (SELECT RoomId FROM #RoomBookedRoom) AND
       R.Id NOT IN (SELECT RoomId FROM #BookedBed);  
       --  
       INSERT INTO #TMPTABLE1(label,RoomId)  
@@ -991,7 +1078,13 @@ IF @Action = 'AvaliableFromRoom'
       GROUP BY label,RoomId ORDER BY label;  
      END    
     IF @PropertyType1 = 'InP'  
-     BEGIN  
+     BEGIN
+      --
+      --select * from #RoomBookedRoom where RoomId = 718;
+      --select * from #BookedBed where RoomId = 718;
+      --select * from #BookedApartment where ApartmentId = 127;return;
+      --select * from #DedicatedRoom;
+      --select * from #DedicatedApartment;return;  
       -- Get Property All Rooms   
       INSERT INTO #TMPTABLE1(label,RoomId)
       SELECT B.BlockName+' - '+A.ApartmentNo+' - '+R.RoomNo+' - '+  
@@ -1011,12 +1104,16 @@ IF @Action = 'AvaliableFromRoom'
       R.Id NOT IN (SELECT RoomId FROM #RoomBookedRoom) AND
       R.Id NOT IN (SELECT RoomId FROM #BookedBed) AND
       A.Id NOT IN (SELECT ApartmentId FROM #BookedApartment) AND
-      R.Id NOT IN (SELECT * FROM #DedicatedRoom) AND
-      A.Id NOT IN (SELECT * FROM #DedicatedApartment);
+      R.Id NOT IN (SELECT RoomId FROM #DedicatedRoom) AND
+      A.Id NOT IN (SELECT ApartmentId FROM #DedicatedApartment);
+      --
+      --select * from #TMPTABLE1;return;
+      --select * from #TMPTABLE1 where RoomId = 718;return;
+      --
      END
    END
   IF @BookingLevel = 'Bed'
-   BEGIN    
+   BEGIN
     INSERT INTO #AgedGst(Id)  
     SELECT Id FROM WRBHBBedBookingPropertyAssingedGuest 
     WHERE BookingId=@BookingId AND IsActive = 1 AND IsDeleted = 0 AND 
@@ -1033,7 +1130,9 @@ IF @Action = 'AvaliableFromRoom'
     CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
     PG.Id NOT IN (SELECT Id FROM #AgedGst) AND
     PG.BookingPropertyId=@PropertyId1 GROUP BY PG.BedId;  
-    --   
+    --
+    --select * from #BedBookedBed;return; 
+    --  
     INSERT INTO #BedBookedBed(BedId)
     SELECT PG.BedId FROM WRBHBBedBookingPropertyAssingedGuest PG  
     WHERE PG.IsActive=1 AND PG.IsDeleted=0 AND   
@@ -1041,6 +1140,8 @@ IF @Action = 'AvaliableFromRoom'
     CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
     PG.Id NOT IN (SELECT Id FROM #AgedGst) AND
     PG.BookingPropertyId=@PropertyId1 GROUP BY PG.BedId;  
+    --
+    --select * from #BedBookedBed;return; 
     --   
     INSERT INTO #BedBookedBed(BedId)
     SELECT PG.BedId FROM WRBHBBedBookingPropertyAssingedGuest PG  
@@ -1052,6 +1153,8 @@ IF @Action = 'AvaliableFromRoom'
     CAST(@ChkInDt AS DATETIME) AND CAST(@ChkOutDt AS DATETIME) AND
     PG.Id NOT IN (SELECT Id FROM #AgedGst) AND
     PG.BookingPropertyId=@PropertyId1 GROUP BY PG.BedId;  
+    --
+    --select * from #BedBookedBed;return; 
     --   
     INSERT INTO #BedBookedBed(BedId)
     SELECT PG.BedId FROM WRBHBBedBookingPropertyAssingedGuest PG  
@@ -1062,14 +1165,23 @@ IF @Action = 'AvaliableFromRoom'
     CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME) >=  
     CAST(@ChkOutDt AS DATETIME) AND PG.BookingPropertyId=@PropertyId1 AND
     PG.Id NOT IN (SELECT Id FROM #AgedGst)
-    GROUP BY PG.BedId;  
+    GROUP BY PG.BedId;
+    --
+    --select * from #BedBookedBed;return; 
     -- Booked BED End
+    --
+    /*select * from #BookedRoom;  
+    select * from #BookedApartment;
+    select * from #BedBookedBed;
+    select * from #DedicatedRoom;
+    select * from #DedicatedApartment;
+    select * from #AgedGst;return;*/
+    --
     IF @PropertyType1 = 'MGH'
      BEGIN
       INSERT INTO #TMPTABLE1(label,RoomId)
       SELECT PB.BlockName+' - '+A.ApartmentNo+' - '+R.RoomNo+' - '+
-      CAST(B.BedNO AS VARCHAR) AS label,B.Id AS BedId
-      FROM WRBHBProperty P
+      CAST(B.BedNO AS VARCHAR) AS label,B.Id FROM WRBHBProperty P
       LEFT OUTER JOIN WRBHBPropertyBlocks PB WITH(NOLOCK)ON PB.PropertyId=P.Id
       LEFT OUTER JOIN WRBHBPropertyApartment A WITH(NOLOCK)ON
       A.PropertyId=P.Id AND A.BlockId=PB.Id
@@ -1092,6 +1204,7 @@ IF @Action = 'AvaliableFromRoom'
      END        
     IF @PropertyType1 = 'InP'  
      BEGIN
+      INSERT INTO #TMPTABLE1(label,RoomId)
       SELECT PB.BlockName+' - '+A.ApartmentNo+' - '+R.RoomNo+' - '+
       CAST(B.BedNO AS VARCHAR) AS label,B.Id AS BedId
       FROM WRBHBProperty P
@@ -1179,7 +1292,7 @@ IF @Action = 'AvaliableFromRoom'
       A.Id IN (SELECT D.ApartmentId FROM WRBHBContractManagement H
       LEFT OUTER JOIN WRBHBContractManagementAppartment D
       WITH(NOLOCK)ON D.ContractId=H.Id
-      WHERE H.IsActive=1 AND D.IsDeleted=0 AND D.IsActive=1 AND
+      WHERE H.IsActive=1 AND H.IsDeleted=0 AND D.IsActive=1 AND
       D.IsDeleted=0 AND H.ClientId=(SELECT ClientId FROM WRBHBBooking 
       WHERE Id = @BookingId) AND H.ContractType=' Dedicated Contracts ' AND
       D.PropertyId = @PropertyId1) AND
@@ -1217,11 +1330,24 @@ IF @Action = 'AvaliableFromRoom'
       A.Id NOT IN (SELECT ApartmentId FROM #DedicatedApartment);
      END    
    END
+  --
+  --select * from #TMPTABLE1;
   -- Avaliable rooms
   SET @AvaRoomCnt =(SELECT COUNT(*) FROM #TMPTABLE1 WHERE RoomId = @RoomId);
   IF @AvaRoomCnt = 0
    BEGIN
-    SELECT '*  Room Not Avliable' AS RoomSts;
+    IF @BookingLevel = 'Apartment'
+     BEGIN
+      SELECT '*  Apartment Not Available' AS RoomSts;
+     END
+    IF @BookingLevel = 'Room'
+     BEGIN
+      SELECT '*  Room Not Available' AS RoomSts;
+     END
+    IF @BookingLevel = 'Bed'
+     BEGIN
+      SELECT '*  Bed Not Available' AS RoomSts;
+     END
    END
   ELSE
    BEGIN

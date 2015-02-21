@@ -11,6 +11,7 @@ namespace HB.Dao
 {
     public class ContractNonDedicatedServiceDAO
     {
+        string UserData;
         public DataSet Save(string NonDedicatedContractServicesDtls, User user, int NonDedicatedContractId)
         {
             DataSet ds = new DataSet();
@@ -44,11 +45,19 @@ namespace HB.Dao
                 command = new SqlCommand();
                 if (ctrNonDdSrv.Id != 0)
                 {
+                    UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                    "', SctId:" + user.SctId + ", Service:ContractNonDedicatedServices_Update" +
+                     ", ProcName:'" + StoredProcedures.ContractNonDedicatedServices_Update;
+
                     command.CommandText = StoredProcedures.ContractNonDedicatedServices_Update;
                     command.Parameters.Add("@Id", SqlDbType.BigInt).Value = ctrNonDdSrv.Id;
                 }
                 else
                 {
+                    UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                    "', SctId:" + user.SctId + ", Service:ContractNonDedicatedServices_Insert" +
+                     ", ProcName:'" + StoredProcedures.ContractNonDedicatedServices_Insert;
+
                     command.CommandText = StoredProcedures.ContractNonDedicatedServices_Insert;
                 }
                 command.CommandType = CommandType.StoredProcedure;
@@ -62,7 +71,7 @@ namespace HB.Dao
                   command.Parameters.Add("@CreatedBy", SqlDbType.BigInt).Value = user.Id;
                   command.Parameters.Add("@AmountChange", SqlDbType.BigInt).Value = ctrNonDdSrv.AmountChange;
                   command.Parameters.Add("@TypeService", SqlDbType.NVarChar).Value = ctrNonDdSrv.TypeService;
-                ds = new WrbErpConnection().ExecuteDataSet(command, "");
+                  ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
             }
             if (n == 0)
             {

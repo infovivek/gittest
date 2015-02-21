@@ -93,7 +93,9 @@ IF @Action='PageLoad'
 	ServiceFB NVARCHAR(MAX),ServiceOT NVARCHAR(MAX),OtherService DECIMAL(27,2),ChkOutServiceST  DECIMAL(27,2),
 	CessService  DECIMAL(27,2),HECess1 DECIMAL(27,2),ExtraMatress  DECIMAL(27,2),CINNo NVARCHAR(MAX),
 	InVoicedate NVARCHAR(MAX),AmtWords NVARCHAR(MAX),
-	LTAgreed DECIMAL(27,2),LTRack DECIMAL(27,2),STAgreed DECIMAL(27,2),STRack DECIMAL(27,2))
+	LTAgreed DECIMAL(27,2),LTRack DECIMAL(27,2),STAgreed DECIMAL(27,2),STRack DECIMAL(27,2),
+	LaundryName NVARCHAR(MAX),ServiceName NVARCHAR(MAX),FoodBev NVARCHAR(MAX),
+	ServChrg1 NVARCHAR(MAX),CessName NVARCHAR(MAX),HCessName NVARCHAR(MAX))
 	
 	INSERT INTO #Prop3(GuestName ,Name ,Stay ,Type ,
 	BookingLevel ,BillDate ,ClientName ,NoOfDays , InVoiceNo ,
@@ -105,7 +107,8 @@ IF @Action='PageLoad'
 	ServiceTaxNo ,Taxablename ,BillAmount ,Address ,LTPer ,STPer ,VATPer ,Food ,
 	Laundry ,Service  ,Miscellaneous ,MiscellaneousRemarks  ,
 	ServiceFB ,ServiceOT ,OtherService ,ChkOutServiceST ,CessService ,HECess1 ,ExtraMatress ,CINNo ,
-	InVoicedate,AmtWords,LTAgreed,LTRack,STAgreed,STRack) 
+	InVoicedate,AmtWords,LTAgreed,LTRack,STAgreed,STRack,
+	LaundryName ,ServiceName ,FoodBev  ,ServChrg1,CessName,HCessName ) 
 	
     select h.GuestName as GuestName,h.Name,h.Stay,h.Type,h.BookingLevel,
     convert(nvarchar(100),h.BillDate,103) as BillDate,h.ClientName,h.NoOfDays,h.InVoiceNo,
@@ -159,7 +162,10 @@ IF @Action='PageLoad'
     sum(CS.HECess) HECess,h.ChkOutTariffExtraAmount ExtraMatress,
     'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),h.CreatedDate,103) as InVoicedate,
     'Rupees : '+dbo.fn_NtoWord(round((isnull(h.ChkOutTariffNetAmount+sum(CS.ChkOutServiceNetAmount),0)),0),'','') AS AmtWords,
-    h.LTAgreedAmount,h.LTRackAmount,h.STAgreedAmount,h.STRackAmount
+    h.LTAgreedAmount,h.LTRackAmount,h.STAgreedAmount,h.STRackAmount,
+    'Laundry' as LaundryName,'Service' as  ServiceName,'Food and Beverages' as FoodBev,
+    'Service Tax@12.00% on ServiceCharge'ServChrg1,
+    'Education Cess @2.00% ' CessName,'Secondary and Higher Education Cess @1.00%' HCessName
     
 	--CSDD.BillAmount
 	
@@ -203,7 +209,8 @@ IF @Action='PageLoad'
 	ServiceTaxNo ,Taxablename ,BillAmount ,Address ,LTPer ,STPer ,VATPer ,Food ,
 	Laundry ,Service  ,Miscellaneous ,MiscellaneousRemarks  ,
 	ServiceFB ,ServiceOT ,OtherService ,ChkOutServiceST ,CessService ,HECess1 ,ExtraMatress ,CINNo ,
-	InVoicedate ,AmtWords, LTAgreed,LTRack,STAgreed,STRack)   
+	InVoicedate ,AmtWords, LTAgreed,LTRack,STAgreed,STRack,
+	LaundryName ,ServiceName ,FoodBev ,ServChrg1,CessName,HCessName)   
 	
     select h.GuestName as GuestName,h.Name,h.Stay,h.Type,h.BookingLevel,
     convert(nvarchar(100),h.BillDate,103) as BillDate,h.ClientName,h.NoOfDays,h.InVoiceNo,
@@ -253,7 +260,10 @@ IF @Action='PageLoad'
     sum(CS.HECess) HECess,h.ChkOutTariffExtraAmount ExtraMatress,
     'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),h.CreatedDate,103) as InVoicedate,
     'Rupees : '+dbo.fn_NtoWord(round((isnull(h.ChkOutTariffNetAmount+sum(CS.ChkOutServiceNetAmount),0)),0),'','') AS AmtWords,
-    h.LTAgreedAmount,h.LTRackAmount,h.STAgreedAmount,h.STRackAmount
+    h.LTAgreedAmount,h.LTRackAmount,h.STAgreedAmount,h.STRackAmount,
+    'Laundry' as LaundryName,'Service' as  ServiceName,'Food and Beverages' as FoodBev,
+    'Service Tax@12.00% on ServiceCharge'ServChrg1,
+    'Education Cess @2.00% ' CessName,'Secondary and Higher Education Cess @1.00%' HCessName
     
     
 	--CSDD.BillAmount
@@ -299,7 +309,8 @@ IF @Action='PageLoad'
 	ServiceTaxNo ,Taxablename ,BillAmount ,Address ,LTPer ,STPer ,VATPer ,Food ,
 	Laundry ,Service  ,Miscellaneous ,MiscellaneousRemarks  ,
 	ServiceFB ,ServiceOT ,OtherService ,ChkOutServiceST ,CessService ,HECess1 ,ExtraMatress ,CINNo ,
-	InVoicedate ,AmtWords, LTAgreed,LTRack,STAgreed,STRack)   
+	InVoicedate ,AmtWords, LTAgreed,LTRack,STAgreed,STRack,
+	LaundryName ,ServiceName ,FoodBev ,ServChrg1,CessName,HCessName)   
 	
     select h.GuestName as GuestName,h.Name,h.Stay,h.Type,h.BookingLevel,
     convert(nvarchar(100),h.BillDate,103) as BillDate,h.ClientName,h.NoOfDays,h.InVoiceNo,
@@ -349,7 +360,10 @@ IF @Action='PageLoad'
     sum(CS.HECess) HECess,h.ChkOutTariffExtraAmount ExtraMatress,
     'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),h.CreatedDate,103) as InVoicedate,
     'Rupees : '+dbo.fn_NtoWord(round((isnull(h.ChkOutTariffNetAmount+sum(CS.ChkOutServiceNetAmount),0)),0),'','') AS AmtWords,
-    h.LTAgreedAmount,h.LTRackAmount,h.STAgreedAmount,h.STRackAmount
+    h.LTAgreedAmount,h.LTRackAmount,h.STAgreedAmount,h.STRackAmount,
+    'Laundry' as LaundryName,'Service' as  ServiceName,'Food and Beverages' as FoodBev,
+    'Service Tax@12.00% on ServiceCharge'ServChrg1,
+    'Education Cess @2.00% ' CessName,'Secondary and Higher Education Cess @1.00%' HCessName
     
     
 	--CSDD.BillAmount
@@ -394,7 +408,9 @@ IF @Action='PageLoad'
 	ServiceTaxNo ,Taxablename ,BillAmount ,Address ,LTPer ,STPer ,VATPer ,Food ,
 	Laundry ,Service  ,Miscellaneous ,MiscellaneousRemarks  ,
 	ServiceFB ,ServiceOT ,OtherService ,ChkOutServiceST ,CessService ,HECess1 ,ExtraMatress ,CINNo ,
-	InVoicedate,AmtWords , LTAgreed,LTRack,STAgreed,STRack   FROM #Prop3
+	InVoicedate,AmtWords , LTAgreed,LTRack,STAgreed,STRack ,
+	LaundryName ,ServiceName ,FoodBev  ,ServChrg1,CessName,HCessName
+	  FROM #Prop3
     group by GuestName ,Name ,Stay ,Type ,
 	BookingLevel ,BillDate ,ClientName ,NoOfDays , InVoiceNo ,
 	ChkOutTariffNetAmount ,TotalTariff ,ServiceAmount ,	LuxuryTax ,SerivceNet ,ServiTarFood , 
@@ -405,7 +421,8 @@ IF @Action='PageLoad'
 	ServiceTaxNo ,Taxablename ,BillAmount ,Address ,LTPer ,STPer ,VATPer ,Food ,
 	Laundry ,Service  ,Miscellaneous ,MiscellaneousRemarks  ,
 	ServiceFB ,ServiceOT ,OtherService ,ChkOutServiceST ,CessService ,HECess1 ,ExtraMatress ,CINNo ,
-	InVoicedate,AmtWords, LTAgreed,LTRack,STAgreed,STRack
+	InVoicedate,AmtWords, LTAgreed,LTRack,STAgreed,STRack,
+	LaundryName ,ServiceName ,FoodBev ,ServChrg1,CessName,HCessName
     
 	END
 	

@@ -16,7 +16,7 @@ namespace HB.Dao
         string UserData;
         public DataSet Save(String CltmgntRowId, Int32 CltmgntID, string Dtlval, User User)
         {
-            UserData = "   UserId : " + User.Id + ", UsreName : " + User.LoginUserName + ", ScreenName : " + User.ScreenName + ", SctId : " + User.SctId + ", BranchId : " + User.BranchId + "";
+           // UserData = "   UserId : " + User.Id + ", UsreName : " + User.LoginUserName + ", ScreenName : " + User.ScreenName + ", SctId : " + User.SctId + ", BranchId : " + User.BranchId + "";
             DataSet ds = new DataSet();
             DataTable dTable = new DataTable("ERRORTBL");
             dTable.Columns.Add("Exception");
@@ -65,12 +65,20 @@ namespace HB.Dao
                 ds = new DataSet();
                 if (ClientGust.Id != 0)
                 {
+                    UserData = " UserId:" + User.Id + ", UsreName:" + User.LoginUserName + ", ScreenName:'" + User.ScreenName +
+                    "', SctId:" + User.SctId + ", Service:ClientMgntClientguest_Update" +
+                     ", ProcName:'" + StoredProcedures.ClientMgntClientguest_Update;
+
                     command.CommandText = StoredProcedures.ClientMgntClientguest_Update;
                     command.Parameters.Add("@Id", SqlDbType.BigInt).Value = ClientGust.Id;
                 }
                 else
                 {
-                     command.CommandText = StoredProcedures.ClientMgntClientguest_Insert;
+                    UserData = " UserId:" + User.Id + ", UsreName:" + User.LoginUserName + ", ScreenName:'" + User.ScreenName +
+                    "', SctId:" + User.SctId + ", Service:ClientMgntClientguest_Insert" +
+                     ", ProcName:'" + StoredProcedures.ClientMgntClientguest_Insert;
+
+                    command.CommandText = StoredProcedures.ClientMgntClientguest_Insert;
                 }
                 command.CommandType = CommandType.StoredProcedure;
                 command.Parameters.Add("@CltmgntId", SqlDbType.BigInt).Value = CltmgntID;

@@ -18,7 +18,7 @@ namespace HB.Dao
        DataSet ds = new DataSet();
        public DataSet Save(String CltmgntRowId, Int32 CltmgntID, string Dtlval, User User)
        {
-           UserData = "   UserId : " + User.Id + ", UsreName : " + User.LoginUserName + ", ScreenName : " + User.ScreenName + ", SctId : " + User.SctId + ", BranchId : " + User.BranchId + "";
+         //  UserData = "   UserId : " + User.Id + ", UsreName : " + User.LoginUserName + ", ScreenName : " + User.ScreenName + ", SctId : " + User.SctId + ", BranchId : " + User.BranchId + "";
            DataTable dTable = new DataTable("ERRORTBL");
            dTable.Columns.Add("Exception");
            XmlDocument document = new XmlDocument();
@@ -42,11 +42,19 @@ namespace HB.Dao
                ds = new DataSet();
                if (NewCstFlds.Id != 0)
                {
+                   UserData = " UserId:" + User.Id + ", UsreName:" + User.LoginUserName + ", ScreenName:'" + User.ScreenName +
+                    "', SctId:" + User.SctId + ", Service:ClientMgntCustomFields_Update" +
+                     ", ProcName:'" + StoredProcedures.ClientMgntCustomFields_Update;
+
                    command.CommandText = StoredProcedures.ClientMgntCustomFields_Update;
                    command.Parameters.Add("@Id", SqlDbType.BigInt).Value = NewCstFlds.Id;
                }
                else
                {
+                   UserData = " UserId:" + User.Id + ", UsreName:" + User.LoginUserName + ", ScreenName:'" + User.ScreenName +
+                    "', SctId:" + User.SctId + ", Service:ClientMgntCustomFields_Insert" +
+                     ", ProcName:'" + StoredProcedures.ClientMgntCustomFields_Insert;
+
                    command.CommandText = StoredProcedures.ClientMgntCustomFields_Insert;
                }
                command.CommandType = CommandType.StoredProcedure;

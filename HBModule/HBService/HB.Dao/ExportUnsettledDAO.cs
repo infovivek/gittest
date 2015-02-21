@@ -18,7 +18,7 @@ namespace HB.Dao
             String UserData;
 
             UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
-            "', SctId:" + user.SctId + ", Service:PettyCashDAO Help" + ", ProcName:'" + StoredProcedures.PettyCash_Help;
+            "', SctId:" + user.SctId + ", Service:ExportUnsettled_Help Help" + ", ProcName:'" + StoredProcedures.ExportUnsettled_Help;
 
             SqlCommand command = new SqlCommand();
             command.CommandText = StoredProcedures.ExportUnsettled_Help;
@@ -33,7 +33,7 @@ namespace HB.Dao
         {
             String UserData;
             UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
-               "', SctId:" + user.SctId + ", Service:TDSDeclarationDAO Search" + ", ProcName:'" + StoredProcedures.TDS_Select;
+               "', SctId:" + user.SctId + ", Service:ExportUnsettled_Search Search" + ", ProcName:'" + StoredProcedures.ExportUnsettled_Search;
 
             SqlCommand command = new SqlCommand();
             command.CommandText = StoredProcedures.ExportUnsettled_Search;

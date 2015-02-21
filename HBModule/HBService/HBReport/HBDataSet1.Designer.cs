@@ -455,6 +455,22 @@ namespace HBReport {
             
             private global::System.Data.DataColumn columnToDate;
             
+            private global::System.Data.DataColumn columnExtraMatr;
+            
+            private global::System.Data.DataColumn columnServChrg;
+            
+            private global::System.Data.DataColumn columnServChrg1;
+            
+            private global::System.Data.DataColumn columnLaundryName;
+            
+            private global::System.Data.DataColumn columnServiceName;
+            
+            private global::System.Data.DataColumn columnFoodBev;
+            
+            private global::System.Data.DataColumn columnCessName;
+            
+            private global::System.Data.DataColumn columnHCessName;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public DataTable1DataTable() {
@@ -1194,6 +1210,70 @@ namespace HBReport {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn ExtraMatrColumn {
+                get {
+                    return this.columnExtraMatr;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn ServChrgColumn {
+                get {
+                    return this.columnServChrg;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn ServChrg1Column {
+                get {
+                    return this.columnServChrg1;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn LaundryNameColumn {
+                get {
+                    return this.columnLaundryName;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn ServiceNameColumn {
+                get {
+                    return this.columnServiceName;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn FoodBevColumn {
+                get {
+                    return this.columnFoodBev;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn CessNameColumn {
+                get {
+                    return this.columnCessName;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn HCessNameColumn {
+                get {
+                    return this.columnHCessName;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -1317,7 +1397,15 @@ namespace HBReport {
                         string Category, 
                         string Location, 
                         string AmtWords, 
-                        string ToDate) {
+                        string ToDate, 
+                        string ExtraMatr, 
+                        string ServChrg, 
+                        string ServChrg1, 
+                        string LaundryName, 
+                        string ServiceName, 
+                        string FoodBev, 
+                        string CessName, 
+                        string HCessName) {
                 DataTable1Row rowDataTable1Row = ((DataTable1Row)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         CheckoutNo,
@@ -1407,7 +1495,15 @@ namespace HBReport {
                         Category,
                         Location,
                         AmtWords,
-                        ToDate};
+                        ToDate,
+                        ExtraMatr,
+                        ServChrg,
+                        ServChrg1,
+                        LaundryName,
+                        ServiceName,
+                        FoodBev,
+                        CessName,
+                        HCessName};
                 rowDataTable1Row.ItemArray = columnValuesArray;
                 this.Rows.Add(rowDataTable1Row);
                 return rowDataTable1Row;
@@ -1518,6 +1614,14 @@ namespace HBReport {
                 this.columnLocation = base.Columns["Location"];
                 this.columnAmtWords = base.Columns["AmtWords"];
                 this.columnToDate = base.Columns["ToDate"];
+                this.columnExtraMatr = base.Columns["ExtraMatr"];
+                this.columnServChrg = base.Columns["ServChrg"];
+                this.columnServChrg1 = base.Columns["ServChrg1"];
+                this.columnLaundryName = base.Columns["LaundryName"];
+                this.columnServiceName = base.Columns["ServiceName"];
+                this.columnFoodBev = base.Columns["FoodBev"];
+                this.columnCessName = base.Columns["CessName"];
+                this.columnHCessName = base.Columns["HCessName"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -1703,6 +1807,22 @@ namespace HBReport {
                 base.Columns.Add(this.columnAmtWords);
                 this.columnToDate = new global::System.Data.DataColumn("ToDate", typeof(string), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnToDate);
+                this.columnExtraMatr = new global::System.Data.DataColumn("ExtraMatr", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnExtraMatr);
+                this.columnServChrg = new global::System.Data.DataColumn("ServChrg", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnServChrg);
+                this.columnServChrg1 = new global::System.Data.DataColumn("ServChrg1", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnServChrg1);
+                this.columnLaundryName = new global::System.Data.DataColumn("LaundryName", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnLaundryName);
+                this.columnServiceName = new global::System.Data.DataColumn("ServiceName", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnServiceName);
+                this.columnFoodBev = new global::System.Data.DataColumn("FoodBev", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnFoodBev);
+                this.columnCessName = new global::System.Data.DataColumn("CessName", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnCessName);
+                this.columnHCessName = new global::System.Data.DataColumn("HCessName", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnHCessName);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -3253,6 +3373,134 @@ namespace HBReport {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public string ExtraMatr {
+                get {
+                    try {
+                        return ((string)(this[this.tableDataTable1.ExtraMatrColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'ExtraMatr\' in table \'DataTable1\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableDataTable1.ExtraMatrColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public string ServChrg {
+                get {
+                    try {
+                        return ((string)(this[this.tableDataTable1.ServChrgColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'ServChrg\' in table \'DataTable1\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableDataTable1.ServChrgColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public string ServChrg1 {
+                get {
+                    try {
+                        return ((string)(this[this.tableDataTable1.ServChrg1Column]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'ServChrg1\' in table \'DataTable1\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableDataTable1.ServChrg1Column] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public string LaundryName {
+                get {
+                    try {
+                        return ((string)(this[this.tableDataTable1.LaundryNameColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'LaundryName\' in table \'DataTable1\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableDataTable1.LaundryNameColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public string ServiceName {
+                get {
+                    try {
+                        return ((string)(this[this.tableDataTable1.ServiceNameColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'ServiceName\' in table \'DataTable1\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableDataTable1.ServiceNameColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public string FoodBev {
+                get {
+                    try {
+                        return ((string)(this[this.tableDataTable1.FoodBevColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'FoodBev\' in table \'DataTable1\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableDataTable1.FoodBevColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public string CessName {
+                get {
+                    try {
+                        return ((string)(this[this.tableDataTable1.CessNameColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'CessName\' in table \'DataTable1\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableDataTable1.CessNameColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public string HCessName {
+                get {
+                    try {
+                        return ((string)(this[this.tableDataTable1.HCessNameColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'HCessName\' in table \'DataTable1\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableDataTable1.HCessNameColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public bool IsCheckoutNoNull() {
                 return this.IsNull(this.tableDataTable1.CheckoutNoColumn);
             }
@@ -4305,6 +4553,102 @@ namespace HBReport {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public void SetToDateNull() {
                 this[this.tableDataTable1.ToDateColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsExtraMatrNull() {
+                return this.IsNull(this.tableDataTable1.ExtraMatrColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetExtraMatrNull() {
+                this[this.tableDataTable1.ExtraMatrColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsServChrgNull() {
+                return this.IsNull(this.tableDataTable1.ServChrgColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetServChrgNull() {
+                this[this.tableDataTable1.ServChrgColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsServChrg1Null() {
+                return this.IsNull(this.tableDataTable1.ServChrg1Column);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetServChrg1Null() {
+                this[this.tableDataTable1.ServChrg1Column] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsLaundryNameNull() {
+                return this.IsNull(this.tableDataTable1.LaundryNameColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetLaundryNameNull() {
+                this[this.tableDataTable1.LaundryNameColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsServiceNameNull() {
+                return this.IsNull(this.tableDataTable1.ServiceNameColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetServiceNameNull() {
+                this[this.tableDataTable1.ServiceNameColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsFoodBevNull() {
+                return this.IsNull(this.tableDataTable1.FoodBevColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetFoodBevNull() {
+                this[this.tableDataTable1.FoodBevColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsCessNameNull() {
+                return this.IsNull(this.tableDataTable1.CessNameColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetCessNameNull() {
+                this[this.tableDataTable1.CessNameColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsHCessNameNull() {
+                return this.IsNull(this.tableDataTable1.HCessNameColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetHCessNameNull() {
+                this[this.tableDataTable1.HCessNameColumn] = global::System.Convert.DBNull;
             }
         }
         

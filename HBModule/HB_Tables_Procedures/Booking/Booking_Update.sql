@@ -52,13 +52,21 @@ CREATE PROCEDURE [dbo].[Sp_Booking_Update](
 @PropertyRefNo NVARCHAR(100),
 @PaymentFlag BIT)
 AS
-BEGIN   
+BEGIN
+ DECLARE @HBStay NVARCHAR(100) = '';
+ IF @PropertyRefNo = 'StayCorporateHB'
+  BEGIN
+   SET @HBStay = 'StayCorporateHB';
+   SET @PropertyRefNo = '';
+  END
+ --   
  UPDATE WRBHBBooking SET CheckInDate = CONVERT(DATE,@CheckInDate,103),
  CheckOutDate = CONVERT(DATE,@CheckOutDate,103),
  ExpectedChkInTime = @ExpectedChkInTime,Status = @Status,AMPM = @AMPM,
  SpecialRequirements = @SpecialRequirements,BookedDt = GETDATE(),
  BookedUsrId = @UsrId,ExtraCCEmail = @ExtraCCEmail,EmailtoGuest = 1,
- PropertyRefNo = @PropertyRefNo,PaymentFlag = @PaymentFlag WHERE Id = @Id;
+ PropertyRefNo = @PropertyRefNo,PaymentFlag = @PaymentFlag,
+ HBStay = @HBStay WHERE Id = @Id;
  SELECT Id,RowId,BookingCode FROM WRBHBBooking WHERE Id = @Id;
  IF @PaymentFlag = 0
   BEGIN

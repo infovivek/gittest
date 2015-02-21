@@ -29,7 +29,7 @@ CREATE PROCEDURE [dbo].[Sp_PropertyRooms_Insert](@PropertyId BIGINT,
 AS
 BEGIN
 IF EXISTS(SELECT NULL FROM  WRBHBPropertyRooms WHERE UPPER(RoomNo)=UPPER(@RoomNo) AND PropertyId =@PropertyId 
-AND BlockId=@BlockId AND ApartmentId=@ApartmentId)
+AND BlockId=@BlockId AND ApartmentId=@ApartmentId and IsActive=1 and IsDeleted=0)
 BEGIN 
 SELECT 'ALREADY EXISTS';
 END 

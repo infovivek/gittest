@@ -51,7 +51,7 @@ private function useWeb(Action:String,CtrlNm:String,ParmArry:Array):void
 	else
 	{
 		//ws.wsdl="http://64.71.143.144/HBService/HBService.asmx?WSDL";
-		ws.wsdl="http://localhost:1644/HBService.asmx?WSDL"; 
+		ws.wsdl="http://localhost:6239/HBService.asmx?WSDL"; 
 	}	
 	//ws.wsdl="http://localhost/HMS_Service/HMSService.asmx?WSDL";
 	//ws.wsdl=arr[1].toString()+"/HMS_Service/HMSService.asmx?WSDL";

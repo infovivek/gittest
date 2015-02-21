@@ -12,6 +12,7 @@ namespace HB.Dao
 {
     public class ClientGradeCityDetailsDAO
     {
+        String UserData = "";
         public DataSet Save(int HdrId ,string Hdrval, User user)
         {
             DataSet ds = new DataSet();
@@ -43,11 +44,19 @@ namespace HB.Dao
                 command = new SqlCommand();
                 if (ClientGrd.Id != 0)
                 {
+                    UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                    "', SctId:" + user.SctId + ", Service:ClientGradeCityDetails_Update" +
+                    ", ProcName:'" + StoredProcedures.ClientGradeCityDetails_Update;
+
                     command.CommandText = StoredProcedures.ClientGradeCityDetails_Update;
                     command.Parameters.Add("@Id", SqlDbType.BigInt).Value = ClientGrd.Id;
                 }
                 else
                 {
+                    UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                    "', SctId:" + user.SctId + ", Service:ClientGradeCityDetails_Insert" +
+                    ", ProcName:'" + StoredProcedures.ClientGradeCityDetails_Insert;
+
                     command.CommandText = StoredProcedures.ClientGradeCityDetails_Insert;
                 }
                 command.CommandType = CommandType.StoredProcedure;

@@ -360,6 +360,34 @@
           <DataField>AmtWords</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
+        <Field Name="ToDate">
+          <DataField>ToDate</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="ExtraMatr">
+          <DataField>ExtraMatr</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="ServChrg">
+          <DataField>ServChrg</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="ServChrg1">
+          <DataField>ServChrg1</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="LaundryName">
+          <DataField>LaundryName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="ServiceName">
+          <DataField>ServiceName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="FoodBev">
+          <DataField>FoodBev</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
       </Fields>
       <Query>
         <DataSourceName>HBDataSet1</DataSourceName>
@@ -717,7 +745,7 @@
         <Top>0.38646in</Top>
         <Left>1.07646in</Left>
         <Height>0.25in</Height>
-        <Width>1.90625in</Width>
+        <Width>2.18473in</Width>
         <ZIndex>10</ZIndex>
         <Style>
           <Border>
@@ -780,7 +808,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox16</rd:DefaultName>
-        <Top>0.69479in</Top>
+        <Top>0.71979in</Top>
         <Left>0.60484cm</Left>
         <Height>0.25in</Height>
         <Width>0.77083in</Width>
@@ -813,7 +841,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox19</rd:DefaultName>
-        <Top>0.69479in</Top>
+        <Top>0.71979in</Top>
         <Left>1.07646in</Left>
         <Height>0.25in</Height>
         <Width>5.72917in</Width>
@@ -846,7 +874,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox52</rd:DefaultName>
-        <Top>1.00729in</Top>
+        <Top>1.05729in</Top>
         <Left>0.60484cm</Left>
         <Height>0.25in</Height>
         <Width>0.77083in</Width>
@@ -877,7 +905,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox53</rd:DefaultName>
-        <Top>1.00729in</Top>
+        <Top>1.05729in</Top>
         <Left>1.07646in</Left>
         <Height>0.25in</Height>
         <Width>5.72917in</Width>
@@ -1085,6 +1113,9 @@
                         <TopBorder>
                           <Color>Black</Color>
                         </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1132,6 +1163,9 @@
                         <TopBorder>
                           <Color>Black</Color>
                         </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1179,6 +1213,9 @@
                         <TopBorder>
                           <Color>Black</Color>
                         </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1221,6 +1258,9 @@
                         <TopBorder>
                           <Color>Black</Color>
                         </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1250,7 +1290,9 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>Extra Mattress</Value>
+                              <Value>=IIf(Fields!ExtraMatress.Value &gt; 0
+    , Fields!ExtraMatr.Value
+    , "")</Value>
                               <Style>
                                 <FontStyle>Normal</FontStyle>
                                 <FontWeight>Normal</FontWeight>
@@ -1270,6 +1312,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1314,6 +1362,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1358,6 +1412,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1382,7 +1442,9 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Fields!ExtraMatress.Value</Value>
+                              <Value>=IIf(Fields!ExtraMatress.Value &gt; 0
+    , Fields!ExtraMatress.Value
+    , "")</Value>
                               <Style />
                             </TextRun>
                           </TextRuns>
@@ -1397,6 +1459,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1426,7 +1494,9 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>Food And Beverages</Value>
+                              <Value>=IIf(Fields!Food.Value &gt; 0
+    , Fields!FoodBev.Value
+    , "")</Value>
                               <Style>
                                 <FontStyle>Normal</FontStyle>
                                 <FontWeight>Normal</FontWeight>
@@ -1446,6 +1516,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1490,6 +1566,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1534,6 +1616,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1558,7 +1646,9 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Fields!Food.Value</Value>
+                              <Value>=IIf(Fields!Food.Value &gt; 0
+    , Fields!Food.Value
+    , "")</Value>
                               <Style />
                             </TextRun>
                           </TextRuns>
@@ -1573,6 +1663,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1602,7 +1698,9 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>Laundry</Value>
+                              <Value>=IIf(Fields!Laundry.Value &gt; 0
+    , Fields!LaundryName.Value
+    , "")</Value>
                               <Style>
                                 <FontStyle>Normal</FontStyle>
                                 <FontWeight>Normal</FontWeight>
@@ -1622,6 +1720,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1666,6 +1770,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1710,6 +1820,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1734,7 +1850,9 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Fields!Laundry.Value</Value>
+                              <Value>=IIf(Fields!Laundry.Value &gt; 0
+    , Fields!Laundry.Value
+    , "")</Value>
                               <Style />
                             </TextRun>
                           </TextRuns>
@@ -1749,6 +1867,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1778,7 +1902,9 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>Service</Value>
+                              <Value>=IIf(Fields!Service.Value &gt; 0
+    , Fields!ServiceName.Value
+    , "")</Value>
                               <Style>
                                 <FontStyle>Normal</FontStyle>
                                 <FontWeight>Normal</FontWeight>
@@ -1798,6 +1924,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1842,6 +1974,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1886,6 +2024,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1910,7 +2054,9 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Fields!Service.Value</Value>
+                              <Value>=IIf(Fields!Service.Value &gt; 0
+    , Fields!Service.Value
+    , "")</Value>
                               <Style />
                             </TextRun>
                           </TextRuns>
@@ -1925,6 +2071,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1954,7 +2106,9 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Fields!MiscellaneousRemarks.Value</Value>
+                              <Value>=IIf(Fields!Miscellaneous.Value &gt; 0
+    , Fields!MiscellaneousRemarks.Value
+    , "")</Value>
                               <Style>
                                 <FontStyle>Normal</FontStyle>
                                 <FontWeight>Normal</FontWeight>
@@ -1974,6 +2128,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -2018,6 +2178,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -2062,6 +2228,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -2086,7 +2258,9 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Fields!Miscellaneous.Value</Value>
+                              <Value>=IIf(Fields!Miscellaneous.Value &gt; 0
+    , Fields!Miscellaneous.Value
+    , "")</Value>
                               <Style />
                             </TextRun>
                           </TextRuns>
@@ -2101,6 +2275,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -2150,6 +2330,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -2194,6 +2380,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -2238,6 +2430,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -2262,7 +2460,9 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Fields!LuxuryTax.Value</Value>
+                              <Value>=IIf(Fields!LuxuryTax.Value &gt; 0
+    , Fields!LuxuryTax.Value
+    , "")</Value>
                               <Style />
                             </TextRun>
                           </TextRuns>
@@ -2277,6 +2477,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -2326,6 +2532,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -2370,6 +2582,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -2414,6 +2632,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -2453,6 +2677,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -2482,7 +2712,9 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Fields!VATPer.Value</Value>
+                              <Value>=IIf(Fields!Vat.Value &gt; 0
+    , Fields!VATPer.Value
+    , "")</Value>
                               <Style>
                                 <FontStyle>Normal</FontStyle>
                                 <FontWeight>Normal</FontWeight>
@@ -2502,6 +2734,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -2546,6 +2784,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -2590,6 +2834,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -2614,7 +2864,9 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Fields!Vat.Value</Value>
+                              <Value>=IIf(Fields!Vat.Value &gt; 0
+    , Fields!Vat.Value
+    , "")</Value>
                               <Style />
                             </TextRun>
                           </TextRuns>
@@ -2629,6 +2881,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -2658,7 +2916,9 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>Service Charge @ 2.5% on Tariff</Value>
+                              <Value>=IIf(Fields!ServiceCharge.Value &gt; 0
+    , Fields!ServChrg.Value
+    , "")</Value>
                               <Style>
                                 <FontStyle>Normal</FontStyle>
                                 <FontWeight>Normal</FontWeight>
@@ -2678,6 +2938,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -2722,6 +2988,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -2766,6 +3038,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -2790,7 +3068,9 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Fields!ServiceCharge.Value</Value>
+                              <Value>=IIf(Fields!ServiceCharge.Value &gt; 0
+    , Fields!ServiceCharge.Value
+    , "")</Value>
                               <Style />
                             </TextRun>
                           </TextRuns>
@@ -2805,6 +3085,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -2834,7 +3120,9 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>Service Tax @4.80% on Food and Beveranges</Value>
+                              <Value>=IIf(Fields!ChkOutServiceST.Value &gt; 0
+    , Fields!ServiceFB.Value
+    , "")</Value>
                               <Style>
                                 <FontStyle>Normal</FontStyle>
                                 <FontWeight>Normal</FontWeight>
@@ -2854,6 +3142,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -2898,6 +3192,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -2942,6 +3242,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -2966,7 +3272,9 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Fields!ChkOutServiceST.Value</Value>
+                              <Value>=IIf(Fields!ChkOutServiceST.Value &gt; 0
+    , Fields!ChkOutServiceST.Value
+    , "")</Value>
                               <Style />
                             </TextRun>
                           </TextRuns>
@@ -2981,6 +3289,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -3010,7 +3324,9 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Fields!ServiceOT.Value</Value>
+                              <Value>=IIf(Fields!OtherService.Value &gt; 0
+    , Fields!ServiceOT.Value
+    , "")</Value>
                               <Style>
                                 <FontStyle>Normal</FontStyle>
                                 <FontWeight>Normal</FontWeight>
@@ -3030,6 +3346,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -3074,6 +3396,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -3118,6 +3446,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -3142,7 +3476,9 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Fields!OtherService.Value</Value>
+                              <Value>=IIf(Fields!OtherService.Value &gt; 0
+    , Fields!OtherService.Value
+    , "")</Value>
                               <Style />
                             </TextRun>
                           </TextRuns>
@@ -3157,6 +3493,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -3186,7 +3528,9 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>Service Tax@12.00% on ServiceCharge</Value>
+                              <Value>=IIf(Fields!SerivceTax.Value &gt; 0
+    , Fields!ServChrg1.Value
+    , "")</Value>
                               <Style>
                                 <FontStyle>Normal</FontStyle>
                                 <FontWeight>Normal</FontWeight>
@@ -3206,6 +3550,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -3250,6 +3600,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -3294,6 +3650,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -3318,7 +3680,9 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Fields!SerivceTax.Value</Value>
+                              <Value>=IIf(Fields!SerivceTax.Value &gt; 0
+    , Fields!SerivceTax.Value
+    , "")</Value>
                               <Style />
                             </TextRun>
                           </TextRuns>
@@ -3333,6 +3697,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -3382,6 +3752,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -3426,6 +3802,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -3470,6 +3852,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -3509,6 +3897,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -3558,6 +3952,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -3602,6 +4002,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -3646,6 +4052,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -3685,6 +4097,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -3882,7 +4300,7 @@
           </TablixMembers>
         </TablixRowHierarchy>
         <DataSetName>DataSet1</DataSetName>
-        <Top>1.29791in</Top>
+        <Top>1.34791in</Top>
         <Left>0.60484cm</Left>
         <Height>4.39584in</Height>
         <Width>6.71958in</Width>
@@ -3908,7 +4326,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox51</rd:DefaultName>
-        <Top>6.66175in</Top>
+        <Top>6.83675in</Top>
         <Left>0.22967cm</Left>
         <Height>0.01042in</Height>
         <Width>6.77958in</Width>
@@ -3946,7 +4364,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox50</rd:DefaultName>
-        <Top>6.20133in</Top>
+        <Top>6.37634in</Top>
         <Left>4.30375in</Left>
         <Height>0.21875in</Height>
         <Width>2.55375in</Width>
@@ -3982,7 +4400,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox48</rd:DefaultName>
-        <Top>5.75077in</Top>
+        <Top>5.78827in</Top>
         <Left>4.135in</Left>
         <Height>0.19792in</Height>
         <Width>2.7725in</Width>
@@ -4018,7 +4436,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox49</rd:DefaultName>
-        <Top>6.20133in</Top>
+        <Top>6.37634in</Top>
         <Left>0.34925cm</Left>
         <Height>0.21875in</Height>
         <Width>1.4375in</Width>
@@ -4054,7 +4472,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox89</rd:DefaultName>
-        <Top>7.95721in</Top>
+        <Top>8.16972in</Top>
         <Left>2.72083in</Left>
         <Height>0.19792in</Height>
         <Width>4.20834in</Width>
@@ -4090,7 +4508,8 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox86</rd:DefaultName>
-        <Top>7.69818in</Top>
+        <Top>7.89819in</Top>
+        <Left>0.03175cm</Left>
         <Height>0.22501in</Height>
         <Width>6.92917in</Width>
         <ZIndex>22</ZIndex>
@@ -4125,7 +4544,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox51</rd:DefaultName>
-        <Top>7.41778in</Top>
+        <Top>7.61779in</Top>
         <Left>0.0125in</Left>
         <Height>0.24151in</Height>
         <Width>6.94792in</Width>
@@ -4160,7 +4579,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox91</rd:DefaultName>
-        <Top>7.17056in</Top>
+        <Top>7.37057in</Top>
         <Left>0.61861in</Left>
         <Height>0.21597in</Height>
         <Width>6.34181in</Width>
@@ -4196,7 +4615,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox50</rd:DefaultName>
-        <Top>7.17056in</Top>
+        <Top>7.37057in</Top>
         <Left>0.0125in</Left>
         <Height>0.21597in</Height>
         <Width>0.58666in</Width>
@@ -4232,7 +4651,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox49</rd:DefaultName>
-        <Top>6.93167in</Top>
+        <Top>7.13168in</Top>
         <Left>0.0125in</Left>
         <Height>0.22153in</Height>
         <Width>6.94792in</Width>
@@ -4268,7 +4687,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox48</rd:DefaultName>
-        <Top>6.69279in</Top>
+        <Top>6.8928in</Top>
         <Left>0.02188in</Left>
         <Height>0.21944in</Height>
         <Width>1.35417in</Width>
@@ -4303,7 +4722,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox41</rd:DefaultName>
-        <Top>6.43585in</Top>
+        <Top>6.61086in</Top>
         <Height>0.20799in</Height>
         <Width>6.96042in</Width>
         <ZIndex>28</ZIndex>
@@ -4338,7 +4757,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox88</rd:DefaultName>
-        <Top>7.95721in</Top>
+        <Top>8.16972in</Top>
         <Left>0.0125in</Left>
         <Height>0.19792in</Height>
         <Width>2.63542in</Width>
@@ -4363,7 +4782,7 @@
               <TextRun>
                 <Value>E &amp; O E</Value>
                 <Style>
-                  <FontSize>8pt</FontSize>
+                  <FontSize>9pt</FontSize>
                 </Style>
               </TextRun>
             </TextRuns>
@@ -4373,51 +4792,11 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox94</rd:DefaultName>
-        <Top>8.18707in</Top>
+        <Top>8.42458in</Top>
         <Left>0.0125in</Left>
-        <Height>0.17501in</Height>
+        <Height>0.19584in</Height>
         <Width>6.91667in</Width>
         <ZIndex>30</ZIndex>
-        <Style>
-          <Border>
-            <Style>None</Style>
-          </Border>
-          <VerticalAlign>Middle</VerticalAlign>
-          <PaddingLeft>2pt</PaddingLeft>
-          <PaddingRight>2pt</PaddingRight>
-          <PaddingTop>2pt</PaddingTop>
-          <PaddingBottom>2pt</PaddingBottom>
-        </Style>
-      </Textbox>
-      <Textbox Name="Textbox96">
-        <CanGrow>true</CanGrow>
-        <KeepTogether>true</KeepTogether>
-        <Paragraphs>
-          <Paragraph>
-            <TextRuns>
-              <TextRun>
-                <Value>Stay simplified is brand of HummingBird</Value>
-                <Style>
-                  <FontStyle>Normal</FontStyle>
-                  <FontFamily>Calibri</FontFamily>
-                  <FontSize>11pt</FontSize>
-                  <FontWeight>Normal</FontWeight>
-                  <TextDecoration>None</TextDecoration>
-                  <Color>#000000</Color>
-                </Style>
-              </TextRun>
-            </TextRuns>
-            <Style>
-              <TextAlign>Center</TextAlign>
-            </Style>
-          </Paragraph>
-        </Paragraphs>
-        <rd:DefaultName>Textbox94</rd:DefaultName>
-        <Top>8.39673in</Top>
-        <Left>0.02188in</Left>
-        <Height>0.25in</Height>
-        <Width>6.91667in</Width>
-        <ZIndex>31</ZIndex>
         <Style>
           <Border>
             <Style>None</Style>
@@ -4446,11 +4825,11 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox4</rd:DefaultName>
-        <Top>5.72577in</Top>
+        <Top>5.76327in</Top>
         <Left>0.0254cm</Left>
         <Height>0.25in</Height>
         <Width>4.125in</Width>
-        <ZIndex>32</ZIndex>
+        <ZIndex>31</ZIndex>
         <Style>
           <Border>
             <Style>None</Style>

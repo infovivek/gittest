@@ -4938,6 +4938,7 @@
 							 textAlign="right" tabIndex="66" prompt="Maximum Discount Allowed"/>
 				<mx:Label x="26" y="31" text="Rack Tariff" id="lbl_RackTariffRoom"/>
 				<mx:Label x="26" y="196.5" text="Status"/>
+				<mx:Label x="65" y="194.5" text="*" color="Red"/>
 				<s:TextInput id="Txt_RackTariff_RB" x="189" y="31" width="220" height="21" restrict="0-9."
 							 tabIndex="62" textAlign="right" focusOut="DecimalChange('Txt_RackTariff_RB')" prompt="Rack Tariff"/>
 				<mx:Label x="26" y="71.5" text="Double Occupancy Tariff" id="lbl_DoubleOccupancyTariff_R"/>

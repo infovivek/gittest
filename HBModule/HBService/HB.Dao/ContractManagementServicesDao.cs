@@ -13,6 +13,7 @@ namespace HB.Dao
 {
    public class ContractManagementServicesDao
     {
+       string UserData;
        public DataSet Save(string data, User user, int ContractId)
        {
            DataSet ds = new DataSet();
@@ -45,11 +46,19 @@ namespace HB.Dao
                   command = new SqlCommand();
                   if (CtrtServ.Id != 0)
                   {
+                      UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                   "', SctId:" + user.SctId + ", Service:ContractManagementServices_Update" +
+                    ", ProcName:'" + StoredProcedures.ContractManagementServices_Update;
+
                       command.CommandText = StoredProcedures.ContractManagementServices_Update;
                       command.Parameters.Add("@Id", SqlDbType.BigInt).Value = CtrtServ.Id;
                   }
                   else
                   {
+                      UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                   "', SctId:" + user.SctId + ", Service:ContractManagementServices_Insert" +
+                    ", ProcName:'" + StoredProcedures.ContractManagementServices_Insert;
+
                       command.CommandText = StoredProcedures.ContractManagementServices_Insert;
                   }
                   command.CommandType = CommandType.StoredProcedure;
@@ -64,7 +73,7 @@ namespace HB.Dao
                   command.Parameters.Add("@AmountChange", SqlDbType.BigInt).Value = CtrtServ.AmountChange;
                   command.Parameters.Add("@TypeService", SqlDbType.NVarChar).Value = CtrtServ.TypeService;
                   // EffectiveFrom      Complimentary      ServiceName  Price       ProductId           Id 
-                  ds = new WrbErpConnection().ExecuteDataSet(command, "");
+                  ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
               }
               if (n == 0)
               {

@@ -585,7 +585,7 @@ IF @Action = 'DatewiseBookingCnt'
 	  JOIN WRBHBClientManagement U WITH(NOLOCK)ON U.Id=B.ClientId AND U.IsActive=1
 	  JOIN WRBHBMasterClientManagement M WITH(NOLOCK)ON U.MasterClientId=M.Id AND M.IsActive=1
 	  WHERE B.IsActive=1 AND B.IsDeleted=0 AND BookingCode != 0 AND
-	  MONTH(BookedDt) = 12 AND YEAR(BookedDt) = 2014 
+	  MONTH(BookedDt) = @Id1 AND YEAR(BookedDt) = @Id2 
 	  GROUP BY ClientId,CONVERT(VARCHAR(100),B.BookedDt,103),M.ClientName,
 	  U.ClientName
 	  ORDER BY CONVERT(VARCHAR(100),B.BookedDt,103) ASC;

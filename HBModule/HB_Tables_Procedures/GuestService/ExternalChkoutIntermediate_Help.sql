@@ -210,7 +210,7 @@ BEGIN
 		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
 		h.BookingId,h.BedId,h.Type,h.BookingCode ,h.ChkInGuest,h.NewCheckInDate,d.ChkOutDt
 		
--- 2 Room Level		
+-- 2 Room Level	( Load checkin status)	
 		
 		INSERT INTO #GUEST(GuestName,GuestId,StateId,CheckInHdrId,PropertyId,RoomId,ApartmentId,  
 		BookingId,BedId,Type,Flag,BookingCode,ChkInDT,ChkOutDT)  
@@ -223,14 +223,15 @@ BEGIN
 		d.IsActive=1 and d.IsDeleted=0
 		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
 		h.PropertyType in ('External Property' , 'Managed G H','MMT','CPP','DdP') and  
-		h.PropertyId = @PropertyId and   d.CurrentStatus = 'CheckIn' and 
+		h.PropertyId = @PropertyId and   d.CurrentStatus = 'CheckIn' and d.RoomShiftingFlag=0 and
 		-- CONVERT(nvarchar(100),ChkoutDate,103) = CONVERT(nvarchar(100),GETDATE(),103) and  
 		h.Id NOT IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where IsActive = 1 and IsDeleted = 0  )  and
 		h.Id not in (Select ChkInHdrId FRom WRBHBExternalChechkOutTAC where IsActive = 1 and IsDeleted = 0)
 		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
 		h.BookingId,h.BedId,h.Type,h.BookingCode ,h.ChkInGuest,h.NewCheckInDate,d.ChkOutDt
 		
--- 2 Bed Level
+		
+-- 2 Bed Level ( Load checkin status)	
 		INSERT INTO #GUEST(GuestName,GuestId,StateId,CheckInHdrId,PropertyId,RoomId,ApartmentId,  
 		BookingId,BedId,Type,Flag,BookingCode,ChkInDT,ChkOutDT)  
 
@@ -242,7 +243,7 @@ BEGIN
 		d.IsActive=1 and d.IsDeleted=0
 		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
 		h.PropertyType in ('Managed G H') and  
-		h.PropertyId = @PropertyId and   d.CurrentStatus = 'CheckIn' and 
+		h.PropertyId = @PropertyId and   d.CurrentStatus = 'CheckIn' and d.RoomShiftingFlag=0 and 
 		-- CONVERT(nvarchar(100),ChkoutDate,103) = CONVERT(nvarchar(100),GETDATE(),103) and  
 		h.Id NOT IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where IsActive = 1 and IsDeleted = 0  )  and
 		h.Id not in (Select ChkInHdrId FRom WRBHBExternalChechkOutTAC where IsActive = 1 and IsDeleted = 0)
@@ -293,7 +294,7 @@ BEGIN
 		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
 		h.BookingId,h.BedId,h.Type,h.BookingCode ,h.ChkInGuest,h.NewCheckInDate,d.ChkOutDt 
 				
---4 Room Level 		
+--4 Room Level (Load when intermediate)
 		INSERT INTO #GUEST(GuestName,GuestId,StateId,CheckInHdrId,PropertyId,RoomId,ApartmentId,  
 		BookingId,BedId,Type,Flag,BookingCode,ChkInDT,ChkOutDT)  
 
@@ -305,7 +306,7 @@ BEGIN
 		d.IsActive=1 and d.IsDeleted=0
 		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
 		h.PropertyType in ('External Property','Managed G H','MMT','CPP','DdP') and  
-		h.PropertyId = @PropertyId and   d.CurrentStatus = 'CheckIn' and 
+		h.PropertyId = @PropertyId and   d.CurrentStatus = 'CheckIn' and d.RoomShiftingFlag=0 and
 		-- CONVERT(nvarchar(100),ChkoutDate,103) = CONVERT(nvarchar(100),GETDATE(),103) and  
 		h.Id  IN (Select ChkInHdrId FROM WRBHBChechkOutHdr where isnull(IntermediateFlag,0) = 1 and  
 		IsActive = 1 and IsDeleted = 0 and Isnull(Flag,0)=0 ) 
@@ -314,7 +315,7 @@ BEGIN
 		group by h.GuestName,h.GuestId,h.StateId,h.Id ,h.PropertyId,h.RoomId,h.ApartmentId,  
 		h.BookingId,h.BedId,h.Type,h.BookingCode ,h.ChkInGuest,h.NewCheckInDate,d.ChkOutDt
 		
---4 Bed Level
+--4 Bed Level (Load when intermediate)
 		INSERT INTO #GUEST(GuestName,GuestId,StateId,CheckInHdrId,PropertyId,RoomId,ApartmentId,  
 		BookingId,BedId,Type,Flag,BookingCode,ChkInDT,ChkOutDT)  
 
@@ -326,7 +327,7 @@ BEGIN
 		d.IsActive=1 and d.IsDeleted=0
 		WHERE h.IsActive=1 AND h.IsDeleted=0 AND   
 		h.PropertyType in ('Managed G H') and  
-		h.PropertyId = @PropertyId and   d.CurrentStatus = 'CheckIn' and 
+		h.PropertyId = @PropertyId and   d.CurrentStatus = 'CheckIn' and  d.RoomShiftingFlag=0 and
 		-- CONVERT(nvarchar(100),ChkoutDate,103) = CONVERT(nvarchar(100),GETDATE(),103) and  
 		h.Id  IN (Select ChkInHdrId FROM WRBHBChechkOutHdr where isnull(IntermediateFlag,0) = 1 and  
 		IsActive = 1 and IsDeleted = 0 and Isnull(Flag,0)=0 ) 
@@ -363,7 +364,7 @@ BEGIN
 		 
 		SELECT DISTINCT U.FirstName AS label,U.Id AS Data FROM WRBHBUser U
 		JOIN WRBHBPropertyUsers P ON U.Id=P.UserId AND P.IsActive=1 AND P.IsDeleted=0
-		WHERE P.UserType in ('Resident Managers','Assistant Resident Managers') AND 
+		WHERE P.UserType in ('Resident Managers','Assistant Resident Managers','Operations Managers','Other Roles') AND 
 		U.IsActive=1 AND U.IsDeleted=0 and P.PropertyId = @PropertyId
 	END
 
@@ -376,54 +377,80 @@ BEGIN
 		
 IF (ISNULL(@IntId,0)!=0)
 BEGIN
+
+
 	SELECT GuestName as Name,RoomNo,EmpCode,ApartmentType,BedType,PropertyType,EmailId FROM WRBHBCheckInHdr  
 	WHERE  Id=@CheckInHdrId AND IsActive=1 AND IsDeleted=0 
 
 	CREATE TABLE #LEVEL(ChkInDate NVARCHAR(100),ChkOutDate NVARCHAR(100),
-	TariffPaymentMode NVARCHAR(100),ServicePaymentMode NVARCHAR(100),TAC nvarchar(100),TACPer DECIMAL(27,2))
-	DECLARE @BookingId BIGINT,@GuestId BIGINT,@BookingLevel nvarchar(100),@NewCheckInDate NVARCHAR(100);
+	TariffPaymentMode NVARCHAR(100),ServicePaymentMode NVARCHAR(100),TAC nvarchar(100),TACPer DECIMAL(27,2),
+	BTCFile NVARCHAR(MAX))
+	DECLARE @BookingId BIGINT,@GuestId BIGINT,@BookingLevel nvarchar(100),@CheckInTime NVARCHAR(100),
+	@NewCheckInDate NVARCHAR(100),@NewCheckInTimeType NVARCHAR(100);
 	SET @BookingId=(SELECT BookingId FROM WRBHBCheckInHdr where Id = @CheckInHdrId and IsActive = 1 and IsDeleted =0)
 	SET @GuestId=(SELECT GuestId from WRBHBCheckInHdr where Id = @CheckInHdrId and IsActive = 1 and IsDeleted =0)
 	SET @BookingLevel=(SELECT Type from WRBHBCheckInHdr where Id = @CheckInHdrId and IsActive = 1 and IsDeleted =0)
 	
 	IF @BookingLevel = 'Room' 
 	BEGIN
-		INSERT INTO #LEVEL(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode,TAC,TACPer)
-		SELECT TOP 1 CONVERT(nvarchar(100),(d.ChkInDt),103),CONVERT(nvarchar(100),(d.ChkOutDt),103),
-		d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,isnull((d.Tariff*h.TACPer/100),0)
+		INSERT INTO #LEVEL(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode,TAC,TACPer,BTCFile)
+		--SELECT TOP 1 CONVERT(nvarchar(100),(d.ChkInDt),103),CONVERT(nvarchar(100),(d.ChkOutDt),103),
+		--d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,isnull((d.Tariff*h.TACPer/100),0)
+		--FROM  WRBHBBookingProperty h 
+		--JOIN WRBHBBookingPropertyAssingedGuest d on h.BookingId= d.BookingId and
+		--h.PropertyId = d.BookingPropertyId
+		--AND h.IsActive = 1 and
+		--h.IsDeleted = 0
+		--WHERE d.GuestId  = @GuestId and d.BookingId = @BookingId and d.IsActive = 1 and d.IsDeleted = 0
+		----group by d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,h.TACPer,d.Tariff,d.ChkInDt,d.ChkOutDt
+		--ORDER BY d.Id DESC;
+		SELECT  CONVERT(NVARCHAR(100),MIN(d.ChkInDt),103),CONVERT(NVARCHAR(100),MAX(d.ChkOutDt),103),
+		d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,isnull((d.Tariff*h.TACPer/100),0),d.BTCFilePath
 		FROM  WRBHBBookingProperty h 
 		JOIN WRBHBBookingPropertyAssingedGuest d on h.BookingId= d.BookingId and
 		h.PropertyId = d.BookingPropertyId
 		AND h.IsActive = 1 and
 		h.IsDeleted = 0
 		WHERE d.GuestId  = @GuestId and d.BookingId = @BookingId and d.IsActive = 1 and d.IsDeleted = 0
-		--group by d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,h.TACPer,d.Tariff,d.ChkInDt,d.ChkOutDt
-		ORDER BY d.Id DESC;
+		group by d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,h.TACPer,d.Tariff,d.ChkInDt,d.ChkOutDt,
+		d.BTCFilePath
+		--ORDER BY d.Id DESC;
 	END
 	
 	IF @BookingLevel = 'Bed' 
 	BEGIN
-		INSERT INTO #LEVEL(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode,TAC,TACPer)
-		SELECT TOP 1 CONVERT(nvarchar(100),(d.ChkInDt),103),CONVERT(nvarchar(100),(d.ChkOutDt),103),
-		d.TariffPaymentMode,d.ServicePaymentMode ,0,0
+		INSERT INTO #LEVEL(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode,TAC,TACPer,BTCFile)
+		--SELECT TOP 1 CONVERT(nvarchar(100),(d.ChkInDt),103),CONVERT(nvarchar(100),(d.ChkOutDt),103),
+		--d.TariffPaymentMode,d.ServicePaymentMode ,0,0
+		--FROM  WRBHBBedBookingProperty h 
+		--JOIN WRBHBBedBookingPropertyAssingedGuest d on h.BookingId= d.BookingId and
+		--h.PropertyId = d.BookingPropertyId
+		--AND h.IsActive = 1 and
+		--h.IsDeleted = 0
+		--WHERE d.GuestId  = @GuestId and d.BookingId = @BookingId and d.IsActive = 1 and d.IsDeleted = 0
+		----group by d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,h.TACPer,d.Tariff,d.ChkInDt,d.ChkOutDt
+		--ORDER BY d.Id DESC;
+		SELECT CONVERT(NVARCHAR(100),MIN(d.ChkInDt),103),CONVERT(NVARCHAR(100),MAX(d.ChkOutDt),103),
+		d.TariffPaymentMode,d.ServicePaymentMode ,0,0,d.BTCFilePath
 		FROM  WRBHBBedBookingProperty h 
 		JOIN WRBHBBedBookingPropertyAssingedGuest d on h.BookingId= d.BookingId and
 		h.PropertyId = d.BookingPropertyId
 		AND h.IsActive = 1 and
 		h.IsDeleted = 0
 		WHERE d.GuestId  = @GuestId and d.BookingId = @BookingId and d.IsActive = 1 and d.IsDeleted = 0
-		--group by d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,h.TACPer,d.Tariff,d.ChkInDt,d.ChkOutDt
-		ORDER BY d.Id DESC;
+		group by d.TariffPaymentMode,d.ServicePaymentMode ,d.Tariff,d.ChkInDt,d.ChkOutDt,d.BTCFilePath
+	--	ORDER BY d.Id DESC;
 	END
 	
 	DECLARE @ChkInDate NVARCHAR(100),@ChkOutDate NVARCHAR(100),@TariffPaymentMode NVARCHAR(100),
-	@ServicePaymentMode NVARCHAR(100),@TAC NVARCHAR(100),@TACPer DECIMAL(27,2);
+	@ServicePaymentMode NVARCHAR(100),@TAC NVARCHAR(100),@TACPer DECIMAL(27,2),@BTCFile NVARCHAR(MAX);
 	SET @ChkInDate =( SELECT ChkInDate FROM #LEVEL)	
 	SET @ChkOutDate =( SELECT ChkOutDate FROM #LEVEL)
 	SET @TariffPaymentMode =(SELECT TariffPaymentMode FROM #LEVEL)
 	SET @ServicePaymentMode =(SELECT ServicePaymentMode FROM #LEVEL)
 	SET @TAC=(SELECT TAC from #LEVEL)
 	SET @TACPer=(SELECT TACPer from #LEVEL)
+	SET @BTCFile=(SELECT BTCFile from #LEVEL)
 	
 	SELECT @NewCheckInDate=convert(nvarchar(100),Cast(NewCheckInDate as DATE),103)	FROM WRBHBCheckInHdr  
 	WHERE IsActive = 1 and IsDeleted = 0 and Id =@CheckInHdrId
@@ -460,7 +487,7 @@ BEGIN
 	
 
 	SELECT ClientName,ClientId,CityId,@TariffPaymentMode as TariffPaymentMode,@ServicePaymentMode as ServicePaymentMode,
-	Id From  WRBHBCheckInHdr  
+	@BTCFile AS BTCFile ,Id From  WRBHBCheckInHdr  
 	WHERE Id=@CheckInHdrId AND IsActive=1 AND IsDeleted=0
 	
 	--Day Count
@@ -480,11 +507,14 @@ BEGIN
 END
 ELSE
 BEGIN
+
+
 	SELECT GuestName as Name,RoomNo,EmpCode,ApartmentType,BedType,PropertyType,EmailId FROM WRBHBCheckInHdr  
 	WHERE  Id=@CheckInHdrId AND IsActive=1 AND IsDeleted=0 
 	
 	CREATE TABLE #LEVELs(ChkInDate NVARCHAR(100),ChkOutDate NVARCHAR(100),
-	TariffPaymentMode NVARCHAR(100),ServicePaymentMode NVARCHAR(100),TAC nvarchar(100),TACPer DECIMAL(27,2))
+	TariffPaymentMode NVARCHAR(100),ServicePaymentMode NVARCHAR(100),TAC nvarchar(100),TACPer DECIMAL(27,2),
+	BTCFile NVARCHAR(MAX))
 	--DECLARE @BookingId BIGINT,@GuestId BIGINT,@BookingLevel nvarchar(100),@NewCheckInDate NVARCHAR(100);
 	SET @BookingId=(SELECT BookingId FROM WRBHBCheckInHdr where Id = @CheckInHdrId and IsActive = 1 and IsDeleted =0)
 	SET @GuestId=(SELECT GuestId from WRBHBCheckInHdr where Id = @CheckInHdrId and IsActive = 1 and IsDeleted =0)
@@ -492,28 +522,45 @@ BEGIN
 	
 	IF @BookingLevel = 'Room' 
 	BEGIN
-		INSERT INTO #LEVELs(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode,TAC,TACPer)
-		SELECT TOP 1 CONVERT(nvarchar(100),(d.ChkInDt),103),CONVERT(nvarchar(100),(d.ChkOutDt),103),
-		d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,isnull((d.Tariff*h.TACPer/100),0)
+		INSERT INTO #LEVELs(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode,TAC,TACPer,BTCFile)
+		--SELECT TOP 1 CONVERT(nvarchar(100),(d.ChkInDt),103),CONVERT(nvarchar(100),(d.ChkOutDt),103),
+		--d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,isnull((d.Tariff*h.TACPer/100),0)
+		--FROM  WRBHBBookingProperty h 
+		--JOIN WRBHBBookingPropertyAssingedGuest d on h.BookingId= d.BookingId and
+		--h.PropertyId = d.BookingPropertyId AND h.IsActive = 1 and h.IsDeleted = 0
+		--where d.GuestId  = @GuestId and d.BookingId = @BookingId and d.IsActive = 1 and d.IsDeleted = 0
+		----group by d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,h.TACPer,d.Tariff,d.ChkInDt,d.ChkOutDt
+		--order by d.Id desc;
+		SELECT  CONVERT(NVARCHAR(100),MIN(d.ChkInDt),103),CONVERT(NVARCHAR(100),MAX(d.ChkOutDt),103),
+		d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,isnull((d.Tariff*h.TACPer/100),0),d.BTCFilePath
 		FROM  WRBHBBookingProperty h 
 		JOIN WRBHBBookingPropertyAssingedGuest d on h.BookingId= d.BookingId and
 		h.PropertyId = d.BookingPropertyId AND h.IsActive = 1 and h.IsDeleted = 0
 		where d.GuestId  = @GuestId and d.BookingId = @BookingId and d.IsActive = 1 and d.IsDeleted = 0
-		--group by d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,h.TACPer,d.Tariff,d.ChkInDt,d.ChkOutDt
-		order by d.Id desc;
+		--and d.RoomShiftingFlag=0
+		group by d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,d.Tariff,h.TACPer,d.BTCFilePath
 	END
 	IF @BookingLevel = 'Bed' 
 	BEGIN
-		INSERT INTO #LEVELs(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode,TAC,TACPer)
-		SELECT TOP 1 CONVERT(nvarchar(100),(d.ChkInDt),103),CONVERT(nvarchar(100),(d.ChkOutDt),103),
-		d.TariffPaymentMode,d.ServicePaymentMode ,0,0
+		INSERT INTO #LEVELs(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode,TAC,TACPer,BTCFile)
+		--SELECT TOP 1 CONVERT(nvarchar(100),(d.ChkInDt),103),CONVERT(nvarchar(100),(d.ChkOutDt),103),
+		--d.TariffPaymentMode,d.ServicePaymentMode ,0,0
+		--FROM  WRBHBBedBookingProperty h 
+		--JOIN WRBHBBedBookingPropertyAssingedGuest d on h.BookingId= d.BookingId and
+		--h.PropertyId = d.BookingPropertyId
+		--AND h.IsActive = 1 AND h.IsDeleted = 0
+		--WHERE d.GuestId  = @GuestId and d.BookingId = @BookingId and d.IsActive = 1 and d.IsDeleted = 0
+		----group by d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,h.TACPer,d.Tariff,d.ChkInDt,d.ChkOutDt
+		--ORDER BY d.Id DESC;
+		SELECT  CONVERT(NVARCHAR(100),MIN(d.ChkInDt),103),CONVERT(NVARCHAR(100),MAX(d.ChkOutDt),103),
+		d.TariffPaymentMode,d.ServicePaymentMode ,0,0,d.BTCFilePath
 		FROM  WRBHBBedBookingProperty h 
 		JOIN WRBHBBedBookingPropertyAssingedGuest d on h.BookingId= d.BookingId and
 		h.PropertyId = d.BookingPropertyId
 		AND h.IsActive = 1 AND h.IsDeleted = 0
 		WHERE d.GuestId  = @GuestId and d.BookingId = @BookingId and d.IsActive = 1 and d.IsDeleted = 0
-		--group by d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,h.TACPer,d.Tariff,d.ChkInDt,d.ChkOutDt
-		ORDER BY d.Id DESC;
+		group by d.TariffPaymentMode,d.ServicePaymentMode ,d.Tariff,d.ChkInDt,d.ChkOutDt,d.BTCFilePath
+	--	ORDER BY d.Id DESC;
 	END
 	--DECLARE @ChkInDate NVARCHAR(100),@ChkOutDate NVARCHAR(100),@TariffPaymentMode NVARCHAR(100),
 	--@ServicePaymentMode NVARCHAR(100),@TAC NVARCHAR(100),@TACPer DECIMAL(27,2);
@@ -523,13 +570,31 @@ BEGIN
 	SET @ServicePaymentMode =(SELECT ServicePaymentMode FROM #LEVELs)
 	SET @TAC=(SELECT TAC from #LEVELs)
 	SET @TACPer=(SELECT TACPer from #LEVELs)
+	SET @BTCFile=(SELECT BTCFile from #LEVELs)
 	
-	SELECT @NewCheckInDate=convert(nvarchar(100),Cast(NewCheckInDate as DATE),103)	FROM WRBHBCheckInHdr  
+	SELECT @CheckInTime=ArrivalTime,@NewCheckInTimeType=TimeType,
+	@NewCheckInDate=convert(nvarchar(100),Cast(NewCheckInDate as DATE),103)	FROM WRBHBCheckInHdr  
 	WHERE IsActive = 1 and IsDeleted = 0 and Id =@CheckInHdrId
 	
+	IF(UPPER(@NewCheckInTimeType)=UPPER('AM'))  
+	BEGIN  
+		IF(CAST(@CheckInTime AS TIME)<CAST('11:00:00' AS TIME))  
+		BEGIN 
+			select @NewCheckInDate=CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,@NewCheckInDate,103)),103)
+		END
+		 
+		ELSE
+		BEGIN
+			SELECT @NewCheckInDate=convert(nvarchar(100),@NewCheckInDate,103)
+		END
+	END
+	ELSE -- new added this else 
+	BEGIN
+		SELECT @NewCheckInDate=convert(nvarchar(100),@NewCheckInDate,103)
+	END
 	
 	SELECT Property,
-	CONVERT(nvarchar(100),@ChkInDate,103)+' To '+CONVERT(nvarchar(100),@ChkOutDate,103) as Stay,Tariff,
+	CONVERT(nvarchar(100),ArrivalDate,103)+' To '+CONVERT(nvarchar(100),@ChkOutDate,103) as Stay,Tariff,
 	CONVERT(nvarchar(100),@ChkOutDate,103) as ChkoutDate,CONVERT(nvarchar(100),@NewCheckInDate,103) as CheckInDate
 	FROM WRBHBCheckInHdr
 	WHERE IsActive = 1 and IsDeleted = 0 and Id =@CheckInHdrId;
@@ -552,7 +617,7 @@ BEGIN
 	
 
 	SELECT ClientName,ClientId,CityId,@TariffPaymentMode as TariffPaymentMode,@ServicePaymentMode as ServicePaymentMode,
-	Id From  WRBHBCheckInHdr  
+	@BTCFile AS BTCFile,Id From  WRBHBCheckInHdr  
 	WHERE Id=@CheckInHdrId AND IsActive=1 AND IsDeleted=0
 	
 	--Day Count
@@ -580,10 +645,11 @@ BEGIN
 	IF(ISNULL(@CID,0)=0)  
 	BEGIN  
 	
+	
 			CREATE TABLE #LEVEL1(ChkInDate NVARCHAR(100),ChkOutDate NVARCHAR(100),
 			TariffPaymentMode NVARCHAR(100),ServicePaymentMode NVARCHAR(100),TAC NVARCHAR(100),TACPer DECIMAL(27,2),
 			STAgreed DECIMAL(27,2),LTAgreed Decimal(27,2),STRack DECIMAL(27,2),LTRack DECIMAL(27,2),
-			SingleMarkup DECIMAL(27,2),DoubleMarkup DECIMAL(27,2),TripleMarkup DECIMAL(27,2))
+			SingleMarkup DECIMAL(27,2),DoubleMarkup DECIMAL(27,2),TripleMarkup DECIMAL(27,2),BTCFile NVARCHAR(MAX))
 			--DECLARE @BookingId BIGINT,@GuestId BIGINT,@BookingLevel nvarchar(100);
 			SET @BookingId=(SELECT BookingId FROM WRBHBCheckInHdr WHERE Id = @CheckInHdrId and IsActive = 1 and IsDeleted =0)
 			SET @GuestId=(SELECT GuestId FROM WRBHBCheckInHdr WHERE Id = @CheckInHdrId and IsActive = 1 and IsDeleted =0)
@@ -592,11 +658,11 @@ BEGIN
 		IF @BookingLevel = 'Room' 
 		BEGIN
 			INSERT INTO #LEVEL1(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode,TAC,TACPer,
-			STAgreed,LTAgreed,STRack,LTRack,SingleMarkup,DoubleMarkup,TripleMarkup)
+			STAgreed,LTAgreed,STRack,LTRack,SingleMarkup,DoubleMarkup,TripleMarkup,BTCFile)
 			SELECT TOP 1 CONVERT(NVARCHAR(100),(d.ChkInDt),103),CONVERT(NVARCHAR(100),(d.ChkOutDt),103),
 			d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,isnull((d.Tariff*h.TACPer/100),0),
 			d.LTonAgreed,d.LTonRack,d.STonAgreed,d.STonRack,(h.GeneralMarkup+h.Markup),
-			(h.GeneralMarkup+h.Markup),(h.GeneralMarkup+h.Markup)
+			(h.GeneralMarkup+h.Markup),(h.GeneralMarkup+h.Markup),d.BTCFilePath 
 			FROM  WRBHBBookingProperty h 
 			JOIN WRBHBBookingPropertyAssingedGuest d on h.BookingId= d.BookingId AND
 			h.PropertyId = d.BookingPropertyId AND h.IsActive = 1 AND h.IsDeleted = 0
@@ -610,12 +676,12 @@ BEGIN
 			
 			
 			INSERT INTO #LEVEL1(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode,TAC,TACPer,
-			STAgreed,LTAgreed,STRack,LTRack,SingleMarkup,DoubleMarkup,TripleMarkup)
+			STAgreed,LTAgreed,STRack,LTRack,SingleMarkup,DoubleMarkup,TripleMarkup,BTCFile)
 			
 			SELECT TOP 1 CONVERT(NVARCHAR(100),(d.ChkInDt),103),CONVERT(NVARCHAR(100),(d.ChkOutDt),103),
 			d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,ISNULL((d.Tariff*h.TACPer/100),0),
 			ISNULL(CD.STAgreed ,0) ,ISNULL(CD.LTAgreed,0),0,ISNULL(CD.LTRack,0),
-			0,0,0
+			0,0,0,d.BTCFilePath
 			FROM  WRBHBBooking B 
 			JOIN WRBHBBookingProperty h on h.BookingId=b.Id AND h.IsActive = 1 AND h.IsDeleted = 0
 			JOIN WRBHBBookingPropertyAssingedGuest d ON h.BookingId= d.BookingId AND
@@ -634,9 +700,9 @@ BEGIN
 		IF @BookingLevel = 'Bed' 
 		BEGIN
 			INSERT INTO #LEVEL1(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode,TAC,TACPer,
-			STAgreed,LTAgreed,STRack,LTRack,SingleMarkup,DoubleMarkup,TripleMarkup)
+			STAgreed,LTAgreed,STRack,LTRack,SingleMarkup,DoubleMarkup,TripleMarkup,BTCFile)
 			SELECT TOP 1 CONVERT(NVARCHAR(100),(d.ChkInDt),103),CONVERT(NVARCHAR(100),(d.ChkOutDt),103),
-			d.TariffPaymentMode,d.ServicePaymentMode ,0,0,0,0,0,0,0,0,0
+			d.TariffPaymentMode,d.ServicePaymentMode ,0,0,0,0,0,0,0,0,0,d.BTCFilePath
 			FROM  WRBHBBedBookingProperty h 
 			JOIN WRBHBBedBookingPropertyAssingedGuest d on h.BookingId= d.BookingId AND
 			h.PropertyId = d.BookingPropertyId AND h.IsActive = 1 AND h.IsDeleted = 0
@@ -651,7 +717,7 @@ BEGIN
 			DECLARE @ChkInDate1 nvarchar(100),@ChkOutDate1 nvarchar(100),@TariffPaymentMode1 nvarchar(100),
 			@ServicePaymentMode1 nvarchar(100),@TAC1 nvarchar(100),@TACPer1 nvarchar(100),
 			@STAgreed Decimal(27,2),@LTAgreed Decimal(27,2),@STRack decimal(27,2),@LTRack decimal(27,2),
-			@SingleMarkup Decimal(27,2),@DoubleMarkup Decimal(27,2),@TripleMarkup Decimal(27,2);
+			@SingleMarkup Decimal(27,2),@DoubleMarkup Decimal(27,2),@TripleMarkup Decimal(27,2),@BTCFile1 NVARCHAR(MAX);
 			SET @ChkInDate1 =( SELECT ChkInDate FROM #LEVEL1)	
 			SET @ChkOutDate1 =( SELECT ChkOutDate FROM #LEVEL1)
 			SET @TariffPaymentMode1 =(SELECT TariffPaymentMode FROM #LEVEL1)
@@ -665,7 +731,7 @@ BEGIN
 			SET @SingleMarkup=(SELECT SingleMarkup FROM #LEVEL1)
 			SET @DoubleMarkup=(SELECT DoubleMarkup FROM #LEVEL1)
 			SET @TripleMarkup=(SELECT TripleMarkup FROM #LEVEL1)
-			
+			SET @BTCFile1=(SELECT BTCFile FROM #LEVEL1)
 			
 			
 			
@@ -674,7 +740,7 @@ BEGIN
 			CREATE TABLE #LEVEL2(ChkInDate NVARCHAR(100),ChkOutDate NVARCHAR(100),
 			TariffPaymentMode NVARCHAR(100),ServicePaymentMode NVARCHAR(100),TAC NVARCHAR(100),TACPer DECIMAL(27,2),
 			STAgreed DECIMAL(27,2),LTAgreed DECIMAL(27,2),STRack DECIMAL(27,2),LTRack DECIMAL(27,2),
-			SingleMarkup DECIMAL(27,2),DoubleMarkup DECIMAL(27,2),TripleMarkup DECIMAL(27,2))
+			SingleMarkup DECIMAL(27,2),DoubleMarkup DECIMAL(27,2),TripleMarkup DECIMAL(27,2),BTCFile NVARCHAR(MAX))
 			--DECLARE @BookingId BIGINT,@GuestId BIGINT,@BookingLevel nvarchar(100);
 			SET @BookingId=(SELECT BookingId FROM WRBHBCheckInHdr WHERE Id = @CheckInHdrId AND IsActive = 1 AND IsDeleted =0)
 			SET @GuestId=(SELECT GuestId FROM WRBHBCheckInHdr WHERE Id = @CheckInHdrId AND IsActive = 1 AND IsDeleted =0)
@@ -683,11 +749,11 @@ BEGIN
 		IF @BookingLevel = 'Room' 
 		BEGIN
 			INSERT INTO #LEVEL2(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode,TAC,TACPer,
-			STAgreed,LTAgreed,STRack,LTRack,SingleMarkup,DoubleMarkup,TripleMarkup)
+			STAgreed,LTAgreed,STRack,LTRack,SingleMarkup,DoubleMarkup,TripleMarkup,BTCFile)
 			SELECT TOP 1 @BillFrom,@BillTo,
 			d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,isnull((d.Tariff*h.TACPer/100),0),
 			d.LTonAgreed,d.LTonRack,d.STonAgreed,d.STonRack,(h.GeneralMarkup+h.Markup),
-			(h.GeneralMarkup+h.Markup),(h.GeneralMarkup+h.Markup)
+			(h.GeneralMarkup+h.Markup),(h.GeneralMarkup+h.Markup),d.BTCFilePath
 			FROM  WRBHBBookingProperty h 
 			JOIN WRBHBBookingPropertyAssingedGuest d on h.BookingId= d.BookingId and
 			h.PropertyId = d.BookingPropertyId	AND h.IsActive = 1 and	h.IsDeleted = 0
@@ -698,12 +764,12 @@ BEGIN
 			order by d.Id desc;
 			
 			INSERT INTO #LEVEL2(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode,TAC,TACPer,
-			STAgreed,LTAgreed,STRack,LTRack,SingleMarkup,DoubleMarkup,TripleMarkup)
+			STAgreed,LTAgreed,STRack,LTRack,SingleMarkup,DoubleMarkup,TripleMarkup,BTCFile)
 			
 			SELECT TOP 1 @BillFrom,@BillTo,
 			d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,isnull((d.Tariff*h.TACPer/100),0),
 			ISNULL(CD.STAgreed ,0) ,ISNULL(CD.LTAgreed,0),0,ISNULL(CD.LTRack,0),
-			0,0,0
+			0,0,0,d.BTCFilePath
 			FROM  WRBHBBooking B 
 			JOIN WRBHBBookingProperty h on h.BookingId=b.Id AND h.IsActive = 1 AND h.IsDeleted = 0
 			JOIN WRBHBBookingPropertyAssingedGuest d on h.BookingId= d.BookingId and
@@ -721,9 +787,9 @@ BEGIN
 		IF @BookingLevel = 'Bed' 
 		BEGIN
 			INSERT INTO #LEVEL2(ChkInDate,ChkOutDate,TariffPaymentMode,ServicePaymentMode,TAC,TACPer,
-			STAgreed,LTAgreed,STRack,LTRack,SingleMarkup,DoubleMarkup,TripleMarkup)
+			STAgreed,LTAgreed,STRack,LTRack,SingleMarkup,DoubleMarkup,TripleMarkup,BTCFile)
 			SELECT TOP 1 CONVERT(NVARCHAR(100),(d.ChkInDt),103),CONVERT(NVARCHAR(100),(d.ChkOutDt),103),
-			d.TariffPaymentMode,d.ServicePaymentMode ,0,0,0,0,0,0,0,0,0
+			d.TariffPaymentMode,d.ServicePaymentMode ,0,0,0,0,0,0,0,0,0,d.BTCFilePath
 			FROM  WRBHBBedBookingProperty h 
 			JOIN WRBHBBedBookingPropertyAssingedGuest d on h.BookingId= d.BookingId AND
 			h.PropertyId = d.BookingPropertyId AND h.IsActive = 1 AND h.IsDeleted = 0
@@ -749,19 +815,44 @@ BEGIN
 			SET @SingleMarkup=(SELECT SingleMarkup FROM #LEVEL2)
 			SET @DoubleMarkup=(SELECT DoubleMarkup FROM #LEVEL2)
 			SET @TripleMarkup=(SELECT TripleMarkup FROM #LEVEL2)
+			SET @BTCFile=(SELECT BTCFile FROM #LEVEL2)
 			
 			
 			
 			
-			SELECT @NewCheckInDate=convert(nvarchar(100),Cast(NewCheckInDate as DATE),103)	FROM WRBHBCheckInHdr  
+			SELECT @CheckInTime=ArrivalTime,@NewCheckInTimeType=TimeType,
+			@NewCheckInDate=convert(nvarchar(100),Cast(NewCheckInDate as DATE),103)	FROM WRBHBCheckInHdr  
 		    WHERE IsActive = 1 and IsDeleted = 0 and Id =@CheckInHdrId
+		    
+		    
+		    
+			IF(UPPER(@NewCheckInTimeType)=UPPER('AM'))  
+			BEGIN  
+				IF(CAST(@CheckInTime AS TIME)<CAST('11:00:00' AS TIME))  
+				BEGIN 
+					select @NewCheckInDate=CONVERT(NVARCHAR,DATEADD(DAY,0,CONVERT(DATE,@ChkInDate,103)),103)
+				END
+				 
+				ELSE
+				BEGIN
+					SELECT @NewCheckInDate=@ChkInDate
+				END
+			END
+			ELSE -- NEW ADDED THIS ELSE 
+			BEGIN
+				SELECT @NewCheckInDate=@ChkInDate
+			END
+		    
+	
+		
+		 
 		 
 		    CREATE TABLE #Prop1(Property NVARCHAR(100),Stay NVARCHAR(100),Tariff DECIMAL(27,2),ChkoutDate NVARCHAR(100),
 		    CheckInDate NVARCHAR(100),SingleMarkup DECIMAL(27,2),DoubleMarkup DECIMAL(27,2),TripleMarkup DECIMAL(27,2))   
 		    
 		    INSERT INTO  #Prop1(Property,Stay,Tariff,ChkoutDate,CheckInDate,SingleMarkup,DoubleMarkup,TripleMarkup)
 			SELECT Property,
-			CONVERT(nvarchar(100),@ChkInDate,103)+' To '+CONVERT(nvarchar(100),@ChkOutDate1,103) as Stay,
+			CONVERT(nvarchar(100),@NewCheckInDate,103)+' To '+CONVERT(nvarchar(100),@ChkOutDate1,103) as Stay,
 			--((round(ISNULL(Tariff,0),0)))+(ISNULL(Tariff,0)*ISNULL(@STAgreed,0)/100)+(ISNULL(Tariff,0)*ISNULL(@LTAgreed,0)/100)+(ISNULL(Tariff,0)*ISNULL(@STRack,0)/100)+
 			--(ISNULL(Tariff,0)*ISNULL(@LTRack,0)/100),0))) AS Tariff,
 			((round(ISNULL(Tariff,0),0))) AS Tariff,
@@ -772,7 +863,7 @@ BEGIN
 			
 			INSERT INTO  #Prop1(Property,Stay,Tariff,ChkoutDate,CheckInDate,SingleMarkup,DoubleMarkup,TripleMarkup)
 			SELECT Property,
-			CONVERT(nvarchar(100),@ChkInDate,103)+' To '+CONVERT(nvarchar(100),@ChkOutDate1,103) as Stay,
+			CONVERT(nvarchar(100),@NewCheckInDate,103)+' To '+CONVERT(nvarchar(100),@ChkOutDate1,103) as Stay,
 			((round(ISNULL(Tariff,0),0))) AS Tariff,
 			CONVERT(nvarchar(100),@ChkOutDate1,103) as ChkoutDate,CONVERT(nvarchar(100),@NewCheckInDate,103) as CheckInDate,
 			0,@DoubleMarkup,0
@@ -781,7 +872,7 @@ BEGIN
 			
 			INSERT INTO  #Prop1(Property,Stay,Tariff,ChkoutDate,CheckInDate,SingleMarkup,DoubleMarkup,TripleMarkup)
 			SELECT Property,
-			CONVERT(nvarchar(100),@ChkInDate,103)+' To '+CONVERT(nvarchar(100),@ChkOutDate1,103) as Stay,
+			CONVERT(nvarchar(100),@NewCheckInDate,103)+' To '+CONVERT(nvarchar(100),@ChkOutDate1,103) as Stay,
 			((round(ISNULL(Tariff,0),0))) AS Tariff,
 			CONVERT(nvarchar(100),@ChkOutDate1,103) as ChkoutDate,CONVERT(nvarchar(100),@NewCheckInDate,103) as CheckInDate,
 			0,0,@TripleMarkup
@@ -790,7 +881,7 @@ BEGIN
 			
 			INSERT INTO  #Prop1(Property,Stay,Tariff,ChkoutDate,CheckInDate,SingleMarkup,DoubleMarkup,TripleMarkup)
 			SELECT Property,
-			CONVERT(nvarchar(100),@ChkInDate,103)+' To '+CONVERT(nvarchar(100),@ChkOutDate1,103) as Stay,
+			CONVERT(nvarchar(100),@NewCheckInDate,103)+' To '+CONVERT(nvarchar(100),@ChkOutDate1,103) as Stay,
 			((round(ISNULL(Tariff,0),0))) AS Tariff,
 			CONVERT(nvarchar(100),@ChkOutDate1,103) as ChkoutDate,CONVERT(nvarchar(100),@NewCheckInDate,103) as CheckInDate,
 			0,0,@TripleMarkup
@@ -810,7 +901,7 @@ BEGIN
 			WHERE  Id=@CheckInHdrId AND IsActive=1 AND IsDeleted=0
 		
 			SELECT ClientName,@TariffPaymentMode as TariffPaymentMode,@ServicePaymentMode as ServicePaymentMode,
-			Id From  WRBHBCheckInHdr  
+			@BTCFile AS BTCFile,Id From  WRBHBCheckInHdr  
 			WHERE Id=@CheckInHdrId AND IsActive=1 AND IsDeleted=0
 	--Day Count
 			CREATE TABLE #CountDays(NoofDays INT,CheckInHdrId INT)
@@ -987,11 +1078,11 @@ BEGIN
 			IF @HR='12'		
 			BEGIN
 			-- To Check Time
-			SET @MIN=(SELECT DATEDIFF(MINUTE,CAST(YEAR(CONVERT(DATE,@ChkInDate,103)) AS VARCHAR)+'-'+
-			CAST(MONTH(CONVERT(DATE,@ChkInDate,103)) AS VARCHAR)+'-'+
-			CAST(DAY(CONVERT(DATE,@ChkInDate,103)) AS VARCHAR)+' '+'12:00:00',CAST(YEAR(CONVERT(DATE,@ChkOutDate,103)) AS VARCHAR)+'-'+
+			SET @MIN=(SELECT DATEDIFF(MINUTE,CAST(YEAR(CONVERT(DATE,@NewCheckInDate,103)) AS VARCHAR)+'-'+
+			CAST(MONTH(CONVERT(DATE,@NewCheckInDate,103)) AS VARCHAR)+'-'+
+			CAST(DAY(CONVERT(DATE,@NewCheckInDate,103)) AS VARCHAR)+' '+'12:00:00',CAST(YEAR(CONVERT(DATE,@ChkOutDate,103)) AS VARCHAR)+'-'+
 			CAST(MONTH(CONVERT(DATE,@ChkOutDate,103)) AS VARCHAR)+'-'+
-			CAST(DAY(CONVERT(DATE,@ChkOutDate,103)) AS VARCHAR)+' '+@chkouttime) AS M
+			CAST(DAY(CONVERT(DATE,@ChkOutDate,103)) AS VARCHAR)+' '+'23:59:59') AS M
 			);
 			IF @MIN>1440 BEGIN SELECT @MIN-120 AS M END
 			ELSE BEGIN SELECT @MIN AS M END	
@@ -999,19 +1090,20 @@ BEGIN
 			SELECT @DateDiff=@MIN/1440,@OutPutHour=(@MIN % 1440)/60,@OutPutSEC=(@MIN % 60) 
 	-- this is 12 hour Format	
 		--Select @MIN/720 as NoDays,(@MIN % 720)/60 as NoHours,(@MIN % 60) as NoMinutes 
-			IF(UPPER(@TimeType)=UPPER('AM'))
-			BEGIN
-				IF(CAST(@chktime AS TIME)<CAST('11:00:00' AS TIME))
-				BEGIN
-					SELECT @NoOfDays=@NoOfDays+1
-					INSERT INTO #ExTariff(Tariff,RackTariffSingle,RackTariffDouble,STAgreed,LTAgreed,STRack,LTRack,Occupancy,Date,
-					SingleMarkupAmount,DoubleMarkupAmount,TACPer)
-					SELECT @Tariff,@RackTariffSingle,@RackTariffDouble,@STAgreed,@LTAgreed,@STRack,@LTRack,@Occupancy,
-					CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,@ChkInDate,103)),103),@SingleMarkupAmount,@DoubleMarkupAmount,
-					@TACPer
-				--	SELECT @Tariff,@RackTariff,CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,@ChkInDate,103)),103)
-				END		 
-			END		 
+-- below function hide with (06Feb15)		
+		--IF(UPPER(@TimeType)=UPPER('AM'))
+		--BEGIN
+		--	IF(CAST(@chktime AS TIME)<CAST('11:00:00' AS TIME))
+		--	BEGIN
+		--		SELECT @NoOfDays=@NoOfDays
+		--		INSERT INTO #ExTariff(Tariff,RackTariffSingle,RackTariffDouble,STAgreed,LTAgreed,STRack,LTRack,Occupancy,Date,
+		--		SingleMarkupAmount,DoubleMarkupAmount,TACPer)
+		--		SELECT @Tariff,@RackTariffSingle,@RackTariffDouble,@STAgreed,@LTAgreed,@STRack,@LTRack,@Occupancy,
+		--		CONVERT(NVARCHAR,DATEADD(DAY,0,CONVERT(DATE,@ChkInDate,103)),103),@SingleMarkupAmount,@DoubleMarkupAmount,
+		--		@TACPer
+		--	--	SELECT @Tariff,@RackTariff,CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,@ChkInDate,103)),103)
+		--	END		 
+		--END		 
 		 --GET AFTER 1 CL CHECKOUT TIME TARIFF ADD  AND ABOVE ONE HR TARIFF ADD  
 			IF(@OutPutHour>12)
 			BEGIN
@@ -1052,20 +1144,24 @@ BEGIN
 					SELECT @Tariff,@RackTariffSingle,@RackTariffDouble,@STAgreed,@LTAgreed,@STRack,@LTRack,@Occupancy,
 					CONVERT(NVARCHAR,DATEADD(DAY,@i,CONVERT(DATE,@ChkInDate,103)),103),@SingleMarkupAmount,@DoubleMarkupAmount,
 					@TACPer
+					--where CONVERT(DATE,@ChkInDate,103) not in(Select CONVERT(DATE,date,103) from #ExTariff)
 					--SELECT @Tariff,@RackTariff,CONVERT(NVARCHAR,DATEADD(DAY,@i,CONVERT(DATE,@ChkInDate,103)),103)
 					SET @i=@i+1
 					SET @DateDiff=@DateDiff-1   
 			
 			 END
-		     
+		 --    select @HR,@chkouttime,@ChkInDate
+			
+			
+			
 			 END--hr end		
 			 
 			 ELSE 
 			 BEGIN
 		 --Get Date Differance
-					SET @MIN=(SELECT DATEDIFF(MINUTE,CAST(YEAR(CONVERT(DATE,@ChkInDate,103)) AS VARCHAR)+'-'+
-					CAST(MONTH(CONVERT(DATE,@ChkInDate,103)) AS VARCHAR)+'-'+
-					CAST(DAY(CONVERT(DATE,@ChkInDate,103)) AS VARCHAR)+' '+@chktime,CAST(YEAR(CONVERT(DATE,@ChkOutDate,103)) AS VARCHAR)+'-'+
+					SET @MIN=(SELECT DATEDIFF(MINUTE,CAST(YEAR(CONVERT(DATE,@NewCheckInDate,103)) AS VARCHAR)+'-'+
+					CAST(MONTH(CONVERT(DATE,@NewCheckInDate,103)) AS VARCHAR)+'-'+
+					CAST(DAY(CONVERT(DATE,@NewCheckInDate,103)) AS VARCHAR)+' '+@chktime,CAST(YEAR(CONVERT(DATE,@ChkOutDate,103)) AS VARCHAR)+'-'+
 					CAST(MONTH(CONVERT(DATE,@ChkOutDate,103)) AS VARCHAR)+'-'+
 					CAST(DAY(CONVERT(DATE,@ChkOutDate,103)) AS VARCHAR)+' '+@chkouttime) AS M
 					);
@@ -1122,12 +1218,13 @@ BEGIN
 			END			
 		END		
 		
-	--	select * from #ExTariff
+		
+		
+		 
 		--select * from #ServiceTax2
 		
 	--	SELECT @TariffPaymentMode;
-	--	select @NoOfDays,@DateDiff
-	
+		
 	--select @TAC
 		IF @TariffPaymentMode IN('Bill to Company (BTC)','Bill to Client')
 		BEGIN
@@ -1571,13 +1668,20 @@ BEGIN
 		  SELECT COUNT(*) AS UnPaid FROM  #TariffSet  WHERE PaymentStatus = 'UnPaid'  
 		 
     END  
-	 else-- for checkout done with flag 0  
- begin  
+	 ELSE-- for checkout done with flag 0  
+ BEGIN  
+ 
+		DECLARE @Tariff1 DECIMAL(27,2),@Id1 INT;
+		SET @Id1 = (SELECT TOP 1  ChkInHdrId FROM WRBHBChechkOutHdr WHERE Id = @CID and IsActive = 1 and IsDeleted = 0 and Flag=0)
+		SET @Tariff1 = (SELECT Tariff FROM WRBHBCheckInHdr WHERE Id = @Id1 AND IsActive = 1 AND IsDeleted = 0)
  
  
-		SELECT Property,Stay,ChkOutTariffAdays  AS Tariff,  
+		--SELECT Property,Stay,ChkOutTariffAdays  AS Tariff,  @Tariff1,
+		--CONVERT(NVARCHAR(100),CheckOutDate,103) AS ChkoutDate,CONVERT(NVARCHAR(100),CheckInDate,103) AS CheckInDate  
+		--FROM WRBHBChechkOutHdr WHERE  Id=@CID and  IsActive=1 and IsDeleted=0 and Flag=0  
+		SELECT Property,Stay,  @Tariff1 AS Tariff,
 		CONVERT(NVARCHAR(100),CheckOutDate,103) AS ChkoutDate,CONVERT(NVARCHAR(100),CheckInDate,103) AS CheckInDate  
-		FROM WRBHBChechkOutHdr WHERE  Id=@CID and  IsActive=1 and IsDeleted=0 and Flag=0  
+		FROM WRBHBChechkOutHdr WHERE  Id=@CID and  IsActive=1 and IsDeleted=0 and Flag=0 
 
 		--BillDate   
 		SELECT CONVERT(VARCHAR(103),CheckOutDate ,103) AS BillDate,convert(nvarchar(100),GETDATE(),103) as TodayDate   
@@ -1587,7 +1691,7 @@ BEGIN
 		SELECT GuestName AS Name,RoomNo,EmpCode,ApartmentType,BedType,PropertyType FROM WRBHBCheckInHdr  
 		WHERE  Id=@CheckInHdrId AND IsActive=1 AND IsDeleted=0  
 
-		CREATE TABLE #PaymentMode1(TariffPaymentMode NVARCHAR(100),ServicePaymentMode NVARCHAR(100))  
+		CREATE TABLE #PaymentMode1(TariffPaymentMode NVARCHAR(100),ServicePaymentMode NVARCHAR(100),BTCFile NVARCHAR(MAX))  
 		-- DECLARE @BookingId BIGINT,@GuestId BIGINT,@BookingLevel nvarchar(100);  
 		set @BookingId=(select BookingId from WRBHBCheckInHdr where Id = @CheckInHdrId)  
 		set @GuestId=(select GuestId from WRBHBCheckInHdr where Id = @CheckInHdrId)  
@@ -1596,34 +1700,35 @@ BEGIN
   
 		If @BookingLevel = 'Room'   
 		 BEGIN  
-			  INSERT INTO #PaymentMode1(TariffPaymentMode,ServicePaymentMode)  
-			  select TariffPaymentMode,ServicePaymentMode  
+			  INSERT INTO #PaymentMode1(TariffPaymentMode,ServicePaymentMode,BTCFile)  
+			  select TariffPaymentMode,ServicePaymentMode ,BTCFilePath 
 			  from WRBHBBookingPropertyAssingedGuest  
 			  where GuestId = @GuestId and BookingId = @BookingId  
 		 END  
 		If @BookingLevel = 'Bed'  
 		 BEGIN  
-			  INSERT INTO #PaymentMode1(TariffPaymentMode,ServicePaymentMode)  
-			  select TariffPaymentMode,ServicePaymentMode   
+			  INSERT INTO #PaymentMode1(TariffPaymentMode,ServicePaymentMode,BTCFile)  
+			  select TariffPaymentMode,ServicePaymentMode,BTCFilePath   
 			  from WRBHBBedBookingPropertyAssingedGuest  
 			  where GuestId = @GuestId and BookingId = @BookingId  
 		 END   
 		If @BookingLevel = 'Apartment'  
 		BEGIN  
-			INSERT INTO #PaymentMode1(TariffPaymentMode,ServicePaymentMode)  
-			select TariffPaymentMode,ServicePaymentMode   
+			INSERT INTO #PaymentMode1(TariffPaymentMode,ServicePaymentMode,BTCFile)  
+			select TariffPaymentMode,ServicePaymentMode,BTCFilePath   
 			from WRBHBApartmentBookingPropertyAssingedGuest  
 			where GuestId = @GuestId and BookingId = @BookingId  
 		END  
 
-		DECLARE @TariffPaymentModes nvarchar(100),@ServicePaymentModes nvarchar(100);  
-		set @TariffPaymentModes =( SELECT top 1 TariffPaymentMode FROM #PaymentMode1)   
-		set @ServicePaymentModes =( SELECT top 1 ServicePaymentMode FROM #PaymentMode1)  
+		DECLARE @TariffPaymentModes nvarchar(100),@ServicePaymentModes nvarchar(100),@BTCFiles NVARCHAR(MAX);  
+		SET @TariffPaymentModes =( SELECT TOP 1 TariffPaymentMode FROM #PaymentMode1)   
+		SET @ServicePaymentModes =( SELECT TOP 1 ServicePaymentMode FROM #PaymentMode1)  
+		SET @BTCFiles =( SELECT TOP 1 BTCFile FROM #PaymentMode1) 
 		--SELECT ClientName,Direct,BTC,Id From  WRBHBCheckInHdr    
 		--WHERE Id=@CheckInHdrId AND IsActive=1 AND IsDeleted=0  
     
 		SELECT ClientName,@TariffPaymentModes as TariffPaymentMode,@ServicePaymentModes as ServicePaymentMode,  
-		Id From  WRBHBCheckInHdr    
+		ISNULL(@BTCFiles,'') AS BTCFile,Id From  WRBHBCheckInHdr    
 		WHERE Id=@CheckInHdrId AND IsActive=1 AND IsDeleted=0  
 		--Day Count  
 		CREATE TABLE #CountDays1(NoofDays INT,CheckInHdrId INT)  
@@ -1636,7 +1741,7 @@ BEGIN
 
 		Select 0 as M;  
 
-		Select NoOfDays from WRBHBChechkOutHdr  where  Id=@CID and IsActive=1 and IsDeleted=0 and Flag=0  
+		Select NoOfDays,PrintInvoice from WRBHBChechkOutHdr  where  Id=@CID and IsActive=1 and IsDeleted=0 and Flag=0  
 
 		select ChkOutTariffTotal NetTariff,ChkOutTariffLT LuxuryTax,  
 		ChkOutTariffST1 ServiceTax,0 LT,0 ST  from WRBHBChechkOutHdr   

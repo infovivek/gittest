@@ -65,7 +65,7 @@ DECLARE @Identity int,@ErrMsg NVARCHAR(MAX),@Str NVARCHAR(100);
  BEGIN
 
 		UPDATE WRBHBPettyCashHdr SET Flag=1 
-		WHERE IsActive=1 AND IsDeleted=0 AND UserId=@RequestedUserId
+		WHERE IsActive=1 AND IsDeleted=0 AND UserId=@RequestedUserId AND Date=CONVERT(Date,@RequestedOn,103)
 		
 		INSERT INTO	WRBHBPettyCashApprovalDtl (PettyCashApprovalHdrId,RequestedOn,Requestedby,
 		PCAccount,RequestedAmount,RequestedStatus,ProcessedStatus,LastProcessedon,Comments,

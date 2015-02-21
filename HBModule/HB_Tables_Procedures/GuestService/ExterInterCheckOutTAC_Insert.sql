@@ -159,12 +159,12 @@ BEGIN
 
 
 
-		UPDATE WRBHBBookingPropertyAssingedGuest SET CurrentStatus = 'CheckOut' ,
-		CheckOutHdrId = @InsId
-		WHERE BookingId=@BookingId and 
-		RoomCaptured=(SELECT TOP 1 RoomCaptured FROM WRBHBBookingPropertyAssingedGuest
-		WHERE BookingId=@BookingId and GuestId=@GuestId
-		ORDER BY Id ASC);
+		--UPDATE WRBHBBookingPropertyAssingedGuest SET CurrentStatus = 'CheckOut' ,
+		--CheckOutHdrId = @InsId
+		--WHERE BookingId=@BookingId and 
+		--RoomCaptured=(SELECT TOP 1 RoomCaptured FROM WRBHBBookingPropertyAssingedGuest
+		--WHERE BookingId=@BookingId and GuestId=@GuestId
+		--ORDER BY Id ASC);
 END
 ELSE
 BEGIN
@@ -191,12 +191,12 @@ BEGIN
 
 
 
-		UPDATE WRBHBBookingPropertyAssingedGuest SET CurrentStatus = 'CheckOut' ,
-		CheckOutHdrId = @InsId
-		WHERE BookingId=@BookingId and 
-		RoomCaptured=(SELECT TOP 1 RoomCaptured FROM WRBHBBookingPropertyAssingedGuest
-		WHERE BookingId=@BookingId and GuestId=@GuestId
-		ORDER BY Id ASC);
+		--UPDATE WRBHBBookingPropertyAssingedGuest SET CurrentStatus = 'CheckOut' ,
+		--CheckOutHdrId = @InsId
+		--WHERE BookingId=@BookingId and 
+		--RoomCaptured=(SELECT TOP 1 RoomCaptured FROM WRBHBBookingPropertyAssingedGuest
+		--WHERE BookingId=@BookingId and GuestId=@GuestId
+		--ORDER BY Id ASC);
 END
 		
 END

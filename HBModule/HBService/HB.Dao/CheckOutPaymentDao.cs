@@ -33,12 +33,18 @@ namespace HB.Dao
             Cmd = new SqlCommand();
             if (ChkOutPay.Id != 0)
             {
+                UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                  "', SctId:" + user.SctId + ", Service:CheckOutPayment_Update" + ", ProcName:'" + StoredProcedures.CheckOutPayment_Update;
+
                 Mode = "Update";
                 Cmd.CommandText = StoredProcedures.CheckOutPayment_Update;
                 Cmd.Parameters.Add("@Id", SqlDbType.Int).Value = ChkOutPay.Id;
             }
             else
             {
+                UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                  "', SctId:" + user.SctId + ", Service:CheckOutPayment_Insert" + ", ProcName:'" + StoredProcedures.CheckOutPayment_Insert;
+
                 Mode = "Save";
                 Cmd.CommandText = StoredProcedures.CheckOutPayment_Insert;
 
@@ -52,7 +58,7 @@ namespace HB.Dao
             Cmd.Parameters.Add("@PaymentMode", SqlDbType.NVarChar).Value = ChkOutPay.PaymentMode;
             Cmd.Parameters.Add("@Payment", SqlDbType.NVarChar).Value = ChkOutPay.Payment;
             Cmd.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = user.Id;
-            ds = new WrbErpConnection().ExecuteDataSet(Cmd, "");
+            ds = new WrbErpConnection().ExecuteDataSet(Cmd, UserData);
             return ds;
         }
     }

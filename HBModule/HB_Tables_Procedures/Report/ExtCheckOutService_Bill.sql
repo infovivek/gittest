@@ -1,10 +1,9 @@
--- ================================================
+
+GO
+/****** Object:  StoredProcedure [dbo].[SP_ExtCheckOutService_Bill]    Script Date: 02/19/2015 22:59:12 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
-GO
-IF EXISTS (SELECT * FROM dbo.SYSOBJECTS WHERE id = OBJECT_ID(N'[dbo].[SP_ExtCheckOutService_Bill]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
-DROP PROCEDURE [dbo].[SP_ExtCheckOutService_Bill]
 GO
 /*=============================================
 Author Name  : shameem
@@ -18,7 +17,7 @@ Name			Date			Signature			Description of Changes
 ********************************************************************************************************	
 *******************************************************************************************************
 -- =============================================*/
-CREATE PROCEDURE [dbo].[SP_ExtCheckOutService_Bill]
+ALTER PROCEDURE [dbo].[SP_ExtCheckOutService_Bill]
 (@Action NVARCHAR(100)=NULL,
 @Str1 NVARCHAR(100)=NULL,
 @Str2  NVARCHAR(100)=NULL,
@@ -117,9 +116,10 @@ IF @Action='PageLoad'
 	ServiceNetAmt DECIMAL(27,2),Address NVARCHAR(MAX),VATPer NVARCHAR(MAX),Food DECIMAL(27,2),Laundry DECIMAL(27,2),
 	Service DECIMAL(27,2),Miscellaneous  DECIMAL(27,2),MiscellaneousRemarks  NVARCHAR(MAX),ServiceFB NVARCHAR(MAX),
 	ServiceOT NVARCHAR(MAX),OtherService DECIMAL(27,2), ChkOutServiceST DECIMAL(27,2),CessService DECIMAL(27,2),
-	HECess2 DECIMAL(27,2),CINNo NVARCHAR(MAX),InVoicedate NVARCHAR(MAX),AmtWords NVARCHAR(MAX))
+	HECess2 DECIMAL(27,2),CINNo NVARCHAR(MAX),InVoicedate NVARCHAR(MAX),AmtWords NVARCHAR(MAX),
+	LaundryName NVARCHAR(MAX),ServiceName NVARCHAR(MAX),FoodBev NVARCHAR(MAX),PropertyType NVARCHAR(MAX),
+	CessName NVARCHAR(MAX),HCessName NVARCHAR(MAX))
 	 
-	
 	
 
 	INSERT INTO #Prop2(GuestName ,Name,Stay ,Type,BookingLevel ,BillDate ,ClientName ,Id,InVoiceNo ,
@@ -129,7 +129,8 @@ IF @Action='PageLoad'
 	Taxablename ,BrandName,Amount ,Vat ,ChkOutServiceLT ,
 	ServiceTax ,Cess ,HECess ,ChkOutServiceNetAmount ,ServiceNetAmt ,Address ,VATPer ,Food ,Laundry ,
 	Service ,Miscellaneous  ,MiscellaneousRemarks  ,ServiceFB ,
-	ServiceOT ,OtherService , ChkOutServiceST ,CessService ,HECess2 ,CINNo ,InVoicedate,AmtWords)
+	ServiceOT ,OtherService , ChkOutServiceST ,CessService ,HECess2 ,CINNo ,InVoicedate,AmtWords,
+	LaundryName,ServiceName,FoodBev,PropertyType,CessName,HCessName)
 	
 	SELECT DISTINCT  h.GuestName as GuestName,h.Name,h.Stay,h.Type,h.BookingLevel,
 	convert(nvarchar(100),h.BillDate,103) as BillDate,
@@ -161,9 +162,11 @@ IF @Action='PageLoad'
     'Service Tax @'+CAST(h.RestaurantSTPer  AS NVARCHAR)+'% on Food and Beverages' ServiceFB,
     'Service Tax @'+CAST(h.BusinessSupportST AS NVARCHAR)+'% on Others' ServiceOT,sum(CS.OtherService) OtherService,
     sum(CS.ChkOutServiceST) ChkOutServiceST,sum(CS.Cess) CessService,sum(CS.HECess) HECess,
-    'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),GETDATE(),103) as InVoicedate,
-    'Rupees : '+dbo.fn_NtoWord(ROUND(CS.ChkOutServiceNetAmount,0),'','') AS AmtWords
-	
+    'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),CS.CreatedDate,103) as InVoicedate,
+    'Rupees : '+dbo.fn_NtoWord(ROUND(CS.ChkOutServiceNetAmount,0),'','') AS AmtWords,
+    'Laundry' as LaundryName,'Service' as  ServiceName,'Food and Beverages' as FoodBev,h.PropertyType,
+    'Education Cess @2.00% ' CessName,'Secondary and Higher Education Cess @1.00%' HCessName
+	 
 	from  WRBHBCheckInHdr d
 	 join WRBHBChechkOutHdr h on h.ChkInHdrId = d.Id and d.IsActive = 1 and d.IsDeleted = 0
 	join WRBHBCheckOutServiceHdr CS on h.Id = cs.CheckOutHdrId and CS.IsActive = 1 and CS.IsDeleted= 0
@@ -182,7 +185,10 @@ IF @Action='PageLoad'
 	h.ChkOutTariffHECess ,h.ChkOutTariffSC,h.CheckInDate,d.Tariff,p.PropertyName,p.Propertaddress,
 	c.CityName,s.StateName,p.Postal,p.Phone,p.Email,	
     H.VATPer,h.RestaurantSTPer ,
-    h.BusinessSupportST ,h.InVoiceNo,h.BillFromDate,h.BillEndDate,CS.ChkOutServiceNetAmount--,t.LuxuryNo
+    h.BusinessSupportST ,h.InVoiceNo,h.BillFromDate,h.BillEndDate,CS.ChkOutServiceNetAmount
+    ,h.PropertyType,CS.CreatedDate--,t.LuxuryNo
+   
+    
    
  -- MGH
    INSERT INTO #Prop2(GuestName ,Name,Stay ,Type,BookingLevel ,BillDate ,ClientName ,Id,InVoiceNo ,
@@ -192,7 +198,8 @@ IF @Action='PageLoad'
 	Taxablename ,BrandName,Amount ,Vat ,ChkOutServiceLT ,
 	ServiceTax ,Cess ,HECess ,ChkOutServiceNetAmount ,ServiceNetAmt ,Address ,VATPer ,Food ,Laundry ,
 	Service ,Miscellaneous  ,MiscellaneousRemarks  ,ServiceFB ,
-	ServiceOT ,OtherService , ChkOutServiceST ,CessService ,HECess2 ,CINNo ,InVoicedate,AmtWords)
+	ServiceOT ,OtherService , ChkOutServiceST ,CessService ,HECess2 ,CINNo ,InVoicedate,AmtWords,
+	LaundryName,ServiceName,FoodBev,PropertyType,CessName,HCessName)
 	
 	SELECT DISTINCT  h.GuestName as GuestName,h.Name,h.Stay,h.Type,h.BookingLevel,
 	convert(nvarchar(100),h.BillDate,103) as BillDate,
@@ -225,8 +232,10 @@ IF @Action='PageLoad'
     'Service Tax @'+CAST(h.RestaurantSTPer  AS NVARCHAR)+'% on Food and Beverages' ServiceFB,
     'Service Tax @'+CAST(h.BusinessSupportST AS NVARCHAR)+'% on Others' ServiceOT,sum(CS.OtherService) OtherService,
     sum(CS.ChkOutServiceST) ChkOutServiceST,sum(CS.Cess) CessService,sum(CS.HECess) HECess,
-    'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),GETDATE(),103) as InVoicedate,
-    'Rupees : '+dbo.fn_NtoWord(ROUND(CS.ChkOutServiceNetAmount,0),'','') AS AmtWords
+    'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),CS.CreatedDate,103) as InVoicedate,
+    'Rupees : '+dbo.fn_NtoWord(ROUND(CS.ChkOutServiceNetAmount,0),'','') AS AmtWords,
+    'Laundry' LaundryName,'Service' ServiceName,'Food and Beverages' FoodBev,h.PropertyType,
+    'Education Cess @2.00%' CessName,'Secondary and Higher Education Cess @1.00%' HCessName
 	
 	from  WRBHBCheckInHdr d
 	 join WRBHBChechkOutHdr h on h.ChkInHdrId = d.Id and d.IsActive = 1 and d.IsDeleted = 0
@@ -246,7 +255,9 @@ IF @Action='PageLoad'
 	h.ChkOutTariffHECess ,h.ChkOutTariffSC,h.CheckInDate,d.Tariff,p.PropertyName,p.Propertaddress,
 	c.CityName,s.StateName,p.Postal,p.Phone,p.Email,	
     H.VATPer,h.RestaurantSTPer ,
-    h.BusinessSupportST ,h.InVoiceNo,h.BillFromDate,h.BillEndDate,CS.ChkOutServiceNetAmount--,t.LuxuryNo
+    h.BusinessSupportST ,h.InVoiceNo,h.BillFromDate,h.BillEndDate,CS.ChkOutServiceNetAmount,h.PropertyType,
+    CS.CreatedDate
+    --,t.LuxuryNo
    
    -- MMT
    INSERT INTO #Prop2(GuestName ,Name,Stay ,Type,BookingLevel ,BillDate ,ClientName ,Id,InVoiceNo ,
@@ -256,7 +267,8 @@ IF @Action='PageLoad'
 	Taxablename ,BrandName,Amount ,Vat ,ChkOutServiceLT ,
 	ServiceTax ,Cess ,HECess ,ChkOutServiceNetAmount ,ServiceNetAmt ,Address ,VATPer ,Food ,Laundry ,
 	Service ,Miscellaneous  ,MiscellaneousRemarks  ,ServiceFB ,
-	ServiceOT ,OtherService , ChkOutServiceST ,CessService ,HECess2 ,CINNo ,InVoicedate,AmtWords)
+	ServiceOT ,OtherService , ChkOutServiceST ,CessService ,HECess2 ,CINNo ,InVoicedate,AmtWords,
+	LaundryName,ServiceName,FoodBev,PropertyType,CessName,HCessName)
 	
 	SELECT DISTINCT  h.GuestName as GuestName,h.Name,h.Stay,h.Type,h.BookingLevel,
 	convert(nvarchar(100),h.BillDate,103) as BillDate,
@@ -288,8 +300,10 @@ IF @Action='PageLoad'
     'Service Tax @'+CAST(h.RestaurantSTPer  AS NVARCHAR)+'% on Food and Beverages' ServiceFB,
     'Service Tax @'+CAST(h.BusinessSupportST AS NVARCHAR)+'% on Others' ServiceOT,sum(CS.OtherService) OtherService,
     sum(CS.ChkOutServiceST) ChkOutServiceST,sum(CS.Cess) CessService,sum(CS.HECess) HECess,
-    'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),GETDATE(),103) as InVoicedate,
-    'Rupees : '+dbo.fn_NtoWord(ROUND(CS.ChkOutServiceNetAmount,0),'','') AS AmtWords
+    'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),CS.CreatedDate,103) as InVoicedate,
+    'Rupees : '+dbo.fn_NtoWord(ROUND(CS.ChkOutServiceNetAmount,0),'','') AS AmtWords,
+    'Laundry' LaundryName,'Service' ServiceName,'Food and Beverages' FoodBev,h.PropertyType,
+    'Education Cess @2.00%' CessName,'Secondary and Higher Education Cess @1.00%' HCessName
 	
 	from  WRBHBCheckInHdr d
 	 join WRBHBChechkOutHdr h on h.ChkInHdrId = d.Id and d.IsActive = 1 and d.IsDeleted = 0
@@ -309,7 +323,10 @@ IF @Action='PageLoad'
 	h.ChkOutTariffHECess ,h.ChkOutTariffSC,h.CheckInDate,d.Tariff,p.HotalName,p.Line1,
 	c.CityName,s.StateName,p.Pincode,p.Phone,p.Email,	
     H.VATPer,h.RestaurantSTPer ,
-    h.BusinessSupportST ,h.InVoiceNo,h.BillFromDate,h.BillEndDate,CS.ChkOutServiceNetAmount--,t.LuxuryNo
+    h.BusinessSupportST ,h.InVoiceNo,h.BillFromDate,h.BillEndDate,CS.ChkOutServiceNetAmount,h.PropertyType,
+    CS.CreatedDate--,t.LuxuryNo
+  
+ Delete   #Prop2 where Amount=0
   
   SELECT GuestName ,Name,Stay ,Type,BookingLevel ,BillDate ,ClientName ,Id,InVoiceNo ,
 	TotalTariff ,LuxuryTax ,NetAmount ,SerivceNet ,SerivceTax1 ,Cess1 ,HCess1 ,ServiceCharge ,
@@ -318,7 +335,9 @@ IF @Action='PageLoad'
 	Taxablename ,BrandName,Amount ,Vat ,ChkOutServiceLT ,
 	ServiceTax ,Cess ,HECess ,ChkOutServiceNetAmount ,ServiceNetAmt ,Address ,VATPer ,Food ,Laundry ,
 	Service ,Miscellaneous  ,MiscellaneousRemarks  ,ServiceFB ,
-	ServiceOT ,OtherService , ChkOutServiceST ,CessService ,HECess2 ,CINNo ,InVoicedate,AmtWords from #Prop2
+	ServiceOT ,OtherService , ChkOutServiceST ,CessService ,HECess2 ,CINNo ,InVoicedate,
+	LaundryName,ServiceName,FoodBev,PropertyType ,CessName,HCessName
+	from #Prop2
 	group by GuestName ,Name,Stay ,Type,BookingLevel ,BillDate ,ClientName ,Id,InVoiceNo ,
 	TotalTariff ,LuxuryTax ,NetAmount ,SerivceNet ,SerivceTax1 ,Cess1 ,HCess1 ,ServiceCharge ,
 	ArrivalDate ,Tariff ,Propertyaddress ,Propcity ,CityName ,StateName , Postal ,Phone ,
@@ -326,8 +345,10 @@ IF @Action='PageLoad'
 	Taxablename ,BrandName,Amount ,Vat ,ChkOutServiceLT ,
 	ServiceTax ,Cess ,HECess ,ChkOutServiceNetAmount ,ServiceNetAmt ,Address ,VATPer ,Food ,Laundry ,
 	Service ,Miscellaneous  ,MiscellaneousRemarks  ,ServiceFB ,
-	ServiceOT ,OtherService , ChkOutServiceST ,CessService ,HECess2 ,CINNo ,InVoicedate,AmtWords
-   
+	ServiceOT ,OtherService , ChkOutServiceST ,CessService ,HECess2 ,CINNo ,InVoicedate,AmtWords,
+	LaundryName,ServiceName,FoodBev,PropertyType,CessName,HCessName
+
+    
 	
 	END
 	

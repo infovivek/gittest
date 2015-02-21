@@ -398,7 +398,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox19</rd:DefaultName>
-        <Top>0.78958in</Top>
+        <Top>0.97708in</Top>
         <Left>0.92309in</Left>
         <Height>0.25in</Height>
         <Width>5.85583in</Width>
@@ -430,10 +430,10 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox18</rd:DefaultName>
-        <Top>0.40625in</Top>
+        <Top>0.46875in</Top>
         <Left>0.92309in</Left>
         <Height>0.25in</Height>
-        <Width>2.22986in</Width>
+        <Width>2.6868in</Width>
         <ZIndex>1</ZIndex>
         <Style>
           <Border>
@@ -463,7 +463,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox15</rd:DefaultName>
-        <Top>0.40625in</Top>
+        <Top>0.46875in</Top>
         <Left>0.27879cm</Left>
         <Height>0.25in</Height>
         <Width>0.77083in</Width>
@@ -496,7 +496,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox16</rd:DefaultName>
-        <Top>0.78958in</Top>
+        <Top>0.97708in</Top>
         <Left>0.27879cm</Left>
         <Height>0.25in</Height>
         <Width>0.77083in</Width>
@@ -564,7 +564,7 @@
         <Top>0.01042in</Top>
         <Left>0.92309in</Left>
         <Height>0.25in</Height>
-        <Width>2.22986in</Width>
+        <Width>2.86271in</Width>
         <ZIndex>5</ZIndex>
         <Style>
           <Border>
@@ -595,7 +595,7 @@
         </Paragraphs>
         <rd:DefaultName>Textbox20</rd:DefaultName>
         <Top>0.01042in</Top>
-        <Left>3.35434in</Left>
+        <Left>3.86684in</Left>
         <Height>0.25in</Height>
         <Width>0.625in</Width>
         <ZIndex>6</ZIndex>
@@ -628,9 +628,9 @@
         </Paragraphs>
         <rd:DefaultName>Textbox21</rd:DefaultName>
         <Top>0.01042in</Top>
-        <Left>3.96059in</Left>
+        <Left>4.47309in</Left>
         <Height>0.25in</Height>
-        <Width>1in</Width>
+        <Width>0.82292in</Width>
         <ZIndex>7</ZIndex>
         <Style>
           <Border>
@@ -661,7 +661,7 @@
         </Paragraphs>
         <rd:DefaultName>Textbox22</rd:DefaultName>
         <Top>0.03334in</Top>
-        <Left>5.26892in</Left>
+        <Left>5.35642in</Left>
         <Height>0.25in</Height>
         <Width>0.73958in</Width>
         <ZIndex>8</ZIndex>
@@ -698,9 +698,9 @@
         </Paragraphs>
         <rd:DefaultName>Textbox23</rd:DefaultName>
         <Top>0.03334in</Top>
-        <Left>6.02239in</Left>
+        <Left>6.10989in</Left>
         <Height>0.25in</Height>
-        <Width>0.91091in</Width>
+        <Width>0.82292in</Width>
         <ZIndex>9</ZIndex>
         <Style>
           <Border>
@@ -733,7 +733,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox48</rd:DefaultName>
-        <Top>3.15047in</Top>
+        <Top>3.40047in</Top>
         <Left>4.19184in</Left>
         <Height>0.25in</Height>
         <Width>2.7725in</Width>
@@ -769,7 +769,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox49</rd:DefaultName>
-        <Top>3.79479in</Top>
+        <Top>4.04479in</Top>
         <Left>0.56454cm</Left>
         <Height>0.25in</Height>
         <Width>1.4375in</Width>
@@ -805,7 +805,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox50</rd:DefaultName>
-        <Top>3.79479in</Top>
+        <Top>4.04479in</Top>
         <Left>4.41059in</Left>
         <Height>0.25in</Height>
         <Width>2.55375in</Width>
@@ -836,7 +836,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox51</rd:DefaultName>
-        <Top>4.19895in</Top>
+        <Top>4.37395in</Top>
         <Left>0.56454cm</Left>
         <Height>0.01042in</Height>
         <Width>6.71104in</Width>
@@ -873,7 +873,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox52</rd:DefaultName>
-        <Top>4.2538in</Top>
+        <Top>4.4413in</Top>
         <Left>0.41275cm</Left>
         <Height>0.20001in</Height>
         <Width>6.8083in</Width>
@@ -909,7 +909,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox53</rd:DefaultName>
-        <Top>4.69826in</Top>
+        <Top>4.88576in</Top>
         <Left>0.15875cm</Left>
         <Height>0.25in</Height>
         <Width>1.4375in</Width>
@@ -944,7 +944,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox54</rd:DefaultName>
-        <Top>4.9927in</Top>
+        <Top>5.1802in</Top>
         <Left>0.15875cm</Left>
         <Height>0.22015in</Height>
         <Width>6.9333in</Width>
@@ -979,7 +979,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox56</rd:DefaultName>
-        <Top>5.50729in</Top>
+        <Top>5.69479in</Top>
         <Left>0.15875cm</Left>
         <Height>0.25in</Height>
         <Width>6.9333in</Width>
@@ -1012,7 +1012,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox58</rd:DefaultName>
-        <Top>6.39756in</Top>
+        <Top>6.58507in</Top>
         <Left>0.15875cm</Left>
         <Height>0.27848in</Height>
         <Width>6.9333in</Width>
@@ -1045,8 +1045,8 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox9</rd:DefaultName>
-        <Top>0.40625in</Top>
-        <Left>3.16684in</Left>
+        <Top>0.46875in</Top>
+        <Left>3.67934in</Left>
         <Height>0.25in</Height>
         <Width>0.8125in</Width>
         <ZIndex>19</ZIndex>
@@ -1078,10 +1078,10 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox12</rd:DefaultName>
-        <Top>0.40625in</Top>
-        <Left>3.96059in</Left>
+        <Top>0.46875in</Top>
+        <Left>4.47309in</Left>
         <Height>0.25in</Height>
-        <Width>1in</Width>
+        <Width>0.82292in</Width>
         <ZIndex>20</ZIndex>
         <Style>
           <Border>
@@ -1111,8 +1111,8 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox24</rd:DefaultName>
-        <Top>0.42917in</Top>
-        <Left>5.26892in</Left>
+        <Top>0.49167in</Top>
+        <Left>5.35642in</Left>
         <Height>0.25in</Height>
         <Width>0.73958in</Width>
         <ZIndex>21</ZIndex>
@@ -1144,10 +1144,10 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox25</rd:DefaultName>
-        <Top>0.42917in</Top>
-        <Left>6.01851in</Left>
+        <Top>0.49167in</Top>
+        <Left>6.10601in</Left>
         <Height>0.25in</Height>
-        <Width>0.91479in</Width>
+        <Width>0.82292in</Width>
         <ZIndex>22</ZIndex>
         <Style>
           <Border>
@@ -1179,7 +1179,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox59</rd:DefaultName>
-        <Top>5.23229in</Top>
+        <Top>5.41979in</Top>
         <Left>0.0625in</Left>
         <Height>0.25in</Height>
         <Width>6.9333in</Width>
@@ -1214,7 +1214,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox60</rd:DefaultName>
-        <Top>5.78645in</Top>
+        <Top>5.97395in</Top>
         <Left>0.15875cm</Left>
         <Height>0.24723in</Height>
         <Width>6.9333in</Width>
@@ -1249,7 +1249,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox62</rd:DefaultName>
-        <Top>6.10937in</Top>
+        <Top>6.29688in</Top>
         <Left>0.12171cm</Left>
         <Height>0.21875in</Height>
         <Width>2.46722in</Width>
@@ -1284,51 +1284,11 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox63</rd:DefaultName>
-        <Top>6.10937in</Top>
+        <Top>6.29688in</Top>
         <Left>2.39018in</Left>
         <Height>0.21875in</Height>
         <Width>4.59604in</Width>
         <ZIndex>26</ZIndex>
-        <Style>
-          <Border>
-            <Style>None</Style>
-          </Border>
-          <VerticalAlign>Middle</VerticalAlign>
-          <PaddingLeft>2pt</PaddingLeft>
-          <PaddingRight>2pt</PaddingRight>
-          <PaddingTop>2pt</PaddingTop>
-          <PaddingBottom>2pt</PaddingBottom>
-        </Style>
-      </Textbox>
-      <Textbox Name="Textbox61">
-        <CanGrow>true</CanGrow>
-        <KeepTogether>true</KeepTogether>
-        <Paragraphs>
-          <Paragraph>
-            <TextRuns>
-              <TextRun>
-                <Value>Stay simplified is brand of HummingBird</Value>
-                <Style>
-                  <FontStyle>Normal</FontStyle>
-                  <FontFamily>Calibri</FontFamily>
-                  <FontSize>11pt</FontSize>
-                  <FontWeight>Normal</FontWeight>
-                  <TextDecoration>None</TextDecoration>
-                  <Color>#000000</Color>
-                </Style>
-              </TextRun>
-            </TextRuns>
-            <Style>
-              <TextAlign>Center</TextAlign>
-            </Style>
-          </Paragraph>
-        </Paragraphs>
-        <rd:DefaultName>Textbox58</rd:DefaultName>
-        <Top>6.69271in</Top>
-        <Left>0.15875cm</Left>
-        <Height>0.22777in</Height>
-        <Width>6.9333in</Width>
-        <ZIndex>27</ZIndex>
         <Style>
           <Border>
             <Style>None</Style>
@@ -1636,6 +1596,173 @@
                         </Paragraph>
                       </Paragraphs>
                       <rd:DefaultName>Price1</rd:DefaultName>
+                      <Style>
+                        <Border>
+                          <Color>LightGrey</Color>
+                          <Style>Solid</Style>
+                        </Border>
+                        <PaddingLeft>2pt</PaddingLeft>
+                        <PaddingRight>2pt</PaddingRight>
+                        <PaddingTop>2pt</PaddingTop>
+                        <PaddingBottom>2pt</PaddingBottom>
+                      </Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+              </TablixCells>
+            </TablixRow>
+            <TablixRow>
+              <Height>0.25in</Height>
+              <TablixCells>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="Textbox6">
+                      <CanGrow>true</CanGrow>
+                      <KeepTogether>true</KeepTogether>
+                      <Paragraphs>
+                        <Paragraph>
+                          <TextRuns>
+                            <TextRun>
+                              <Value />
+                              <Style />
+                            </TextRun>
+                          </TextRuns>
+                          <Style />
+                        </Paragraph>
+                      </Paragraphs>
+                      <rd:DefaultName>Textbox6</rd:DefaultName>
+                      <Style>
+                        <Border>
+                          <Color>LightGrey</Color>
+                          <Style>Solid</Style>
+                        </Border>
+                        <PaddingLeft>2pt</PaddingLeft>
+                        <PaddingRight>2pt</PaddingRight>
+                        <PaddingTop>2pt</PaddingTop>
+                        <PaddingBottom>2pt</PaddingBottom>
+                      </Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="Textbox7">
+                      <CanGrow>true</CanGrow>
+                      <KeepTogether>true</KeepTogether>
+                      <Paragraphs>
+                        <Paragraph>
+                          <TextRuns>
+                            <TextRun>
+                              <Value>Other SericeTax @</Value>
+                              <Style />
+                            </TextRun>
+                          </TextRuns>
+                          <Style>
+                            <TextAlign>Right</TextAlign>
+                          </Style>
+                        </Paragraph>
+                      </Paragraphs>
+                      <rd:DefaultName>Textbox7</rd:DefaultName>
+                      <Style>
+                        <Border>
+                          <Color>LightGrey</Color>
+                          <Style>Solid</Style>
+                        </Border>
+                        <RightBorder>
+                          <Style>None</Style>
+                        </RightBorder>
+                        <VerticalAlign>Middle</VerticalAlign>
+                        <PaddingLeft>2pt</PaddingLeft>
+                        <PaddingRight>2pt</PaddingRight>
+                        <PaddingTop>2pt</PaddingTop>
+                        <PaddingBottom>2pt</PaddingBottom>
+                      </Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="SServiceTax">
+                      <CanGrow>true</CanGrow>
+                      <KeepTogether>true</KeepTogether>
+                      <Paragraphs>
+                        <Paragraph>
+                          <TextRuns>
+                            <TextRun>
+                              <Value>=Fields!SServiceTax.Value</Value>
+                              <Style />
+                            </TextRun>
+                          </TextRuns>
+                          <Style>
+                            <TextAlign>Left</TextAlign>
+                          </Style>
+                        </Paragraph>
+                      </Paragraphs>
+                      <rd:DefaultName>SServiceTax</rd:DefaultName>
+                      <Style>
+                        <Border>
+                          <Color>LightGrey</Color>
+                          <Style>Solid</Style>
+                        </Border>
+                        <LeftBorder>
+                          <Style>None</Style>
+                        </LeftBorder>
+                        <VerticalAlign>Middle</VerticalAlign>
+                        <PaddingLeft>2pt</PaddingLeft>
+                        <PaddingRight>2pt</PaddingRight>
+                        <PaddingTop>2pt</PaddingTop>
+                        <PaddingBottom>2pt</PaddingBottom>
+                      </Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="Textbox26">
+                      <CanGrow>true</CanGrow>
+                      <KeepTogether>true</KeepTogether>
+                      <Paragraphs>
+                        <Paragraph>
+                          <TextRuns>
+                            <TextRun>
+                              <Value />
+                              <Style />
+                            </TextRun>
+                          </TextRuns>
+                          <Style />
+                        </Paragraph>
+                      </Paragraphs>
+                      <rd:DefaultName>Textbox26</rd:DefaultName>
+                      <Style>
+                        <Border>
+                          <Color>LightGrey</Color>
+                          <Style>Solid</Style>
+                        </Border>
+                        <PaddingLeft>2pt</PaddingLeft>
+                        <PaddingRight>2pt</PaddingRight>
+                        <PaddingTop>2pt</PaddingTop>
+                        <PaddingBottom>2pt</PaddingBottom>
+                      </Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="OtherService">
+                      <CanGrow>true</CanGrow>
+                      <KeepTogether>true</KeepTogether>
+                      <Paragraphs>
+                        <Paragraph>
+                          <TextRuns>
+                            <TextRun>
+                              <Value>=Fields!OtherService.Value</Value>
+                              <Style />
+                            </TextRun>
+                          </TextRuns>
+                          <Style />
+                        </Paragraph>
+                      </Paragraphs>
+                      <rd:DefaultName>OtherService</rd:DefaultName>
                       <Style>
                         <Border>
                           <Color>LightGrey</Color>
@@ -2487,16 +2614,19 @@
             <TablixMember>
               <KeepWithGroup>Before</KeepWithGroup>
             </TablixMember>
+            <TablixMember>
+              <KeepWithGroup>Before</KeepWithGroup>
+            </TablixMember>
           </TablixMembers>
         </TablixRowHierarchy>
         <RepeatRowHeaders>true</RepeatRowHeaders>
         <KeepTogether>true</KeepTogether>
         <DataSetName>DataSet1</DataSetName>
-        <Top>1.21458in</Top>
+        <Top>1.46458in</Top>
         <Left>0.18333in</Left>
-        <Height>1.75in</Height>
+        <Height>2in</Height>
         <Width>6.77684in</Width>
-        <ZIndex>28</ZIndex>
+        <ZIndex>27</ZIndex>
         <Style>
           <Border>
             <Style>None</Style>
@@ -2518,11 +2648,11 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox5</rd:DefaultName>
-        <Top>3.01875in</Top>
+        <Top>3.26875in</Top>
         <Left>0.13in</Left>
         <Height>0.25in</Height>
         <Width>4in</Width>
-        <ZIndex>29</ZIndex>
+        <ZIndex>28</ZIndex>
         <Style>
           <Border>
             <Style>None</Style>

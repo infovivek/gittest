@@ -74,8 +74,8 @@ IF @GuestId = 0
   CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId,
   Designation,GradeId,Nationality,Title)
   VALUES(@ClientId,'',@EmpCode,@FirstName,@LastName,@Grade,
-  dbo.TRIM(@MobileNo),
-  @EmailId,0,0,@UsrId,GETDATE(),@UsrId,GETDATE(),1,0,NEWID(),
+  dbo.TRIM(@MobileNo),dbo.TRIM(@EmailId),
+  0,0,@UsrId,GETDATE(),@UsrId,GETDATE(),1,0,NEWID(),
   @Designation,@GradeId,@Nationality,@Title);
   SET @GuestId=@@IDENTITY;
  END
@@ -84,7 +84,7 @@ ELSE
   UPDATE WRBHBClientManagementAddClientGuest SET EmpCode=@EmpCode,
   FirstName=@FirstName,LastName=@LastName,
   GMobileNo=dbo.TRIM(@MobileNo),
-  EmailId=@EmailId,Designation=@Designation,Nationality=@Nationality,
+  EmailId=dbo.TRIM(@EmailId),Designation=@Designation,Nationality=@Nationality,
   Title=@Title,Grade=@Grade,GradeId=@GradeId
   WHERE Id=@GuestId AND CltmgntId=@ClientId;
  END
@@ -93,7 +93,7 @@ ELSE
  Title,FirstName,LastName,Grade,Designation,EmailId,MobileNo,Nationality,
  CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId)
  VALUES(@BookingId,@GuestId,@GradeId,@EmpCode,@Title,@FirstName,@LastName,
- @Grade,@Designation,@EmailId,dbo.TRIM(@MobileNo),@Nationality,@UsrId,
+ @Grade,@Designation,dbo.TRIM(@EmailId),dbo.TRIM(@MobileNo),@Nationality,@UsrId,
  GETDATE(),@UsrId,GETDATE(),1,0,NEWID());
  SELECT Id,RowId FROM WRBHBBookingGuestDetails WHERE Id=@@IDENTITY; 
 END

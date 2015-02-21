@@ -13,6 +13,7 @@ namespace HB.Dao
 {
     public class CloneClientDAO
     {
+        string UserData;
         public DataSet Save(string[] data, Entity.User user)
         {
             string UserData;
@@ -36,7 +37,7 @@ namespace HB.Dao
                 CC.ToId = Convert.ToInt32(document.SelectNodes("//GridXml")[i].Attributes["ClientId"].Value);
 
                 UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
-                           "', SctId:" + user.SctId + ", Service:PettyCashDAO Insert" + ", ProcName:'" + StoredProcedures.PettyCash_Insert;
+                           "', SctId:" + user.SctId + ", Service:CloneClientPref_Insert Insert" + ", ProcName:'" + StoredProcedures.CloneClientPref_Insert;
                 command = new SqlCommand();
                 command.CommandText = StoredProcedures.CloneClientPref_Insert;
                 command.CommandType = CommandType.StoredProcedure;

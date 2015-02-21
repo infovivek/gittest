@@ -125,16 +125,16 @@
 					sheet.setCell(0,9,'GuestName');
 					sheet.setCell(0,10,'CheckInDt');
 					sheet.setCell(0,11,'CheckOutDt');
-					sheet.setCell(0,12,'StayDays');
+					sheet.setCell(0,12,'BasePrice');
 					sheet.setCell(0,13,'Tariff / Day');
-					sheet.setCell(0,14,'MarkUp');
+					sheet.setCell(0,14,'StayDays');
 					sheet.setCell(0,15,'Total Tariff');
-					sheet.setCell(0,16,'Booking Level');
-					sheet.setCell(0,17,'Tariff Payment Mode');					
-					sheet.setCell(0,18,'Status');
-					sheet.setCell(0,19,'UserName');
-					sheet.setCell(0,20,'BookingDate');
-					sheet.setCell(0,21,Grd_BookingDtls.columns[21].headerText);
+					sheet.setCell(0,16,'MarkUp');
+					sheet.setCell(0,17,'Booking Level');
+					sheet.setCell(0,18,'Tariff Payment Mode');					
+					sheet.setCell(0,19,'Status');
+					sheet.setCell(0,20,'UserName');
+					sheet.setCell(0,21,'BookingDate');
 					sheet.setCell(0,22,Grd_BookingDtls.columns[22].headerText);
 					sheet.setCell(0,23,Grd_BookingDtls.columns[23].headerText);
 					sheet.setCell(0,24,Grd_BookingDtls.columns[24].headerText);
@@ -144,6 +144,7 @@
 					sheet.setCell(0,28,Grd_BookingDtls.columns[28].headerText);
 					sheet.setCell(0,29,Grd_BookingDtls.columns[29].headerText);
 					sheet.setCell(0,30,Grd_BookingDtls.columns[30].headerText);
+					sheet.setCell(0,31,Grd_BookingDtls.columns[31].headerText);
 					for(var i:int = 0; i < arrExportResult.length; i++)
 					{
 						sheet.setCell(i+1, 0, arrExportResult[i].SNo);
@@ -158,25 +159,26 @@
 						sheet.setCell(i+1, 9, arrExportResult[i].GuestName);
 						sheet.setCell(i+1, 10, arrExportResult[i].CheckInDt);
 						sheet.setCell(i+1, 11, arrExportResult[i].CheckOutDt);
-						sheet.setCell(i+1, 12, arrExportResult[i].StayDays);
+						sheet.setCell(i+1, 12, arrExportResult[i].BasePrice);
 						sheet.setCell(i+1, 13, arrExportResult[i].Tariff);
-						sheet.setCell(i+1, 14, arrExportResult[i].MarkUp);
+						sheet.setCell(i+1, 14, arrExportResult[i].StayDays);
 						sheet.setCell(i+1, 15, arrExportResult[i].TotalTariff);
-						sheet.setCell(i+1, 16, arrExportResult[i].BookingLevel);
-						sheet.setCell(i+1, 17, arrExportResult[i].TariffPaymentMode);
-						sheet.setCell(i+1, 18, arrExportResult[i].Status);
-						sheet.setCell(i+1, 19, arrExportResult[i].UserName);
-						sheet.setCell(i+1, 20, arrExportResult[i].BookingDate);
-						sheet.setCell(i+1, 21, arrExportResult[i].Column1);
-						sheet.setCell(i+1, 22, arrExportResult[i].Column2);
-						sheet.setCell(i+1, 23, arrExportResult[i].Column3);
-						sheet.setCell(i+1, 24, arrExportResult[i].Column4);
-						sheet.setCell(i+1, 25, arrExportResult[i].Column5);
-						sheet.setCell(i+1, 26, arrExportResult[i].Column6);
-						sheet.setCell(i+1, 27, arrExportResult[i].Column7);
-						sheet.setCell(i+1, 28, arrExportResult[i].Column8);
-						sheet.setCell(i+1, 29, arrExportResult[i].Column9);
-						sheet.setCell(i+1, 30, arrExportResult[i].Column10);
+						sheet.setCell(i+1, 16, arrExportResult[i].MarkUp);
+						sheet.setCell(i+1, 17, arrExportResult[i].BookingLevel);
+						sheet.setCell(i+1, 18, arrExportResult[i].TariffPaymentMode);
+						sheet.setCell(i+1, 19, arrExportResult[i].Status);
+						sheet.setCell(i+1, 20, arrExportResult[i].UserName);
+						sheet.setCell(i+1, 21, arrExportResult[i].BookingDate);
+						sheet.setCell(i+1, 22, arrExportResult[i].Column1);
+						sheet.setCell(i+1, 23, arrExportResult[i].Column2);
+						sheet.setCell(i+1, 24, arrExportResult[i].Column3);
+						sheet.setCell(i+1, 25, arrExportResult[i].Column4);
+						sheet.setCell(i+1, 26, arrExportResult[i].Column5);
+						sheet.setCell(i+1, 27, arrExportResult[i].Column6);
+						sheet.setCell(i+1, 28, arrExportResult[i].Column7);
+						sheet.setCell(i+1, 29, arrExportResult[i].Column8);
+						sheet.setCell(i+1, 30, arrExportResult[i].Column9);
+						sheet.setCell(i+1, 31, arrExportResult[i].Column10);
 					}
 					xlsFile.sheets.addItem(sheet);      
 					var bytes:ByteArray = xlsFile.saveToByteArray();
@@ -262,7 +264,7 @@
 	 <s:BorderContainer width="100%" height="100%" backgroundColor="#fbf9f9" borderVisible="false">
 		<s:Scroller x="0" y="60" width="100%" height="450" id="Scr_Grid" visible="true">
 	    	<s:VGroup width="100%" height="100%">
-			<mx:DataGrid id="Grd_BookingDtls" x="0" y="53" width="2400" height="100%"
+			<mx:DataGrid id="Grd_BookingDtls" x="0" y="53" width="2750" height="100%"
 						 horizontalScrollPolicy="off">
 				<mx:columns>
 					<mx:DataGridColumn width="50" dataField="SNo"/>
@@ -275,13 +277,14 @@
 					<mx:DataGridColumn width="100" dataField="City"/>
 					<mx:DataGridColumn width="100" dataField="EmpCode"/>
 					<mx:DataGridColumn width="100" dataField="GuestName"/>
-					<mx:DataGridColumn width="50" dataField="CheckInDt"/>
-					<mx:DataGridColumn width="50" dataField="CheckOutDt"/>
-					<mx:DataGridColumn width="50" dataField="StayDays"/>					
-					<mx:DataGridColumn width="50" dataField="Tariff"/>
-					<mx:DataGridColumn width="50" dataField="MarkUp"/>
+					<mx:DataGridColumn width="100" dataField="CheckInDt"/>
+					<mx:DataGridColumn width="100" dataField="CheckOutDt"/>
+					<mx:DataGridColumn width="100" dataField="BasePrice"/>
+					<mx:DataGridColumn width="100" dataField="Tariff"/>
+					<mx:DataGridColumn width="50" dataField="StayDays"/>
 					<mx:DataGridColumn width="100" dataField="TotalTariff"/>
-					<mx:DataGridColumn width="50" dataField="BookingLevel"/>
+					<mx:DataGridColumn width="100" dataField="MarkUp"/>
+					<mx:DataGridColumn width="100" dataField="BookingLevel"/>
 					<mx:DataGridColumn width="100" dataField="TariffPaymentMode"/>					
 					<mx:DataGridColumn width="50" dataField="Status"/>
 					<mx:DataGridColumn width="100" dataField="UserName"/>

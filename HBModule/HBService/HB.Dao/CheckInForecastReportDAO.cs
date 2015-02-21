@@ -13,8 +13,12 @@ namespace HB.Dao
 {
     public class CheckInForecastReportDAO
     {
+        string UserData;
         public DataSet Help(string[] data, User user)
        {
+                UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                "', SctId:" + user.SctId + ", Service:CheckInForecastReport_Help" + ", ProcName:'" + StoredProcedures.CheckInForecastReport_Help;
+
                SqlCommand command = new SqlCommand();
                command.CommandText = StoredProcedures.CheckInForecastReport_Help;
                command.CommandType = CommandType.StoredProcedure;
@@ -25,7 +29,7 @@ namespace HB.Dao
                command.Parameters.Add("@Pram4", SqlDbType.VarChar).Value = data[5].ToString();
                command.Parameters.Add("@Pram5", SqlDbType.VarChar).Value = data[6].ToString();
                command.Parameters.Add("@UserId", SqlDbType.BigInt).Value = user.Id;
-               return new WrbErpConnection().ExecuteDataSet(command, "");
+               return new WrbErpConnection().ExecuteDataSet(command, UserData);
        }
     }
 }

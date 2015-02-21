@@ -112,6 +112,13 @@ BEGIN
      SET @ClientBookerId=@@IDENTITY;
     END
   END
+ --ISNULL(HBStay,'') = 'StayCorporateHB')
+ DECLARE @HBStay NVARCHAR(100) = '';
+ IF @PropertyRefNo = 'StayCorporateHB'
+  BEGIN
+   SET @HBStay = 'StayCorporateHB';
+   SET @PropertyRefNo = '';
+  END
 -- Booking Insert Begin
  INSERT INTO WRBHBBooking(ClientId,GradeId,StateId,CityId,ClientName,
  CheckInDate,ExpectedChkInTime,CheckOutDate,GradeName,StateName,CityName,
@@ -119,7 +126,7 @@ BEGIN
  ModifiedDate,IsActive,IsDeleted,RowId,Status,Sales,ClientBookerId,
  ClientBookerName,ClientBookerEmail,EmailtoGuest,Note,CRM,TrackingNo,
  AMPM,BookingLevel,PONo,CancelStatus,BookedDt,BookedUsrId,HRPolicy,
- HRPolicyOverrideRemarks,PropertyRefNo)
+ HRPolicyOverrideRemarks,PropertyRefNo,HBStay)
  VALUES(@ClientId,@GradeId,@StateId,@CityId,@ClientName,
  CONVERT(DATE,@CheckInDate,103),RTRIM(LTRIM(@ExpectedChkInTime)),
  CONVERT(DATE,@CheckOutDate,103),@GradeName,@StateName,@CityName,
@@ -127,7 +134,7 @@ BEGIN
  GETDATE(),1,0,NEWID(),@Status,@Sales,@ClientBookerId,
  @ClientBookerName,@ClientBookerEmail,@EmailtoGuest,@Note,@CRM,@TrackingNo,
  @AMPM,@BookingLevel,'','',GETDATE(),@UsrId,@HRPolicy,
- @HRPolicyOverrideRemarks,@PropertyRefNo);
+ @HRPolicyOverrideRemarks,@PropertyRefNo,@HBStay);
  SELECT Id,RowId,BookingCode,ExpectedChkInTime FROM WRBHBBooking 
  WHERE Id = @@IDENTITY; 
 -- Booking Insert End

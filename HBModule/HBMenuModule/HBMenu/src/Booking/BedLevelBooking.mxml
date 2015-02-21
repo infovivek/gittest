@@ -34,7 +34,7 @@
 			public var ErrStr:String="",GradeName:String="",BookedId:int=0;
 			public var BookingPropertyId:int=0,BookingPropertyTableId:int=0;
 			public var ClientBookerId:int=0,ClientBookerName:String="",Flag:Boolean=true;
-			public var Save_Method:String="",GuestId:int = 0;
+			public var Save_Method:String="",GuestId:int = 0,UsrId:String = "",TitleLoadFlg:Boolean=true;
 			public var Time:String="",Hr:String="",Min:String="",ExpInTime:String="";
 			protected function Application1_creationCompleteHandler(event:FlexEvent):void
 			{
@@ -61,15 +61,23 @@
 				Tcl_Time.setTime=new Date("11/11/11,12:00:00");
 				Ddl_AMPM.selectedItem="PM";
 				Txt_Result.visible = false;
+				UsrId = Global_AC[0].UsrId;
+				//UsrId = "7";
+				//
+				Lbl_SalesCRM.visible = false;
+				Lbl_SSP.visible = false;
+				Ddl_SSP.visible = false;
+				Lbl_ExtraCCEmail.visible = false;
+				Txt_ExtraCCemail.visible = false;
+				Lbl_Tab3Note.visible = false;
+				Txt_SpecialRequirements.visible = false;
 				//
 				FnHelp_PageLoad();FnHelp_Title();
-				//
-				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Bed',2223]);
 			}
 			
 			protected function FnHelp_PageLoad():void
 			{
-				useWeb("BOOKING","PageLoad_CUSTOM",[GlobalXml,'PageLoad','','','','',0,0,0,0,0,0,0]);				
+				useWeb("BOOKING","PageLoad_CUSTOM",[GlobalXml,'ClientorMasterClientLoad','','','','',0,0,0,0,0,UsrId,0]);				
 			}
 			
 			public function FnHelp_Title():void
@@ -98,15 +106,44 @@
 				Tmp=null;
 			}
 			
+			private function GuestLoad(event:CloseEvent):void 
+			{
+				if (event.detail == Alert.YES) 
+				{
+					FnHelp_Guest();
+				}
+			}
+			
 			private function Custom_WebSer_Result (Ds_Objects:Object):void				
 			{
+				Txt_StayDays.text="";Dt_ChkInDt.selectedDate=new Date();
+				Hlp_Client.dataProvider = null;
 				if (Ds_Objects.currentTarget.description.toString() == "PageLoad_CUSTOM")
 				{
-					Txt_StayDays.text="";Dt_ChkInDt.selectedDate=new Date();
-					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					if(Ds_Objects.result.Tables.Table.Rows[0].TmpStr == "MasterClient")
 					{
-						Hlp_Client.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
-					}					
+						if (Ds_Objects.result.Tables.Table2.Rows.length > 0)
+						{
+							Hlp_Client.dataProvider=Ds_Objects.result.Tables.Table2.Rows as ArrayCollection;
+						}
+					}
+					else
+					{
+						Hlp_Client.enabled = false;
+						Hlp_Client.text = Ds_Objects.result.Tables.Table2.Rows[0].ClientName;
+						ClientId = Ds_Objects.result.Tables.Table2.Rows[0].ClientId;
+						Lbl_ClientName.text=Hlp_Client.text;
+						if(TitleLoadFlg == true)
+						{
+							alignAlert(Alert.show("Do you want to load existing Guest details?", "Warning !",
+								Alert.YES | Alert.NO,null,GuestLoad, iconWarning, Alert.NO),10,"");
+							TitleLoadFlg = false;
+						}
+						else
+						{
+							FnHelp_Guest();
+						}
+					}
 					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
 					{
 						Dt_ChkInDt.text=Ds_Objects.result.Tables.Table1.Rows[0].CDt;
@@ -222,9 +259,6 @@
 					}
 					if(Save_Method == "DirectBooking")
 					{
-						/*var ss:String=Ds_Objects.result.Tables.Table.Rows[0].BookingCode;
-						alignAlert(Alert.show("Booking Confirmed Successfully.","Message !",Alert.OK, 
-						null, null, iconTickLarge, Alert.OK),10,"");*/
 						BookedId=Id;
 						useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Bed',BookedId]);
 						FnClear();
@@ -269,14 +303,7 @@
 						BookingPropertyId=Ac_Pr[0].PropertyId;
 						BookingPropertyTableId=Ac_Pr[0].Id
 						Ddl_Property.prompt=Ac_Pr[0].label;
-						PropertyType=Ac_Pr[0].PropertyType;
-						/*if(Ac_Pr.length == 1)
-						{
-						BookingPropertyId=Ac_Pr[0].PropertyId;
-						BookingPropertyTableId=Ac_Pr[0].Id
-						Ddl_Property.prompt=Ac_Pr[0].label;
-						PropertyType=Ac_Pr[0].PropertyType;
-						}*/
+						PropertyType=Ac_Pr[0].PropertyType;						
 					}
 					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
 					{
@@ -293,6 +320,13 @@
 					if (Ds_Objects.result.Tables.Table4.Rows.length > 0)
 					{
 						Ddl_TariffPaymentMode.dataProvider=Ds_Objects.result.Tables.Table4.Rows as ArrayCollection;
+					}
+					if (Ds_Objects.result.Tables.Table5.Rows.length > 0)
+					{
+						Ddl_ServicePaymentMode.dataProvider=Ds_Objects.result.Tables.Table5.Rows as ArrayCollection;
+					}
+					if (Ds_Objects.result.Tables.Table5.Rows.length < 0)
+					{
 						Ddl_ServicePaymentMode.dataProvider=Ds_Objects.result.Tables.Table4.Rows as ArrayCollection;
 					}
 					var asd:ArrayCollection=new ArrayCollection(); 
@@ -405,9 +439,7 @@
 									}
 									Lbl_C2Name.visible = true;
 									Lbl_C2M.visible = true;
-									//Chk_C2.visible = true;
 									Hlp_Column2.visible = true;
-									//Chk_C2.selected = false;
 								}
 								else
 								{
@@ -415,7 +447,6 @@
 									Hlp_Column2.fnClear();
 									Lbl_C2Name.visible = false;
 									Lbl_C2M.visible = false;
-									//Chk_C2.visible = false;
 									Hlp_Column2.visible = false;									
 								}
 							}
@@ -443,21 +474,17 @@
 										Hlp_Column3.dataProvider = null;
 										Hlp_Column3.fnClear();
 									}
-									//Chk_C3.selected = false;
 									Lbl_C3Name.visible = true;
 									Lbl_C3M.visible = true;
 									Hlp_Column3.visible = true;
-									//Chk_C3.visible = true;
 								}
 								else
 								{
 									Lbl_C3M.text = "";									
 									Hlp_Column3.fnClear();
-									//Chk_C3.selected = false;
 									Lbl_C3Name.visible = false;
 									Lbl_C3M.visible = false;
 									Hlp_Column3.visible = false;
-									//Chk_C3.visible = false;
 								}
 							}
 							if(Ac_Column[q].Id == 4)
@@ -487,8 +514,6 @@
 									Lbl_C4Name.visible = true;
 									Lbl_C4M.visible = true;
 									Hlp_Column4.visible = true;
-									//Chk_C4.selected = false;
-									//Chk_C4.visible = true;
 								}
 								else
 								{
@@ -497,8 +522,6 @@
 									Lbl_C4M.text = "";
 									Hlp_Column4.visible = false;
 									Hlp_Column4.fnClear();
-									//Chk_C4.selected = false;
-									//Chk_C4.visible = false;
 								}
 							}
 							if(Ac_Column[q].Id == 5)
@@ -528,8 +551,6 @@
 									Lbl_C5Name.visible = true;
 									Lbl_C5M.visible = true;
 									Hlp_Column5.visible = true;
-									//Chk_C5.visible = true;
-									//Chk_C5.selected = false;
 								}
 								else
 								{
@@ -538,8 +559,6 @@
 									Lbl_C5M.text = "";
 									Hlp_Column5.visible = false;
 									Hlp_Column5.fnClear();
-									//Chk_C5.visible = false;
-									//Chk_C5.selected = false;
 								}
 							}
 							if(Ac_Column[q].Id == 6)
@@ -568,8 +587,6 @@
 									Lbl_C6M.visible = true;									
 									Hlp_Column6.visible = true;
 									Hlp_Column6.fnClear();
-									//Chk_C6.selected = false;
-									//Chk_C6.visible = true;
 								}
 								else
 								{
@@ -578,8 +595,6 @@
 									Lbl_C6M.text = "";
 									Hlp_Column6.visible = false;
 									Hlp_Column6.fnClear();
-									//Chk_C6.selected = false;
-									//Chk_C6.visible = false;
 								}
 							}
 							if(Ac_Column[q].Id == 7)
@@ -598,20 +613,16 @@
 									if (Ds_Objects.result.Tables.Table7.Rows.length > 0)
 									{
 										Hlp_Column7.dataProvider = null;
-										//Hlp_Column7.fnClear();
 										Hlp_Column7.dataProvider = Ds_Objects.result.Tables.Table7.Rows as ArrayCollection;
 									}
 									else
 									{
 										Hlp_Column7.dataProvider = null;
-										//Hlp_Column7.fnClear();
 									}
 									Lbl_C7Name.visible = true;
 									Lbl_C7M.visible = true;
 									Hlp_Column7.visible = true;									
 									Hlp_Column7.fnClear();
-									//Chk_C7.selected = false;
-									//Chk_C7.visible = true;
 								}
 								else
 								{
@@ -620,8 +631,6 @@
 									Hlp_Column7.visible = false;
 									Lbl_C7M.text = "";									
 									Hlp_Column7.fnClear();
-									//Chk_C7.selected = false;
-									//Chk_C7.visible = false;
 								}
 							}
 							if(Ac_Column[q].Id == 8)
@@ -640,20 +649,16 @@
 									if (Ds_Objects.result.Tables.Table8.Rows.length > 0)
 									{
 										Hlp_Column8.dataProvider = null;
-										//Hlp_Column8.fnClear();
 										Hlp_Column8.dataProvider = Ds_Objects.result.Tables.Table8.Rows as ArrayCollection;
 									}
 									else
 									{
 										Hlp_Column8.dataProvider = null;
-										//Hlp_Column8.fnClear();
 									}
 									Lbl_C8Name.visible = true;
 									Lbl_C8M.visible = true;									
 									Hlp_Column8.visible = true;
 									Hlp_Column8.fnClear();
-									//Chk_C8.selected = false;
-									//Chk_C8.visible = true;
 								}
 								else
 								{
@@ -662,8 +667,6 @@
 									Lbl_C8M.text = "";
 									Hlp_Column8.visible = false;
 									Hlp_Column8.fnClear();
-									//Chk_C8.selected = false;
-									//Chk_C8.visible = false;
 								}
 							}
 							if(Ac_Column[q].Id == 9)
@@ -694,8 +697,6 @@
 									Lbl_C9M.visible = true;									
 									Hlp_Column9.visible = true;
 									Hlp_Column9.fnClear();
-									//Chk_C9.selected = false;
-									//Chk_C9.visible = true;
 								}
 								else
 								{
@@ -704,8 +705,6 @@
 									Lbl_C9M.text = "";
 									Hlp_Column9.visible = false;
 									Hlp_Column9.fnClear();
-									//Chk_C9.selected = false;
-									//Chk_C9.visible = false;
 								}
 							}
 							if(Ac_Column[q].Id == 10)
@@ -736,8 +735,6 @@
 									Lbl_C10M.visible = true;									
 									Hlp_Column10.visible = true;
 									Hlp_Column10.fnClear();
-									//Chk_C10.visible = true;
-									//Chk_C10.selected = false;
 								}
 								else
 								{
@@ -746,8 +743,6 @@
 									Lbl_C10M.text = "";
 									Hlp_Column10.visible = false;
 									Hlp_Column10.fnClear();
-									//Chk_C10.visible = false;
-									//Chk_C10.selected = false;
 								}
 							}
 							Hlp_Column1.text = Ds_Objects.result.Tables.Table11.Rows[0].Column1;
@@ -854,32 +849,6 @@
 					Ac=Grd_Guest._getGridSrc as ArrayCollection;
 					if(Ac.length > 0)
 					{
-						/*var GradId:int=event.currentTarget.selectedRow.GradeId;
-						var Grad:String=event.currentTarget.selectedRow.Grade;
-						var ExistsGradeId:int=0,ExistsGrade:String="";
-						for(var i:int = 0; i < Ac.length; i++)
-						{
-						if(Ac[i].GradeId != 0)
-						{
-						ExistsGradeId = Ac[i].GradeId;
-						ExistsGrade = Ac[i].Grade;
-						i = Ac.length;
-						}
-						}
-						if(GradId != 0)
-						{
-						if(ExistsGradeId != 0)
-						{
-						if((GradId != ExistsGradeId)||(Grad != ExistsGrade))
-						{
-						Grd_Guest._setValuetoCtrl("hlpEmpCode","");
-						alignAlert(Alert.show("Grade Not Match",
-						"Alert Message !",Alert.OK,null, null, iconWarning, Alert.OK),10,"");
-						return;
-						}
-						}							
-						}*/
-						// exists guest 
 						var Acc:ArrayCollection=new ArrayCollection();
 						Acc=Grd_Guest._getGridSrc as ArrayCollection;
 						if(Acc.length > 0)
@@ -964,46 +933,6 @@
 				{
 					return Str;
 				}
-				/*var Ac:ArrayCollection=new ArrayCollection();
-				Ac=Grd_Guest._getGridSrc as ArrayCollection;
-				if(Ac.length > 0)
-				{
-				var GradId:int=arrObj.GradeId;
-				var Grad:String=arrObj.Grade;
-				var ExistsGradeId:int=0,ExistsGrade:String="";
-				for(var i:int = 0; i < Ac.length; i++)
-				{
-				if(Ac[i].GradeId != 0)
-				{
-				ExistsGradeId = Ac[i].GradeId;
-				ExistsGrade = Ac[i].Grade;
-				i = Ac.length;
-				}
-				if((Ac[i].GradeId == 0)&&(Ac[i].Grade != ""))
-				{
-				ExistsGradeId = Ac[i].GradeId;
-				ExistsGrade = Ac[i].Grade;
-				i = Ac.length;
-				}
-				}
-				if(GradId != 0)
-				{
-				if(GradId != ExistsGradeId)
-				{							
-				return "Grade Not Matched.";
-				}
-				}
-				if((GradId == 0)&&(Grad != ""))
-				{
-				if(ExistsGrade != "")
-				{
-				if(ExistsGrade != Grad)
-				{
-				return "Grade Not Matched.";
-				}
-				}
-				}									
-				}*/
 				return "";
 			}
 			
@@ -1198,26 +1127,6 @@
 					}
 					ErrStr = ErrStr + "* CheckIn Date is Required.\n";
 				}
-				/*Time = "";Hr = "";Min = "";ExpInTime = "";
-				Time = Tcl_Time.getTime();
-				Hr = Time.substr(0,2);
-				Min = Time.substr(3,2);
-				if(Number(Hr) > 12)
-				{
-				var sdf:Number=Number(Hr) - 12;
-				if(sdf <= 9)
-				{
-				ExpInTime = "0"+String(Number(Hr) - 12)+":"+Min+":"+"00";
-				}
-				else
-				{
-				ExpInTime = String(Number(Hr) - 12)+":"+Min+":"+"00";
-				}						
-				}
-				if(Number(Hr) <= 12)
-				{
-				ExpInTime = Tcl_Time.getTime();
-				}*/
 				if(Tcl_Time.getTime() == "00:00:00")
 				{
 					if(Flag == true)
@@ -1261,7 +1170,6 @@
 					Ddl_Booker.dataProvider=sdfs;Ddl_Booker.prompt="Please Select Booker";
 					Txt_PropertyFilter.text="";Txt_LocalityFilter.text="";
 					ClientBookerId=0;ClientBookerName="";Txt_BookerEmail.text="";
-					Chk_EmailtoGuest.selected=true;
 					var sdfsdsd:ArrayCollection=new ArrayCollection();
 					Grd_Property.dataProvider=sdfsdsd;
 					Txt_NewBooker.text="";Txt_NewBookerEmail.text="";
@@ -1361,73 +1269,6 @@
 					Err = Err + "*  Email to Guest is Required.\n";
 					Chk_EmailtoGuest.setFocus();
 				}
-				/*var Flagg:Boolean=true;
-				if((ClientBookerId == 0) && (Txt_NewBooker.text == "") && (Txt_NewBookerEmail.text == "") && (Chk_EmailtoGuest.selected == false))
-				{
-				Err = Err + "*  Booker Email is Required.\n";
-				Ddl_Booker.setFocus();Flagg=false;			
-				}
-				if((ClientBookerId = 0) && (Txt_NewBooker.text == "") && (Txt_NewBookerEmail.text == "")
-				{
-				Err = Err + "*  Booker Email is Required.\n";
-				Ddl_Booker.setFocus();Flagg=false;			
-				}
-				
-				if(Flagg == true)
-				{
-				if(Chk_EmailtoGuest.selected == false)
-				{
-				if(ClientBookerId == 0)
-				{
-				if(Txt_NewBooker.text == "")
-				{
-				Err = Err + "*  New Booker Name is Required.\n";
-				}
-				if(Txt_NewBookerEmail.text == "")
-				{
-				Err = Err + "*  New Booker Email is Required.\n";
-				}
-				if(Txt_NewBooker.text != "")
-				{
-				if(Txt_NewBooker.text.length < 4)
-				{
-				Err = Err + "*  New Booker Name Must be 4 Characters is Required.\n";
-				}
-				}							
-				if(Txt_NewBookerEmail.text != "")
-				{
-				EmailValidator.validate(Txt_NewBookerEmail.text);
-				Err = Err + ErrStr;
-				}
-				}
-				}
-				if(Chk_EmailtoGuest.selected == true)
-				{
-				if((Txt_NewBooker.text != "")||(Txt_NewBookerEmail.text != ""))
-				{
-				if(Txt_NewBooker.text == "")
-				{
-				Err = Err + "*  New Booker Name is Required.\n";
-				}
-				if(Txt_NewBookerEmail.text == "")
-				{
-				Err = Err + "*  New Booker Email is Required.\n";
-				}
-				if(Txt_NewBooker.text != "")
-				{
-				if(Txt_NewBooker.text.length < 4)
-				{
-				Err = Err + "*  New Booker Name Must be 4 Characters is Required.\n";
-				}
-				}							
-				if(Txt_NewBookerEmail.text != "")
-				{
-				EmailValidator.validate(Txt_NewBookerEmail.text);
-				Err = Err + ErrStr;
-				}
-				}
-				}
-				}*/
 				if(Err != "")
 				{
 					alignAlert(Alert.show(Err,"Requierd Field(s) !",Alert.OK,null,null,
@@ -1473,7 +1314,7 @@
 						EmailtoGuest:Chk_EmailtoGuest.selected,Note:"",
 						SpecialRequirements:"",Id:Id,Status:"Step2",AMPM:Ddl_AMPM.selectedItem,
 						BookingLevel:"Bed",ExtraCCEmail:Txt_ExtraCCemail.text,HRPolicy:false,
-						HRPolicyOverrideRemarks:"",PropertyRefNo:""}]);
+						HRPolicyOverrideRemarks:"",PropertyRefNo:"StayCorporateHB"}]);
 				var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
 				var GuestXml:String="";
 				GuestXml += "<ROOT>";
@@ -1515,7 +1356,7 @@
 				var TD:String = TDt.substr(0,2);
 				var ChkOutDt:String=TY+'-'+TM+'-'+TD+' '+'11:59:00 AM';
 				
-				useWeb("BedBooking","Tab3_to_Tab2_CUSTOM",[GlobalXml,'BedLevel_Property','','',
+				useWeb("BedBooking","Tab3_to_Tab2_CUSTOM",[GlobalXml,'BedLevel_Property','','HBStay',
 					ChkInDt,ChkOutDt,0,CityId,ClientId,0,GradeId,Id,123]);
 				Ddl_Booker.setFocus();
 			}
@@ -1701,21 +1542,6 @@
 						}
 					}
 				}
-				/*if(Ac1.length != 0)
-				{
-				if(SSPId != 0)
-				{
-				for(var t1:int = 0; t1 < Len1; t1++)
-				{
-				if(SSPId == Ac1[t1].SSPId)
-				{
-				alignAlert(Alert.show("* SSP Already Assigned to Guest","Alert Message !",
-				Alert.OK,null,null,iconWarning,Alert.OK),10,"");
-				return;
-				}
-				}
-				}
-				}*/
 				Txt_Result.text = "";
 				Txt_FileName.text = "";
 				if(TariffPaymentMode == "Bill to Company (BTC)")
@@ -1726,40 +1552,6 @@
 				{
 					FnAddtoCart();
 				}
-				/*Grd_GuestTab3.dataProvider=null;
-				var Len:int=Ac.length;
-				for(var j:int = 0; j < Len; j++)
-				{
-				if(Ac[j].Tick == 1)
-				{
-				Cnt = Cnt + 1;
-				Ac1.addItem
-				({EmpCode:Ac[j].EmpCode,FirstName:Ac[j].FirstName,LastName:Ac[j].LastName,
-				GuestId:Ac[j].GuestId,BedType:BedType,Tariff:Txt_Tariff.text,
-				RoomId:RoomId,BedId:BedId,SSPId:SSPId,
-				BookingPropertyId:BookingPropertyId,
-				BookingPropertyTableId:BookingPropertyTableId,
-				ServicePaymentMode:ServicePaymentMode,
-				TariffPaymentMode:TariffPaymentMode,Id:0,Name:Ac[j].Name,
-				Column1:Ac[j].Txt_C1,Column2:Ac[j].Txt_C2,Column3:Ac[j].Txt_C3,Column4:Ac[j].Txt_C4,
-				Column5:Ac[j].Txt_C5,Column6:Ac[j].Txt_C6,Column7:Ac[j].Txt_C7,Column8:Ac[j].Txt_C8,
-				Column9:Ac[j].Txt_C9,Column10:Ac[j].Txt_C10});
-				Tmp.removeItemAt(j);
-				j=0;Len=Ac.length;j=j-1;
-				}					
-				}
-				Grd_GuestTab3.dataProvider=Tmp.source;
-				Grd_PropertyAssignedGst.dataProvider=Ac1;
-				
-				var Ac_BedType:ArrayCollection = new ArrayCollection();
-				Ac_BedType = Ddl_Bed.dataProvider as ArrayCollection;
-				
-				var index:int = Ddl_Bed.selectedIndex;
-				Ac_BedType.removeItemAt(Ddl_Bed.selectedIndex);
-				BedId=0;RoomId=0;BedType="";BedTariff=0;Txt_Tariff.text="";
-				Ddl_Bed.dataProvider = null;
-				Ddl_Bed.dataProvider = Ac_BedType;
-				Ddl_Bed.prompt = "Please Select Bed";*/
 			}
 			
 			public var uploadURL:URLRequest = new URLRequest();
@@ -1782,8 +1574,9 @@
 			{
 				if(Txt_FileName.text == "")
 				{
-					Pnl_Upload.visible = false;
-					FnAddtoCart();
+					//Pnl_Upload.visible = false;
+					//FnAddtoCart();
+					alignAlert(Alert.show("* File is Required.","Alert Message !",Alert.OK, null, null,iconWarning, Alert.OK),10,"");
 				}
 				else
 				{
@@ -1791,14 +1584,10 @@
 				}
 			}
 			
-			private var fileTypes:Array = new Array();
-			//private var imageTypes:FileFilter = new FileFilter("Images ( *.jpg; *.jpeg; *.gif; *.png; *.eml)" ,"*.jpg; *.jpeg; *.gif; *.png; *.eml");			
-			//private var documentTypes:FileFilter = new FileFilter("Documents (*.pdf), (*.doc),(*.docx), (*.rtf), (*.txt)",("*.pdf; *.doc; *.rtf, *.txt"));
+			private var fileTypes:Array = new Array();			
 			private function browseFiles(event:Event):void
 			{
 				fileTypes = new Array();
-				//fileTypes.push(imageTypes);
-				//fileTypes.push(documentTypes);
 				fileRef.browse(fileTypes);
 			}
 			
@@ -1870,10 +1659,6 @@
 				cursorManager.removeBusyCursor();
 				alignAlert(Alert.show("There was an error uploading the file, please try again!","Alert Message !",
 					Alert.OK, null, null,iconWarning, Alert.OK),10,"");
-				//if (event.status != 200)
-				//{
-				//	mx.controls.Alert.show(String(event),"Error",0);
-				//}
 			}
 			
 			private function ioErrorHandler(event:IOErrorEvent):void
@@ -2050,7 +1835,7 @@
 						SpecialRequirements:Txt_SpecialRequirements.text,
 						Id:Id,Status:"Direct Booked",AMPM:Ddl_AMPM.selectedItem,BookingLevel:"Bed",
 						ExtraCCEmail:Txt_ExtraCCemail.text,HRPolicy:false,HRPolicyOverrideRemarks:"",
-						PropertyRefNo:"",PaymentFlag:true}]);
+						PropertyRefNo:"StayCorporateHB",PaymentFlag:true}]);
 				var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
 				var Tmp1:ArrayCollection=new ArrayCollection();
 				var GuestXml:String="";
@@ -2153,29 +1938,6 @@
 					return;
 				}				
 				GradeId = 0;GradeName="";
-				/*if(Chk_HRPolicy.selected == false)
-				{
-				var Ac:ArrayCollection = new ArrayCollection();
-				Ac = Grd_Guest._getGridSrc as ArrayCollection;
-				for(var i:int = 0; i < Ac.length; i++)
-				{
-				if((Number(Ac[i].GradeId) == 0)&&(Ac[i].Grade != ""))
-				{
-				GradeId = 0;GradeName = Ac[i].Grade;
-				}
-				if(Number(Ac[i].GradeId) != 0)
-				{
-				GradeId = Ac[i].GradeId;
-				GradeName = Ac[i].Grade;
-				i = Ac.length;
-				}					
-				}
-				}
-				if(Chk_HRPolicy.selected == true)
-				{
-				GradeId = 0;GradeName="";
-				}*/	
-				
 				var FDt:String = Dt_ChkInDt.text;										
 				var FY:String = FDt.substr(6,10);
 				var FM:String = FDt.substr(3,2);
@@ -2188,7 +1950,7 @@
 				var ChkOutDt:String=TY+'-'+TM+'-'+TD+' '+'11:59:00 AM';
 				
 				useWeb("BedBooking","Property_CUSTOM",[GlobalXml,'BedLevel_Property',
-					GradeName,'',ChkInDt,ChkOutDt,0,CityId,ClientId,0,GradeId,0,0]);
+					GradeName,'HBStay',ChkInDt,ChkOutDt,0,CityId,ClientId,0,GradeId,0,0]);
 			}			
 			
 			protected function Txt_LocalityFilter_changeHandler(event:TextOperationEvent):void
@@ -2321,11 +2083,6 @@
 				{
 					Grd_Property.toolTip = "Phone: "+DataGridItemRenderer(event.itemRenderer).data.Phone +"\nEmail: "+DataGridItemRenderer(event.itemRenderer).data.Email;
 				}
-				/*if (event.itemRenderer.measuredWidth > event.itemRenderer.width)
-				{
-				var str:String =  DataGridItemRenderer(event.itemRenderer).data.Phone;
-				}
-				Grd_Property.toolTip = str;*/
 			}
 			
 			public function Split(event:Event):void
@@ -2522,7 +2279,7 @@
 			<mx:Label x="44" y="70.95" text="Client Name"/>
 			<mx:Label x="23" y="57" text="Tracking Number" visible="false"/>
 			<s:HGroup x="524" y="71.45" width="420" height="20" gap="10" horizontalAlign="left"
-					  verticalAlign="middle">
+					  verticalAlign="middle" id="Lbl_SalesCRM">
 				<s:Label text="Sales Person" id="Lbl_Sales"/>
 				<s:Label text="&amp;"/>
 				<s:Label text="CRM Person" id="Lbl_CRM"/>
@@ -2589,13 +2346,13 @@
 							<mx:DataGridColumn width="60" dataField="StarRating" editable="false"
 											   headerText="Star"/>
 							<mx:DataGridColumn width="70" dataField="PropertyType" editable="false"
-											   headerText="Type" textAlign="center"/>
+											   headerText="Type" textAlign="center" visible="false"/>
 							<mx:DataGridColumn width="80" dataField="Tariff" editable="false"
-											   textAlign="center"/>
+											   textAlign="center" visible="false"/>
 							<mx:DataGridColumn width="80" dataField="Discount" editable="true"
-											   textAlign="center"/>
+											   textAlign="center" visible="false"/>
 							<mx:DataGridColumn width="100" dataField="DiscountTariff" editable="false"
-											   textAlign="center" headerText="Discounted Tariff"/>
+											   textAlign="center" headerText="Tariff"/>
 							<mx:DataGridColumn width="100" dataField="Phone" editable="false"
 											   textAlign="left"/>
 							<mx:DataGridColumn width="100" dataField="Email" editable="false"
@@ -2768,23 +2525,23 @@
 							maxChars="1000" tabIndex="47"/>
 				<s:TextArea id="Txt_ExtraCCemail" x="228.75" y="433" width="220" height="32"
 							maxChars="1000" tabIndex="47"/>
-				<mx:Label x="531.85" y="438.5" text="Note"/>
-				<mx:Label x="126.85" y="438.5" text="Extra CC Email"/>
-				<s:DropDownList id="Ddl_ServicePaymentMode" x="395" y="143" width="170" height="23"
+				<mx:Label x="531.85" y="438.5" text="Note" id="Lbl_Tab3Note"/>
+				<mx:Label x="126.85" y="438.5" text="Extra CC Email" id="Lbl_ExtraCCEmail"/>
+				<s:DropDownList id="Ddl_ServicePaymentMode" x="395" y="144" width="170" height="23"
 								change="Ddl_ServicePaymentMode_changeHandler(event)"
 								prompt="Service Payment Mode" tabIndex="46"/>
-				<s:DropDownList id="Ddl_TariffPaymentMode" x="101" y="143" width="170" height="23"
+				<s:DropDownList id="Ddl_TariffPaymentMode" x="101" y="144" width="170" height="23"
 								change="Ddl_TariffPaymentMode_changeHandler(event)"
 								prompt="Tariff Payment Mode" tabIndex="45"/>
-				<mx:Label x="12" y="13" text="Property"/>
+				<mx:Label x="12" y="12" text="Property"/>
 				<s:DropDownList id="Ddl_Property" x="101" y="12" width="464" height="23"
 								prompt="Please Select Property" tabIndex="41"/>
-				<mx:Label x="12" y="54.35" text="Bed Type"/>
-				<s:DropDownList id="Ddl_Bed" x="101" y="56.25" width="170" height="17.25"
+				<mx:Label x="12" y="79" text="Bed Type"/>
+				<s:DropDownList id="Ddl_Bed" x="101" y="80.875" width="170" height="17.25"
 								change="Ddl_Room_changeHandler(event)"
 								prompt="Please Select Bed" tabIndex="42"/>
-				<mx:Label x="12" y="99.25" text="SSP"/>
-				<s:DropDownList id="Ddl_SSP" x="101" y="101.15" width="170" height="17.25"
+				<mx:Label x="12" y="119.25" text="SSP" id="Lbl_SSP"/>
+				<s:DropDownList id="Ddl_SSP" x="101" y="121.15" width="170" height="17.25"
 								change="Ddl_SSP_changeHandler(event)"
 								prompt="Please Select SSP" tabIndex="43"/>
 				<mx:Label x="30" y="11" text="Room Level" visible="false"/>
@@ -2795,9 +2552,9 @@
 						<fx:String>Bed Level</fx:String>
 					</mx:ArrayCollection>
 				</s:DropDownList>
-				<mx:Label x="294" y="144" text="Service Mode"/>
-				<mx:Label x="12" y="144" text="Tariff Mode"/>
-				<mx:Label x="362" y="79.25" text="Bed Tariff"/>
+				<mx:Label x="294" y="146" text="Service Mode"/>
+				<mx:Label x="12" y="146" text="Tariff Mode"/>
+				<mx:Label x="362" y="79" text="Bed Tariff"/>
 				<mx:DataGrid id="Grd_GuestTab3" x="586" y="12" width="370" height="155"
 							 editable="true" focusEnabled="false">
 					<mx:columns>
@@ -2873,7 +2630,7 @@
 						<mx:DataGridColumn width="0" dataField="RoomCaptured" visible="false"/>						
 					</mx:columns>
 				</mx:DataGrid>
-				<s:TextInput x="455" y="78.3" id="Txt_Tariff" height="23" width="80" textAlign="center"
+				<s:TextInput x="455" y="78" id="Txt_Tariff" height="23" width="80" textAlign="center"
 							 editable="false" focusEnabled="false"/>
 				<s:HGroup x="586" y="190.45" width="372" horizontalAlign="center" gap="0">
 					<mx:Label x="586" y="190.5" text="CheckIn :" fontWeight="bold"

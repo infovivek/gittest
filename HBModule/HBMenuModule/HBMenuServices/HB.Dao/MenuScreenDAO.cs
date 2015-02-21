@@ -25,6 +25,7 @@ namespace HB.Dao
             command.Parameters.Add("@Pram3", SqlDbType.NVarChar).Value = Hdrval[4].ToString();
             command.Parameters.Add("@UserName", SqlDbType.NVarChar).Value = Hdrval[5].ToString();
             command.Parameters.Add("@Password", SqlDbType.NVarChar).Value = Hdrval[6].ToString();
+            command.Parameters.Add("@userIds", SqlDbType.Int).Value = Convert.ToInt32(user.Id);
             return new WrbErpConnection().ExecuteDataSet(command, UserData);
         }
     }

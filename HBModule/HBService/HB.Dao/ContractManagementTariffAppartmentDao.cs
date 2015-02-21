@@ -14,6 +14,7 @@ namespace HB.Dao
 {
     public class ContractManagementTariffAppartmentDao
     {
+        string UserData;
         public DataSet Save(string data, Entity.User user, int ContractId)
         {
             DataSet ds = new DataSet();
@@ -85,11 +86,19 @@ namespace HB.Dao
                 command = new SqlCommand();
                 if (CMTA.Id != 0)
                 {
+                    UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                   "', SctId:" + user.SctId + ", Service:ContractManagementTariffAppartment_Update" +
+                    ", ProcName:'" + StoredProcedures.ContractManagementTariffAppartment_Update;
+
                     command.CommandText = StoredProcedures.ContractManagementTariffAppartment_Update;
                     command.Parameters.Add("@Id", SqlDbType.BigInt).Value = CMTA.Id;
                 }
                 else
                 {
+                    UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                   "', SctId:" + user.SctId + ", Service:ContractManagementTariffAppartment_Insert" +
+                    ", ProcName:'" + StoredProcedures.ContractManagementTariffAppartment_Insert;
+
                     command.CommandText = StoredProcedures.ContractManagementTariffAppartment_Insert;
                 }
                 command.CommandType = CommandType.StoredProcedure;
@@ -110,7 +119,7 @@ namespace HB.Dao
 
                 command.Parameters.Add("@BlockId", SqlDbType.BigInt).Value = CMTA.BlockId;
 
-                ds = new WrbErpConnection().ExecuteDataSet(command, "");
+                ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
             }
             if (n == 0)
             {

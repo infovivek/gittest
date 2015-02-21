@@ -292,55 +292,119 @@ IF @Action = 'BedLevel_Property'
   DELETE FROM #BED1 WHERE GetType='Contract' AND 
   PropertyType='InP' AND Tariff=0;
   -- Managed Guest House
-  INSERT INTO #BED1(PropertyId,BlockId,ApartmentId,RoomId,BedId,Tariff,
-  GetType,PropertyType,DiscountModePer,DiscountModeRS,
-  DiscountAllowed)  
-  SELECT P.Id,B.Id,A.Id,R.Id,B.Id,B.BedRackTarrif,'Contract','MGH',0,0,0 
-  FROM WRBHBProperty P
-  LEFT OUTER JOIN WRBHBPropertyBlocks PB WITH(NOLOCK)ON PB.PropertyId = P.Id
-  LEFT OUTER JOIN WRBHBPropertyApartment A WITH(NOLOCK)ON A.PropertyId = P.Id
-  AND A.BlockId = PB.Id
-  LEFT OUTER JOIN WRBHBPropertyRooms R WITH(NOLOCK)ON R.PropertyId = P.Id AND 
-  R.ApartmentId = A.Id AND R.PropertyId = P.Id AND R.BlockId = PB.Id
-  LEFT OUTER JOIN WRBHBPropertyRoomBeds B WITH(NOLOCK)ON B.RoomId = R.Id
-  LEFT OUTER JOIN WRBHBContractManagementTariffAppartment D WITH(NOLOCK)ON 
-  D.PropertyId = P.Id
-  LEFT OUTER JOIN WRBHBContractManagement H WITH(NOLOCK)ON H.Id = D.ContractId
-  WHERE P.IsActive = 1 AND P.IsDeleted = 0 AND D.IsActive = 1 AND 
-  D.IsDeleted = 0 AND H.IsActive = 1 AND H.IsDeleted=0 AND 
-  H.ContractType = ' Managed Contracts ' AND R.IsActive = 1 AND 
-  R.IsDeleted = 0 AND H.ClientId = @ClientId AND P.CityId = @CityId AND 
-  P.Category = 'Managed G H' AND A.IsActive = 1 AND A.IsDeleted = 0 AND 
-  A.Status = 'Active' AND R.RoomStatus = 'Active' AND 
-  A.SellableApartmentType != 'HUB' AND B.IsActive = 1 AND B.IsDeleted = 0 AND
-  R.Id NOT IN (SELECT RoomId FROM #ExstsDdpRoom) AND
-  B.Id NOT IN (SELECT BedId FROM #ExstsInPBed) AND
-  R.Id NOT IN (SELECT RoomId FROM #ExsInPRoom) AND
-  A.Id NOT IN (SELECT ApartmentId FROM #ExstsInPApartment) AND
-  A.Id NOT IN (SELECT ApartmentId FROM #ExstsApartment)
-  GROUP BY P.Id,B.Id,A.Id,R.Id,B.Id,B.BedRackTarrif;
+  IF EXISTS(SELECT NULL FROM WRBHBClientManagement WHERE Id = @ClientId AND
+  ISNULL(MGHOverride,0) = 0)
+   BEGIN
+	INSERT INTO #BED1(PropertyId,BlockId,ApartmentId,RoomId,BedId,Tariff,
+	GetType,PropertyType,DiscountModePer,DiscountModeRS,
+	DiscountAllowed)  
+	SELECT P.Id,B.Id,A.Id,R.Id,B.Id,B.BedRackTarrif,'Contract','MGH',0,0,0 
+	FROM WRBHBProperty P
+	LEFT OUTER JOIN WRBHBPropertyBlocks PB WITH(NOLOCK)ON PB.PropertyId = P.Id
+	LEFT OUTER JOIN WRBHBPropertyApartment A WITH(NOLOCK)ON A.PropertyId = P.Id
+	AND A.BlockId = PB.Id
+	LEFT OUTER JOIN WRBHBPropertyRooms R WITH(NOLOCK)ON R.PropertyId = P.Id AND 
+	R.ApartmentId = A.Id AND R.PropertyId = P.Id AND R.BlockId = PB.Id
+	LEFT OUTER JOIN WRBHBPropertyRoomBeds B WITH(NOLOCK)ON B.RoomId = R.Id
+	LEFT OUTER JOIN WRBHBContractManagementTariffAppartment D WITH(NOLOCK)ON 
+	D.PropertyId = P.Id
+	LEFT OUTER JOIN WRBHBContractManagement H WITH(NOLOCK)ON H.Id = D.ContractId
+	WHERE P.IsActive = 1 AND P.IsDeleted = 0 AND D.IsActive = 1 AND 
+	D.IsDeleted = 0 AND H.IsActive = 1 AND H.IsDeleted=0 AND 
+	H.ContractType = ' Managed Contracts ' AND R.IsActive = 1 AND 
+	R.IsDeleted = 0 AND H.ClientId = @ClientId AND P.CityId = @CityId AND 
+	P.Category = 'Managed G H' AND A.IsActive = 1 AND A.IsDeleted = 0 AND 
+	A.Status = 'Active' AND R.RoomStatus = 'Active' AND 
+	A.SellableApartmentType != 'HUB' AND B.IsActive = 1 AND B.IsDeleted = 0 AND
+	R.Id NOT IN (SELECT RoomId FROM #ExstsDdpRoom) AND
+	B.Id NOT IN (SELECT BedId FROM #ExstsInPBed) AND
+	R.Id NOT IN (SELECT RoomId FROM #ExsInPRoom) AND
+	A.Id NOT IN (SELECT ApartmentId FROM #ExstsInPApartment) AND
+	A.Id NOT IN (SELECT ApartmentId FROM #ExstsApartment)
+	GROUP BY P.Id,B.Id,A.Id,R.Id,B.Id,B.BedRackTarrif;
+   END
+  ELSE
+   BEGIN
+    INSERT INTO #BED1(PropertyId,BlockId,ApartmentId,RoomId,BedId,Tariff,
+    GetType,PropertyType,DiscountModePer,DiscountModeRS,DiscountAllowed)  
+    SELECT P.Id,B.Id,A.Id,R.Id,B.Id,B.BedRackTarrif,'Contract','MGH',0,0,0 
+    FROM WRBHBProperty P
+    LEFT OUTER JOIN WRBHBPropertyBlocks PB WITH(NOLOCK)ON PB.PropertyId = P.Id
+    LEFT OUTER JOIN WRBHBPropertyApartment A WITH(NOLOCK)ON A.PropertyId = P.Id
+    AND A.BlockId = PB.Id
+    LEFT OUTER JOIN WRBHBPropertyRooms R WITH(NOLOCK)ON R.PropertyId = P.Id AND 
+    R.ApartmentId = A.Id AND R.PropertyId = P.Id AND R.BlockId = PB.Id
+    LEFT OUTER JOIN WRBHBPropertyRoomBeds B WITH(NOLOCK)ON B.RoomId = R.Id
+    LEFT OUTER JOIN WRBHBContractManagementTariffAppartment D WITH(NOLOCK)ON 
+    D.PropertyId = P.Id
+    LEFT OUTER JOIN WRBHBContractManagement H WITH(NOLOCK)ON H.Id = D.ContractId
+    WHERE P.IsActive = 1 AND P.IsDeleted = 0 AND D.IsActive = 1 AND 
+    D.IsDeleted = 0 AND H.IsActive = 1 AND H.IsDeleted=0 AND 
+    H.ContractType = ' Managed Contracts ' AND R.IsActive = 1 AND 
+    R.IsDeleted = 0 AND P.CityId = @CityId AND H.ClientId IN
+	(SELECT Id FROM WRBHBClientManagement WHERE IsActive = 1 AND
+	IsDeleted = 0 AND ISNULL(MGHOverride,0) = 1 AND MasterClientId IN 
+	(SELECT MasterClientId FROM WRBHBClientManagement WHERE Id = @ClientId)) AND
+    P.Category = 'Managed G H' AND A.IsActive = 1 AND A.IsDeleted = 0 AND 
+    A.Status = 'Active' AND R.RoomStatus = 'Active' AND 
+    A.SellableApartmentType != 'HUB' AND B.IsActive = 1 AND B.IsDeleted = 0 AND
+    R.Id NOT IN (SELECT RoomId FROM #ExstsDdpRoom) AND
+    B.Id NOT IN (SELECT BedId FROM #ExstsInPBed) AND
+    R.Id NOT IN (SELECT RoomId FROM #ExsInPRoom) AND
+    A.Id NOT IN (SELECT ApartmentId FROM #ExstsInPApartment) AND
+    A.Id NOT IN (SELECT ApartmentId FROM #ExstsApartment)
+    GROUP BY P.Id,B.Id,A.Id,R.Id,B.Id,B.BedRackTarrif;
+   END
   -- FINAL SELECT
-  SELECT P.PropertyName,B.PropertyId,B.GetType,B.PropertyType,B.Tariff,
-  P.Phone,P.Email,L.Locality AS Locality,P.LocalityId,0 AS Tick,1 AS Chk,
-  0 AS Id,B.DiscountModePer AS Per,B.DiscountModeRS AS Rs,B.DiscountAllowed,
-  '' AS Discount,B.Tariff AS DiscountTariff,
-  CASE WHEN T.PropertyType = '1 Star' THEN '1'
-       WHEN T.PropertyType = '2 Star' THEN '2'
-       WHEN T.PropertyType = '3 Star' THEN '3'
-       WHEN T.PropertyType = '4 Star' THEN '4'
-       WHEN T.PropertyType = '5 Star' THEN '5'
-       WHEN T.PropertyType = '6 Star' THEN '6'
-       WHEN T.PropertyType = '7 Star' THEN '7'
-       WHEN T.PropertyType = '7+ Star' THEN '7+'
-       WHEN T.PropertyType = 'Serviced Appartments' THEN 'S A'
-       ELSE T.PropertyType END AS StarRating
-  FROM #BED1 B
-  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON B.PropertyId=P.Id
-  LEFT OUTER JOIN WRBHBLocality L WITH(NOLOCK)ON L.Id=P.LocalityId
-  LEFT OUTER JOIN WRBHBPropertyType T WITH(NOLOCK)ON T.Id=P.PropertyType 
-  GROUP BY P.PropertyName,B.PropertyId,B.Tariff,P.Phone,P.Email,
-  L.Locality,P.LocalityId,B.GetType,B.PropertyType,
-  B.DiscountModePer,B.DiscountModeRS,B.DiscountAllowed,T.PropertyType;
+  IF @Str2 = 'HBStay'
+   BEGIN
+    SELECT P.PropertyName,B.PropertyId,B.GetType,B.PropertyType,B.Tariff,
+    P.Phone,P.Email,L.Locality AS Locality,P.LocalityId,0 AS Tick,1 AS Chk,
+    0 AS Id,B.DiscountModePer AS Per,B.DiscountModeRS AS Rs,B.DiscountAllowed,
+    '' AS Discount,B.Tariff AS DiscountTariff,
+    CASE WHEN T.PropertyType = '1 Star' THEN '1'
+         WHEN T.PropertyType = '2 Star' THEN '2'
+         WHEN T.PropertyType = '3 Star' THEN '3'
+         WHEN T.PropertyType = '4 Star' THEN '4'
+         WHEN T.PropertyType = '5 Star' THEN '5'
+         WHEN T.PropertyType = '6 Star' THEN '6'
+         WHEN T.PropertyType = '7 Star' THEN '7'
+         WHEN T.PropertyType = '7+ Star' THEN '7+'
+         WHEN T.PropertyType = 'Serviced Appartments' THEN 'S A'
+         ELSE T.PropertyType END AS StarRating
+    FROM #BED1 B
+    LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON B.PropertyId=P.Id
+    LEFT OUTER JOIN WRBHBLocality L WITH(NOLOCK)ON L.Id=P.LocalityId
+    LEFT OUTER JOIN WRBHBPropertyType T WITH(NOLOCK)ON T.Id=P.PropertyType
+    WHERE B.PropertyType NOT IN ('InP')
+    GROUP BY P.PropertyName,B.PropertyId,B.Tariff,P.Phone,P.Email,
+    L.Locality,P.LocalityId,B.GetType,B.PropertyType,
+    B.DiscountModePer,B.DiscountModeRS,B.DiscountAllowed,T.PropertyType;
+   END
+  ELSE
+   BEGIN
+    SELECT P.PropertyName,B.PropertyId,B.GetType,B.PropertyType,B.Tariff,
+    P.Phone,P.Email,L.Locality AS Locality,P.LocalityId,0 AS Tick,1 AS Chk,
+    0 AS Id,B.DiscountModePer AS Per,B.DiscountModeRS AS Rs,B.DiscountAllowed,
+    '' AS Discount,B.Tariff AS DiscountTariff,
+    CASE WHEN T.PropertyType = '1 Star' THEN '1'
+         WHEN T.PropertyType = '2 Star' THEN '2'
+         WHEN T.PropertyType = '3 Star' THEN '3'
+         WHEN T.PropertyType = '4 Star' THEN '4'
+         WHEN T.PropertyType = '5 Star' THEN '5'
+         WHEN T.PropertyType = '6 Star' THEN '6'
+         WHEN T.PropertyType = '7 Star' THEN '7'
+         WHEN T.PropertyType = '7+ Star' THEN '7+'
+         WHEN T.PropertyType = 'Serviced Appartments' THEN 'S A'
+         ELSE T.PropertyType END AS StarRating
+    FROM #BED1 B
+    LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON B.PropertyId=P.Id
+    LEFT OUTER JOIN WRBHBLocality L WITH(NOLOCK)ON L.Id=P.LocalityId
+    LEFT OUTER JOIN WRBHBPropertyType T WITH(NOLOCK)ON T.Id=P.PropertyType 
+    GROUP BY P.PropertyName,B.PropertyId,B.Tariff,P.Phone,P.Email,
+    L.Locality,P.LocalityId,B.GetType,B.PropertyType,
+    B.DiscountModePer,B.DiscountModeRS,B.DiscountAllowed,T.PropertyType;
+   END
  END
 IF @Action = 'BedLevel_Tab2_to_Tab3_Dtls'
  BEGIN
@@ -516,8 +580,17 @@ IF @Action = 'BedLevel_Tab2_to_Tab3_Dtls'
   GROUP BY PG.ApartmentId;
   -- Apartment Booked End
   -- Booking property
-  SELECT TOP 1 PropertyType+' - '+PropertyName AS label,PropertyId,Id,
-  PropertyType FROM WRBHBBedBookingProperty WHERE BookingId=@Id1;
+  IF EXISTS(SELECT NULL FROM WRBHBBooking WHERE Id = @Id1 AND
+  ISNULL(HBStay,'') = 'StayCorporateHB')
+   BEGIN
+    SELECT TOP 1 PropertyName AS label,PropertyId,Id,
+    PropertyType FROM WRBHBBedBookingProperty WHERE BookingId=@Id1;
+   END
+  ELSE
+   BEGIN
+    SELECT TOP 1 PropertyType+' - '+PropertyName AS label,PropertyId,Id,
+    PropertyType FROM WRBHBBedBookingProperty WHERE BookingId=@Id1;
+   END
   -- Beds Avaliable in Property
   IF @PTYPE = 'InP'
    BEGIN
@@ -592,19 +665,33 @@ IF @Action = 'BedLevel_Tab2_to_Tab3_Dtls'
   SELECT label,Id,Tariff FROM #SSP1;
   --SSP End
   -- Payment Mode Begin
-  DECLARE @BTC BIT;
-  CREATE TABLE #PAYMENT1(label NVARCHAR(100));
-  SET @BTC=(SELECT BTC FROM WRBHBClientManagement WHERE Id=@ClientId);
-  IF @BTC = 1
+  CREATE TABLE #TPAY(label NVARCHAR(100));
+  CREATE TABLE #SPAY(label NVARCHAR(100));
+  IF @PTYPE = 'MGH'
    BEGIN
-    INSERT INTO #PAYMENT1(label) SELECT 'Bill to Company (BTC)';
-    INSERT INTO #PAYMENT1(label) SELECT 'Direct';
+    INSERT INTO #TPAY(label) SELECT 'Bill to Company (BTC)';
+    INSERT INTO #SPAY(label) SELECT 'Bill to Company (BTC)';
+    INSERT INTO #SPAY(label) SELECT 'Direct';
    END
-  ELSE
+  IF @PTYPE != 'MGH'
    BEGIN
-    INSERT INTO #PAYMENT1(label) SELECT 'Direct';
-   END
-  SELECT label FROM #PAYMENT1; 
+    DECLARE @BTC BIT;
+    SET @BTC=(SELECT ISNULL(BTC,0) FROM WRBHBClientManagement WHERE Id=@ClientId);
+    IF @BTC = 1
+     BEGIN
+      INSERT INTO #TPAY(label) SELECT 'Bill to Company (BTC)';
+      INSERT INTO #TPAY(label) SELECT 'Direct';
+      INSERT INTO #SPAY(label) SELECT 'Bill to Company (BTC)';
+      INSERT INTO #SPAY(label) SELECT 'Direct';
+     END
+    ELSE
+     BEGIN
+      INSERT INTO #TPAY(label) SELECT 'Direct';
+      INSERT INTO #SPAY(label) SELECT 'Direct';
+     END
+   END 
+  SELECT label FROM #TPAY ORDER BY label;
+  SELECT label FROM #SPAY ORDER BY label; 
   -- Payment Mode End
  END
 IF @Action = 'BeforeSaveBedValidation'

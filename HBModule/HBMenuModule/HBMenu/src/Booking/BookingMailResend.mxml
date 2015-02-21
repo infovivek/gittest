@@ -12,7 +12,7 @@
 			import mx.events.FlexEvent;
 			public static var GlobalXml:String="";
 			public static var Global_AC:ArrayCollection=new ArrayCollection();
-			public var BookingId:int=0,ClientId:int=0,PropertyId:int=0,BookingLevel:String="";
+			public var BookingId:int=0,ClientId:int=0,BookingLevel:String="";
 			public var EmailErrMsg:String="",UsrId:int=0,UsrEmail:String="";
 			protected function application1_creationCompleteHandler(event:FlexEvent):void
 			{
@@ -22,13 +22,14 @@
 				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
 				GlobalXml += "</ROOT>";
 				UsrId = Global_AC[0].UsrId;
+				//UsrId = 31;
 				FnHelp();
 			}
 			
 			protected function FnHelp():void
 			{
 				useWeb("BookingResendMail","Client_Property_Load_CUSTOM",
-					[GlobalXml,'Client_Property_Load','','','','',UsrId,0,0,0]);				
+					[GlobalXml,'Client_Property_Load_hbstay','','','','',UsrId,0,0,0]);				
 			}
 			
 			private function Custom_WebSer_Result (Ds_Objects:Object):void
@@ -38,17 +39,23 @@
 					var asd:ArrayCollection=new ArrayCollection();
 					Hlp_Client.dataProvider=asd;Hlp_Client.fnClear();ClientId=0;
 					var sda:ArrayCollection=new ArrayCollection();
-					Hlp_Property.dataProvider=sda;Hlp_Property.fnClear();PropertyId=0;
 					var dsa:ArrayCollection=new ArrayCollection();
 					Hlp_BookingCode.dataProvider=dsa;Hlp_BookingCode.fnClear();BookingId=0;
-					UsrEmail="";Txt_Email.text = "";
-					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					UsrEmail="";Txt_Email.text = "";					
+					if(Ds_Objects.result.Tables.Table.Rows[0].TmpStr == "MasterClient")
 					{
-						Hlp_Client.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						Hlp_Client.enabled = true;
+						if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+						{
+							Hlp_Client.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+						}
 					}
-					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+					else
 					{
-						Hlp_Property.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+						Hlp_Client.enabled = false;
+						Hlp_Client.text = Ds_Objects.result.Tables.Table1.Rows[0].ClientName;
+						ClientId = Ds_Objects.result.Tables.Table1.Rows[0].Id;
+						Show_clickHandler();
 					}
 					if (Ds_Objects.result.Tables.Table2.Rows.length > 0)
 					{
@@ -124,26 +131,13 @@
 				{
 					Hlp_Client.text=Hlp_Client.Select_Row.ClientName;
 					ClientId=Hlp_Client.Select_Row.Id;
+					Show_clickHandler();
 				}
 				else
 				{
 					Hlp_Client.fnClear();ClientId=0;
 				}
-				Hlp_Property._setFocus();
-			}
-			
-			public function FnOnselection_Property():void
-			{
-				if(Hlp_Property.selected())
-				{
-					Hlp_Property.text=Hlp_Property.Select_Row.PropertyName;
-					PropertyId=Hlp_Property.Select_Row.ZId;
-				}
-				else
-				{
-					Hlp_Property.fnClear();PropertyId=0;
-				}
-				Btn_Show.setFocus();
+				Txt_Email.setFocus();
 			}
 			
 			public function FnOnselection_BookingCode():void
@@ -161,10 +155,10 @@
 				Txt_Email.setFocus();
 			}
 			
-			protected function Btn_Show_clickHandler(event:MouseEvent):void
+			protected function Show_clickHandler():void
 			{
 				useWeb("BookingResendMail","BookingLoad_CUSTOM",
-					[GlobalXml,'BookingLoad','','','','',ClientId,PropertyId,0,0]);
+					[GlobalXml,'BookingLoad','HBStay','','','',ClientId,0,0,0]);
 			}
 			
 			protected function EmailValidator_validHandler(event:ValidationResultEvent):void
@@ -188,28 +182,22 @@
 	<fx:Script source="..\\Common\\CommonScript.as"/>
 	<fx:Script source="..\\Common\\Functions.as"/>
 	<s:HGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
-		<s:BorderContainer x="14" y="66" width="888" height="398" backgroundColor="#fbf9f9"
+		<s:BorderContainer x="14" y="76" width="888" height="372" backgroundColor="#fbf9f9"
 						   borderVisible="false">
-			<WrbHelpComp:HelpText x="396" y="104" width="200" height="23" id="Hlp_BookingCode" depth="1"
+			<WrbHelpComp:HelpText x="395" y="104" width="200" height="23" id="Hlp_BookingCode" depth="1"
 								  onselection="{FnOnselection_BookingCode()}" pxSetColumnsWidth="198,0,0"
 								  pxTabIndex="3"/>
-			<WrbHelpComp:HelpText x="111" y="50" width="250" height="23" id="Hlp_Client" depth="1"
+			<WrbHelpComp:HelpText x="395" y="50" width="250" height="23" id="Hlp_Client" depth="1"
 								  onselection="{FnOnselection_Client()}" pxSetColumnsWidth="248,0"
 								  pxTabIndex="1"/>
-			<WrbHelpComp:HelpText x="503" y="50" width="250" height="23" id="Hlp_Property" depth="1"
-								  onselection="{FnOnselection_Property()}" pxSetColumnsWidth="248,0"
-								  pxTabIndex="2"/>
-			<s:TextInput x="396" y="158" width="200" height="23" id="Txt_Email" tabIndex="4"/>
-			<mx:Label x="282" y="105" text="Booking Code" fontWeight="bold"/>
-			<mx:Label x="19" y="51" text="Client Name" fontWeight="bold"/>
-			<mx:Label x="398" y="51" text="Property Name" fontWeight="bold"/>
-			<s:Label x="382" y="109.5" text="*" color="red"/>
-			<mx:Label x="282" y="159" text="Email Id" fontWeight="bold"/>
-			<WrbComp:Button_BB id="Btn_Send" x="396" y="213" click="Btn_Send_clickHandler(event)"
+			<s:TextInput x="395" y="158" width="200" height="23" id="Txt_Email" tabIndex="4"/>
+			<mx:Label x="281" y="105" text="Booking Code" fontWeight="bold"/>
+			<mx:Label x="281" y="51" text="Client Name" fontWeight="bold"/>
+			<s:Label x="381" y="109.5" text="*" color="red"/>
+			<mx:Label x="281" y="159" text="Email Id" fontWeight="bold"/>
+			<WrbComp:Button_BB id="Btn_Send" x="395" y="213" click="Btn_Send_clickHandler(event)"
 							   _Label="Send"/>
-			<WrbComp:Button_BB id="Btn_Show" x="786" y="45.5" click="Btn_Show_clickHandler(event)"
-							   _Label="Show"/>
-			<WrbComp:Button_BB id="Btn_Clear" x="512" y="213" click="FnClear()"
+			<WrbComp:Button_BB id="Btn_Clear" x="511" y="213" click="FnClear()"
 							   _Label="Clear"/>
 		</s:BorderContainer>
 	</s:HGroup>

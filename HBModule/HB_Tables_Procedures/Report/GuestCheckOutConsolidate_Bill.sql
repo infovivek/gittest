@@ -118,7 +118,9 @@ DECLARE @CompanyName VARCHAR(100),@Address NVARCHAR(100),@PanCardNo VARCHAR(100)
     sum(CS.ChkOutServiceST) ChkOutServiceST,sum(CS.Cess) CessService,
     sum(CS.HECess) HECess,h.ChkOutTariffExtraAmount ExtraMatress,
     'CIN No: U72900KA2005PTC035942' as CINNo,CONVERT(nvarchar(100),h.CreatedDate,103) as InVoicedate,
-    'Rupees : '+dbo.fn_NtoWord(round((isnull(h.ChkOutTariffNetAmount+sum(CS.ChkOutServiceNetAmount),0)),0),'','') AS AmtWords
+    'Rupees : '+dbo.fn_NtoWord(round((isnull(h.ChkOutTariffNetAmount+sum(CS.ChkOutServiceNetAmount),0)),0),'','') AS AmtWords,
+    'Extra Matress' ExtraMatr,'Food and Beverages' FoodBev,'Laundry' LaundryName,'Service' ServiceName,
+    'Service Charge  @ 2.5% on Tariff' ServChrg,'Service Tax@12.00% on ServiceCharge'ServChrg1
     
 	--CSDD.BillAmount
 	

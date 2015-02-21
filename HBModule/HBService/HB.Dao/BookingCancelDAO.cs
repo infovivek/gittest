@@ -13,8 +13,11 @@ namespace HB.Dao
 {
     public class BookingCancelDAO
     {
+        string UserData = "";
         public DataSet Save(string PropertyAssignedGuest, User user, int BookingId, string Remarks, string SendMail)
         {
+            UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+           "', SctId:" + user.SctId + ", Service : BookingPropertyAssingedGuestDAO : Save, " + ", ProcName:'" + StoredProcedures.BookingPropertyAssingedGuest_Update; 
             DataSet ds = new DataSet();
             DataTable ETable = new DataTable("ERRORTBLDAO");
             DataTable ExTable = new DataTable("Exists");
@@ -87,7 +90,7 @@ namespace HB.Dao
                 System.Net.Mail.MailMessage message = new System.Net.Mail.MailMessage();
                 //DSBooking.Tables[1].Rows[0][4].ToString()    
 
-                message.From = new System.Net.Mail.MailAddress("stay@hummingbirdIndia.com", "", System.Text.Encoding.UTF8);
+                message.From = new System.Net.Mail.MailAddress("noreply@hummingbirdindia.com", "", System.Text.Encoding.UTF8);
                 //message.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
                 message.To.Add(new System.Net.Mail.MailAddress("stay@hummingbirdIndia.com"));
                 if (ds.Tables[0].Rows[0][10].ToString() == "False")
@@ -170,7 +173,7 @@ namespace HB.Dao
                 //message.Bcc.Add(new System.Net.Mail.MailAddress("deepak@admonk.in"));
                 message.Bcc.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
                 message.Bcc.Add(new System.Net.Mail.MailAddress("arun@warblerit.com"));
-                //message.CC.Add(new System.Net.Mail.MailAddress("arun@warblerit.com"));
+                message.CC.Add(new System.Net.Mail.MailAddress("anbu@warblerit.com"));
                 //
                 message.Subject = "Stay Modification Booking # : " + ds.Tables[0].Rows[0][0].ToString();
 
@@ -361,6 +364,9 @@ namespace HB.Dao
         }
         public DataSet Delete(string[] data, User user)
         {
+            UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+            "', SctId:" + user.SctId + ", Service : Booking : Delete, " + ", ProcName:'" + StoredProcedures.Booking_Delete; 
+
             SqlCommand command = new SqlCommand();
             command.CommandText = StoredProcedures.Booking_Delete;
             command.CommandType = CommandType.StoredProcedure;
@@ -368,7 +374,7 @@ namespace HB.Dao
             command.Parameters.Add("@Pram1", SqlDbType.VarChar).Value = data[1].ToString();
             command.Parameters.Add("@Pram2", SqlDbType.BigInt).Value = Convert.ToInt32(data[2].ToString());
             command.Parameters.Add("@UserId", SqlDbType.BigInt).Value = user.Id;
-            return new WrbErpConnection().ExecuteDataSet(command, "");
+            return new WrbErpConnection().ExecuteDataSet(command, UserData);
         }
         private String EmailValidate(String EmailId)
         {
@@ -388,6 +394,9 @@ namespace HB.Dao
         }
         public DataSet Help(string[] data, User user)
         {
+            UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+            "', SctId:" + user.SctId + ", Service : BookingCancel : Help, " + ", ProcName:'" + StoredProcedures.BookingCancel_Help; 
+
             SqlCommand command = new SqlCommand();
             DataSet ds = new DataSet();
             string Err = "";
@@ -410,7 +419,7 @@ namespace HB.Dao
                     command.Parameters.Add("@Remarks", SqlDbType.NVarChar).Value =  data[4].ToString();
                 }
                 command.Parameters.Add("@UserId", SqlDbType.BigInt).Value = user.Id;
-                ds= new WrbErpConnection().ExecuteDataSet(command, "");
+                ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
                 if (data[1].ToString() == "BookingDelete")
                 {
                     if (data[5].ToString() == "true")
@@ -421,9 +430,9 @@ namespace HB.Dao
                             System.Net.Mail.MailMessage message = new System.Net.Mail.MailMessage();
                             //DSBooking.Tables[1].Rows[0][4].ToString()    
 
-                            message.From = new System.Net.Mail.MailAddress("stay@hummingbirdIndia.com", "", System.Text.Encoding.UTF8);
+                            message.From = new System.Net.Mail.MailAddress("noreply@hummingbirdindia.com", "", System.Text.Encoding.UTF8);
                             //message.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
-                            message.To.Add(new System.Net.Mail.MailAddress("stay@hummingbirdIndia.com"));
+                            message.To.Add(new System.Net.Mail.MailAddress("noreply@hummingbirdindia.com"));
                             if (ds.Tables[0].Rows[0][7].ToString() == "False")
                             {
                                 Valid = EmailValidate(ds.Tables[4].Rows[0][0].ToString());
@@ -500,7 +509,7 @@ namespace HB.Dao
                             }
                             message.Bcc.Add(new System.Net.Mail.MailAddress("vivek@warblerit.com"));
                             //message.Bcc.Add(new System.Net.Mail.MailAddress("prabathkar@admonk.in"));
-                            //message.Bcc.Add(new System.Net.Mail.MailAddress("deepak@admonk.in"));
+                            message.Bcc.Add(new System.Net.Mail.MailAddress("anbu@warblerit.com"));
                             message.Bcc.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
                             message.Bcc.Add(new System.Net.Mail.MailAddress("arun@warblerit.com"));
                             //
@@ -653,9 +662,9 @@ namespace HB.Dao
                            System.Net.Mail.MailMessage message = new System.Net.Mail.MailMessage();
                            //DSBooking.Tables[1].Rows[0][4].ToString()    
 
-                           message.From = new System.Net.Mail.MailAddress("stay@hummingbirdIndia.com", "", System.Text.Encoding.UTF8);
+                           message.From = new System.Net.Mail.MailAddress("noreply@hummingbirdindia.com", "", System.Text.Encoding.UTF8);
                            //message.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
-                           message.To.Add(new System.Net.Mail.MailAddress("stay@hummingbirdIndia.com"));
+                           message.To.Add(new System.Net.Mail.MailAddress("noreply@hummingbirdindia.com"));
                            if (ds.Tables[0].Rows[0][7].ToString() == "False")
                            {
                                Valid = EmailValidate(ds.Tables[4].Rows[0][0].ToString());
@@ -723,7 +732,7 @@ namespace HB.Dao
                            }
                            message.Bcc.Add(new System.Net.Mail.MailAddress("vivek@warblerit.com"));
                            //message.Bcc.Add(new System.Net.Mail.MailAddress("prabathkar@admonk.in"));
-                           //message.Bcc.Add(new System.Net.Mail.MailAddress("deepak@admonk.in"));
+                           message.Bcc.Add(new System.Net.Mail.MailAddress("anbu@warblerit.com"));
                            message.Bcc.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
                            message.Bcc.Add(new System.Net.Mail.MailAddress("arun@warblerit.com"));
 
@@ -917,7 +926,7 @@ namespace HB.Dao
                            }
                            message.Bcc.Add(new System.Net.Mail.MailAddress("vivek@warblerit.com"));
                            //message.Bcc.Add(new System.Net.Mail.MailAddress("prabathkar@admonk.in"));
-                          // message.Bcc.Add(new System.Net.Mail.MailAddress("deepak@admonk.in"));
+                           message.Bcc.Add(new System.Net.Mail.MailAddress("anbu@warblerit.com"));
                            message.Bcc.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
                            message.Bcc.Add(new System.Net.Mail.MailAddress("arun@warblerit.com"));
                            //
@@ -1030,7 +1039,7 @@ namespace HB.Dao
                            smtp.EnableSsl = true;
                            if (Err == "")
                            {
-                                smtp.Send(message);
+                               smtp.Send(message);
                                //ds.Tables.Add(ETable);
                            }
                            else

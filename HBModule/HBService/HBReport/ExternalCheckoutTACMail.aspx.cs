@@ -81,7 +81,7 @@ namespace HBReport
                     fs.Write(mybytes, 0, mybytes.Length);
                 }
                 System.Net.Mail.MailMessage message = new System.Net.Mail.MailMessage();
-                        message.From = new System.Net.Mail.MailAddress("noreply@staysimplyfied.com", "staysimplyfied", System.Text.Encoding.UTF8);
+                message.From = new System.Net.Mail.MailAddress("noreply@hummingbirdindia.com", "HummingBird", System.Text.Encoding.UTF8);
                 string Valid = ""; string Err = "";
                 if (ds.Tables[0].Rows[0][11].ToString() != "") // Mail 
                 {
@@ -241,7 +241,7 @@ namespace HBReport
                        " <table cellpadding=\"0\" cellspacing=\"0\" width=\"600\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
                        " <tr style=\"font-size:11px; font-weight:normal;\"> " +
                        " <td colspan=\"3\" style=\"padding-top:30px;\"> <p style=\"color:orange; font-weight:bold; margin:0px; font-size:11px;\"> Thanking You, <br>" +
-                       " Team Stay Simplyfied </p> " + " <br>" +
+                       " Team HummingBird </p> " + " <br>" +
                         //   " <p style=\"color:orange; font-weight:bold; margin:0px; font-size:11px; padding-top:20px;\">Disclaimer :</p>" +
                         //   " <p style=\"font-size:10px; padding-top:10px; padding-bottom:20px;\">" +// Disclaimer + "</p>" +
                        " </td></tr> </table>";
@@ -281,7 +281,7 @@ namespace HBReport
                     catch (Exception ex)
                     {
                         CreateLogFiles log = new CreateLogFiles();
-                        log.ErrorLog(ex.Message + " -->External Checkout --> " + message.Subject);
+                        log.ErrorLog(ex.Message + " -->External Checkout TAC Mail--> " + message.Subject);
                     }
 
                 }

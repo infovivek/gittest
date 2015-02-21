@@ -33,62 +33,94 @@ IF @Action = 'Client_Property_Load'
 IF @Action = 'BookingLoad'
  BEGIN
   CREATE TABLE #TMP(BookingCode BIGINT,Id BIGINT,
-  BookingLevelId NVARCHAR(100),ClientId INT,PropertyId INT);
-  INSERT INTO #TMP(BookingCode,Id,BookingLevelId,ClientId,PropertyId)
+  BookingLevelId NVARCHAR(100),ClientId INT,PropertyId INT,HBStay NVARCHAR(100));
+  INSERT INTO #TMP(BookingCode,Id,BookingLevelId,ClientId,PropertyId,HBStay)
   -- Room Level Booking
   SELECT B.BookingCode,B.Id,B.BookingLevel AS BookingLevelId,
-  B.ClientId,BG.BookingPropertyId 
+  B.ClientId,BG.BookingPropertyId,ISNULL(B.HBStay,'') 
   FROM WRBHBBooking B
   LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON 
   BP.BookingId=B.Id --AND BP.PropertyType != 'MMT'
   LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG
   WITH(NOLOCK)ON BG.BookingId=B.Id AND BG.BookingPropertyId=BP.PropertyId
   WHERE B.IsActive=1 AND B.IsDeleted=0 AND BG.IsActive=1 AND 
-  BG.IsDeleted=0 AND BG.CurrentStatus='Booked'
+  BG.IsDeleted=0 AND BG.CurrentStatus='Booked' AND B.BookingCode != 0
   GROUP BY B.BookingCode,B.Id,B.BookingLevel,B.ClientId,
-  BG.BookingPropertyId
+  BG.BookingPropertyId,ISNULL(B.HBStay,'')
   UNION ALL
   -- Bed Level Booking
   SELECT B.BookingCode,B.Id,B.BookingLevel AS BookingLevelId ,
-  B.ClientId,BG.BookingPropertyId 
+  B.ClientId,BG.BookingPropertyId,ISNULL(B.HBStay,'')
   FROM WRBHBBooking B
   LEFT OUTER JOIN WRBHBApartmentBookingPropertyAssingedGuest BG
   WITH(NOLOCK)ON BG.BookingId=B.Id
   WHERE B.IsActive=1 AND B.IsDeleted=0 AND BG.IsActive=1 AND 
-  BG.IsDeleted=0 AND BG.CurrentStatus='Booked'
+  BG.IsDeleted=0 AND BG.CurrentStatus='Booked' AND B.BookingCode != 0
   GROUP BY B.BookingCode,B.Id,B.BookingLevel,B.ClientId,
-  BG.BookingPropertyId
+  BG.BookingPropertyId,ISNULL(B.HBStay,'')
   UNION ALL
   -- Apartment Level Booking
   SELECT B.BookingCode,B.Id,B.BookingLevel AS BookingLevelId,
-  B.ClientId,BG.BookingPropertyId  
+  B.ClientId,BG.BookingPropertyId,ISNULL(B.HBStay,'')
   FROM WRBHBBooking B
   LEFT OUTER JOIN WRBHBBedBookingPropertyAssingedGuest BG
   WITH(NOLOCK)ON BG.BookingId=B.Id
   WHERE B.IsActive=1 AND B.IsDeleted=0 AND BG.IsActive=1 AND 
-  BG.IsDeleted=0 AND BG.CurrentStatus='Booked'
+  BG.IsDeleted=0 AND BG.CurrentStatus='Booked' AND B.BookingCode != 0
   GROUP BY B.BookingCode,B.Id,B.BookingLevel,B.ClientId,
-  BG.BookingPropertyId;
-  IF @Id1 != 0 AND @Id2 = 0
+  BG.BookingPropertyId,ISNULL(B.HBStay,'');
+  IF @Str1 = 'HBStay'
    BEGIN
     SELECT BookingCode,Id,BookingLevelId FROM #TMP
-    WHERE ClientId=@Id1 ORDER BY BookingCode DESC;
+    WHERE ClientId=@Id1 AND HBStay = 'StayCorporateHB' ORDER BY BookingCode DESC;
    END
-  IF @Id1 = 0 AND @Id2 != 0
+  ELSE
    BEGIN
-    SELECT BookingCode,Id,BookingLevelId FROM #TMP
-    WHERE PropertyId=@Id2 ORDER BY BookingCode DESC;
+	IF @Id1 != 0 AND @Id2 = 0
+	 BEGIN
+	  SELECT BookingCode,Id,BookingLevelId FROM #TMP
+	  WHERE ClientId=@Id1 ORDER BY BookingCode DESC;
+	 END
+	IF @Id1 = 0 AND @Id2 != 0
+	 BEGIN
+	  SELECT BookingCode,Id,BookingLevelId FROM #TMP
+	  WHERE PropertyId=@Id2 ORDER BY BookingCode DESC;
+	 END
+	IF @Id1 != 0 AND @Id2 != 0
+	 BEGIN
+	  SELECT BookingCode,Id,BookingLevelId FROM #TMP
+	  WHERE ClientId=@Id1 AND PropertyId=@Id2
+	  ORDER BY BookingCode DESC;
+	 END
+	IF @Id1 = 0 AND @Id2 = 0
+	 BEGIN
+	  SELECT BookingCode,Id,BookingLevelId FROM #TMP
+	  ORDER BY BookingCode DESC;
+	 END
    END
-  IF @Id1 != 0 AND @Id2 != 0
+ END
+IF @Action = 'Client_Property_Load_hbstay'
+ BEGIN
+  -- MasterClient,Client
+  DECLARE @TmpStr NVARCHAR(100) = '',@ClientId BIGINT = 0;
+  SELECT TOP 1 @TmpStr = Designation,@ClientId = ClientId FROM WrbhbTravelDesk 
+  WHERE IsActive = 1 AND IsDeleted = 0 AND Id = @Id1;
+  --
+  SELECT @TmpStr AS TmpStr;
+  --
+  IF @TmpStr = 'MasterClient'
    BEGIN
-    SELECT BookingCode,Id,BookingLevelId FROM #TMP
-    WHERE ClientId=@Id1 AND PropertyId=@Id2
-    ORDER BY BookingCode DESC;
+    SELECT ClientName,Id FROM WRBHBClientManagement
+    WHERE IsActive=1 AND IsDeleted=0 AND MasterClientId = @ClientId 
+    ORDER BY ClientName ASC;
    END
-  IF @Id1 = 0 AND @Id2 = 0
+  ELSE
    BEGIN
-    SELECT BookingCode,Id,BookingLevelId FROM #TMP
-    ORDER BY BookingCode DESC;
+    SELECT ClientName,Id FROM WRBHBClientManagement
+    WHERE IsActive=1 AND IsDeleted=0 AND Id = @ClientId 
+    ORDER BY ClientName ASC;
    END
+  -- User Email Id
+  SELECT dbo.TRIM(ISNULL(Email,'')) AS Email FROM WrbhbTravelDesk WHERE Id = @Id1;
  END
 END

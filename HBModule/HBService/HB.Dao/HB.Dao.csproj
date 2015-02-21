@@ -94,6 +94,7 @@
     <Compile Include="BTCSubmissionDAO.cs" />
     <Compile Include="CheckInDtlsDAO.cs" />
     <Compile Include="CheckInForecastReportDAO.cs" />
+    <Compile Include="CheckInRollbackDao.cs" />
     <Compile Include="CheckoutAndIntermediateDao.cs" />
     <Compile Include="CheckOutandInterSettleDtlDao.cs" />
     <Compile Include="CheckOutandInterSettleHdrDao.cs" />

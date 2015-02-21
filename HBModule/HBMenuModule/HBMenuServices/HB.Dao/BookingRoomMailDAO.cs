@@ -35,14 +35,9 @@ namespace HB.Dao
             command.Parameters.Add("@Str", SqlDbType.NVarChar).Value = "";
             command.Parameters.Add("@Id", SqlDbType.BigInt).Value = BookingId;
             ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
-            System.Net.Mail.MailMessage message = new System.Net.Mail.MailMessage();            
-            //SmtpMail oMail = new SmtpMail("TryIt");
+            System.Net.Mail.MailMessage message = new System.Net.Mail.MailMessage();
             Err = "";
             string Flag = "true";
-            /*string pattern = @"^[a-z][a-z|0-9|]*([_][a-z|0-9]+)*([.][a-z|" +
-               @"0-9]+([_][a-z|0-9]+)*)?@[a-z][a-z|0-9|]*\.([a-z]" +
-               @"[a-z|0-9]*(\.[a-z][a-z|0-9]*)?)$";*/
-            //string pattern = @"\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*";
             string pattern = "^([0-9a-zA-Z]([-\\.\\w]*[0-9a-zA-Z])*@([0-9a-zA-Z][-\\w]*[0-9a-zA-Z]\\.)+[a-zA-Z]{2,9})$";
             for (int j = 0; j < ds.Tables[9].Rows.Count; j++)
             {
@@ -74,16 +69,12 @@ namespace HB.Dao
                 dT.Rows.Add(Err);
                 ds.Tables.Add(dT);
             }
-            //ds.Tables[1].Rows[0][4].ToString()
             if (ds.Tables[10].Rows.Count > 0)
             {
-                //message.From = new System.Net.Mail.MailAddress("homestay@uniglobeatb.co.in", "", System.Text.Encoding.UTF8);
                 message.From = new System.Net.Mail.MailAddress(ds.Tables[4].Rows[0][15].ToString(), "", System.Text.Encoding.UTF8);
             }
             else
             {
-                //message.From = new System.Net.Mail.MailAddress("stay@staysimplyfied.com", "", System.Text.Encoding.UTF8);
-                //message.From = new System.Net.Mail.MailAddress("stay@hummingbirdindia.com", "", System.Text.Encoding.UTF8);
                 message.From = new System.Net.Mail.MailAddress(ds.Tables[4].Rows[0][14].ToString(), "", System.Text.Encoding.UTF8);
             }
             //message.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
@@ -139,96 +130,7 @@ namespace HB.Dao
             message.Bcc.Add(new System.Net.Mail.MailAddress("bookingbcc@staysimplyfied.com"));
             message.Bcc.Add(new System.Net.Mail.MailAddress("vivek@warblerit.com"));
             message.Bcc.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
-            message.Subject = "Booking Confirmation - " + ds.Tables[2].Rows[0][2].ToString();
-            /*if (ds.Tables[10].Rows.Count > 0)
-            {
-                oMail.From = "homestay@uniglobeatb.co.in";
-                oMail.To.Add("booking_confirmation@staysimplyfied.com");
-                if (ds.Tables[4].Rows[0][0].ToString() == "0")
-                {
-                    if (ds.Tables[8].Rows[0][0].ToString() != "")
-                    {
-                        oMail.To.Add(ds.Tables[8].Rows[0][0].ToString());
-                    }
-                }
-                else
-                {
-                    for (int i = 0; i < ds.Tables[5].Rows.Count; i++)
-                    {
-                        if (ds.Tables[5].Rows[i][0].ToString() != "")
-                        {
-                            oMail.To.Add(ds.Tables[5].Rows[i][0].ToString());
-                        }
-                    }
-                    if (ds.Tables[8].Rows[0][0].ToString() != "")
-                    {
-                        oMail.Cc.Add(ds.Tables[8].Rows[0][0].ToString());
-                    }
-                }
-                //Extra CC
-                for (int i = 0; i < ds.Tables[7].Rows.Count; i++)
-                {
-                    if (ds.Tables[7].Rows[i][0].ToString() != "")
-                    {
-                        oMail.Cc.Add(ds.Tables[7].Rows[i][0].ToString());
-                    }
-                }
-                if (ds.Tables[2].Rows[0][4].ToString() != "")
-                {
-                    oMail.Bcc.Add(ds.Tables[2].Rows[0][4].ToString());
-                }
-                oMail.Bcc.Add("bookingbcc@staysimplyfied.com");
-                oMail.Bcc.Add("vivek@warblerit.com");
-                oMail.Bcc.Add("sakthi@warblerit.com");
-                oMail.Bcc.Add("arun@warblerit.com");
-                oMail.Subject = "Booking Confirmation - " + ds.Tables[2].Rows[0][2].ToString();
-            }
-            else
-            {
-                message.From = new System.Net.Mail.MailAddress("stay@staysimplyfied.com", "", System.Text.Encoding.UTF8);
-                //message.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
-                //message.To.Add(new System.Net.Mail.MailAddress("vivek@admonk.in"));
-                //message.Subject = "Room Booking Confirmation - " + ds.Tables[2].Rows[0][2].ToString();
-                message.To.Add(new System.Net.Mail.MailAddress("booking_confirmation@staysimplyfied.com"));
-                if (ds.Tables[4].Rows[0][0].ToString() == "0")
-                {
-                    if (ds.Tables[8].Rows[0][0].ToString() != "")
-                    {
-                        message.To.Add(new System.Net.Mail.MailAddress(ds.Tables[8].Rows[0][0].ToString()));
-                    }
-                }
-                else
-                {
-                    for (int i = 0; i < ds.Tables[5].Rows.Count; i++)
-                    {
-                        if (ds.Tables[5].Rows[i][0].ToString() != "")
-                        {
-                            message.To.Add(new System.Net.Mail.MailAddress(ds.Tables[5].Rows[i][0].ToString()));
-                        }
-                    }
-                    if (ds.Tables[8].Rows[0][0].ToString() != "")
-                    {
-                        message.CC.Add(new System.Net.Mail.MailAddress(ds.Tables[8].Rows[0][0].ToString()));
-                    }
-                }
-                //Extra CC
-                for (int i = 0; i < ds.Tables[7].Rows.Count; i++)
-                {
-                    if (ds.Tables[7].Rows[i][0].ToString() != "")
-                    {
-                        message.CC.Add(new System.Net.Mail.MailAddress(ds.Tables[7].Rows[i][0].ToString()));
-                    }
-                }
-                if (ds.Tables[2].Rows[0][4].ToString() != "")
-                {
-                    message.Bcc.Add(new System.Net.Mail.MailAddress(ds.Tables[2].Rows[0][4].ToString()));
-                }
-                message.Bcc.Add(new System.Net.Mail.MailAddress("bookingbcc@staysimplyfied.com"));
-                message.Bcc.Add(new System.Net.Mail.MailAddress("vivek@warblerit.com"));
-                message.Bcc.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
-                message.Bcc.Add(new System.Net.Mail.MailAddress("arun@warblerit.com"));
-                message.Subject = "Booking Confirmation - " + ds.Tables[2].Rows[0][2].ToString();
-            }*/
+            message.Subject = "Booking Confirmation - " + ds.Tables[2].Rows[0][2].ToString();           
             string typeofpty = ds.Tables[4].Rows[0][8].ToString();
             string Imagelocation = "";
             string Imagealt = "";
@@ -255,12 +157,7 @@ namespace HB.Dao
                         "<th align=\"left\" width=\"50%\" style=\"padding: 10px 0px 10px 10px;\">" +
                         "<img src=" + Imagelocation + " width=\"200px\" height=\"52px\" alt=" + Imagealt + ">" +              //Image Name Change
                         "</th><th width=\"50%\"></th></tr></table>";
-            /*string Imagebody =
-                " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #cccdcf solid 1px\">" +
-                " <tr><td><table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\">" +
-                " <tr><td width=\"800px\" align=\"left\" style=\"padding: 10px 0px 10px 10px;\"> " +
-                " <img src=" + Imagelocation + " width=\"250px\" height=\"70px\" alt=" + ds.Tables[6].Rows[0][1].ToString() + ">" +
-                " </td></tr></table>";*/
+            
             string SecondRow = " <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #ffffff solid 1px\">" +
                         " <tr><td style=\"width: 65%;\">" +
                         " <p style=\"font-weight:bold; color:orange;\">Booking confirmation details" +
@@ -275,68 +172,7 @@ namespace HB.Dao
                         " <tr><td>" +
                         " <p style=\"color:orange; font-weight:bold; font-size:14px;\"> Guest Details :</p>" +
                         " </td></tr>" +
-                        " </table>";
-            /*if (ds.Tables[4].Rows[0][8].ToString() == "ExP")
-            {
-                SecondRow = " <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #ffffff solid 1px\">" +
-                        " <tr><td style=\"width: 65%;\">" +
-                        " <p style=\"font-weight:bold; color:orange;\">Booking confirmation details" +
-                        " <span style=\"color:#000; background-color:#ffcc00; padding:5px;\">Booking # : " + ds.Tables[2].Rows[0][2].ToString() + " </span></p>" + //Reservation
-                        " <p style=\"margin:0px;\">Booked by : <span>" + ds.Tables[2].Rows[0][3].ToString() + "</span></p><br>" + //Date
-                        " <p style=\"margin:0px;\">Reservation Date : <span>" + ds.Tables[2].Rows[0][7].ToString() + "</span></p><br>" + //Date
-                        " <p style=\"margin:0px;\">Company Name : <span>" + ds.Tables[2].Rows[0][1].ToString() + "</span></p>" + //company name
-                        " </td>" +
-                        " <td>" +
-                        " <p style=\"padding:5px 5px 5px 5px; font-size:13px; color:#000; font-weight:bold; background-color:#ffcc00;\">Please refer your name and reference number - " + ds.Tables[4].Rows[0][9].ToString() + " at the time of check-In</p>"+
-                        " </td></tr>" +
-                        " <tr><td>" +
-                        " <p style=\"color:orange; font-weight:bold; font-size:14px;\"> Guest Details :</p>" +
-                        " </td></tr>"+
-                        " </table>";                
-                SecondRow =
-                            " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\">" +
-                            " <tr style=\"position:relative; background-color:#fff; font-size:11px;\">" +
-                            " <td width=\"400px\" style=\" padding-bottom:1px;\">" +
-                            " <p style=\"font-weight:bold; color:orange;\">Booking confirmation details" +
-                            " <span style=\"color:#000; background-color:#ffcc00; padding:5px;\">Booking # : " + ds.Tables[2].Rows[0][2].ToString() + " </span></p>" + //Reservation
-                            " <p style=\"margin:0px;\">Booked by : <span>" + ds.Tables[2].Rows[0][3].ToString() + "</span></p><br>" + //Date
-                            " <p style=\"margin:0px;\">Reservation Date : <span>" + ds.Tables[2].Rows[0][7].ToString() + "</span></p><br>" + //Date
-                            " <p style=\"margin:0px;\">Company Name : <span>" + ds.Tables[2].Rows[0][1].ToString() + "</span></p>" + //company name
-                            " </td><td width=\"400px\"><p style=\"padding:25px 25px 25px 25px; font-size:13px; color:#000; font-weight:bold; background-color:#ffcc00;\">Please refer your name and reference number - " + ds.Tables[4].Rows[0][9].ToString() + " at the time of check-In</p>" +
-                            " <p style=\"margin-top:0px;\"> <span style=\"color:orange; font-size:12px;\"></span></p>" +
-                            " </td></tr><tr><td width=\"800px\" style=\"margin-bottom:\">" +
-                            " <p style=\"color:orange; font-weight:bold; font-size:14px;\"> Guest Details :</p>" +
-                            " </td> </tr></table>";
-           
-            else
-            {
-                SecondRow = " <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"left\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #ffffff solid 1px\">" +
-                        " <tr><td>" +
-                        " <p style=\"font-weight:bold; color:orange;\">Booking confirmation details" +
-                        " <span style=\"color:#000; background-color:#ffcc00; padding:5px;\">Booking # : " + ds.Tables[2].Rows[0][2].ToString() + " </span></p>" + //Reservation
-                        " <p style=\"margin:0px;\">Booked by : <span>" + ds.Tables[2].Rows[0][3].ToString() + "</span></p><br>" + //Date
-                        " <p style=\"margin:0px;\">Reservation Date : <span>" + ds.Tables[2].Rows[0][7].ToString() + "</span></p><br>" + //Date
-                        " <p style=\"margin:0px;\">Company Name : <span>" + ds.Tables[2].Rows[0][1].ToString() + "</span></p>" + //company name
-                        " </td></tr>" +
-                        " <tr><td>" +
-                        " <p style=\"color:orange; font-weight:bold; font-size:14px;\"> Guest Details :</p>" +
-                        " </td></tr>" +
-                        " </table>";                
-            }*/
-            /*string SecondRow =
-                " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\">" +
-                " <tr style=\"position:relative; background-color:#fff; font-size:11px;\">" +
-                " <td width=\"400\" style=\" padding-bottom:1px;\">" +
-                " <p style=\"font-weight:bold; color:orange;\">Booking confirmation details" +
-                " <span style=\"color:#000; background-color:#ffcc00; padding:5px;\">Booking # : " + ds.Tables[2].Rows[0][2].ToString() + " </span></p>" + //Reservation
-                " <p style=\"margin:0px;\">Booked by : <span>" + ds.Tables[2].Rows[0][3].ToString() + "</span></p>" +             //Name                    
-                " <p style=\"margin:0px;\">Reservation Date : <span>" + ds.Tables[2].Rows[0][7].ToString() + "</span></p>" + //Date
-                " <p style=\"margin:0px;\">Company Name : <span>" + ds.Tables[2].Rows[0][1].ToString() + "</span></p>" + //company name
-                " </td><td width=\"200\"><p style=\"margin:0px;\"></p>" +
-                " <p style=\"margin-top:0px;\"> <span style=\"color:orange; font-size:12px;\"></span></p>" +
-                " </td></tr><tr><td width=\"800px\" style=\"margin-bottom:\">" +
-                " <p style=\"color:orange; font-weight:bold; font-size:14px;\"> Guest Details</p>" +
-                " </td> </tr></table>";*/
+                        " </table>";            
             string GuestDetailsTable1 = "";
             // MGH,DdP,
             if ((typeofpty == "MGH") || (typeofpty == "DdP"))
@@ -520,23 +356,7 @@ namespace HB.Dao
                     "    </p>" +
                     " </td><td width=\"200\" style=\"padding:10px; margin-bottom:20px; border-bottom:1px solid #ccc;\"> " +
                     " <p> Name:" + UserName + " </p> <p> Email :" + " " + EmailId + " </p><p> Phone: " + PhoneNo + "</p></td>" +
-                    " </tr></table>";
-            //string Disclaimer = "This message (including attachment if any) is confidential and may be privileged. Before opening attachments please check them for viruses and defects. HummingBird Travel & Stay Private Limited (HummingBird) will not be responsible for any viruses or defects or any forwarded attachments emanating either from within HummingBird or outside. If you have received this message by mistake please notify the sender by return e-mail and delete this message from your system. Any unauthorized use or dissemination of this message in whole or in part is strictly prohibited. Please note that e-mails are susceptible to change and HummingBird shall not be liable for any improper, untimely or incomplete transmission.";
-            /*string FooterDtls =
-                    " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
-                    " <tr style=\"font-size:11px; font-weight:normal;\">" +
-                    " <th width=\"50%\" style=\"background-color:#eee; padding:5px 0px; border-right:1px solid #ccc;\"><p style=\"text-align:center; padding-left:10px;\">Security Policy</p></th>" +
-                    " <th width=\"50%\" style=\"background-color:#eee; padding:5px 0px;\"><p style=\"text-align:center; padding-left:10px;\">Cancellation / No Show / Early Departure Policy</p></th>" +
-                    " </tr><tr style=\"font-size:11px; font-weight:normal;\">" +
-                    " <td width=\"200\" style=\"padding:10px; border-right:1px solid #ccc; margin-bottom:20px; border-bottom:1px solid #ccc;\">" +
-                    " <ol type=\"A\" style=\"font-weight: bold;\"><li><span>A picture of the guest will be taken through webcam for records.</span></li>" +
-                    " <li><span>The guest's mobile number and official e-mail address needs to be provided.</span></li>" +
-                    " <li><span>Government Photo ID proof such as driving license, passport, voter ID card etc. needs to be produced. (Kindly confirm whether PAN CARD is accepted)</span></li>" +
-                    " <li><span>A company business card or company ID card needs to be produced.</span></li></ol>" +
-                    " </td><td width=\"200\" style=\"padding:10px; margin-bottom:20px; border-bottom:1px solid #ccc;\"><ol type=\"A\" style=\"font-weight: bold;\"><li><span>Cancellation of booking to be confirmed through Email.</span></li><li><span>Mail to be sent to stay@staysimplyfied.com and mention the booking ID no. </span></li>" +
-                    " <li><span>800px refund will be made if cancellation request is sent 48 (forty eight) hours prior to the check-in date and NIL amount will be refunded if cancellation request sent beyond 48 (forty eight) hours to check-in date.</span></li>" +
-                    " <li><span>1 day tariff will be charged for No-show without intimation.</span></li></td></ol>" +
-                    " </tr></table><br>";*/
+                    " </tr></table>";            
             string FooterDtls =
                     " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
                     " <tr style=\"font-size:11px; font-weight:normal;\">" +
@@ -547,13 +367,7 @@ namespace HB.Dao
                     " " + ds.Tables[4].Rows[0][5].ToString() + "" +
                     " </td><td width=\"200\" style=\"padding:10px; margin-bottom:20px; border-bottom:1px solid #ccc;\">"+
                     " " + ds.Tables[4].Rows[0][6].ToString() + "</td>" +
-                    " </tr></table><br>";
-                    /*"<tr style=\"font-size:0px; font-weight:normal;\"> " +
-                    " <td colspan=\"3\" style=\"padding-top:0px;\"> <p style=\"color:orange; font-weight:bold; margin:0px; font-size:0px;\"> " +
-                    " HUMMINGBIRD Travel and stay Pvt Ltd</p><br><hr>" +
-                    " <p style=\"color:orange; font-weight:bold; margin:0px; font-size:11px; padding-top:20px;\">Disclaimer :</p>" +
-                    " <p style=\"font-size:10px; padding-top:10px; padding-bottom:20px;\">" + Disclaimer + "</p>" +
-                    " </td></tr> </table>";*/
+                    " </tr></table><br>";                    
             message.Body = Imagebody + SecondRow + GuestDetailsTable1 + AddressDtls + QRCode + FooterDtls;
             message.IsBodyHtml = true;
             // SMTP Email email: 
@@ -570,50 +384,7 @@ namespace HB.Dao
             {
                 CreateLogFiles log = new CreateLogFiles();
                 log.ErrorLog(ex.Message + " --> Room Level Booking Confirmation Mail --> " + message.Subject);
-            }           
-            /*if (ds.Tables[10].Rows.Count > 0)
-            {
-                oMail.HtmlBody = message.Body;
-                SmtpServer oServer = new SmtpServer("mail.uniglobeatb.co.in");                    
-                oServer.User = "homestay@uniglobeatb.co.in";
-                oServer.Password = "Atb@33%";
-                oServer.Port = 465;                    
-                oServer.ConnectType = SmtpConnectType.ConnectSSLAuto;
-                SmtpClient osmtp = new SmtpClient();
-                try
-                {
-                    osmtp.SendMail(oServer, oMail);
-                }
-                catch (Exception ex)
-                {
-                    CreateLogFiles log = new CreateLogFiles();
-                    log.ErrorLog(ex.Message + "Room Level Booking Confirmation Mail in Port 465" + oMail.Subject);
-                }
-            }
-            else
-            {
-                System.Net.Mail.SmtpClient smtp = new System.Net.Mail.SmtpClient();
-                smtp.EnableSsl = true;
-                smtp.Host = "smtp.gmail.com";
-                smtp.Port = 587;
-                smtp.Credentials = new System.Net.NetworkCredential("stay@staysimplyfied.com", "stay1234");
-
-                //smtp.Host = "email-smtp.us-west-2.amazonaws.com";
-                //smtp.Port = 587;
-                //smtp.Credentials = new System.Net.NetworkCredential("AKIAINVSHP2KIQNEFBPQ", "At7MguGAFrQDn8QMcKOTFVgxIUZs6X4UC+7HQsXrk+BJ");
-
-                try
-                {
-                    smtp.Send(message);
-                }
-                catch (Exception ex)
-                {
-                    CreateLogFiles log = new CreateLogFiles();
-                    log.ErrorLog(ex.Message + "Room Level Booking Confirmation Mail in Port 587" + message.Subject);
-                }                
-                //smtp.Credentials = new System.Net.NetworkCredential("vivek@admonk.in", "vivekadmonk");
-                //smtp.Credentials = new System.Net.NetworkCredential("stay@hummingbirdindia.com", "hb@hummingbird");                
-            }*/
+            }            
             // Property Mail            
             if (ds.Tables[3].Rows.Count > 0)
             {
@@ -623,18 +394,13 @@ namespace HB.Dao
                     //string PropertyMail = "sakthi@warblerit.com,vivek@warblerit.com,arun@warblerit.com";
                     var PtyMail = PropertyMail.Split(',');
                     int cnt = PtyMail.Length;
-                    System.Net.Mail.MailMessage message1 = new System.Net.Mail.MailMessage();
-                    //SmtpMail Mail = new SmtpMail("TryIt");
-                    //ds.Tables[1].Rows[0][4].ToString()
+                    System.Net.Mail.MailMessage message1 = new System.Net.Mail.MailMessage();                    
                     if (ds.Tables[10].Rows.Count > 0)
                     {
-                        //message1.From = new System.Net.Mail.MailAddress("homestay@uniglobeatb.co.in", "", System.Text.Encoding.UTF8);
                         message1.From = new System.Net.Mail.MailAddress(ds.Tables[4].Rows[0][15].ToString(), "", System.Text.Encoding.UTF8);
                     }
                     else
                     {
-                        //message1.From = new System.Net.Mail.MailAddress("stay@staysimplyfied.com", "", System.Text.Encoding.UTF8);
-                        //message1.From = new System.Net.Mail.MailAddress("stay@hummingbirdindia.com", "", System.Text.Encoding.UTF8);
                         message1.From = new System.Net.Mail.MailAddress(ds.Tables[4].Rows[0][14].ToString(), "", System.Text.Encoding.UTF8);
                     }
                     //message1.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
@@ -660,47 +426,7 @@ namespace HB.Dao
                     message1.Bcc.Add(new System.Net.Mail.MailAddress("bookingbcc@staysimplyfied.com"));
                     message1.Bcc.Add(new System.Net.Mail.MailAddress("vivek@warblerit.com"));
                     message1.Bcc.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
-                    message1.Subject = "Booking Confirmation - " + ds.Tables[2].Rows[0][2].ToString();
-                    /*if (ds.Tables[10].Rows.Count > 0)
-                    {
-                        Mail.From = "homestay@uniglobeatb.co.in";
-                        for (int i = 0; i < cnt; i++)
-                        {
-                            if (PtyMail[i].ToString() != "")
-                            {
-                                Mail.To.Add(PtyMail[i].ToString());
-                            }
-                        }
-                        if (ds.Tables[2].Rows[0][4].ToString() != "")
-                        {
-                            Mail.Bcc.Add(ds.Tables[2].Rows[0][4].ToString());
-                        }
-                        Mail.Bcc.Add("bookingbcc@staysimplyfied.com");
-                        Mail.Bcc.Add("vivek@warblerit.com");
-                        Mail.Bcc.Add("sakthi@warblerit.com");
-                        Mail.Bcc.Add("arun@warblerit.com");
-                        Mail.Subject = "Booking Confirmation - " + ds.Tables[2].Rows[0][2].ToString();
-                    }
-                    else
-                    {
-                        message1.From = new System.Net.Mail.MailAddress("stay@staysimplyfied.com", "", System.Text.Encoding.UTF8);
-                        for (int i = 0; i < cnt; i++)
-                        {
-                            if (PtyMail[i].ToString() != "")
-                            {
-                                message1.To.Add(new System.Net.Mail.MailAddress(PtyMail[i].ToString()));
-                            }
-                        }
-                        if (ds.Tables[2].Rows[0][4].ToString() != "")
-                        {
-                            message1.Bcc.Add(new System.Net.Mail.MailAddress(ds.Tables[2].Rows[0][4].ToString()));
-                        }
-                        message1.Bcc.Add(new System.Net.Mail.MailAddress("bookingbcc@staysimplyfied.com"));
-                        message1.Bcc.Add(new System.Net.Mail.MailAddress("vivek@warblerit.com"));
-                        message1.Bcc.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
-                        message1.Bcc.Add(new System.Net.Mail.MailAddress("arun@warblerit.com"));
-                        message1.Subject = "Booking Confirmation - " + ds.Tables[2].Rows[0][2].ToString();
-                    }*/
+                    message1.Subject = "Booking Confirmation - " + ds.Tables[2].Rows[0][2].ToString();                    
                     string typeofpty1 = ds.Tables[4].Rows[0][8].ToString();
                     string Imagelocation1 = "";
                     string Imagealt1 = "";
@@ -718,9 +444,7 @@ namespace HB.Dao
                     {
                         Imagelocation1 = ds.Tables[4].Rows[0][10].ToString();
                         Imagealt1 = ds.Tables[4].Rows[0][11].ToString();
-                    }
-                    //Imagelocation1 = ds.Tables[6].Rows[0][2].ToString();
-                    //Imagealt = ds.Tables[6].Rows[0][3].ToString();
+                    }                    
                     string Imagebody1 =
                         " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #cccdcf solid 1px\">" +
                         "<tr><td>" +
@@ -728,13 +452,7 @@ namespace HB.Dao
                         "<tr> " +
                         "<th align=\"left\" width=\"50%\" style=\"padding: 10px 0px 10px 10px;\">" +
                         "<img src=" + Imagelocation1 + " width=\"200px\" height=\"52px\" alt=" + Imagealt1 + ">" +              //Image Name Change
-                        "</th><th width=\"50%\"></th></tr></table>";
-                    /*string Imagebody1 =
-                        " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #cccdcf solid 1px\">" +
-                        " <tr><td><table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\">" +
-                        " <tr><td width=\"800px\" align=\"left\" style=\"padding: 10px 0px 10px 10px;\"> " +
-                        " <img src=" + Imagelocation1 + " width=\"250px\" height=\"70px\" alt=" + ds.Tables[6].Rows[0][3].ToString() + ">" +
-                        " </td></tr></table>";*/
+                        "</th><th width=\"50%\"></th></tr></table>";                    
                     string SecondRow1 = " <table width=\"800px\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"left\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #ffffff solid 1px\">" +
                         " <tr><td>" +
                         " <p style=\"font-weight:bold; color:orange;\">Booking confirmation details" +
@@ -747,54 +465,7 @@ namespace HB.Dao
                         " <p style=\"color:orange; font-weight:bold; font-size:14px;\"> Guest Details :</p>" +
                         " </td></tr>" +
                         " </table>";
-                    /*if (ds.Tables[4].Rows[0][8].ToString() == "ExP")
-                    {
-                        SecondRow1 =
-                            " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\">" +
-                            " <tr style=\"position:relative; background-color:#fff; font-size:11px;\">" +
-                            " <td width=\"400\" style=\" padding-bottom:1px;\">" +
-                            " <p style=\"font-weight:bold; color:orange;\">Booking confirmation details" +
-                            " <span style=\"color:#000; background-color:#ffcc00; padding:5px;\">Booking # : " + ds.Tables[2].Rows[0][2].ToString() + " </span></p>" + //Reservation
-                            " <p style=\"margin:0px;\">Reservation Date : <span>" + ds.Tables[2].Rows[0][7].ToString() + "</span></p><br>" + //Date
-                            " <p style=\"margin:0px;\">Property Name : <span>" + ds.Tables[4].Rows[0][3].ToString() + "</span></p><br>" + //Date
-                            " <p style=\"margin:0px;\">Company Name : <span>" + ds.Tables[2].Rows[0][1].ToString() + "</span></p>" + //company name
-                            " </td><td width=\"300\"><p style=\"padding:25px 25px 25px 25px; font-size:13px; color:#000; font-weight:bold; background-color:#ffcc00;\">Please refer your name and reference number - " + ds.Tables[4].Rows[0][9].ToString() + " at the time of check-In</p>" +
-                            " <p style=\"margin-top:0px;\"> <span style=\"color:orange; font-size:12px;\"></span></p>" +
-                            " </td></tr><tr><td width=\"800px\" style=\"margin-bottom:\">" +
-                            " <p style=\"color:orange; font-weight:bold; font-size:14px;\"> Guest Details :</p>" +
-                            " </td> </tr></table>";
-
-                        SecondRow1 = " <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #ffffff solid 1px\">" +
-                        " <tr><td style=\"width: 65%;\">" +
-                        " <p style=\"font-weight:bold; color:orange;\">Booking confirmation details" +
-                        " <span style=\"color:#000; background-color:#ffcc00; padding:5px;\">Booking # : " + ds.Tables[2].Rows[0][2].ToString() + " </span></p>" + //Reservation
-                        " <p style=\"margin:0px;\">Reservation Date : <span>" + ds.Tables[2].Rows[0][7].ToString() + "</span></p><br>" + //Date
-                        " <p style=\"margin:0px;\">Property Name : <span>" + ds.Tables[4].Rows[0][3].ToString() + "</span></p><br>" + //Date
-                        " <p style=\"margin:0px;\">Company Name : <span>" + ds.Tables[2].Rows[0][1].ToString() + "</span></p>" + //company name
-                        " </td>" +
-                        " <td>" +
-                        " <p style=\"padding:5px 5px 5px 5px; font-size:13px; color:#000; font-weight:bold; background-color:#ffcc00;\">Please refer your name and reference number - " + ds.Tables[4].Rows[0][9].ToString() + " at the time of check-In</p>" +
-                        " </td></tr>" +
-                        " <tr><td>" +
-                        " <p style=\"color:orange; font-weight:bold; font-size:14px;\"> Guest Details :</p>" +
-                        " </td></tr>" +
-                        " </table>";                
-                    }
-                    else
-                    {
-                        SecondRow1 = " <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"left\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #ffffff solid 1px\">" +
-                        " <tr><td style=\"width: 65%;\">" +
-                        " <p style=\"font-weight:bold; color:orange;\">Booking confirmation details" +
-                        " <span style=\"color:#000; background-color:#ffcc00; padding:5px;\">Booking # : " + ds.Tables[2].Rows[0][2].ToString() + " </span></p>" + //Reservation
-                        " <p style=\"margin:0px;\">Reservation Date : <span>" + ds.Tables[2].Rows[0][7].ToString() + "</span></p><br>" + //Date
-                        " <p style=\"margin:0px;\">Property Name : <span>" + ds.Tables[4].Rows[0][3].ToString() + "</span></p><br>" + //Date
-                        " <p style=\"margin:0px;\">Company Name : <span>" + ds.Tables[2].Rows[0][1].ToString() + "</span></p>" + //company name
-                        " </td></tr>" +
-                        " <tr><td>" +
-                        " <p style=\"color:orange; font-weight:bold; font-size:14px;\"> Guest Details :</p>" +
-                        " </td></tr>" +
-                        " </table>";                
-                    }*/
+                    
                     string GuestDetailsTable11 = "";
                     if ((typeofpty == "MGH") || (typeofpty == "DdP"))
                     {
@@ -944,22 +615,6 @@ namespace HB.Dao
                                 "<li>All the invoices to be raised on “Hummingbird Travel & Stay Pvt Ltd” and all statutory numbers of the property to be mentioned on the invoice. Invoice should reach within three days of the check-out date.</li></td></tr>" +
                                 "</table>";
                     }
-                    //string Disclaimer1 = "This message (including attachment if any) is confidential and may be privileged. Before opening attachments please check them for viruses and defects. HummingBird Travel & Stay Private Limited (HummingBird) will not be responsible for any viruses or defects or any forwarded attachments emanating either from within HummingBird or outside. If you have received this message by mistake please notify the sender by return e-mail and delete this message from your system. Any unauthorized use or dissemination of this message in whole or in part is strictly prohibited. Please note that e-mails are susceptible to change and HummingBird shall not be liable for any improper, untimely or incomplete transmission.";
-                    /*string FooterDtls1 =
-                            " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
-                            " <tr style=\"font-size:11px; font-weight:normal;\">" +
-                            " <th width=\"50%\" style=\"background-color:#eee; padding:5px 0px; border-right:1px solid #ccc;\"><p style=\"text-align:center; padding-left:10px;\">Security Policy</p></th>" +
-                            " <th width=\"50%\" style=\"background-color:#eee; padding:5px 0px;\"><p style=\"text-align:center; padding-left:10px;\">Cancellation / No Show / Early Departure Policy</p></th>" +
-                            " </tr><tr style=\"font-size:11px; font-weight:normal;\">" +
-                            " <td width=\"200\" style=\"padding:10px; border-right:1px solid #ccc; margin-bottom:20px; border-bottom:1px solid #ccc;\">" +
-                            " <ol type=\"A\" style=\"font-weight: bold;\"><li><span>A picture of the guest will be taken through webcam for records.</span></li>" +
-                            " <li><span>The guest's mobile number and official e-mail address needs to be provided.</span></li>" +
-                            " <li><span>Government Photo ID proof such as driving license, passport, voter ID card etc. needs to be produced. (Kindly confirm whether PAN CARD is accepted)</span></li>" +
-                            " <li><span>A company business card or company ID card needs to be produced.</span></li></ol>" +
-                            " </td><td width=\"200\" style=\"padding:10px; margin-bottom:20px; border-bottom:1px solid #ccc;\"><ol type=\"A\" style=\"font-weight: bold;\"><li><span>Cancellation of booking to be confirmed through Email.</span></li><li><span> Mail to be sent to stay@staysimplyfied.com and mention the booking ID no.</span></li>" +
-                            " <li><span>800px refund will be made if cancellation request is sent 48 (forty eight) hours prior to the check-in date and NIL amount will be refunded if cancellation request sent beyond 48 (forty eight) hours to check-in date.</span></li>" +
-                            " <li><span>1 day tariff will be charged for No-show without intimation.</span></li></td></ol>" +
-                            " </tr></table><br>";*/
                     string FooterDtls1 =
                             " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
                             " <tr style=\"font-size:11px; font-weight:normal;\">" +
@@ -970,12 +625,7 @@ namespace HB.Dao
                             "" + ds.Tables[4].Rows[0][5].ToString() + "" +
                             " </td><td width=\"200\" style=\"padding:10px; margin-bottom:20px; border-bottom:1px solid #ccc;\">"+
                             "" + ds.Tables[4].Rows[0][6].ToString() + "</td></tr></table><br>";
-                    /*"<tr style=\"font-size:0px; font-weight:normal;\"> " +
-                    " <td colspan=\"3\" style=\"padding-top:0px;\"> <p style=\"color:orange; font-weight:bold; margin:0px; font-size:0px;\"> " +
-                    " HUMMINGBIRD Travel and stay Pvt Ltd</p><br><hr>" +
-                    " <p style=\"color:orange; font-weight:bold; margin:0px; font-size:11px; padding-top:10px;\">Disclaimer :</p>" +
-                    " <p style=\"font-size:10px; padding-top:10px; padding-bottom:20px;\">" + Disclaimer1 + "</p>" +
-                    " </td></tr> </table>";*/
+                    
                     message1.Body = Imagebody1 + SecondRow1 + GuestDetailsTable11 + AddressDtls1 + FooterDtls1;
                     message1.IsBodyHtml = true;
                     // SMTP Email email:
@@ -992,45 +642,7 @@ namespace HB.Dao
                     {
                         CreateLogFiles log = new CreateLogFiles();
                         log.ErrorLog(ex.Message + " --> Room Level Booking Confirmation Property Mail --> " + message1.Subject);
-                    }
-                    /*if (ds.Tables[10].Rows.Count > 0)
-                    {
-                        Mail.HtmlBody = message1.Body;
-                        SmtpServer Server = new SmtpServer("mail.uniglobeatb.co.in");
-                        Server.User = "homestay@uniglobeatb.co.in";
-                        Server.Password = "Atb@33%";
-                        Server.Port = 465;
-                        Server.ConnectType = SmtpConnectType.ConnectSSLAuto;
-                        SmtpClient Smtp = new SmtpClient();
-                        try
-                        {
-                            Smtp.SendMail(Server, Mail);
-                        }
-                        catch (Exception ex)
-                        {
-                            CreateLogFiles log = new CreateLogFiles();
-                            log.ErrorLog(ex.Message + "Room Level Booking Property Mail in Port 465" + Mail.Subject);
-                        }
-                    }
-                    else
-                    {
-                        System.Net.Mail.SmtpClient smtp1 = new System.Net.Mail.SmtpClient();
-                        smtp1.EnableSsl = true;
-                        smtp1.Host = "smtp.gmail.com";
-                        smtp1.Port = 587;
-                        smtp1.Credentials = new System.Net.NetworkCredential("stay@staysimplyfied.com", "stay1234");
-                        try
-                        {
-                            smtp1.Send(message1);
-                        }
-                        catch (Exception ex)
-                        {
-                            CreateLogFiles log = new CreateLogFiles();
-                            log.ErrorLog(ex.Message + "Room Level Booking Property Mail in Port 587" + message1.Subject);
-                        }
-                        //smtp.Credentials = new System.Net.NetworkCredential("vivek@admonk.in", "vivekadmonk");
-                        //smtp.Credentials = new System.Net.NetworkCredential("stay@hummingbirdindia.com", "hb@hummingbird");
-                    }*/
+                    }                   
                 }
             }            
             return ds;

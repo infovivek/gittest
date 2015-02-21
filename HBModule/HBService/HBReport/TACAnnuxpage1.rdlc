@@ -3548,46 +3548,6 @@
           <PaddingBottom>2pt</PaddingBottom>
         </Style>
       </Textbox>
-      <Textbox Name="Textbox95">
-        <CanGrow>true</CanGrow>
-        <KeepTogether>true</KeepTogether>
-        <Paragraphs>
-          <Paragraph>
-            <TextRuns>
-              <TextRun>
-                <Value>Stay simplified is brand of HummingBird</Value>
-                <Style>
-                  <FontStyle>Normal</FontStyle>
-                  <FontFamily>Calibri</FontFamily>
-                  <FontSize>12pt</FontSize>
-                  <FontWeight>Normal</FontWeight>
-                  <TextDecoration>None</TextDecoration>
-                  <Color>#000000</Color>
-                </Style>
-              </TextRun>
-            </TextRuns>
-            <Style>
-              <TextAlign>Center</TextAlign>
-            </Style>
-          </Paragraph>
-        </Paragraphs>
-        <rd:DefaultName>Textbox94</rd:DefaultName>
-        <Top>8.33007in</Top>
-        <Left>0.01875in</Left>
-        <Height>0.25in</Height>
-        <Width>8.70397in</Width>
-        <ZIndex>14</ZIndex>
-        <Style>
-          <Border>
-            <Style>None</Style>
-          </Border>
-          <VerticalAlign>Middle</VerticalAlign>
-          <PaddingLeft>2pt</PaddingLeft>
-          <PaddingRight>2pt</PaddingRight>
-          <PaddingTop>2pt</PaddingTop>
-          <PaddingBottom>2pt</PaddingBottom>
-        </Style>
-      </Textbox>
       <Textbox Name="Textbox58">
         <CanGrow>true</CanGrow>
         <KeepTogether>true</KeepTogether>
@@ -3607,7 +3567,7 @@
         <Left>2.6336cm</Left>
         <Height>0.01042in</Height>
         <Width>6.77958in</Width>
-        <ZIndex>15</ZIndex>
+        <ZIndex>14</ZIndex>
         <Style>
           <Border>
             <Style>None</Style>
@@ -3645,7 +3605,7 @@
         <Left>6.96118cm</Left>
         <Height>0.22431in</Height>
         <Width>3.2833in</Width>
-        <ZIndex>16</ZIndex>
+        <ZIndex>15</ZIndex>
         <Style>
           <Border>
             <Style>None</Style>
@@ -3680,7 +3640,7 @@
         <Left>6.96118cm</Left>
         <Height>0.22431in</Height>
         <Width>3.2833in</Width>
-        <ZIndex>17</ZIndex>
+        <ZIndex>16</ZIndex>
         <Style>
           <Border>
             <Style>None</Style>
@@ -3712,7 +3672,7 @@
         <Top>7.69285in</Top>
         <Height>0.25in</Height>
         <Width>4.31042in</Width>
-        <ZIndex>18</ZIndex>
+        <ZIndex>17</ZIndex>
         <Style>
           <Border>
             <Style>None</Style>
@@ -3744,7 +3704,7 @@
         <Left>4.76171in</Left>
         <Height>0.25in</Height>
         <Width>3.94225in</Width>
-        <ZIndex>19</ZIndex>
+        <ZIndex>18</ZIndex>
         <Style>
           <Border>
             <Style>None</Style>

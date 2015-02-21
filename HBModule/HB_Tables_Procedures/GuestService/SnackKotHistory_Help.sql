@@ -72,7 +72,7 @@ CREATE PROCEDURE dbo.[SP_SnackKOTHistory_Help]
 		AND CH.IsActive=1 AND CH.IsDeleted=0
 		WHERE KH.PropertyId=@PropertyId  AND KH.IsActive=1 And KH.IsDeleted=0
 		AND KH.Date BETWEEN CONVERT(Date,@Str1 ,103)
-		AND CONVERT(Date,@Str2,103) AND ISNULL(KH.ChkoutServiceFlag,0)!=0
+		AND CONVERT(Date,@Str2,103) --AND ISNULL(KH.ChkoutServiceFlag,0)!=0
 				 
 		END	
   	
@@ -142,7 +142,7 @@ CREATE PROCEDURE dbo.[SP_SnackKOTHistory_Help]
 	
 	SELECT DISTINCT H.GuestName as Name,--CONVERT(NVARCHAR,H.Date,105) AS ArrivalDate,
 	H.RoomNo,CH.BookingId,H.ClientName,CONVERT(NVARCHAR,CH.ArrivalDate,103) AS ChkInDt,
-	CONVERT(NVARCHAR,CH.ChkOutDate,103) AS ChkOutDt,S.ServiceItem AS Item,S.Quantity,S.Price,S.Amount,
+	CONVERT(NVARCHAR,CH.ChkOutDate,103) AS ChkOutDt,S.ServiceItem AS Item,S.Quantity,CAST((S.Amount/S.Quantity)AS DECIMAL(27,2)) AS Price,S.Amount,
 	C.TotalAmount,C.ServiceTax AS SerivceTax,C.VAT AS Vat,C.Cess,HECess AS HCess,
 	(ISNULL(C.TotalAmount,0)+ISNULL(C.ServiceTax,0)+ISNULL(C.VAT,0)+ISNULL(C.Cess,0)+ISNULL(C.HECess,0))
 	AS NetAmount,P.PropertyName,P.Propertaddress AS Propertyaddress,

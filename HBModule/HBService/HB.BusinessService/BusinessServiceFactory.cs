@@ -380,6 +380,12 @@ namespace HB.BusinessService
                 case "CreditNoteService":
                     _businessService = new CreditNoteService();
                     break;
+                case "BookingStatusReport":
+                    _businessService = new CreditNoteService();
+                    break;
+                case "CheckInRollback":
+                    _businessService = new CheckInRollbackService();
+                    break;
             }
             return _businessService;
         }

@@ -109,12 +109,12 @@ BEGIN
 	IF @Action='TRPageload'
 	BEGIN
 	 SELECT ClientName,Id FROM WRBHBClientManagement 
-	 WHERE  Status='Active' 
+	 WHERE  Status='Active' AND IsActive=1 AND IsDeleted=0
 	END
 	IF @Action='Client'
 	BEGIN
 	 SELECT TrClientURL FROM WRBHBClientManagement 
-	 WHERE  Id=@Id
+	 WHERE  Id=@Id AND IsActive=1 AND IsDeleted=0
 	END
 END
 

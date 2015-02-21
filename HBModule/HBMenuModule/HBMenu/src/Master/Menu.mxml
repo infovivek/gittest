@@ -3,7 +3,7 @@
 			   xmlns:s="library://ns.adobe.com/flex/spark"
 			   xmlns:mx="library://ns.adobe.com/flex/mx"
 			   xmlns:WrbComp="WrbComp.*"
-			   width="100%" height="100%" creationComplete="pagrInit()" pageTitle="MENU">
+			   width="100%" height="100%" creationComplete="pagrInit()" pageTitle="Hummingbird Corporate Stay">
 	<fx:Script source = "..\\Common\\CommonScript.as"/>
 	<fx:Script source = "..\\Common\\Functions.as"/>
 	<fx:Style source="..\\Common\\ApplicationCSS.css" />
@@ -21,7 +21,7 @@
 			public var GlobalXml:String="",UserType:String="";		
 			private var result:XML;
 			public var UserId:int=0;
-			public var UserName:String="";
+			public var UserName:String="",LoginType:String="";
 			public var Menu_AC:ArrayCollection=new ArrayCollection();
 			public var Modual_AC:ArrayCollection=new ArrayCollection();
 			public var Logo:String=""; var ClientId:int=0;
@@ -41,7 +41,8 @@
 				GlobalXml += "<ROOT>";
 				GlobalXml += ObjToXmlStr_Comm(ScrDtls,"GlobalXml")
 				GlobalXml += "</ROOT>"; 
-				txt_User.text="test";txt_Password.text="test";SighIn();
+				//txt_User.text="minidurai@warblerit.com";txt_Password.text="1234";SighIn();
+				//txt_User.text="test";txt_Password.text="test";SighIn();
 			}
 			private function loadConfigXML():void
 			{
@@ -79,11 +80,13 @@
 							Grp_SWFLoader.visible=true;
 							grp_Login.visible=false;
 							Brd_Menu1.visible=true;	
+							brd_details.visible=true;
+							Ddl_LoginType.visible=false;
 							lbl_UserName.text=Ds_Objects.result.Tables.Table.Rows[0].FirstName;
 							UserName=Ds_Objects.result.Tables.Table.Rows[0].FirstName;
 							UserId=Ds_Objects.result.Tables.Table.Rows[0].Id;
 							ClientId=Ds_Objects.result.Tables.Table.Rows[0].ClientId;
-							txt_ScreenName.text="";
+							LoginType=Ds_Objects.result.Tables.Table.Rows[0].LoginType; 							txt_ScreenName.text="";
 							Grp_SWFLoader.removeAllElements(); 
 							if (Ds_Objects.result.Tables.Table3.Rows.length > 0)
 							{
@@ -98,7 +101,20 @@
 							{
 								Logo=Ds_Objects.result.Tables.Table1.Rows[0].Logo;
 								Dynamiclogo.source=Logo;//"Assets/asia.png";
+								if(Logo=='')
+								{
+									Dynamiclogo.source='http://sstage.in/Client_images/TempLogo.Jpg';
+								}
 							}
+							if(LoginType=="MasterClient")
+							{
+								if (Ds_Objects.result.Tables.Table4.Rows.length > 0)
+								{
+									Ddl_LoginType.prompt='Select Client';
+									Ddl_LoginType.dataProvider=Ds_Objects.result.Tables.Table4.Rows as ArrayCollection	
+								}		 
+								Ddl_LoginType.visible=false; 
+							} 
 						}
 						else
 						{
@@ -110,11 +126,11 @@
 					var ScrDtls:ArrayCollection = new ArrayCollection
 						([{
 							ScrNM:"",SctId:0,
-							UsrId:0,UsrName:0,sav:0,
+							UsrId:UserId,UsrName:0,sav:0,
 							Del:0,BranchId:0,BranchName:"",
 							KitchenId:0,KitchenName:"",
 							ServicePath:ServicePath,ReportUrl:ReportUrl,
-							RoleId:0,RoleName:'Master'
+							RoleId:0,RoleName:'Profile'
 						}]);
 					GlobalXml="";
 					GlobalXml += "<ROOT>";
@@ -123,7 +139,7 @@
 					useWeb("MenuScreen","Data_CUSTOM",[GlobalXml,'DATALOAD',ClientId,0,'','','']);
 				}
 				if (Ds_Objects.currentTarget.description.toString() == "Data_CUSTOM")
-				{   brd_details.visible=true;
+				{    
 					Grd_PaymentTypes.dataProvider=null; 
 					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
 					{
@@ -131,17 +147,41 @@
 					}
 				}
 				if (Ds_Objects.currentTarget.description.toString() == "Data_CUSTOM")
-				{   brd_details.visible=true;
+				{   
 					Grd_CityWise.dataProvider=null; 
 					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
 					{
 						Grd_CityWise.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection
 					}
 				}
+				if (Ds_Objects.currentTarget.description.toString() == "Search_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows[0].EmailId =="EmailId Is Incorrect")
+					{
+						Txt_forgot.text="";
+						alignAlert(Alert.show("Your MailId is Not Match.","Error Message !",Alert.OK,
+							this,null,iconWarning),10);
+					}
+					else
+					{
+						Logout();
+						Txt_forgot.text="";
+						alignAlert(Alert.show("Your Pasword has been Send To Your Email.","Alert Message !",Alert.OK, 
+							null, null,iconWarning, Alert.OK),10,'');					
+					}
+					
+				}
 			}
 			private static var CtrlID:ArrayCollection=new ArrayCollection();
 			private function Menu_Load():void
 			{ 
+//				if((Ddl_LoginType.visible==true)&&(Ddl_LoginType.selectedItem.label=="Select"))
+//				{
+//					alignAlert(Alert.show("Select Branch...","Alert !",Alert.OK, null, null,iconWarning, Alert.OK),10);
+//				}
+//				else
+//				{
+//					Ddl_LoginType.visible=false;
 				var NewControl:Object;
 				var CtrlType:String="";
 				var Grp_Type:String="";
@@ -152,15 +192,15 @@
 				{
 					var _x:int=0;
 					var _y:int=17;	
-					if(Modual_AC[i].ModuleName== "Master")
+					if(Modual_AC[i].ModuleName== "Profile")
 					{
 						Grp_Type="Grp_Master";
-						_x=50;
+						_x=1060;
 						NewControl = new mx.controls.Label;
 						NewControl.id = "lbl1" + i;
 						NewControl.text= Modual_AC[i].ModuleName;
 						NewControl.setStyle("color","#F90808");
-						NewControl.x =40;
+						NewControl.x =1150;
 						NewControl.y=17;	
 						Grp_Master.addElement(NewControl as mx.controls.Label)
 					}
@@ -180,12 +220,12 @@
 					else if(Modual_AC[i].ModuleName== "Report")
 					{
 						Grp_Type="Grp_Report";
-						_x=50;
+						_x=1150;
 						NewControl = new mx.controls.Label;
 						NewControl.id = "lbl1" + i;
 						NewControl.text= Modual_AC[i].ModuleName;
 						NewControl.setStyle("color","#F90808");
-						NewControl.x =40;
+						NewControl.x =1200;
 						NewControl.y=17;	
 						Grp_Report.addElement(NewControl as mx.controls.Label)
 					}
@@ -227,11 +267,11 @@
 				var ScrDtls:ArrayCollection = new ArrayCollection
 					([{
 						ScrNM:"",SctId:0,
-						UsrId:0,UsrName:0,sav:0,
+						UsrId:UserId,UsrName:0,sav:0,
 						Del:0,BranchId:0,BranchName:"",
 						KitchenId:0,KitchenName:"",
 						ServicePath:ServicePath,ReportUrl:ReportUrl,
-						RoleId:0,RoleName:'Master'
+						RoleId:0,RoleName:'Profile'
 					}]);
 				GlobalXml="";
 				GlobalXml += "<ROOT>";
@@ -251,6 +291,7 @@
 				brd_details.visible=false;
 				Brd_forgot.visible=false;
 				txt_User.enabled=true;
+				Ddl_LoginType.visible=false;
 			}
 			private function SighIn():void
 			{
@@ -281,58 +322,44 @@
 				GlobalXml += ObjToXmlStr_Comm(ScrDtls,"GlobalXml")
 				GlobalXml += "</ROOT>"; 
 				useWeb("MenuScreen","User_CUSTOM",[GlobalXml,'User',0,0,'',txt_User.text,txt_Password.text]); 
+				
 			}
 			
 			private function MenuClick(event:Event):void
 			{
-				var Ddl_Id:String=event.target.id;
-				var Arr_Screen:Array=new Array();
-				Arr_Screen=Ddl_Id.split(',');
-				var ScrDtls:ArrayCollection = new ArrayCollection
-					([{
-						ScrNM:Arr_Screen[3],SctId:Arr_Screen[2],
-						UsrId:UserId,UsrName:UserName,sav:1,
-						Del:1,ServicePath:ServicePath,ReportUrl:ReportUrl
-					}]);
-				Global_ACMu=ScrDtls					
-				Grp_SWFLoader.removeAllElements();
-				swfLoader.unloadAndStop(true);
-				Grp_SWFLoader.addElement(swfLoader);
-				cursorManager.setBusyCursor();						
-				swfLoader.cachePolicy = "off"; 
-				swfLoader.load(Arr_Screen[1]);				
-				txt_ScreenName.text =Arr_Screen[3];							
-				Grp_SWFLoader.visible=true;												
-				cursorManager.removeBusyCursor();
-				brd_details.visible=false;
-			}
-			
-			//			private function MenuClick(Str:String,Str2:String):void
-			//			{
-			//				var ScrDtls:ArrayCollection = new ArrayCollection
-			//					([{
-			//						ScrNM:"",SctId:1,
-			//						UsrId:1,UsrName:"mini",sav:1,
-			//						Del:1,ServicePath:ServicePath,ReportUrl:ReportUrl
-			//					}]);
-			//				Global_ACMu=ScrDtls				
-			//				
-			//				Grp_SWFLoader.removeAllElements();
-			//				swfLoader.unloadAndStop(true);
-			//				Grp_SWFLoader.addElement(swfLoader);
-			//				cursorManager.setBusyCursor();						
-			//				swfLoader.cachePolicy = "off"; 
-			//				swfLoader.load(Str);
-			//				
-			//				txt_ScreenName.text =Str2;
-			//				Grp_SWFLoader.visible=true;												
-			//				cursorManager.removeBusyCursor();
-			//				brd_details.visible=false;
-			//			}
+				
+//				if((Ddl_LoginType.visible==true)&&(Ddl_LoginType.prompt=="Select Client"))
+//				{
+//					alignAlert(Alert.show("Select Client...","Alert !",Alert.OK, null, null,iconWarning, Alert.OK),10);
+//				}
+//				else
+//				{
+					var Ddl_Id:String=event.target.id;
+					var Arr_Screen:Array=new Array();
+					Arr_Screen=Ddl_Id.split(',');
+					var ScrDtls:ArrayCollection = new ArrayCollection
+						([{
+							ScrNM:Arr_Screen[3],SctId:Arr_Screen[2],
+							UsrId:UserId,UsrName:UserName,sav:1,
+							Del:1,ServicePath:ServicePath,ReportUrl:ReportUrl
+						}]);
+					Global_ACMu=ScrDtls					
+					Grp_SWFLoader.removeAllElements();
+					swfLoader.unloadAndStop(true);
+					Grp_SWFLoader.addElement(swfLoader);
+					cursorManager.setBusyCursor();						
+					swfLoader.cachePolicy = "off"; 
+					swfLoader.load(Arr_Screen[1]);				
+					txt_ScreenName.text =Arr_Screen[3];							
+					Grp_SWFLoader.visible=true;												
+					cursorManager.removeBusyCursor();
+					brd_details.visible=false;
+			//	}
+			} 
 			private function RollOver(str:String):void
 			{
 				MoveDown_Menu1.play();
-				if(str=="Master")
+				if(str=="Profile")
 				{
 					Grp_Booking.visible=false; 
 					Grp_Report.visible=false;
@@ -367,6 +394,7 @@
 				Txt_forgot.setFocus();
 				brd_details.visible=false;
 				txt_User.enabled=false;
+				Txt_forgot.text="";
 			}
 			protected function SendEmail():void
 			{
@@ -401,7 +429,7 @@
 						Del:0,BranchId:0,BranchName:"",
 						KitchenId:0,KitchenName:"",
 						ServicePath:ServicePath,ReportUrl:ReportUrl,
-						RoleId:0,RoleName:"Master"
+						RoleId:0,RoleName:"Profile"
 					}]);
 				GlobalXml="";
 				GlobalXml += "<ROOT>";
@@ -416,6 +444,15 @@
 			protected function EmailValidator_invalidHandler(event:ValidationResultEvent):void
 			{
 				ErrMsg="*  Email  "+event.message+".\n";
+			}
+			
+			public function Change_LoginType():void
+			{
+				var ClientName:String="";
+				ClientName=Ddl_LoginType.selectedItem.label;
+				Ddl_LoginType.prompt=ClientName;
+				ClientId=Ddl_LoginType.selectedItem.zClientId;
+				//useWeb("MenuScreen","Data_CUSTOM",[GlobalXml,'DATALOAD',ClientId,0,'','','']);
 			}
 		]]>
 	</fx:Script>
@@ -439,8 +476,10 @@
 						
 					</s:BitmapImage>
 					<!--s:Image width="177" height="52" source="assets/logo1.png"/-->
-					<s:VGroup width="100%" height="100%" verticalAlign="bottom" horizontalAlign="left">
-					</s:VGroup>
+					<s:HGroup width="100%" height="100%" verticalAlign="middle" horizontalAlign="right">
+						<s:DropDownList id="Ddl_LoginType" width="250" height="23"
+										change="Change_LoginType()" tabIndex="1" visible="false"/>
+					</s:HGroup>
 				</s:HGroup>
 				<s:HGroup width="50%" height="100%" verticalAlign="middle" horizontalAlign="right">
 					<s:BorderContainer width="316" height="48" borderVisible="false" >
@@ -469,17 +508,18 @@
 		<s:BorderContainer width="100%" height="30" borderVisible="false" backgroundColor="#eb1c24">
 			<s:HGroup x="0" y="0" width="100%" height="100%" id="Grp_MenuLoad" verticalAlign="middle" gap="15">
 				<s:Spacer width="10"/> 
-				<s:Label color="#ffffff" text="Master" fontFamily="Georgia" fontWeight="bold" 
-						 buttonMode="true" rollOver="RollOver('Master')"/>	
 				<s:Label color="#ffffff" text="Booking" fontFamily="Georgia" fontWeight="bold" 
 						 buttonMode="true" rollOver="RollOver('BK')"/>
-				<s:Label color="#ffffff" text="Report" fontFamily="Georgia" fontWeight="bold" 
-						 buttonMode="true" rollOver="RollOver('RT')"/> 
+				
 				
 				
 			</s:HGroup>
 			<s:HGroup x="0" y="0" width="98%" height="100%" id="Grp_MenuLoad1" verticalAlign="middle" horizontalAlign="right" gap="15" visible="true">			
 				<s:Label id="txt_ScreenName" fontFamily="Georgia" fontSize="15"/>
+				<s:Label y="500" color="#ffffff" text="Profile" fontFamily="Georgia" fontWeight="bold" 
+						 buttonMode="true" rollOver="RollOver('Profile')"/>	 
+				<s:Label color="#ffffff" text="Report" fontFamily="Georgia" fontWeight="bold" 
+						 buttonMode="true" rollOver="RollOver('RT')"/> 
 			</s:HGroup>
 		</s:BorderContainer>
 	</s:VGroup>
@@ -493,7 +533,7 @@
 					<mx:VRule x="11" y="99" width="14" height="272" strokeWidth="2" strokeColor="#eb1c24"/>
 				</s:HGroup>
 				<s:Group width="45%" height="100%">
-					<s:Label x="24" y="148" text="Sign in to your nest account." fontFamily="Serif"  color="#eb1c24" fontSize="17"/>
+					<s:Label x="24" y="148" text="Sign in to your account." fontFamily="Serif"  color="#eb1c24" fontSize="17"/>
 					<s:Label x="24" y="188" text="User" fontSize="15"   fontWeight="bold"/>
 					<s:Label x="24" y="261" text="Password" fontSize="15"   fontWeight="bold"/>
 					<mx:TextInput x="24" y="209" width="228" borderVisible="false" tabIndex="1" id="txt_User"/>
@@ -510,7 +550,7 @@
 	</s:HGroup>	
 	<s:BorderContainer x="0" y="-1500" depth="20" id="Brd_Menu1" width="100%" height="190" borderVisible="false" backgroundColor="#eeeeee" visible="true" rollOut="RollOut()">
 		<s:Group x="0" y="10" width="100%" height="100%" id="Grp_Master" visible="false"> 
-			<!--mx:LinkButton x="162" y="47" label="Property Add" click="MenuClick('PropertyManagement.swf','Master')" textAlign="left"/-->
+			<!--mx:LinkButton x="162" y="47" label="Property Add" click="MenuClick('PropertyManagement.swf','Profile')" textAlign="left"/-->
 		</s:Group>
 		<s:Group x="0" y="10" width="100%" height="100%" id="Grp_Booking" visible="false">	
 			<!--mx:Label x="40" y="17" text="Report's" color="#eb1c24"/-->
@@ -540,21 +580,23 @@
 	<s:BorderContainer x="0" y="80" width="100%" height="100%" visible="true" id="brd_details" > 
 		<!--s:Scroller left="0" right="1" top="0" bottom="-171"   visible="false"-->
 		<s:HGroup width="100%" height="100%" >  
-			<s:BorderContainer x="0" y="0" width="99%" height="100%"  visible="true" borderVisible="false"> 
-				<s:Label x="128" y="86" width="96"    text="Payment Modes" fontWeight="bold"/> 
-				<mx:DataGrid id="Grd_PaymentTypes" depth="100" x="120" y="112" width="400" height="350" tabIndex="10"
-							 borderStyle="outset"> 
+			<s:BorderContainer x="0" y="0" width="50%" height="100%"  visible="true" borderVisible="false"> 
+				<s:Label x="48" y="86" width="96"    text="Payment Modes" fontWeight="bold"/> 
+				<mx:DataGrid id="Grd_PaymentTypes" depth="100" x="90" y="112" width="400" height="350" tabIndex="10"
+							 borderStyle="outset" verticalAlign="middle"> 
 					<mx:columns>		 	
 						<mx:DataGridColumn dataField="TotalSpend" width="100"  headerText="Total Spend For Month"  textAlign="center" />
-						<mx:DataGridColumn dataField="Amount" width="100" headerText="TotalAmount"  textAlign="center"/>
+						<mx:DataGridColumn dataField="Amount" width="100" headerText="Amount"  textAlign="center"/>
 						
 					</mx:columns>
 				</mx:DataGrid> 
-				<s:Label x="798" y="86" width="96"    text="CityWise" fontWeight="bold"/>
-				<mx:DataGrid id="Grd_CityWise" depth="100" x="780" y="112" width="400" height="350" tabIndex="10"
-							 borderStyle="outset"> 
+				</s:BorderContainer>
+				<s:BorderContainer x="0" y="0" width="50%" visible="true"  height="100%" borderVisible="false">
+				<s:Label x="60" y="86" width="96"    text="City Wise" fontWeight="bold"/>
+				<mx:DataGrid id="Grd_CityWise" depth="100" x="100" y="112" width="400" height="350" tabIndex="10"
+							 borderStyle="outset" visible="true" verticalAlign="middle"> 
 					<mx:columns>		 	
-						<mx:DataGridColumn dataField="CityName" width="100"  headerText="City Name"  textAlign="center" />
+						<mx:DataGridColumn dataField="CityName" width="180"  headerText="City Name"  textAlign="center" />
 						<mx:DataGridColumn dataField="Amount" width="100" headerText="Amount"  textAlign="center"/>
 						
 					</mx:columns>

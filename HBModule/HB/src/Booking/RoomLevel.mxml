@@ -11,6 +11,10 @@
 		<mx:EmailValidator id="EmailValidator" invalid="EmailValidator_invalidHandler(event)"
 						   valid="EmailValidator_validHandler(event)"/>
 		<mx:NumberFormatter id="NF_Two" precision="2"/>
+		<!--mx:ZipCodeValidator id="zipV" 
+		source="{Txt}" 
+		property="text"/-->
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
 	<fx:Script source = "..\\Common\\CommonScript.as"/>
 	<fx:Script source = "..\\Common\\Functions.as"/>
@@ -31,6 +35,7 @@
 			import mx.formatters.NumberFormatter;
 			import mx.managers.IFocusManager;
 			import mx.messaging.AbstractConsumer;
+			import mx.skins.halo.BusyCursor;
 			
 			import org.hamcrest.object.strictlyEqualTo;
 			import org.hamcrest.text.SubstringMatcher;
@@ -58,11 +63,16 @@
 			public var Ac_DdlValue:ArrayCollection = new ArrayCollection();
 			protected function Application1_creationCompleteHandler(event:FlexEvent):void
 			{
+				// @Action NVARCHAR(100),@Str1 NVARCHAR(100),@Str2 NVARCHAR(100),@ChkInDt NVARCHAR(100),
+				// @ChkOutDt NVARCHAR(100),@StateId BIGINT,@CityId BIGINT,@ClientId BIGINT,
+				// @PropertyId BIGINT,@GradeId BIGINT,@Id1 BIGINT,@Id2 BIGINT)
 				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
 				GlobalXml="";
 				GlobalXml += "<ROOT>";
 				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
-				GlobalXml += "</ROOT>";				
+				GlobalXml += "</ROOT>";
+				//Hlp_Client.text=GlobalXml;
+				//<ROOT><GlobalXml ScrNM= 'Screen&amp;Name&amp;'  UsrName= 'ADMIN'  UsrId= '4'  sav= 'true'  ServicePath= ''  RoleId= '0'  RoleName= ''  SctId= '551'  ReportUrl= ''  Del= 'true'   /></ROOT>
 				Grd_Guest._clear();Pnl.visible=false;
 				Lbl_Sales.text="Sales Person";Lbl_CRM.text="CRM Person";												
 				Bdr_Tab2.visible=false;Bdr_Tab3.visible=false;
@@ -81,13 +91,58 @@
 				var qaz:ArrayCollection=new ArrayCollection();
 				Grd_RecommendedProperty.dataProvider=qaz;
 				Tcl_Time.setTime=new Date("11/11/11,12:00:00");
+				Ddl_AMPM.selectedItem="PM";
 				Chk_MMT.selected=true;
 				Chk_MMT.visible=false;
 				Txt_HRPolicyOverrideRemarks.visible = false;
 				Btn_AdvancePaid.visible=false;
 				Hlp_Client.visible = true;
-				FnHelp_PageLoad();FnHelp_Title();								
-				var ss:String=Global_AC[0].UsrId;
+				Chk_PaymentEmail.selected = true;
+				resultsTxtField.visible = false;
+				FnHelp_PageLoad();FnHelp_Title();
+				//useWeb("BookingPayment","BookingPayment_CUSTOM",[GlobalXml,"PaymentEmail","","",7160,0]);// payment email
+				//var str:String = "12,12,12,12,12.00";
+				//str = str.toLowerCase(); //thi$ i$ a t#%%ible exam73@
+				//var start:Date=new Date();var end:Date=new Date(2015,3,1);				
+				//var num:Number= (end.getUTCFullYear() - start.getUTCFullYear()) * 12 +(end.getUTCMonth() - start.getUTCMonth());								
+				//useWeb("BOOKING","Tab2_to_Tab3_Dtls_CUSTOM",[GlobalXml,'Tab2_to_Tab3_Dtls','','','','',0,0,0,0,0,26,0]);				
+				var ss:String=Global_AC[0].UsrId;				
+				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Room',11223]);
+				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,"RoomResend",10709]);				
+				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Bed',9614]);
+				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Apartment',2027]);
+				//useWeb("BookingMail","RecommendMail_CUSTOM",[GlobalXml,'Recommend',5809]);
+				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'MMT',5765]);
+				//useWeb("BookingMail","SendSMS_CUSTOM",[GlobalXml,'SMS',10564]);// S M S
+				/*var ChkInDt:String="2015-03-01 12:00:00 PM";
+				var ChkOutDt:String="2015-03-02 12:00:00 PM";
+				CityId = 0;
+				useWeb("API","API_CUSTOM",[GlobalXml,'GetAPIdata',CityId,ChkInDt,ChkOutDt]);*/
+				/*var ChkInDt:String="2015-03-01";
+				var ChkOutDt:String="2015-03-02";
+				CityId = 0;
+				useWeb("API","GetAPIdataJson_CUSTOM",[GlobalXml,'GetAPIdataJson',CityId,ChkInDt,ChkOutDt]);*/
+				//useWeb("API","123_CUSTOM",[GlobalXml,'StaticData']); // STATIC HOTEL INSERT & UPDATE				
+				//useWeb("API","MMT_CUSTOM",[GlobalXml,'MMTdata','','','','',31,0,0,0]);				
+				//StringValid.source("s!a@");
+				/*var dsfsd:String=",@#$%^";
+				var str1:String = dsfsd.replace(",","");
+				var str2:String = str1.replace("@","");
+				var str3:String = str2.replace("#","");
+				var str4:String = str3.replace("$","");
+				var str5:String = str4.replace("%","");
+				var str6:String = str5.replace("^","");
+				var ds:String = String(str6.length);*/
+				/*Bdr_Tab2.visible=false;Bdr_Tab3.visible=true;
+				Btn_Tab1.setStyle("backgroundColor","#c2c2c2");
+				Lbl_Tab1.setStyle("color","#ffffff");				
+				Btn_Tab2.setStyle("backgroundColor","#c2c2c2");
+				Lbl_Tab2.setStyle("color","#ffffff");				
+				Btn_Tab3.setStyle("backgroundColor","#eb1c24");
+				Lbl_Tab3.setStyle("color","#ffffff");
+				useWeb("BOOKING","Tab2_to_Tab3_Dtls_CUSTOM",
+				[GlobalXml,'Tab2_to_Tab3_Dtls','','','','',0,0,0,0,0,5091,0]);*/
+				//FnImageBrowse();
 			}
 			
 			protected function FnHelp_PageLoad():void
@@ -136,8 +191,10 @@
 					{
 						APIHdrId = Ds_Objects.result.Tables.Table1.Rows[0].Str;
 					}
+					//
 					var Ac_Gst:ArrayCollection=new ArrayCollection();
 					Ac_Gst=Grd_Guest._getGridSrc as ArrayCollection;					
+					//					
 					useWeb("BOOKING","Property_CUSTOM",[GlobalXml,'Property',
 						GradeName,GuestIds,ChkInDt,ChkOutDt,APIHdrId,CityId,ClientId,Ac_Gst.length,GradeId,0,0]);					
 				}
@@ -152,6 +209,7 @@
 					{
 						Dt_ChkInDt.text=Ds_Objects.result.Tables.Table1.Rows[0].CDt;
 						Dt_ChkOutDt.text=Ds_Objects.result.Tables.Table1.Rows[0].NDt;
+						//
 						var Dt:String = Dt_ChkInDt.text;										
 						var Y:String = Dt.substr(6,10);
 						var M:String = String(Dt.substr(3,2));
@@ -159,8 +217,10 @@
 						var RangeStart:String = Y+'/'+M+'/'+D;						
 						Dt_ChkOutDt.selectableRange = {rangeStart:new Date(RangeStart)};
 						Dt_ChkOutDt.selectedDate = new Date(RangeStart);
+						//
 						var D1:String =String(Number(Dt.substr(0,2)));
 						var RangeStart1:String = Y+'/'+M+'/'+D1;
+						//Dt_ChkInDt.selectableRange = {rangeStart:new Date(RangeStart1)};
 						Txt_StayDays.text = "1";
 					}
 					if (Ds_Objects.result.Tables.Table2.Rows.length > 0)
@@ -244,14 +304,18 @@
 										Hlp_Column1.dataProvider = null;
 										Hlp_Column1.fnClear();
 									}
+									//Chk_C1.selected = false;
 									Lbl_C1Name.visible = true;
 									Lbl_C1M.visible = true;									
-									Hlp_Column1.visible = true;								
+									Hlp_Column1.visible = true;									
+									//Chk_C1.visible = true;									
 								}
 								else
 								{
 									Lbl_C1M.text = "";
 									Hlp_Column1.fnClear();
+									//Chk_C1.visible = false;
+									//Chk_C1.selected = false;
 									Lbl_C1Name.visible = false;
 									Lbl_C1M.visible = false;									
 									Hlp_Column1.visible = false;							
@@ -284,7 +348,9 @@
 									}
 									Lbl_C2Name.visible = true;
 									Lbl_C2M.visible = true;
+									//Chk_C2.visible = true;
 									Hlp_Column2.visible = true;
+									//Chk_C2.selected = false;
 								}
 								else
 								{
@@ -292,6 +358,7 @@
 									Hlp_Column2.fnClear();
 									Lbl_C2Name.visible = false;
 									Lbl_C2M.visible = false;
+									//Chk_C2.visible = false;
 									Hlp_Column2.visible = false;									
 								}
 							}
@@ -319,17 +386,21 @@
 										Hlp_Column3.dataProvider = null;
 										Hlp_Column3.fnClear();
 									}
+									//Chk_C3.selected = false;
 									Lbl_C3Name.visible = true;
 									Lbl_C3M.visible = true;
 									Hlp_Column3.visible = true;
+									//Chk_C3.visible = true;
 								}
 								else
 								{
 									Lbl_C3M.text = "";									
 									Hlp_Column3.fnClear();
+									//Chk_C3.selected = false;
 									Lbl_C3Name.visible = false;
 									Lbl_C3M.visible = false;
 									Hlp_Column3.visible = false;
+									//Chk_C3.visible = false;
 								}
 							}
 							if(Ac_Column[q].Id == 4)
@@ -359,6 +430,8 @@
 									Lbl_C4Name.visible = true;
 									Lbl_C4M.visible = true;
 									Hlp_Column4.visible = true;
+									//Chk_C4.selected = false;
+									//Chk_C4.visible = true;
 								}
 								else
 								{
@@ -367,6 +440,8 @@
 									Lbl_C4M.text = "";
 									Hlp_Column4.visible = false;
 									Hlp_Column4.fnClear();
+									//Chk_C4.selected = false;
+									//Chk_C4.visible = false;
 								}
 							}
 							if(Ac_Column[q].Id == 5)
@@ -396,6 +471,8 @@
 									Lbl_C5Name.visible = true;
 									Lbl_C5M.visible = true;
 									Hlp_Column5.visible = true;
+									//Chk_C5.visible = true;
+									//Chk_C5.selected = false;
 								}
 								else
 								{
@@ -404,6 +481,8 @@
 									Lbl_C5M.text = "";
 									Hlp_Column5.visible = false;
 									Hlp_Column5.fnClear();
+									//Chk_C5.visible = false;
+									//Chk_C5.selected = false;
 								}
 							}
 							if(Ac_Column[q].Id == 6)
@@ -432,6 +511,8 @@
 									Lbl_C6M.visible = true;									
 									Hlp_Column6.visible = true;
 									Hlp_Column6.fnClear();
+									//Chk_C6.selected = false;
+									//Chk_C6.visible = true;
 								}
 								else
 								{
@@ -440,6 +521,8 @@
 									Lbl_C6M.text = "";
 									Hlp_Column6.visible = false;
 									Hlp_Column6.fnClear();
+									//Chk_C6.selected = false;
+									//Chk_C6.visible = false;
 								}
 							}
 							if(Ac_Column[q].Id == 7)
@@ -458,16 +541,20 @@
 									if (Ds_Objects.result.Tables.Table7.Rows.length > 0)
 									{
 										Hlp_Column7.dataProvider = null;
+										//Hlp_Column7.fnClear();
 										Hlp_Column7.dataProvider = Ds_Objects.result.Tables.Table7.Rows as ArrayCollection;
 									}
 									else
 									{
 										Hlp_Column7.dataProvider = null;
+										//Hlp_Column7.fnClear();
 									}
 									Lbl_C7Name.visible = true;
 									Lbl_C7M.visible = true;
 									Hlp_Column7.visible = true;									
 									Hlp_Column7.fnClear();
+									//Chk_C7.selected = false;
+									//Chk_C7.visible = true;
 								}
 								else
 								{
@@ -476,6 +563,8 @@
 									Hlp_Column7.visible = false;
 									Lbl_C7M.text = "";									
 									Hlp_Column7.fnClear();
+									//Chk_C7.selected = false;
+									//Chk_C7.visible = false;
 								}
 							}
 							if(Ac_Column[q].Id == 8)
@@ -494,16 +583,20 @@
 									if (Ds_Objects.result.Tables.Table8.Rows.length > 0)
 									{
 										Hlp_Column8.dataProvider = null;
+										//Hlp_Column8.fnClear();
 										Hlp_Column8.dataProvider = Ds_Objects.result.Tables.Table8.Rows as ArrayCollection;
 									}
 									else
 									{
 										Hlp_Column8.dataProvider = null;
+										//Hlp_Column8.fnClear();
 									}
 									Lbl_C8Name.visible = true;
 									Lbl_C8M.visible = true;									
 									Hlp_Column8.visible = true;
 									Hlp_Column8.fnClear();
+									//Chk_C8.selected = false;
+									//Chk_C8.visible = true;
 								}
 								else
 								{
@@ -512,6 +605,8 @@
 									Lbl_C8M.text = "";
 									Hlp_Column8.visible = false;
 									Hlp_Column8.fnClear();
+									//Chk_C8.selected = false;
+									//Chk_C8.visible = false;
 								}
 							}
 							if(Ac_Column[q].Id == 9)
@@ -542,6 +637,8 @@
 									Lbl_C9M.visible = true;									
 									Hlp_Column9.visible = true;
 									Hlp_Column9.fnClear();
+									//Chk_C9.selected = false;
+									//Chk_C9.visible = true;
 								}
 								else
 								{
@@ -550,6 +647,8 @@
 									Lbl_C9M.text = "";
 									Hlp_Column9.visible = false;
 									Hlp_Column9.fnClear();
+									//Chk_C9.selected = false;
+									//Chk_C9.visible = false;
 								}
 							}
 							if(Ac_Column[q].Id == 10)
@@ -580,6 +679,8 @@
 									Lbl_C10M.visible = true;									
 									Hlp_Column10.visible = true;
 									Hlp_Column10.fnClear();
+									//Chk_C10.visible = true;
+									//Chk_C10.selected = false;
 								}
 								else
 								{
@@ -588,24 +689,276 @@
 									Lbl_C10M.text = "";
 									Hlp_Column10.visible = false;
 									Hlp_Column10.fnClear();
+									//Chk_C10.visible = false;
+									//Chk_C10.selected = false;
 								}
 							}
-							Hlp_Column1.text = Hlp_Client.text=Ds_Objects.result.Tables.Table11.Rows[0].Column1;
-							Hlp_Column2.text = Hlp_Client.text=Ds_Objects.result.Tables.Table11.Rows[0].Column2;
-							Hlp_Column3.text = Hlp_Client.text=Ds_Objects.result.Tables.Table11.Rows[0].Column3;
-							Hlp_Column4.text = Hlp_Client.text=Ds_Objects.result.Tables.Table11.Rows[0].Column4;
-							Hlp_Column5.text = Hlp_Client.text=Ds_Objects.result.Tables.Table11.Rows[0].Column5;
-							Hlp_Column6.text = Hlp_Client.text=Ds_Objects.result.Tables.Table11.Rows[0].Column6;
-							Hlp_Column7.text = Hlp_Client.text=Ds_Objects.result.Tables.Table11.Rows[0].Column7;
-							Hlp_Column8.text = Hlp_Client.text=Ds_Objects.result.Tables.Table11.Rows[0].Column8;
-							Hlp_Column9.text = Hlp_Client.text=Ds_Objects.result.Tables.Table11.Rows[0].Column9;
-							Hlp_Column10.text = Hlp_Client.text=Ds_Objects.result.Tables.Table11.Rows[0].Column10;
+							Hlp_Column1.text = Ds_Objects.result.Tables.Table11.Rows[0].Column1;
+							Hlp_Column2.text = Ds_Objects.result.Tables.Table11.Rows[0].Column2;
+							Hlp_Column3.text = Ds_Objects.result.Tables.Table11.Rows[0].Column3;
+							Hlp_Column4.text = Ds_Objects.result.Tables.Table11.Rows[0].Column4;
+							Hlp_Column5.text = Ds_Objects.result.Tables.Table11.Rows[0].Column5;
+							Hlp_Column6.text = Ds_Objects.result.Tables.Table11.Rows[0].Column6;
+							Hlp_Column7.text = Ds_Objects.result.Tables.Table11.Rows[0].Column7;
+							Hlp_Column8.text = Ds_Objects.result.Tables.Table11.Rows[0].Column8;
+							Hlp_Column9.text = Ds_Objects.result.Tables.Table11.Rows[0].Column9;
+							Hlp_Column10.text = Ds_Objects.result.Tables.Table11.Rows[0].Column10;
 						}
 						Pnl_CustomFields.visible = true;
 						Btn_BackTab3.enabled = false;
 						Btn_Backed.enabled = false;
-					}					
-				}				
+					}
+					return;
+					//else
+					{
+						Hlp_Column1.fnClear();Hlp_Column2.fnClear();Hlp_Column3.fnClear();
+						Hlp_Column4.fnClear();Hlp_Column5.fnClear();Hlp_Column6.fnClear();
+						Hlp_Column7.fnClear();Hlp_Column8.fnClear();Hlp_Column9.fnClear();
+						Hlp_Column10.fnClear();
+						var Ac1:ArrayCollection = new ArrayCollection();
+						Ac1 = Grd_PropertyAssignedGuest.dataProvider as ArrayCollection; 
+						var RoomCaptured:Number = 0,maxValue:Number = 1;
+						for each (var o:Object in Ac1)
+						{
+							if (o.RoomCaptured > maxValue)
+							{
+								maxValue = o.RoomCaptured;
+							}
+						}				
+						RoomCaptured = maxValue + 1;				
+						var Ac_GuestTab3:ArrayCollection = new ArrayCollection();
+						Ac_GuestTab3 = Grd_GuestTab3.dataProvider as ArrayCollection;
+						var Len:int = Ac_GuestTab3.length;
+						Grd_GuestTab3.dataProvider = null;
+						for(var j:int = 0; j < Len; j++)
+						{
+							if(Ac_GuestTab3[j].Tick == 1)
+							{
+								Cnt = Cnt + 1;
+								Ac1.addItem
+									({EmpCode:Ac_GuestTab3[j].EmpCode,FirstName:Ac_GuestTab3[j].FirstName,
+										LastName:Ac_GuestTab3[j].LastName,GuestId:Ac_GuestTab3[j].GuestId,
+										Occupancy:Ddl_Occupancy.selectedItem,
+										RoomType:RoomType,Tariff:Number(Txt_Tariff.text),RoomId:RoomId,
+										BookingPropertyId:BookingPropertyId,SSPId:SSPId,
+										BookingPropertyTableId:BookingPropertyTableId,Id:0,
+										ServicePaymentMode:ServicePaymentMode,
+										TariffPaymentMode:TariffPaymentMode,
+										Name:Ac_GuestTab3[j].Name,RoomCaptured:RoomCaptured,
+										//
+										Column1:Hlp_Column1.text,Column2:Hlp_Column2.text,
+										Column3:Hlp_Column3.text,Column4:Hlp_Column4.text,
+										Column5:Hlp_Column5.text,Column6:Hlp_Column6.text,
+										Column7:Hlp_Column7.text,Column8:Hlp_Column8.text,
+										Column9:Hlp_Column9.text,Column10:Hlp_Column10.text
+									});
+								Ac_GuestTab3.removeItemAt(j);
+								j = 0;
+								Len = Ac_GuestTab3.length;
+								j = j - 1;
+							}					
+						}
+						Grd_GuestTab3.dataProvider = Ac_GuestTab3.source;
+						Grd_PropertyAssignedGuest.dataProvider = Ac1;
+						Btn_BackTab3.enabled = true;
+						Btn_Backed.enabled = true;
+						Pnl_CustomFields.visible = false;
+					}
+				}
+				/*if (Ds_Objects.currentTarget.description.toString() == "ComponentCreation_CUSTOM")
+				{
+				var y:int = 0,Y1:int = 0,X1:int = 0;
+				var LblName:String = "",LblValue:String = "",LblMandatory:String = "",LblId:String = "";
+				var value:ArrayCollection = new ArrayCollection();										
+				if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+				{
+				value = Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+				y = Y1 + 10;
+				for(var j:int = 0; j < value.length; j++)
+				{
+				LblName = value[j].FieldName;
+				LblMandatory = value[j].Mandatory;
+				LblId = value[j].Id;
+				if(LblMandatory == "true")
+				{
+				LblMandatory = "*";
+				}
+				else
+				{
+				LblMandatory = "";
+				}
+				CreateControl("Lbl",j,0,y,true,LblName,0);
+				CreateControl("Lbl1",j,165,y,true,LblMandatory,0);							
+				if(LblId == "1")
+				{
+				if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+				{
+				Ac_DdlValue = Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+				}
+				else
+				{
+				Ac_DdlValue = new ArrayCollection();
+				}
+				}
+				if(LblId == "2")
+				{
+				if (Ds_Objects.result.Tables.Table2.Rows.length > 0)
+				{
+				Ac_DdlValue = Ds_Objects.result.Tables.Table2.Rows as ArrayCollection;
+				}
+				else
+				{
+				Ac_DdlValue = new ArrayCollection();
+				}
+				}
+				if(LblId == "3")
+				{
+				if (Ds_Objects.result.Tables.Table3.Rows.length > 0)
+				{
+				Ac_DdlValue = Ds_Objects.result.Tables.Table3.Rows as ArrayCollection;
+				}
+				else
+				{
+				Ac_DdlValue = new ArrayCollection();
+				}
+				}
+				if(LblId == "4")
+				{
+				if (Ds_Objects.result.Tables.Table4.Rows.length > 0)
+				{
+				Ac_DdlValue = Ds_Objects.result.Tables.Table4.Rows as ArrayCollection;
+				}
+				else
+				{
+				Ac_DdlValue = new ArrayCollection();
+				}
+				}
+				if(LblId == "5")
+				{
+				if (Ds_Objects.result.Tables.Table5.Rows.length > 0)
+				{
+				Ac_DdlValue = Ds_Objects.result.Tables.Table5.Rows as ArrayCollection;
+				}
+				else
+				{
+				Ac_DdlValue = new ArrayCollection();
+				}
+				}
+				if(LblId == "6")
+				{
+				if (Ds_Objects.result.Tables.Table6.Rows.length > 0)
+				{
+				Ac_DdlValue = Ds_Objects.result.Tables.Table6.Rows as ArrayCollection;
+				}
+				else
+				{
+				Ac_DdlValue = new ArrayCollection();
+				}
+				}
+				if(LblId == "7")
+				{
+				if (Ds_Objects.result.Tables.Table7.Rows.length > 0)
+				{
+				Ac_DdlValue = Ds_Objects.result.Tables.Table7.Rows as ArrayCollection;
+				}
+				else
+				{
+				Ac_DdlValue = new ArrayCollection();
+				}
+				}
+				if(LblId == "8")
+				{
+				if (Ds_Objects.result.Tables.Table8.Rows.length > 0)
+				{
+				Ac_DdlValue = Ds_Objects.result.Tables.Table8.Rows as ArrayCollection;
+				}
+				else
+				{
+				Ac_DdlValue = new ArrayCollection();
+				}
+				}
+				if(LblId == "9")
+				{
+				if (Ds_Objects.result.Tables.Table9.Rows.length > 0)
+				{
+				Ac_DdlValue = Ds_Objects.result.Tables.Table9.Rows as ArrayCollection;
+				}
+				else
+				{
+				Ac_DdlValue = new ArrayCollection();
+				}
+				}
+				if(LblId == "10")
+				{
+				if (Ds_Objects.result.Tables.Table10.Rows.length > 0)
+				{
+				Ac_DdlValue = Ds_Objects.result.Tables.Table10.Rows as ArrayCollection;
+				}
+				else
+				{
+				Ac_DdlValue = new ArrayCollection();
+				}
+				}
+				CreateControl("Ddl",i,180,y,true,LblValue,0);							
+				CreateControl("txt",j,220,y,true,LblValue,0);
+				CreateControl("Lbl",j,250,y,false,LblId,0);
+				y = y + 40;
+				X1 = j;
+				}
+				Y1 = y + 40;
+				}
+				/*var value:ArrayCollection=new ArrayCollection
+				([{Name:"ABCDEFGHIJKLMNOPQRST",Value:"",Mandatory:"*",CustomFieldId:"0",Id:"0"},
+				{Name:"B",Value:"",Mandatory:"",CustomFieldId:"0",Id:"0"}]);
+				var value1:ArrayCollection=new ArrayCollection
+				([{Name:"C",Value:"",Mandatory:"*",CustomFieldId:"0",Id:"0"},
+				{Name:"D",Value:"",Mandatory:"",CustomFieldId:"0",Id:"0"}]);*/
+				/*if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+				{
+				var value1:ArrayCollection=new ArrayCollection();
+				value = Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+				if(value1.length > 0)
+				{
+				y = Y1 - 40;
+				}
+				else
+				{
+				y = Y1 + 10;
+				}
+				for(var i:int = 0; i < value.length; i++)
+				{
+				LblName=value[i].FieldName;
+				LblValue=value[i].FieldValue;
+				LblMandatory=value[i].Mandatory;
+				LblCustomFieldId=value[i].FieldId;
+				LblId = value[i].Id;
+				if(LblMandatory == "true")
+				{
+				LblMandatory = "*";
+				}
+				else
+				{
+				LblMandatory = "";
+				}
+				CreateControl("Lbl",i,0,y,true,LblName,0);
+				CreateControl("Lbl1",i,165,y,true,LblMandatory,0);
+				CreateControl("Ddl",i,180,y,true,LblValue,0);
+				CreateControl("Lbl",i,200,y,false,LblCustomFieldId,0);
+				CreateControl("Lbl",i,220,y,false,LblId,0);
+				y = y + 40;
+				X1 = i;
+				}
+				Y1 = y + 40;
+				}*/
+				/*if((value.length == 0)&&(value1.length == 0))
+				{
+				Btn_CustomFields.visible=false;Btn_CustomFields.width=-1;
+				}
+				else
+				{
+				Btn_CustomFields.visible=true;Btn_CustomFields.width=100;
+				}*/				
+				//}
 				if (Ds_Objects.currentTarget.description.toString() == "Property_CUSTOM")
 				{
 					Ddl_PropertyType.selectedItem="Property Type";
@@ -622,7 +975,18 @@
 					{
 						Grd_RecommendedProperty.dataProvider=Ds_Objects.result.Tables.Table1.Rows 
 							as ArrayCollection;
+					}				
+					/*var Acdsfds:ArrayCollection=new ArrayCollection();
+					Acdsfds=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					var dfda:Array=new Array();
+					var dfsf:String="";
+					for(var i:int = 0; i < Acdsfds.length; i++)
+					{
+					dfsf = dfsf + Acdsfds[i].Color + ',';
 					}					
+					dfda=dfsf.split(',');					
+					ac_color=dfsf.split(',');*/
+					
 				}
 				if (Ds_Objects.currentTarget.description.toString() == "Tab1_Next_CUSTOM")
 				{
@@ -670,6 +1034,8 @@
 				}
 				if (Ds_Objects.currentTarget.description.toString() == "RecommendMail_CUSTOM")
 				{
+					/*alignAlert(Alert.show("Recommended Property Send Successfully.","Message !",Alert.OK, 
+					null, null, iconTickLarge, Alert.OK),10,"");*/
 					alignAlert(Alert.show("Property Recommendation Sent Successfully","Message !",Alert.OK, 
 						null, null, iconTickLarge, Alert.OK),10,"");
 				}
@@ -689,7 +1055,7 @@
 						}
 						else
 						{
-							BookedId=0;
+							BookedId = 0;
 							alignAlert(Alert.show("Booking Confirmed Successfully.","Message !",Alert.OK, 
 								null, null, iconTickLarge, Alert.OK),10,"");
 						}
@@ -701,6 +1067,7 @@
 					{
 						var Ac_Gst1:ArrayCollection=new ArrayCollection();
 						Ac_Gst1=Grd_Guest._getGridSrc as ArrayCollection;
+						// again pre load in MMT
 						if(Hlp_TrackingNo.text != "")
 						{
 							useWeb("BOOKING","RmdPty_GuestDtls_CUSTOM",[GlobalXml,'RmdPty_GuestDtls',
@@ -711,34 +1078,48 @@
 							useWeb("BOOKING","Tab3_to_Tab2_CUSTOM",[GlobalXml,'Property',GradeName,GuestIds,
 								ChkInDt,ChkOutDt,APIHdrId,CityId,ClientId,Ac_Gst1.length,GradeId,BookedId,123]);
 						}
+						//alignAlert(Alert.show("No Rooms Avaliable.","Alert Message !",Alert.OK,null,null,iconWarning,Alert.OK),10,"");
 						alignAlert(Alert.show(Ds_Objects.result.Tables.Table.Rows[0].Strg,"Alert Message !",Alert.OK,
 							null,null,iconWarning,Alert.OK),10,"");
 					}
 					if(Ds_Objects.result.Tables.Table.Rows[0].Sts == "Yes")
 					{
-						BookedId=0;APIHdrId=0;
+						BookedId = 0;APIHdrId = 0;
 						alignAlert(Alert.show("Booking Confirmed Successfully.","Message !",Alert.OK, 
 							null, null, iconTickLarge, Alert.OK),10,"");
-						FnClear();
 					}
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "BookingPayment_CUSTOM")
+				{
+					alignAlert(Alert.show("Booking Payment eMail Sent Successfully.","Message !",Alert.OK, 
+						null, null, iconTickLarge, Alert.OK),10,"");
+					FnClear();
 				}
 				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
 				{					
 					if(Save_Method == "Direct Booking")
 					{
-						BookedId=Id;
-						if(PropertyType == "MMT")
+						BookedId = Id;
+						if(Chk_PaymentEmail.selected == true)
 						{
-							useWeb("API","MMT_CUSTOM",[GlobalXml,'MMTdata','','','','',BookedId,0,0,0]);							
+							if(PropertyType == "MMT")
+							{
+								useWeb("API","MMT_CUSTOM",[GlobalXml,'MMTdata','','','','',BookedId,0,0,0]);
+							}
+							else
+							{
+								useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Room',BookedId]);								
+							}
 						}
 						else
 						{
-							useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Room',BookedId]);
-							FnClear();
-						}						
-					}
+							useWeb("BookingPayment","BookingPayment_CUSTOM",[GlobalXml,"PaymentEmail","","",BookedId,0]);
+						}
+						FnClear();												
+					}					
 					if(Save_Method == "Tab2_to_Tab3")
 					{
+						Pnl123.visible = false;
 						Id=Ds_Objects.result.Tables.Table.Rows[0].Id;
 						Bdr_Tab2.visible=false;Bdr_Tab3.visible=true;
 						Btn_Tab1.setStyle("backgroundColor","#c2c2c2");
@@ -800,10 +1181,10 @@
 					Ddl_TariffPaymentMode.dataProvider=null;
 					Ddl_TariffPaymentMode.prompt="Tariff Payment Mode";
 					TariffPaymentMode="",ServicePaymentMode="";
-					Txt_AdvAmt.text="";Txt_Bank.text="";Txt_PropertyRefNo.text="";FilePath.text="";resultsTxtField.text="";
 					var qsx:ArrayCollection=new ArrayCollection();
 					Grd_PropertyAssignedGuest.dataProvider=qsx;Txt_SpecialRequirements.text="";
 					Txt_AdvAmt.text="";Txt_Bank.text="";
+					//
 					if(Ac_Pr1.length == 1)
 					{
 						var FDt:String = Dt_ChkInDt.text;										
@@ -816,13 +1197,17 @@
 						var TM:String = TDt.substr(3,2);
 						var TD:String = TDt.substr(0,2);
 						ChkOutDt=TY+'-'+TM+'-'+TD+' '+'11:59:00 AM';
+						//
 						BookingPropertyTableId=Ac_Pr1[0].Id;
 						BookingPropertyId=Ac_Pr1[0].PropertyId;
 						PropertyType=Ac_Pr1[0].PropertyType;
 						Ddl_Property.prompt=Ac_Pr1[0].label;
 						useWeb("BOOKING","BookingPropertyDtls_CUSTOM",[GlobalXml,'BookingPropertyDtls',
-							"","",ChkInDt,ChkOutDt,
-							0,0,0,BookingPropertyId,0,BookingPropertyTableId,0]);						
+							"","",ChkInDt,ChkOutDt, // Str
+							0,0,0,BookingPropertyId,0,BookingPropertyTableId,0]);
+						/*useWeb("BOOKING","BookingPropertyDtls_CUSTOM",[GlobalXml,'BookingPropertyDtls',
+						"","",Dt_ChkInDt.text,Dt_ChkOutDt.text, // Str
+						0,0,0,BookingPropertyId,0,BookingPropertyTableId,0]);*/
 					}
 					Lbl_ChkInDt.text=Dt_ChkInDt.text;Lbl_ChkOutDt.text=Dt_ChkOutDt.text;
 					
@@ -852,11 +1237,14 @@
 					TariffPaymentMode="",ServicePaymentMode="";
 					var dfg:ArrayCollection=new ArrayCollection();
 					Grd_PropertyAssignedGuest.dataProvider=dfg;Txt_SpecialRequirements.text="";
-					Txt_AdvAmt.text="";Txt_Bank.text="";Txt_PropertyRefNo.text="";FilePath.text="";resultsTxtField.text="";
+					Txt_AdvAmt.text="";Txt_Bank.text="";
+					//
 					BookingPropertyTableId=Ac_Pr[0].Id;
 					BookingPropertyId=Ac_Pr[0].PropertyId;
+					//ASD.text=String(BookingPropertyId);
 					PropertyType=Ac_Pr[0].PropertyType;
 					Ddl_Property.prompt=Ac_Pr[0].label;
+					//
 					var FDt1:String = Dt_ChkInDt.text;										
 					var FY1:String = FDt1.substr(6,10);
 					var FM1:String = FDt1.substr(3,2);
@@ -867,9 +1255,13 @@
 					var TM1:String = TDt1.substr(3,2);
 					var TD1:String = TDt1.substr(0,2);
 					ChkOutDt=TY1+'-'+TM1+'-'+TD1+' '+'11:59:00 AM';
+					//
 					useWeb("BOOKING","BookingPropertyDtls_CUSTOM",[GlobalXml,'BookingPropertyDtls',
-						"","",ChkInDt,ChkOutDt,
+						"","",ChkInDt,ChkOutDt, // Str
 						0,0,0,BookingPropertyId,0,BookingPropertyTableId,0]);
+					/*useWeb("BOOKING","BookingPropertyDtls_CUSTOM",[GlobalXml,'BookingPropertyDtls',
+					"","",Dt_ChkInDt.text,Dt_ChkOutDt.text, // Str
+					0,0,0,BookingPropertyId,0,BookingPropertyTableId,0]);*/
 				}				
 				if (Ds_Objects.currentTarget.description.toString() == "BookingPropertyDtls_CUSTOM")
 				{
@@ -887,15 +1279,15 @@
 					Grd_GuestTab3.dataProvider=null;
 					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
 					{
-						Ddl_TariffPaymentMode.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
-						if(PropertyType == "MMT")
+						Ddl_TariffPaymentMode.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;						
+						/*if(PropertyType == "MMT")
 						{
-							Ddl_ServicePaymentMode.dataProvider=Ds_Objects.result.Tables.Table4.Rows as ArrayCollection;
+						Ddl_ServicePaymentMode.dataProvider=Ds_Objects.result.Tables.Table4.Rows as ArrayCollection;
 						}
 						if(PropertyType != "MMT")
 						{
-							Ddl_ServicePaymentMode.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
-						}						
+						Ddl_ServicePaymentMode.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						}*/						
 					}
 					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
 					{
@@ -908,7 +1300,15 @@
 					if (Ds_Objects.result.Tables.Table3.Rows.length > 0)
 					{
 						Grd_GuestTab3.dataProvider=Ds_Objects.result.Tables.Table3.Rows as ArrayCollection;
-					}					
+					}
+					if (Ds_Objects.result.Tables.Table4.Rows.length > 0)
+					{
+						Ddl_ServicePaymentMode.dataProvider=Ds_Objects.result.Tables.Table4.Rows as ArrayCollection;
+					}
+					if (Ds_Objects.result.Tables.Table4.Rows.length < 0)
+					{
+						Ddl_ServicePaymentMode.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+					}
 					Lbl_ChkInDt.text=Dt_ChkInDt.text;Lbl_ChkOutDt.text=Dt_ChkOutDt.text;
 				}
 				if (Ds_Objects.currentTarget.description.toString() == "Tab3_to_Tab2_CUSTOM")
@@ -941,10 +1341,15 @@
 				{
 					if(Ds_Objects.result.Tables.Table.Rows[0].Sts == "No")
 					{
+						//alignAlert(Alert.show("Property Not Available.","Alert Message !",
+						//	Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+						//
 						alignAlert(Alert.show(Ds_Objects.result.Tables.Table.Rows[0].Strg,"Alert Message !",
 							Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+						//
 						var Ac_Gst123:ArrayCollection=new ArrayCollection();
 						Ac_Gst123=Grd_Guest._getGridSrc as ArrayCollection;
+						//
 						useWeb("BOOKING","Property_CUSTOM",[GlobalXml,'Property',GradeName,GuestIds,
 							ChkInDt,ChkOutDt,APIHdrId,CityId,ClientId,Ac_Gst123.length,GradeId,0,0]);
 					}
@@ -967,6 +1372,19 @@
 			private static var CtrlID:ArrayCollection=new ArrayCollection();
 			public function CreateControl(_CtrlType:String,_i:int,_x:int,_y:int,visble:Boolean,LblName:String,maxChars:int):void
 			{
+				/*var value:ArrayCollection=new ArrayCollection
+				([{label:"A A A"},{label:"B B B"},{label:"C C C"},{label:"D D D"}]);*/
+				/*var Ar_Value:Array = new Array();
+				var Ac_Value:ArrayCollection = new ArrayCollection();
+				if(_CtrlType == "Ddl")
+				{
+				var Str:String = LblName;
+				Ar_Value = Str.split("|");
+				for(var i:int = 0; i < Ar_Value.length; i++)
+				{
+				Ac_Value.addItemAt({label:Ar_Value[i]},i);
+				}					
+				}*/
 				var NewControl:Object;					
 				switch(_CtrlType)
 				{
@@ -1076,6 +1494,7 @@
 				else
 				{
 					Hlp_TrackingNo.fnClear();Id=0;
+					//
 					Hlp_Client.fnClear();ClientId=0;Lbl_ClientName.text=Hlp_Client.text;
 					Lbl_Sales.text="Sales Person";Lbl_CRM.text="CRM Person";
 					Grd_Guest._clear();FnHelp_Guest();FnHelp_PageLoad();
@@ -1131,6 +1550,37 @@
 			
 			public function FnStringValidation(Str:String):String
 			{
+				/*var str1:String = Str.replace("~","");
+				var str2:String = str1.replace("@","");
+				var str3:String = str2.replace("#","");
+				var str4:String = str3.replace("$","");
+				var str5:String = str4.replace("%","");
+				var str6:String = str5.replace("^","");
+				var str7:String = str6.replace("`","");				
+				var str8:String = str7.replace("&","");
+				var str9:String = str8.replace("*","");
+				var str10:String = str9.replace("(","");
+				var str11:String = str10.replace(")","");
+				var str12:String = str11.replace("-","");
+				var str13:String = str12.replace("_","");
+				var str14:String = str13.replace("=","");				
+				var str15:String = str14.replace("+","");
+				var str16:String = str15.replace("{","");
+				var str17:String = str16.replace("[","");
+				var str18:String = str17.replace("}","");
+				var str19:String = str18.replace("]","");				
+				var str20:String = str19.replace("|","");				
+				var str21:String = str20.replace(":","");
+				var str22:String = str21.replace(";","");
+				var str23:String = str22.replace("'","");
+				var str24:String = str23.replace("<","");
+				var str25:String = str24.replace(">","");
+				var str26:String = str25.replace(",","");
+				var str27:String = str26.replace(".","");
+				var str28:String = str27.replace(" ","");
+				var str29:String = str28.replace("?","");
+				var str30:String = str29.replace("/","");*/				
+				// Not Fixed Spl Character \ "
 				ErrStr = "";var SStr:String="",StrStr:String="",Flg:Boolean = true;
 				StrStr = Str.toLowerCase(); 
 				for(var f:int = 0; f < StrStr.length; f++)
@@ -1169,6 +1619,7 @@
 			{
 				if(event.currentTarget.ID == "hlpEmpCode")
 				{
+					// grade validation 
 					var Ac:ArrayCollection=new ArrayCollection();
 					Ac=Grd_Guest._getGridSrc as ArrayCollection;
 					if(Ac.length > 0)
@@ -1197,7 +1648,8 @@
 									return;
 								}
 							}							
-						} 
+						}
+						// exists guest 
 						var Acc:ArrayCollection=new ArrayCollection();
 						Acc=Grd_Guest._getGridSrc as ArrayCollection;
 						if(Acc.length > 0)
@@ -1215,7 +1667,8 @@
 								}
 							}					
 						}
-					}
+					}					
+					// values assign
 					Grd_Guest._setValuetoCtrl("hlpEmpCode",event.currentTarget.selectedRow.EmpCode);
 					Grd_Guest._setValuetoCtrl("hlpTitle",event.currentTarget.selectedRow.TitleId);
 					Grd_Guest._setValuetoCtrl("txtFirstName",event.currentTarget.selectedRow.FirstName);
@@ -1230,6 +1683,11 @@
 					Grd_Guest._setFocus(8);
 					Grd_Guest._setFocusFlag(false);					
 				}
+				/*if(event.currentTarget.ID == "hlpTitle")
+				{
+				Grd_Guest._setFocus(8);
+				Grd_Guest._setFocusFlag(false);
+				}*/
 				event.currentTarget.selectedRow = null;
 			}
 			
@@ -1243,11 +1701,23 @@
 						Str=Str+"*  Please Select Valid Title ( Mr / Ms / Mrs / Dr ).\n";
 					}					
 				}
+				/*var FrstNme:String = arrObj.FirstName;
+				var FrstNme1:String = FnStringValidation(arrObj.FirstName);
+				if(FrstNme.length != FrstNme1.length)
+				{
+				Str = Str + "*  First Name is Invalid.\n";
+				}*/
 				var FrstNme:String = FnStringValidation(arrObj.FirstName);
 				if(FrstNme == "InValid")
 				{
 					Str = Str + "*  First Name is Invalid.\n";
 				}
+				/*var LstNme:String = arrObj.LastName;
+				var LstNme1:String = FnStringValidation(arrObj.LastName);
+				if(LstNme.length != LstNme1.length)
+				{
+				Str = Str + "*  Last Name is Invalid.\n";
+				}*/
 				var LstNme:String = FnStringValidation(arrObj.LastName);
 				if(LstNme == "InValid")
 				{
@@ -1323,7 +1793,77 @@
 						}
 					}									
 				}
-				return "";			
+				return "";
+				//				// grade validation 
+				//				var Ac:ArrayCollection=new ArrayCollection();
+				//				Ac=Grd_Guest._getGridSrc as ArrayCollection;
+				//				if(Ac.length > 0)
+				//				{
+				//					if(Number(arrObj.GradeId) != 0)
+				//					{
+				//						if(arrObj.GradeId != Ac[0].GradeId)
+				//						{
+				//							/*Grd_Guest._setValuetoCtrl("hlpEmpCode","");
+				//							alignAlert(Alert.show("Grade Not Match",
+				//							"Alert Message !",Alert.OK,null, null, iconWarning, Alert.OK),10,"");*/
+				//							Str="Grade Not Match";
+				//							return Str;
+				//						}
+				//					}
+				//					if((Number(arrObj.GradeId) == 0)&&(Number(arrObj.GradeId) == 0))
+				//					{
+				//						if(arrObj.Grade != Ac[0].Grade)
+				//						{
+				//							/*Grd_Guest._setValuetoCtrl("hlpEmpCode","");
+				//							alignAlert(Alert.show("Grade Not Match",
+				//							"Alert Message !",Alert.OK,null, null, iconWarning, Alert.OK),10,"");*/
+				//							Str="Grade Not Match";
+				//							return Str;
+				//						}
+				//					}
+				//					
+				//				}
+				//				return Str;*/
+				/*if(Number(arrObj.GradeId) != 0)  
+				{
+				var Ac_Grade:ArrayCollection=new ArrayCollection();
+				Ac_Grade=Ddl_Grade.dataProvider as ArrayCollection;
+				var Len_Grade:int=Ac_Grade.length;
+				var Flag:Boolean=true;
+				for(var i:int=0;i<Len_Grade;i++)
+				{
+				if(arrObj.GradeId == Ac_Grade[i].Id)
+				{
+				Flag = false;
+				}
+				}
+				if(Len_Grade == 0)
+				{
+				Ac_Grade.addItemAt({label:arrObj.Grade,Id:arrObj.GradeId},Len_Grade);
+				Flag = false;
+				}
+				if(Flag == true)
+				{
+				Ac_Grade.addItemAt({label:arrObj.Grade,Id:arrObj.GradeId},Len_Grade);						
+				}
+				Ddl_Grade.dataProvider=null;
+				Ddl_Grade.dataProvider=Ac_Grade;
+				//if(Ac_Grade.length == 1)
+				//{
+				//	GradeId=Ac_Grade[0].Id;
+				//	Ddl_Grade.prompt=Ac_Grade[0].label;
+				//}
+				//else
+				//{
+				Ddl_Grade.prompt="Please Select Grade";
+				GradeId=0;
+				//}
+				}
+				return Str;*/
+				//if((arrObj.Title!="Mr")&&(arrObj.Title!="Ms"))
+				//{
+				//Str=Str+"*  Please Enter Valid Title ( Mr / Ms ).\n";
+				//}
 			}
 			
 			public function Custom_Grid_Delete(Index:int,Ac_Grid:ArrayCollection,GridId:String):void
@@ -1335,7 +1875,41 @@
 						useWeb("BOOKING","XXX_CUSTOM",
 							[GlobalXml,'GuestDelete','','','','',0,0,0,0,0,Ac_Grid[Index].Id,0]);
 					}					
-				}															
+				}
+				/*var GradeId_Tmp:int=Ac_Grid[Index].GradeId;
+				var Count:int=0;
+				for(var i:int=0; i < Ac_Grid.length; i++)	
+				{
+				if(GradeId_Tmp == Ac_Grid[i].GradeId)
+				{
+				Count = Count + 1;
+				}
+				}
+				var Ac_Grade:ArrayCollection=new ArrayCollection();
+				Ac_Grade=Ddl_Grade.dataProvider as ArrayCollection;
+				var Len_Grade:int=Ac_Grade.length;
+				if(Count == 1)
+				{
+				for(var j:int=0; j < Len_Grade; j++)
+				{
+				if(GradeId_Tmp == Ac_Grade[j].Id)
+				{
+				Ac_Grade.removeItemAt(j);j=Len_Grade;
+				}
+				}
+				}
+				Ddl_Grade.dataProvider=null;
+				Ddl_Grade.dataProvider=Ac_Grade;
+				if(Ac_Grade.length == 1)
+				{
+				GradeId=Ac_Grade[0].Id;
+				Ddl_Grade.prompt=Ac_Grade[0].label;
+				}
+				else
+				{
+				Ddl_Grade.prompt="Please Select Grade";
+				GradeId=0;
+				}*/												
 			}
 			
 			protected function Ddl_Occupancy_clickHandler(event:MouseEvent):void
@@ -1367,20 +1941,24 @@
 			
 			protected function FnClear():void
 			{
+				// tab 1
 				var sdfsd:ArrayCollection=new ArrayCollection();
 				Hlp_Client.dataProvider=sdfsd;Hlp_Client.fnClear();
 				ClientId=0;Dt_ChkInDt.selectedDate=new Date();Tcl_Time.setTime=new Date();
 				Dt_ChkOutDt.selectedDate=new Date();
 				Grd_Guest._clear();Lbl_Sales.text="Sales Person";Lbl_CRM.text="CRM Person";
 				Tcl_Time.setTime=new Date("11/11/11,12:00:00");
+				Ddl_AMPM.selectedItem="PM";
 				Hlp_TrackingNo.fnClear();Lbl_ClientName.text="";
+				// tab 2
 				var sdfsdsd:ArrayCollection=new ArrayCollection();
-				Hlp_Stat.dataProvider=sdfsdsd;Hlp_Stat.fnClear();CityId=0;
+				Hlp_Stat.dataProvider=sdfsdsd;Hlp_Stat.fnClear();StateId=0;
 				var rtt:ArrayCollection=new ArrayCollection();
 				Hlp_City.dataProvider=rtt;Hlp_City.fnClear();CityId=0;
 				ClientBookerId=0;ClientBookerName="";Txt_BookerEmail.text="";Ddl_Booker.dataProvider=null;
 				Ddl_Booker.prompt="Please Select Booker";Chk_EmailtoGuest.selected=false;
 				Grd_Property.dataProvider=null;Ddl_PropertyType.selectedItem="Property Type";
+				// tab 3
 				Ddl_Property.dataProvider=null;Ddl_Property.prompt="Please Select Property";
 				BookingPropertyTableId=0;BookingPropertyId="";SSPId=0;
 				Ddl_Room.dataProvider=null;Ddl_Room.prompt="Please Select Room";
@@ -1394,7 +1972,9 @@
 				Ddl_ServicePaymentMode.dataProvider=null;
 				Ddl_ServicePaymentMode.prompt="Service Payment Mode";
 				Txt_SpecialRequirements.text="";
+				//
 				Txt_Bank.text="";Txt_AdvAmt.text="";
+				//
 				Bdr_Tab2.visible=false;Bdr_Tab3.visible=false;
 				Btn_Tab1.setStyle("backgroundColor","#eb1c24");
 				Lbl_Tab1.setStyle("color","#ffffff");				
@@ -1402,12 +1982,17 @@
 				Lbl_Tab2.setStyle("color","#ffffff");				
 				Btn_Tab3.setStyle("backgroundColor","#c2c2c2");
 				Lbl_Tab3.setStyle("color","#ffffff");
+				// Help Loading
 				Id=0;Chk_MMT.selected=true;
+				//
 				Txt_ExtraCCEmail.text = "";
 				Txt_HRPolicyOverrideRemarks.text = "";
 				Chk_HRPolicy.selected = false;
 				Txt_HRPolicyOverrideRemarks.visible = false;
+				Chk_PaymentEmail.selected = true;
+				//
 				Txt_ExtraCCEmail.text="";Txt_PropertyRefNo.text = "";resultsTxtField.text = "";FilePath.text="";
+				Pnl123.visible = false;
 				FnHelp_PageLoad();FnHelp_Guest_Tmp();
 			}			
 			
@@ -1445,6 +2030,7 @@
 					if(Ac_Tmp[j].Tick == 1)
 					{
 						Cnt += 1;
+						//if(Ac_Tmp[j].GetType == "API"){GetTypeCnt += 1;}
 					}
 				}
 				if(Cnt == 0)
@@ -1583,7 +2169,73 @@
 				GuestPropertyXml += "<ROOT>";
 				GuestPropertyXml += ObjToXmlStr_Comm(GuestProperty,"GridXml")
 				GuestPropertyXml += "</ROOT>";
-				useWeb("BOOKING","Save_CUSTOM",[GlobalXml,HdrXml,GuestXml,PropertyXml,GuestPropertyXml]);				
+				useWeb("BOOKING","Save_CUSTOM",[GlobalXml,HdrXml,GuestXml,PropertyXml,GuestPropertyXml]);
+				/*var CustomField:String="";
+				CustomField += "<ROOT>";
+				CustomField += ObjToXmlStr_Comm(Ac_Dtls,"GridXml")
+				CustomField += "</ROOT>";*/				
+				// Get value from component creations
+				/*var Ac_Data:ArrayCollection=new ArrayCollection()
+				var n:int=0;
+				for(var i:int=0;i<CtrlID.length;i++)
+				{				
+				if(CtrlID[i].className!="")
+				{					
+				n=n+1
+				Ac_Data.addItem(TopCntl.getElementAt(i))
+				if(n==5)
+				{
+				RequiredFlag=true;
+				getValueFrmCtrl(Ac_Data);
+				Ac_Data=new ArrayCollection();
+				n=0;
+				if(RequiredFlag == false)
+				{
+				Pnl.visible=true;
+				alignAlert(Alert.show("*  Fields are Required.","Requierd Field(s) !",
+				Alert.OK,null,null,iconErrLarge,Alert.OK),10,"");
+				return;
+				}
+				}
+				}
+				}*/
+			}
+			
+			private function getValueFrmCtrl(ArrElet:ArrayCollection):ArrayCollection
+			{
+				/*var Value:String="";
+				var RetArr:ArrayCollection=new ArrayCollection();
+				var _className:String="";
+				var _obj:Object=new Object();
+				for(var j:int=0;j<ArrElet.length;j++) 
+				{					
+				_obj=ArrElet[j]					
+				_className=_obj.className
+				switch(_className)
+				{	
+				case "Label":
+				Value = _obj.text;
+				break;
+				case "TextInput":
+				Value = _obj.text;
+				break;
+				case "DropDownList":
+				Value = _obj.prompt;
+				break;						
+				}
+				RetArr.addItem(Value)
+				}
+				if(RetArr[1] == "*")
+				{
+				if((RetArr[2] == "")||(RetArr[2] == "Select"))
+				{
+				RequiredFlag=false;
+				}
+				}
+				Ac_Dtls.addItem({CustomFields:RetArr[0],Mandatory:RetArr[1],CustomFieldsValue:RetArr[2],
+				CustomFieldsId:RetArr[3],Id:RetArr[4]});*/
+				var RetArr:ArrayCollection=new ArrayCollection();
+				return RetArr;
 			}
 			
 			protected function Btn_Close_clickHandler(event:MouseEvent):void
@@ -1647,6 +2299,7 @@
 			protected function Btn_Tab1Next_clickHandler(event:MouseEvent):void
 			{
 				ErrStr="";Flag=true;
+				// focus change hlp client to other component
 				Btn_NextTab2.setFocus();
 				if(ClientId == 0)
 				{
@@ -1731,11 +2384,13 @@
 					Txt_PropertyFilter.text="";Txt_LocalityFilter.text="";
 					Txt_RecommendPropertyFilter.text="";Txt_RecommendLocalityFilter.text="";
 					ClientBookerId=0;ClientBookerName="";Txt_BookerEmail.text="";
-					Txt_Note.text="";Chk_EmailtoGuest.selected=false;
+					Txt_Note.text="";
 					var dfsgd:ArrayCollection=new ArrayCollection();
 					Grd_Property.dataProvider=dfsgd;
 					var sdfsf:ArrayCollection=new ArrayCollection();
 					Grd_RecommendedProperty.dataProvider=sdfsf;
+					//
+					// Get Guest Id
 					GuestIds="";
 					for(var j:int = 0; j < Ac_Gst.length; j++)
 					{
@@ -1744,6 +2399,7 @@
 							GuestIds = GuestIds + Ac_Gst[j].GuestId + ',';
 						}
 					}
+					//
 					var FDt:String = Dt_ChkInDt.text;										
 					var FY:String = FDt.substr(6,10);
 					var FM:String = FDt.substr(3,2);
@@ -1754,11 +2410,15 @@
 					var TM:String = TDt.substr(3,2);
 					var TD:String = TDt.substr(0,2);
 					ChkOutDt=TY+'-'+TM+'-'+TD+' '+'11:59:00 AM';
+					//
 					useWeb("BOOKING","Tab1_Next_CUSTOM",
 						[GlobalXml,'Tab1_Next',GuestIds,'',ChkInDt,ChkOutDt,0,0,ClientId,0,0,0,0]);
+					
+					//Bdr_Tab2.visible=true;Bdr_Tab3.visible=false;
 				}
 				if(Id != 0)
 				{
+					Pnl123.visible = false;
 					var Ac:ArrayCollection=new ArrayCollection();
 					var ReqFlag:Boolean=true;
 					Ac=Grd_Guest._getGridSrc as ArrayCollection;
@@ -1783,7 +2443,8 @@
 								SpecialRequirements:"",Id:Id,Status:"RmdPty",AMPM:Ddl_AMPM.selectedItem,
 								BookingLevel:"Room",ExtraCCEmail:Txt_ExtraCCEmail.text,
 								HRPolicy:Chk_HRPolicy.selected,HRPolicyOverrideRemarks:Txt_HRPolicyOverrideRemarks.text,
-								PropertyRefNo:Txt_PropertyRefNo.text}]);
+								PropertyRefNo:Txt_PropertyRefNo.text,
+								PaymentFlag:Chk_PaymentEmail.selected}]);
 						var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
 						var Tmp1:ArrayCollection=new ArrayCollection();
 						var GuestXml:String="";
@@ -1856,6 +2517,9 @@
 						Err = Err + "*  More than one Property is not Allowed.\n";
 					}
 				}
+				//var Flagg:Boolean=true;
+				//if((ClientBookerId == 0) && (Txt_NewBooker.text == "") && (Txt_NewBookerEmail.text == "") &&
+				//	(Chk_EmailtoGuest.selected == false))
 				if (ClientBookerId == 0)
 				{
 					if((Txt_NewBooker.text == "") && (Txt_NewBookerEmail.text == ""))
@@ -1881,7 +2545,62 @@
 				{
 					Err = Err + "*  Email to Guest is Required.\n";
 					Chk_EmailtoGuest.setFocus();
-				}				
+				}
+				/*if(Flagg == true)
+				{
+				if(Chk_EmailtoGuest.selected == false)
+				{
+				if(ClientBookerId == 0)
+				{
+				if(Txt_NewBooker.text == "")
+				{
+				Err = Err + "*  New Booker Name is Required.\n";
+				}
+				if(Txt_NewBookerEmail.text == "")
+				{
+				Err = Err + "*  New Booker Email is Required.\n";
+				}
+				if(Txt_NewBooker.text != "")
+				{
+				if(Txt_NewBooker.text.length < 4)
+				{
+				Err = Err + "*  New Booker Name Must be 4 Characters is Required.\n";
+				}
+				}							
+				if(Txt_NewBookerEmail.text != "")
+				{
+				EmailValidator.validate(Txt_NewBookerEmail.text);
+				Err = Err + ErrStr;
+				}
+				}
+				}
+				if(Chk_EmailtoGuest.selected == true)
+				{
+				if((Txt_NewBooker.text != "")||(Txt_NewBookerEmail.text != ""))
+				{
+				if(Txt_NewBooker.text == "")
+				{
+				Err = Err + "*  New Booker Name is Required.\n";
+				}
+				if(Txt_NewBookerEmail.text == "")
+				{
+				Err = Err + "*  New Booker Email is Required.\n";
+				}
+				if(Txt_NewBooker.text != "")
+				{
+				if(Txt_NewBooker.text.length < 4)
+				{
+				Err = Err + "*  New Booker Name Must be 4 Characters is Required.\n";
+				}
+				}							
+				if(Txt_NewBookerEmail.text != "")
+				{
+				EmailValidator.validate(Txt_NewBookerEmail.text);
+				Err = Err + ErrStr;
+				}
+				}
+				}
+				}*/
 				if(Chk_HRPolicy.selected == true)
 				{
 					if(Txt_HRPolicyOverrideRemarks.text == "")
@@ -1926,12 +2645,13 @@
 				}
 				var sdf:ArrayCollection = new ArrayCollection();
 				sdf = Grd_Guest._getGridSrc;
+				var dssdf:int = Math.round(sdf.length / 2);
 				if((CityCode != "") && (Ac_Prpty[0].PropertyType == "MMT"))
 				{					
 					useWeb("API","AvailabilityExistingData_CUSTOM",
 						[GlobalXml,'AvailabilityExistingData',CityCode,Ac_Prpty[0].PropertyId,
 							Ac_Prpty[0].RatePlanCode,Ac_Prpty[0].RoomTypeCode,ChkInDt,ChkOutDt,
-							Ac_Prpty[0].APIHdrId,sdf.length]);
+							Ac_Prpty[0].APIHdrId,dssdf]);
 				}
 				else
 				{
@@ -1961,7 +2681,92 @@
 					{
 						Cnt1 = Cnt1 + 1;
 					}
-				}				
+				}
+				/*if((Cnt == 0)&&(Cnt1 == 0))
+				{
+				Err = Err + "*  Property is Required.\n";
+				}
+				var Flg:Boolean=true;
+				if((Cnt != 0)&&(Cnt1 != 0))
+				{
+				Err = Err + "*  More than one Property is not Allowed.\n";
+				Flg=false;
+				}
+				if(Flg == true)
+				{
+				if((Cnt > 1)||(Cnt1 > 1))
+				{
+				Err = Err + "*  More than one Property is not Allowed.\n";
+				}
+				}
+				var Flagg:Boolean=true;
+				if((ClientBookerId == 0) && (Txt_NewBooker.text == "") && (Txt_NewBookerEmail.text == "") &&
+				(Chk_EmailtoGuest.selected == false))
+				{
+				Err = Err + "*  Booker Email is Required.\n";
+				Ddl_Booker.setFocus();Flagg=false;			
+				}
+				if(Flagg == true)
+				{
+				if(Chk_EmailtoGuest.selected == false)
+				{
+				if(ClientBookerId == 0)
+				{
+				if(Txt_NewBooker.text == "")
+				{
+				Err = Err + "*  New Booker Name is Required.\n";
+				}
+				if(Txt_NewBookerEmail.text == "")
+				{
+				Err = Err + "*  New Booker Email is Required.\n";
+				}
+				if(Txt_NewBooker.text != "")
+				{
+				if(Txt_NewBooker.text.length < 4)
+				{
+				Err = Err + "*  New Booker Name Must be 4 Characters is Required.\n";
+				}
+				}							
+				if(Txt_NewBookerEmail.text != "")
+				{
+				EmailValidator.validate(Txt_NewBookerEmail.text);
+				Err = Err + ErrStr;
+				}
+				}
+				}
+				if(Chk_EmailtoGuest.selected == true)
+				{
+				if((Txt_NewBooker.text != "")||(Txt_NewBookerEmail.text != ""))
+				{
+				if(Txt_NewBooker.text == "")
+				{
+				Err = Err + "*  New Booker Name is Required.\n";
+				}
+				if(Txt_NewBookerEmail.text == "")
+				{
+				Err = Err + "*  New Booker Email is Required.\n";
+				}
+				if(Txt_NewBooker.text != "")
+				{
+				if(Txt_NewBooker.text.length < 4)
+				{
+				Err = Err + "*  New Booker Name Must be 4 Characters is Required.\n";
+				}
+				}							
+				if(Txt_NewBookerEmail.text != "")
+				{
+				EmailValidator.validate(Txt_NewBookerEmail.text);
+				Err = Err + ErrStr;
+				}
+				}
+				}
+				}
+				if(Err != "")
+				{
+				alignAlert(Alert.show(Err,"Requierd Field(s) !",Alert.OK,null,null,
+				iconErrLarge,Alert.OK),10,"");
+				return;
+				}*/
 				var Ac_Prpty:ArrayCollection=new ArrayCollection();var len:int=0,i:int=0;
 				if(Cnt == 1)
 				{
@@ -2090,8 +2895,10 @@
 						var TM:String = TDt.substr(3,2);
 						var TD:String = TDt.substr(0,2);
 						ChkOutDt=TY+'-'+TM+'-'+TD+' '+'11:59:00 AM';
+						//
 						var Ac_Gst:ArrayCollection=new ArrayCollection();
 						Ac_Gst=Grd_Guest._getGridSrc as ArrayCollection;
+						//
 						if(Chk_MMT.selected == true)
 						{
 							useWeb("BOOKING","Tab3_to_Tab2_CUSTOM",[GlobalXml,'Property',GradeName,GuestIds,
@@ -2175,9 +2982,11 @@
 				if(Ac[Index].Tick == 0)
 				{
 					Ac[Index].Tick = 1;
+					//
 					GuestId = Ac[Index].GuestId;
 					useWeb("BOOKING","CustomFields_CUSTOM",
 						[GlobalXml,'CustomFields','','','','',0,0,ClientId,0,0,Ac[Index].GuestId,0]);
+					//Pnl_CustomFields.visible = true;
 				}
 				else
 				{
@@ -2259,19 +3068,26 @@
 					var GetType:String=event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].GetType;
 					var SingleTariffandMarkup:Number=Number(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].SingleandMarkup);
 					var SingleTariff:Number=Number(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].SingleTariff);
-					var Value:Number=SingleTariffandMarkup-SingleTariff;										
+					//var Value:Number=SingleTariffandMarkup-SingleTariff;
+					var Value:Number = Number(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].GeneralMarkup);
 					var TAC:Boolean=Boolean(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].TAC);
 					var DiscountModeRS:Boolean=Boolean(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].DiscountModeRS);
 					var DiscountModePer:Boolean=Boolean(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].DiscountModePer);
 					var DiscountAllowed:Number=Number(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].DiscountAllowed);
 					var Markup:int=event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup;
 					var MarkupStr:String=String(Markup);
+					var LTAgreed:Number=event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].LTAgreed;
+					var STAgreed:Number=event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].STAgreed;
+					var SC:Number=event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].SC;
+					//var Markup:String=NF_Two.format(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup);
+					//var MarkupAmt:String=Markup.replace(/[,]/g,"");
 					if(Markup == 0)
 					{
 						event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup="";
 					}
+					var ExtraMarkup:Number = 0;
 					if((PropertyType == "ExP")&&(Markup != 0))
-					{
+					{						
 						if(TAC == false)
 						{
 							if(Markup < 0)
@@ -2280,17 +3096,20 @@
 								if(Number(MpAmt) <= Value)
 								{
 									event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup=Markup;
+									ExtraMarkup = Markup + Math.round((Markup * LTAgreed / 100) + (Markup * STAgreed / 100) + (Markup * SC / 100)); 
 								}
 								else
 								{
 									var val:String="-"+String(Value);
 									event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup=val;
+									ExtraMarkup =  Number("-"+String(Value + Math.round((Value * LTAgreed / 100) + (Value * STAgreed / 100) + (Value * SC / 100))));
 									Cnt = Cnt + 1;
 									if(Cnt == 1)
 									{
 										alignAlert(Alert.show("Maximum Deduction Amount is "+NF_Two.format(val),
 											"Alert Message !",Alert.OK,null,null,iconWarning,Alert.OK),10,"");
 										Grd_Guest._setFocus(0);
+										//Ddl_PropertyType.setFocus();
 										Cnt=0;return;
 									}																		
 								}
@@ -2300,10 +3119,12 @@
 								if(Markup <= Value)
 								{
 									event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup=Markup;
+									ExtraMarkup = Markup + Math.round((Markup * LTAgreed / 100) + (Markup * STAgreed / 100) + (Markup * SC / 100));									
 								}
 								else
 								{
 									event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup=Value;
+									ExtraMarkup =  Value + Math.round((Value * LTAgreed / 100) + (Value * STAgreed / 100) + (Value * SC / 100));
 									Cnt = Cnt + 1;
 									if(Cnt == 1)
 									{
@@ -2312,15 +3133,15 @@
 										Ddl_PropertyType.setFocus();
 										Cnt=0;
 										return;
-									}									
+									}
 								}
-							}
+							}							
 						}						
 						else
 						{
 							event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup="";
 						}						
-					}			
+					}					
 					else if((PropertyType == "InP")&&(Markup != 0)&&(GetType == "Property"))
 					{
 						if(GetType == "Property")
@@ -2330,6 +3151,7 @@
 							{
 								Discnt=Math.round((SingleTariff*DiscountAllowed)/100);
 							}
+							//(DiscountModeRS == true)
 							if(DiscountModeRS == true)
 							{
 								Discnt=DiscountAllowed;
@@ -2340,10 +3162,12 @@
 								{
 									event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup=Markup;
 									Cnt = 0;
+									ExtraMarkup = Markup;
 								}
 								else
 								{
 									event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup=Discnt;
+									ExtraMarkup = Discnt;
 									Cnt = Cnt + 1;
 									if(Cnt == 1)
 									{
@@ -2360,11 +3184,13 @@
 								if(Number(MpAmt1) <= Discnt)
 								{
 									event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup=Markup;
+									ExtraMarkup = Markup;
 								}
 								else
 								{
 									var val1:String="-"+Discnt;
 									event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup=val1;
+									ExtraMarkup = Number(val1);
 									Cnt = Cnt + 1;
 									if(Cnt == 1)
 									{
@@ -2389,24 +3215,32 @@
 					{
 						event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup="";
 					}
+					// Internal,ManagedGH,Dedicated,ClientPrefered,External
+					//if((Type == "ManagedGH")||(Type == "Dedicated")||(Type == "ClientPrefered")||(Type == "External"))
+					// Single
 					if(Number(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].SingleandMarkup) > 0)
 					{
 						event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].SingleandMarkup1=
 							Number(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].SingleandMarkup)+
-							Number(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup);
-					}
+							ExtraMarkup;
+						//Number(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup);
+					}					
+					// Double
 					if(Number(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].DoubleandMarkup) > 0)
 					{
 						event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].DoubleandMarkup1=
 							Number(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].DoubleandMarkup)+
-							Number(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup);
-					}
+							ExtraMarkup;
+						//Number(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup);
+					}					
+					// Triple
 					if(Number(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].TripleandMarkup) > 0)
 					{
 						event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].TripleandMarkup1=
 							Number(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].TripleandMarkup)+
-							Number(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup);
-					}				
+							ExtraMarkup;
+						//Number(event.currentTarget.dataProvider[event.currentTarget.editedItemPosition.rowIndex].Markup);
+					}									
 				}
 			}
 			
@@ -2427,12 +3261,16 @@
 					var TM:String = TDt.substr(3,2);
 					var TD:String = TDt.substr(0,2);
 					ChkOutDt=TY+'-'+TM+'-'+TD+' '+'11:59:00 AM';
+					//
 					BookingPropertyTableId=Ddl_Property.selectedItem.Id;
 					BookingPropertyId=Ddl_Property.selectedItem.PropertyId;
 					PropertyType=Ddl_Property.selectedItem.PropertyType;
+					/*useWeb("BOOKING","BookingPropertyDtls_CUSTOM",[GlobalXml,'BookingPropertyDtls',
+					"","",Dt_ChkInDt.text,Dt_ChkOutDt.text, // Str
+					0,0,0,BookingPropertyId,0,BookingPropertyTableId,0]);*/
 					useWeb("BOOKING","BookingPropertyDtls_CUSTOM",[GlobalXml,'BookingPropertyDtls',
-						"","",ChkInDt,ChkOutDt,
-						0,0,0,BookingPropertyId,0,BookingPropertyTableId,0]); 
+						"","",ChkInDt,ChkOutDt, // Str
+						0,0,0,BookingPropertyId,0,BookingPropertyTableId,0]);       // Id
 				}				
 			}
 			
@@ -2490,6 +3328,13 @@
 				{
 					Err = Err + "*  Property is Required.\n";
 				}
+				if((PropertyType == "InP")||(PropertyType == "MGH")||(PropertyType == "DdP"))
+				{
+					if(RoomId == 0)
+					{
+						Err = Err + "*  Room is Required.\n";
+					}
+				}				
 				if(RoomType == "")
 				{
 					Err = Err + "*  Room is Required.\n";
@@ -2526,12 +3371,21 @@
 				if(Cnt == 0)
 				{
 					Err = Err + "*  Guest is Required.\n";
-				}				
+				}
+				/*if((Cnt == 3)||(Cnt > 3))
+				{
+				if((Ddl_Occupancy.selectedItem == "Double")||(Ddl_Occupancy.selectedItem == "Single"))
+				{
+				Err = Err + "* Only 2 Guest is Allowed.\n";
+				}
+				}*/				
 				if(Err != "")
 				{
 					alignAlert(Alert.show(Err,"Requierd Field(s) !",Alert.OK,null,null,iconErrLarge,Alert.OK),10,"");
 					return;
 				}
+				// ((PropertyType == "MGH")||(PropertyType == "DdP"))
+				//if((PropertyType == "InP")||(PropertyType == "CPP")||(PropertyType == "ExP"))
 				if((PropertyType == "InP")||(PropertyType == "ExP")||(PropertyType == "MMT"))
 				{					
 					if((Txt_Tariff.text == "")||(Number(Txt_Tariff.text) == 0))
@@ -2544,6 +3398,7 @@
 						}
 					}
 				}
+				//if(ClientId == 1657){Txt_Tariff.text="0";}
 				var Ac:ArrayCollection = new ArrayCollection();
 				var Ac1:ArrayCollection = new ArrayCollection();
 				Ac = Tmp;
@@ -2564,14 +3419,36 @@
 						}
 					}
 				}
+				/*if(Ac1.length != 0)
+				{
+				if(SSPId != 0)
+				{
+				for(var t1:int = 0; t1 < Len1; t1++)
+				{
+				if(SSPId == Ac1[t1].SSPId)
+				{
+				alignAlert(Alert.show("* SSP Already Assigned to Guest","Alert Message !",
+				Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+				return;
+				}
+				}
+				}
+				}*/
+				// Custom Fields
+				//Pnl.visible = true;
+				//Pnl_CustomFields.visible = true;
+				//useWeb("BOOKING","ComponentCreation_CUSTOM",[GlobalXml,'ComponentCreation','','','','',0,0,ClientId,0,0,0,0]);				
+				//useWeb("BOOKING","CustomFields_CUSTOM",
+				//	[GlobalXml,'CustomFields','','','','',0,0,ClientId,0,0,GstId,0]);				
+				//return;
+				resultsTxtField.text = "";
+				FilePath.text = "";
 				if(TariffPaymentMode == "Bill to Company (BTC)")
 				{
-					resultsTxtField.text = "";
 					FnImageBrowse();
 				}
 				if(TariffPaymentMode != "Bill to Company (BTC)")
 				{
-					resultsTxtField.text = "";
 					FnAddtoCart();
 				}								
 			}
@@ -2596,14 +3473,21 @@
 				Grd_GuestTab3.dataProvider = null;
 				var Len:int = Ac.length;
 				var BTCFilePath:String = "";
-				if(resultsTxtField.text == "")
+				if(TariffPaymentMode == "Bill to Company (BTC)")
 				{
-					BTCFilePath = "";
+					if(resultsTxtField.text == "")
+					{
+						BTCFilePath = "";
+					}
+					else
+					{
+						BTCFilePath = "http://sstage.in/BookingBTCUpload/"+resultsTxtField.text;
+					}
 				}
 				else
 				{
-					BTCFilePath = "http://sstage.in/BookingBTCUpload/"+resultsTxtField.text;
-				}
+					BTCFilePath = "";
+				}				
 				for(var j:int = 0; j < Len; j++)
 				{
 					if(Ac[j].Tick == 1)
@@ -2629,6 +3513,23 @@
 				}
 				Grd_GuestTab3.dataProvider = Tmp.source;
 				Grd_PropertyAssignedGuest.dataProvider = Ac1;
+				//
+				if((PropertyType == "InP")||(PropertyType == "MGH")||(PropertyType == "DdP"))
+				{
+					var Ac_RoomType:ArrayCollection = new ArrayCollection();
+					Ac_RoomType = Ddl_Room.dataProvider as ArrayCollection;				
+					var index:int = Ddl_Room.selectedIndex;
+					Ac_RoomType.removeItemAt(Ddl_Room.selectedIndex);
+					RoomId = 0;
+					Ddl_Room.dataProvider = null;
+					Ddl_Room.dataProvider = Ac_RoomType;
+					Ddl_Room.prompt = "Please Select Room";
+				}
+				// clear
+				/*RoomType="";Single=0;Double=0;Triple=0;SSPId=0;RoomId=0;
+				Ddl_Room.prompt="";Ddl_Room.prompt="Please Select Room";				
+				Ddl_SSP.prompt="";Ddl_SSP.prompt="Please Select SSP";
+				Ddl_Occupancy_changeHandler();*/
 			}
 			
 			protected function Ddl_Occupancy_changeHandler():void
@@ -2675,7 +3576,15 @@
 			{
 				var Err:String="";
 				var Ac_PtoG:ArrayCollection=new ArrayCollection();
-				Ac_PtoG=Grd_PropertyAssignedGuest.dataProvider as ArrayCollection;
+				Ac_PtoG=Grd_PropertyAssignedGuest.dataProvider as ArrayCollection;				
+				/*if(TariffPaymentMode == "")
+				{
+				Err = Err + "*  Tariff Payment Mode is Required.\n";
+				}
+				if(ServicePaymentMode == "")
+				{
+				Err = Err + "*  Service Payment Mode is Required.\n";
+				}*/
 				if(Ac_PtoG.length == 0)
 				{
 					Err = Err + "*  Guest is not added in cart.\n";
@@ -2698,6 +3607,17 @@
 						}
 					}
 				}
+				/*if(PropertyType == "ExP")
+				{
+				if(Txt_PropertyRefNo.text == "")
+				{
+				Err += "*  Reference No is Required.\n";
+				}					
+				}*/
+				/*if(PropertyType != "ExP")
+				{
+				Txt_PropertyRefNo.text = "";
+				}*/				
 				if(Err != "")
 				{
 					alignAlert(Alert.show(Err,"Requierd Field(s) !",Alert.OK,null,null,iconErrLarge,Alert.OK),10,"");
@@ -2732,6 +3652,11 @@
 				{
 					Status="Booked";
 				}
+				if(Id == 0)
+				{
+					alignAlert(Alert.show("* There was an error, please go back & try again!","Alert Message !",Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+					return;
+				}
 				var Ac_Hdr:ArrayCollection=new ArrayCollection
 					([{ClientId:0,ClientName:"",Sales:"",CRM:"",
 						CheckInDate:Dt_ChkInDt.text,
@@ -2744,7 +3669,7 @@
 						Id:Id,Status:Status,AMPM:Ddl_AMPM.selectedItem,BookingLevel:"Room",
 						ExtraCCEmail:Txt_ExtraCCEmail.text,HRPolicy:Chk_HRPolicy.selected,
 						HRPolicyOverrideRemarks:Txt_HRPolicyOverrideRemarks.text,
-						PropertyRefNo:Txt_PropertyRefNo.text}]);
+						PropertyRefNo:Txt_PropertyRefNo.text,PaymentFlag:Chk_PaymentEmail.selected}]);
 				var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
 				var Tmp1:ArrayCollection=new ArrayCollection();
 				var GuestXml:String="";
@@ -2821,6 +3746,8 @@
 			protected function Btn_PropertyShow_clickHandler(event:MouseEvent):void
 			{
 				ErrStr="";Flag=true;
+				//FnOnselection_City();
+				//FnOnselection_State();
 				if(StateId == 0)
 				{
 					if(Flag == true)
@@ -2902,8 +3829,10 @@
 				var TM:String = TDt.substr(3,2);
 				var TD:String = TDt.substr(0,2);
 				ChkOutDt=TY+'-'+TM+'-'+TD+' '+'11:59:00 AM';
+				//
 				var Ac_Gst:ArrayCollection=new ArrayCollection();
-				Ac_Gst=Grd_Guest._getGridSrc as ArrayCollection;
+				Ac_Gst=Grd_Guest._getGridSrc as ArrayCollection;					
+				//				
 				if(Chk_MMT.selected == true)
 				{
 					useWeb("BOOKING","Property_CUSTOM",[GlobalXml,'Property',
@@ -2914,6 +3843,19 @@
 					useWeb("BOOKING","Property_CUSTOM",[GlobalXml,'Property',
 						GradeName,GuestIds,ChkInDt,ChkOutDt,0,CityId,ClientId,Ac_Gst.length,GradeId,0,0]);
 				}
+				// DYNAMIC API PROCESS
+				/*if(Chk_MMT.selected == true)
+				{
+				useWeb("API","API_CUSTOM",[GlobalXml,'GetAPIdata',CityId,ChkInDt,ChkOutDt]);
+				}
+				if(Chk_MMT.selected == false)
+				{
+				useWeb("BOOKING","Property_CUSTOM",[GlobalXml,'Property',
+				GradeName,GuestIds,ChkInDt,ChkOutDt,0,CityId,ClientId,0,GradeId,0,0]);
+				}*/				
+				// only date in chkin & chkout date
+				/*useWeb("BOOKING","Property_CUSTOM",[GlobalXml,'Property',
+				GradeName,GuestIds,Dt_ChkInDt.text,Dt_ChkOutDt.text,0,CityId,ClientId,0,GradeId,0,0]);*/
 			}		
 			
 			protected function Txt_RecommendPropertyFilter_changeHandler(event:TextOperationEvent):void
@@ -3040,39 +3982,68 @@
 			{
 				
 			}
-			public var P:String = "",E:String = "",M:String = "",T:String = "",I:String = "";
+			public var Phone:String = "",Email:String = "",MealPlan:String = "",PtyType:String = "";
+			public var Inclusions:String = "",TripRating:String = "";
 			protected function Grd_Property_itemRollOverHandler(event:ListEvent):void
 			{
-				P = "";E = "";M = "";T = "";I = ""
+				Phone = "";Email = "";MealPlan = "";PtyType = "";Inclusions = "";TripRating = "";				
+				//asdddddd.text = String(Number(event.itemRenderer.width));
+				//asdddddd0.text = String(Number(event.itemRenderer.measuredWidth));
 				if (event.itemRenderer.measuredWidth > 50)
 				{
-					P = DataGridItemRenderer(event.itemRenderer).data.Phone;
-					E = DataGridItemRenderer(event.itemRenderer).data.Email;
-					I = DataGridItemRenderer(event.itemRenderer).data.Inclusions;
-					M = DataGridItemRenderer(event.itemRenderer).data.MealPlan;
-					T = DataGridItemRenderer(event.itemRenderer).data.PropertyType;
-					if(T != "MMT")
+					Phone = DataGridItemRenderer(event.itemRenderer).data.Phone;
+					Email = DataGridItemRenderer(event.itemRenderer).data.Email;
+					Inclusions = DataGridItemRenderer(event.itemRenderer).data.Inclusions;
+					MealPlan = DataGridItemRenderer(event.itemRenderer).data.MealPlan;
+					PtyType = DataGridItemRenderer(event.itemRenderer).data.PropertyType;
+					TripRating = DataGridItemRenderer(event.itemRenderer).data.TripadvisorRating;
+					var toolTip:String = "";
+					if(PtyType != "MMT")
 					{
-						if (I == "")
+						if(Phone != "")
 						{
-							Grd_Property.toolTip = "Phone: "+P+"\nEmail: "+E;
+							toolTip = "Phone: "+Phone+"\n";
 						}
-						else
+						if(Email != "")
 						{
-							Grd_Property.toolTip = "Phone: "+P+"\nEmail: "+E+"\nInclusions: "+I;
+							toolTip += "Email: "+Email+"\n";
+						}
+						if(Inclusions != "")
+						{
+							toolTip += "Inclusions: "+Inclusions+"\n";
+						}
+						if (TripRating != "")
+						{
+							toolTip += "Trip Rating: "+TripRating+"\n";
+						}						
+					}
+					if(PtyType == "MMT")
+					{
+						if(Phone != "")
+						{
+							toolTip = "Phone: "+Phone+"\n";
+						}
+						if(Email != "")
+						{
+							toolTip += "Email: "+Email+"\n";
+						}
+						if(Inclusions != "")
+						{
+							toolTip += "Inclusions: "+MealPlan+"\n";
+						}
+						if (TripRating != "")
+						{
+							toolTip += "Trip Rating: "+TripRating+"\n";
 						}
 					}
-					if(T == "MMT")
+					if (toolTip != "")
 					{
-						if (M == "")
-						{
-							Grd_Property.toolTip = "Phone: "+P+"\nEmail: "+E;
-						}
-						else
-						{
-							Grd_Property.toolTip = "Phone: "+P+"\nEmail: "+E+"\nInclusions: "+M;
-						}
-					}										
+						Grd_Property.toolTip = toolTip;
+					}
+					if (toolTip == "")
+					{
+						Grd_Property.toolTip = null;
+					}
 				}				
 			}
 			
@@ -3083,35 +4054,61 @@
 			
 			protected function Grd_RecommendedProperty_itemRollOverHandler(event:ListEvent):void
 			{
-				P = "";E = "";M = "";T = "";I = ""								
+				Phone = "";Email = "";MealPlan = "";PtyType = "";Inclusions = "";TripRating = "";								
 				if (event.itemRenderer.measuredWidth > 50)
 				{
-					P = DataGridItemRenderer(event.itemRenderer).data.Phone;
-					E = DataGridItemRenderer(event.itemRenderer).data.Email;
-					I = DataGridItemRenderer(event.itemRenderer).data.Inclusions;
-					M = DataGridItemRenderer(event.itemRenderer).data.MealPlan;
-					T = DataGridItemRenderer(event.itemRenderer).data.PropertyType;
-					if(T != "MMT")
+					Phone = DataGridItemRenderer(event.itemRenderer).data.Phone;
+					Email = DataGridItemRenderer(event.itemRenderer).data.Email;
+					Inclusions = DataGridItemRenderer(event.itemRenderer).data.Inclusions;
+					MealPlan = DataGridItemRenderer(event.itemRenderer).data.MealPlan;
+					PtyType = DataGridItemRenderer(event.itemRenderer).data.PropertyType;
+					TripRating = DataGridItemRenderer(event.itemRenderer).data.TripadvisorRating;
+					var toolTip:String = "";
+					if(PtyType != "MMT")
 					{
-						if (I == "")
+						if(Phone != "")
 						{
-							Grd_RecommendedProperty.toolTip = "Phone: "+P+"\nEmail: "+E;
+							toolTip = "Phone: "+Phone+"\n";
 						}
-						else
+						if(Email != "")
 						{
-							Grd_RecommendedProperty.toolTip = "Phone: "+P+"\nEmail: "+E+"\nInclusions: "+I;
+							toolTip += "Email: "+Email+"\n";
+						}
+						if(Inclusions != "")
+						{
+							toolTip += "Inclusions: "+Inclusions+"\n";
+						}
+						if (TripRating != "")
+						{
+							toolTip += "Trip Rating: "+TripRating+"\n";
+						}						
+					}
+					if(PtyType == "MMT")
+					{
+						if(Phone != "")
+						{
+							toolTip = "Phone: "+Phone+"\n";
+						}
+						if(Email != "")
+						{
+							toolTip += "Email: "+Email+"\n";
+						}
+						if(Inclusions != "")
+						{
+							toolTip += "Inclusions: "+MealPlan+"\n";
+						}
+						if (TripRating != "")
+						{
+							toolTip += "Trip Rating: "+TripRating+"\n";
 						}
 					}
-					if(T == "MMT")
+					if (toolTip != "")
 					{
-						if (M == "")
-						{
-							Grd_RecommendedProperty.toolTip = "Phone: "+P+"\nEmail: "+E;
-						}
-						else
-						{
-							Grd_RecommendedProperty.toolTip = "Phone: "+P+"\nEmail: "+E+"\nInclusions: "+M;
-						}
+						Grd_RecommendedProperty.toolTip = toolTip;
+					}
+					if (toolTip == "")
+					{
+						Grd_RecommendedProperty.toolTip = null;
 					}										
 				}
 			}
@@ -3226,13 +4223,70 @@
 						ACC_Guest[f].Txt_C8 = Hlp_Column8.text;
 						ACC_Guest[f].Txt_C9 = Hlp_Column9.text;
 						ACC_Guest[f].Txt_C10 = Hlp_Column10.text;
+						/*ACC_Guest[f].Chk_C1 = Chk_C1.selected;
+						ACC_Guest[f].Chk_C2 = Chk_C2.selected;
+						ACC_Guest[f].Chk_C3 = Chk_C3.selected;
+						ACC_Guest[f].Chk_C4 = Chk_C4.selected;
+						ACC_Guest[f].Chk_C5 = Chk_C5.selected;
+						ACC_Guest[f].Chk_C6 = Chk_C6.selected;
+						ACC_Guest[f].Chk_C7 = Chk_C7.selected;
+						ACC_Guest[f].Chk_C8 = Chk_C8.selected;
+						ACC_Guest[f].Chk_C9 = Chk_C9.selected;
+						ACC_Guest[f].Chk_C10 = Chk_C10.selected;*/
 						f = ACC_Guestlength;
 					}
 				}
 				Grd_GuestTab3.dataProvider = ACC_Guest;
 				Btn_BackTab3.enabled = true;
 				Btn_Backed.enabled = true;
-				Pnl_CustomFields.visible = false;				
+				Pnl_CustomFields.visible = false;
+				return;
+				var Ac1:ArrayCollection = new ArrayCollection();
+				Ac1 = Grd_PropertyAssignedGuest.dataProvider as ArrayCollection; 
+				var RoomCaptured:Number = 0,maxValue:Number = 1;
+				for each (var o:Object in Ac1)
+				{
+					if (o.RoomCaptured > maxValue)
+					{
+						maxValue = o.RoomCaptured;
+					}
+				}				
+				RoomCaptured = maxValue + 1;				
+				var Ac:ArrayCollection = new ArrayCollection();
+				Ac = Grd_GuestTab3.dataProvider as ArrayCollection;
+				var Len:int = Ac.length;
+				Grd_GuestTab3.dataProvider = null;
+				for(var j:int = 0; j < Len; j++)
+				{
+					if(Ac[j].Tick == 1)
+					{
+						Cnt = Cnt + 1;
+						Ac1.addItem
+							({EmpCode:Ac[j].EmpCode,FirstName:Ac[j].FirstName,LastName:Ac[j].LastName,
+								GuestId:Ac[j].GuestId,Occupancy:Ddl_Occupancy.selectedItem,
+								RoomType:RoomType,Tariff:Number(Txt_Tariff.text),RoomId:RoomId,
+								BookingPropertyId:BookingPropertyId,SSPId:SSPId,
+								BookingPropertyTableId:BookingPropertyTableId,Id:0,
+								ServicePaymentMode:ServicePaymentMode,TariffPaymentMode:TariffPaymentMode,
+								Name:Ac[j].Name,RoomCaptured:RoomCaptured,
+								//
+								Column1:Hlp_Column1.text,Column2:Hlp_Column2.text,
+								Column3:Hlp_Column3.text,Column4:Hlp_Column4.text,
+								Column5:Hlp_Column5.text,Column6:Hlp_Column6.text,
+								Column7:Hlp_Column7.text,Column8:Hlp_Column8.text,
+								Column9:Hlp_Column9.text,Column10:Hlp_Column10.text
+							});
+						Ac.removeItemAt(j);
+						j = 0;
+						Len = Ac.length;
+						j = j - 1;
+					}					
+				}
+				Grd_GuestTab3.dataProvider = Ac.source;
+				Grd_PropertyAssignedGuest.dataProvider = Ac1;
+				Btn_BackTab3.enabled = true;
+				Btn_Backed.enabled = true;
+				Pnl_CustomFields.visible = false;
 			}
 			
 			protected function Chk_HRPolicy_changeHandler():void
@@ -3251,8 +4305,6 @@
 			
 			public function FnImageBrowse():void
 			{
-				FilePath.text = "";
-				resultsTxtField.text = "";
 				Pnl123.visible = true;
 				init();	
 			}
@@ -3261,6 +4313,7 @@
 			{
 				if(FilePath.text == "")
 				{
+					//alignAlert(Alert.show("* File is Required.","Alert Message !",Alert.OK, null, null,iconWarning, Alert.OK),10,"");
 					Pnl123.visible = false;
 					FnAddtoCart();
 				}
@@ -3276,17 +4329,17 @@
 			public function init():void
 			{
 				Btn_Browse.addEventListener(MouseEvent.CLICK, browseFiles);
+				//Filedata.addEventListener(MouseEvent.CLICK, browseFiles);
 				fileRef.addEventListener(Event.SELECT, selectHandler);
 			}
 			
-			private var fileTypes:Array = new Array();
-			private var imageTypes:FileFilter = new FileFilter("Images (*.jpg; *.jpeg; *.gif; *.png)" ,"*.jpg; *.jpeg; *.gif; *.png");
-			private var documentTypes:FileFilter = new FileFilter("Documents (*.pdf), (*.doc), (*.rtf), (*.txt)",("*.pdf; *.doc; *.rtf, *.txt"));
+			//private var imageTypes:FileFilter = new FileFilter("Images ( *.jpg; *.jpeg; *.gif; *.png; *.eml)" ,"*.jpg; *.jpeg; *.gif; *.png; *.eml");			
+			//private var documentTypes:FileFilter = new FileFilter("Documents (*.pdf), (*.doc),(*.docx), (*.rtf), (*.txt)",("*.pdf; *.doc; *.rtf, *.txt"));
 			private function browseFiles(event:Event):void
 			{
-				fileTypes = new Array();
-				fileTypes.push(imageTypes);
-				fileTypes.push(documentTypes);
+				var fileTypes:Array = new Array();
+				//fileTypes.push(imageTypes);
+				//fileTypes.push(documentTypes);
 				fileRef.browse(fileTypes);
 			}
 			
@@ -3298,8 +4351,10 @@
 			
 			private function uploadFiles():void
 			{
+				cursorManager.setBusyCursor();
 				uploadURL = new URLRequest();
 				uploadURL.url = "http://sstage.in/BookingBTCUpload.php?id="+String(Id)+","+Img_RoomCaptured+"&pid=0&imgcount=0&imgformat="+FilePath.text;
+				//uploadURL.url = "http://sstage.in/BookingBTCUpload.php?id=Sakthi&pid=0&imgcount=0&imgformat="+ImageFormat;
 				uploadURL.method = "POST";
 				uploadURL.contentType = "multipart/form-data";
 				fileRef.addEventListener(Event.COMPLETE, completeHandler);
@@ -3309,15 +4364,16 @@
 				fileRef.addEventListener(IOErrorEvent.IO_ERROR,ioErrorHandler);
 				fileRef.upload(uploadURL);
 				Pnl123.visible = false;
-				FilePath.text = "";
 			}	
 			
 			private function completeHandler(event:Event):void
 			{
-								
+				//Alert.show("File Uploaded successfully");
+				cursorManager.removeBusyCursor();
 			}
 			private function dataHandler(event:DataEvent):void
 			{
+				cursorManager.removeBusyCursor();
 				resultsTxtField.text = "";
 				resultsTxtField.text = event.data.toString();
 				var Err_Image:String = resultsTxtField.text;
@@ -3335,33 +4391,37 @@
 					}
 					else
 					{
-						FnAddtoCart();						
+						FnAddtoCart();
 					}
 				}								
 			}
 			
 			private function securityErrorHandler(event:SecurityErrorEvent):void
-			{				
+			{
+				cursorManager.removeBusyCursor();
+				//mx.controls.Alert.show(String(event),"Security Error",0);
 				alignAlert(Alert.show("There was an error uploading the file, please try again!","Alert Message !",
 					Alert.OK, null, null,iconWarning, Alert.OK),10,"");
 			}
 			
 			private function httpStatusHandler(event:HTTPStatusEvent):void
 			{
+				cursorManager.removeBusyCursor();
 				alignAlert(Alert.show("There was an error uploading the file, please try again!","Alert Message !",
-					Alert.OK, null, null,iconWarning, Alert.OK),10,"");				
+					Alert.OK, null, null,iconWarning, Alert.OK),10,"");
+				//if (event.status != 200)
+				//{
+				//	mx.controls.Alert.show(String(event),"Error",0);
+				//}
 			}
 			
 			private function ioErrorHandler(event:IOErrorEvent):void
 			{
+				cursorManager.removeBusyCursor();
 				alignAlert(Alert.show("There was an error uploading the file, please try again!","Alert Message !",
 					Alert.OK, null, null,iconWarning, Alert.OK),10,"");
-			}		
-			
-			protected function Btn_Pnl123Close_clickHandler():void
-			{
-				Pnl123.visible = false;
-			}
+				//mx.controls.Alert.show(String(event),"ioError",0);
+			}	
 			
 		]]>
 	</fx:Script>	
@@ -3396,7 +4456,7 @@
 			<mx:Label x="327" y="154.25" text="Expected CheckIn Time"/>
 			<mx:Label x="690" y="192.25" text="Approximate Stay Days"/>
 			<mx:Label x="732" y="154.25" text="CheckOut Date"/>
-			<WrbComp:ProDGrid1 x="44.90001" y="220" width="900" height="242" id="Grd_Guest" depth="0"
+			<WrbComp:ProDGrid1 x="39.9" y="221" width="900" height="242" id="Grd_Guest" depth="0"
 							   _ColDataField="EmpCode~Title~FirstName~LastName~Grade~Designation~EmailId~MobileNo~Nationality~GuestId~GradeId~Id"
 							   _ColHdrText="Emp Code~Title~First Name~Last Name~Grade~Designation~Email Id~Mobile No~Nationality~GuestId~GradeId~Id"
 							   _ColType="hlp~hlp~txt~txt~txt~txt~txt~txt~txt~txt~txt~txt"
@@ -3445,15 +4505,20 @@
 								<mx:DataGridColumn width="80" dataField="RoomType" editable="false"/>
 								<mx:DataGridColumn width="35" dataField="TaxAdded" editable="false"
 												   headerText="Tax"/>								
-								<mx:DataGridColumn width="50" dataField="SingleTariff" editable="false"
+								<mx:DataGridColumn width="50" dataField="BaseTariff" editable="false"
+												   headerText="Base"/>
+								<mx:DataGridColumn width="0" dataField="SingleTariff" editable="false"
+												   visible="false"/>
+								<mx:DataGridColumn width="0" dataField="DoubleTariff" editable="false"
+												   visible="false"/>
+								<mx:DataGridColumn width="0" dataField="TripleTariff" editable="false"
+												   visible="false"/>
+								<mx:DataGridColumn width="50" dataField="SingleandMarkup" visible="true" editable="false"
 												   headerText="Single"/>
-								<mx:DataGridColumn width="50" dataField="DoubleTariff" editable="false"
-												   headerText="Double"/>
-								<mx:DataGridColumn width="50" dataField="TripleTariff" editable="false"
+								<mx:DataGridColumn width="50" dataField="DoubleandMarkup" visible="true" editable="false"
+												   headerText="Double"/>								
+								<mx:DataGridColumn width="50" dataField="TripleandMarkup" visible="true" editable="false"
 												   headerText="Triple"/>
-								<mx:DataGridColumn width="0" dataField="SingleandMarkup" visible="false"/>
-								<mx:DataGridColumn width="0" dataField="DoubleandMarkup" visible="false"/>								
-								<mx:DataGridColumn width="0" dataField="TripleandMarkup" visible="false"/>
 								<mx:DataGridColumn width="55" dataField="Markup" textAlign="right"/>
 								<mx:DataGridColumn width="60" dataField="SingleandMarkup1" editable="false"
 												   headerText="Mark 1"/>
@@ -3471,9 +4536,18 @@
 								<mx:DataGridColumn width="0" dataField="Locality" visible="false"/>
 								<mx:DataGridColumn width="0" dataField="LocalityId" visible="false"/>
 								<mx:DataGridColumn width="0" dataField="Id" visible="false"/>
+								<!-- EXTRA FIELDS IN API -->
 								<mx:DataGridColumn width="0" dataField="RatePlanCode" visible="false"/>
 								<mx:DataGridColumn width="0" dataField="RoomTypeCode" visible="false"/>
-								<mx:DataGridColumn width="0" dataField="APIHdrId" visible="false"/>								
+								<mx:DataGridColumn width="0" dataField="APIHdrId" visible="false"/>
+								<mx:DataGridColumn width="0" dataField="TripadvisorRating" visible="false"/>
+								<!-- 29 DEC 2014 -->
+								<mx:DataGridColumn width="0" dataField="LTAgreed" visible="false"/>
+								<mx:DataGridColumn width="0" dataField="LTRack" visible="false"/>								
+								<mx:DataGridColumn width="0" dataField="STAgreed" visible="false"/>
+								<mx:DataGridColumn width="0" dataField="TaxInclusive" visible="false"/>
+								<mx:DataGridColumn width="0" dataField="GeneralMarkup" visible="false"/>
+								<mx:DataGridColumn width="0" dataField="SC" visible="false"/>
 							</mx:columns>
 						</mx:DataGrid>
 						<mx:DataGrid id="Grd_RecommendedProperty" x="22.25" y="397" width="925" height="228"
@@ -3504,15 +4578,17 @@
 												   textAlign="left"/>
 								<mx:DataGridColumn width="35" dataField="TaxAdded" editable="false"
 												   headerText="Tax"/>
-								<mx:DataGridColumn width="50" dataField="SingleTariff" editable="false"
-												   headerText="Single"/>
-								<mx:DataGridColumn width="50" dataField="DoubleTariff" editable="false"
-												   headerText="Double"/>
-								<mx:DataGridColumn width="50" dataField="TripleTariff" editable="false"
-												   headerText="Triple"/>
-								<mx:DataGridColumn width="0" dataField="SingleandMarkup" visible="false"/>
-								<mx:DataGridColumn width="0" dataField="DoubleandMarkup" visible="false"/>								
-								<mx:DataGridColumn width="0" dataField="TripleandMarkup" visible="false"/>
+								<mx:DataGridColumn width="50" dataField="BaseTariff" editable="false"
+												   headerText="Base"/>
+								<mx:DataGridColumn width="0" dataField="SingleTariff" visible="false"/>
+								<mx:DataGridColumn width="0" dataField="DoubleTariff" visible="false"/>
+								<mx:DataGridColumn width="0" dataField="TripleTariff" visible="false"/>
+								<mx:DataGridColumn width="50" dataField="SingleandMarkup" headerText="Single"
+												   editable="false"/>
+								<mx:DataGridColumn width="50" dataField="DoubleandMarkup" headerText="Double"
+												   editable="false"/>								
+								<mx:DataGridColumn width="50" dataField="TripleandMarkup" headerText="Triple"
+												   editable="false"/>
 								<mx:DataGridColumn width="55" dataField="Markup" textAlign="right"/>
 								<mx:DataGridColumn width="60" dataField="SingleandMarkup1" editable="false"
 												   headerText="Mark 1"/>
@@ -3530,9 +4606,18 @@
 								<mx:DataGridColumn width="0" dataField="Locality" visible="false"/>
 								<mx:DataGridColumn width="0" dataField="LocalityId" visible="false"/>
 								<mx:DataGridColumn width="0" dataField="Id" visible="false"/>
+								<!-- EXTRA FIELDS IN API -->
 								<mx:DataGridColumn width="0" dataField="RoomPlanCode" visible="false"/>
 								<mx:DataGridColumn width="0" dataField="RoomTypeCode" visible="false"/>
 								<mx:DataGridColumn width="0" dataField="APIHdrId" visible="false"/>
+								<mx:DataGridColumn width="0" dataField="TripadvisorRating" visible="false"/>
+								<!-- 29 DEC 2014 -->
+								<mx:DataGridColumn width="0" dataField="LTAgreed" visible="false"/>
+								<mx:DataGridColumn width="0" dataField="LTRack" visible="false"/>								
+								<mx:DataGridColumn width="0" dataField="STAgreed" visible="false"/>
+								<mx:DataGridColumn width="0" dataField="TaxInclusive" visible="false"/>
+								<mx:DataGridColumn width="0" dataField="GeneralMarkup" visible="false"/>
+								<mx:DataGridColumn width="0" dataField="SC" visible="false"/>
 							</mx:columns>
 						</mx:DataGrid>
 						
@@ -3544,6 +4629,7 @@
 											  onselection="{FnOnselection_State()}" pxTabIndex="26"
 											  pxSetColumnsWidth="198,0" depth="1" pxSetHeight="233">
 						</WrbHelpComp:HelpText>
+						<!-- Below -->
 						<mx:Label x="22.25" y="638.45" text="Booker Name"/>
 						<s:DropDownList id="Ddl_Booker" x="148" y="637.45" width="175" height="23" tabIndex="32"
 										prompt="Please Select Booker" change="Ddl_Booker_changeHandler(event)"
@@ -3563,10 +4649,13 @@
 									tabIndex="33"/>
 						<WrbComp:Button_HB id="Btn_NextTab2" x="863.2" y="715.25006" _Label="Next" depth="1"
 										   click="API_Tab2_to_Tab3()"/>
+						<!--Btn_NextTab2_clickHandler-->
 						<WrbComp:Button_HB id="Btn_BackTab2" x="22.25" y="715.25" _Label="Back"
 										   click="Btn_BackTab2_clickHandler(event)"/>
 						<WrbComp:Button_HB id="Btn_SendMail" x="430" y="720.25" width="150" buttonMode="true"
 										   _Label="Recommend Property" click="FnSave_RecommandProperty()"/>
+						
+						<!--Below -->
 						<s:TextInput id="Txt_PropertyFilter" x="301.25" y="51" width="150" height="23"
 									 change="Txt_PropertyFilter_changeHandler(event)"
 									 prompt="Property Filter" tabIndex="30"/>
@@ -3684,7 +4773,7 @@
 								   click="Btn_Backed_clickHandler(event)" width="110"/>
 				<WrbComp:Button_HB id="Btn_Add" x="481" y="185" _Label="Add to Cart"
 								   click="Btn_Add_clickHandler(event)" buttonMode="true"/>
-				<WrbComp:Button_HB id="Btn_AdvancePaid" x="283" y="185" _Label="Advance Paid"
+				<WrbComp:Button_HB id="Btn_AdvancePaid" x="283" y="70" _Label="Advance Paid"
 								   click="Btn_AdvancePaid_clickHandler(event)" buttonMode="true"
 								   width="100"/>
 				<s:TextArea id="Txt_SpecialRequirements" x="465.8" y="433" width="200" height="32"
@@ -3890,21 +4979,19 @@
 						<WrbComp:Button_HB id="Btn_PnlClose" _Label="Close" click="Btn_PnlClose_click()"/>
 					</s:HGroup>
 				</s:Panel>
-				<mx:Panel id="Pnl123" x="279" y="128" width="511" height="189"  visible="false"
-						  title="Uploader">
-					<s:BorderContainer width="100%" height="100%">					
-						<s:TextInput id="FilePath" visible="true" x="33" y="33" width="350" height="25"/>
-						<WrbComp:Button_HB id="Btn_Browse" x="400" y="29.5" _Label="Browse"
-										   buttonMode="true" click="FnImageBrowse()" depth="0"/>						
-						<WrbComp:Button_HB id="Btn_Upload" x="160" y="90" _Label="Upload"
-										   buttonMode="true" click="FnImageSave()" depth="0"/>
-						<WrbComp:Button_HB id="Btn_Pnl123Close" x="263" y="90" _Label="Close"
-										   buttonMode="true" click="Btn_Pnl123Close_clickHandler()"
-										   depth="0"/>
-						<mx:TextArea id="resultsTxtField" x="23" y="64" width="150" height="20"
-									 name="resultsTxtField" visible="false"/>
-					</s:BorderContainer>
-				</mx:Panel>
+				<s:CheckBox x="283" y="192" label="Send Confirmation Email" id="Chk_PaymentEmail" depth="0"/>
+				<s:Panel x="253" y="133" width="515" height="131" id="Pnl123" title="Upload Files" borderVisible="false"
+						 visible="false">
+					<s:Label x="496" y="-22" text="X" click="{Pnl123.visible = false;}" buttonMode="true"
+							 toolTip="Close"/>
+					<s:TextInput id="FilePath" visible="true" x="31" y="31" width="259" height="32"/>
+					<WrbComp:Button_HB id="Btn_Browse" x="303" y="31" height="32" _Label="Browse"
+									   buttonMode="true" click="FnImageBrowse()" depth="0"/>
+					<WrbComp:Button_HB id="Btn_Upload" x="400" y="31" _Label="Add"
+									   buttonMode="true" click="FnImageSave()" depth="0"/>
+					<mx:TextArea id="resultsTxtField" x="48" y="6" width="150" height="20"
+								 name="resultsTxtField" visible="true"/>
+				</s:Panel>
 			</s:BorderContainer>
 			<WrbComp:Button_HB id="Btn_Tab1Next" x="860" y="479.25" _Label="Next" depth="0"
 							   click="Btn_Tab1Next_clickHandler(event)" buttonMode="true"/>

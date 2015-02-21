@@ -102,7 +102,10 @@ s|DropDownList
 	symbolColor:#eb1c24;
 	
 }
-
+/*mx|CursorManager
+{
+	busyCursor: Embed(skinClass="CursorManager_busyCursor");
+}*/
 mx|DataGrid
 {
 	color: #585656;
@@ -125,16 +128,13 @@ mx|DataGrid
 	fontWeight: bold;
 	textAlign: center;
 } 
-mx|CursorManager
-/*{
-	busyCursor: Embed(skinClass="CursorManager_busyCursor");
-}
+
 mx|DateChooser
 {
-	nextMonthSkin: Embed(skinClass="DateChooser_nextMonthSkin");
+	/*nextMonthSkin: Embed(skinClass="DateChooser_nextMonthSkin");
 	nextYearSkin: Embed(skinClass="DateChooser_nextYearSkin");
 	prevMonthSkin: Embed(skinClass="DateChooser_prevMonthSkin");
-	prevYearSkin: Embed(skinClass="DateChooser_prevYearSkin");	
+	prevYearSkin: Embed(skinClass="DateChooser_prevYearSkin");	*/
 	
 	focusColor:#7C7C7C;
 	todayStyleName: dateChooserToday;
@@ -154,7 +154,7 @@ mx|DateChooser
 	borderVisible:false;
 	chromeColor:#eb1c24;
 	headerColors:#eb1c24;
-}*/
+}
 
 
 s|RadioButton

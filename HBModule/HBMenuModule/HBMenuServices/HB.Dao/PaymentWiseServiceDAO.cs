@@ -23,10 +23,11 @@ namespace HB.Dao
             command.CommandText = StoredProcedures.PaymentWiseService_Help;
             command.CommandType = CommandType.StoredProcedure;
             command.Parameters.Add("@Action", SqlDbType.NVarChar).Value = data[1].ToString();
-            command.Parameters.Add("@Str", SqlDbType.NVarChar).Value = data[3].ToString();
-            command.Parameters.Add("@FromDt", SqlDbType.NVarChar).Value =data[2].ToString();
+            command.Parameters.Add("@Str", SqlDbType.NVarChar).Value = data[2].ToString();
+            command.Parameters.Add("@FromDt", SqlDbType.NVarChar).Value =data[3].ToString();
             command.Parameters.Add("@ToDt", SqlDbType.NVarChar).Value = data[4].ToString();
             command.Parameters.Add("@ClientId", SqlDbType.Int).Value = Convert.ToInt32(data[5].ToString());
+            command.Parameters.Add("@UserId", SqlDbType.Int).Value = Convert.ToInt32(data[6].ToString());
             return new WrbErpConnection().ExecuteDataSet(command, UserData);
         }
     }

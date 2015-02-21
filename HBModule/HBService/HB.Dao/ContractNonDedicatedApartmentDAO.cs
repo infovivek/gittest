@@ -12,6 +12,7 @@ namespace HB.Dao
 {
     public class ContractNonDedicatedApartmentDAO
     {
+        string UserData;
         public DataSet Save(string NonDedicatedContractApartDtls, User user, int NonDedicatedContractId)
         {
             DataSet ds = new DataSet();
@@ -127,11 +128,19 @@ namespace HB.Dao
                 command = new SqlCommand();
                 if (ctrNonDdApt.Id != 0)
                 {
+                    UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                    "', SctId:" + user.SctId + ", Service:ContractNonDedicatedApartment_Update" +
+                     ", ProcName:'" + StoredProcedures.ContractNonDedicatedApartment_Update;
+
                     command.CommandText = StoredProcedures.ContractNonDedicatedApartment_Update;
                     command.Parameters.Add("@Id", SqlDbType.BigInt).Value = ctrNonDdApt.Id;
                 }
                 else
                 {
+                    UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                    "', SctId:" + user.SctId + ", Service:ContractNonDedicatedApartment_Insert" +
+                     ", ProcName:'" + StoredProcedures.ContractNonDedicatedApartment_Insert;
+
                     command.CommandText = StoredProcedures.ContractNonDedicatedApartment_Insert;
                 }
                 command.CommandType = CommandType.StoredProcedure;
@@ -150,7 +159,7 @@ namespace HB.Dao
                 command.Parameters.Add("@PropertyName", SqlDbType.NVarChar).Value = ctrNonDdApt.Property;
                 command.Parameters.Add("@PropertyCategory", SqlDbType.NVarChar).Value = ctrNonDdApt.PrtyCategory;
                 command.Parameters.Add("@PropertyId", SqlDbType.BigInt).Value = ctrNonDdApt.PropertyId;
-                ds = new WrbErpConnection().ExecuteDataSet(command, "");
+                ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
             }
             if (n == 0)
             {

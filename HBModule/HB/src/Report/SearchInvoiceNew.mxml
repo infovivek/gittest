@@ -13,6 +13,7 @@
 			<s:SimpleMotionPath property="alpha" valueFrom="1.0" valueTo="0.0" />
 		</s:Animate>
 		<s:RadioButtonGroup id="Modes"  change="CourierChange()"/> 
+		<mx:NumberFormatter id="NF_Two" precision="2" rounding="nearest"/>
 	</fx:Declarations>
 	
 	<fx:Script source = "..\\Common\\CommonScript.as"/>
@@ -21,11 +22,17 @@
 	<fx:Script>
 		<![CDATA[ 
 			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			import mx.events.CloseEvent;
 			public static var GlobalXml:String = ""; 
 			public var ErrorFlag:Boolean=true; 
 			public var Id:Number=0; 	public var Str_ChkOut:String="",Str_Serv:String="",Str_Settle:String="";
-			public var Str_ChkOut1:String="",Str_Serv1:String="",Str_Settle1:String="",Str_ChkOutTAC:String="";
-			public var InVoiceNo:String="",ChkOutHdrId:int=0,Statuss:String="";
+			public var Str_ChkOut1:String="",Str_Serv1:String="",Str_Settle1:String="",Str_ChkOutTAC:String="",ErrMsg:String="";
+			public var InVoiceNo:String="",ChkOutHdrId:int=0,Statuss:String="",BillType:String="",ErrStr:String="",ErrStr1:String="";
+			public var AddMode:Boolean=true,Flag:Boolean=true;
+			public 	var Type:String="";
+			public var Str_Tariff:String="",Str_CServ:String="";
+			public var PrintTariffId:int=0;
+			
 			protected function PageLoad():void
 			{
 				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
@@ -52,11 +59,17 @@
 				
 				
 				Str_ChkOutTAC="http://sstage.in/HBReport/ExternalCheckoutTAC.aspx?";
+				// Rdlc Print
+				Str_Tariff="http://localhost:6236/CreditNoteTariffBill.aspx?";
+				Str_CServ="http://localhost:6236/CreditNoteServiceBill.aspx?";
+//				Str_Tariff="http://sstage.in/HBReport/CreditNoteTariffBill.aspx?";
+//				Str_CServ="http://sstage.in/HBReport/CreditNoteServiceBill.aspx?";
 				Modes.selectedValue=0;
+				
 			}
 			private function Custom_WebSer_Result (Ds_Objects:Object):void
 			{ 
-				Grd_SearchInvoice.dataProvider= null;
+				//Grd_SearchInvoice.dataProvider= null;
 				try
 				{
 					if (Ds_Objects.currentTarget.description.toString() == "Report_CUSTOM")
@@ -79,6 +92,143 @@
 				catch(Exception)
 				{
 					
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "CreditNoteTariff_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Txt_CrdInVoiceNo.text=Ds_Objects.result.Tables.Table.Rows[0].CreditNoteNo;
+						
+					}
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Txt_ChkInVoiceNo.text=Ds_Objects.result.Tables.Table1.Rows[0].InVoiceNo
+						Txt_ChkOutId.text=Ds_Objects.result.Tables.Table1.Rows[0].ChkOutId;
+						Txt_PropertyId.text=Ds_Objects.result.Tables.Table1.Rows[0].PropertyId;
+					}
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_Tariff.dataProvider=Ds_Objects.result.Tables.Table2.Rows as ArrayCollection;
+					}
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						lbl_LT.text=Ds_Objects.result.Tables.Table3.Rows[0].LuxuryTaxPer
+						lbl_TST.text=Ds_Objects.result.Tables.Table3.Rows[0].ServiceTaxPer
+						lbl_Vat.text=Ds_Objects.result.Tables.Table3.Rows[0].VATPer
+						lbl_STFB.text=Ds_Objects.result.Tables.Table3.Rows[0].RestaurantSTPer
+					}
+					
+					if(Grd_Tariff.dataProvider !=null)
+					{
+						var TotAmt:Number=0,Len:Number=0;
+						var TempGrids:ArrayCollection = Grd_Tariff.dataProvider as ArrayCollection;
+						for(var i:int=0;i<TempGrids.length;i++)
+						{
+							TotAmt+=Number(TempGrids[i].Total);
+						}
+						var LT:Number=Number(lbl_LT.text);
+						var ST:Number=Number(lbl_TST.text);
+						var TLT:Number=TotAmt*LT/100
+						var TST:Number=TotAmt*ST/100
+						var LT1:String=NF_Two.format(TLT);
+						Txt_LT.text=LT1.replace(",","");
+						var ST1:String=NF_Two.format(TST);
+						Txt_TST.text=ST1.replace(",","");
+						var TA:String=NF_Two.format(TotAmt+TLT+TST);
+						Txt_TTotal.text=TA.replace(",","");
+					}
+										
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "CreditNoteService_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Txt_CrdInVoiceNo.text=Ds_Objects.result.Tables.Table.Rows[0].CreditNoteNo;
+						
+					}
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Txt_ChkInVoiceNo.text=Ds_Objects.result.Tables.Table1.Rows[0].InVoiceNo
+						Txt_ChkOutId.text=Ds_Objects.result.Tables.Table1.Rows[0].ChkOutId;
+						Txt_PropertyId.text=Ds_Objects.result.Tables.Table1.Rows[0].PropertyId;
+					}
+					
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_Service.dataProvider=Ds_Objects.result.Tables.Table2.Rows as ArrayCollection;
+					}
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						lbl_LT.text=Ds_Objects.result.Tables.Table3.Rows[0].LuxuryTaxPer
+						lbl_TST.text=Ds_Objects.result.Tables.Table3.Rows[0].ServiceTaxPer
+						lbl_Vat.text=Ds_Objects.result.Tables.Table3.Rows[0].VATPer
+						lbl_STFB.text=Ds_Objects.result.Tables.Table3.Rows[0].RestaurantSTPer
+					}
+					
+					if(Grd_Service.dataProvider !=null)
+					{
+						var TotAmt:Number=0,Len:Number=0;
+						var TempGrids1:ArrayCollection = Grd_Service.dataProvider as ArrayCollection;		
+						for(var i:int=0;i<TempGrids1.length;i++)
+						{
+							TotAmt+=Number(TempGrids1[i].Total);
+						}
+						var VAT:Number=Number(lbl_Vat.text);
+						var STFB:Number=Number(lbl_STFB.text);
+						var ST:Number=Number(lbl_ST.text);
+						var VT:Number=TotAmt*VAT/100
+						var SFB:Number=TotAmt*STFB/100
+						var STS:Number=TotAmt*ST/100
+						var VT1:String=NF_Two.format(VT);
+						Txt_Vat.text=VT1.replace(",","");
+						var STF:String=NF_Two.format(SFB);
+						Txt_STFB.text=STF.replace(",","");
+						var ST1:String=NF_Two.format(STS);
+						Txt_ST.text=ST1.replace(",","");
+						var TA:String=NF_Two.format(TotAmt+VT+SFB+STS);
+						Txt_STotal.text=TA.replace(",","");
+					}
+					
+				}
+				
+				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
+				{
+					Type=Ds_Objects.result.Tables.Table.Rows[0].Type
+					if(Type=="Tariff")
+					{
+						PrintTariffId=0
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{
+							PrintTariffId=Ds_Objects.result.Tables.Table.Rows[0].Id;
+							ExternalInterface.call("changeDocumentTitle",Str_Tariff+PrintTariffId);
+						}
+						else
+						{
+							alignAlert(Alert.show("CreditNote Added Successfully.","Message !",Alert.OK,
+								null, null,	iconTickLarge, Alert.OK),10,"");
+						}
+					}
+					else if(Type=="Service")
+					{
+						PrintTariffId=0
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{
+							PrintTariffId=Ds_Objects.result.Tables.Table.Rows[0].Id;
+							ExternalInterface.call("changeDocumentTitle",Str_CServ+PrintTariffId);
+						}
+						else
+						{
+							alignAlert(Alert.show("CreditNote Added Successfully.","Message !",Alert.OK,
+								null, null,	iconTickLarge, Alert.OK),10,"");
+						}
+					}
+					else if(Type=="Exists")
+					{
+						alignAlert(Alert.show("CreditNote is Already Submitted For this InVoice .","Message !",Alert.OK,
+							null, null,	iconWarning, Alert.OK),10,"");
+					}
+					
+					ClearTariff()
 				}
 			}
 			
@@ -247,7 +397,7 @@
 					}	
 				}
 			} 
-			public var Type:String="";
+			
 			protected function CourierChange()
 			{
 				// TODO Auto-generated method stub
@@ -389,34 +539,332 @@
 				InVoiceNo=Grd_SearchInvoice.selectedItem.InvoiceNumber;
 				ChkOutHdrId=Grd_SearchInvoice.selectedItem.ChkoutId;
 				Statuss=Grd_SearchInvoice.selectedItem.Status;
-				//useWeb("VendorChequeApproval","Actionload_CUSTOM",[GlobalXml,"Action",InVoiceNo,'','','','',ChkOutHdrId,0,0]);
-				if(Statuss=='UnSettled')
-				{
-					brd_CreditNote.visible=true
-				}
-				else
-				{
-					alignAlert(Alert.show("Select Unsettled Invoice","Alert Message !",
-						Alert.OK,null,null,iconWarning,Alert.OK),10,"");
-					return;
-				}
+				BillType=Grd_SearchInvoice.selectedItem.BillType;
+				//useWeb("VendorChequeApproval","Actionload_CUSTOM",[GlobalXml,"Action",,'','','','',ChkOutHdrId,0,0]);
+				
+//				if(Statuss=='UnSettled')
+//				{
+					if(BillType=='Tariff')
+					{
+	    				brd_CreditNote.visible=true;
+						brd_Tariff.visible=true;
+						brd_Service.visible=false;
+						useWeb("SearchInvoiceReport","CreditNoteTariff_CUSTOM",[GlobalXml,"CreditNoteTariff",InVoiceNo,'','','','',ChkOutHdrId,0,0]);
+					}
+					else if(BillType=='Service')
+					{
+						brd_CreditNote.visible=true
+						brd_Tariff.visible=false;
+						brd_Service.visible=true;
+						useWeb("SearchInvoiceReport","CreditNoteService_CUSTOM",[GlobalXml,"CreditNoteService",InVoiceNo,'','','','',ChkOutHdrId,0,0]);
+					}
+					else 
+					{
+						alignAlert(Alert.show("Select Tariff or Service","Alert Message !",
+													Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+												return;
+					}
+//				}
+//				else
+//				{
+//					alignAlert(Alert.show("Select Unsettled Invoice","Alert Message !",
+//						Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+//					return;
+//				}
 			}
 			protected function FnC_clickHandler(event):void
 			{
-				brd_CreditNote.visible=false;				
+				brd_CreditNote.visible=false;//Clear();				
 			}
 			
-			protected function button1_clickTariff(event:MouseEvent):void
+//			protected function button1_clickTariff(event:MouseEvent):void
+//			{
+//				brd_Tariff.visible=true;
+//				brd_Service.visible=false;				
+//			}
+//			protected function button2_clickService(event:MouseEvent):void
+//			{
+//				brd_Tariff.visible=false;
+//				brd_Service.visible=true;
+//			}
+			protected function FnValidation_BeforeTariffSave():String
 			{
-				brd_Tariff.visible=true;
-				brd_Service.visible=false;				
+				ErrStr="";
+				var Flag:Boolean=true;
+				if(Txt_ChkInVoiceNo.text=="")
+				{
+					if(Flag==true)
+					{
+						Txt_ChkInVoiceNo.setFocus();
+						Flag=false;
+					}
+					ErrStr=ErrStr+"* Check Out InVoice No is Required.\n";
+				}
+				if(Txt_CrdInVoiceNo.text=="")
+				{
+					if(Flag==true)
+					{
+						Txt_CrdInVoiceNo.setFocus();
+						Flag=false;
+					}
+					ErrStr=ErrStr+"* Credit Note No is Required.\n";
+				}
+				if((Grd_Tariff.dataProvider==null)||(Grd_Tariff.dataProvider.length==0))
+				{
+					if(Flag==true)
+					{
+						Grd_Tariff.setFocus();
+						Flag=false;
+					}
+					ErrStr=ErrStr+"* Check Out InVoice No is Required.\n";
+				}
+				
+				if(txt_TariffDes.text=="")
+				{
+					if(Flag==true)
+					{
+						txt_TariffDes.setFocus();
+						Flag=false;
+					}
+					ErrStr=ErrStr+"* Description is Required.\n";
+				}
+				
+				return ErrStr;
 			}
-			protected function button2_clickService(event:MouseEvent):void
+			protected function btn_TariffSave(event:MouseEvent):void
 			{
-				brd_Tariff.visible=false;
-				brd_Service.visible=true;
+				ErrStr="";
+				ErrMsg = ""; Flag = true; 
+				var Str:String=FnValidation_BeforeTariffSave();
+				if(ErrStr !="")
+				{
+					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10,"");
+					return;
+				} 
+				else
+				{
+					alignAlert(Alert.show("Do you want to Submit the Credit Note For Tariff?", "Warning",Alert.YES | Alert.NO, null,
+						FnTariffSave1, iconWarning, Alert.NO),10,"");
+				}
+				
 			}
-			
+			protected function FnTariffSave1(event:CloseEvent):void
+			{
+				if ((event.detail==Alert.YES)) 
+				{
+					    	var arrcopy:ArrayCollection = new ArrayCollection
+							([{ 
+								ChkInVoiceNo:Txt_ChkInVoiceNo.text,
+								CrdInVoiceNo:'',
+								CreditNoteNo:Txt_CrdInVoiceNo.text,
+								LuxuryTax:Txt_LT.text,
+								ServiceTax1:Txt_TST.text,
+								ServiceTax2:Txt_TST1.text,
+								TotalAmount:Txt_TTotal.text,
+								Description:txt_TariffDes.text,
+								ChkOutId:Txt_ChkOutId.text,
+								PropertyId:Txt_PropertyId.text,
+								Id:Id
+							}])
+					}
+					var StatusGrid:ArrayCollection=new ArrayCollection();
+					StatusGrid=Grd_Tariff.dataProvider as ArrayCollection
+					var HdrXml:String="";
+					HdrXml += "<ROOT>";
+					HdrXml += ObjToXmlStr_Comm(StatusGrid,"HdrXml")
+					HdrXml += "</ROOT>";
+					
+					var HdrXml1:String=""
+					HdrXml1 += "<ROOT>";	
+					HdrXml1 += ObjToXmlStr_Comm(arrcopy,"HdrXml1") 
+					HdrXml1 += "</ROOT>";
+					useWeb("CreditNoteTariff","Save_CUSTOM",[GlobalXml,HdrXml1,HdrXml]);
+			}
+			protected function FnValidation_BeforeServiceSave():String
+			{
+				ErrStr="";
+				var Flag:Boolean=true;
+				if(Txt_ChkInVoiceNo.text=="")
+				{
+					if(Flag==true)
+					{
+						Txt_ChkInVoiceNo.setFocus();
+						Flag=false;
+					}
+					ErrStr=ErrStr+"* Check Out InVoice No is Required.\n";
+				}
+				if(Txt_CrdInVoiceNo.text=="")
+				{
+					if(Flag==true)
+					{
+						Txt_CrdInVoiceNo.setFocus();
+						Flag=false;
+					}
+					ErrStr=ErrStr+"* Credit Note No is Required.\n";
+				}
+				if((Grd_Service.dataProvider==null)||(Grd_Service.dataProvider.length==0))
+				{
+					if(Flag==true)
+					{
+						Grd_Service.setFocus();
+						Flag=false;
+					}
+					ErrStr=ErrStr+"* Check Out InVoice No is Required.\n";
+				}
+				if(txt_Service.text=="")
+				{
+					if(Flag==true)
+					{
+						txt_Service.setFocus();
+						Flag=false;
+					}
+					ErrStr=ErrStr+"* Description is Required.\n";
+				}
+				return ErrStr;
+			}
+			protected function btn_ServiceSave(event:MouseEvent):void
+			{
+				ErrStr="";
+				ErrMsg = ""; Flag = true; 
+				var Str:String=FnValidation_BeforeServiceSave();
+				if(ErrStr !="")
+				{
+					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10,"");
+					return;
+				} 
+				else
+				{
+					alignAlert(Alert.show("Do you want to Submit the Credit Note For Service?", "Warning",Alert.YES | Alert.NO, null,
+						FnServiceSave1, iconWarning, Alert.NO),10,"");
+				}
+				
+			}
+			protected function FnServiceSave1(event:CloseEvent):void
+			{
+				if ((event.detail==Alert.YES)) 
+				{
+					var arrcopy:ArrayCollection = new ArrayCollection
+						([{ 
+							ChkInVoiceNo:Txt_ChkInVoiceNo.text,
+							CrdInVoiceNo:'',
+							CreditNoteNo:Txt_CrdInVoiceNo.text,
+							VAT:Txt_Vat.text,
+							ServiceTaxFB:Txt_STFB.text,
+							ServiceTaxOT:Txt_ST.text,
+							Cess:0.00,
+							HECess:0.00,
+							TotalAmount:Txt_STotal.text,
+							Description:txt_Service.text,
+							ChkOutId:Txt_ChkOutId.text,
+							PropertyId:Txt_PropertyId.text,
+							Id:Id
+						}])
+				}
+				var ServiceGrid:ArrayCollection=new ArrayCollection();
+				ServiceGrid=Grd_Service.dataProvider as ArrayCollection
+				var HdrXml:String="";
+				HdrXml += "<ROOT>";
+				HdrXml += ObjToXmlStr_Comm(ServiceGrid,"HdrXml")
+				HdrXml += "</ROOT>";
+				
+				var HdrXml1:String=""
+				HdrXml1 += "<ROOT>";	
+				HdrXml1 += ObjToXmlStr_Comm(arrcopy,"HdrXml1") 
+				HdrXml1 += "</ROOT>";
+				useWeb("CreditNoteService","Save_CUSTOM",[GlobalXml,HdrXml1,HdrXml]);
+			}
+			protected function Grd_Ingredients_focusOutHandler(event:FocusEvent):void
+			{
+				var temp_Val2:String=event.currentTarget.editable;
+				if(event.currentTarget.editedItemPosition != null)
+				{ 
+					
+					var Val2:Number =event.currentTarget.selectedItem.TariffAmount
+					var Val3:Number =event.currentTarget.selectedItem.NoOfDays						
+					event.currentTarget.selectedItem.Total = Val2*Val3;
+					var TotAmt:Number=0,Len:Number=0;
+					var TempGrids:ArrayCollection = Grd_Tariff.dataProvider as ArrayCollection;
+					TotAmt=event.currentTarget.selectedItem.Total
+					var LT:Number=Number(lbl_LT.text);
+					var ST:Number=Number(lbl_TST.text);
+					var STC:Number=Number(lbl_TSC.text);
+					var TLT:Number=TotAmt*LT/100
+					var TST:Number=TotAmt*ST/100
+					var TSC:Number=	TotAmt*STC/100
+					var LT1:String=NF_Two.format(TLT);
+					Txt_LT.text=LT1.replace(",","");
+					var ST1:String=NF_Two.format(TST);
+					Txt_TST.text=ST1.replace(",","");
+					var ST2:String=NF_Two.format(TSC);
+					Txt_TST1.text=ST2.replace(",","");
+					var TA:String=NF_Two.format(TotAmt+TLT+TST+TSC);
+					Txt_TTotal.text=TA.replace(",","");
+												
+				}
+				else
+				{
+					
+				}
+			}
+			protected function Grd_Ingredients_focusOutHandler1(event:FocusEvent):void
+			{
+				var Tot:Number=0;
+				var temp_Val2:String=event.currentTarget.editable;
+				if(event.currentTarget.editedItemPosition != null)
+				{ 
+					
+					var Val2:Number =event.currentTarget.selectedItem.ServiceAmount
+					var Val3:Number =event.currentTarget.selectedItem.Quantity						
+					
+					 Tot=(Val2*Val3);
+					 event.currentTarget.selectedItem.Total = Tot;
+					var TotAmt:Number=0,Len:Number=0;
+					var TempGrids:ArrayCollection = Grd_Service.dataProvider as ArrayCollection;
+					for(var i:int=0;i<TempGrids.length;i++)
+					{
+						TotAmt+=Number(TempGrids[i].Total);
+					}
+					var VAT:Number=Number(lbl_Vat.text);
+					var STFB:Number=Number(lbl_STFB.text);
+					var ST:Number=Number(lbl_ST.text);
+					var VT:Number=TotAmt*VAT/100
+					var SFB:Number=TotAmt*STFB/100
+					var STS:Number=TotAmt*ST/100
+					var VT1:String=NF_Two.format(VT);
+					Txt_Vat.text=VT1.replace(",","");
+					var STF:String=NF_Two.format(SFB);
+					Txt_STFB.text=STF.replace(",","");
+					var ST1:String=NF_Two.format(STS);
+					Txt_ST.text=ST1.replace(",","");
+					var TA:String=NF_Two.format(TotAmt+VT+SFB+STS);
+					Txt_STotal.text=TA.replace(",","");
+											
+				}
+				else
+				{
+					
+				}
+			}
+			protected function ClearTariff():void
+			{
+					Txt_ChkInVoiceNo.text="";
+					Txt_CrdInVoiceNo.text="";
+					Txt_LT.text="";
+					Txt_TST.text="";
+					Txt_TTotal.text="";
+					txt_TariffDes.text="";
+					Txt_ChkOutId.text="";
+					Txt_PropertyId.text="";
+					Id:0
+					Grd_Tariff.dataProvider=null;
+					Grd_Service.dataProvider=null;
+					Txt_Vat.text="";lbl_LT.text="";lbl_TST.text="";
+					txt_TariffDes.text="";lbl_STFB.text="";
+					Txt_STFB.text="";Txt_ST.text="";Txt_STotal.text="";
+					txt_Service.text="";lbl_Vat.text="";
+					lbl_ST.text="";brd_CreditNote.visible=false;
+					
+			}
 		]]>
 	</fx:Script>
 	<s:BorderContainer x="0" y="30" width="100%" height="84" borderVisible="false" backgroundColor="#f4efef" depth="10">
@@ -501,77 +949,83 @@
 			 
 		</s:HGroup> 
 	</s:BorderContainer> 
+	
 	<s:BorderContainer x="0" y="116" width="100%" height="396" id="brd_CreditNote"	borderVisible="true" visible="false" depth="1500">
-	<mx:Label x="113" y="56" text="CheckOut InVoiceNo"/>
-	<s:TextInput x="266" y="56" width="163" height="18"  id="Txt_ChkInVoiceNo" editable="false"/>
-		<mx:Label x="463" y="56" text="CreditNote InVoiceNo"/>
-		<s:TextInput x="606" y="56" width="163" height="18"  id="Txt_CrdInVoiceNo" editable="false"/>
+	<mx:Label x="173" y="56" text="CheckOut InVoiceNo"/>
+	<s:TextInput x="326" y="56" width="163" height="18"  id="Txt_ChkInVoiceNo" editable="false"/>
+		<s:TextInput x="266" y="56" width="163" height="18"  id="Txt_ChkOutId" editable="false" visible="false"/>
+		<s:TextInput x="266" y="56" width="163" height="18"  id="Txt_PropertyId" editable="false" visible="false"/>
+		<mx:Label x="523" y="56" text="CreditNote No"/>
+		<s:TextInput x="646" y="56" width="163" height="18"  id="Txt_CrdInVoiceNo" editable="false"/>
 	<s:BorderContainer x="69" y="79" width="1174" height="309" id="brd_Tariff"
 						   borderVisible="true" visible="true" depth="1500">
-		<mx:DataGrid id="Grd_Tariff" x="179" y="17" width="789" height="124"  editable="false" tabIndex="3" verticalAlign="middle">
+		<mx:DataGrid id="Grd_Tariff" x="179" y="17" width="789" height="124"  editable="true" tabIndex="3" verticalAlign="middle"
+					 doubleClickEnabled="true" textAlign="center" borderVisible="true" 
+					 focusOut="Grd_Ingredients_focusOutHandler(event)">
 		<mx:columns> 
 		<mx:DataGridColumn dataField="Type"  editable="false" textAlign="center" visible="true" width="100"/>						
-		<mx:DataGridColumn dataField="TariffAmount"  textAlign="right" visible="true" editable="false" width="150" />
-		<mx:DataGridColumn dataField="NoOfDays"  textAlign="right" visible="true" editable="true"  width="150" />
-		<mx:DataGridColumn dataField="Total"  width="100" textAlign="right" editable="false" visible="true"/>
+		<mx:DataGridColumn dataField="TariffAmount"  textAlign="center" visible="true" editable="true" width="150" />
+		<mx:DataGridColumn dataField="NoOfDays"  textAlign="center" visible="true" editable="true"  width="150" />
+		<mx:DataGridColumn dataField="Total"  width="100" textAlign="center" editable="false" visible="true"/>
 		</mx:columns>
 		</mx:DataGrid>
 		<mx:Label x="193" y="167" text="Description"/>
-		<s:TextArea id="txt_Tariff" x="279" y="150" width="322" height="107" maxChars="2000"/>
+		<s:TextArea id="txt_TariffDes" x="279" y="150" width="322" height="92" maxChars="2000"/>
 		
-		<mx:Label x="49" y="18" text="Tariff Credit Note" color="red"/> 
+		<mx:Label x="49" y="8" text="Tariff Credit Note" color="red"/> 
 		<mx:Label x="633" y="151" text="LuxuryTax @"/>
-		<mx:Label x="633" y="177" text="ServiceTax @"/>
-		<mx:Label x="633" y="203" text="ServiceTax @"/>
+		<mx:Label x="633" y="186" text="ServiceTax @"/>
+		<mx:Label x="633" y="213" text="ServiceTax @"/>
 		<mx:Label x="712" y="151" width="39" text="" id="lbl_LT"/>
-		<mx:Label x="713" y="177" width="39" text="" id="lbl_TST"/>
-		<mx:Label x="713" y="203" width="39" text="" id="lbl_TST1"/>
-		<mx:Label x="633" y="242" text="Total Amount"/>
-		<s:TextInput x="832" y="153" width="116" id="Txt_LT"/>
-		<s:TextInput x="832" y="206" width="116" id="Txt_TST"/>
-		<s:TextInput x="832" y="179" width="116" id="Txt_TST1"/>
-		<s:TextInput x="832" y="236" width="116" id="Txt_TTotal"/>
+		<mx:Label x="713" y="186" width="39" text="" id="lbl_TST"/>
+		<mx:Label x="713" y="213" width="57" text="12.36" id="lbl_TSC"/>
+		<mx:Label x="633" y="241" text="Total Amount"/>
+		<s:TextInput x="832" y="153" width="116" id="Txt_LT" editable="false"/>
+		<s:TextInput x="832" y="186" width="116" id="Txt_TST" editable="false"/>
+		<s:TextInput x="832" y="212" width="116" id="Txt_TST1" editable="false"/>
+		<s:TextInput x="832" y="241" width="116" id="Txt_TTotal" editable="false"/>
+		<s:Button x="541" y="275" label="Submit" id="btn_Tariff" click="btn_TariffSave(event)"/>
 	</s:BorderContainer>
 	<s:BorderContainer x="69" y="79" width="1174" height="309" id="brd_Service"
 						   borderVisible="true" visible="false" depth="1500">
-			<mx:DataGrid id="Grd_Service" x="179" y="17" width="789" height="124"  editable="false" tabIndex="3" verticalAlign="middle">
+			<mx:DataGrid id="Grd_Service" x="179" y="17" width="789" height="124"  editable="true" tabIndex="3" verticalAlign="middle"
+						 focusOut="Grd_Ingredients_focusOutHandler1(event)">
 				<mx:columns> 
 					<mx:DataGridColumn dataField="Item"  editable="false" textAlign="center" visible="true" width="100"/>						
-					<mx:DataGridColumn dataField="ServiceAmount"  textAlign="right" visible="true" editable="false" width="150" />
-					<mx:DataGridColumn dataField="Amount"  textAlign="right" visible="true" editable="true" width="150" />
-					<mx:DataGridColumn dataField="Tax"  textAlign="right" visible="true"  width="150" />
-					<mx:DataGridColumn dataField="Total"  width="100" textAlign="right" editable="false" visible="true"/>
+					<mx:DataGridColumn dataField="ServiceAmount"  textAlign="center" visible="true" editable="false" width="150" />
+					<mx:DataGridColumn dataField="Quantity"  textAlign="center" visible="true" editable="true" width="150" />
+					<mx:DataGridColumn dataField="Total"  width="100" textAlign="center" editable="false" visible="true"/>
 				</mx:columns>
 			</mx:DataGrid>
 			<mx:Label x="180" y="175" text="Description"/>
-			<s:TextArea id="txt_Service" x="261" y="148" width="277" height="121" maxChars="2000"/>
+			<s:TextArea id="txt_Service" x="261" y="148" width="277" height="104" maxChars="2000"/>
 		<mx:Label x="49" y="8" text="Service Credit Note" color="red"/> 
 		<mx:Label x="563" y="145" text="VAT @"/>
 		<mx:Label x="563" y="171" text="ServiceTax @"/>
 		<mx:Label x="563" y="197" text="ServiceTax @"/>
-		<mx:Label x="563" y="224" text="Cess @"/>
-		<mx:Label x="563" y="250" text="HE Cess @"/>
+		<!--mx:Label x="563" y="224" text="Cess @"/-->
+		<!--mx:Label x="563" y="250" text="HE Cess @"/-->
 		<mx:Label x="611" y="145" width="39" text="" id="lbl_Vat"/>
 		<mx:Label x="643" y="171" width="39" text="" id="lbl_STFB"/>
-		<mx:Label x="643" y="197" width="39" text="" id="lbl_ST"/>
-		<mx:Label x="613" y="224" width="39" text="" id="lbl_Cess"/>
-		<mx:Label x="633" y="250" width="39" text="" id="lbl_HECess"/>
+		<mx:Label x="643" y="197" width="51" text="12.36" id="lbl_ST"/>
+		<!--mx:Label x="613" y="224" width="39" text="" id="lbl_Cess"/-->
+		<!--mx:Label x="633" y="250" width="39" text="" id="lbl_HECess"/-->
 		<mx:Label x="693" y="171" width="151" text="On Food and Beverages"/>
 		<mx:Label x="693" y="197" width="73" text="On Others"/>
-		<mx:Label x="563" y="282" text="Total Amount"/>
-		<s:TextInput x="852" y="145" width="116" id="Txt_Vat"/>
-		<s:TextInput x="852" y="250" width="116" id="Txt_STFB"/>
-		<s:TextInput x="852" y="171" width="116" id="Txt_ST"/>
-		<s:TextInput x="852" y="197" width="116" id="Txt_Cess"/>
-		<s:TextInput x="852" y="224" width="116" id="Txt_HECess"/>
-		<s:TextInput x="852" y="281" width="116" id="Txt_STotal"/>
+		<mx:Label x="563" y="231" text="Total Amount"/>
+		<s:TextInput x="852" y="145" width="116" id="Txt_Vat" editable="false"/>
+		<s:TextInput x="852" y="171" width="116" id="Txt_STFB" editable="false"/>
+		<s:TextInput x="852" y="200" width="116" id="Txt_ST" editable="false"/>
+		<!--s:TextInput x="852" y="197" width="116" id="Txt_Cess" editable="false"/-->
+		<!--s:TextInput x="852" y="224" width="116" id="Txt_HECess" editable="false"/-->
+		<s:TextInput x="852" y="230" width="116" id="Txt_STotal" editable="false"/>
+		<s:Button id="btn_Service" x="521" y="270" width="78" height="20" label="Submit" click="btn_ServiceSave(event)"/>
 	</s:BorderContainer>
 		<s:BorderContainer x="0" y="0" width="100%" height="42" borderVisible="true"  backgroundColor="#c2c2c2">
 			<s:Image x="1335" y="14" source="@Embed(source='../Assets/CrossSmall.png')" 
 					 buttonMode="true" toolTip="Close" click="FnC_clickHandler(event)"/>
 			<mx:Label x="32" y="13" text="Credit Note" color="red"/>
 		</s:BorderContainer>
-		<s:Button x="850" y="54" label="Tariff" click="button1_clickTariff(event)" />
-		<s:Button x="992" y="56" label="Service" click="button2_clickService(event)"/>
+		
 	</s:BorderContainer>
 </s:Application>

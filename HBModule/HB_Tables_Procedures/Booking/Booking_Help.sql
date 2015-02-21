@@ -226,10 +226,20 @@ IF @Action = 'GuestDelete'
 IF @Action = 'Tab2_to_Tab3_Dtls'
  BEGIN
   -- TAB3 PROPERTY LOAD
-  SELECT PropertyType+' - '+PropertyName AS label,
-  CAST(PropertyId AS NVARCHAR) AS PropertyId,Id,PropertyType 
-  FROM WRBHBBookingProperty
-  WHERE IsActive=1 AND IsDeleted=0 AND BookingId=@Id1;
+  IF EXISTS(SELECT NULL FROM WRBHBBooking WHERE Id = @Id1 AND
+  ISNULL(HBStay,'') = 'StayCorporateHB')
+   BEGIN
+    SELECT PropertyName AS label,CAST(PropertyId AS NVARCHAR) AS PropertyId,
+    Id,PropertyType FROM WRBHBBookingProperty
+    WHERE IsActive=1 AND IsDeleted=0 AND BookingId=@Id1;
+   END
+  ELSE
+   BEGIN
+    SELECT PropertyType+' - '+PropertyName AS label,
+    CAST(PropertyId AS NVARCHAR) AS PropertyId,Id,PropertyType 
+    FROM WRBHBBookingProperty
+    WHERE IsActive=1 AND IsDeleted=0 AND BookingId=@Id1;
+   END
   -- TAB3 GUEST LOAD
   SELECT GuestId,EmpCode,FirstName,LastName,0 AS Tick,1 AS Chk,
   FirstName+'  '+LastName AS Name 
@@ -587,29 +597,60 @@ IF @Action = 'Property'
   -- Avaliable M G H Property
   CREATE TABLE #ManagedGH(PropertyName NVARCHAR(100),Id BIGINT,
   GetType NVARCHAR(100),PropertyType NVARCHAR(100));
-  INSERT INTO #ManagedGH(PropertyName,Id,GetType,PropertyType)  
-  SELECT P.PropertyName,P.Id,'Contract','MGH'
-  FROM WRBHBProperty P
-  LEFT OUTER JOIN WRBHBPropertyApartment A WITH(NOLOCK)ON
-  A.PropertyId = P.Id
-  LEFT OUTER JOIN WRBHBPropertyRooms R WITH(NOLOCK)ON 
-  R.PropertyId=P.Id AND R.ApartmentId = A.Id
-  LEFT OUTER JOIN WRBHBContractManagementTariffAppartment D WITH(NOLOCK)ON
-  D.PropertyId=P.Id
-  LEFT OUTER JOIN WRBHBContractManagement H WITH(NOLOCK)ON 
-  H.Id=D.ContractId
-  WHERE P.IsActive=1 AND P.IsDeleted=0 AND D.IsActive=1 AND 
-  D.IsDeleted=0 AND H.IsActive=1 AND H.IsDeleted=0 AND 
-  H.ContractType=' Managed Contracts ' AND R.IsActive=1 AND
-  R.IsDeleted=0 AND P.CityId=@CityId AND H.ClientId=@ClientId AND
-  P.Category='Managed G H' AND A.IsActive = 1 AND A.IsDeleted = 0 AND
-  A.Status = 'Active' AND R.RoomStatus = 'Active' AND
-  A.SellableApartmentType != 'HUB' AND 
-  R.Id NOT IN (SELECT RoomId FROM #BookedRoom) AND
-  A.Id NOT IN (SELECT ApartmentId FROM #BookedApartment) AND
-  R.Id NOT IN (SELECT RoomId FROM #DedicatedRoom) AND
-  A.Id NOT IN (SELECT ApartmentId FROM #DedicatedApartment)
-  GROUP BY P.PropertyName,P.Id;
+  IF EXISTS(SELECT NULL FROM WRBHBClientManagement WHERE Id = @ClientId AND
+  ISNULL(MGHOverride,0) = 0)
+   BEGIN
+    INSERT INTO #ManagedGH(PropertyName,Id,GetType,PropertyType)
+    SELECT P.PropertyName,P.Id,'Contract','MGH' FROM WRBHBProperty P
+    LEFT OUTER JOIN WRBHBPropertyApartment A WITH(NOLOCK)ON
+	A.PropertyId = P.Id
+	LEFT OUTER JOIN WRBHBPropertyRooms R WITH(NOLOCK)ON 
+	R.PropertyId=P.Id AND R.ApartmentId = A.Id
+	LEFT OUTER JOIN WRBHBContractManagementTariffAppartment D WITH(NOLOCK)ON
+	D.PropertyId=P.Id
+	LEFT OUTER JOIN WRBHBContractManagement H WITH(NOLOCK)ON 
+	H.Id=D.ContractId
+	WHERE P.IsActive=1 AND P.IsDeleted=0 AND D.IsActive=1 AND 
+	D.IsDeleted=0 AND H.IsActive=1 AND H.IsDeleted=0 AND 
+	H.ContractType=' Managed Contracts ' AND R.IsActive=1 AND
+	R.IsDeleted=0 AND P.CityId=@CityId AND H.ClientId=@ClientId AND
+	P.Category='Managed G H' AND A.IsActive = 1 AND A.IsDeleted = 0 AND
+	A.Status = 'Active' AND R.RoomStatus = 'Active' AND
+	A.SellableApartmentType != 'HUB' AND 
+	R.Id NOT IN (SELECT RoomId FROM #BookedRoom) AND
+	A.Id NOT IN (SELECT ApartmentId FROM #BookedApartment) AND
+	R.Id NOT IN (SELECT RoomId FROM #DedicatedRoom) AND
+	A.Id NOT IN (SELECT ApartmentId FROM #DedicatedApartment)
+	GROUP BY P.PropertyName,P.Id;
+   END
+  ELSE
+   BEGIN
+    INSERT INTO #ManagedGH(PropertyName,Id,GetType,PropertyType)
+    SELECT P.PropertyName,P.Id,'Contract','MGH' FROM WRBHBProperty P
+    LEFT OUTER JOIN WRBHBPropertyApartment A WITH(NOLOCK)ON
+	A.PropertyId = P.Id
+	LEFT OUTER JOIN WRBHBPropertyRooms R WITH(NOLOCK)ON 
+	R.PropertyId=P.Id AND R.ApartmentId = A.Id
+	LEFT OUTER JOIN WRBHBContractManagementTariffAppartment D WITH(NOLOCK)ON
+	D.PropertyId=P.Id
+	LEFT OUTER JOIN WRBHBContractManagement H WITH(NOLOCK)ON 
+	H.Id=D.ContractId
+	WHERE P.IsActive=1 AND P.IsDeleted=0 AND D.IsActive=1 AND 
+	D.IsDeleted=0 AND H.IsActive=1 AND H.IsDeleted=0 AND 
+	H.ContractType=' Managed Contracts ' AND R.IsActive=1 AND
+	R.IsDeleted=0 AND P.CityId=@CityId AND H.ClientId IN
+	(SELECT Id FROM WRBHBClientManagement WHERE IsActive = 1 AND
+	IsDeleted = 0 AND ISNULL(MGHOverride,0) = 1 AND MasterClientId IN 
+	(SELECT MasterClientId FROM WRBHBClientManagement WHERE Id = @ClientId)) AND
+	P.Category='Managed G H' AND A.IsActive = 1 AND A.IsDeleted = 0 AND
+	A.Status = 'Active' AND R.RoomStatus = 'Active' AND
+	A.SellableApartmentType != 'HUB' AND 
+	R.Id NOT IN (SELECT RoomId FROM #BookedRoom) AND
+	A.Id NOT IN (SELECT ApartmentId FROM #BookedApartment) AND
+	R.Id NOT IN (SELECT RoomId FROM #DedicatedRoom) AND
+	A.Id NOT IN (SELECT ApartmentId FROM #DedicatedApartment)
+	GROUP BY P.PropertyName,P.Id;
+   END
   -- #Dedicated Property
   CREATE TABLE #Dedicated(PropertyName NVARCHAR(100),Id BIGINT,
   GetType NVARCHAR(100),PropertyType NVARCHAR(100));
@@ -990,7 +1031,7 @@ IF @Action = 'Property'
   --
   --SELECT AgreedSingle,HRSingle,Inclusive,Id FROM #TmpExternal;
   --SELECT @StarFlag,@MinValue,@MaxValue;
-  --SELECT * FROM #TmpExternal WHERE Id = 1476;RETURN;
+  --SELECT * FROM #TmpExternal WHERE Id = 2804;RETURN;
   --
   CREATE TABLE #TmpExpHR(PropertyName NVARCHAR(100),Id BIGINT,
   GetType NVARCHAR(100),PropertyType NVARCHAR(100),RoomType NVARCHAR(100),
@@ -1014,7 +1055,7 @@ IF @Action = 'Property'
   FROM #TmpExternal;
   --
   --SELECT @Flag,@Rs;
-  --SELECT * FROM #TmpExternal WHERE Id = 1476;RETURN;
+  --SELECT * FROM #TmpExternal where Id = 2804;RETURN;
   --  
   CREATE TABLE #TmpExternalHR(PropertyName NVARCHAR(100),Id BIGINT,
   GetType NVARCHAR(100),PropertyType NVARCHAR(100),RoomType NVARCHAR(100),
@@ -1253,7 +1294,8 @@ IF @Action = 'Property'
   T23.Tariffgroup='RoomDiscount' AND T23.HeaderId=H.HeaderId AND
   T23.HotelId=H.HotelId
   WHERE ISNULL(RR.RoomRateratePlanCode,'') != '' AND
-  ISNULL(RR.RoomRateroomTypeCode,'') != '' AND H.HeaderId=@StateId 
+  ISNULL(RR.RoomRateroomTypeCode,'') != '' AND H.HeaderId=@StateId AND
+  H.IsActive = 1 
   --AND H.HotelId  IN ('20120928153050770','201304030953079210')
   GROUP BY H.HotelId,RR.RoomRateratePlanCode,RR.RoomRateroomTypeCode,
   RR.RoomRateavailableCount,T11.RoomTariffroomNumber,T11.Tariffamount,
@@ -1342,7 +1384,8 @@ IF @Action = 'Property'
   LEFT OUTER JOIN WRBHBAPIRateMealPlanInclusionDtls I WITH(NOLOCK)ON
   I.HotelId=T.HotelId AND I.RatePlanCode=T.RoomRatePlanCode AND 
   I.HeaderId=H.HeaderId
-  WHERE H.HeaderId=@StateId AND ISNULL(SH.HotalName,'') != '';
+  WHERE H.HeaderId=@StateId AND ISNULL(SH.HotalName,'') != '' AND
+  SH.IsActive = 1 AND H.IsActive = 1;
   --
   --SELECT * FROM #API;RETURN
 -- API data END
@@ -1698,30 +1741,42 @@ IF @Action = 'BookingPropertyDtls'
   -- GradeId
   SET @GradeId=(SELECT GradeId FROM WRBHBBooking WHERE Id=@BookingId);
   -- Payment Mode
-  CREATE TABLE #PAYMENT(label NVARCHAR(100));
+  CREATE TABLE #TARIFFPAYMENT(label NVARCHAR(100));
+  CREATE TABLE #SERVICEPAYMENT(label NVARCHAR(100));
   IF @PropertyType = 'MMT' AND @GetType = 'API'
    BEGIN
-    INSERT INTO #PAYMENT(label) SELECT 'Bill to Company (BTC)';
+    INSERT INTO #TARIFFPAYMENT(label) SELECT 'Bill to Company (BTC)';
+    INSERT INTO #SERVICEPAYMENT(label) SELECT 'Direct';
    END
-  ELSE
+  IF @PropertyType = 'MGH'
    BEGIN
+    INSERT INTO #TARIFFPAYMENT(label) SELECT 'Bill to Company (BTC)';
+    INSERT INTO #SERVICEPAYMENT(label) SELECT 'Bill to Company (BTC)';
+    INSERT INTO #SERVICEPAYMENT(label) SELECT 'Direct';
+   END
+  IF @PropertyType NOT IN('MGH','MMT')
+   BEGIN    
     DECLARE @BTC BIT=0;
     SET @BTC=(SELECT BTC FROM WRBHBClientManagement WHERE Id=@ClientId);
     IF @BTC = 1
      BEGIN
-      INSERT INTO #PAYMENT(label) SELECT 'Bill to Company (BTC)';
-      INSERT INTO #PAYMENT(label) SELECT 'Direct';
+      INSERT INTO #TARIFFPAYMENT(label) SELECT 'Bill to Company (BTC)';
+      INSERT INTO #TARIFFPAYMENT(label) SELECT 'Direct';
+      INSERT INTO #SERVICEPAYMENT(label) SELECT 'Bill to Company (BTC)';
+      INSERT INTO #SERVICEPAYMENT(label) SELECT 'Direct';
      END
     ELSE
      BEGIN
-      INSERT INTO #PAYMENT(label) SELECT 'Direct';
-     END
+      INSERT INTO #TARIFFPAYMENT(label) SELECT 'Direct';
+      INSERT INTO #SERVICEPAYMENT(label) SELECT 'Direct';
+     END    
     IF @PropertyType = 'CPP'
      BEGIN
-      INSERT INTO #PAYMENT(label) SELECT 'Bill to Client';    
+      INSERT INTO #TARIFFPAYMENT(label) SELECT 'Bill to Client';
+      INSERT INTO #SERVICEPAYMENT(label) SELECT 'Bill to Client';
      END
    END  
-  SELECT label FROM #PAYMENT;
+  SELECT label FROM #TARIFFPAYMENT ORDER BY label;
   -- SSP START
   DECLARE @sspcnt INT=0;
   CREATE TABLE #SSP(label NVARCHAR(100),Id BIGINT,
@@ -1969,7 +2024,9 @@ IF @Action = 'BookingPropertyDtls'
     A.Status='Active' AND R.RoomStatus='Active' AND
     BP.Id=@Id1 AND D.PropertyId=@PropertyId AND
     R.Id NOT IN (SELECT RoomId FROM #ExistingDedicatedProperty1) AND
-    A.Id NOT IN (SELECT ApartmentId FROM #ExDdPApartmnt1) 
+    A.Id NOT IN (SELECT ApartmentId FROM #ExDdPApartmnt1) AND
+    D.ContractId IN (SELECT Id FROM WRBHBContractManagement WHERE ClientId = @ClientId AND IsActive = 1 AND
+    IsDeleted = 0)
     ORDER BY B.BlockName,A.ApartmentNo,R.RoomNo;
     --
     INSERT INTO #DdP(label,RoomId,SingleandMarkup,DoubleandMarkup,
@@ -1993,7 +2050,9 @@ IF @Action = 'BookingPropertyDtls'
     A.Status='Active' AND R.RoomStatus='Active' AND
     BP.Id=@Id1 AND D.PropertyId=@PropertyId AND
     R.Id NOT IN (SELECT RoomId FROM #ExistingDedicatedProperty1) AND
-    A.Id NOT IN (SELECT ApartmentId FROM #ExDdPApartmnt1) 
+    A.Id NOT IN (SELECT ApartmentId FROM #ExDdPApartmnt1) AND
+    D.ContractId IN (SELECT Id FROM WRBHBContractManagement WHERE ClientId = @ClientId AND IsActive = 1 AND
+    IsDeleted = 0)
     ORDER BY B.BlockName,A.ApartmentNo,R.RoomNo;
     --
     SELECT label,RoomId,SingleandMarkup,DoubleandMarkup,TripleandMarkup 
@@ -2257,7 +2316,8 @@ IF @Action = 'BookingPropertyDtls'
   FROM WRBHBBookingGuestDetails 
   WHERE IsActive=1 AND IsDeleted=0 AND BookingId=@BookingId;
   --
-  SELECT 'Direct' AS label;
+  --SELECT 'Direct' AS label;
+  SELECT label FROM #SERVICEPAYMENT ORDER BY label;
  END
 IF @Action = 'CustomFields'
  BEGIN
@@ -2383,5 +2443,35 @@ IF @Action = 'CustomFields'
   ISNULL(Column9,'') AS Column9,ISNULL(Column10,'') AS Column10
   FROM WRBHBClientManagementAddClientGuest
   WHERE Id = @Id1 AND CltmgntId = @ClientId;
+ END
+IF @Action = 'ClientorMasterClientLoad'
+ BEGIN
+  -- MasterClient,Client
+  DECLARE @TmpStr NVARCHAR(100) = '';
+  SELECT TOP 1 @TmpStr = Designation,@ClientId = ClientId FROM WrbhbTravelDesk 
+  WHERE IsActive = 1 AND IsDeleted = 0 AND Id = @Id1;
+  --
+  SELECT @TmpStr AS TmpStr;
+  --
+  SELECT CONVERT(VARCHAR(100),GETDATE(),103) AS CDt,
+  CONVERT(VARCHAR(100),DATEADD(DAY,1,GETDATE()),103) AS NDt;
+  --
+  IF @TmpStr = 'MasterClient'
+   BEGIN
+    -- Client
+    SELECT C.ClientName,C.BCity AS ClientPlace,C.Id,'' AS SalesId,'' AS CRMId 
+    FROM WRBHBClientManagement C WHERE C.IsDeleted = 0 AND C.IsActive = 1 AND
+    C.MasterClientId = @ClientId ORDER BY C.ClientName ASC;    
+    --
+    SELECT TrackingNo,Id FROM WRBHBBooking WHERE IsActive=1 AND 
+    IsDeleted=0 AND TrackingNo != 0 AND Status='RmdPty' AND
+    ClientId IN (SELECT Id FROM WRBHBClientManagement WHERE IsActive = 1 AND
+    MasterClientId = @ClientId AND IsDeleted = 0);
+   END
+  IF @TmpStr = 'Client'
+   BEGIN
+    SELECT ClientName,@ClientId AS ClientId FROM WRBHBClientManagement 
+    WHERE Id = @ClientId;
+   END
  END
 END

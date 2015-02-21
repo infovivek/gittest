@@ -360,6 +360,22 @@
           <DataField>AmtWords</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
+        <Field Name="ToDate">
+          <DataField>ToDate</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="ExtraMatr">
+          <DataField>ExtraMatr</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="ServChrg">
+          <DataField>ServChrg</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="ServChrg1">
+          <DataField>ServChrg1</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
       </Fields>
       <Query>
         <DataSourceName>HBDataSet1</DataSourceName>
@@ -423,7 +439,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox15</rd:DefaultName>
-        <Top>0.5675in</Top>
+        <Top>0.605in</Top>
         <Left>0.381cm</Left>
         <Height>0.25in</Height>
         <Width>0.76041in</Width>
@@ -456,7 +472,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox16</rd:DefaultName>
-        <Top>1.03833in</Top>
+        <Top>1.11333in</Top>
         <Left>0.381cm</Left>
         <Height>0.25in</Height>
         <Width>0.76041in</Width>
@@ -519,7 +535,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox18</rd:DefaultName>
-        <Top>0.5675in</Top>
+        <Top>0.605in</Top>
         <Left>0.94875in</Left>
         <Height>0.25in</Height>
         <Width>2.675in</Width>
@@ -552,7 +568,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox19</rd:DefaultName>
-        <Top>1.03833in</Top>
+        <Top>1.11333in</Top>
         <Left>0.94875in</Left>
         <Height>0.25in</Height>
         <Width>5.95696in</Width>
@@ -717,7 +733,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox24</rd:DefaultName>
-        <Top>0.5675in</Top>
+        <Top>0.605in</Top>
         <Left>3.66542in</Left>
         <Height>0.25in</Height>
         <Width>0.80208in</Width>
@@ -750,7 +766,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox25</rd:DefaultName>
-        <Top>0.5675in</Top>
+        <Top>0.605in</Top>
         <Left>4.51333in</Left>
         <Height>0.25in</Height>
         <Width>0.78125in</Width>
@@ -956,6 +972,9 @@
                         <TopBorder>
                           <Color>Black</Color>
                         </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -998,6 +1017,9 @@
                         <TopBorder>
                           <Color>Black</Color>
                         </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1040,6 +1062,9 @@
                         <TopBorder>
                           <Color>Black</Color>
                         </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1084,6 +1109,9 @@
                         <TopBorder>
                           <Color>Black</Color>
                         </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1106,14 +1134,16 @@
               <TablixCells>
                 <TablixCell>
                   <CellContents>
-                    <Textbox Name="Textbox34">
+                    <Textbox Name="Textbox37">
                       <CanGrow>true</CanGrow>
                       <KeepTogether>true</KeepTogether>
                       <Paragraphs>
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>Extra Mattress</Value>
+                              <Value>=IIf(Fields!ExtraMatress.Value &gt; 0
+    , Fields!ExtraMatr.Value
+    , "")</Value>
                               <Style />
                             </TextRun>
                           </TextRuns>
@@ -1122,12 +1152,18 @@
                           </Style>
                         </Paragraph>
                       </Paragraphs>
-                      <rd:DefaultName>Textbox34</rd:DefaultName>
+                      <rd:DefaultName>Textbox37</rd:DefaultName>
                       <Style>
                         <Border>
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1165,6 +1201,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1201,6 +1243,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1224,7 +1272,9 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Fields!ExtraMatress.Value</Value>
+                              <Value>=IIf(Fields!ExtraMatress.Value &gt; 0
+    , Fields!ExtraMatress.Value
+    , "")</Value>
                               <Style />
                             </TextRun>
                           </TextRuns>
@@ -1239,6 +1289,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1283,6 +1339,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1322,6 +1384,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1361,6 +1429,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1385,7 +1459,9 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Fields!LuxuryTax.Value</Value>
+                              <Value>=IIf(Fields!LuxuryTax.Value &gt; 0
+    , Fields!LuxuryTax.Value
+    , "")</Value>
                               <Style />
                             </TextRun>
                           </TextRuns>
@@ -1400,6 +1476,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1413,6 +1495,7 @@
                         <PaddingBottom>2pt</PaddingBottom>
                       </Style>
                     </Textbox>
+                    <rd:Selected>true</rd:Selected>
                   </CellContents>
                 </TablixCell>
               </TablixCells>
@@ -1444,6 +1527,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1483,6 +1572,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1522,6 +1617,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1561,6 +1662,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1590,7 +1697,9 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>Service Charge  @ 2.5% on Tariff</Value>
+                              <Value>=IIf(Fields!ServiceCharge.Value &gt; 0
+    , Fields!ServChrg.Value
+    , "")</Value>
                               <Style />
                             </TextRun>
                           </TextRuns>
@@ -1605,6 +1714,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1644,6 +1759,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1683,6 +1804,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1707,7 +1834,9 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Fields!ServiceCharge.Value</Value>
+                              <Value>=IIf(Fields!ServiceCharge.Value &gt; 0
+    , Fields!ServiceCharge.Value
+    , "")</Value>
                               <Style />
                             </TextRun>
                           </TextRuns>
@@ -1722,6 +1851,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1751,7 +1886,9 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>Service Tax@12.00% on ServiceCharge</Value>
+                              <Value>=IIf(Fields!SerivceTax.Value &gt; 0
+    , Fields!ServChrg1.Value
+    , "")</Value>
                               <Style />
                             </TextRun>
                           </TextRuns>
@@ -1766,6 +1903,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1805,6 +1948,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1844,6 +1993,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1868,7 +2023,9 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Fields!SerivceTax.Value</Value>
+                              <Value>=IIf(Fields!SerivceTax.Value &gt; 0
+    , Fields!SerivceTax.Value
+    , "")</Value>
                               <Style />
                             </TextRun>
                           </TextRuns>
@@ -1883,6 +2040,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1927,6 +2090,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -1966,6 +2135,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -2005,6 +2180,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -2044,6 +2225,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -2088,6 +2275,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -2127,6 +2320,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -2166,6 +2365,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -2205,6 +2410,12 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
+                        <BottomBorder>
+                          <Style>None</Style>
+                        </BottomBorder>
                         <LeftBorder>
                           <Color>Black</Color>
                         </LeftBorder>
@@ -2254,6 +2465,9 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
                         <BottomBorder>
                           <Color>Black</Color>
                         </BottomBorder>
@@ -2301,6 +2515,9 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
                         <BottomBorder>
                           <Color>Black</Color>
                         </BottomBorder>
@@ -2348,6 +2565,9 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
                         <BottomBorder>
                           <Color>Black</Color>
                         </BottomBorder>
@@ -2392,6 +2612,9 @@
                           <Color>WhiteSmoke</Color>
                           <Style>Solid</Style>
                         </Border>
+                        <TopBorder>
+                          <Style>None</Style>
+                        </TopBorder>
                         <BottomBorder>
                           <Color>Black</Color>
                         </BottomBorder>
@@ -2446,7 +2669,7 @@
           </TablixMembers>
         </TablixRowHierarchy>
         <DataSetName>DataSet1</DataSetName>
-        <Top>1.82027in</Top>
+        <Top>2.02027in</Top>
         <Left>0.67945cm</Left>
         <Height>2.78126in</Height>
         <Width>6.66666in</Width>
@@ -2476,7 +2699,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox4</rd:DefaultName>
-        <Top>5.58in</Top>
+        <Top>5.90501in</Top>
         <Left>0.2675in</Left>
         <Height>0.25in</Height>
         <Width>1.35417in</Width>
@@ -2511,7 +2734,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox9</rd:DefaultName>
-        <Top>5.58in</Top>
+        <Top>5.90501in</Top>
         <Left>4.65292in</Left>
         <Height>0.25in</Height>
         <Width>2.09375in</Width>
@@ -2542,7 +2765,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox29</rd:DefaultName>
-        <Top>5.87445in</Top>
+        <Top>6.19946in</Top>
         <Left>0.1675in</Left>
         <Height>0.01042in</Height>
         <Width>6.41667in</Width>
@@ -2579,7 +2802,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox41</rd:DefaultName>
-        <Top>5.89182in</Top>
+        <Top>6.26682in</Top>
         <Left>0.005in</Left>
         <Height>0.25in</Height>
         <Width>6.74167in</Width>
@@ -2615,7 +2838,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox48</rd:DefaultName>
-        <Top>6.28625in</Top>
+        <Top>6.56125in</Top>
         <Left>0.0425in</Left>
         <Height>0.25in</Height>
         <Width>1.35417in</Width>
@@ -2651,7 +2874,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox49</rd:DefaultName>
-        <Top>6.58764in</Top>
+        <Top>6.86264in</Top>
         <Left>0.0175in</Left>
         <Height>0.25in</Height>
         <Width>6.74167in</Width>
@@ -2687,7 +2910,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox50</rd:DefaultName>
-        <Top>6.89042in</Top>
+        <Top>7.16542in</Top>
         <Left>0.0175in</Left>
         <Height>0.21597in</Height>
         <Width>0.58666in</Width>
@@ -2723,7 +2946,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox51</rd:DefaultName>
-        <Top>7.17376in</Top>
+        <Top>7.44876in</Top>
         <Left>0.0175in</Left>
         <Height>0.25in</Height>
         <Width>6.74167in</Width>
@@ -2756,7 +2979,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox52</rd:DefaultName>
-        <Top>1.47583in</Top>
+        <Top>1.63833in</Top>
         <Left>0.381cm</Left>
         <Height>0.25in</Height>
         <Width>0.76041in</Width>
@@ -2787,7 +3010,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox53</rd:DefaultName>
-        <Top>1.47583in</Top>
+        <Top>1.63833in</Top>
         <Left>0.94875in</Left>
         <Height>0.25in</Height>
         <Width>5.95696in</Width>
@@ -2822,7 +3045,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox66</rd:DefaultName>
-        <Top>4.66195in</Top>
+        <Top>4.91195in</Top>
         <Left>3.86563in</Left>
         <Height>0.25in</Height>
         <Width>2.88104in</Width>
@@ -2858,7 +3081,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox86</rd:DefaultName>
-        <Top>7.49166in</Top>
+        <Top>7.76666in</Top>
         <Left>0.0175in</Left>
         <Height>0.25in</Height>
         <Width>6.74167in</Width>
@@ -2894,7 +3117,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox88</rd:DefaultName>
-        <Top>7.82361in</Top>
+        <Top>8.09861in</Top>
         <Left>0.0175in</Left>
         <Height>0.25in</Height>
         <Width>2.63542in</Width>
@@ -2930,7 +3153,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox89</rd:DefaultName>
-        <Top>7.82361in</Top>
+        <Top>8.09861in</Top>
         <Left>2.67583in</Left>
         <Height>0.25in</Height>
         <Width>4.08334in</Width>
@@ -2965,7 +3188,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox91</rd:DefaultName>
-        <Top>6.89042in</Top>
+        <Top>7.16542in</Top>
         <Left>0.62361in</Left>
         <Height>0.21597in</Height>
         <Width>6.13556in</Width>
@@ -2998,7 +3221,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox92</rd:DefaultName>
-        <Top>0.5675in</Top>
+        <Top>0.605in</Top>
         <Left>5.3425in</Left>
         <Height>0.25in</Height>
         <Width>0.73958in</Width>
@@ -3031,7 +3254,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox93</rd:DefaultName>
-        <Top>0.5675in</Top>
+        <Top>0.605in</Top>
         <Left>6.12167in</Left>
         <Height>0.25in</Height>
         <Width>0.78404in</Width>
@@ -3064,51 +3287,11 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox94</rd:DefaultName>
-        <Top>8.10555in</Top>
+        <Top>8.38055in</Top>
         <Left>0.0175in</Left>
         <Height>0.25in</Height>
         <Width>6.74167in</Width>
         <ZIndex>30</ZIndex>
-        <Style>
-          <Border>
-            <Style>None</Style>
-          </Border>
-          <VerticalAlign>Middle</VerticalAlign>
-          <PaddingLeft>2pt</PaddingLeft>
-          <PaddingRight>2pt</PaddingRight>
-          <PaddingTop>2pt</PaddingTop>
-          <PaddingBottom>2pt</PaddingBottom>
-        </Style>
-      </Textbox>
-      <Textbox Name="Textbox95">
-        <CanGrow>true</CanGrow>
-        <KeepTogether>true</KeepTogether>
-        <Paragraphs>
-          <Paragraph>
-            <TextRuns>
-              <TextRun>
-                <Value>Stay simplified is brand of HummingBird</Value>
-                <Style>
-                  <FontStyle>Normal</FontStyle>
-                  <FontFamily>Calibri</FontFamily>
-                  <FontSize>11pt</FontSize>
-                  <FontWeight>Normal</FontWeight>
-                  <TextDecoration>None</TextDecoration>
-                  <Color>#000000</Color>
-                </Style>
-              </TextRun>
-            </TextRuns>
-            <Style>
-              <TextAlign>Center</TextAlign>
-            </Style>
-          </Paragraph>
-        </Paragraphs>
-        <rd:DefaultName>Textbox94</rd:DefaultName>
-        <Top>8.40529in</Top>
-        <Left>0.0175in</Left>
-        <Height>0.25in</Height>
-        <Width>6.74167in</Width>
-        <ZIndex>31</ZIndex>
         <Style>
           <Border>
             <Style>None</Style>
@@ -3137,10 +3320,10 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox3</rd:DefaultName>
-        <Top>4.66195in</Top>
+        <Top>4.91195in</Top>
         <Height>0.25in</Height>
         <Width>3.84042in</Width>
-        <ZIndex>32</ZIndex>
+        <ZIndex>31</ZIndex>
         <Style>
           <Border>
             <Style>None</Style>

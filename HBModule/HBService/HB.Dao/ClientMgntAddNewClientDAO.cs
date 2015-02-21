@@ -16,7 +16,7 @@ namespace HB.Dao
         string UserData;
         public DataSet Save(String CltmgntRowId,Int32 CltmgntID, string Dtlval, User User)
         {
-            UserData = "   UserId : " + User.Id + ", UsreName : " + User.LoginUserName + ", ScreenName : " + User.ScreenName + ", SctId : " + User.SctId + ", BranchId : " + User.BranchId + "";
+           // UserData = "   UserId : " + User.Id + ", UsreName : " + User.LoginUserName + ", ScreenName : " + User.ScreenName + ", SctId : " + User.SctId + ", BranchId : " + User.BranchId + "";
             DataSet ds = new DataSet();
             DataTable dTable = new DataTable("ERRORTBL");
             dTable.Columns.Add("Exception");
@@ -49,12 +49,20 @@ namespace HB.Dao
                 ds = new DataSet();
                 if (NewClient.Id != 0)
                 {
+                    UserData = " UserId:" + User.Id + ", UsreName:" + User.LoginUserName + ", ScreenName:'" + User.ScreenName +
+                   "', SctId:" + User.SctId + ", Service:ClientMgntAddNewClient_Update" +
+                   ", ProcName:'" + StoredProcedures.ClientMgntAddNewClient_Update;
+
                     command.CommandText = StoredProcedures.ClientMgntAddNewClient_Update;
                     command.Parameters.Add("@Id", SqlDbType.BigInt).Value = NewClient.Id;
                 }
                 else
                 {
-                     command.CommandText = StoredProcedures.ClientMgntAddNewClient_Insert;
+                    UserData = " UserId:" + User.Id + ", UsreName:" + User.LoginUserName + ", ScreenName:'" + User.ScreenName +
+                    "', SctId:" + User.SctId + ", Service:ClientMgntAddNewClient_Insert" +
+                     ", ProcName:'" + StoredProcedures.ClientMgntAddNewClient_Insert;
+                    
+                    command.CommandText = StoredProcedures.ClientMgntAddNewClient_Insert;
                 }
                 command.CommandType = CommandType.StoredProcedure;
                 command.Parameters.Add("@CltmgntId", SqlDbType.BigInt).Value = CltmgntID;

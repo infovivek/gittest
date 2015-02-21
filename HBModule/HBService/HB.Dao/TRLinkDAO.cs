@@ -27,7 +27,7 @@ namespace HB.Dao
             TR.ClientId = Convert.ToInt32(document.SelectSingleNode("//HdrXml").Attributes["ClientId"].Value);
 
             UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
-                    "', SctId:" + user.SctId + ", Service:PropertyDAO Insert" + ", ProcName:'" + StoredProcedures.Property_Insert;
+                    "', SctId:" + user.SctId + ", Service:TRLink_Insert Insert" + ", ProcName:'" + StoredProcedures.TRLink_Insert;
 
             command.CommandText = StoredProcedures.TRLink_Insert;
 

@@ -48,7 +48,7 @@
 				ClientId:int=0,CityId:int=0,ServiceChargeChk:int=0;
 			public var  PropertyId:String="";
 			public var PropertyType1:String="";
-			public var new_TariffPaymentMode:String=""; 
+			public var new_TariffPaymentMode:String="",BTCFileUploaded:String=""; 
 			public var RB:String="";
 			public var ChkOutHdrId:int=0;
 			public var Direct1:String="";
@@ -79,20 +79,20 @@
 				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
 				GlobalXml += "</ROOT>";
 				// Rdlc Print
-				Str_ChkOut="http://localhost:6236/ExternalCheckOutTariff.aspx?";
-				Str_Serv="http://localhost:6236/GuestCheckOutService1.aspx?";
-				Str_Settle="http://localhost:6236/GuestCheckOutConsolidate1.aspx?";
-				Str_ChkOutEXT ="http://localhost:6236/ExternalCheckoutTACMail.aspx?";
+//				Str_ChkOut="http://localhost:6236/ExternalCheckOutTariff.aspx?";
+//				Str_Serv="http://localhost:6236/GuestCheckOutService1.aspx?";
+//				Str_Settle="http://localhost:6236/GuestCheckOutConsolidate1.aspx?";
+//				Str_ChkOutEXT ="http://localhost:6236/ExternalCheckoutTACMail.aspx?";
 //				
 //				Str_ExIntTar="http://localhost:4171/ExternalIntermediateCheckOutTariff.aspx?";
 //				Str_ExIntServ="http://localhost:4171/ExternalIntermediateCheckoutService.aspx?";
 //				Str_ExIntSettle="http://localhost:4171/ExternalIntermediateCheckoutConsolidate.aspx?";
 //				Str_ExIntTAC ="http://localhost:4171/ExternalIntermediateTAC.aspx?";
 				
-//				Str_ChkOut="http://sstage.in/HBReport/ExternalCheckOutTariff.aspx?";
-//				Str_Serv="http://sstage.in/HBReport/GuestCheckOutService1.aspx?";
-//				Str_Settle="http://sstage.in/HBReport/GuestCheckOutConsolidate1.aspx?";
-//				Str_ChkOutEXT ="http://sstage.in/HBReport/ExternalCheckoutTACMail.aspx?";
+				Str_ChkOut="http://sstage.in/HBReport/ExternalCheckOutTariff.aspx?";
+				Str_Serv="http://sstage.in/HBReport/GuestCheckOutService1.aspx?";
+				Str_Settle="http://sstage.in/HBReport/GuestCheckOutConsolidate1.aspx?";
+				Str_ChkOutEXT ="http://sstage.in/HBReport/ExternalCheckoutTACMail.aspx?";
 				
 				Str_ExIntTar="http://sstage.in/HBReport/ExternalIntermediateCheckOutTariff.aspx?";
 				Str_ExIntServ="http://sstage.in/HBReport/ExternalIntermediateCheckoutService.aspx?";
@@ -360,7 +360,7 @@
 									bdr_SerPay1.visible=false;
 									Btn_Settlement.visible=true;
 									bdr_ConPay1.visible=false;
-									
+				//					CompanyInvoice.selected=RB;
 									
 								}
 								else if(RB=="Bill to Client")
@@ -613,6 +613,34 @@
 					if(Ds_Objects.result.Tables.Table3.Rows.length > 0)
 					{
 						Txt_Client.text=Ds_Objects.result.Tables.Table3.Rows[0].ClientName;
+				//		FilePath.text=Ds_Objects.result.Tables.Table3.Rows[0].BTCFile;
+				//		FilePath2.text=Ds_Objects.result.Tables.Table3.Rows[0].BTCFile;
+						BTCFileUploaded=Ds_Objects.result.Tables.Table3.Rows[0].BTCFile;
+						if(lbl_Nettariff.text != "0")
+						{
+							if(BTCFileUploaded != "")
+							{
+								FileUpload1.visible=false;
+							}
+							else
+							{
+								FileUpload1.visible=true;
+								
+							}
+						}
+						if(lbl_Nettariff.text != "0")
+						{
+							if(BTCFileUploaded != "")
+							{
+								FileUpload2.visible=false;
+							}
+							else
+							{
+								FileUpload2.visible=true;
+								
+							}
+						}
+						
 						var RB:String=Ds_Objects.result.Tables.Table3.Rows[0].TariffPaymentMode;
 						//		var RB:String = "true";
 						var RB1:Boolean = RB == Ds_Objects.result.Tables.Table3.Rows[0].TariffPaymentMode;
@@ -653,6 +681,7 @@
 									BTC.selected=RB;
 									BTC1="Bill to Company (BTC)";
 									Mode1 = "Bill to Company (BTC)1";
+				//					CompanyInvoice.selected=RB;
 									Chk_PrintInvoice.visible=false;
 									lbl_servicetaxlable.visible=true;
 									lbl_TariffST.visible=true;
@@ -666,6 +695,7 @@
 									bdr_SerPay1.visible=false;
 									Btn_Settlement.visible=true;
 									bdr_ConPay1.visible=false;
+									
 									
 									
 								}
@@ -1430,6 +1460,7 @@
 								Cheque.enabled=false;
 								NEFT.enabled=false;
 								CompanyInvoice.enabled=true;
+				//				CompanyInvoice.selected=true;
 								Cash2.enabled=false;
 								CreditCard2.enabled=false;
 								Cheque2.enabled=false;
@@ -1595,6 +1626,7 @@
 									Cheque.enabled=false;
 									NEFT.enabled=false;
 									CompanyInvoice.enabled=true;
+			//						CompanyInvoice.selected=true;
 									Cash2.enabled=false;
 									CreditCard2.enabled=false;
 									Cheque2.enabled=false;
@@ -1971,7 +2003,7 @@
 											if(Txt_TotalTariff.text != "0")
 											{
 												PrintChkOutId=Ds_Objects.result.Tables.Table.Rows[0].Id;
-												ExternalInterface.call("changeDocumentTitle",Str_ChkOutEXT+PrintChkOutId);
+					//							ExternalInterface.call("changeDocumentTitle",Str_ChkOutEXT+PrintChkOutId);
 												//	ExternalInterface.call("changeDocumentTitle",Str_ExIntTAC+PrintChkOutId);
 											}
 											//				PrintChkOutId=Ds_Objects.result.Tables.Table.Rows[0].Id;
@@ -2772,11 +2804,11 @@
 										PrintChkOutId=0;
 										if (Ds_Objects.result.Tables.Table.Rows.length > 0)
 										{
-											if(Txt_TotalTariff.text != "0")
-											{
-												PrintChkOutId=Ds_Objects.result.Tables.Table.Rows[0].Id;
-												ExternalInterface.call("changeDocumentTitle",Str_ChkOutEXT+PrintChkOutId);
-											}
+//											if(Txt_TotalTariff.text != "0")
+//											{
+											PrintChkOutId=Ds_Objects.result.Tables.Table.Rows[0].Id;
+						//						ExternalInterface.call("changeDocumentTitle",Str_ChkOutEXT+PrintChkOutId);
+//											}
 											//				PrintChkOutId=Ds_Objects.result.Tables.Table.Rows[0].Id;
 											
 											
@@ -5225,6 +5257,10 @@
 					{
 						Grid_Settle.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
 					}
+					else
+					{
+						Grid_Settle.dataProvider=null;
+					}
 					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
 					{
 						Txt_Pname.text=Ds_Objects.result.Tables.Table1.Rows[0].Name;
@@ -6491,7 +6527,7 @@
 					}
 				}
 				
-				else // MGH AND MMT
+				else // MGH,MMT,DdP
 				{
 					if(Checkout.selected==true)
 					{
@@ -6525,36 +6561,37 @@
 										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"",
 										Email:txt_Email.text
 									}]);
-								
-								
 								var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");	
-								//useWeb("ExternalCheckOut","Save_CUSTOM",[GlobalXml,HdrXml]);
+								useWeb("ExterIntermediateChkoutService","Save_CUSTOM",[GlobalXml,HdrXml]);
 								
-								var Ac_Hdr1:ArrayCollection=new ArrayCollection
-									([{
-										ChkOutHdrId:ChkOutHdrId,
-										TACInvoiceNo:Txt_InvoiceNo.text,GuestName:hlp_GuestName.text,
-										BookingLevel:Txt_bookinlevel.text,BillDate:Txt_Billdate.text,
-										ClientName:Txt_Client.text,Property:Txt_Property.text,TotalTariff:Txt_TotalTariff.text,
-										NetAmount:Txt_NetAmount.text,
-										//SerivceTax:Txt_ServiceTax12.text,
-										Cess:Txt_Cess.text,HECess:Txt_HECess.text,
-										NetAmount:Txt_NetAmount.text,Referance:Txt_referance.text,
-										Id:Id,ChkInHdrId:CheckInHdrId,NoOfDays:lbl_tariff.text,
-										CheckInType:Txt_CheckInType.text,RoomId:RoomId,BookingId:BookingId,
-										PropertyId:PropertyId,GuestId:GuestId,StateId:StateId,
-										Direct:Direct1,PropertyType:Txt_PropertyType.text,
-										Status:"UnSettled",CheckOutDate:DT_CheckOutDate.text,CheckInDate:Txt_CheckInDate.text,
-										MarkUpAmount:Txt_MarkupAmount.text,BusinessSupportST:lbl_BST.text,
-										Rate:Txt_Rate.text,TACInvoiceFile:"",TotalBusinessSupportST:Txt_BusinessSupportST.text,
-										TACAmount:Txt_NetAmountTAC.text,
-										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:""
-										
-									}]);
-								
-								
-								var GrdXml:String = ObjToXmlStr_Comm(Ac_Hdr1,"GrdXml");	
-								useWeb("ExterIntermediateChkoutService","Save_CUSTOM",[GlobalXml,HdrXml,GrdXml]);
+//								var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");	
+//								//useWeb("ExternalCheckOut","Save_CUSTOM",[GlobalXml,HdrXml]);
+//								
+//								var Ac_Hdr1:ArrayCollection=new ArrayCollection
+//									([{
+//										ChkOutHdrId:ChkOutHdrId,
+//										TACInvoiceNo:Txt_InvoiceNo.text,GuestName:hlp_GuestName.text,
+//										BookingLevel:Txt_bookinlevel.text,BillDate:Txt_Billdate.text,
+//										ClientName:Txt_Client.text,Property:Txt_Property.text,TotalTariff:Txt_TotalTariff.text,
+//										NetAmount:Txt_NetAmount.text,
+//										//SerivceTax:Txt_ServiceTax12.text,
+//										Cess:Txt_Cess.text,HECess:Txt_HECess.text,
+//										NetAmount:Txt_NetAmount.text,Referance:Txt_referance.text,
+//										Id:Id,ChkInHdrId:CheckInHdrId,NoOfDays:lbl_tariff.text,
+//										CheckInType:Txt_CheckInType.text,RoomId:RoomId,BookingId:BookingId,
+//										PropertyId:PropertyId,GuestId:GuestId,StateId:StateId,
+//										Direct:Direct1,PropertyType:Txt_PropertyType.text,
+//										Status:"UnSettled",CheckOutDate:DT_CheckOutDate.text,CheckInDate:Txt_CheckInDate.text,
+//										MarkUpAmount:Txt_MarkupAmount.text,BusinessSupportST:lbl_BST.text,
+//										Rate:Txt_Rate.text,TACInvoiceFile:"",TotalBusinessSupportST:Txt_BusinessSupportST.text,
+//										TACAmount:Txt_NetAmountTAC.text,
+//										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:""
+//										
+//									}]);
+//								
+//								
+//								var GrdXml:String = ObjToXmlStr_Comm(Ac_Hdr1,"GrdXml");	
+//								useWeb("ExterIntermediateChkoutService","Save_CUSTOM",[GlobalXml,HdrXml,GrdXml]);
 							}
 							if((event.detail==Alert.NO))
 							{
@@ -6651,7 +6688,7 @@
 							//					}
 						}
 					}
-					else if (Intermediate.selected==true)
+					else if (Intermediate.selected==true) // MGH,MMT,DdP(Intermediate)
 					{
 						if(Mode1 == "Direct1")
 						{
@@ -6683,36 +6720,37 @@
 										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate",
 										Email:txt_Email.text
 									}]);
-								
-								
 								var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");	
-								//useWeb("ExternalCheckOut","Save_CUSTOM",[GlobalXml,HdrXml]);
+								useWeb("ExterIntermediateChkoutService","Save_CUSTOM",[GlobalXml,HdrXml]);
 								
-								var Ac_Hdr1:ArrayCollection=new ArrayCollection
-									([{
-										ChkOutHdrId:ChkOutHdrId,
-										TACInvoiceNo:Txt_InvoiceNo.text,GuestName:hlp_GuestName.text,
-										BookingLevel:Txt_bookinlevel.text,BillDate:Txt_Billdate.text,
-										ClientName:Txt_Client.text,Property:Txt_Property.text,TotalTariff:Txt_TotalTariff.text,
-										NetAmount:Txt_NetAmount.text,
-										//SerivceTax:Txt_ServiceTax12.text,
-										Cess:Txt_Cess.text,HECess:Txt_HECess.text,
-										NetAmount:Txt_NetAmount.text,Referance:Txt_referance.text,
-										Id:Id,ChkInHdrId:CheckInHdrId,NoOfDays:lbl_tariff.text,
-										CheckInType:Txt_CheckInType.text,RoomId:RoomId,BookingId:BookingId,
-										PropertyId:PropertyId,GuestId:GuestId,StateId:StateId,
-										Direct:Direct1,PropertyType:Txt_PropertyType.text,
-										Status:"UnSettled",CheckOutDate:DT_CheckOutDate.text,CheckInDate:Txt_CheckInDate.text,
-										MarkUpAmount:Txt_MarkupAmount.text,BusinessSupportST:lbl_BST.text,
-										Rate:Txt_Rate.text,TACInvoiceFile:"",TotalBusinessSupportST:Txt_BusinessSupportST.text,
-										TACAmount:Txt_NetAmountTAC.text,
-										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate"
-										
-									}]);
-								
-								
-								var GrdXml:String = ObjToXmlStr_Comm(Ac_Hdr1,"GrdXml");	
-								useWeb("ExterIntermediateChkoutService","Save_CUSTOM",[GlobalXml,HdrXml,GrdXml]);
+//								var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");	
+//								//useWeb("ExternalCheckOut","Save_CUSTOM",[GlobalXml,HdrXml]);
+//								
+//								var Ac_Hdr1:ArrayCollection=new ArrayCollection
+//									([{
+//										ChkOutHdrId:ChkOutHdrId,
+//										TACInvoiceNo:Txt_InvoiceNo.text,GuestName:hlp_GuestName.text,
+//										BookingLevel:Txt_bookinlevel.text,BillDate:Txt_Billdate.text,
+//										ClientName:Txt_Client.text,Property:Txt_Property.text,TotalTariff:Txt_TotalTariff.text,
+//										NetAmount:Txt_NetAmount.text,
+//										//SerivceTax:Txt_ServiceTax12.text,
+//										Cess:Txt_Cess.text,HECess:Txt_HECess.text,
+//										NetAmount:Txt_NetAmount.text,Referance:Txt_referance.text,
+//										Id:Id,ChkInHdrId:CheckInHdrId,NoOfDays:lbl_tariff.text,
+//										CheckInType:Txt_CheckInType.text,RoomId:RoomId,BookingId:BookingId,
+//										PropertyId:PropertyId,GuestId:GuestId,StateId:StateId,
+//										Direct:Direct1,PropertyType:Txt_PropertyType.text,
+//										Status:"UnSettled",CheckOutDate:DT_CheckOutDate.text,CheckInDate:Txt_CheckInDate.text,
+//										MarkUpAmount:Txt_MarkupAmount.text,BusinessSupportST:lbl_BST.text,
+//										Rate:Txt_Rate.text,TACInvoiceFile:"",TotalBusinessSupportST:Txt_BusinessSupportST.text,
+//										TACAmount:Txt_NetAmountTAC.text,
+//										BillFromDate:DT_BillFromDate.text,BillEndDate:DT_BillTo.text,Intermediate:"Intermediate"
+//										
+//									}]);
+//								
+//								
+//								var GrdXml:String = ObjToXmlStr_Comm(Ac_Hdr1,"GrdXml");	
+//								useWeb("ExterIntermediateChkoutService","Save_CUSTOM",[GlobalXml,HdrXml,GrdXml]);
 							}
 							if((event.detail==Alert.NO))
 							{
@@ -6886,6 +6924,14 @@
 					btn_Sctrl.enabled=true;
 					btn_Settle.enabled=false;
 					Grid_Settle.dataProvider=null;
+			//		bdr_Tariff.visible=true;
+			//		btn_Tariff.enabled=true;
+					
+				}
+				else
+				{
+					hlp_GuestName.text="";
+					GuestId=0;
 				}
 				
 			}
@@ -7052,7 +7098,7 @@
 				Txt_Apartment.text="";
 				Txt_TariffLoad.text="";
 				DT_CheckOutDate.text="";
-				Txt_PropertyType.text="";
+		//		Txt_PropertyType.text="";
 				Txt_TariffSTAgree.text="";
 				Txt_TariffSTRack.text="";
 				Txt_TariffLTAgree.text="";
@@ -7182,29 +7228,35 @@
 				{
 					F2="Second";
 					var ErrStr:String="";var Flag:Boolean=true;
-					if(hlp_GuestName.text=="")
+//					if(hlp_GuestName.text=="")
+//					{
+//						if(Flag==true)
+//						{
+//							hlp_GuestName.setFocus();Flag=false;
+//						}
+//						ErrStr=ErrStr+"*  Guest Name is Required.\n";					
+//					}
+					if((Grid_Service.dataProvider==null)||(Grid_Service.dataProvider.length==0))
 					{
 						if(Flag==true)
-						{
-							hlp_GuestName.setFocus();Flag=false;
+						{ 
+							//Grd_Details.setFocus();
+							Flag=false;
 						}
-						ErrStr=ErrStr+"*  Guest Name is Required.\n";					
+						ErrStr=ErrStr+ "*  Do You Want to Exit Kot? \n";
 					}
-					//					if((Grid_Service.dataProvider==null)||(Grid_Service.dataProvider.length==0))
-					//					{
-					//						if(Flag==true)
-					//						{ 
-					//							//Grd_Details.setFocus();
-					//							Flag=false;
-					//						}
-					//						ErrStr=ErrStr+ "*  Service Item is Required \n";
-					//					}
+//					if(ErrStr!="")
+//					{
+//						alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
+//						return;					
+//					}
 					if(ErrStr!="")
 					{
-						alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
-						return;					
-					}
-					
+						alignAlert(Alert.show(ErrStr, "Warning",Alert.YES | Alert.NO, null,
+							ServiceKot, iconWarning, Alert.NO),10,"");
+						return;
+						
+					}	
 					
 //					var Ac_Hdr:ArrayCollection=new ArrayCollection
 //						([{
@@ -7368,7 +7420,7 @@
 				btn_Service.Button_B_mouseOverHandler();				
 				btn_Tariff.Button_OutHandler();					
 				Btn_Settlement.Button_OutHandler();
-				bdr_Tariff.visible=false;
+				bdr_Tariff.visible=true;
 				bdr_Service.visible=true;
 				bdr_Settle.visible=false;
 				if(Grid_Service.dataProvider==null)
@@ -7523,6 +7575,7 @@
 				Chk_Select.selected=false;
 				FnClear();
 				Grid_Settle.dataProvider=null;
+				Grid_Service.dataProvider=null;
 				CheckOutHdrId=0;lbl_tariff.text="";
 				Txt_ServiceBillAmt.text="";
 				Txt_ServiceVat.text="";Txt_SerivceTax.text="";
@@ -7597,6 +7650,10 @@
 				lbl_ConPaid.text="";
 				lbl_ConPaymode.text="";
 				txt_Email.text="";
+				
+				TariffPayClr();
+				ServicePayClr();
+				ConsolidatePayClr();
 			}
 			
 			protected function AllClear():void
@@ -8688,6 +8745,18 @@
 							F7="CompanyInvoice";
 							var ErrStr:String="";var Flag:Boolean=true;
 							
+//							if(FilePath.text == "")
+//							{
+//								if(Flag==true)
+//								{
+//									FileUpload1.setFocus();Flag=false;
+//								}
+//								ErrStr=ErrStr+"*  Company Invoice is Required.\n";
+//							}
+//							else
+//							{
+//								FilePath.text = "";
+//							}
 							
 							
 							if(ErrStr!="")
@@ -9052,7 +9121,18 @@
 							F7="CompanyInvoice";
 							var ErrStr:String="";var Flag:Boolean=true;
 							
-							
+//							if(FilePath.text == "")
+//							{
+//								if(Flag==true)
+//								{
+//									FileUpload1.setFocus();Flag=false;
+//								}
+//								ErrStr=ErrStr+"*  Company Invoice is Required.\n";
+//							}
+//							else
+//							{
+//								FilePath.text = "";
+//							}
 							
 							if(ErrStr!="")
 							{
@@ -10763,6 +10843,18 @@
 							F7="CompanyInvoice";
 							var ErrStr:String="";var Flag:Boolean=true;
 							
+//							if(FilePath2.text == "")
+//							{
+//								if(Flag==true)
+//								{
+//									FileUpload2.setFocus();Flag=false;
+//								}
+//								ErrStr=ErrStr+"*  Company Invoice is Required.\n";
+//							}
+//							else
+//							{
+//								FilePath2.text = "";
+//							}
 							
 							if(ErrStr!="")
 							{
@@ -11095,28 +11187,19 @@
 						{
 							F7="CompanyInvoice";
 							var ErrStr:String="";var Flag:Boolean=true;
-							//					if(Txt_ConsolidatePayment.text=="")
-							//					{
-							//						if(Flag==true)
-							//						{
-							//							Txt_ConsolidatePayment.setFocus();Flag=false;
-							//						}
-							//						ErrStr=ErrStr+"*  Amount is Required.\n";					
-							//					}
-							//					if(ErrStr!="")
-							//					{
-							//						alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
-							//						return;					
-							//					}
-							//					
-							//					if(Txt_ConCmpnyAppru.text=="")
-							//					{
-							//						if(Flag==true)
-							//						{
-							//							Txt_ConCmpnyAppru.setFocus();Flag=false;
-							//						}
-							//						ErrStr=ErrStr+"*  Approver is Required.\n";					
-							//					}
+							
+//							if(FilePath2.text == "")
+//							{
+//								if(Flag==true)
+//								{
+//									FileUpload2.setFocus();Flag=false;
+//								}
+//								ErrStr=ErrStr+"*  Company Invoice is Required.\n";
+//							}
+//							else
+//							{
+//								FilePath2.text = "";
+//							}
 							
 							if(ErrStr!="")
 							{
@@ -11269,7 +11352,17 @@
 				bdr_PaymentCredit.visible=false;
 				bdr_TariffCash1.visible=false;
 				bdr_TariffNEFT1.visible=false;
-				//				
+				if(BTCFileUploaded != "")
+				{
+					FileUpload1.visible=false;
+					alignAlert(Alert.show("Company Invoice is already submitted","Message !",Alert.OK,
+						null, FnOk,	iconTickLarge, Alert.OK),10,"");
+					
+				}
+				else
+				{
+					FileUpload1.visible=true;
+				}			
 			}
 			
 			protected function TariffNEFT_clickHandler(event:MouseEvent):void
@@ -11443,7 +11536,17 @@
 				bdr_ConPaymentCredit.visible=false;
 				ConsolidateCash1.visible=false;
 				bdr_ConsolidateNEFT1.visible=false;
-				//				
+				if(BTCFileUploaded != "")
+				{
+					FileUpload2.visible=false;
+					alignAlert(Alert.show("Company Invoice is already submitted","Message !",Alert.OK,
+						null, FnOk,	iconTickLarge, Alert.OK),10,"");
+					
+				}
+				else
+				{
+					FileUpload2.visible=true;
+				}				
 			}
 			
 			protected function ConNEFT2_clickHandler(event:MouseEvent):void
@@ -11550,6 +11653,7 @@
 				// TODO Auto-generated method stub
 				
 				CheckOutHdrId=0;
+	//			PrintChkOutId=0;
 				Txt_Cashreceive.text="";
 				DT_TariffCashDate.text="";				
 				ddl_CashReceivedby.selectedItem="";
@@ -11581,6 +11685,8 @@
 				
 				if(Direct.selected==true)
 				{
+					CheckOutHdrId=0;
+	//				PrintChkOutId=0;
 					Cash.selected="";
 					CreditCard.selected="";
 					CompanyInvoice.selected="";
@@ -11600,6 +11706,8 @@
 				}
 				else
 				{
+					CheckOutHdrId=0;
+	//				PrintChkOutId=0;
 					Cash.selected="";
 					CreditCard.selected="";
 					CompanyInvoice.selected="";
@@ -11611,6 +11719,7 @@
 					CompanyInvoice.enabled=true;
 					Cheque.enabled=false;
 					NEFT.enabled=false;
+					FilePath.text="";
 					
 					
 					txt_TariffOutstanding.enabled=false;
@@ -11633,6 +11742,8 @@
 			protected function ServicePayClr():void
 			{
 				// TODO Auto-generated method stub
+				CheckOutHdrId=0;
+	//			PrintChkOutId=0;
 				Txt_ServiPayCash.text="";
 				ddl_ServiPayCashRecBy.selectedItem="";
 				Txt_ServicePaymentCardDtl.text="";
@@ -11681,6 +11792,8 @@
 			protected function ConsolidatePayClr():void
 			{
 				// TODO Auto-generated method stub
+				CheckOutHdrId=0;
+			//	PrintChkOutId=0;
 				Txt_ConsoPayCash.text="";
 				DT_ConPayCashDate.text="";
 				ddl_ConsoPayCashRecBy.selectedItem="";
@@ -11707,7 +11820,7 @@
 				Txt_ConNEFTDateMonth.text="";
 				Txt_ConNEFTDateYear.text="";
 				Txt_ConNEFTBankName.text="";
-				Txt_ConsolidateLoad.text="";
+	//			Txt_ConsolidateLoad.text="";
 				
 				
 				Cash2.selected="";
@@ -12350,6 +12463,8 @@
 				
 				
 			}
+			
+			// External Property Direct Mode Print invoice save 2 table
 			public function FnUpdate(event:CloseEvent):void
 			{
 				if(Checkout.selected==true)
@@ -12634,6 +12749,9 @@
 			{
 				// TODO Auto-generated method stub
 				FnSettleClr();
+				bdr_TariffPay1.visible=false;
+				bdr_SerPay1.visible=false;
+				bdr_ConPay1.visible=false;
 			}
 			
 			protected function Checkout_clickHandler(event:MouseEvent):void
@@ -13172,20 +13290,20 @@
 									 visible="false"/>
 					</s:BorderContainer>
 					<s:BorderContainer x="57" y="194" width="466" height="205" id="bdr_TariffCompinvoice1" visible="false">
-						<s:TextInput x="223" y="94" width="178" id="Txt_CmpnyAppru"  visible="true"/>
-						<s:TextInput x="223" y="120" width="178" id="Txt_TariffCmpReq" visible="true"/>
-						<s:TextInput x="223" y="147" width="178" id="Txt_TariffCmpEmail" visible="true"/>
-						<s:TextInput x="223" y="175" width="178" id="Txt_TariffCmpPhone" visible="true"/>
-						<mx:Label id="lbl_TariffCIapp" visible="true" x="56" y="94" width="156"
+						<s:TextInput x="223" y="84" width="178" id="Txt_CmpnyAppru"  visible="true"/>
+						<s:TextInput x="223" y="110" width="178" id="Txt_TariffCmpReq" visible="true"/>
+						<s:TextInput x="223" y="137" width="178" id="Txt_TariffCmpEmail" visible="true"/>
+						<s:TextInput x="223" y="165" width="178" id="Txt_TariffCmpPhone" visible="true"/>
+						<mx:Label id="lbl_TariffCIapp" visible="true" x="56" y="84" width="156"
 								  text="Approver                                :"/>
-						<mx:Label id="lbl_TariffCmpReq" visible="true" x="56" y="121" width="156"
+						<mx:Label id="lbl_TariffCmpReq" visible="true" x="56" y="111" width="156"
 								  text="Requester                             :"/>
-						<mx:Label id="lbl_TariffCmpEmail" visible="true" x="56" y="147" width="156"
+						<mx:Label id="lbl_TariffCmpEmail" visible="true" x="56" y="137" width="156"
 								  text="Email ID                                 :"/>
-						<mx:Label id="lbl_TariffCmpPhone" visible="true" x="56" y="175" width="156"
+						<mx:Label id="lbl_TariffCmpPhone" visible="true" x="56" y="165" width="156"
 								  text="Phone No                               :"/>
 						
-						<mx:Panel x="59" y="10" height="70" title="File Uploader">
+						<mx:Panel x="59" y="3" height="70" title="File Uploader" id="FileUpload1" visible="true">
 							<mx:ControlBar>
 								<mx:Spacer width="80%"/>
 								<mx:HBox>
@@ -13506,7 +13624,7 @@
 									 maxChars="4" visible="false"/>
 					</s:BorderContainer>
 					<s:BorderContainer x="80" y="198" width="460" height="210" id="bdr_ConsolidateCmpnyInvoice1" visible="false" depth="2000">
-						<mx:Panel x="59" y="10" height="70" title="File Uploader">
+						<mx:Panel x="59" y="10" height="70" title="File Uploader" id="FileUpload2" visible="false">
 							<mx:ControlBar>
 								<mx:Spacer width="80%"/>
 								<mx:HBox>

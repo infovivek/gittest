@@ -292,7 +292,14 @@
 					}
 					if (Ds_Objects.result.Tables.Table4.Rows.length > 0)
 					{
-						Ddl_TariffPaymentMode.dataProvider=Ds_Objects.result.Tables.Table4.Rows as ArrayCollection;
+						Ddl_TariffPaymentMode.dataProvider=Ds_Objects.result.Tables.Table4.Rows as ArrayCollection;						
+					}
+					if (Ds_Objects.result.Tables.Table5.Rows.length > 0)
+					{
+						Ddl_ServicePaymentMode.dataProvider=Ds_Objects.result.Tables.Table5.Rows as ArrayCollection;
+					}
+					if (Ds_Objects.result.Tables.Table5.Rows.length < 0)
+					{
 						Ddl_ServicePaymentMode.dataProvider=Ds_Objects.result.Tables.Table4.Rows as ArrayCollection;
 					}
 					var asd:ArrayCollection=new ArrayCollection(); 

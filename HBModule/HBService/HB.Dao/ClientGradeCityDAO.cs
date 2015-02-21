@@ -13,6 +13,7 @@ namespace HB.Dao
 {
     public class ClientGradeCityDAO
     {
+        String UserData = "";
         public DataSet Save(string Hdrval, User user)
         {
             DataSet ds = new DataSet();
@@ -69,11 +70,20 @@ namespace HB.Dao
             ClientGrd.Id = Convert.ToInt32(document.SelectSingleNode("HdrXml").Attributes["Id"].Value);
             if (ClientGrd.Id != 0)
             {
+
+                UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                  "', SctId:" + user.SctId + ", Service:ClientGradeCity_Update" +
+                  ", ProcName:'" + StoredProcedures.ClientGradeCity_Update;
+
                 command.CommandText = StoredProcedures.ClientGradeCity_Update;
                 command.Parameters.Add("@Id", SqlDbType.BigInt).Value = ClientGrd.Id;
             }
             else
             {
+                UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                 "', SctId:" + user.SctId + ", Service:ClientGradeCity Insert" +
+                 ", ProcName:'" + StoredProcedures.ClientGradeCity_Insert;
+
                 command.CommandText = StoredProcedures.ClientGradeCity_Insert;
             }
             command.CommandType = CommandType.StoredProcedure;
@@ -87,11 +97,15 @@ namespace HB.Dao
             command.Parameters.Add("@NeedGH", SqlDbType.BigInt).Value = Convert.ToBoolean(document.SelectSingleNode("HdrXml").Attributes["NeedGH"].Value);
             command.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = user.Id;
 
-            ds = new WrbErpConnection().ExecuteDataSet(command, "");
+            ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
             return ds;
         }
         public DataSet Search(string[] data, User user)
         {
+            UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                 "', SctId:" + user.SctId + ", Service:ClientGradeCity_Select" +
+                 ", ProcName:'" + StoredProcedures.ClientGradeCity_Select;
+
             SqlCommand command = new SqlCommand();
             command.CommandText = StoredProcedures.ClientGradeCity_Select;
             command.CommandType = CommandType.StoredProcedure;
@@ -99,10 +113,14 @@ namespace HB.Dao
             command.Parameters.Add("@Pram1", SqlDbType.Int).Value = Convert.ToInt32(data[2].ToString());
             command.Parameters.Add("@Pram2", SqlDbType.VarChar).Value = data[3].ToString();
             command.Parameters.Add("@UserId", SqlDbType.Int).Value = user.Id;
-            return new WrbErpConnection().ExecuteDataSet(command, "");
+            return new WrbErpConnection().ExecuteDataSet(command, UserData);
         }
         public DataSet Delete(string[] data, User user)
         {
+            UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                 "', SctId:" + user.SctId + ", Service:ClientGradeCity_Delete" +
+                 ", ProcName:'" + StoredProcedures.ClientGradeCity_Delete;
+        
             SqlCommand command = new SqlCommand();
             command.CommandText = StoredProcedures.ClientGradeCity_Delete;
             command.CommandType = CommandType.StoredProcedure;
@@ -110,10 +128,14 @@ namespace HB.Dao
             command.Parameters.Add("@Pram1", SqlDbType.VarChar).Value = data[2].ToString();
             command.Parameters.Add("@Pram2", SqlDbType.BigInt).Value = Convert.ToInt32(data[3].ToString());
             command.Parameters.Add("@UserId", SqlDbType.BigInt).Value = user.Id;
-            return new WrbErpConnection().ExecuteDataSet(command, "");
+            return new WrbErpConnection().ExecuteDataSet(command, UserData);
         }
         public DataSet Help(string[] data, User user)
         {
+            UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                 "', SctId:" + user.SctId + ", Service:ClientGradeCity_Help" +
+                 ", ProcName:'" + StoredProcedures.ClientGradeCity_Help;
+
             DataSet ds = new DataSet();
             SqlCommand command = new SqlCommand();
             if (data[1].ToString() != "GradeSave")
@@ -127,7 +149,7 @@ namespace HB.Dao
                 command.Parameters.Add("@Pram3", SqlDbType.VarChar).Value = data[4].ToString();
                 command.Parameters.Add("@Pram4", SqlDbType.VarChar).Value = data[5].ToString();
                 command.Parameters.Add("@UserId", SqlDbType.BigInt).Value = user.Id;
-                ds= new WrbErpConnection().ExecuteDataSet(command, "");
+                ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
             }
             else
             {

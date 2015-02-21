@@ -192,13 +192,49 @@ namespace HB.Dao
                         command.Parameters.Add("@Id3", SqlDbType.BigInt).Value = 0;
                         command.Parameters.Add("@Id4", SqlDbType.BigInt).Value = 0;
                         ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
-                        //
+                        // ROOM RATE
                         decimal RoomNo1Existsamt = Convert.ToDecimal(ds.Tables[0].Rows[0][0].ToString()) * CntDys;
                         decimal RoomNo2Existsamt = Convert.ToDecimal(ds.Tables[1].Rows[0][0].ToString()) * CntDys;
+                        // ROOM TAX
+                        decimal RoomNo1ExistsTaxamt = 0;
+                        if (ds.Tables[2].Rows.Count > 0)
+                        {
+                            RoomNo1ExistsTaxamt = Convert.ToDecimal(ds.Tables[2].Rows[0][0].ToString()) * CntDys;
+                        }
+                        decimal RoomNo2ExistsTaxamt = 0;
+                        if (ds.Tables[3].Rows.Count > 0)
+                        {
+                            RoomNo2ExistsTaxamt = Convert.ToDecimal(ds.Tables[3].Rows[0][0].ToString()) * CntDys;
+                        }
+                        // ROOM discount
+                        decimal RoomNo1Existsdiscountamt = 0;
+                        if (ds.Tables[4].Rows.Count > 0)
+                        {
+                            RoomNo1Existsdiscountamt = Convert.ToDecimal(ds.Tables[4].Rows[0][0].ToString()) * CntDys;
+                        }
+                        decimal RoomNo2Existsdiscountamt = 0;
+                        if (ds.Tables[5].Rows.Count > 0)
+                        {
+                            RoomNo2Existsdiscountamt = Convert.ToDecimal(ds.Tables[5].Rows[0][0].ToString()) * CntDys;
+                        }
+                        decimal diff = Convert.ToDecimal(ds.Tables[6].Rows[0][0].ToString());
                         //
                         FlagStr = "";
                         //
-                        if ((RoomNo1Existsamt >= RoomRate1) && (RoomNo2Existsamt >= RoomRate2) && (RoomAvaCnt >= GstCnt))
+                        //if ((RoomNo1Existsamt == RoomRate1) && (RoomNo2Existsamt == RoomRate2) && (RoomAvaCnt >= GstCnt) &&
+                        //    (RoomNo1ExistsTaxamt == Taxes1) && (RoomNo2ExistsTaxamt == Taxes2) &&
+                        //    (RoomNo1Existsdiscountamt == RoomDiscount1) && (RoomNo2Existsdiscountamt == RoomDiscount2))
+                        //{
+                        //    Flag = true;
+                        //}
+                        decimal Rate1diff = Math.Abs(RoomNo1Existsamt - RoomRate1);
+                        decimal Rate2diff = Math.Abs(RoomNo2Existsamt - RoomRate2);
+                        decimal Tax1diff = Math.Abs(RoomNo1ExistsTaxamt - Taxes1);
+                        decimal Tax2diff = Math.Abs(RoomNo2ExistsTaxamt - Taxes2);
+                        decimal Discount1diff = Math.Abs(RoomNo1Existsdiscountamt - RoomDiscount1);
+                        decimal Discount2diff = Math.Abs(RoomNo2Existsdiscountamt - RoomDiscount2);
+                        if ((Rate1diff < diff) && (Rate2diff < diff) && (Tax1diff < diff) && (Tax2diff < diff) &&
+                            (Discount1diff < diff) && (Discount2diff < diff) && (RoomAvaCnt >= GstCnt))
                         {
                             Flag = true;
                         }
@@ -221,23 +257,37 @@ namespace HB.Dao
                             command.Parameters.Add("@Id3", SqlDbType.BigInt).Value = Math.Round(Taxes1 / CntDys);
                             command.Parameters.Add("@Id4", SqlDbType.BigInt).Value = Math.Round(Taxes2 / CntDys);
                             ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
-                            if ((RoomDiscount1 != 0) || (RoomDiscount2 != 0))
-                            {
-                                command = new SqlCommand();
-                                ds = new DataSet();
-                                command.CommandText = StoredProcedures.API_Help;
-                                command.CommandType = CommandType.StoredProcedure;
-                                command.Parameters.Add("@Action", SqlDbType.NVarChar).Value = "MMTDiscountUpdate";
-                                command.Parameters.Add("@Str1", SqlDbType.NVarChar).Value = api.HotelId;
-                                command.Parameters.Add("@Str2", SqlDbType.NVarChar).Value = api.RatePlanCode;
-                                command.Parameters.Add("@Str3", SqlDbType.NVarChar).Value = api.RoomTypecode;
-                                command.Parameters.Add("@Str4", SqlDbType.NVarChar).Value = api.HeaderId;
-                                command.Parameters.Add("@Id1", SqlDbType.BigInt).Value = Math.Round(RoomDiscount1 / CntDys);
-                                command.Parameters.Add("@Id2", SqlDbType.BigInt).Value = Math.Round(RoomDiscount2 / CntDys);
-                                command.Parameters.Add("@Id3", SqlDbType.BigInt).Value = 0;
-                                command.Parameters.Add("@Id4", SqlDbType.BigInt).Value = 0;
-                                ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
-                            }
+                            command = new SqlCommand();
+                            ds = new DataSet();
+                            command.CommandText = StoredProcedures.API_Help;
+                            command.CommandType = CommandType.StoredProcedure;
+                            command.Parameters.Add("@Action", SqlDbType.NVarChar).Value = "MMTDiscountUpdate";
+                            command.Parameters.Add("@Str1", SqlDbType.NVarChar).Value = api.HotelId;
+                            command.Parameters.Add("@Str2", SqlDbType.NVarChar).Value = api.RatePlanCode;
+                            command.Parameters.Add("@Str3", SqlDbType.NVarChar).Value = api.RoomTypecode;
+                            command.Parameters.Add("@Str4", SqlDbType.NVarChar).Value = api.HeaderId;
+                            command.Parameters.Add("@Id1", SqlDbType.BigInt).Value = Math.Round(RoomDiscount1 / CntDys);
+                            command.Parameters.Add("@Id2", SqlDbType.BigInt).Value = Math.Round(RoomDiscount2 / CntDys);
+                            command.Parameters.Add("@Id3", SqlDbType.BigInt).Value = 0;
+                            command.Parameters.Add("@Id4", SqlDbType.BigInt).Value = 0;
+                            ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
+                            //if ((roomdiscount1 != 0) || (roomdiscount2 != 0))
+                            //{
+                            //    command = new sqlcommand();
+                            //    ds = new dataset();
+                            //    command.commandtext = storedprocedures.api_help;
+                            //    command.commandtype = commandtype.storedprocedure;
+                            //    command.parameters.add("@action", sqldbtype.nvarchar).value = "mmtdiscountupdate";
+                            //    command.parameters.add("@str1", sqldbtype.nvarchar).value = api.hotelid;
+                            //    command.parameters.add("@str2", sqldbtype.nvarchar).value = api.rateplancode;
+                            //    command.parameters.add("@str3", sqldbtype.nvarchar).value = api.roomtypecode;
+                            //    command.parameters.add("@str4", sqldbtype.nvarchar).value = api.headerid;
+                            //    command.parameters.add("@id1", sqldbtype.bigint).value = math.round(roomdiscount1 / cntdys);
+                            //    command.parameters.add("@id2", sqldbtype.bigint).value = math.round(roomdiscount2 / cntdys);
+                            //    command.parameters.add("@id3", sqldbtype.bigint).value = 0;
+                            //    command.parameters.add("@id4", sqldbtype.bigint).value = 0;
+                            //    ds = new wrberpconnection().executedataset(command, userdata);
+                            //}
                         }
                     }
                     else

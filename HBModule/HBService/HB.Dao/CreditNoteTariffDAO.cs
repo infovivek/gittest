@@ -40,6 +40,14 @@ namespace HB.Dao
                 {
                     Dep.ChkInVoiceNo = doc.SelectNodes("//HdrXml1")[i].Attributes["ChkInVoiceNo"].Value;
                 }
+                if (doc.SelectNodes("//HdrXml1")[i].Attributes["CrdInVoiceNo"].Value == "")
+                {
+                    Dep.CrdInVoiceNo = "";
+                }
+                else
+                {
+                    Dep.CrdInVoiceNo = doc.SelectNodes("//HdrXml1")[i].Attributes["CrdInVoiceNo"].Value;
+                }
                 if (doc.SelectNodes("//HdrXml1")[i].Attributes["CreditNoteNo"].Value == "")
                 {
                     Dep.CreditNoteNo = "";
@@ -64,13 +72,13 @@ namespace HB.Dao
                 {
                     Dep.ServiceTax1 = Convert.ToDecimal(doc.SelectNodes("//HdrXml1")[i].Attributes["ServiceTax1"].Value);
                 }
-                if (doc.SelectNodes("//HdrXml")[i].Attributes["ServiceTax2"].Value == "")
+                if (doc.SelectNodes("//HdrXml1")[i].Attributes["ServiceTax2"].Value == "")
                 {
                     Dep.ServiceTax2 = 0;
                 }
                 else
                 {
-                    Dep.ServiceTax2 = Convert.ToDecimal(doc.SelectNodes("//HdrXml")[i].Attributes["ServiceTax2"].Value);
+                    Dep.ServiceTax2 = Convert.ToDecimal(doc.SelectNodes("//HdrXml1")[i].Attributes["ServiceTax2"].Value);
                 }
                 if (doc.SelectNodes("//HdrXml1")[i].Attributes["TotalAmount"].Value == "")
                 {
@@ -79,6 +87,30 @@ namespace HB.Dao
                 else
                 {
                     Dep.TotalAmount = Convert.ToDecimal(doc.SelectNodes("//HdrXml1")[i].Attributes["TotalAmount"].Value);
+                }
+                if (doc.SelectNodes("//HdrXml1")[i].Attributes["Description"].Value == "")
+                {
+                    Dep.Description ="";
+                }
+                else
+                {
+                    Dep.Description = doc.SelectNodes("//HdrXml1")[i].Attributes["Description"].Value;
+                }
+                if (doc.SelectNodes("//HdrXml1")[i].Attributes["ChkOutId"].Value == "")
+                {
+                    Dep.ChkOutId = 0;
+                }
+                else
+                {
+                    Dep.ChkOutId = Convert.ToInt32(doc.SelectNodes("//HdrXml1")[i].Attributes["ChkOutId"].Value);
+                }
+                if (doc.SelectNodes("//HdrXml1")[i].Attributes["PropertyId"].Value == "")
+                {
+                    Dep.PropertyId = 0;
+                }
+                else
+                {
+                    Dep.PropertyId = Convert.ToInt32(doc.SelectNodes("//HdrXml1")[i].Attributes["PropertyId"].Value);
                 }
                 if (doc.SelectNodes("//HdrXml1")[i].Attributes["Id"].Value == "")
                 {
@@ -90,17 +122,21 @@ namespace HB.Dao
                 }
                 command = new SqlCommand();
                 UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
-                "', SctId:" + user.SctId + ", Service:DepositDAO Insert" + ", ProcName:'" + StoredProcedures.Deposit_Insert;
+                "', SctId:" + user.SctId + ", Service:CreditNoteHdr_Insert" + ", ProcName:'" + StoredProcedures.CreditNoteTariffHdr_Insert;
 
-                command.CommandText = StoredProcedures.Deposit_Insert;
+                command.CommandText = StoredProcedures.CreditNoteTariffHdr_Insert;
 
                 command.CommandType = CommandType.StoredProcedure;
                 command.Parameters.Add("@ChkInVoiceNo", SqlDbType.NVarChar).Value = Dep.ChkInVoiceNo;
+                command.Parameters.Add("@CrdInVoiceNo", SqlDbType.NVarChar).Value = Dep.CrdInVoiceNo;
                 command.Parameters.Add("@CreditNoteNo", SqlDbType.NVarChar).Value = Dep.CreditNoteNo;
                 command.Parameters.Add("@LuxuryTax", SqlDbType.Decimal).Value = Dep.LuxuryTax;
                 command.Parameters.Add("@ServiceTax1", SqlDbType.Decimal).Value = Dep.ServiceTax1;
                 command.Parameters.Add("@ServiceTax2", SqlDbType.Decimal).Value = Dep.ServiceTax2;
                 command.Parameters.Add("@TotalAmount", SqlDbType.Decimal).Value = Dep.TotalAmount;
+                command.Parameters.Add("@Description", SqlDbType.NVarChar).Value = Dep.Description;
+                command.Parameters.Add("@ChkOutId", SqlDbType.Int).Value =Dep.ChkOutId;
+                command.Parameters.Add("@PropertyId", SqlDbType.Int).Value = Dep.PropertyId;
                 command.Parameters.Add("@Createdby", SqlDbType.Int).Value = user.Id;
                 ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
 
@@ -120,13 +156,13 @@ namespace HB.Dao
                 {
                     Dep.Type = doc.SelectNodes("//HdrXml")[i].Attributes["Type"].Value;
                 }
-                if (doc.SelectNodes("//HdrXml")[i].Attributes["Amount"].Value == "")
+                if (doc.SelectNodes("//HdrXml")[i].Attributes["TariffAmount"].Value == "")
                 {
-                    Dep.Amount = 0;
+                    Dep.TariffAmount = 0;
                 }
                 else
                 {
-                    Dep.Amount = Convert.ToInt32(doc.SelectNodes("//HdrXml")[i].Attributes["Amount"].Value);
+                    Dep.TariffAmount = Convert.ToInt32(doc.SelectNodes("//HdrXml")[i].Attributes["TariffAmount"].Value);
                 }
                 if (doc.SelectNodes("//HdrXml")[i].Attributes["NoOfDays"].Value == "")
                 {
@@ -145,11 +181,11 @@ namespace HB.Dao
                     Dep.Total = Convert.ToInt32(doc.SelectNodes("//HdrXml")[i].Attributes["Total"].Value);
                 }
                 command.CommandType = CommandType.StoredProcedure;
-              
-                    command.CommandText = StoredProcedures.DtlDeposit_Insert;
+
+                    command.CommandText = StoredProcedures.CreditNoteTariffDtl_Insert;
                     command.Parameters.Add("@CrdTariffHdrId", SqlDbType.BigInt).Value = Dep.CrdTariffHdrId;
                     command.Parameters.Add("@Type", SqlDbType.NVarChar).Value = Dep.Type;
-                    command.Parameters.Add("@Amount", SqlDbType.Decimal).Value = Dep.Amount;
+                    command.Parameters.Add("@Amount", SqlDbType.Decimal).Value = Dep.TariffAmount;
                     command.Parameters.Add("@NoOfDays", SqlDbType.NVarChar).Value = Dep.NoOfDays;
                     command.Parameters.Add("@Total", SqlDbType.BigInt).Value = Dep.Total;
                     command.Parameters.Add("@Createdby", SqlDbType.Bit).Value = user.Id;

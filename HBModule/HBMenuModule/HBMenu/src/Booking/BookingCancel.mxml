@@ -16,30 +16,49 @@
 			import mx.events.CloseEvent;
 			public static var Global_AC:ArrayCollection = new ArrayCollection();
 			public static var GlobalXml:String = "";
-			public var DtlsId:int = 0,BookingId:int = 0,Status:String = "",PropertyType:String = "";
+			public var DtlsId:int = 0,BookingId:int = 0,Status:String = "",PropertyType:String = "",UsrId:int = 0;
+			public var ClientId:int = 0;
 			private function Page_Load():void
 			{
 				Global_AC = funLoginInfo("<gScrId>1</gScrId><gUsrFk>1</gUsrFk>");				
 				GlobalXml = "";
 				GlobalXml += "<ROOT>";
 				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
-				GlobalXml += "</ROOT>";					
-				SCtrl.setButtonRights("Delete",true);
-				SCtrl.setButtonRights("Clear",true);
-				SCtrl.setButtonRights("Save",true);
-				SCtrl.setButtonRights("Search",true);
+				GlobalXml += "</ROOT>";				
+				UsrId = Global_AC[0].UsrId;
 				hlp_BookingCode._setFocus();
-				help();
-				//Chk_Mail.selected = true;
-				//useWeb("BookingMail","MMTBookingCancel_CUSTOM",[GlobalXml,"BookingCancelMMT",4661,"Test Cancelation",Chk_Mail.selected]);
+				Grd_Property.dataProvider = null;
+				Fn_Help_Client();
 			}
-			private function help():void
+			// @Action, @Str1,@Id,@Remarks
+			private function Fn_Booking_Help():void
 			{				
-				useWeb("BookingCancel","BookingCode_CUSTOM", [GlobalXml, "BookingCodeCancel","", 0, Global_AC[0].UsrId]);
+				useWeb("BookingCancel","BookingCode_CUSTOM", [GlobalXml, "BookingCodeCancel","HBStay",ClientId,""]);
 			}
+			
+			private function Fn_Help_Client():void
+			{				
+				useWeb("BookingCancel","ClientLoad_CUSTOM", [GlobalXml, "ClientLoad","",0,""]);
+			}
+			
 			private function Custom_WebSer_Result (Ds_Objects:Object):void				
 			{
-				
+				if (Ds_Objects.currentTarget.description.toString() == "ClientLoad_CUSTOM")
+				{
+					Hlp_Client.dataProvider = null;Hlp_Client.fnClear();ClientId = 0;
+					if (Ds_Objects.result.Tables.Table.Rows[0].TmpStr == "MasterClient")
+					{
+						Hlp_Client.enabled = true;
+						Hlp_Client.dataProvider = Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+					}
+					else
+					{
+						Hlp_Client.enabled = false;
+						Hlp_Client.text = Ds_Objects.result.Tables.Table1.Rows[0].ClientName;
+						ClientId = Ds_Objects.result.Tables.Table1.Rows[0].Id;
+						Fn_Booking_Help();
+					}
+				}				
 				if (Ds_Objects.currentTarget.description.toString() == "BookingCode_CUSTOM")
 				{
 					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
@@ -106,13 +125,13 @@
 				txt_Remarks.text="";
 				Grd_Property.dataProvider=null;
 				hlp_BookingCode.text="";
-				txt_Client.text="";
+				Hlp_Client.fnClear();
 				txt_Property.text="";
 				BookingId=0;
 				DtlsId=0;
 				GuestFlag=false;
 				hlp_BookingCode._setFocus();
-				help();
+				Fn_Help_Client();
 			}
 			public var Ac_Guest:ArrayCollection=new ArrayCollection();	
 			public var selectedindex:int=0;
@@ -200,19 +219,28 @@
 					else
 					{
 						useWeb("BookingCancel","BookingGuestDelete_CUSTOM", [GlobalXml, "BookingGuestApartmentDelete",HdrXml, BookingId,txt_Remarks.text,Chk_Mail.selected]);
-					}
-					
-				}
-					
-				
+					}					
+				}			
 			}
+			
+			public function FnClient():void
+			{
+				Hlp_Client.fnClear();ClientId = 0;
+				if(hlp_BookingCode.selected())
+				{
+					Hlp_Client.text = Hlp_Client.Select_Row.ClientName;
+					ClientId = Hlp_Client.Select_Row.Id;
+					Fn_Booking_Help();
+				}				
+			}
+			
 			private function fnGetBooking():void
 			{
 				if(hlp_BookingCode.selected())
 				{
 					hlp_BookingCode.text = hlp_BookingCode.Select_Row.BookingCode;
 					BookingId = hlp_BookingCode.Select_Row.Id;
-					txt_Client.text = hlp_BookingCode.Select_Row.ZClientNameId;					
+					Hlp_Client.text = hlp_BookingCode.Select_Row.ZClientNameId;					
 					txt_BookingLevel.text = hlp_BookingCode.Select_Row.ZBookingLevelId;
 					PropertyType = hlp_BookingCode.Select_Row.ZPropertyTypeId;
 					if(PropertyType == "MMT")
@@ -229,7 +257,7 @@
 				else
 				{
 					hlp_BookingCode.text = ""; hlp_BookingCode.fnClear(); BookingId = 0;
-					txt_Client.text = ""; txt_BookingLevel.text = ""; PropertyType = "";
+					txt_BookingLevel.text = ""; PropertyType = ""; txt_Property.text="";
 				}
 			}
 			
@@ -336,23 +364,31 @@
 				return Itm;		
 			}
 			
+			protected function button_hb2_clickHandler(event:MouseEvent):void
+			{
+				Fn_Help_Client();
+			}
+			
 		]]>
 	</fx:Script>
-	<mx:Label x="37" y="36" text="Booking No"/>
-	<mx:Label x="74" y="76" text="Filter"/>
-	<mx:Label x="295" y="36" text="Client"/>
-	<mx:Label x="85" y="346" text="Remarks"/>
-	<mx:Label x="581" y="36" text="Property"/>
-	<mx:Label x="818" y="66" text="Payment Mode"/>
-	<WrbHelpComp:HelpText x="110" y="36.5" width="135" depth="2" id="hlp_BookingCode" tabIndex="1" 
+	<s:VGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+	<s:BorderContainer x="6" width="909" height="517" backgroundAlpha="0.1" borderVisible="false">
+	<mx:Label x="27" y="57" text="Booking No"/>
+		<s:Label x="100" y="61.5" text="*" color="red"/>
+	<mx:Label x="26" y="98" text="Filter"/>
+	<mx:Label x="25" y="16" text="Client"/>
+	<mx:Label x="21.25" y="377" text="Remarks"/>
+		<s:Label x="83.25" y="381.5" text="*" color="red"/>
+	<mx:Label x="529" y="57" text="Property"/>
+	<mx:Label x="750.25" y="98" text="Payment  Mode"/>
+	<WrbHelpComp:HelpText x="111" y="57.5" width="135" depth="2" id="hlp_BookingCode" tabIndex="1" 
 						  onselection="{fnGetBooking()}" pxSetColumnsWidth="100,200,0,300">
 	</WrbHelpComp:HelpText>
-	<s:TextInput x="339" y="36.5" width="221" id="txt_Client"/>
-	<s:TextInput x="644" y="36.5" width="262" id="txt_Property"/>
-	<mx:DataGrid id="Grd_Property" x="35.35" y="106" width="925" height="223"
-				 editable="true"  keyDown="Grd_POS_keyDownHandler(event)" depth="1">
+	<s:TextInput x="592" y="57.5" width="301" id="txt_Property" editable="false"/>
+	<mx:DataGrid id="Grd_Property" x="26" y="130" height="230"
+				 editable="false"  keyDown="Grd_POS_keyDownHandler(event)" depth="1">
 		<mx:columns>
-			<mx:DataGridColumn dataField="Tick" headerText="Delete" width="50"  editable="false">
+			<!--mx:DataGridColumn dataField="Tick" headerText="X" width="40"  editable="false">
 				<mx:itemRenderer>
 					<fx:Component>
 						<mx:HBox horizontalAlign="center" verticalAlign="middle">
@@ -361,16 +397,16 @@
 						</mx:HBox>
 					</fx:Component>
 				</mx:itemRenderer>
-			</mx:DataGridColumn>
+			</mx:DataGridColumn-->
 			<mx:DataGridColumn width="100" dataField="FirstName" visible="true" editable="false"/>								
 			<mx:DataGridColumn width="100" dataField="LastName" editable="false" />								
 			<mx:DataGridColumn width="80" dataField="Occupancy" editable="false"/>								
-			<mx:DataGridColumn width="80" dataField="RoomType" editable="false" />
-			<mx:DataGridColumn width="50" dataField="Tariff" editable="false" />
-			<mx:DataGridColumn width="90" dataField="ChkInDt" editable="false" headerText="Check In Date"/>
-			<mx:DataGridColumn width="90" dataField="ChkOutDt" editable="false" headerText="Check Out Date"/>			
-			<mx:DataGridColumn width="80" dataField="TariffPaymentMode" editable="false" headerText="Tariff"/>
-			<mx:DataGridColumn width="80" dataField="ServicePaymentMode" editable="false" headerText="Service"/>			
+			<mx:DataGridColumn width="95" dataField="RoomType" editable="false" />
+			<mx:DataGridColumn width="90" dataField="Tariff" editable="false" />
+			<mx:DataGridColumn width="90" dataField="ChkInDt" editable="false" headerText="ChkIn Dt"/>
+			<mx:DataGridColumn width="90" dataField="ChkOutDt" editable="false" headerText="ChkOut Dt"/>			
+			<mx:DataGridColumn width="110" dataField="TariffPaymentMode" editable="false" headerText="Tariff"/>
+			<mx:DataGridColumn width="110" dataField="ServicePaymentMode" editable="false" headerText="Service"/>			
 			<mx:DataGridColumn width="0" dataField="GuestId" visible="false"/>
 			<mx:DataGridColumn width="0" dataField="RoomId" visible="false"/>
 			<mx:DataGridColumn width="0" dataField="BookingPrTariffPaymentModeopertyId" visible="false"/>			
@@ -378,20 +414,24 @@
 			<mx:DataGridColumn width="0" dataField="DateDiffs" visible="false"/>
 		</mx:columns>
 	</mx:DataGrid>
-	<mx:HRule x="0" y="417" width="100%" strokeColor="#eb1c24"/>
-	<s:HGroup x="0" y="422" width="100%" height="30" horizontalAlign="center" verticalAlign="top">
-		<WrbComp:SaveControl id="SCtrl" docRefresh="Clear()">
-		</WrbComp:SaveControl>
-		<WrbComp:Button_HB width="130" _Label="Cancel Guest" click="DeleteGrid1()" id="Btn_Cancel">
+	<s:HGroup x="21" y="473" width="872" height="30" horizontalAlign="center" verticalAlign="top" gap="25">
+		<WrbComp:Button_HB width="0" _Label="Cancel Guest" click="DeleteGrid1()" id="Btn_Cancel" visible="false">
 		</WrbComp:Button_HB>
-		<WrbComp:Button_HB x="660" width="130" _Label="Cancel Booking "
+		<WrbComp:Button_HB x="660" _Label="Cancel"
 						   click="button_hb1_clickHandler(event)" id="Btn_CancelBooking">
 		</WrbComp:Button_HB>
-		
+		<WrbComp:Button_HB x="660" _Label="Refresh"
+						   click="button_hb2_clickHandler(event)">
+		</WrbComp:Button_HB>		
 	</s:HGroup>
-	<s:TextArea x="152" y="344" width="299" height="66" id="txt_Remarks" tabIndex="2"/>
-	<s:TextInput x="110" y="77" width="135" height="22" prompt="First Name" id="FiltFirstName" change="filter('GuestName')"/>
-	<mx:Label x="250" y="76" text="Booking Level"/>
-	<s:TextInput x="339" y="76.5" width="135" id="txt_BookingLevel" enabled="false"/>
-	<s:CheckBox x="644" y="344" label="Send Mail" id="Chk_Mail" tabIndex="3"/>
+	<s:TextArea x="102" y="375" width="791" height="25" id="txt_Remarks" tabIndex="2"/>
+	<s:TextInput x="66" y="97.5" width="97" height="22" prompt="First Name" id="FiltFirstName" change="filter('GuestName')"/>
+	<mx:Label x="276" y="57" text="Booking Level"/>
+	<s:TextInput x="371" y="57.5" width="135" id="txt_BookingLevel" editable="false"/>
+	<s:CheckBox x="420.75" y="424" label="Send Mail" id="Chk_Mail" tabIndex="3"/>
+		<WrbHelpComp:HelpText x="111" y="16" width="300" id="Hlp_Client"
+							  onselection="{FnClient()}" pxSetColumnsWidth="198,100,0">
+		</WrbHelpComp:HelpText>
+	</s:BorderContainer>
+	</s:VGroup>
 </s:Application>

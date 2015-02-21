@@ -86,7 +86,7 @@ namespace HB.Dao
                 //message.From = new System.Net.Mail.MailAddress("stay@hummingbirdindia.com", "", System.Text.Encoding.UTF8);
                 message.From = new System.Net.Mail.MailAddress(ds.Tables[4].Rows[0][14].ToString(), "", System.Text.Encoding.UTF8);
             }
-            //message.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
+            //message.To.Add(new System.Net.Mail.MailAddress("sakthikrr@gmail.com"));
             //message.Subject = "Booking - " + ds.Tables[2].Rows[0][2].ToString();
             message.To.Add(new System.Net.Mail.MailAddress("booking_confirmation@staysimplyfied.com"));
             if (ds.Tables[4].Rows[0][0].ToString() == "0")
@@ -638,6 +638,7 @@ namespace HB.Dao
                         message1.From = new System.Net.Mail.MailAddress(ds.Tables[4].Rows[0][14].ToString(), "", System.Text.Encoding.UTF8);
                     }
                     //message1.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
+                    //message1.To.Add(new System.Net.Mail.MailAddress("sakthikrr@gmail.com"));
                     //message1.Subject = "Booking - " + ds.Tables[2].Rows[0][2].ToString();
                     for (int i = 0; i < cnt; i++)
                     {

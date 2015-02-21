@@ -17,8 +17,9 @@
     <application path="Master/Menu.mxml"/>
     <application path="Booking/DirectBooking.mxml"/>
     <application path="Booking/BookingCancel.mxml"/>
+    <application path="Report/PrptyDatewise.mxml"/>
+    <application path="Report/CityDatewise.mxml"/>
     <application path="FRONTHB.mxml"/>
-    <application path="Booking/RoomShiftingNew.mxml"/>
     <application path="Report/CitywiseReport.mxml"/>
     <application path="Master/Test.mxml"/>
     <application path="Report/PaymentTypeReport.mxml"/>

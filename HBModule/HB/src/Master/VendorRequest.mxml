@@ -676,7 +676,7 @@
 				resultsTxtField.text = event.data.toString();
 				if(resultsTxtField.text=="There was an error uploading the file, please try again!")
 				{
-					alignAlert(Alert.show("There was an error uploading the Image, please try again!","Error !",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
+					alignAlert(Alert.show("There was an error uploading the Image, please try again!","Error !",Alert.OK, null, null,iconWarning, Alert.OK),10,"");
 				}
 				else
 				{

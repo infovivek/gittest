@@ -12,6 +12,7 @@ namespace HB.Dao
 {
      public class CheckInDtlsDAO
         {
+           String UserData;
            public DataSet Save(string ChkInHdr, User user, int ChkInHdrId)
             {
                 DataSet ds = new DataSet();
@@ -110,11 +111,17 @@ namespace HB.Dao
                     command = new SqlCommand();
                     if (ChkIn.Id != 0)
                     {
+                        UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                        "', SctId:" + user.SctId + ", Service:CheckInDtls_Update" + ", ProcName:'" + StoredProcedures.CheckInDtls_Update;
+
                         command.CommandText = StoredProcedures.CheckInDtls_Update;
                         command.Parameters.Add("@Id", SqlDbType.BigInt).Value = ChkIn.Id;
                     }
                     else
                     {
+                        UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                       "', SctId:" + user.SctId + ", Service:CheckInDtls_Insert" + ", ProcName:'" + StoredProcedures.CheckInDtls_Insert;
+
                         command.CommandText = StoredProcedures.CheckInDtls_Insert;
                     }
                     command.CommandType = CommandType.StoredProcedure;
@@ -139,9 +146,9 @@ namespace HB.Dao
                     command.Parameters.Add("@VAT", SqlDbType.Decimal).Value = ChkIn.VAT;
                     command.Parameters.Add("@Luxury", SqlDbType.Decimal).Value = ChkIn.Luxury;
                     command.Parameters.Add("@ExtraBed", SqlDbType.Decimal).Value = ChkIn.ExtraBed; */
-                    
-                   
-                    ds = new WrbErpConnection().ExecuteDataSet(command, "");
+
+
+                    ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
                     
                     {
                         ds.Tables.Add(dTable);
@@ -152,7 +159,10 @@ namespace HB.Dao
                      {
                          string UserData;
                          SqlCommand command = new SqlCommand();
-                         UserData = "   UserId : " + user.Id + ", UsreName : " + user.LoginUserName + ", ScreenName : " + user.ScreenName + ", SctId : " + user.SctId + ", BranchId : " + user.BranchId + "";
+
+                        UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                        "', SctId:" + user.SctId + ", Service:CheckIn : Help" + ", ProcName:'" + StoredProcedures.CheckIn_Help;
+
                          command = new SqlCommand();
                          command.CommandText = StoredProcedures.CheckIn_Help;
                          command.CommandType = CommandType.StoredProcedure;

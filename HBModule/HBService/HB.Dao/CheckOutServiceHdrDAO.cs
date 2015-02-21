@@ -94,12 +94,18 @@ namespace HB.Dao
             Cmd = new SqlCommand();
             if (ChkOutSer.Id != 0)
             {
+                UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                 "', SctId:" + user.SctId + ", Service:CheckOutHdrService_Update" + ", ProcName:'" + StoredProcedures.CheckOutHdrService_Update;
+
                 Mode = "Update";
                 Cmd.CommandText = StoredProcedures.CheckOutHdrService_Update;
                 Cmd.Parameters.Add("@Id", SqlDbType.Int).Value = ChkOutSer.Id;
             }
             else
             {
+                UserData = " UserId:" + user.Id + ", UsreName:" + user.LoginUserName + ", ScreenName:'" + user.ScreenName +
+                 "', SctId:" + user.SctId + ", Service:CheckOutHdrService_Insert" + ", ProcName:'" + StoredProcedures.CheckOutHdrService_Insert;
+
                 Mode = "Save";
                 Cmd.CommandText = StoredProcedures.CheckOutHdrService_Insert;
 
@@ -117,7 +123,7 @@ namespace HB.Dao
             Cmd.Parameters.Add("@MiscellaneousAmount", SqlDbType.Decimal).Value = ChkOutSer.MiscellaneousAmount;
             Cmd.Parameters.Add("@OtherService", SqlDbType.Decimal).Value = ChkOutSer.OtherService;
             Cmd.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = user.Id;
-            ds = new WrbErpConnection().ExecuteDataSet(Cmd, "");
+            ds = new WrbErpConnection().ExecuteDataSet(Cmd, UserData);
             return ds;
         }
         public DataSet Search(string[] data, User User)
@@ -131,7 +137,8 @@ namespace HB.Dao
         }
         public DataSet HelpResult(string[] data, User User)
         {
-            UserData = "   UserId : " + User.Id + ", UsreName : " + User.LoginUserName + ", ScreenName : " + User.ScreenName + ", SctId : " + User.SctId + ", BranchId : " + User.BranchId + "";
+            UserData = " UserId:" + User.Id + ", UsreName:" + User.LoginUserName + ", ScreenName:'" + User.ScreenName +
+                 "', SctId:" + User.SctId + ", Service:CheckOutHdrService_Help" + ", ProcName:'" + StoredProcedures.CheckOutHdrService_Help;
             Cmd = new SqlCommand();
             Cmd.CommandText = StoredProcedures.CheckOutHdrService_Help;
             Cmd.CommandType = CommandType.StoredProcedure;

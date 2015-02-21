@@ -411,7 +411,7 @@ BEGIN
        Select C.ChkInGuest GuestName ,C.Id,c.BookingId,C.RoomNo,C.RoomId ,
         B.GuestId,B.Type, B.PropertyName,B.ChkOutDate CheckOutDate,B.CityName,B.CityId,B.Category,B.MOP
         from WRBHBCheckInHdr c
-        join #TEMPFINALCHKOUTS B on b.BookingId=c.BookingId and C.Id=b.CheckInHdrId
+        join #TEMPFINALCHKOUTS B on b.BookingId=c.BookingId--and C.Id=b.CheckInHdrId
         where IsActive=1 and IsDeleted=0
        group by  B.GuestId,B.Type, B.PropertyName,B.ChkOutDate,B.CityName,B.CityId,
        C.ChkInGuest,C.Id,c.BookingId,C.RoomNo,C.RoomId,B.Category,B.MOP

@@ -65,6 +65,7 @@ CREATE PROCEDURE [dbo].[Sp_ContractBill_Help]
 			JOIN  WRBHBInvoiceManagedGHAmount IMA ON CM.Id=IMA.ContractId 
 			WHERE IMA.IsActive=1 AND IMA.IsDeleted=0 
 			AND IMA.Type!=' Managed Contracts '
+			
 		END
 		ELSE
 		BEGIN
@@ -72,7 +73,7 @@ CREATE PROCEDURE [dbo].[Sp_ContractBill_Help]
 			FROM WRBHBContractManagement CM
 			JOIN  WRBHBInvoiceManagedGHAmount IMA ON CM.Id=IMA.ContractId 
 			WHERE IMA.IsActive=1 AND IMA.IsDeleted=0
-			AND IMA.Type=' Managed Contracts '
+			AND IMA.Type=' Managed Contracts '			
 		END
 		
 		SELECT DISTINCT Convert(NVARCHAR(100),T1.StartDate,103) AS StartDate,
@@ -104,7 +105,8 @@ CREATE PROCEDURE [dbo].[Sp_ContractBill_Help]
    BEGIN
 		IF @Mode='Contract'
 		BEGIN
-			SELECT ContractName +'-'+CAST(MONTH(CONVERT(NVARCHAR(100),RentDate,103)) AS NVARCHAR)+'-'+CAST(YEAR(CONVERT(NVARCHAR(100),RentDate,103)) AS NVARCHAR) as label,
+			SELECT ContractName +'-'+CAST(MONTH(CONVERT(NVARCHAR(100),RentDate,103)) AS NVARCHAR)+'-'+
+			CAST(YEAR(CONVERT(NVARCHAR(100),RentDate,103)) AS NVARCHAR) as label,
 			CM.Id as data FROM WRBHBContractManagement CM
 			JOIN  WRBHBInvoiceManagedGHAmount IMA ON CM.Id=IMA.ContractId WHERE CM.ClientId=@Id AND 
 			CM.IsActive=1 AND CM.IsDeleted=0 AND IMA.Type!=' Managed Contracts ' AND IMA.IsActive=1

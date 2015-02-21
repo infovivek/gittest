@@ -24,11 +24,17 @@ namespace HB.Dao
             Cmd = new SqlCommand();
             if (Lty.Id != 0)
             {
+                UserData = " UserId:" + User.Id + ", UsreName:" + User.LoginUserName + ", ScreenName:'" + User.ScreenName +
+                   "', SctId:" + User.SctId + ", Service:City_Update" + ", ProcName:'" + StoredProcedures.City_Update;
+
                 Cmd.CommandText = StoredProcedures.City_Update;
                 Cmd.Parameters.Add("@Id", SqlDbType.Int).Value = Lty.Id;
             }
             else
             {
+                UserData = " UserId:" + User.Id + ", UsreName:" + User.LoginUserName + ", ScreenName:'" + User.ScreenName +
+                   "', SctId:" + User.SctId + ", Service:City_Insert" + ", ProcName:'" + StoredProcedures.City_Insert;
+
                 Cmd.CommandText = StoredProcedures.City_Insert;
             }
             Cmd.CommandType = CommandType.StoredProcedure;
@@ -42,7 +48,9 @@ namespace HB.Dao
 
         public DataSet Help(string[] data, User User)
         {
-            UserData = "   UserId : " + User.Id + ", UsreName : " + User.LoginUserName + ", ScreenName : " + User.ScreenName + ", SctId : " + User.SctId + ", BranchId : " + User.BranchId + "";
+            UserData = " UserId:" + User.Id + ", UsreName:" + User.LoginUserName + ", ScreenName:'" + User.ScreenName +
+                   "', SctId:" + User.SctId + ", Service:City_Help" + ", ProcName:'" + StoredProcedures.City_Help;
+
             Cmd = new SqlCommand();
             Cmd.CommandText = StoredProcedures.City_Help;
             Cmd.CommandType = CommandType.StoredProcedure;
@@ -54,7 +62,9 @@ namespace HB.Dao
 
         public DataSet Search(string[] data, User User)
         {
-            UserData = "   UserId : " + User.Id + ", UsreName : " + User.LoginUserName + ", ScreenName : " + User.ScreenName + ", SctId : " + User.SctId + ", BranchId : " + User.BranchId + "";
+            UserData = " UserId:" + User.Id + ", UsreName:" + User.LoginUserName + ", ScreenName:'" + User.ScreenName +
+                   "', SctId:" + User.SctId + ", Service:City_Select" + ", ProcName:'" + StoredProcedures.City_Select;
+
             Cmd = new SqlCommand();
             Cmd.CommandText = StoredProcedures.City_Select;
             Cmd.CommandType = CommandType.StoredProcedure;
@@ -65,7 +75,8 @@ namespace HB.Dao
 
         public DataSet Delete(string[] data, User User)
         {
-            UserData = "   UserId : " + User.Id + ", UsreName : " + User.LoginUserName + ", ScreenName : " + User.ScreenName + ", SctId : " + User.SctId + ", BranchId : " + User.BranchId + "";
+            UserData = " UserId:" + User.Id + ", UsreName:" + User.LoginUserName + ", ScreenName:'" + User.ScreenName +
+                   "', SctId:" + User.SctId + ", Service:City_Delete" + ", ProcName:'" + StoredProcedures.City_Delete;
             Cmd = new SqlCommand();
             Cmd.CommandText = StoredProcedures.City_Delete;
             Cmd.CommandType = CommandType.StoredProcedure;

@@ -712,7 +712,7 @@ END
 		IF @Direct = 'Direct'
 		BEGIN
 			UPDATE WRBHBChechkOutHdr set PaymentStatus = 'Paid'  ,IntermediateFlag = 1,IsActive=1
-			WHERE Id = @InsId and PropertyType =  'External Property' 
+			WHERE Id = @InsId and PropertyType =  'External Property' AND ISNULL(PrintInvoice,0) ! = 1
 
 			UPDATE WRBHBChechkOutHdr set PaymentStatus = 'Paid'  ,IntermediateFlag = 1,IsActive=1
 			WHERE Id = @InsId and PropertyType IN ('Managed G H','DdP') 
@@ -781,7 +781,7 @@ END
 		IF @Direct = 'Direct'
 		BEGIN
 			UPDATE WRBHBChechkOutHdr set PaymentStatus = 'Paid'  ,Flag = 1
-			WHERE Id = @InsId and PropertyType =  'External Property' 
+			WHERE Id = @InsId and PropertyType =  'External Property' AND ISNULL(PrintInvoice,0) ! = 1
 
 			UPDATE WRBHBChechkOutHdr set PaymentStatus = 'Paid'  --,Flag = 1
 			WHERE Id = @InsId and PropertyType IN ('Managed G H','DdP') 

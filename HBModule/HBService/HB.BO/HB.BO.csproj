@@ -62,6 +62,7 @@
     <Compile Include="BTCSubmissionBO.cs" />
     <Compile Include="CheckInDtlsBo.cs" />
     <Compile Include="CheckInForecastReportBO.cs" />
+    <Compile Include="CheckInRollbackBO.cs" />
     <Compile Include="CheckoutAndIntermediateBO.cs" />
     <Compile Include="CheckOutandInterSettleDtlBO.cs" />
     <Compile Include="CheckOutandInterSettleHdrBO.cs" />

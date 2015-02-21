@@ -144,7 +144,9 @@ END
 		AND PC.RequestedOn=CONVERT(NVARCHAR,@Str,103)
 		ORDER BY PC.CreatedDate
 		
-		SELECT UserName,Status,Comments,Processedon FROM #User ORDER BY CONVERT(date,Processedon,103) ASC
+		SELECT UserName,Status,Comments,Processedon FROM #User 
+		GROUP BY UserName,Status,Comments,Processedon
+		ORDER BY CONVERT(date,Processedon,103) ASC
 	END
 	--IF @Action='Delete'
 	-- BEGIN

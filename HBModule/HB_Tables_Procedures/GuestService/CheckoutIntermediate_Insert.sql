@@ -370,18 +370,18 @@ BEGIN
 		VALUES(@InsId,@GuestName,'Tariff',@ChkOutTariffNetAmount,@CreatedBy,GETDATE(),@CreatedBy,
 		GETDATE(),1,0,NEWID())
 
-		UPDATE WRBHBBookingPropertyAssingedGuest SET CurrentStatus = 'CheckOut' ,
+		UPDATE WRBHBBookingPropertyAssingedGuest SET CurrentStatus = 'UnSettled' ,
 		CheckOutHdrId = @InsId
 		WHERE BookingId=@BookingId and 
 		RoomCaptured=(SELECT TOP 1 RoomCaptured FROM WRBHBBookingPropertyAssingedGuest
 		WHERE BookingId=@BookingId and GuestId=@GuestId
 		ORDER BY Id ASC);
 
-		UPDATE WRBHBBedBookingPropertyAssingedGuest SET CurrentStatus = 'CheckOut' 
+		UPDATE WRBHBBedBookingPropertyAssingedGuest SET CurrentStatus = 'UnSettled' 
 		WHERE BookingId=@BookingId and  BedId =@BedId AND -- GuestId=@GuestId and
 		IsActive= 1 and IsDeleted = 0;
 
-		UPDATE WRBHBApartmentBookingPropertyAssingedGuest SET CurrentStatus = 'CheckOut' 
+		UPDATE WRBHBApartmentBookingPropertyAssingedGuest SET CurrentStatus = 'UnSettled' 
 		WHERE BookingId=@BookingId and  ApartmentId =@ApartmentId AND --GuestId=@GuestId and
 		IsActive= 1 and IsDeleted = 0;
 END

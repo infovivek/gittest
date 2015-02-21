@@ -67,7 +67,7 @@ BEGIN
  ELSE
  BEGIN
 		UPDATE WRBHBPettyCashHdr SET Flag=1 
-		WHERE IsActive=1 AND IsDeleted=0 AND UserId=@RequestedUserId
+		WHERE IsActive=1 AND IsDeleted=0 AND UserId=@RequestedUserId AND Date=CONVERT(Date,@RequestedOn,103)
 	 
 		INSERT INTO	WRBHBNewPettyCashApprovalDtl (PettyCashApprovalHdrId,RequestedOn,Requestedby,
 		PCAccount,RequestedAmount,RequestedStatus,ProcessedStatus,LastProcessedon,Comments,
@@ -118,7 +118,7 @@ BEGIN
  ELSE
  BEGIN
 		UPDATE WRBHBPettyCashHdr SET Flag=1 
-		WHERE IsActive=1 AND IsDeleted=0 AND UserId=@RequestedUserId
+		WHERE IsActive=1 AND IsDeleted=0 AND UserId=@RequestedUserId AND Date=CONVERT(Date,@RequestedOn,103)
 		
 		INSERT INTO	WRBHBNewPettyCashApprovalDtl (PettyCashApprovalHdrId,RequestedOn,Requestedby,
 		PCAccount,RequestedAmount,RequestedStatus,ProcessedStatus,LastProcessedon,Comments,
@@ -157,7 +157,7 @@ BEGIN
  ELSE
  BEGIN
   		UPDATE WRBHBPettyCashHdr SET Flag=1 
-		WHERE IsActive=1 AND IsDeleted=0 AND UserId=@RequestedUserId
+		WHERE IsActive=1 AND IsDeleted=0 AND UserId=@RequestedUserId AND Date=CONVERT(Date,@RequestedOn,103)
 		
 		INSERT INTO	WRBHBNewPettyCashApprovalDtl (PettyCashApprovalHdrId,RequestedOn,Requestedby,
 		PCAccount,RequestedAmount,RequestedStatus,ProcessedStatus,LastProcessedon,Comments,

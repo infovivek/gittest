@@ -37,6 +37,7 @@ DECLARE @ClientName NVARCHAR(100),@ClientName1 NVARCHAR(100);
 CREATE TABLE #QAZXSW(Id INT,Name NVARCHAR(100));
 CREATE TABLE #Mail(Id INT,Email NVARCHAR(100));
 DECLARE @BookingPropertyId BIGINT;
+DECLARE @UnsettledCHhkInDt DATE;
 IF @BookingLevel = 'Room'  
  BEGIN  
   -- get PropertyType  
@@ -51,7 +52,7 @@ IF @BookingLevel = 'Room'
   WHERE IsActive = 1 AND IsDeleted = 0 AND RoomShiftingFlag = 0 AND
   RoomCaptured = @RoomCaptured AND RoomId = @FromRoomId AND
   BookingId = @BookingId;	  
-  --
+  -- Get Room Apartment Id
   DECLARE @RoomApartmentId BIGINT = 0;
   SELECT @RoomApartmentId = ISNULL(ApartmentId,0) FROM WRBHBPropertyRooms 
   WHERE Id = @ToRoomId;
@@ -185,7 +186,6 @@ IF @BookingLevel = 'Room'
     END
   IF @Type = 'Stay'
    BEGIN
-    --IF @PropertyType != ''
     IF @CurrentStatus = 'Booked'    
      BEGIN
       --
@@ -228,7 +228,8 @@ IF @BookingLevel = 'Room'
       WHERE IsActive = 1 AND IsDeleted = 0 AND BookingId = @BookingId AND  
       RoomCaptured = @RoomCaptured;  
      END
-    IF @CurrentStatus = 'CheckIn'    
+    --IF @CurrentStatus IN('CheckIn','UnSettled')
+    IF @CurrentStatus IN('CheckIn','UnSettled')
      BEGIN
       --
       SELECT @EChkInDt = MIN(ChkInDt),@EChkOutDt = MAX(ChkOutDt)      
@@ -250,7 +251,8 @@ IF @BookingLevel = 'Room'
       RoomType,Tariff,RoomId,BookingPropertyId,BookingPropertyTableId,
       CreatedBy,CreatedDate,@UsrId,GETDATE(),1,0,NEWID(),SSPId,
       ServicePaymentMode,TariffPaymentMode,
-      CONVERT(DATE,@ChkInDt,103),CONVERT(DATE,@ChkOutDt,103),ExpectChkInTime,AMPM,
+      --CONVERT(DATE,@ChkInDt,103),CONVERT(DATE,@ChkOutDt,103),ExpectChkInTime,AMPM,
+      ChkInDt,CONVERT(DATE,@ChkOutDt,103),ExpectChkInTime,AMPM,
       RoomCaptured,@RoomApartmentId,RackSingle,RackDouble,RackTriple,
       PtyChkInTime,PtyChkInAMPM,PtyChkOutTime,PtyChkOutAMPM,PtyGraceTime,
       LTonAgreed,LTonRack,STonAgreed,STonRack,CurrentStatus,CheckInHdrId,0,Title,
@@ -308,11 +310,16 @@ IF @BookingLevel = 'Room'
     BP.Id = (SELECT TOP 1 BookingPropertyId   
     FROM WRBHBBookingPropertyAssingedGuest WHERE BookingId = @BookingId);  
     -- Dataset Table 4  
-    SELECT ClientBookerEmail FROM WRBHBBooking WHERE Id=@BookingId;  
+    SELECT dbo.TRIM(ClientBookerEmail) FROM WRBHBBooking WHERE Id=@BookingId;  
     -- dataset table 5  
-    SELECT EmailId FROM WRBHBBookingGuestDetails WHERE BookingId=@BookingId;  
+    SELECT dbo.TRIM(EmailId) FROM WRBHBBookingGuestDetails 
+    WHERE BookingId = @BookingId AND GuestId IN
+    (SELECT GuestId FROM WRBHBBookingPropertyAssingedGuest 
+    WHERE BookingId = @BookingId AND
+    RoomCaptured = @RoomCaptured) AND ISNULL(EmailId,'') != ''
+    GROUP BY EmailId;  
     -- dataset table 6  
-    SELECT Email FROM dbo.WRBHBClientManagementAddNewClient   
+    SELECT dbo.TRIM(Email) FROM dbo.WRBHBClientManagementAddNewClient   
     WHERE IsActive=1 AND IsDeleted=0 AND ContactType='Extra C C' AND  
     CltmgntId=(SELECT ClientId FROM WRBHBBooking B WHERE B.Id=@BookingId);  
     --dataset table 7  
@@ -320,69 +327,67 @@ IF @BookingLevel = 'Room'
     WHERE Id=(SELECT B.ClientId FROM WRBHBBooking B  
     JOIN  WRBHBClientwisePricingModel P ON B.ClientId=P.ClientId   
     AND P.IsActive=1 AND P.IsDeleted=0 WHERE B.Id=@BookingId);  
-    --dataset table 8  
-    --SELECT Id FROM #AssignedGuestTableId
-    SELECT @ClientName = ClientName FROM WRBHBClientManagement
+    --dataset table 8
+    SELECT @ClientName = dbo.TRIM(ISNULL(ClientName,'')) FROM WRBHBClientManagement
     WHERE Id = (SELECT ClientId FROM WRBHBBooking WHERE Id = @BookingId);
-    --CREATE TABLE #QAZXSW(Id INT,Name NVARCHAR(100));
+    --
     INSERT INTO #QAZXSW(Id,Name)
     SELECT * FROM dbo.Split(@ClientName,' ');
     SET @ClientName1 = (SELECT TOP 1 Name FROM #QAZXSW);
-    --
-    /*CREATE TABLE #QAZXSW(Name NVARCHAR(100),EChkInDt NVARCHAR(100),
-    EChkOutDt NVARCHAR(100),NowChkInDt NVARCHAR(100),NowChkOutDt NVARCHAR(100),
-    ExpectChkInTime NVARCHAR(100),DayDiff INT,TariffPaymentMode NVARCHAR(100),
-    ServicePaymentMode NVARCHAR(100));  
-    INSERT INTO #QAZXSW(Name,EChkInDt,EChkOutDt,NowChkInDt,NowChkOutDt,
-    ExpectChkInTime,DayDiff,TariffPaymentMode,ServicePaymentMode)*/
+    --    
     SELECT STUFF((SELECT ', '+BA.Title+'. '+BA.FirstName+'  '+BA.LastName  
     FROM WRBHBBookingPropertyAssingedGuest BA   
     WHERE BA.BookingId=B.BookingId AND BA.RoomCaptured=B.RoomCaptured AND  
     BA.Id IN (SELECT Id FROM #AssignedGuestTableId)  
-    FOR XML PATH('')),1,1,'') AS Name,  
-    --CONVERT(VARCHAR(100),B.ChkInDt,103),CONVERT(VARCHAR(100),B.ChkOutDt,103),
+    FOR XML PATH('')),1,1,'') AS Name,
     CONVERT(VARCHAR(100),@EChkInDt,103),CONVERT(VARCHAR(100),@EChkOutDt,103),
     CONVERT(VARCHAR(100),@NowChkInDt,103),CONVERT(VARCHAR(100),@NowChkOutDt,103),
     --@ChkInDt,@ChkOutDt,
-    B.ExpectChkInTime+' '+B.AMPM,  
-    --DATEDIFF(DAY,CONVERT(DATE,@ChkInDt,103),CONVERT(DATE,@ChkOutDt,103)),
-    DATEDIFF(DAY,@NowChkInDt,@NowChkOutDt),
+    B.ExpectChkInTime+' '+B.AMPM,DATEDIFF(DAY,@NowChkInDt,@NowChkOutDt),
     CASE WHEN @TariffMode = 'Direct' THEN 'Direct<br>(Cash/Card)'
          WHEN @TariffMode = 'Bill to Client' THEN 'Bill to '+@ClientName1 
          ELSE @TariffMode END,
     CASE WHEN @ServiceMode = 'Direct' THEN 'Direct<br>(Cash/Card)'
          WHEN @ServiceMode = 'Bill to Client' THEN 'Bill to '+@ClientName1 
          ELSE @ServiceMode END
-    /*CASE WHEN B.TariffPaymentMode = 'Direct' THEN 'Direct<br>(Cash/Card)'
-         WHEN B.TariffPaymentMode = 'Bill to Client' THEN 'Bill to '+@ClientName1 
-         ELSE B.TariffPaymentMode END,
-    CASE WHEN B.ServicePaymentMode = 'Direct' THEN 'Direct<br>(Cash/Card)'
-         WHEN B.ServicePaymentMode = 'Bill to Client' THEN 'Bill to '+@ClientName1 
-         ELSE B.ServicePaymentMode END*/
     FROM WRBHBBookingPropertyAssingedGuest AS B  
     WHERE B.Id IN (SELECT Id FROM #AssignedGuestTableId);
     --dataset table 9
-    --CREATE TABLE #Mail(Id INT,Email NVARCHAR(100));
+    CREATE TABLE #SENDeMAIL(Email VARCHAR(MAX));
     SET @BookingPropertyId = (SELECT TOP 1 BookingPropertyId 
     FROM WRBHBBookingPropertyAssingedGuest WHERE BookingId = @BookingId);
     IF @PropertyType = 'CPP'
      BEGIN
+      INSERT INTO #SENDeMAIL(Email)
       SELECT ISNULL(D.Email,'') FROM WRBHBContractClientPref_Header H
       LEFT OUTER JOIN WRBHBContractClientPref_Details D
       WITH(NOLOCK)ON D.HeaderId = H.Id
       WHERE H.IsActive = 1 AND H.IsDeleted = 0 AND D.IsActive = 1 AND
-      D.IsDeleted = 0 AND 
+      D.IsDeleted = 0 AND ISNULL(D.Email,'') != '' AND
       H.ClientId = (SELECT ClientId FROM WRBHBBooking WHERE Id = @BookingId) 
       AND D.PropertyId = @BookingPropertyId
       GROUP BY ISNULL(D.Email,''); 
      END
     ELSE
-     BEGIN      
+     BEGIN
+      INSERT INTO #SENDeMAIL(Email)      
       SELECT ISNULL(Email,'') FROM WRBHBProperty WHERE Id = @BookingPropertyId;
      END
+    /*;WITH tmp(DataItem,Email) AS
+    (
+      SELECT LEFT(Email, CHARINDEX(',',Email+',')-1),
+      STUFF(Email, 1, CHARINDEX(',',Email+','), '') FROM #SENDeMAIL
+      UNION ALL
+      SELECT LEFT(Email, CHARINDEX(',',Email+',')-1),
+      STUFF(Email, 1, CHARINDEX(',',Email+','), '') FROM tmp
+      WHERE Email > ''
+    )
+    SELECT dbo.TRIM(DataItem) AS Email FROM tmp WHERE DataItem != '' GROUP BY DataItem;*/
+    SELECT dbo.TRIM(Email) AS Email FROM #SENDeMAIL WHERE Email != '' 
+    GROUP BY Email;
    END
  END
-/*IF @BookingLevel = 'Bed'  
+IF @BookingLevel = 'Bed'  
  BEGIN
   -- get PropertyType    
   SELECT TOP 1 @PropertyType = BP.PropertyType FROM WRBHBBedBookingProperty BP  
@@ -396,12 +401,15 @@ IF @BookingLevel = 'Room'
   WHERE IsActive = 1 AND IsDeleted = 0 AND RoomShiftingFlag = 0 AND
   RoomCaptured = @RoomCaptured AND BedId = @FromRoomId AND
   BookingId = @BookingId;
-  --
+  -- get room id & apartment id
   DECLARE @BedRoomId BIGINT;
   SELECT @BedRoomId = RoomId FROM WRBHBPropertyRoomBeds WHERE Id = @ToRoomId;
   DECLARE @BedApartmentId BIGINT;
   SELECT @BedApartmentId = ApartmentId FROM WRBHBPropertyRooms 
   WHERE Id = @BedRoomId;
+  --
+  --select @BookingLevel,@Type;return;
+  --
   IF @Type = 'Shift'
    BEGIN
     IF @PropertyType IN ('InP','MGH') AND @CurrentStatus = 'Booked'
@@ -564,7 +572,8 @@ IF @BookingLevel = 'Room'
       WHERE IsActive = 1 AND IsDeleted = 0 AND BookingId = @BookingId AND  
       RoomCaptured = @RoomCaptured;  
      END
-    IF @CurrentStatus = 'CheckIn'    
+    --IF @CurrentStatus IN('CheckIn','UnSettled')
+    IF @CurrentStatus IN('CheckIn','UnSettled')
      BEGIN
       --
       SELECT @EChkInDt = MIN(ChkInDt),@EChkOutDt = MAX(ChkOutDt)      
@@ -603,6 +612,8 @@ IF @BookingLevel = 'Room'
       WHERE IsActive = 1 AND IsDeleted = 0 AND BookingId = @BookingId AND  
       RoomCaptured = @RoomCaptured;  
      END
+    --
+    --select @BookingLevel,@Type;return;
     -- UPDATE PAYMENT MODE
     UPDATE WRBHBBedBookingPropertyAssingedGuest 
     SET TariffPaymentMode = @TariffMode,ServicePaymentMode = @ServiceMode 
@@ -617,7 +628,6 @@ IF @BookingLevel = 'Room'
     FROM WRBHBBooking B  
     LEFT OUTER JOIN WRBHBUser U  WITH(NOLOCK) ON  U.Id=@UsrId  
     WHERE B.Id=@BookingId;
-    --
     -- Dataset TABLE 1  
     SELECT TOP 1 Logo,@Stay FROM WRBHBCompanyMaster WHERE IsActive = 1
     ORDER BY Id DESC;  
@@ -643,81 +653,56 @@ IF @BookingLevel = 'Room'
     BP.Id = (SELECT TOP 1 BookingPropertyId   
     FROM WRBHBBedBookingPropertyAssingedGuest WHERE BookingId = @BookingId);  
     -- Dataset Table 4  
-    SELECT ClientBookerEmail FROM WRBHBBooking WHERE Id=@BookingId;  
+    SELECT dbo.TRIM(ClientBookerEmail) FROM WRBHBBooking WHERE Id=@BookingId;  
     -- dataset table 5  
-    SELECT EmailId FROM WRBHBBookingGuestDetails 
-    WHERE BookingId=@BookingId GROUP BY EmailId;  
+    SELECT dbo.TRIM(EmailId) FROM WRBHBBookingGuestDetails 
+    WHERE BookingId = @BookingId AND GuestId IN
+    (SELECT GuestId FROM WRBHBBedBookingPropertyAssingedGuest 
+    WHERE BookingId = @BookingId AND RoomCaptured = @RoomCaptured) 
+    GROUP BY EmailId;  
     -- dataset table 6  
-    SELECT Email FROM dbo.WRBHBClientManagementAddNewClient   
+    SELECT dbo.TRIM(Email) FROM dbo.WRBHBClientManagementAddNewClient   
     WHERE IsActive=1 AND IsDeleted=0 AND ContactType='Extra C C' AND  
-    CltmgntId=(SELECT ClientId FROM WRBHBBooking B WHERE B.Id=@BookingId);  
+    CltmgntId=(SELECT ClientId FROM WRBHBBooking B WHERE B.Id=@BookingId); 
+    --
+    --select @BookingLevel,@Type;return; 
     --dataset table 7  
     SELECT ClientLogo FROM WRBHBClientManagement   
     WHERE Id=(SELECT B.ClientId FROM WRBHBBooking B  
     JOIN  WRBHBClientwisePricingModel P ON B.ClientId=P.ClientId   
     AND P.IsActive=1 AND P.IsDeleted=0 WHERE B.Id=@BookingId);  
-    --dataset table 8  
-    --SELECT Id FROM #AssignedGuestTableId
+    --dataset table 8
     --
-    SELECT @ClientName = ClientName FROM WRBHBClientManagement
+    SELECT @ClientName = dbo.TRIM(ISNULL(ClientName,'')) FROM WRBHBClientManagement
     WHERE Id = (SELECT ClientId FROM WRBHBBooking WHERE Id = @BookingId);
-    --CREATE TABLE #QAZXSW(Id INT,Name NVARCHAR(100));
+    --
+    --select @BookingLevel,@Type,@ClientName;return;
+    --
     INSERT INTO #QAZXSW(Id,Name)
     SELECT * FROM dbo.Split(@ClientName,' ');
     SET @ClientName1 = (SELECT TOP 1 Name FROM #QAZXSW);
     --
-    /*CREATE TABLE #QAZXSW(Name NVARCHAR(100),EChkInDt NVARCHAR(100),
-    EChkOutDt NVARCHAR(100),NowChkInDt NVARCHAR(100),NowChkOutDt NVARCHAR(100),
-    ExpectChkInTime NVARCHAR(100),DayDiff INT,TariffPaymentMode NVARCHAR(100),
-    ServicePaymentMode NVARCHAR(100));  
-    INSERT INTO #QAZXSW(Name,EChkInDt,EChkOutDt,NowChkInDt,NowChkOutDt,
-    ExpectChkInTime,DayDiff,TariffPaymentMode,ServicePaymentMode)*/
+    --select @BookingLevel,@Type,@ClientName1;return;
+    --   
     SELECT STUFF((SELECT ', '+BA.Title+'. '+BA.FirstName+'  '+BA.LastName  
     FROM WRBHBBedBookingPropertyAssingedGuest BA   
     WHERE BA.BookingId=B.BookingId AND BA.RoomCaptured=B.RoomCaptured AND  
     BA.Id IN (SELECT Id FROM #AssignedGuestTableId)  
-    FOR XML PATH('')),1,1,'') AS Name,  
-    --CONVERT(VARCHAR(100),B.ChkInDt,103),CONVERT(VARCHAR(100),B.ChkOutDt,103),
+    FOR XML PATH('')),1,1,'') AS Name,
     CONVERT(VARCHAR(100),@EChkInDt,103),CONVERT(VARCHAR(100),@EChkOutDt,103),
     CONVERT(VARCHAR(100),@NowChkInDt,103),CONVERT(VARCHAR(100),@NowChkOutDt,103),
-    --@ChkInDt,@ChkOutDt,
-    B.ExpectChkInTime+' '+B.AMPM,  
-    --DATEDIFF(DAY,CONVERT(DATE,@ChkInDt,103),CONVERT(DATE,@ChkOutDt,103)),
+    B.ExpectChkInTime+' '+B.AMPM,
     DATEDIFF(DAY,@NowChkInDt,@NowChkOutDt),
     CASE WHEN @TariffMode = 'Direct' THEN 'Direct<br>(Cash/Card)'
          WHEN @TariffMode = 'Bill to Client' THEN 'Bill to '+@ClientName1 
          ELSE @TariffMode END,
     CASE WHEN @ServiceMode = 'Direct' THEN 'Direct<br>(Cash/Card)'
          WHEN @ServiceMode = 'Bill to Client' THEN 'Bill to '+@ClientName1 
-         ELSE @ServiceMode END         
-    /*CASE WHEN B.TariffPaymentMode = 'Direct' THEN 'Direct<br>(Cash/Card)'
-         WHEN B.TariffPaymentMode = 'Bill to Client' THEN 'Bill to '+@ClientName1 
-         ELSE B.TariffPaymentMode END,
-    CASE WHEN B.ServicePaymentMode = 'Direct' THEN 'Direct<br>(Cash/Card)'
-         WHEN B.ServicePaymentMode = 'Bill to Client' THEN 'Bill to '+@ClientName1 
-         ELSE B.ServicePaymentMode END*/
+         ELSE @ServiceMode END
     FROM WRBHBBedBookingPropertyAssingedGuest AS B  
     WHERE B.Id IN (SELECT Id FROM #AssignedGuestTableId);
     --dataset table 9
-    --CREATE TABLE #Mail(Id INT,Email NVARCHAR(100));
-    --DECLARE @BookingPropertyId BIGINT;
-    SET @BookingPropertyId = (SELECT TOP 1 BookingPropertyId 
-    FROM WRBHBBookingPropertyAssingedGuest WHERE BookingId = @BookingId);
-    IF @PropertyType = 'CPP'
-     BEGIN
-      SELECT ISNULL(D.Email,'') FROM WRBHBContractClientPref_Header H
-      LEFT OUTER JOIN WRBHBContractClientPref_Details D
-      WITH(NOLOCK)ON D.HeaderId = H.Id
-      WHERE H.IsActive = 1 AND H.IsDeleted = 0 AND D.IsActive = 1 AND
-      D.IsDeleted = 0 AND 
-      H.ClientId = (SELECT ClientId FROM WRBHBBooking WHERE Id = @BookingId) 
-      AND D.PropertyId = @BookingPropertyId
-      GROUP BY ISNULL(D.Email,''); 
-     END
-    ELSE
-     BEGIN      
-      SELECT ISNULL(Email,'') FROM WRBHBProperty WHERE Id = @BookingPropertyId;
-     END
+    SELECT '' AS Email;
    END
  END
 IF @BookingLevel = 'Apartment'  
@@ -887,7 +872,8 @@ IF @BookingLevel = 'Apartment'
       WHERE IsActive = 1 AND IsDeleted = 0 AND BookingId = @BookingId AND  
       RoomCaptured = @RoomCaptured;  
      END
-    IF @CurrentStatus = 'CheckIn'    
+    --IF @CurrentStatus IN('CheckIn','UnSettled')
+    IF @CurrentStatus IN('CheckIn','UnSettled')
      BEGIN
       --
       SELECT @EChkInDt = MIN(ChkInDt),@EChkOutDt = MAX(ChkOutDt)      
@@ -965,11 +951,14 @@ IF @BookingLevel = 'Apartment'
     BP.Id = (SELECT TOP 1 BookingPropertyId   
     FROM WRBHBApartmentBookingPropertyAssingedGuest WHERE BookingId = @BookingId);  
     -- Dataset Table 4  
-    SELECT ClientBookerEmail FROM WRBHBBooking WHERE Id=@BookingId;  
+    SELECT dbo.TRIM(ClientBookerEmail) FROM WRBHBBooking WHERE Id=@BookingId;  
     -- dataset table 5  
-    SELECT EmailId FROM WRBHBBookingGuestDetails WHERE BookingId=@BookingId;  
+    SELECT dbo.TRIM(EmailId) FROM WRBHBBookingGuestDetails 
+    WHERE BookingId = @BookingId AND GuestId IN
+    (SELECT GuestId FROM WRBHBApartmentBookingPropertyAssingedGuest
+    WHERE BookingId = @BookingId AND RoomCaptured = @RoomCaptured);  
     -- dataset table 6  
-    SELECT Email FROM dbo.WRBHBClientManagementAddNewClient   
+    SELECT dbo.TRIM(Email) FROM dbo.WRBHBClientManagementAddNewClient   
     WHERE IsActive=1 AND IsDeleted=0 AND ContactType='Extra C C' AND  
     CltmgntId=(SELECT ClientId FROM WRBHBBooking B WHERE B.Id=@BookingId);  
     --dataset table 7  
@@ -978,7 +967,7 @@ IF @BookingLevel = 'Apartment'
     JOIN  WRBHBClientwisePricingModel P ON B.ClientId=P.ClientId   
     AND P.IsActive=1 AND P.IsDeleted=0 WHERE B.Id=@BookingId);  
     --dataset table 8
-    SELECT @ClientName = ClientName FROM WRBHBClientManagement
+    SELECT @ClientName = dbo.TRIM(ISNULL(ClientName,'')) FROM WRBHBClientManagement
     WHERE Id = (SELECT ClientId FROM WRBHBBooking WHERE Id = @BookingId);
     INSERT INTO #QAZXSW(Id,Name)
     SELECT * FROM dbo.Split(@ClientName,' ');
@@ -997,33 +986,11 @@ IF @BookingLevel = 'Apartment'
          ELSE @TariffMode END,
     CASE WHEN @ServiceMode = 'Direct' THEN 'Direct<br>(Cash/Card)'
          WHEN @ServiceMode = 'Bill to Client' THEN 'Bill to '+@ClientName1 
-         ELSE @ServiceMode END
-    /*CASE WHEN B.TariffPaymentMode = 'Direct' THEN 'Direct<br>(Cash/Card)'
-         WHEN B.TariffPaymentMode = 'Bill to Client' THEN 'Bill to '+@ClientName1 
-         ELSE B.TariffPaymentMode END,
-    CASE WHEN B.ServicePaymentMode = 'Direct' THEN 'Direct<br>(Cash/Card)'
-         WHEN B.ServicePaymentMode = 'Bill to Client' THEN 'Bill to '+@ClientName1 
-         ELSE B.ServicePaymentMode END*/
+         ELSE @ServiceMode END    
     FROM WRBHBApartmentBookingPropertyAssingedGuest AS B  
     WHERE B.Id IN (SELECT Id FROM #AssignedGuestTableId);
     --dataset table 9
-    SET @BookingPropertyId = (SELECT TOP 1 BookingPropertyId 
-    FROM WRBHBApartmentBookingPropertyAssingedGuest WHERE BookingId = @BookingId);
-    IF @PropertyType = 'CPP'
-     BEGIN
-      SELECT ISNULL(D.Email,'') FROM WRBHBContractClientPref_Header H
-      LEFT OUTER JOIN WRBHBContractClientPref_Details D
-      WITH(NOLOCK)ON D.HeaderId = H.Id
-      WHERE H.IsActive = 1 AND H.IsDeleted = 0 AND D.IsActive = 1 AND
-      D.IsDeleted = 0 AND 
-      H.ClientId = (SELECT ClientId FROM WRBHBBooking WHERE Id = @BookingId) 
-      AND D.PropertyId = @BookingPropertyId
-      GROUP BY ISNULL(D.Email,''); 
-     END
-    ELSE
-     BEGIN      
-      SELECT ISNULL(Email,'') FROM WRBHBProperty WHERE Id = @BookingPropertyId;
-     END
+    SELECT '' AS Email;
    END
- END*/
+ END
 END
