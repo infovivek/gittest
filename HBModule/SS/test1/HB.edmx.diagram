@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="4e3318e4dcd34b7b8a2f82a29aa39ad5" Name="Diagram1" ZoomLevel="80">
+        <EntityTypeShape EntityType="HBModel.ClientManagementHelp" Width="1.5" PointX="0.75" PointY="2.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.FAdmin" Width="1.5" PointX="0.75" PointY="10.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.FClientLogo" Width="1.5" PointX="9.75" PointY="12.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.FInformation" Width="1.5" PointX="12.75" PointY="2.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.Mail" Width="1.5" PointX="11.75" PointY="12.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.Paswword" Width="1.5" PointX="14.75" PointY="2.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.RolesRight" Width="1.5" PointX="22.75" PointY="13.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.sysdiagram" Width="1.5" PointX="22.75" PointY="5.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.TrRequest" Width="1.5" PointX="22.75" PointY="18.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.webpages_Membership" Width="1.5" PointX="0.75" PointY="25.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.webpages_OAuthMembership" Width="1.5" PointX="2.75" PointY="25.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.webpages_Roles" Width="1.5" PointX="22.75" PointY="2.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBAdjustmentCategory" Width="1.5" PointX="4.75" PointY="25.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBApartmentBookingProperty" Width="1.5" PointX="6.75" PointY="25.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBApartmentBookingPropertyAssingedGuest" Width="1.5" PointX="12.75" PointY="25.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBAPICityCode" Width="1.5" PointX="14.75" PointY="25.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBAPIHeader" Width="1.5" PointX="19.75" PointY="25.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBAPIHeader_FrontEnd" Width="1.5" PointX="24.75" PointY="5.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBAPIHotelHeader" Width="1.5" PointX="24.75" PointY="10.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBAPIHotelHeader_FrontEnd" Width="1.5" PointX="24.75" PointY="13.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBAPIRateMealPlanInclusionDtl" Width="1.5" PointX="24.75" PointY="16.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBAPIRateMealPlanInclusionDtls_FrontEnd" Width="1.5" PointX="16.75" PointY="26.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBAPIRoomRateDtl" Width="1.5" PointX="24.75" PointY="20.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBAPIRoomRateDtls_FrontEnd" Width="1.5" PointX="21.75" PointY="26.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBAPIRoomTypeDtl" Width="1.5" PointX="24.75" PointY="24.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBAPIRoomTypeDtls_FrontEnd" Width="1.5" PointX="23.75" PointY="27.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBAPITariffDtl" Width="1.5" PointX="25.75" PointY="27.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBAPITariffDtls_FrontEnd" Width="1.5" PointX="2.75" PointY="28.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBBankAccount" Width="1.5" PointX="7.75" PointY="2.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBBankTransaction" Width="1.5" PointX="26.75" PointY="5.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBBedBookingProperty" Width="1.5" PointX="26.75" PointY="10.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBBedBookingPropertyAssingedGuest" Width="1.5" PointX="27.75" PointY="17.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBBooking" Width="1.5" PointX="27.75" PointY="29.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBBookingAdvanceAmountPaid" Width="1.5" PointX="28.75" PointY="2.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBBookingCustomFieldsDetail" Width="1.5" PointX="28.75" PointY="7.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBBookingGuestDetail" Width="1.5" PointX="14.75" PointY="30.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBBookingProperty" Width="1.5" PointX="16.75" PointY="30.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBBookingPropertyAssingedGuest" Width="1.5" PointX="18.75" PointY="30.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBBookingPropertyAssingedGuest_FrontEnd" Width="1.5" PointX="20.75" PointY="30.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBBookingTrackingPayment" Width="1.5" PointX="28.75" PointY="12.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBBTCSubmission" Width="1.5" PointX="22.75" PointY="30.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBBTCSubmissionCard" Width="1.5" PointX="29.75" PointY="16.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBBTCSubmissionCash" Width="1.5" PointX="29.75" PointY="22.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBBTCSubmissionCheque" Width="1.5" PointX="24.75" PointY="31.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBBTCSubmissionDetail" Width="1.5" PointX="29.75" PointY="27.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBBTCSubmissionNEFT" Width="1.5" PointX="30.75" PointY="2.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBChechkOutHdr" Width="1.5" PointX="0.75" PointY="32.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBChechkOutPaymentCard" Width="1.5" PointX="2.75" PointY="32.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBChechkOutPaymentCash" Width="1.5" PointX="4.75" PointY="32.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBChechkOutPaymentCheque" Width="1.5" PointX="30.75" PointY="7.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBChechkOutPaymentCompanyInvoice" Width="1.5" PointX="6.75" PointY="32.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBChechkOutPaymentNEFT" Width="1.5" PointX="8.75" PointY="32.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBCheckInHdr" Width="1.5" PointX="29.75" PointY="32.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBCheckOutServiceDtl" Width="1.5" PointX="31.75" PointY="13.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBCheckOutServiceHdr" Width="1.5" PointX="31.75" PointY="19.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBCheckOutSettleDtl" Width="1.5" PointX="31.75" PointY="25.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBCheckOutSettleHdr" Width="1.5" PointX="31.75" PointY="31.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBCity" Width="1.5" PointX="20" PointY="14.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBClientColumn" Width="1.5" PointX="32.75" PointY="2.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBClientContactType" Width="1.5" PointX="33.75" PointY="12.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBClientGrade" Width="1.5" PointX="20" PointY="4.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBClientGradeValue" Width="1.5" PointX="20" PointY="8.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBClientGradeValueDetail" Width="1.5" PointX="22.25" PointY="8.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBClientManagement" Width="1.5" PointX="17.75" PointY="3.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBClientManagementAddNewClient" Width="1.5" PointX="33.75" PointY="25.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBClientManagementCustomField" Width="1.5" PointX="33.75" PointY="31.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBClientSMTP" Width="1.5" PointX="34.75" PointY="2.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBClientwisePricingModel" Width="1.5" PointX="34.75" PointY="7.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBCompanyMaster" Width="1.5" PointX="10.75" PointY="36.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBContarctProductMaster" Width="1.5" PointX="24.75" PointY="36.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBContractClientPref_Details" Width="1.5" PointX="31.75" PointY="36.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBContractClientPref_Header" Width="1.5" PointX="33.75" PointY="36.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBContractManagement" Width="1.5" PointX="12.75" PointY="15.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBContractManagementAppartment" Width="1.5" PointX="15" PointY="13.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBContractManagementService" Width="1.5" PointX="35.75" PointY="12.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBContractManagementTariffAppartment" Width="1.5" PointX="15" PointY="19.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBContractNonDedicated" Width="1.5" PointX="0.75" PointY="15.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBContractNonDedicatedApartment" Width="1.5" PointX="3" PointY="13.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBContractNonDedicatedService" Width="1.5" PointX="3" PointY="19.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBDeposit" Width="1.5" PointX="12.75" PointY="37.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBDepositsDlt" Width="1.5" PointX="35.75" PointY="18.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBExpenseGroup" Width="1.5" PointX="35.75" PointY="22.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBExpenseHead" Width="1.5" PointX="35.75" PointY="25.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBExternal_Users" Width="1.5" PointX="35.75" PointY="30.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBExternalChechkOutTAC" Width="1.5" PointX="35.75" PointY="35.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBFeedBckForm" Width="1.5" PointX="36.75" PointY="2.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBFinancialYear" Width="1.5" PointX="4.75" PointY="38.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBGradeMaster" Width="1.5" PointX="6.75" PointY="38.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBImportGuest" Width="1.5" PointX="20.75" PointY="38.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBInternal_Users" Width="1.5" PointX="37.75" PointY="10.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBInvoiceExternalAmount" Width="1.5" PointX="37.75" PointY="16.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBInvoiceExternalAmountMonthGenerated" Width="1.5" PointX="37.75" PointY="21.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBInvoiceMaintenanceAmount" Width="1.5" PointX="37.75" PointY="24.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBInvoiceManagedGHAmount" Width="1.5" PointX="37.75" PointY="30.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBInvoiceManagedGHAmountMonthGenerated" Width="1.5" PointX="37.75" PointY="38.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBInvoiceRentAmount" Width="1.5" PointX="38.75" PointY="2.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBInvoiceRentMonthGeneratedMaintenance" Width="1.5" PointX="26.75" PointY="40.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBInvoiceRentMonthGeneratedRent" Width="1.5" PointX="2.75" PointY="41.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBKOTDtl" Width="1.5" PointX="39.75" PointY="9.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBKOTHdr" Width="1.5" PointX="39.75" PointY="16.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBKOTUser" Width="1.5" PointX="39.75" PointY="21.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBLocality" Width="1.5" PointX="39.75" PointY="27.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBMapPOAndVendorPaymentDtl" Width="1.5" PointX="39.75" PointY="31.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBMapPOAndVendorPaymentHdr" Width="1.5" PointX="39.75" PointY="37.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBMapVendor" Width="1.5" PointX="40.75" PointY="2.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBMarkup" Width="1.5" PointX="4.75" PointY="42.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBMasterClientManagement" Width="1.5" PointX="6.75" PointY="42.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBMMTMarkup" Width="1.5" PointX="8.75" PointY="42.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBMMTMarkupHistory" Width="1.5" PointX="22.75" PointY="42.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBNewPCExpenseApproval" Width="1.5" PointX="37.75" PointY="42.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBOutsourceServiceItem" Width="1.5" PointX="39.75" PointY="42.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBPCExpenseApproval" Width="1.5" PointX="41.75" PointY="7.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBPettyCash" Width="1.5" PointX="41.75" PointY="13.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBPettyCashApprovalDtl" Width="1.5" PointX="41.75" PointY="19.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBPettyCashHdr" Width="1.5" PointX="41.75" PointY="25.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBPettyCashStatu" Width="1.5" PointX="24.75" PointY="43.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBPettyCashStatusHdr" Width="1.5" PointX="26.75" PointY="43.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBProperty" Width="1.5" PointX="41.75" PointY="31.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBPropertyAgreement" Width="1.5" PointX="7.75" PointY="14.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBPropertyAgreementsAssociationName" Width="1.5" PointX="41.75" PointY="43.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBPropertyAgreementsDetail" Width="1.5" PointX="10" PointY="20.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBPropertyAgreementsHistory" Width="1.5" PointX="10.75" PointY="44.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBPropertyAgreementsOwner" Width="1.5" PointX="10" PointY="7.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBPropertyAgreementsRoomCharge" Width="1.5" PointX="10" PointY="25.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBPropertyAgreementsRoomChargesHistory" Width="1.5" PointX="12.75" PointY="44.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBPropertyAgreementsRoomType" Width="1.5" PointX="42.75" PointY="2.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBPropertyApartment" Width="1.5" PointX="10.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBPropertyApartmentHistory" Width="1.5" PointX="18.75" PointY="44.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBPropertyBlock" Width="1.5" PointX="31.75" PointY="44.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBPropertyImage" Width="1.5" PointX="43.75" PointY="6.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBPropertyOwnerApartment" Width="1.5" PointX="13" PointY="7.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBPropertyOwnerOtherContact" Width="1.5" PointX="43.75" PointY="10.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBPropertyOwnerProperty" Width="1.5" PointX="10" PointY="16.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBPropertyOwner" Width="1.5" PointX="7.75" PointY="4.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBPropertyRoomBed" Width="1.5" PointX="20" PointY="20.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBPropertyRoomBedsHistory" Width="1.5" PointX="43.75" PointY="15.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBPropertyRoom" Width="1.5" PointX="17.75" PointY="20" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBPropertyRoomsHistory" Width="1.5" PointX="14.75" PointY="45.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBPropertyType" Width="1.5" PointX="43.75" PointY="20.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBPropertyUser" Width="1.5" PointX="43.75" PointY="23.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBReconcilePayment" Width="1.5" PointX="43.75" PointY="28.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBReconcilePaymentRef" Width="1.5" PointX="28.75" PointY="45.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBRole" Width="1.5" PointX="3" PointY="5.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBRolesGroup" Width="1.5" PointX="0.75" PointY="5.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBRolesRight" Width="1.5" PointX="5.25" PointY="3.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBScreenMaster" Width="1.5" PointX="43.75" PointY="34.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBSSPCodeGeneration" Width="1.5" PointX="43.75" PointY="39.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBSSPCodeGenerationApartment" Width="1.5" PointX="43.75" PointY="44.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBSSPCodeGenerationRoom" Width="1.5" PointX="2.75" PointY="46.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBSSPCodeGenerationService" Width="1.5" PointX="20.75" PointY="46.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBState" Width="1.5" PointX="17.75" PointY="15.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBStaticHotel" Width="1.5" PointX="33.75" PointY="46.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBStaticHotels123" Width="1.5" PointX="45.75" PointY="2.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBTaxMapping" Width="1.5" PointX="45.75" PointY="13.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBTDSDeclaration" Width="1.5" PointX="45.75" PointY="19.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBTDSSlab" Width="1.5" PointX="45.75" PointY="24.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBTiaAndNTia" Width="1.5" PointX="45.75" PointY="30.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBTransSubsPriceModel" Width="1.5" PointX="45.75" PointY="35.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBTripAdvicerData" Width="1.5" PointX="39.75" PointY="47.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBUser" Width="1.5" PointX="45.75" PointY="47.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBUserGroup" Width="1.5" PointX="30.75" PointY="48.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBUserRole" Width="1.5" PointX="5.25" PointY="7.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBVendor" Width="1.5" PointX="35.75" PointY="48.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBVendorAdvancePayment" Width="1.5" PointX="47.75" PointY="2.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBVendorCategory" Width="1.5" PointX="4.75" PointY="49.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBVendorChequeApprovalDtl" Width="1.5" PointX="47.75" PointY="8.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBVendorChequeApprovalNewDtl" Width="1.5" PointX="6.75" PointY="49.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBVendorCost" Width="1.5" PointX="47.75" PointY="14.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBVendorRequest" Width="1.5" PointX="47.75" PointY="19.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBVendorRequestDtl" Width="1.5" PointX="22.75" PointY="49.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBVendorRequestTemp" Width="1.5" PointX="24.75" PointY="49.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBVendorRequestTempDtl" Width="1.5" PointX="47.75" PointY="27.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBVendorSettlementAdjusmentAdvanceAmount" Width="1.5" PointX="26.75" PointY="49.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBVendorSettlementHdr" Width="1.5" PointX="47.75" PointY="32.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBVendorSettlementInvoiceAmount" Width="1.5" PointX="47.75" PointY="36.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBVendorSettlementPaidAmount" Width="1.5" PointX="47.75" PointY="42.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBVendorSettlementTACInvoiceAmount" Width="1.5" PointX="41.75" PointY="49.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBContractProductSubMaster" Width="1.5" PointX="47.75" PointY="47.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBLaundrServiceDtl" Width="1.5" PointX="16.75" PointY="50.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBLaundrServiceHdr" Width="1.5" PointX="49.75" PointY="2.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBNewKOTEntryDtl" Width="1.5" PointX="0.75" PointY="51.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBNewKOTEntryHdr" Width="1.5" PointX="49.75" PointY="8.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBNewKOTUserEntryDtl" Width="1.5" PointX="49.75" PointY="14.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBNewKOTUserEntryHdr" Width="1.5" PointX="12.75" PointY="51.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBNewPettyCashApprovalDtl" Width="1.5" PointX="49.75" PointY="19.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBNewPettyCashApprovalHdr" Width="1.5" PointX="18.75" PointY="51.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBOutsourceKOTDtl" Width="1.5" PointX="49.75" PointY="25.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBOutsourceKOTHdr" Width="1.5" PointX="49.75" PointY="30.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBPettyCashApprovalHdr" Width="1.5" PointX="49.75" PointY="35.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBReference" Width="1.5" PointX="49.75" PointY="39.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBTaxMaster" Width="1.5" PointX="49.75" PointY="44.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBVendorChequeApprovalHdr" Width="1.5" PointX="2.75" PointY="52.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBVendorChequeApprovalNewHdr" Width="1.5" PointX="28.75" PointY="52.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="HBModel.WRBHBVendorRequestType" Width="1.5" PointX="30.75" PointY="52.625" IsExpanded="true" />
+        <AssociationConnector Association="HBModel.FK__WRBHBCity__State__2DE6D218" ManuallyRouted="false" />
+        <AssociationConnector Association="HBModel.FK__WRBHBClie__Clien__27C3E46E" ManuallyRouted="false" />
+        <AssociationConnector Association="HBModel.FK__WRBHBClie__Clien__58D1301D" ManuallyRouted="false" />
+        <AssociationConnector Association="HBModel.FK__WRBHBClie__Clien__6E414E4F" ManuallyRouted="false" />
+        <AssociationConnector Association="HBModel.FK_WRBHBContractManagementAppartment_WRBHBContractManagement" ManuallyRouted="false" />
+        <AssociationConnector Association="HBModel.FK_WRBHBContractManagementTariffAppartment_WRBHBContractManagement" ManuallyRouted="false" />
+        <AssociationConnector Association="HBModel.FK_WRBHBContractNonDedicatedApartment_WRBHBContractNonDedicated" ManuallyRouted="false" />
+        <AssociationConnector Association="HBModel.FK_WRBHBContractNonDedicatedServices_WRBHBContractNonDedicated" ManuallyRouted="false" />
+        <AssociationConnector Association="HBModel.FK__WRBHBProp__Agree__3E1D39E1" ManuallyRouted="false" />
+        <AssociationConnector Association="HBModel.FK__WRBHBProp__Agree__40058253" ManuallyRouted="false" />
+        <AssociationConnector Association="HBModel.FK__WRBHBProp__Agree__41EDCAC5" ManuallyRouted="false" />
+        <AssociationConnector Association="HBModel.FK__WRBHBProp__Owner__40F9A68C" ManuallyRouted="false" />
+        <AssociationConnector Association="HBModel.FK__WRBHBProp__Apart__45BE5BA9" ManuallyRouted="false" />
+        <AssociationConnector Association="HBModel.FK__WRBHBProp__Owner__46B27FE2" ManuallyRouted="false" />
+        <AssociationConnector Association="HBModel.FK__WRBHBProp__Owner__47A6A41B" ManuallyRouted="false" />
+        <AssociationConnector Association="HBModel.FK__WRBHBProp__RoomI__7849DB76" ManuallyRouted="false" />
+        <AssociationConnector Association="HBModel.FK__WRBHBRole__RoleG__7D439ABD" ManuallyRouted="false" />
+        <AssociationConnector Association="HBModel.FK_WRBHBRolesRights_WRBHBRoles" ManuallyRouted="false" />
+        <AssociationConnector Association="HBModel.FK_WRBHBUserRoles_WRBHBRoles" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="HBModel.UserProfile" Width="1.5" PointX="3.375" PointY="0.75" />
+        <EntityTypeShape EntityType="HBModel.WRBHBClientManagementAddClientGuest" Width="1.5" PointX="52.375" PointY="0.75" />
+        <EntityTypeShape EntityType="HBModel.WrbhbTravelDesk" Width="1.5" PointX="52.375" PointY="9.75" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

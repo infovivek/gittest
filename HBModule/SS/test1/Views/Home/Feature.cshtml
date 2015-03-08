@@ -1,0 +1,144 @@
+﻿@{
+    ViewBag.Title = "Feature";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="menu">
+    <div class="content-area">
+        <span class="navs col-xs-12 col-sm-4 col-md-3 pointer" onclick="redirectF()">Features<div class="underline"></div></span>
+        <span class="navs col-xs-12 col-sm-4 col-md-3 pointer" onclick="redirectD()">Demo</span>
+        <div class="clearfix"></div>
+    </div>
+</div>
+
+
+<div class="body-contents">
+    <div class="content-area features ">
+
+        <div class="table-header">
+            <div class="header-name col-xs-9 col-sm-9 col-md-6">BUSINESS TRAVELLER</div>
+            <div class="triangle pull-left"></div>
+        </div>
+        <div class="table-container">
+            <table class="pricing-table features">
+                <tr class="header-row">
+                    <td class="width-15"></td>
+                    <td class="text-center width-15">START UP</td>
+                    <td class="text-center width-15">SME</td>
+                    <td class="text-center width-15">LARGE CORPORATES</td>
+                    <td></td>
+                </tr>
+
+                <tr>
+                    <td>MACHINE LEARNING SEARCH</td>
+                    <td><div class="ss-dot"></div></td>
+                    <td><div class="ss-dot"></div></td>
+                    <td><div class="ss-dot"></div></td>
+                    <td rowspan="4" class="pricing-table-bottom-border">&lsquo;The Machine learning&rsquo; technology would track your preferred city and hotel to ensure swift booking.</td>
+                </tr>
+                <tr>
+                    <td>ZIP BOOKING</td>
+                    <td><div class="ss-dot"></div></td>
+                    <td><div class="ss-dot"></div></td>
+                    <td><div class="ss-dot"></div></td>
+                </tr>
+                <tr>
+                    <td>CONFIRMATION</td>
+                    <td><div class="ss-dot"></div></td>
+                    <td><div class="ss-dot"></div></td>
+                    <td><div class="ss-dot"></div></td>
+                </tr>
+                <tr>
+                    <td>SPEND REPORTS</td>
+                    <td><div class="ss-dot"></div></td>
+                    <td><div class="ss-dot"></div></td>
+                    <td><div class="ss-dot"></div></td>
+                </tr>
+
+            </table>
+
+
+        </div>
+
+        <div class="table-header">
+            <div class="header-name col-xs-9 col-sm-9 col-md-6">Admin & HR</div>
+            <div class="triangle pull-left"></div>
+        </div>
+        <div class="table-container">
+            <table class="pricing-table features">
+                <tbody>
+                    <tr>
+                        <td class="width-15">GUEST HOUSE</td>
+                        <td class="width-15"><div class="ss-dot"></div></td>
+                        <td class="width-15"><div class="ss-dot"></div></td>
+                        <td class="width-15"><div class="ss-dot"></div></td>
+                        <td rowspan="4" class="pricing-table-bottom-border">Only online platform that enables booking into your company Guest houses. <br> Only online platform that can handle large group bookings</td>
+                    </tr>
+                    <tr>
+                        <td>POLICY CONTROL</td>
+                        <td><div class="ss-dot"></div></td>
+                        <td><div class="ss-dot"></div></td>
+                        <td><div class="ss-dot"></div></td>
+                    </tr>
+                    <tr>
+                        <td>LARGE GROUP BOOKING</td>
+                        <td><div class="ss-dot"></div></td>
+                        <td><div class="ss-dot"></div></td>
+                        <td><div class="ss-dot"></div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-header">
+            <div class="header-name col-xs-9 col-sm-9 col-md-6">CEO/CFO</div>
+            <div class="triangle pull-left"></div>
+        </div>
+        <div class="table-container">
+            <table class="pricing-table features">
+                <tbody>
+                    <tr>
+                        <td class="width-15">SPEND REPORTS & ANALYTICE</td>
+                        <td class="width-15"><div class="ss-dot"></div></td>
+                        <td class="width-15"><div class="ss-dot"></div></td>
+                        <td class="width-15"><div class="ss-dot"></div></td>
+                        <td rowspan="2">Realtime analytics available on a single window. Estimated cost saving 33%.</td>
+                    </tr>
+                    <tr>
+                        <td>STAY SIMPLYFIED</td>
+                        <td><div class="ss-dot"></div></td>
+                        <td><div class="ss-dot"></div></td>
+                        <td><div class="ss-dot"></div></td>
+                    </tr>
+                    <tr class="empty-row"><br /></tr>
+                    <tr style="background-color:#CCCCCC">
+                        <td style="color:#000000">FREE TRIAL PERIOD</td>
+                        <td style="color:#e6802b;font-weight:bold;text-align:center">FREE</td>
+                        <td style="color:#e6802b;font-weight:bold;text-align:center">1 Month</td>
+                        <td style="color:#e6802b;font-weight:bold;text-align:center">1 Month</td>
+                    </tr>
+                    <tr style="background-color:#CCCCCC">
+                        <td style="color:#000000">AFTER FREE PERIOD</td>
+                        <td style="color:#e6802b;font-weight:bold;text-align:center">FREE</td>
+                        <td style="color:#e6802b;font-weight:bold;text-align:center">&#8377; 5555/Month</td>
+                        <td style="color:#e6802b;font-weight:bold;text-align:center">&#8377; 8888/Month</td>
+                    </tr>
+        </div>
+        <tr class="empty-row"></tr><tr class="empty-row"></tr>
+        </tbody>
+        </table>
+    </div>
+</div>
+	</div>
+
+<script type="text/javascript">
+    function redirectF() {     
+     
+        window.location.href = '/Home/Feature';
+    }
+    function redirectD() {
+
+        window.location.href = '/Home/Demo';
+    }
+</script>
+            

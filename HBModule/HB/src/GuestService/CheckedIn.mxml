@@ -136,7 +136,7 @@
 			{				
 				
 				useWeb("GuestCheckIn","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,0,0,0,65]);
-	//			useWeb("GuestCheckIn","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,0,0,0,Global_AC[0].UsrId]);
+		//		useWeb("GuestCheckIn","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,0,0,0,Global_AC[0].UsrId]);
 				//			useWeb("GuestCheckIn","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,0,0,0,0]);
 			}
 			
@@ -1068,9 +1068,9 @@
 					//	PropertyTypeId=hlp_Property.Select_Row.PropertyTypeId;
 					
 					
-		//			useWeb("GuestCheckIn","Guest_CUSTOM",[GlobalXml,'GuestLoad','',0,0,0,0,PropertyId,SSPId,Global_AC[0].UsrId]);
+					useWeb("GuestCheckIn","Guest_CUSTOM",[GlobalXml,'GuestLoad','',0,0,0,0,PropertyId,SSPId,Global_AC[0].UsrId]);
 					
-					useWeb("GuestCheckIn","Guest_CUSTOM",[GlobalXml,'GuestLoad','',0,0,0,0,PropertyId,SSPId,65]);
+		//			useWeb("GuestCheckIn","Guest_CUSTOM",[GlobalXml,'GuestLoad','',0,0,0,0,PropertyId,SSPId,65]);
 					Hlp_Reservation.enabled=true;
 					
 					Hlp_Reservation.text="";

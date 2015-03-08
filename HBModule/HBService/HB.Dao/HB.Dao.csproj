@@ -90,6 +90,7 @@
     <Compile Include="BookingRecommendPropertyMailDAO.cs" />
     <Compile Include="BookingRoomMailDAO.cs" />
     <Compile Include="BookingRoomResendMailDAO.cs" />
+    <Compile Include="BTCDownloadDAO.cs" />
     <Compile Include="BTCSPaymentDAO.cs" />
     <Compile Include="BTCSubmissionDAO.cs" />
     <Compile Include="CheckInDtlsDAO.cs" />
@@ -171,6 +172,10 @@
     <Compile Include="PettyCashRequiredStatusDAO.cs" />
     <Compile Include="PettyCashStatusDAO.cs" />
     <Compile Include="PettyCashStatusHdrDAO.cs" />
+    <Compile Include="PreformaInvoiceEXTMMTCPPchkoutDao.cs" />
+    <Compile Include="PreformaInvoiceIntenalchkoutDao.cs" />
+    <Compile Include="ProformainvoiceServiceDtlsDao.cs" />
+    <Compile Include="ProformainvoiceServicehdrDao.cs" />
     <Compile Include="PropertyOwnerOtherContactsDAO.cs" />
     <Compile Include="PropertyReportDAO.cs" />
     <Compile Include="ReassignClientDAO.cs" />

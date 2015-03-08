@@ -35,11 +35,13 @@ namespace HB.Dao
                 //message.From = new System.Net.Mail.MailAddress("stay@staysimplyfied.com", "", System.Text.Encoding.UTF8);
                 message.From = new System.Net.Mail.MailAddress("stay@hummingbirdindia.com", "", System.Text.Encoding.UTF8);
             }
+            //message.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
+            //message.Subject = "Booking Payment - " + ds.Tables[2].Rows[0][2].ToString();
             message.To.Add(new System.Net.Mail.MailAddress("stay@staysimplyfied.com"));
             message.CC.Add(new System.Net.Mail.MailAddress("shiv@hummingbirdindia.com"));
             message.Subject = "Booking Payment - " + ds.Tables[2].Rows[0][2].ToString();
             message.Bcc.Add(new System.Net.Mail.MailAddress("vivek@warblerit.com"));
-            message.Bcc.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));                        
+            message.Bcc.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
             string Imagelocation = "";
             Imagelocation = ds.Tables[6].Rows[0][0].ToString();
             string Imagebody =
@@ -55,7 +57,7 @@ namespace HB.Dao
                         " <p style=\"font-weight:bold; color:orange;\">Booking Payment details" +
                         " <span style=\"color:#000; background-color:#ffcc00; padding:5px;\">Payment Code # : " + ds.Tables[2].Rows[0][2].ToString() + " </span></p>" + //Reservation
                         " <p style=\"margin:0px;\">Booked by :<span>" + ds.Tables[2].Rows[0][3].ToString() + "</span></p><br>" + //Date
-                        " <p style=\"margin:0px;\"><a href='http://www.google.com'>Reservation Date : <span>" + ds.Tables[2].Rows[0][7].ToString() + "</span></a></p><br>" + //Date
+                        " <p style=\"margin:0px;\"><a href='" + ds.Tables[4].Rows[0][16].ToString() + "'>Reservation Date : <span>" + ds.Tables[2].Rows[0][7].ToString() + "</span></a></p><br>" + //Date
                         " <p style=\"margin:0px;\">Company Name : <span>" + ds.Tables[2].Rows[0][1].ToString() + "</span></p>" + //company name
                         " </td>" +
                         " <td>" +

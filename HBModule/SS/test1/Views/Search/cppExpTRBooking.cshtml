@@ -1,0 +1,372 @@
+﻿@model test1.Models.CppExpTRBookingBO
+@{
+    ViewBag.Title = "cppExpTRBooking";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .bookpageclr {
+        color: #666;
+    }
+</style>
+@using (Html.BeginForm("CppExpTRConfirmBooking", "Search"))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="booking-cont">
+        <div class="container">
+            <div class="col-md-12 col-lg-12 col-sm-12 booking-wrapper">
+                <div class="col-md-12 col-lg-12 col-sm-12 no-padding">
+                    <h3 class="bordered bookpageclr">@Model.PropertyName</h3>
+                </div>
+
+                @*<div class="col-md-3 col-lg-3 col-sm-12 no-padding">
+                    <img src="@Model.ImageLocation" alt="Property Photo" class="img-responsive" style="width:278px; height:278px;">
+                                    </div>*@
+
+                <div class="col-md-9 col-lg-9 col-sm-12 booking-details">
+                    <!-- Check In -->
+                    <div class="col-md-3 col-lg-3 col-sm-3 col-xs-6 checkin">
+                        <h3 class="bookpageclr">Check-in</h3>
+                        <p class="bookpageclr">@Model.CheckIn</p>
+                    </div>
+
+
+                    <!-- Check Out -->
+                    <div class="col-md-3 col-lg-3 col-sm-3 col-xs-6 checkin">
+                        <h3 class="bookpageclr">Check-Out</h3>
+                        <p class="bookpageclr">@Model.Checkout</p>
+                    </div>
+
+
+                    <!-- Guests -->
+                    <div class="col-md-3 col-lg-3 col-sm-3 col-xs-6 ">
+                        <h3 class="bookpageclr">Guests</h3>
+                        <p class="bookpageclr">@Model.RoomCount</p>
+                    </div>
+                    <br /><br /><br /><br />
+                    <div>
+                        <fieldset>
+                            <label style="font-weight:bold;">Traveller's Count:@Model.count</label>
+                            <table border="1">
+                                <tbody>
+                                    <tr>
+                                        <th>
+                                            Employee code
+                                        </th>
+                                        <th>
+                                            Employee Name
+                                        </th>
+                                        <th>
+                                            Email
+                                        </th>
+                                    </tr>
+
+                                    @if (Model.count > 0)
+                                    {
+                                        <tr id="row1">
+                                            <td>
+                                                @Html.TextBoxFor(model => model.EmployeeCode1, new { @id = "ec1" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Name1, new { @id = "l2" })
+                                            </td>
+
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Email1, new { @id = "e1" })
+                                            </td>
+                                        </tr>
+                                    }
+                                    @if (Model.count > 1)
+                                    {
+                                        <tr id="row2">
+                                            <td>
+                                                @Html.TextBoxFor(model => model.EmployeeCode2, new { @id = "ec2" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Name2, new { @id = "l2" })
+                                            </td>
+
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Email2, new { @id = "e2" })
+                                            </td>
+                                        </tr>
+                                    }
+                                    @if (Model.count > 2)
+                                    {
+                                        <tr id="row3">
+                                            <td>
+                                                @Html.TextBoxFor(model => model.EmployeeCode3, new { @id = "ec3" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Name3, new { @id = "l3" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Email3, new { @id = "e3" })
+                                            </td>
+                                        </tr>
+                                    }
+                                    @if (Model.count > 3)
+                                    {
+                                        <tr id="row4">
+                                            <td>
+                                                @Html.TextBoxFor(model => model.EmployeeCode4, new { @id = "ec4" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Name4, new { @id = "l4" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Email4, new { @id = "e4" })
+                                            </td>
+                                        </tr>
+                                    }
+                                    @if (Model.count > 4)
+                                    {
+                                        <tr id="row5">
+                                            <td>
+                                                @Html.TextBoxFor(model => model.EmployeeCode5, new { @id = "ec5" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Name5, new { @id = "l5" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Email5, new { @id = "e5" })
+                                            </td>
+                                        </tr>
+                                    }
+                                    @if (Model.count > 5)
+                                    {
+                                        <tr id="row6">
+                                            <td>
+                                                @Html.TextBoxFor(model => model.EmployeeCode6, new { @id = "ec6" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Name6, new { @id = "l6" })
+                                            </td>
+
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Email6, new { @id = "e6" })
+                                            </td>
+                                        </tr>
+                                    }
+                                    @if (Model.count > 6)
+                                    {
+                                        <tr id="row7">
+                                            <td>
+                                                @Html.TextBoxFor(model => model.EmployeeCode7, new { @id = "ec7" })
+                                            </td>
+
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Name7, new { @id = "l7" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Email7, new { @id = "e7" })
+                                            </td>
+
+
+                                        </tr>
+                                    }
+                                    @if (Model.count > 7)
+                                    {
+                                        <tr id="row8">
+                                            <td>
+                                                @Html.TextBoxFor(model => model.EmployeeCode8, new { @id = "ec8" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Name8, new { @id = "l8" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Email8, new { @id = "e8" })
+                                            </td>
+                                        </tr>
+                                    }
+                                    @if (Model.count > 8)
+                                    {
+                                        <tr id="row9">
+
+                                            <td>
+                                                @Html.TextBoxFor(model => model.EmployeeCode9, new { @id = "ec9" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Name9, new { @id = "l9" })
+                                            </td>
+
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Email9, new { @id = "e9" })
+                                            </td>
+                                        </tr>
+                                    }
+                                    @if (Model.count > 9)
+                                    {
+                                        <tr id="row10">
+                                            <td>
+                                                @Html.TextBoxFor(model => model.EmployeeCode10, new { @id = "ec10" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Name10, new { @id = "l10" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Email10, new { @id = "e10" })
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+
+                        </fieldset>
+
+                        <fieldset>
+                            <table border="1">
+                                <tbody>
+                                    <tr>
+                                        <th>
+                                            @Model.column1
+                                        </th>
+                                        <th>
+                                            @Model.column2
+                                        </th>
+                                        <th>
+                                            @Model.column3
+                                        </th>
+                                        <th>
+                                            @Model.column4
+                                        </th>
+                                        <th>
+                                            @Model.column5
+                                        </th>
+                                        <th>
+                                            @Model.column6
+                                        </th>
+                                        <th>
+                                            @Model.column7
+                                        </th>
+                                        <th>
+                                            @Model.column8
+                                        </th>
+                                        <th>
+                                            @Model.column9
+                                        </th>
+                                        <th>
+                                            @Model.column10
+                                        </th>
+                                    </tr>
+                                <tbody>
+                            </table>
+                        </fieldset>
+                    </div>
+                </div>
+
+
+
+                <div>
+                    @Html.HiddenFor(m => m.BookerMail)
+                    @Html.HiddenFor(m => m.BookerName)
+                    @Html.HiddenFor(m => m.BookrerId)
+                    @Html.HiddenFor(m => m.CheckIn)
+                    @Html.HiddenFor(m => m.Checkout)
+                    @Html.HiddenFor(m => m.CityCode)
+                    @Html.HiddenFor(m => m.cityId)
+                    @Html.HiddenFor(m => m.CityName)
+                    @Html.HiddenFor(m => m.CliendId)
+                    @Html.HiddenFor(m => m.ClientName)
+                    @Html.HiddenFor(m => m.PropertyId)
+                    @Html.HiddenFor(m => m.PropertyType)
+                    @Html.HiddenFor(m => m.RoomCount)
+                    @Html.HiddenFor(m => m.RoomId)
+                    @Html.HiddenFor(m => m.RoomCount)
+                    @Html.HiddenFor(m => m.RoomType)
+                    @Html.HiddenFor(m => m.SateName)
+                    @Html.HiddenFor(m => m.ServicePayMode)
+                    @Html.HiddenFor(m => m.SingleOccupancy)
+                    @Html.HiddenFor(m => m.doubleOccupancy)
+                    @Html.HiddenFor(m => m.stateId)
+                    @Html.HiddenFor(m => m.TariffPayMode)
+                    @Html.HiddenFor(m => m.Title1)
+                    @Html.HiddenFor(m => m.Title2)
+                    @Html.HiddenFor(m => m.Title3)
+                    @Html.HiddenFor(m => m.Title4)
+                    @Html.HiddenFor(m => m.Title5)
+                    @Html.HiddenFor(m => m.Title7)
+                    @Html.HiddenFor(m => m.Title8)
+                    @Html.HiddenFor(m => m.Title9)
+                    @Html.HiddenFor(m => m.Title10)
+                    @Html.HiddenFor(m => m.grade1)
+                    @Html.HiddenFor(m => m.grade2)
+                    @Html.HiddenFor(m => m.grade3)
+                    @Html.HiddenFor(m => m.grade4)
+                    @Html.HiddenFor(m => m.grade5)
+                    @Html.HiddenFor(m => m.grade6)
+                    @Html.HiddenFor(m => m.grade7)
+                    @Html.HiddenFor(m => m.grade8)
+                    @Html.HiddenFor(m => m.grade9)
+                    @Html.HiddenFor(m => m.grade10)
+                    @Html.HiddenFor(m => m.GradeId1)
+                    @Html.HiddenFor(m => m.GradeId2)
+                    @Html.HiddenFor(m => m.GradeId3)
+                    @Html.HiddenFor(m => m.GradeId4)
+                    @Html.HiddenFor(m => m.GradeId5)
+                    @Html.HiddenFor(m => m.GradeId6)
+                    @Html.HiddenFor(m => m.GradeId7)
+                    @Html.HiddenFor(m => m.GradeId8)
+                    @Html.HiddenFor(m => m.GradeId9)
+                    @Html.HiddenFor(m => m.GradeId10)
+                    @Html.HiddenFor(m => m.guestId1)
+                    @Html.HiddenFor(m => m.guestId2)
+                    @Html.HiddenFor(m => m.guestId3)
+                    @Html.HiddenFor(m => m.guestId4)
+                    @Html.HiddenFor(m => m.guestId5)
+                    @Html.HiddenFor(m => m.guestId6)
+                    @Html.HiddenFor(m => m.guestId7)
+                    @Html.HiddenFor(m => m.guestId8)
+                    @Html.HiddenFor(m => m.guestId9)
+                    @Html.HiddenFor(m => m.guestId10)
+                    @Html.HiddenFor(m => m.UserId)
+                    @Html.HiddenFor(m => m.Level)
+                    @Html.HiddenFor(m => m.Nationality1)
+                    @Html.HiddenFor(m => m.Nationality2)
+                    @Html.HiddenFor(m => m.Nationality3)
+                    @Html.HiddenFor(m => m.Nationality4)
+                    @Html.HiddenFor(m => m.Nationality5)
+                    @Html.HiddenFor(m => m.Nationality6)
+                    @Html.HiddenFor(m => m.Nationality7)
+                    @Html.HiddenFor(m => m.Nationality8)
+                    @Html.HiddenFor(m => m.Nationality9)
+                    @Html.HiddenFor(m => m.Nationality10)
+                    @Html.HiddenFor(m => m.count)
+                </div>
+                <div class="col-md-12 col-lg-12 col-sm-12 last">
+                    <div class="row">
+                        <div class="col-md-12 col-lg-12 col-sm-12 bordered">
+                            <div class="col-md-4 col-lg-4 col-sm-12">
+                                <!--  <input type="checkbox" value="agreed" id="terms" name="terms" checked="checked" readonly="readonly"> -->
+                                I / We acknowledge and accept the <a onclick="window.open('','mywindow','width=400,height=200,left=0,top=100,screenX=0,screenY=100')" style=" cursor:pointer">Terms and Conditions</a>  applicable and available on the site
+                            </div>
+
+
+                            <div class="col-md-3 col-lg-3 col-sm-8 ">
+
+
+                                <h3 style="color: #333">Total : Rs. @Model.Total_Tariff</h3> 			  <input type="hidden" id="total" name="total" value="" />
+                                <input type="hidden" id="amount" name="amount" value=" " />
+
+
+
+                            </div>
+
+                            <div class="col-md-3 col-lg-3 col-sm-8">
+                                <input type="submit" value="Confirm Booking" onclick="return validation1()" id="submit" name="submit" style="width:60%">
+                            </div>
+
+
+                            <div class="col-md-2 col-lg-2 col-sm-6">
+                                <input type="button" onclick="javascript:window.history.go(-1);" value="Go Back" id="back" name="submit" style="width:50%">
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+}

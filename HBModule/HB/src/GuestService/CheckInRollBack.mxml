@@ -66,8 +66,8 @@
 			public function Help():void
 			{				
 				
-		//		useWeb("CheckInRollback","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,0,65]);
-				useWeb("CheckInRollback","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,0,Global_AC[0].UsrId]);
+				useWeb("CheckInRollback","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,0,65]);
+		//		useWeb("CheckInRollback","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,0,Global_AC[0].UsrId]);
 				//			useWeb("GuestCheckIn","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,0,0,0,Global_AC[0].UsrId]);
 				//			useWeb("GuestCheckIn","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,0,0,0,0]);
 			}
@@ -126,6 +126,15 @@
 					ErrStr=ErrStr+"* Booking Code is Required.\n";					
 				}
 				
+				if(txt_Remarks.text=="")
+				{
+					if(Flag==true)
+					{
+						txt_Remarks.setFocus();Flag=false;
+					}
+					ErrStr=ErrStr+"* Remarks is Required.\n";					
+				}
+				
 				if(ErrStr!="")
 				{
 					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
@@ -154,8 +163,8 @@
 							GuestId:GuestId,Chkindate:txt_chkindt.text,CheckInHdrId:CheckInHdrId,
 							ChkoutDate:txt_chkoutdt.text,GuestName:txt_Guestname.text,Property:txt_Property.text,
 							BookingCode:hlp_Bookingcode.text,ApartmentId:ApartmentId,BedId:BedId,
-							Type:txt_type.text,ChangedStatus:txt_statuschanged.text,BookingLevel:txt_bookinglevel.text
-							
+							Type:txt_type.text,ChangedStatus:txt_statuschanged.text,BookingLevel:txt_bookinglevel.text,
+							Remarks:txt_Remarks.text
 						}]);
 					var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");		
 					useWeb("CheckInRollback","Save_CUSTOM",[GlobalXml,HdrXml]);
@@ -180,6 +189,7 @@
 				txt_type.text="";
 				txt_chkoutdt.text="";
 				txt_bookinglevel.text="";
+				txt_Remarks.text="";
 				lbl_statuschanged.visible=false;
 				txt_statuschanged.visible=false;
 			}
@@ -230,7 +240,7 @@
 				<s:TextInput x="547" y="176" width="187" id="txt_bookinglevel" editable="false"/>
 				<mx:Label x="134" y="230" text="CheckIn Date"/>
 				<mx:Label x="444" y="230" text="CheckOut Date"/>
-				<mx:Label x="134" y="288" text="Status to changed" visible="false" id="lbl_statuschanged"/>
+				<mx:Label x="134" y="288" text="Changed to Status" visible="false" id="lbl_statuschanged"/>
 				
 				<s:HGroup x="267" y="454" width="338" height="40" horizontalAlign="right" verticalAlign="middle"
 						  depth="0">
@@ -240,6 +250,8 @@
 					<WrbComp:Button_HB width="104" click="FnClr()" Lable_val="Clear">
 					</WrbComp:Button_HB>
 				</s:HGroup>
+				<mx:Label x="476" y="288" text="Remarks"/>
+				<s:TextArea x="547" y="288" height="74" id="txt_Remarks"/>
 			</s:Group>
 		</s:BorderContainer>
 	</s:VGroup>

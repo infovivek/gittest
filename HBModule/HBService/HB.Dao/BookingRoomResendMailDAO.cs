@@ -68,7 +68,7 @@ namespace HB.Dao
                 }
                 //message.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
                 //message.Subject = "Room Booking Confirmation - " + ds.Tables[2].Rows[0][2].ToString();
-                message.To.Add(new System.Net.Mail.MailAddress("booking_confirmation@staysimplyfied.com"));
+                //message.To.Add(new System.Net.Mail.MailAddress("booking_confirmation@staysimplyfied.com"));
                 var Mail = Email.Split(',');
                 for (int i = 0; i < Mail.Length; i++)
                 {
@@ -81,9 +81,11 @@ namespace HB.Dao
                 {
                     message.CC.Add(new System.Net.Mail.MailAddress(UsrEmail));
                 }
+                message.Bcc.Add(new System.Net.Mail.MailAddress("booking_confirmation@staysimplyfied.com"));
                 message.Bcc.Add(new System.Net.Mail.MailAddress("bookingbcc@staysimplyfied.com"));
                 message.Bcc.Add(new System.Net.Mail.MailAddress("vivek@warblerit.com"));
                 message.Bcc.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
+                //message.Bcc.Add(new System.Net.Mail.MailAddress("hbconf@warblerit.com"));
                 message.Subject = "Booking Confirmation - " + ds.Tables[2].Rows[0][2].ToString();
                 string typeofpty = ds.Tables[4].Rows[0][8].ToString();
                 string Imagelocation = "";
@@ -110,7 +112,9 @@ namespace HB.Dao
                             "<tr> " +
                             "<th align=\"left\" width=\"50%\" style=\"padding: 10px 0px 10px 10px;\">" +
                             "<img src=" + Imagelocation + " width=\"200px\" height=\"52px\" alt=" + Imagealt + ">" +              //Image Name Change
-                            "</th><th width=\"50%\"></th></tr></table>";
+                            "</th><th width=\"50%\" style=\"padding: 10px 10px 10px 10px;\" align=\"right\">" +
+                        "" + ds.Tables[4].Rows[0][16].ToString() + "" +
+                        "</th></tr></table>";
                 string SecondRow = " <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #ffffff solid 1px\">" +
                             " <tr><td style=\"width: 65%;\">" +
                             " <p style=\"font-weight:bold; color:orange;\">Booking confirmation details" +
@@ -230,34 +234,67 @@ namespace HB.Dao
                 {
                     Taxes = ds.Tables[4].Rows[0][7].ToString();
                 }
-                string AddressDtls =
-                    "<p style=\"margin-top:10px; margin-left:5px; font-size:11px;\">" +
-                    " <span style=\"color:#f54d02; font-weight:bold; font-size:11px;\">Tax :</span> " + Taxes + "" +
-                    " </p>" +
-                    " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
-                    " <tr style=\"font-size:11px; background-color:#eee;\">" +
-                    " <td width=\"800px\" style=\"padding:12px 5px;\">" +
-                    " <p style=\"color:orange; font-weight:bold; margin:0px; font-size:14px;\"> Contact Details</p>" +
+                string AddressDtls = "";
+                if (ds.Tables[10].Rows.Count > 0)
+                {
+                    AddressDtls =
+                        "<p style=\"margin-top:10px; margin-left:5px; font-size:11px;\">" +
+                        " <span style=\"color:#f54d02; font-weight:bold; font-size:11px;\">Tax :</span> " + Taxes + "" +
+                        " </p>" +
+                        " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
+                        " <tr style=\"font-size:11px; background-color:#eee;\">" +
+                        " <td width=\"800px\" style=\"padding:12px 5px;\">" +
+                        " <p style=\"color:orange; font-weight:bold; margin:0px; font-size:14px;\"> Contact Details</p>" +
+                            " <p style=\"margin-top:20px;\">" +
+                        " <span style=\"color:#f54d02; font-weight:bold\">Property Name : </span> " + ds.Tables[1].Rows[0][5].ToString() + "  <br>" +
+                        " </p><p style=\"margin-top:5px;\">" +
                         " <p style=\"margin-top:20px;\">" +
-                    " <span style=\"color:#f54d02; font-weight:bold\">Property Name : </span> " + ds.Tables[1].Rows[0][5].ToString() + "  <br>" +
-                    " </p><p style=\"margin-top:5px;\">" +
-                    " <p style=\"margin-top:20px;\">" +
-                    " <span style=\"color:#f54d02; font-weight:bold\">Property Address :</span> " + ds.Tables[1].Rows[0][0].ToString() + "  <br>" +
-                    " </p><p style=\"margin-top:5px;\">" +
-                    " <span style=\"color:#f54d02; font-weight:bold\">Property Phone :</span> " + ds.Tables[1].Rows[0][1].ToString() + "" +
-                    " </p><p style=\"margin-top:5px;\">" +
-                    " <span style=\"color:#f54d02; font-weight:bold\">Directions :</span> " + ds.Tables[1].Rows[0][2].ToString() + "" +
-                    " </p><p style=\"margin-top:5px;\">" +
-                    " <span style=\"color:#f54d02; font-weight:bold\">Note :</span> " + Note + "" +
-                    " </p><p style=\"margin-top:5px;\">" +
-                    " <span style=\"color:#f54d02; font-weight:bold\">Special Requirements :</span> " + ds.Tables[2].Rows[0][8].ToString() + "" +
-                    " </p><p style=\"margin-top:5px;\">" +
-                    " <span style=\"color:#f54d02; font-weight:bold\">Check In Policy :</span> " + CheckInPolicy + "" +
-                    " </p><p style=\"margin-top:5px;\">" +
-                    " <span style=\"color:#f54d02; font-weight:bold\">Check Out Policy :</span> " + CheckOutPolicy + "" +
-                    " </p><p style=\"margin-top:12px;\">" +
-                    " <span style=\"color:#f54d02; font-weight:bold\">Need help booking? : </span><strong>1800-425-3454</strong> (9:00 AM  to  5:00 PM)<br>" +
-                    " </p></td></tr></table>";
+                        " <span style=\"color:#f54d02; font-weight:bold\">Property Address :</span> " + ds.Tables[1].Rows[0][0].ToString() + "  <br>" +
+                        " </p><p style=\"margin-top:5px;\">" +
+                        " <span style=\"color:#f54d02; font-weight:bold\">Property Phone :</span> " + ds.Tables[1].Rows[0][1].ToString() + "" +
+                        " </p><p style=\"margin-top:5px;\">" +
+                        " <span style=\"color:#f54d02; font-weight:bold\">Directions :</span> " + ds.Tables[1].Rows[0][2].ToString() + "" +
+                        " </p><p style=\"margin-top:5px;\">" +
+                        " <span style=\"color:#f54d02; font-weight:bold\">Note :</span> " + Note + "" +
+                        " </p><p style=\"margin-top:5px;\">" +
+                        " <span style=\"color:#f54d02; font-weight:bold\">Special Requirements :</span> " + ds.Tables[2].Rows[0][8].ToString() + "" +
+                        " </p><p style=\"margin-top:5px;\">" +
+                        " <span style=\"color:#f54d02; font-weight:bold\">Check In Policy :</span> " + CheckInPolicy + "" +
+                        " </p><p style=\"margin-top:5px;\">" +
+                        " <span style=\"color:#f54d02; font-weight:bold\">Check Out Policy :</span> " + CheckOutPolicy + "" +
+                        " </p></td></tr></table>";
+                }
+                else
+                {
+                    AddressDtls =
+                        "<p style=\"margin-top:10px; margin-left:5px; font-size:11px;\">" +
+                        " <span style=\"color:#f54d02; font-weight:bold; font-size:11px;\">Tax :</span> " + Taxes + "" +
+                        " </p>" +
+                        " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\" style=\"padding-top:10px;\">" +
+                        " <tr style=\"font-size:11px; background-color:#eee;\">" +
+                        " <td width=\"800px\" style=\"padding:12px 5px;\">" +
+                        " <p style=\"color:orange; font-weight:bold; margin:0px; font-size:14px;\"> Contact Details</p>" +
+                            " <p style=\"margin-top:20px;\">" +
+                        " <span style=\"color:#f54d02; font-weight:bold\">Property Name : </span> " + ds.Tables[1].Rows[0][5].ToString() + "  <br>" +
+                        " </p><p style=\"margin-top:5px;\">" +
+                        " <p style=\"margin-top:20px;\">" +
+                        " <span style=\"color:#f54d02; font-weight:bold\">Property Address :</span> " + ds.Tables[1].Rows[0][0].ToString() + "  <br>" +
+                        " </p><p style=\"margin-top:5px;\">" +
+                        " <span style=\"color:#f54d02; font-weight:bold\">Property Phone :</span> " + ds.Tables[1].Rows[0][1].ToString() + "" +
+                        " </p><p style=\"margin-top:5px;\">" +
+                        " <span style=\"color:#f54d02; font-weight:bold\">Directions :</span> " + ds.Tables[1].Rows[0][2].ToString() + "" +
+                        " </p><p style=\"margin-top:5px;\">" +
+                        " <span style=\"color:#f54d02; font-weight:bold\">Note :</span> " + Note + "" +
+                        " </p><p style=\"margin-top:5px;\">" +
+                        " <span style=\"color:#f54d02; font-weight:bold\">Special Requirements :</span> " + ds.Tables[2].Rows[0][8].ToString() + "" +
+                        " </p><p style=\"margin-top:5px;\">" +
+                        " <span style=\"color:#f54d02; font-weight:bold\">Check In Policy :</span> " + CheckInPolicy + "" +
+                        " </p><p style=\"margin-top:5px;\">" +
+                        " <span style=\"color:#f54d02; font-weight:bold\">Check Out Policy :</span> " + CheckOutPolicy + "" +
+                        " </p><p style=\"margin-top:12px;\">" +
+                        " <span style=\"color:#f54d02; font-weight:bold\">Need help booking? : </span><strong>1800-425-3454</strong> (9:00 AM  to  5:00 PM)<br>" +
+                        " </p></td></tr></table>";
+                }
                 string UserName = "";
                 string EmailId = "";
                 string PhoneNo = "";

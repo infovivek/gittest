@@ -33,6 +33,7 @@
     <application path="GuestService/OutsourcedKOTEntery.mxml"/>
     <application path="Report/MapPurchseOrderAndVendorInvoice.mxml"/>
     <application path="Master/ExpenseMaster.mxml"/>
+    <application path="GuestService/PreformaInvoiceEXPMMTCPP.mxml"/>
     <application path="Master/PettyCashNewReport.mxml"/>
     <application path="Sales/ClientManagement.mxml"/>
     <application path="Finance/MapPurchseOrderAndVendorInvoice.mxml"/>
@@ -81,6 +82,7 @@
     <application path="Report/ExternalInvoiceReport.mxml"/>
     <application path="GuestService/SnackKOTHistory.mxml"/>
     <application path="Booking/ApartmentBooking.mxml"/>
+    <application path="Report/BTCDownload.mxml"/>
     <application path="Master/Import.mxml"/>
     <application path="Report/PendingUnsettled.mxml"/>
     <application path="GuestService/ExternalCheckOut.mxml"/>
@@ -136,6 +138,8 @@
     <application path="Booking/BookingConfirmation.mxml"/>
     <application path="Master/GuestImport.mxml"/>
     <application path="Master/HB.mxml"/>
+    <application path="GuestService/PreformaInvoice.mxml"/>
+    <application path="Report/PendingCheckoutReport.mxml"/>
   </applications>
   <modules/>
   <buildCSSFiles/>

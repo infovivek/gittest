@@ -40,6 +40,9 @@ IF(@FilePath !='')
 	IF(@Amount !=0)
 	--IF(ISNULL(@TempSave,'') ='False')
 	BEGIN
+	
+		UPDATE WRBHBVendorRequest SET Partial=1 WHERE Id=@VendorRequestHdrId
+		
 		INSERT INTO	WRBHBVendorRequestDtl (VendorRequestHdrId,ApartmentId,RoomId,Filepath,Description,
 				BillNo,Amount,IsActive,IsDeleted,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,RowId)
 		VALUES (@VendorRequestHdrId,@ApartmentId,@RoomId,@FilePath,@Description,@BillNo,@Amount,

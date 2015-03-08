@@ -86,6 +86,42 @@ SELECT @CityId=CityId FROM WRBHBProperty P  WHERE IsDeleted=0 AND  P.Id =@Select
   SELECT CityName label,Id CityId FROM WRBHBCity C WHERE StateId=@StateId
   
   SELECT Locality label,Id LocalityId FROM WRBHBLocality C WHERE CityId=@CityId
+  
+	SELECT  FirstName label,hd.Id UserId,0 as Id,rl.Roles UserType FROM dbo.WRBHBUser hd
+	join WRBHBUserRoles rl on hd.Id=rl.UserId and rl.IsActive=1 and rl.IsDeleted=0
+	WHERE  hd.IsActive=1 AND hd.IsDeleted=0  AND  rl.Roles='Operations Managers'
+	AND hd.Id NOT IN(SELECT UserId FROM WRBHBPropertyUsers WHERE PropertyId=@SelectId
+	AND IsActive=1 AND IsDeleted=0)
+	
+	SELECT  FirstName label,hd.Id UserId,0 as Id,rl.Roles UserType FROM dbo.WRBHBUser hd
+	  join WRBHBUserRoles rl on hd.Id=rl.UserId and rl.IsActive=1 and rl.IsDeleted=0
+	WHERE   hd.IsActive=1 AND hd.IsDeleted=0 AND  rl.Roles='Resident Managers'
+	AND hd.Id NOT IN(SELECT UserId FROM WRBHBPropertyUsers WHERE PropertyId=@SelectId
+	AND IsActive=1 AND IsDeleted=0);
+	
+	SELECT  FirstName label,hd.Id UserId,0 as Id,rl.Roles UserType FROM dbo.WRBHBUser hd
+	  join WRBHBUserRoles rl on hd.Id=rl.UserId and rl.IsActive=1 and rl.IsDeleted=0
+	WHERE  hd.IsActive=1 AND hd.IsDeleted=0  AND  rl.Roles='Assistant Resident Managers'
+	AND hd.Id NOT IN(SELECT UserId FROM WRBHBPropertyUsers WHERE PropertyId=@SelectId
+	AND IsActive=1 AND IsDeleted=0);
+	
+	SELECT  FirstName label,hd.Id UserId,0 as Id,rl.Roles UserType FROM dbo.WRBHBUser hd
+	  join WRBHBUserRoles rl on hd.Id=rl.UserId and rl.IsActive=1 and rl.IsDeleted=0
+	WHERE  hd.IsActive=1 AND hd.IsDeleted=0  AND  rl.Roles='Project Managers'
+	AND hd.Id NOT IN(SELECT UserId FROM WRBHBPropertyUsers WHERE PropertyId=@SelectId
+	AND IsActive=1 AND IsDeleted=0);
+	
+	SELECT  FirstName label,hd.Id UserId,0 as Id,rl.Roles UserType FROM dbo.WRBHBUser hd
+	  join WRBHBUserRoles rl on hd.Id=rl.UserId and rl.IsActive=1 and rl.IsDeleted=0
+	WHERE  hd.IsActive=1 AND hd.IsDeleted=0 AND  rl.Roles='Ops Head'
+	AND hd.Id NOT IN(SELECT UserId FROM WRBHBPropertyUsers WHERE PropertyId=@SelectId
+	AND IsActive=1 AND IsDeleted=0);
+	
+	SELECT  FirstName label,hd.Id UserId,0 as Id,rl.Roles UserType FROM dbo.WRBHBUser hd
+	  join WRBHBUserRoles rl on hd.Id=rl.UserId and rl.IsActive=1 and rl.IsDeleted=0 
+	WHERE   hd.IsActive=1 AND hd.IsDeleted=0 AND  rl.Roles='Finance'
+	AND hd.Id NOT IN(SELECT UserId FROM WRBHBPropertyUsers WHERE PropertyId=@SelectId
+	AND IsActive=1 AND IsDeleted=0);
    
 END   
    

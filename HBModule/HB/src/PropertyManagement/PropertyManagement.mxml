@@ -717,48 +717,64 @@
 							{
 								Lst_DSOM.dataProvider=Ds_Objects.result.Tables.Table1.Rows;							
 								Ac_Clear=Ds_Objects.result.Tables.Table1.Rows;
-								SearchUserList('Lst_SCOM',Ac_Clear,'Ac_Clear')
-								
-								
+								//SearchUserList('Lst_SCOM',Ac_Clear,'Ac_Clear')
 							}
 							if (Ds_Objects.result.Tables.Table2.Rows.length > 0)
 							{
 								Lst_DSRM.dataProvider=Ds_Objects.result.Tables.Table2.Rows;
 								Ac_Clear1=Ds_Objects.result.Tables.Table2.Rows;
-								SearchUserList('Lst_SCRM',Ac_Clear1,'Ac_Clear1')				
-								
 							}
 							if (Ds_Objects.result.Tables.Table3.Rows.length > 0)
 							{
 								Lst_DSARM.dataProvider=Ds_Objects.result.Tables.Table3.Rows;
 								Ac_Clear2=Ds_Objects.result.Tables.Table3.Rows;
-								SearchUserList('Lst_SCARM',Ac_Clear2,'Ac_Clear2')				
-								
 							}
 							if (Ds_Objects.result.Tables.Table4.Rows.length > 0)
 							{
 								Lst_DSPM.dataProvider=Ds_Objects.result.Tables.Table4.Rows;
 								Ac_Clear3=Ds_Objects.result.Tables.Table4.Rows;
-								SearchUserList('Lst_SCPM',Ac_Clear3,'Ac_Clear3')				
-								
 							}
 							if (Ds_Objects.result.Tables.Table5.Rows.length > 0)
 							{
 								Lst_DSOR.dataProvider=Ds_Objects.result.Tables.Table5.Rows;
 								Ac_Clear4=Ds_Objects.result.Tables.Table5.Rows;
-								SearchUserList('Lst_SCOR',Ac_Clear4,'Ac_Clear4')		
-								
-								
 							}
 							if (Ds_Objects.result.Tables.Table6.Rows.length > 0)
 							{
 								Lst_DSSAL.dataProvider=Ds_Objects.result.Tables.Table6.Rows;
 								Ac_Clear5=Ds_Objects.result.Tables.Table6.Rows;
-								SearchUserList('Lst_SCSAL',Ac_Clear5,'Ac_Clear5')		
 							}	
 							if (Ds_Objects.result.Tables.Table7.Rows.length > 0)
 							{
 								grd_Block._setGridSrc=Ds_Objects.result.Tables.Table7.Rows as ArrayCollection ;	
+							}
+							if (Ds_Objects.result.Tables.Table10.Rows.length > 0)
+							{
+								Lst_SCOM.dataProvider=Ds_Objects.result.Tables.Table10.Rows;							
+								
+								
+							}
+							if (Ds_Objects.result.Tables.Table11.Rows.length > 0)
+							{
+								Lst_SCRM.dataProvider=Ds_Objects.result.Tables.Table11.Rows;
+								Ac_Clear1=Ds_Objects.result.Tables.Table11.Rows;
+	
+							}
+							if (Ds_Objects.result.Tables.Table12.Rows.length > 0)
+							{
+								Lst_SCARM.dataProvider=Ds_Objects.result.Tables.Table12.Rows;
+								Ac_Clear2=Ds_Objects.result.Tables.Table12.Rows;
+							}
+							if (Ds_Objects.result.Tables.Table13.Rows.length > 0)
+							{
+								Lst_SCPM.dataProvider=Ds_Objects.result.Tables.Table12.Rows;
+								Ac_Clear3=Ds_Objects.result.Tables.Table13.Rows;
+							}
+							if (Ds_Objects.result.Tables.Table14.Rows.length > 0)
+							{
+								Lst_SCOR.dataProvider=Ds_Objects.result.Tables.Table14.Rows;
+								Ac_Clear4=Ds_Objects.result.Tables.Table14.Rows;
+
 							}
 						}
 						if(Mode=="PropertyApartment")

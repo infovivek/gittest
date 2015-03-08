@@ -824,7 +824,7 @@ IF @Action = 'BookingDtls'
     LEFT OUTER JOIN WRBHBUser U1 WITH(NOLOCK)ON U1.Id = B.BookedUsrId
     WHERE B.BookingLevel = 'Room' AND BP.GetType IN ('Property','Contract') AND
     BG.RoomShiftingFlag = 0 AND BG.CurrentStatus IN ('Canceled','No Show') AND
-    CONVERT(DATE,B.BookedDt,103) BETWEEN
+     CONVERT(DATE,B.BookedDt,103) BETWEEN
     CONVERT(DATE,@Str1,103) AND CONVERT(DATE,@Str2,103) AND
     B.BookingCode != 0
     GROUP BY B.BookingCode,B.Id,MC.ClientName,C.ClientName,B.ClientId,U.FirstName,
@@ -867,7 +867,7 @@ IF @Action = 'BookingDtls'
     WHERE B.BookingLevel = 'Bed' AND BP.GetType IN ('Property','Contract') AND
     BG.IsActive = 1 AND BG.IsDeleted = 0 AND B.BookingCode != 0 AND 
     BG.CurrentStatus IN ('CheckOut','Booked','CheckIn') AND
-    CONVERT(DATE,B.BookedDt,103) BETWEEN
+     CONVERT(DATE,B.BookedDt,103) BETWEEN
     CONVERT(DATE,@Str1,103) AND CONVERT(DATE,@Str2,103)
     GROUP BY B.BookingCode,B.Id,MC.ClientName,C.ClientName,B.ClientId,U.FirstName,
     P.PropertyName,BP.PropertyType,BP.PropertyId,Cty.CityName,B.CityId,
@@ -910,7 +910,7 @@ IF @Action = 'BookingDtls'
     ISNULL(BG.RoomShiftingFlag,0) = 0 AND B.BookingCode != 0 AND 
     BG.CurrentStatus IN ('Canceled','No Show') AND
     CONVERT(DATE,B.BookedDt,103) BETWEEN
-   CONVERT(DATE,@Str1,103) AND CONVERT(DATE,@Str2,103)  
+    CONVERT(DATE,@Str1,103) AND CONVERT(DATE,@Str2,103)  
     GROUP BY B.BookingCode,B.Id,MC.ClientName,C.ClientName,B.ClientId,U.FirstName,
     P.PropertyName,BP.PropertyType,BP.PropertyId,Cty.CityName,B.CityId,
     CCG.FirstName,CCG.LastName,BG.GuestId,BG.Tariff,BG.TariffPaymentMode,
@@ -953,7 +953,7 @@ IF @Action = 'BookingDtls'
     WHERE B.BookingLevel = 'Apartment' AND BP.GetType IN ('Property','Contract') AND
     BG.IsActive = 1 AND BG.IsDeleted = 0 AND B.BookingCode != 0 AND 
     BG.CurrentStatus IN ('CheckOut','Booked','CheckIn') AND
-    CONVERT(DATE,B.BookedDt,103) BETWEEN
+     CONVERT(DATE,B.BookedDt,103) BETWEEN
    CONVERT(DATE,@Str1,103) AND CONVERT(DATE,@Str2,103) 
     GROUP BY B.BookingCode,B.Id,MC.ClientName,C.ClientName,B.ClientId,U.FirstName,
     P.PropertyName,BP.PropertyType,BP.PropertyId,Cty.CityName,B.CityId,
@@ -996,7 +996,7 @@ IF @Action = 'BookingDtls'
     BP.GetType IN ('Property','Contract') AND
     ISNULL(BG.RoomShiftingFlag,0) = 0 AND B.BookingCode != 0 AND 
     BG.CurrentStatus IN ('Canceled','No Show') AND
-    CONVERT(DATE,B.BookedDt,103) BETWEEN
+     CONVERT(DATE,B.BookedDt,103) BETWEEN
     CONVERT(DATE,@Str1,103) AND CONVERT(DATE,@Str2,103)
     GROUP BY B.BookingCode,B.Id,MC.ClientName,C.ClientName,B.ClientId,U.FirstName,
     P.PropertyName,BP.PropertyType,BP.PropertyId,Cty.CityName,B.CityId,
@@ -1040,7 +1040,7 @@ IF @Action = 'BookingDtls'
     WHERE B.BookingLevel = 'Room' AND BP.GetType IN ('API') AND
     BG.IsActive = 1 AND BG.IsDeleted = 0 AND B.BookingCode != 0 AND 
     BG.CurrentStatus IN ('CheckOut','Booked','CheckIn') AND
-    CONVERT(DATE,B.BookedDt,103) BETWEEN
+     CONVERT(DATE,B.BookedDt,103) BETWEEN
     CONVERT(DATE,@Str1,103) AND CONVERT(DATE,@Str2,103)
     GROUP BY B.BookingCode,B.Id,MC.ClientName,C.ClientName,B.ClientId,U.FirstName,
     P.HotalName,BP.PropertyType,BP.PropertyId,Cty.CityName,B.CityId,
@@ -1082,7 +1082,7 @@ IF @Action = 'BookingDtls'
     LEFT OUTER JOIN WRBHBUser U1 WITH(NOLOCK)ON U1.Id = B.BookedUsrId
     WHERE B.BookingLevel = 'Room' AND BP.GetType IN ('API') AND
     BG.RoomShiftingFlag = 0 AND BG.CurrentStatus IN ('Canceled','No Show') AND
-    CONVERT(DATE,B.BookedDt,103) BETWEEN
+     CONVERT(DATE,B.BookedDt,103) BETWEEN
     CONVERT(DATE,@Str1,103) AND CONVERT(DATE,@Str2,103) AND
     B.BookingCode != 0
     GROUP BY B.BookingCode,B.Id,MC.ClientName,C.ClientName,B.ClientId,U.FirstName,
@@ -1235,7 +1235,7 @@ IF @Action = 'BookingDtls'
     WHERE B.BookingLevel = 'Room' AND BP.GetType IN ('Property','Contract') AND
     BG.IsActive = 1 AND BG.IsDeleted = 0 AND B.BookingCode != 0 AND 
     BG.CurrentStatus IN ('CheckOut','Booked','CheckIn') AND
-    CONVERT(DATE,B.BookedDt,103) BETWEEN CONVERT(DATE,@Str1,103) AND CONVERT(DATE,@Str2,103)
+     CONVERT(DATE,B.BookedDt,103) BETWEEN CONVERT(DATE,@Str1,103) AND CONVERT(DATE,@Str2,103)
      AND B.ClientId = @ClientId
     GROUP BY B.BookingCode,B.Id,MC.ClientName,C.ClientName,B.ClientId,U.FirstName,
     P.PropertyName,BP.PropertyType,BP.PropertyId,Cty.CityName,B.CityId,
@@ -1276,7 +1276,7 @@ IF @Action = 'BookingDtls'
     LEFT OUTER JOIN WRBHBUser U1 WITH(NOLOCK)ON U1.Id = B.BookedUsrId
     WHERE B.BookingLevel = 'Room' AND BP.GetType IN ('Property','Contract') AND
     BG.RoomShiftingFlag = 0 AND BG.CurrentStatus IN ('Canceled','No Show') AND
-    CONVERT(DATE,B.BookedDt,103) BETWEEN CONVERT(DATE,@Str1,103) AND CONVERT(DATE,@Str2,103)
+     CONVERT(DATE,B.BookedDt,103) BETWEEN CONVERT(DATE,@Str1,103) AND CONVERT(DATE,@Str2,103)
     AND B.BookingCode != 0 AND B.ClientId = @ClientId
     GROUP BY B.BookingCode,B.Id,MC.ClientName,C.ClientName,B.ClientId,U.FirstName,
     P.PropertyName,BP.PropertyType,BP.PropertyId,Cty.CityName,B.CityId,
@@ -1318,7 +1318,7 @@ IF @Action = 'BookingDtls'
     WHERE B.BookingLevel = 'Bed' AND BP.GetType IN ('Property','Contract') AND
     BG.IsActive = 1 AND BG.IsDeleted = 0 AND B.BookingCode != 0 AND 
     BG.CurrentStatus IN ('CheckOut','Booked','CheckIn') AND
-    CONVERT(DATE,B.BookedDt,103) BETWEEN CONVERT(DATE,@Str1,103) AND CONVERT(DATE,@Str2,103)
+     CONVERT(DATE,B.BookedDt,103) BETWEEN CONVERT(DATE,@Str1,103) AND CONVERT(DATE,@Str2,103)
      AND B.ClientId = @ClientId
     GROUP BY B.BookingCode,B.Id,MC.ClientName,C.ClientName,B.ClientId,U.FirstName,
     P.PropertyName,BP.PropertyType,BP.PropertyId,Cty.CityName,B.CityId,
@@ -1360,7 +1360,7 @@ IF @Action = 'BookingDtls'
     WHERE B.BookingLevel = 'Bed' AND BP.GetType IN ('Property','Contract') AND
     ISNULL(BG.RoomShiftingFlag,0) = 0 AND B.BookingCode != 0 AND 
     BG.CurrentStatus IN ('Canceled','No Show') AND 
-    CONVERT(DATE,B.BookedDt,103) BETWEEN CONVERT(DATE,@Str1,103) AND CONVERT(DATE,@Str2,103)
+     CONVERT(DATE,B.BookedDt,103) BETWEEN CONVERT(DATE,@Str1,103) AND CONVERT(DATE,@Str2,103)
      AND B.ClientId = @ClientId
     GROUP BY B.BookingCode,B.Id,MC.ClientName,C.ClientName,B.ClientId,U.FirstName,
     P.PropertyName,BP.PropertyType,BP.PropertyId,Cty.CityName,B.CityId,
@@ -1402,7 +1402,7 @@ IF @Action = 'BookingDtls'
     WHERE B.BookingLevel = 'Apartment' AND BP.GetType IN ('Property','Contract') AND
     BG.IsActive = 1 AND BG.IsDeleted = 0 AND B.BookingCode != 0 AND 
     BG.CurrentStatus IN ('CheckOut','Booked','CheckIn') AND
-    CONVERT(DATE,B.BookedDt,103) BETWEEN CONVERT(DATE,@Str1,103) AND CONVERT(DATE,@Str2,103)
+     CONVERT(DATE,B.BookedDt,103) BETWEEN CONVERT(DATE,@Str1,103) AND CONVERT(DATE,@Str2,103)
      AND B.ClientId = @ClientId
     GROUP BY B.BookingCode,B.Id,MC.ClientName,C.ClientName,B.ClientId,U.FirstName,
     P.PropertyName,BP.PropertyType,BP.PropertyId,Cty.CityName,B.CityId,
@@ -1445,7 +1445,7 @@ IF @Action = 'BookingDtls'
     BP.GetType IN ('Property','Contract') AND
     ISNULL(BG.RoomShiftingFlag,0) = 0 AND B.BookingCode != 0 AND 
     BG.CurrentStatus IN ('Canceled','No Show') AND
-    CONVERT(DATE,B.BookedDt,103) BETWEEN CONVERT(DATE,@Str1,103) AND CONVERT(DATE,@Str2,103)
+     CONVERT(DATE,B.BookedDt,103) BETWEEN CONVERT(DATE,@Str1,103) AND CONVERT(DATE,@Str2,103)
      AND B.ClientId = @ClientId
     GROUP BY B.BookingCode,B.Id,MC.ClientName,C.ClientName,B.ClientId,U.FirstName,
     P.PropertyName,BP.PropertyType,BP.PropertyId,Cty.CityName,B.CityId,
@@ -1489,7 +1489,7 @@ IF @Action = 'BookingDtls'
     WHERE B.BookingLevel = 'Room' AND BP.GetType IN ('API') AND
     BG.IsActive = 1 AND BG.IsDeleted = 0 AND B.BookingCode != 0 AND 
     BG.CurrentStatus IN ('CheckOut','Booked','CheckIn') AND
-    CONVERT(DATE,B.BookedDt,103) BETWEEN CONVERT(DATE,@Str1,103) AND CONVERT(DATE,@Str2,103)
+     CONVERT(DATE,B.BookedDt,103) BETWEEN CONVERT(DATE,@Str1,103) AND CONVERT(DATE,@Str2,103)
      AND B.ClientId = @ClientId
     GROUP BY B.BookingCode,B.Id,MC.ClientName,C.ClientName,B.ClientId,U.FirstName,
     P.HotalName,BP.PropertyType,BP.PropertyId,Cty.CityName,B.CityId,
@@ -1533,7 +1533,7 @@ IF @Action = 'BookingDtls'
     LEFT OUTER JOIN WRBHBUser U1 WITH(NOLOCK)ON U1.Id = B.BookedUsrId
     WHERE B.BookingLevel = 'Room' AND BP.GetType IN ('API') AND
     BG.RoomShiftingFlag = 0 AND BG.CurrentStatus IN ('Canceled','No Show') AND
-    CONVERT(DATE,B.BookedDt,103) BETWEEN CONVERT(DATE,@Str1,103) AND CONVERT(DATE,@Str2,103)
+     CONVERT(DATE,B.BookedDt,103) BETWEEN CONVERT(DATE,@Str1,103) AND CONVERT(DATE,@Str2,103)
      AND B.BookingCode != 0 AND B.ClientId = @ClientId
     GROUP BY B.BookingCode,B.Id,MC.ClientName,C.ClientName,B.ClientId,U.FirstName,
     P.HotalName,BP.PropertyType,BP.PropertyId,Cty.CityName,B.CityId,
@@ -1635,7 +1635,7 @@ IF @Action = 'BookingDtls'
     CH.ChkOutTariffTotal AS TotTarif,
     T.TariffPaymentMode,T1.RoomCaptured,T.CurrentStatus,T.BookerName,
     T.BookedDt,T.Column1,T.Column2,T.Column3,T.Column4,T.Column5,T.Column6,
-    T.Column7,T.Column8,T.Column9,T.Column10,T.BookingLevel FROM #TMP T
+    T.Column7,T.Column8,T.Column9,T.Column10,T.BookingLevel FROM #TMP T 
     LEFT OUTER JOIN #TariffDivision T1 WITH(NOLOCK)ON 
     T.BookingId = T1.BookingId AND T.GuestId = T1.GuestId AND
     T.RoomCaptured = T1.RoomCaptured
@@ -1649,6 +1649,8 @@ IF @Action = 'BookingDtls'
     T.Column7,T.Column8,T.Column9,T.Column10,T.BookingLevel,CH.NoOfDays,CH.ChkOutTariffTotal;
     
    END
+   
+ 
    CREATE TABLE #Final(BookingCode BIGINT,BookingId BIGINT,
   MasterClientName NVARCHAR(100),ClientName NVARCHAR(100),ClientId BIGINT,
   CRMName NVARCHAR(100),PropertyName NVARCHAR(100),PropertyType NVARCHAR(100),
@@ -2094,9 +2096,11 @@ IF @Action = 'BookingDtls'
   FROM WRBHBClientColumns 
   WHERE ClientId=@ClientId AND IsActive=1 AND IsDeleted=0
  END
+ ELSE
+ BEGIN
   SELECT 'Column1','Column2','Column3','Column4','Column5','Column6','Column7','Column8','Column9','Column10'
  END
-
+END
 	IF @Action = 'ExternalVendorPOPageLoad'
 	 BEGIN
 	  -- Date

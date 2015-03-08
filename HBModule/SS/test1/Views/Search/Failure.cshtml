@@ -1,0 +1,27 @@
+﻿
+@{
+    ViewBag.Title = "Failure";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<br/>
+<br />
+<br />
+<br />
+<br />
+
+<div style="text-align:center; color:red;">
+    @if (ViewBag.mssg == null || ViewBag.mssg == "")
+    { 
+    <span>Booking Failed For some Reason..Please Try Again or contact your Booking Team.</span>
+    }
+    else
+    {
+        <span>@ViewBag.mssg</span>
+    }
+</div>
+
+<br />
+<br />
+<br />
+<br />

@@ -258,6 +258,8 @@ IF @Action='PageLoad'
     h.BusinessSupportST ,h.InVoiceNo,h.BillFromDate,h.BillEndDate,CS.ChkOutServiceNetAmount,h.PropertyType,
     CS.CreatedDate
     --,t.LuxuryNo
+    
+
    
    -- MMT
    INSERT INTO #Prop2(GuestName ,Name,Stay ,Type,BookingLevel ,BillDate ,ClientName ,Id,InVoiceNo ,

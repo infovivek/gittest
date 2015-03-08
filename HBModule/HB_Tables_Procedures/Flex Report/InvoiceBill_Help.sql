@@ -214,7 +214,6 @@ BEGIN
    CONVERT(DATE,H.CreatedDate,103) BETWEEN CONVERT(DATE,@Pram3,103)  
    AND CONVERT(DATE,@Pram4,103) --AND H.Flag=1   
    
-  
  END    
  END  
  ELSE  
@@ -317,9 +316,11 @@ BEGIN
  END 
  ---UPDATE TAC INVOCE NO
  UPDATE #TempInvoiceBill SET InVoiceNo=S.TACInvoiceNo from #TempInvoiceBill a
- join WRBHBExternalChechkOutTAC s WITH(NOLOCK) ON A.CheckInId=S.ChkInHdrId 
- WHERE Type='Direct'
+ join WRBHBExternalChechkOutTAC s WITH(NOLOCK) ON A.CheckInId=S.ChkInHdrId AND s.IsActive=1
+ WHERE Type='Direct' 
  
+ UPDATE #TempInvoiceBill SET GuestName=S.GuestName from #TempInvoiceBill a
+ join WRBHBChechkOutHdr s WITH(NOLOCK) ON A.CheckInId=S.ChkInHdrId AND s.IsActive=1
  
  
  --SERVICE CESS,HCHESS,VAT AMOUNT ADD  
@@ -328,6 +329,12 @@ BEGIN
  FROM #TempInvoiceBill B  
  JOIN WRBHBCheckOutServiceHdr H WITH(NOLOCK) ON B.CheckOutId=H.CheckOutHdrId  
  AND H.IsActive=1 AND H.IsDeleted=0  
+ 
+  INSERT INTO #TempInvoiceBillService(CheckOutId,Cess,HCess,ChkOutServiceVat)  
+ SELECT H.ChkOutHdrId,H.ChkOutTariffCess,H.ChkOutTariffHECess,0 AS ChkOutServiceVat   
+ FROM #TempInvoiceBill B  
+ JOIN WRBHBExternalChechkOutTAC H WITH(NOLOCK) ON B.CheckOutId=H.ChkOutHdrId AND H.IsActive=1
+ AND H.IsActive=1 AND H.IsDeleted=0 AND B.Type='Direct'  
    
    
  UPDATE #TempInvoiceBill SET Cess=B.Cess+S.Cess,HCess=B.Hcess+S.HCess   
@@ -369,13 +376,18 @@ BEGIN
  GROUP BY H.Id,H.CheckOutHdrId  
   
  --FOOD AND Beverages AND SERVICE TAX AND VAT  
- INSERT INTO #TempInvoiceBillFOODANDBeverages(FOODANDBeverages,CheckOutId,CheckOutServiceHdrId,SerivceTax4,VAT,MiscellaneousAmount)
- SELECT (ISNULL(H.ChkOutServiceAmtl,0)),H.CheckOutHdrId,0,
- (ISNULL(cast(ChkOutServiceST as decimal(27,2)),0)) SerivceTax4,  
+ INSERT INTO #TempInvoiceBillFOODANDBeverages(FOODANDBeverages,CheckOutId,CheckOutServiceHdrId,SerivceTax4,
+ VAT,MiscellaneousAmount)
+ SELECT SUM((ISNULL(D.ChkOutSerAmount,0))),H.CheckOutHdrId,0,
+ (ISNULL(cast(ChkOutServiceST as decimal(27,2)),0)+(ISNULL(H.OtherService,0))) SerivceTax4,  
  (ISNULL(ChkOutServiceVat,0)),(ISNULL(H.MiscellaneousAmount,0)) MiscellaneousAmount  
  FROM #TempInvoiceBill B  
  JOIN WRBHBCheckOutServiceHdr H WITH(NOLOCK) ON B.CheckOutId=H.CheckOutHdrId AND H.IsActive=1 AND H.IsDeleted=0
-    
+ JOIN  WRBHBCheckOutServiceDtls D WITH(NOLOCK) ON H.Id = D.ServiceHdrId AND D.IsActive=1 AND D.IsDeleted=0
+ WHERE D.TypeService='Food And Beverages' 
+ GROUP BY H.CheckOutHdrId,ChkOutServiceST,ChkOutServiceVat,H.MiscellaneousAmount,H.OtherService
+ 
+
  --SELECT SUM(ISNULL(D.ChkOutSerAmount,0)),H.CheckOutHdrId,0,
  --SUM(ISNULL(cast(ChkOutServiceST as decimal(27,2)),0)) SerivceTax4,  
  --SUM(ISNULL(ChkOutServiceVat,0))  
@@ -395,7 +407,7 @@ BEGIN
  JOIN WRBHBContarctProductMaster P WITH(NOLOCK) ON P.Id = D.ProductId AND P.TypeService='Laundry'  
  AND P.IsActive=1 AND P.IsDeleted=0   
  GROUP BY H.Id,H.CheckOutHdrId  
-   
+ 
  --PROPERTY ID CHECK  
  IF @Pram2=0  
  BEGIN  
@@ -424,15 +436,21 @@ BEGIN
   MasterClientName, GuestName,SerivceTax7,Servicetax12,ServiceCharge,CheckInDate,  
   CheckOutDate,BillStartDate,BillEndDate,Location,LuxuryTax,TotalAmount,  
   TariffAmount,Broadband,FOODANDBeverages,SerivceTax4,VAT,Laundry,ExtraAmount,Cess,Hcess,
-  MarkupAmount,H.Type,H.CheckOutId,MiscellaneousAmount   
+  MarkupAmount,H.Type,H.CheckOutId,MiscellaneousAmount  
+  
+   
   
   ---UPDATE TOTAL AMONT FOR DIRECT MODE
-  UPDATE #TempBillFinal SET TotalAmount=H.ChkOutTariffTotal FROM #TempBillFinal S
+  --UPDATE #TempBillFinal SET TotalAmount=H.ChkOutTariffTotal FROM #TempBillFinal S
+  --JOIN WRBHBChechkOutHdr H WITH(NOLOCK) ON S.CheckOutId=H.Id AND S.TotalAmount=0
+  
+  UPDATE #TempBillFinal SET TotalAmount=T.TACAmount FROM #TempBillFinal S
   JOIN WRBHBChechkOutHdr H WITH(NOLOCK) ON S.CheckOutId=H.Id AND S.Type='Direct'
+  join WRBHBExternalChechkOutTAC T WITH(NOLOCK) ON H.ChkInHdrId=T.ChkInHdrId AND T.IsActive=1
   
-  UPDATE #TempBillFinal SET TotalAmount=H.ChkOutTariffTotal FROM #TempBillFinal S
-  JOIN WRBHBChechkOutHdr H WITH(NOLOCK) ON S.CheckOutId=H.Id AND S.TotalAmount=0
-  
+  UPDATE #TempBillFinal SET TariffAmount=(T.Rate*T.NoOfDays+T.TotalBusinessSupportST) FROM #TempBillFinal S
+  JOIN WRBHBChechkOutHdr H WITH(NOLOCK) ON S.CheckOutId=H.Id AND S.Type='Direct'
+  join WRBHBExternalChechkOutTAC T WITH(NOLOCK) ON H.ChkInHdrId=T.ChkInHdrId AND T.IsActive=1
   
   SELECT @Count=COUNT(* ) FROM #TempBillFinal  
     
@@ -452,13 +470,12 @@ BEGIN
     
   SELECT CreatedDate,ModifiedDate,BookingCode,InVoiceNo,PropertyName,ClientName,MasterClientName,  
   GuestName,SerivceTax7,Servicetax12,ServiceCharge,CheckInDate,CheckOutDate,BillStartDate,BillEndDate,Location,LuxuryTax,  
- (SerivceTax7+Servicetax12+LuxuryTax+ServiceCharge+TariffAmount+Broadband+FOODANDBeverages+SerivceTax4+VAT+Laundry+ExtraAmount+CAST(Cess AS DECIMAL(27,2))+
-  CAST(Hcess AS DECIMAL(27,2))+Miscellaneous) AS TotalAmount,TariffAmount,Broadband,
+ (SerivceTax7+Servicetax12+LuxuryTax+ServiceCharge+TariffAmount+Broadband+FOODANDBeverages+SerivceTax4+VAT+Laundry+ExtraAmount+
+ CAST(Cess AS DECIMAL(27,2))+CAST(Hcess AS DECIMAL(27,2))+Miscellaneous) AS TotalAmount,TariffAmount,Broadband,
   FOODANDBeverages,SerivceTax4,VAT,Laundry,ExtraAmount,  
   CAST(Cess AS DECIMAL(27,2)) Cess,CAST(Hcess AS DECIMAL(27,2)) Hcess,0 AS DiscountAmount,Miscellaneous  
   FROM #TempBillFinal 
   ORDER BY OrderBy ,CAST(BookingCode AS BIGINT) ASC   
-  
   
  END  
  ELSE  
@@ -493,11 +510,13 @@ BEGIN
   H.Type,H.CheckOutId,MiscellaneousAmount  
     
   ---UPDATE TOTAL AMONT FOR DIRECT MODE
-  UPDATE #TempBillFinal SET TotalAmount=H.ChkOutTariffTotal FROM #TempBillFinal S
-  JOIN WRBHBChechkOutHdr H WITH(NOLOCK) ON S.CheckOutId=H.Id AND S.Type='Direct'
+  UPDATE #TempBillFinal SET TotalAmount=T.TACAmount FROM #TempBillFinal S
+  JOIN WRBHBChechkOutHdr H WITH(NOLOCK) ON S.CheckOutId=H.Id AND S.Type='Direct' 
+  join WRBHBExternalChechkOutTAC T WITH(NOLOCK) ON H.ChkInHdrId=T.ChkInHdrId AND T.IsActive=1
   
-  UPDATE #TempBillFinal SET TotalAmount=H.ChkOutTariffTotal FROM #TempBillFinal S
-  JOIN WRBHBChechkOutHdr H WITH(NOLOCK) ON S.CheckOutId=H.Id AND S.TotalAmount=0
+  UPDATE #TempBillFinal SET TariffAmount=(T.Rate*T.NoOfDays+T.TotalBusinessSupportST) FROM #TempBillFinal S
+  JOIN WRBHBChechkOutHdr H WITH(NOLOCK) ON S.CheckOutId=H.Id AND S.Type='Direct' 
+  join WRBHBExternalChechkOutTAC T WITH(NOLOCK) ON H.ChkInHdrId=T.ChkInHdrId AND T.IsActive=1
   
   SELECT @Count=COUNT(* ) FROM #TempBillFinal  
     
@@ -771,7 +790,9 @@ BEGIN
  JOIN WRBHBCheckOutServiceHdr H WITH(NOLOCK) ON B.CheckOutId=H.CheckOutHdrId  
  AND H.IsActive=1 AND H.IsDeleted=0  
    
-   
+ UPDATE #TempInvoiceBill SET GuestName=S.GuestName from #TempInvoiceBill a
+ join WRBHBChechkOutHdr s WITH(NOLOCK) ON A.CheckInId=S.ChkInHdrId AND s.IsActive=1
+  
  UPDATE #TempInvoiceBill SET Cess=B.Cess+S.Cess,HCess=B.Hcess+S.HCess   
  FROM #TempInvoiceBill B  
  JOIN #TempInvoiceBillService S ON S.CheckOutId=B.CheckOutId  
@@ -1131,11 +1152,11 @@ IF @Pram5='External Property'
    ChkOutTariffHECess,H.NoOfDays,B.Id,H.ChkInHdrId,H.PrintInvoice,H.Direct    
    FROM WRBHBChechkOutHdr H  
    JOIN WRBHBBooking  B WITH(NOLOCK) ON H.BookingId=B.Id AND B.IsActive=1 AND B.IsDeleted=0  
-   JOIN WRBHBProperty P WITH(NOLOCK) ON H.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0 AND P.Category=@Pram5  
+   JOIN WRBHBProperty P WITH(NOLOCK) ON H.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0 AND P.Category='External Property'  
    JOIN WRBHBCity CC WITH(NOLOCK) ON CC.Id=P.CityId  
    JOIN WRBHBClientManagement C WITH(NOLOCK) ON B.ClientId=C.Id AND C.IsActive=1 AND C.IsDeleted=0  
    JOIN WRBHBMasterClientManagement MC WITH(NOLOCK) ON C.MasterClientId=MC.Id AND MC.IsActive=1 AND MC.IsDeleted=0  
-   WHERE H.IsActive=1 AND H.IsDeleted=0 AND   
+   WHERE H.IsActive=1 AND H.IsDeleted=0 AND   H.Direct !='Direct' AND
    CONVERT(DATE,H.CreatedDate,103) BETWEEN CONVERT(DATE,@Pram3,103)  
    AND CONVERT(DATE,@Pram4,103) --AND H.Flag=1   
    
@@ -1184,7 +1205,7 @@ IF @Pram5='External Property'
    JOIN WRBHBCity CC WITH(NOLOCK) ON CC.Id=P.CityId AND CC.Id=P.CityId  
    JOIN WRBHBClientManagement C WITH(NOLOCK) ON B.ClientId=C.Id AND C.Id=@Pram1 AND C.IsActive=1 AND C.IsDeleted=0  
    JOIN WRBHBMasterClientManagement MC WITH(NOLOCK) ON C.MasterClientId=MC.Id  AND MC.IsActive=1 AND MC.IsDeleted=0  
-   WHERE H.IsActive=1 AND H.IsDeleted=0 AND   
+   WHERE H.IsActive=1 AND H.IsDeleted=0 AND    H.Direct !='Direct' AND
    CONVERT(DATE,H.CreatedDate,103) BETWEEN CONVERT(DATE,@Pram3,103)  
    AND CONVERT(DATE,@Pram4,103) --AND H.Flag=1   
    
@@ -1213,13 +1234,18 @@ IF @Pram5='External Property'
    
   END    
  END 
+ 
+UPDATE #TempInvoiceBill SET GuestName=S.GuestName from #TempInvoiceBill a
+ join WRBHBChechkOutHdr s WITH(NOLOCK) ON A.CheckInId=S.ChkInHdrId AND s.IsActive=1
+ 
+ 
  --SERVICE CESS,HCHESS,VAT AMOUNT ADD  
  INSERT INTO #TempInvoiceBillService(CheckOutId,Cess,HCess,ChkOutServiceVat)  
  SELECT H.CheckOutHdrId,H.Cess,H.HECess,H.ChkOutServiceVat   
  FROM #TempInvoiceBill B  
  JOIN WRBHBCheckOutServiceHdr H WITH(NOLOCK) ON B.CheckOutId=H.CheckOutHdrId  
  AND H.IsActive=1 AND H.IsDeleted=0  
-   
+  
    
  UPDATE #TempInvoiceBill SET Cess=B.Cess+S.Cess,HCess=B.Hcess+S.HCess   
  FROM #TempInvoiceBill B  
@@ -1288,9 +1314,7 @@ IF @Pram5='External Property'
   CheckOutDate,BillStartDate,BillEndDate,Location,LuxuryTax,TotalAmount,  
   ExtraAmount,PaymentType,PaymentMode,AcountNo,NoOfDays,D.PaymentDate,Cess,Hcess,MarkupAmount  
    
-  
-    
-    
+      
   SELECT @Count=COUNT(* ) FROM #TempBillFinal  
     
   IF @Count!=0  
@@ -1339,8 +1363,7 @@ IF @Pram5='External Property'
   CheckOutDate,BillStartDate,BillEndDate,Location,LuxuryTax,TotalAmount,  
   ExtraAmount,PaymentType,PaymentMode,AcountNo,NoOfDays,D.PaymentDate,Cess,Hcess,MarkupAmount  
   
-   
-    
+     
   SELECT @Count=COUNT(* ) FROM #TempBillFinal  
     
   IF @Count!=0  

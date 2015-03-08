@@ -1,0 +1,479 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>OccupancyChart</title>
+    @Scripts.Render("~/bundles/bootstrap")
+    @Styles.Render("~/Content/css")
+    @Styles.Render("~/Content/css1")
+    @Styles.Render("~/Content/css2")
+</head>
+<body>
+    <div>
+        <div>
+            <div style="padding-left: 5%;background:#f1f7f7;height:60px;">
+                <table>
+                    <tr>
+                        <td><label style="width: 90px; font-family: Arial, sans-serif;">From Date</label></td>
+                        <td><input style="width:150px;" type="text" id="From_datepicker"></td>
+                        <td><label style="width:80px;padding-left:5px;">To Date</label></td>
+                        <td><input style="width:150px;" type="text" id="To_datepicker"></td>
+                        <td><label style="width:65px;padding-left:10px;">Property</label></td>
+                        <td style="padding-left:10px;">
+                            @Html.DropDownList("Property", new SelectList(@ViewBag.Property, "Id", "Property"),
+                     "Select Property", new { width = "150px" })
+                        </td>
+                        <td></td>
+                        <td style="padding-left:10px;"><input class="btn btn-info" type="button" id="Save" value="Submit" onclick="Submit()"></td>
+                        <td style="padding-left:10px;"><input class="btn btn-info" type="button" id="Save" value="Clear" onclick="Clear()"></td>
+                        <td><input type="hidden" value="" id="DownloadExcel" /></td>
+                    </tr>
+                </table>
+                <div style="float:left; width:350px;">
+                    <label style="width: 100%; font-family: Arial, sans-serif;" id="PropertyName"></label>
+                </div>
+                <div style="float:left; width:30px;">
+                    <div style="width: 15px; height: 15px; background-color: #4cff00; float: left;"></div>
+                </div>
+                <div style="float:left; ">
+                    <label style="width: 90px; font-family: Arial, sans-serif;">Booked</label>
+                </div>
+
+                <div style="float:left; width:30px;">
+                    <div style="width: 15px; height: 15px; background-color: #11750d; float: left; "></div>
+                </div>
+                <div style="float:left; ">
+                    <label style="width: 90px; font-family: Arial, sans-serif;">Checked In</label>
+                </div>
+
+                <div style="float:left; width:30px;">
+                    <div style="width: 15px; height: 15px; background-color: #4aa449; float: left; "></div>
+                </div>
+                <div style="float:left;">
+                    <label style="width: 90px; font-family: Arial, sans-serif;">Checked Out</label>
+                </div>
+
+
+            </div>
+            <div class="OuterDiv">
+                <div class="LeftDiv"><table id="Data" style="height:100%;"></table></div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+
+        //$(function () {
+        //    $("#From_datepicker").datepicker({
+        //        defaultDate: "+1w",
+        //        changeMonth: true,
+        //        numberOfMonths: 3,
+        //        dateformat: "mm/dd/yy",
+        //        showanim: "slide",
+        //        onClose: function (selectedDate) {
+        //            $("#To_datepicker").datepicker("option", "minDate", selectedDate);
+        //            $("#From_datepicker").datepicker("option", "dateFormat", "yy-mm-dd");
+
+        //        }
+        //    });
+        //    $("#To_datepicker").datepicker({
+        //        defaultDate: "+1w",
+        //        changeMonth: true,
+        //        numberOfMonths: 3,
+        //        dateformat: "mm/dd/yy",
+        //        showanim: "slide",
+        //        onClose: function (selectedDate) {
+        //            $("#From_datepicker").datepicker("option", "maxDate", selectedDate);
+        //            $("#To_datepicker").datepicker("option", "dateFormat", "yy-mm-dd");
+
+        //        }
+        //    });
+        //});
+        $(document).ready(function () {
+            var nowTemp = new Date();
+            var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0);
+            var checkin = $('#From_datepicker').datepicker({
+                //onRender: function (date) {
+                //    return date.valueOf() < now.valueOf() ? 'disabled' : '';
+                //}
+
+
+            }).on('changeDate', function (ev) {
+
+                if (ev.date.valueOf() > checkout.date.valueOf()) {
+                    var newDate = new Date(ev.date)
+                    newDate.setDate(newDate.getDate() + 1);
+                    checkout.setValue(newDate);
+                }
+                else {
+                    var newDate = new Date(ev.date)
+                    newDate.setDate(newDate.getDate() + 1);
+                    checkout.setValue(newDate);
+                }
+                checkin.hide();
+                // $('#checkout')[0].focus();
+            }).data('datepicker');
+
+
+
+
+            var checkin1 = $('#checkin1').datepicker({
+                onRender: function (date) {
+                    return date.valueOf() < now.valueOf() ? 'disabled' : '';
+                }
+            }).on('changeDate', function (ev) {
+                if (ev.date.valueOf() > checkout1.date.valueOf()) {
+                    var newDate = new Date(ev.date)
+                    newDate.setDate(newDate.getDate() + 1);
+                    checkout1.setValue(newDate);
+                }
+                checkin1.hide();
+                //$('#checkout1')[0].focus();
+            }).data('datepicker');
+
+
+
+
+
+            var checkout = $('#To_datepicker').datepicker({
+                onRender: function (date) {
+                    return date.valueOf() <= checkin.date.valueOf() ? 'disabled' : '';
+                }
+            }).on('changeDate', function (ev) {
+                checkout.hide();
+            }).data('datepicker');
+
+
+
+
+            var checkout1 = $('#checkout1').datepicker({
+                onRender: function (date) {
+                    return date.valueOf() <= checkin1.date.valueOf() ? 'disabled' : '';
+                }
+            }).on('changeDate', function (ev) {
+                checkout1.hide();
+            }).data('datepicker');
+            //var currentDate = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
+            //var next = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000);
+            //var day = currentDate.getDate()
+            //var month = currentDate.getMonth() + 1
+            //var year = currentDate.getFullYear()
+            //var day1 = next.getDate()
+            //var month1 = next.getMonth() + 1
+            //var year1 = next.getFullYear()
+            //document.getElementById("checkin").value = month + "/" + day + "/" + year;
+            //document.getElementById("checkout").value = month1 + "/" + day1 + "/" + year1;
+        });
+        function Clear() {
+
+            $('#Data').empty();
+            $('#Data1').empty();
+            $("#From_datepicker").val("");
+            $("#To_datepicker").val("");
+            $("#Property").val("");
+            $("#PropertyName").text("");
+        }
+
+        function Submit() {
+
+            var StartDate = $("#From_datepicker").val();
+            var EndDate = $("#To_datepicker").val();
+            var PropertyId = $("#Property").val();
+            var Property = $("#Property option:selected").text();
+            $("#PropertyName").text(Property);
+            var Flage = true;
+            var Err = "";
+            if (StartDate == "") {
+                Flage = false;
+                Err = "Please Select From Date <br/>";
+            }
+            if (EndDate == "") {
+                Flage = false;
+                Err += "Please Select End Date <br/>";
+            }
+            if (PropertyId == "") {
+                Flage = false;
+                Err += "Please Select Property";
+            }
+            if (Flage == true) {
+                $.ajax({
+                    cache: false,
+                    type: "GET",
+                    url: "@(Url.RouteUrl("OccupancyData"))",
+                    data: {
+                        "StartDate": StartDate, "EndDate": EndDate,
+                        "PropertyId": PropertyId
+                    },
+                    success: function (data) {
+
+                        var Len = data.length;
+                        if (Len > 0) {
+                            $('#Data').empty();
+                            $('#Data').append("<thead class='OccupancyHeader' ></thead>");
+                            $('#Data').append("<tbody class='OccupancyHeader'></tbody>");
+                            $('#Data > thead').append('<tr></tr>');
+                            $('#Data > thead > tr:last').append('<td class="OccupancyHeader"  >Room Details</td>');
+                            var DtaeDetailsFlag = true;
+                            var TotalNoRoomsFlag = true;
+                            var RoomOccupancyFlag = true;
+                            var RoomAvailableFlag = true;
+                            var RoomPerFlag = true;
+                            var EmployeeFlag = true;
+                            var TotalFlag = true;
+                            var RoomFlag = true;
+                            var RoomNo = 0;
+                            var RoomName = "";
+                            $.each(data, function (id, option) {
+
+                                if (option.Type == "Date") {
+
+                                    var date1 = new Date(option.DT);
+                                    var month = new Array();
+                                    month[0] = "Jan";
+                                    month[1] = "Feb";
+                                    month[2] = "Mar";
+                                    month[3] = "Apr";
+                                    month[4] = "May";
+                                    month[5] = "Jun";
+                                    month[6] = "Jul";
+                                    month[7] = "Aug";
+                                    month[8] = "Sep";
+                                    month[9] = "Oct";
+                                    month[10] = "Nov";
+                                    month[11] = "Dec";
+
+                                    var weekday = new Array(7);
+                                    weekday[0] = "Sun";
+                                    weekday[1] = "Mon";
+                                    weekday[2] = "Tue";
+                                    weekday[3] = "Wed";
+                                    weekday[4] = "Thu";
+                                    weekday[5] = "Fri";
+                                    weekday[6] = "Sat";
+
+                                    var dd = date1.getDate().toString();
+                                    var mm = date1.getMonth() + 1;
+                                    var y = date1.getFullYear();
+                                    var day = weekday[date1.getDay()];
+                                    var mon = month[date1.getMonth()];
+
+                                    if (dd == "1") {
+                                        dd = "01";
+                                    }
+                                    else if (dd == "2") {
+                                        dd = "02";
+                                    }
+                                    else if (dd == "3") {
+                                        dd = "03";
+                                    }
+                                    else if (dd == "4") {
+                                        dd = "04";
+                                    }
+                                    else if (dd == "5") {
+                                        dd = "05";
+                                    }
+                                    else if (dd == "6") {
+                                        dd = "06";
+                                    }
+                                    else if (dd == "7") {
+                                        dd = "07";
+                                    }
+                                    else if (dd == "8") {
+                                        dd = "08";
+                                    }
+                                    else if (dd == "9") {
+                                        dd = "09";
+                                    }
+                                    if (day != "Sun")
+                                        $('#Data > thead > tr:last').append('<td class="OccupancyHeader"  >' + dd + "/" + mon + '<hr /><label class="NormalDay">' + day + ' <label></td>');
+                                    else
+                                        $('#Data > thead > tr:last').append('<td class="OccupancyHeader"  >' + dd + "/" + mon + '<hr /><label class="Sun">' + day + ' <label></td>');
+                                }
+                                else if (option.Type == "Data") {
+
+                                    if (RoomNo != option.RoomId) {
+                                        $('#Data > tbody').append('<tr></tr>');
+                                        $('#Data > tbody > tr:last').append('<td class="OccupancyDetails"  >' + option.RoomName + ' </td>');
+                                        RoomNo = option.RoomId;
+                                        RoomName = option.RoomName;
+                                    }
+                                    else {
+                                        var GuestDetails = option.GuestName;
+                                        var DetailData = GuestDetails.split(':');
+
+                                        if (GuestDetails == "") {
+                                            $('#Data > tbody > tr:last').append('<td class="OccupancyDetails"  ></td>');
+                                        }
+                                        else if (DetailData[6] == "CheckOut") {
+
+                                            var Value1 = option.DT;
+                                            var Value2 = DetailData[2];
+                                            var Value3 = DetailData[3];
+                                            var Level = DetailData[4];
+
+                                            if (Value1 == Value2) {
+                                                $('#Data > tbody > tr:last').append('<td  class="OccupancyDetails" title=" BookingCode : ' + DetailData[0] + '\n GuestName : ' + DetailData[1] + ' \n CheckIn Date : ' + DetailData[2] + '\n CheckOut Date : ' + DetailData[3] + '\n Booking Leavel : ' + DetailData[4] + '\n Occupancy Type : ' + DetailData[5] + '\n Status : ' + DetailData[6] + '"><div style="width:50%;height:100%;float:left;border:none;" class="OccupancyDetails2"></div><div style="width:50%;height:100%;float:right;border:none;" class="OccupancyCheckOut"></div></td>');
+                                            }
+                                            else if (Value1 == Value3) {
+                                                $('#Data > tbody > tr:last').append('<td  class="OccupancyDetails" title=" BookingCode : ' + DetailData[0] + '\n GuestName : ' + DetailData[1] + ' \n CheckIn Date : ' + DetailData[2] + '\n CheckOut Date : ' + DetailData[3] + '\n Booking Leavel : ' + DetailData[4] + '\n Occupancy Type : ' + DetailData[5] + '\n Status : ' + DetailData[6] + '"><div style="width:50%;height:100%;float:left;border:none;" class="OccupancyCheckOut"></div><div style="width:50%;height:100%;float:right;border:none;" class="OccupancyDetails2"></div></td>');
+                                            }
+                                            else {
+                                                if (Level != "Bed")
+                                                    $('#Data > tbody > tr:last').append('<td class="OccupancyDetails" title=" BookingCode : ' + DetailData[0] + '\n GuestName : ' + DetailData[1] + ' \n CheckIn Date : ' + DetailData[2] + '\n CheckOut Date : ' + DetailData[3] + '\n Booking Leavel : ' + DetailData[4] + '\n Occupancy Type : ' + DetailData[5] + '\n Status : ' + DetailData[6] + '"><div style="width:100%;height:100%;border:none;" class="OccupancyCheckOut"></div></td>');
+                                                else
+                                                    $('#Data > tbody > tr:last').append('<td class="OccupancyDetails" title=" BookingCode : ' + DetailData[0] + '\n GuestName : ' + DetailData[1] + ' \n CheckIn Date : ' + DetailData[2] + '\n CheckOut Date : ' + DetailData[3] + '\n Booking Leavel : ' + DetailData[4] + '\n Occupancy Type : ' + DetailData[5] + '\n Status : ' + DetailData[6] + '"><div style="width:50%;height:100%;float:left;border:none;" class="OccupancyDetails2"></div><div style="width:50%;height:100%;float:right;border:none;" class="OccupancyCheckOut"></div></td>');
+
+                                            }
+
+                                        }
+                                        else if (DetailData[6] == "Booked") {
+                                            var Value1 = option.DT;
+                                            var Value2 = DetailData[2];
+                                            var Value3 = DetailData[3];
+                                            var Level = DetailData[4];
+                                            if (Value1 == Value2) {
+                                                $('#Data > tbody > tr:last').append('<td  class="OccupancyDetails" title=" BookingCode : ' + DetailData[0] + '\n GuestName : ' + DetailData[1] + ' \n CheckIn Date : ' + DetailData[2] + '\n CheckOut Date : ' + DetailData[3] + '\n Booking Leavel : ' + DetailData[4] + '\n Occupancy Type : ' + DetailData[5] + '\n Status : ' + DetailData[6] + '"><div style="width:50%;height:100%;float:left;border:none;" class="OccupancyDetails2"></div><div style="width:50%;height:100%;float:right;border:none;" class="OccupancyBooked"></div></td>');
+                                            }
+                                            else if (Value1 == Value3) {
+                                                $('#Data > tbody > tr:last').append('<td  class="OccupancyDetails" title=" BookingCode : ' + DetailData[0] + '\n GuestName : ' + DetailData[1] + ' \n CheckIn Date : ' + DetailData[2] + '\n CheckOut Date : ' + DetailData[3] + '\n Booking Leavel : ' + DetailData[4] + '\n Occupancy Type : ' + DetailData[5] + '\n Status : ' + DetailData[6] + '"><div style="width:50%;height:100%;float:left;border:none;" class="OccupancyBooked"></div><div style="width:50%;height:100%;float:right;border:none;" class="OccupancyDetails2"></div></td>');
+                                            }
+                                            else {
+                                                if (Level != "Bed")
+                                                    $('#Data > tbody > tr:last').append('<td class="OccupancyDetails" title=" BookingCode : ' + DetailData[0] + '\n GuestName : ' + DetailData[1] + ' \n CheckIn Date : ' + DetailData[2] + '\n CheckOut Date : ' + DetailData[3] + '\n Booking Leavel : ' + DetailData[4] + '\n Occupancy Type : ' + DetailData[5] + '\n Status : ' + DetailData[6] + '"><div style="width:100%;height:100%;border:none;" class="OccupancyBooked"></div></td>');
+                                                else
+                                                    $('#Data > tbody > tr:last').append('<td class="OccupancyDetails" title=" BookingCode : ' + DetailData[0] + '\n GuestName : ' + DetailData[1] + ' \n CheckIn Date : ' + DetailData[2] + '\n CheckOut Date : ' + DetailData[3] + '\n Booking Leavel : ' + DetailData[4] + '\n Occupancy Type : ' + DetailData[5] + '\n Status : ' + DetailData[6] + '"><div style="width:50%;height:100%;float:left;border:none;" class="OccupancyDetails2"></div><div style="width:50%;height:100%;float:right;border:none;" class="OccupancyBooked"></div></td>');
+                                            }
+                                        }
+                                        else if (DetailData[6] == "CheckIn") {
+                                            var Value1 = option.DT;
+                                            var Value2 = DetailData[2];
+                                            var Value3 = DetailData[3];
+                                            var Level = DetailData[4];
+                                            if (Value1 == Value2) {
+                                                $('#Data > tbody > tr:last').append('<td  class="OccupancyDetails" title=" BookingCode : ' + DetailData[0] + '\n GuestName : ' + DetailData[1] + ' \n CheckIn Date : ' + DetailData[2] + '\n CheckOut Date : ' + DetailData[3] + '\n Booking Leavel : ' + DetailData[4] + '\n Occupancy Type : ' + DetailData[5] + '\n Status : ' + DetailData[6] + '"><div style="width:50%;height:100%;float:left;border:none;" class="OccupancyDetails2"></div><div style="width:50%;height:100%;float:right;border:none;" class="OccupancyCheckIn"></div></td>');
+                                            }
+                                            else if (Value1 == Value3) {
+                                                $('#Data > tbody > tr:last').append('<td  class="OccupancyDetails" title=" BookingCode : ' + DetailData[0] + '\n GuestName : ' + DetailData[1] + ' \n CheckIn Date : ' + DetailData[2] + '\n CheckOut Date : ' + DetailData[3] + '\n Booking Leavel : ' + DetailData[4] + '\n Occupancy Type : ' + DetailData[5] + '\n Status : ' + DetailData[6] + '"><div style="width:50%;height:100%;float:left;border:none;" class="OccupancyCheckIn"></div><div style="width:50%;height:100%;float:right;border:none;" class="OccupancyDetails2"></div></td>');
+                                            }
+                                            else {
+                                                if (Level != "Bed")
+                                                    $('#Data > tbody > tr:last').append('<td class="OccupancyDetails" title=" BookingCode : ' + DetailData[0] + '\n GuestName : ' + DetailData[1] + ' \n CheckIn Date : ' + DetailData[2] + '\n CheckOut Date : ' + DetailData[3] + '\n Booking Leavel : ' + DetailData[4] + '\n Occupancy Type : ' + DetailData[5] + '\n Status : ' + DetailData[6] + '"><div style="width:100%;height:100%;border:none;" class="OccupancyCheckIn"></div></td>');
+                                                else
+                                                    $('#Data > tbody > tr:last').append('<td class="OccupancyDetails" title=" BookingCode : ' + DetailData[0] + '\n GuestName : ' + DetailData[1] + ' \n CheckIn Date : ' + DetailData[2] + '\n CheckOut Date : ' + DetailData[3] + '\n Booking Leavel : ' + DetailData[4] + '\n Occupancy Type : ' + DetailData[5] + '\n Status : ' + DetailData[6] + '"><div style="width:50%;height:100%;float:left;border:none;" class="OccupancyDetails2"></div><div style="width:50%;height:100%;float:right;border:none;" class="OccupancyCheckIn"></div></td>');
+                                            }
+                                        }
+                                        else {
+
+                                            var BookingStatus = DetailData[6];
+                                            var StatusArr = BookingStatus.split('/');
+                                            var FirstDiv = "";
+                                            var SecondDiv = "";
+                                            if (StatusArr[0].trim() == "CheckIn")
+                                                FirstDiv = "OccupancyCheckIn";
+                                            else if (StatusArr[0].trim() == "Booked")
+                                                FirstDiv = "OccupancyBooked";
+                                            else
+                                                FirstDiv = "OccupancyCheckOut";
+
+                                            if (StatusArr[1].trim() == "CheckIn")
+                                                SecondDiv = "OccupancyCheckIn";
+                                            else if (StatusArr[1].trim() == "Booked")
+                                                SecondDiv = "OccupancyBooked";
+                                            else
+                                                SecondDiv = "OccupancyCheckOut";
+
+                                            $('#Data > tbody > tr:last').append('<td class="OccupancyDetails" title=" BookingCode : ' + DetailData[0] + '\n GuestName : ' + DetailData[1] + ' \n CheckIn Date : ' + DetailData[2] + '\n CheckOut Date : ' + DetailData[3] + '\n Booking Leavel : ' + DetailData[4] + '\n Occupancy Type : ' + DetailData[5] + '\n Status : ' + DetailData[6] + '"><div style="width:50%;height:100%;border-top: 0px solid;border-bottom: 0px solid;border-left: 0px solid;border-right:1px solid white;float:left;" class="' + FirstDiv + '"></div><div style="width:50%;height:100%;border-top: 0px solid;border-bottom: 0px solid;border-left: 1px solid white;border-right:0px solid ;float:right" class="' + SecondDiv + '"></div></td>');
+                                        }
+                                    }
+                                }
+                                else if (option.Type == "Detail Date") {
+
+                                    if (DtaeDetailsFlag == true) {
+                                        $('#Data > tbody').append('<tr></tr>');
+                                        $('#Data > tbody > tr:last').append('<td class="OccupancyHeader">Days</td>');
+                                        DtaeDetailsFlag = false;
+                                    }
+                                    var today = new Date(option.DT);
+                                    var dd1 = today.getDate();
+                                    today.setDate(today.getDate() + 1)
+                                    var dd2 = today.getDate();
+
+
+                                    $('#Data > tbody > tr:last').append('<td class="OccupancyHeader">' + dd1 + '/' + dd2 + '</td>');
+                                }
+                                else if (option.Type == "Total No Rooms") {
+
+                                    if (TotalNoRoomsFlag == true) {
+                                        $('#Data > tbody > tr:last').append('<td class="OccupancyHeader">Total</td>');
+                                        $('#Data > tbody').append('<tr></tr>');
+                                        $('#Data > tbody > tr:last').append('<td class="OccupancyHeader">Total No Of Room Nights</td>');
+                                        TotalNoRoomsFlag = false;
+                                    }
+                                    $('#Data > tbody > tr:last').append('<td class="OccupancyDetails">' + option.RoomId + '</td>');
+                                }
+                                else if (option.Type == "Room Occupancy") {
+
+                                    if (RoomOccupancyFlag == true) {
+                                        $('#Data > tbody').append('<tr></tr>');
+                                        $('#Data > tbody > tr:last').append('<td class="OccupancyHeader">Occupied</td>');
+                                        RoomOccupancyFlag = false;
+                                    }
+                                    $('#Data > tbody > tr:last').append('<td class="OccupancyDetails">' + option.RoomId + '</td>');
+                                }
+
+                                else if (option.Type == "Room Available") {
+
+                                    if (RoomAvailableFlag == true) {
+                                        $('#Data > tbody').append('<tr></tr>');
+                                        $('#Data > tbody > tr:last').append('<td class="OccupancyHeader">Available</td>');
+                                        RoomAvailableFlag = false;
+                                    }
+                                    $('#Data > tbody > tr:last').append('<td class="OccupancyDetails">' + option.RoomId + '</td>');
+                                }
+                                else if (option.Type == "Room Per") {
+
+                                    if (RoomPerFlag == true) {
+                                        $('#Data > tbody').append('<tr></tr>');
+                                        $('#Data > tbody > tr:last').append('<td class="OccupancyHeader">Occupancy %</td>');
+                                        RoomPerFlag = false;
+                                    }
+                                    $('#Data > tbody > tr:last').append('<td class="OccupancyDetails">' + option.RoomId + '</td>');
+                                }
+                                else if (option.Type == "Employee") {
+
+                                    if (EmployeeFlag == true) {
+                                        $('#Data > tbody').append('<tr></tr>');
+                                        $('#Data > tbody > tr:last').append('<td class="OccupancyHeader">No.Of Guest</td>');
+                                        EmployeeFlag = false;
+                                    }
+                                    $('#Data > tbody > tr:last').append('<td class="OccupancyDetails">' + option.RoomId + '</td>');
+                                }
+
+
+                            });
+                        }
+                        else {
+                            alertify.error("Data not Available");
+                            $('#Data').empty();
+                            $('#Data1').empty();
+                        }
+
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alertify.error("Failed to retrieve Data");
+
+                    }
+                });
+            }
+            else {
+                alertify.error(Err);
+            }
+
+
+        }    </script>
+</body>
+</html>

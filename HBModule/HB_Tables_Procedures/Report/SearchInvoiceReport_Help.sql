@@ -158,25 +158,36 @@ END
 		
 			
     			
-    INSERT INTO #TempInvoiceBillTotalAmount1(TotalAmount,CheckOutId,ChkInHdrId,BillType,BillAmount)
-	SELECT SUM(CSD.BillAmount),H.Id,H.ChkInHdrId ,CSD.BillType,Csd.BillAmount
-	FROM WRBHBChechkOutHdr H
-	JOIN WRBHBCheckOutSettleHdr  CSH WITH(NOLOCK) ON CSH.ChkOutHdrId=H.Id AND CSH.IsActive=1 AND CSH.IsDeleted=0
-	JOIN WRBHBCheckOutSettleDtl  CSD WITH(NOLOCK) ON CSD.CheckOutSettleHdrId=CSH.Id AND 
-	CSD.IsActive=1 AND CSD.IsDeleted=0	
-	WHERE H.IsActive=1 AND H.IsDeleted=0  
-	GROUP BY H.Id,H.ChkInHdrId,CSD.BillType,Csd.BillAmount
-	ORDER BY Id desc
+ --   INSERT INTO #TempInvoiceBillTotalAmount1(TotalAmount,CheckOutId,ChkInHdrId,BillType,BillAmount)
+	--SELECT SUM(CSD.BillAmount),H.Id,H.ChkInHdrId ,CSD.BillType,Csd.BillAmount
+	--FROM WRBHBChechkOutHdr H
+	--JOIN WRBHBCheckOutSettleHdr  CSH WITH(NOLOCK) ON CSH.ChkOutHdrId=H.Id AND CSH.IsActive=1 AND CSH.IsDeleted=0
+	--JOIN WRBHBCheckOutSettleDtl  CSD WITH(NOLOCK) ON CSD.CheckOutSettleHdrId=CSH.Id AND 
+	--CSD.IsActive=1 AND CSD.IsDeleted=0	
+	--WHERE H.IsActive=1 AND H.IsDeleted=0  
+	--GROUP BY H.Id,H.ChkInHdrId,CSD.BillType,Csd.BillAmount
+	--ORDER BY Id desc
 	
 	INSERT INTO #TempInvoiceBillTotalAmount1(TotalAmount,CheckOutId,ChkInHdrId,BillType,BillAmount)
 	Select SUM(h.ChkOutTariffNetAmount),H.Id,H.ChkInHdrId ,'Tariff',h.ChkOutTariffNetAmount
 	FROM WRBHBChechkOutHdr H
-	where IsActive=1 and IsDeleted=0 and H.Id not in (Select CheckOutId from #TempInvoiceBillTotalAmount1)
-	 and h.ChkOutTariffNetAmount!=0
+	where IsActive=1 and IsDeleted=0 --and H.Id NOT IN (Select CheckOutId from #TempInvoiceBillTotalAmount1)
+	AND h.ChkOutTariffNetAmount!=0
 	GROUP BY H.Id,H.ChkInHdrId, h.ChkOutTariffNetAmount
 	ORDER BY Id desc
+	
+	INSERT INTO #TempInvoiceBillTotalAmount1(TotalAmount,CheckOutId,ChkInHdrId,BillType,BillAmount)
+	Select SUM(H.ChkOutServiceAmtl) AS TotalAmount,B.Id,B.ChkInHdrId ,'Service',H.ChkOutServiceNetAmount
+	FROM WRBHBChechkOutHdr B
+	JOIN WRBHBCheckOutServiceHdr H WITH(NOLOCK) ON B.Id=H.CheckOutHdrId AND H.IsActive=1 AND H.IsDeleted=0
+    JOIN WRBHBCheckOutServiceDtls D WITH(NOLOCK) ON H.Id = D.ServiceHdrId AND D.IsActive=1 AND D.IsDeleted=0
+    WHERE --D.TypeService='Food And Beverages' 
+	 B.IsActive=1 and B.IsDeleted=0 --AND B.Id NOT IN (Select CheckOutId from #TempInvoiceBillTotalAmount1)
+	AND D.ChkOutSerAmount!=0
+	GROUP BY B.Id,B.ChkInHdrId,H.ChkOutServiceNetAmount
+	ORDER BY Id desc
 			
-   INSERT INTO #TempInvoiceBillTariffAmount1(TariffAmount,CheckOutId,ChkInHdrId)
+    INSERT INTO #TempInvoiceBillTariffAmount1(TariffAmount,CheckOutId,ChkInHdrId)
 	SELECT H.ChkOutTariffTotal,H.Id,H.ChkInHdrId
 	FROM WRBHBChechkOutHdr H	
 	WHERE H.IsActive=1 AND H.IsDeleted=0  
@@ -218,7 +229,7 @@ END
 		if(@Str1='')
 		begin
 		Update #TempBillFinal1 Set TariffAmount=BillAmount
-			where BillType='Service'
+		where BillType='Service'
 		SELECT BookingCode,InVoiceNo InvoiceNumber,p.PropertyName+'-'+Location Property,ClientName ClientName, 
 		GuestName GuestName,CheckInDate CheckInDate,CheckOutDate CheckOutDate,Location,
 		TotalAmount,TariffAmount Amount,BillAmount Amounts,BillType BillType,BillId ChkoutId,
@@ -374,7 +385,7 @@ BEGIN
 	 SELECT 'Tariff' AS Type,(ChkOutTariffTotal/NoOfDays) AS TariffAmount ,NoOfDays,(ChkOutTariffTotal/NoOfDays) AS Total
 	 FROM WRBHBChechkOutHdr WHERE Id=@Id1 AND InVoiceNo=@FromDt
 
-	 SELECT LuxuryTaxPer,ServiceTaxPer,VATPer,RestaurantSTPer FROM WRBHBChechkOutHdr
+	 SELECT LuxuryTaxPer,ServiceTaxPer,VATPer,RestaurantSTPer,ISNULL(ServiceChargeChk,0) AS ServiceCharge FROM WRBHBChechkOutHdr
 	 WHERE Id=@Id1 AND InVoiceNo=@FromDt AND IsActive=1 AND IsDeleted=0
 END
 END
@@ -394,13 +405,14 @@ BEGIN
 	 SELECT InVoiceNo,Id AS ChkOutId,PropertyId FROM WRBHBChechkOutHdr WHERE 
 	 Id=@Id1 AND InVoiceNo=@FromDt
 
-	 SELECT ChkOutSerItem AS Item,ChkOutSerAmount AS ServiceAmount,0 AS Quantity,0 AS Total
+	 SELECT ChkOutSerItem AS Item,ChkOutSerAmount AS ServiceAmount,0 AS Quantity,0 AS Total,
+	 0 AS Tax,TypeService
 	 FROM WRBHBCheckOutServiceDtls D 
 	 JOIN WRBHBCheckOutServiceHdr H WITH(NOLOCK)ON D.ServiceHdrId=H.Id AND H.IsActive=1 AND H.IsDeleted=0
 	 JOIN WRBHBChechkOutHdr C WITH(NOLOCK)ON H.CheckOutHdrId=C.Id AND C.IsActive=1 AND C.IsDeleted=0
 	 WHERE C.Id=@Id1 AND C.InVoiceNo=@FromDt AND ChkOutSerAmount !=0
  
-	 SELECT LuxuryTaxPer,ServiceTaxPer,VATPer,RestaurantSTPer FROM WRBHBChechkOutHdr
+	 SELECT LuxuryTaxPer,ServiceTaxPer,VATPer,RestaurantSTPer,ISNULL(ServiceChargeChk,0) AS ServiceCharge FROM WRBHBChechkOutHdr
 	 WHERE Id=@Id1 AND InVoiceNo=@FromDt AND IsActive=1 AND IsDeleted=0;
 END
 END

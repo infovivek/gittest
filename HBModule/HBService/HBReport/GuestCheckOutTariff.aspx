@@ -28,7 +28,7 @@
             InteractiveDeviceInfos="(Collection)" WaitMessageFont-Names="Verdana" 
             WaitMessageFont-Size="14pt" SizeToReportContent="true" ProcessingMode="Local" 
             PromptAreaCollapsed="true" AsyncRendering="false" 
-             ShowExportControls="False">
+             ShowExportControls="False" ShowPrintButton="true">
            
             <LocalReport ReportPath="GuestCheckOutTariff.rdlc">
                 <DataSources>

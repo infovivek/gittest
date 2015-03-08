@@ -1,0 +1,63 @@
+﻿@model test1.Models.MoreDetailsBO
+@{
+    ViewBag.Title = "Aboutproperty";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="booking-cont">
+
+    <div class="container">
+        <div class="col-md-12 col-lg-12 col-sm-12 booking-wrapper">
+            <div class="col-md-12 col-lg-12 col-sm-12 no-padding">
+                <h3 class="bordered">@Model.PptyName</h3>
+            </div>
+
+            <div class="col-md-3 col-lg-3 col-sm-12 no-padding">
+                <img src="@Model.ImageSourse" alt="Property Photo" class="img-responsive" style="width:278px; height:278px;">
+
+
+
+            </div>
+
+
+            <div class="col-md-9 col-lg-9 col-sm-12 coupon-cont">
+                <p>
+                   @Model.About
+                </p>
+                <div class="row">
+                    <!--<div class="col-md-12 col-lg-12 col-sm-12 ameneties">
+                      <ul class="amenetieslist">
+                        <li>
+                          <i class="fa fa-glass fa-2x not-available"><span>Bar</span></i>
+                        </li>
+                        <li>
+                          <i class="fa fa-coffee fa-2x"><span>Coffee Shop</span></i>
+                        </li>
+                        <li>
+                          <i class="fa fa-plane fa-2x not-available"><span>Travel Desk</span></i>
+                        </li>
+                        <li>
+                          <i class="fa fa-cutlery fa-2x"><span>Restaurant</span></i>
+                        </li>
+                        <li>
+                          <i class="fa fa-asterisk fa-2x"><span>Air Conditioned</span></i>
+                        </li>
+                      </ul>
+                    </div>-->
+                </div>
+                <div class="col-md-4 col-lg-4 col-sm-4 no-padding">
+                    <p >
+                        <a href="javascript:window.history.go(-1);">Go back</a>
+                    </p>
+                </div>
+            </div>
+
+
+
+
+        </div>
+
+    </div>
+</div>
+
+

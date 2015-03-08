@@ -15,8 +15,8 @@
 			public static var Global_AC:ArrayCollection = new ArrayCollection();
 			public static var GlobalXml:String = "";
 			public var ClientId:int=0,RangeEnd:String="";
-			public var Column21:String="",Column22:String="",Column23:String="",Column24:String="",Column25:String="";
-			public var Column26:String="",Column27:String="",Column28:String="",Column29:String="",Column30:String="";
+			public var Column22:String="",Column23:String="",Column24:String="",Column25:String="",Column26:String="";
+			public var Column27:String="",Column28:String="",Column29:String="",Column30:String="",Column31:String="";
 			protected function PageLoad():void
 			{
 				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
@@ -75,20 +75,20 @@
 					}
 					if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
 					{
-						Column21=Ds_Objects.result.Tables.Table1.Rows[0].Column1;
-						Column22=Ds_Objects.result.Tables.Table1.Rows[0].Column2;
-						Column23=Ds_Objects.result.Tables.Table1.Rows[0].Column3;
-						Column24=Ds_Objects.result.Tables.Table1.Rows[0].Column4;
-						Column25=Ds_Objects.result.Tables.Table1.Rows[0].Column5;
-						Column26=Ds_Objects.result.Tables.Table1.Rows[0].Column6;
-						Column27=Ds_Objects.result.Tables.Table1.Rows[0].Column7;
-						Column28=Ds_Objects.result.Tables.Table1.Rows[0].Column8;
-						Column29=Ds_Objects.result.Tables.Table1.Rows[0].Column9;
-						Column30=Ds_Objects.result.Tables.Table1.Rows[0].Column10;
+						Column22=Ds_Objects.result.Tables.Table1.Rows[0].Column1;
+						Column23=Ds_Objects.result.Tables.Table1.Rows[0].Column2;
+						Column24=Ds_Objects.result.Tables.Table1.Rows[0].Column3;
+						Column25=Ds_Objects.result.Tables.Table1.Rows[0].Column4;
+						Column26=Ds_Objects.result.Tables.Table1.Rows[0].Column5;
+						Column27=Ds_Objects.result.Tables.Table1.Rows[0].Column6;
+						Column28=Ds_Objects.result.Tables.Table1.Rows[0].Column7;
+						Column29=Ds_Objects.result.Tables.Table1.Rows[0].Column8;
+						Column30=Ds_Objects.result.Tables.Table1.Rows[0].Column9;
+						Column31=Ds_Objects.result.Tables.Table1.Rows[0].Column10;
 					}
 					var Ac:ArrayCollection = new ArrayCollection();
 					Ac = Grd_BookingDtls.dataProvider as ArrayCollection;
-					for(var i:int = 21; i <= 30; i++)
+					for(var i:int = 22; i <= 31; i++)
 					{
 					 (Grd_BookingDtls.columns[i] as DataGridColumn).headerText =this["Column"+i] 
 					}

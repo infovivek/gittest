@@ -132,7 +132,7 @@ BEGIN
 			CheckInDate,CheckOutDate,COH.GuestName
 			FROM WRBHBChechkOutPaymentCash PC
 			JOIN WRBHBChechkOutHdr COH ON PC.ChkOutHdrId=COH.Id AND COH.IsActive=1 AND COH.IsDeleted=0
-			JOIN WRBHBClientManagement CM ON COH.ClientName=CM.ClientName AND CM.IsActive=1 AND CM.IsDeleted=0
+			JOIN WRBHBClientManagement CM ON COH.ClientId=CM.Id AND CM.IsActive=1 AND CM.IsDeleted=0
 			WHERE COH.PropertyId=@Id AND PC.IsActive=1 AND PC.IsDeleted=0
 			GROUP BY Payment,COH.InVoiceNo,COH.Id,CM.Id,COH.Property,COH.PropertyId,
 			CheckInDate,CheckOutDate,GuestName
@@ -149,7 +149,7 @@ BEGIN
 			CheckInDate,CheckOutDate,COH.GuestName
 			FROM WRBHBChechkOutPaymentCheque PC
 			JOIN WRBHBChechkOutHdr COH ON PC.ChkOutHdrId=COH.Id AND COH.IsActive=1 AND COH.IsDeleted=0
-			JOIN WRBHBClientManagement CM ON COH.ClientName=CM.ClientName AND CM.IsActive=1 AND CM.IsDeleted=0
+			JOIN WRBHBClientManagement CM ON COH.ClientId=CM.Id AND CM.IsActive=1 AND CM.IsDeleted=0
 			WHERE COH.PropertyId=@Id AND PC.IsActive=1 AND PC.IsDeleted=0
 			GROUP BY Payment,COH.InVoiceNo,COH.Id,CM.Id,COH.Property,COH.PropertyId,
 			CheckInDate,CheckOutDate,GuestName
@@ -166,7 +166,7 @@ BEGIN
 			CheckInDate,CheckOutDate,COH.GuestName
 			FROM WRBHBChechkOutPaymentCompanyInvoice PC
 			JOIN WRBHBChechkOutHdr COH ON PC.ChkOutHdrId=COH.Id AND COH.IsActive=1 AND COH.IsDeleted=0
-			JOIN WRBHBClientManagement CM ON COH.ClientName=CM.ClientName AND CM.IsActive=1 AND CM.IsDeleted=0
+			JOIN WRBHBClientManagement CM ON COH.ClientId=CM.Id AND CM.IsActive=1 AND CM.IsDeleted=0
 			WHERE COH.PropertyId=@Id AND PC.IsActive=1 AND PC.IsDeleted=0
 			GROUP BY Payment,COH.InVoiceNo,COH.Id,CM.Id,COH.Property,COH.PropertyId,
 			CheckInDate,CheckOutDate,GuestName

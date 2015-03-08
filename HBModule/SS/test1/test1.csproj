@@ -1,0 +1,1245 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{A7E4E370-FB72-4C3B-B883-DA568AD69842}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>test1</RootNamespace>
+    <AssemblyName>test1</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <MvcBuildViews>false</MvcBuildViews>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.Web.Helpers">
+      <HintPath>..\packages\Microsoft.AspNet.WebHelpers.3.2.2\lib\net45\Microsoft.Web.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.2\lib\net45\System.Web.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.2\lib\net45\System.Web.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.2\lib\net45\System.Web.WebPages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.2\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.2\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Abstractions" />
+    <Reference Include="System.Web.Routing" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http">
+    </Reference>
+    <Reference Include="System.Net.Http.WebRequest">
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.0.0\lib\net45\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Optimization">
+      <HintPath>..\packages\Microsoft.AspNet.Web.Optimization.1.1.1\lib\net40\System.Web.Optimization.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <Private>True</Private>
+      <HintPath>..\packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="WebGrease">
+      <Private>True</Private>
+      <HintPath>..\packages\WebGrease.1.5.2\lib\WebGrease.dll</HintPath>
+    </Reference>
+    <Reference Include="Antlr3.Runtime">
+      <Private>True</Private>
+      <HintPath>..\packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="WebMatrix.Data, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.Data.3.2.2\lib\net45\WebMatrix.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="WebMatrix.WebData, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.WebData.3.2.2\lib\net45\WebMatrix.WebData.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.6.0.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\packages\EntityFramework.6.0.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Core">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.1.0.0\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Owin">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.1.0.0\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.EntityFramework">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.EntityFramework.1.0.0\lib\net45\Microsoft.AspNet.Identity.EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="Owin">
+      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin">
+      <HintPath>..\packages\Microsoft.Owin.2.0.0\lib\net45\Microsoft.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Host.SystemWeb">
+      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.2.0.0\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security">
+      <HintPath>..\packages\Microsoft.Owin.Security.2.0.0\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.Facebook">
+      <HintPath>..\packages\Microsoft.Owin.Security.Facebook.2.0.0\lib\net45\Microsoft.Owin.Security.Facebook.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.Cookies">
+      <HintPath>..\packages\Microsoft.Owin.Security.Cookies.2.0.0\lib\net45\Microsoft.Owin.Security.Cookies.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.OAuth">
+      <HintPath>..\packages\Microsoft.Owin.Security.OAuth.2.0.0\lib\net45\Microsoft.Owin.Security.OAuth.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.Google">
+      <HintPath>..\packages\Microsoft.Owin.Security.Google.2.0.0\lib\net45\Microsoft.Owin.Security.Google.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.Twitter">
+      <HintPath>..\packages\Microsoft.Owin.Security.Twitter.2.0.0\lib\net45\Microsoft.Owin.Security.Twitter.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.MicrosoftAccount">
+      <HintPath>..\packages\Microsoft.Owin.Security.MicrosoftAccount.2.0.0\lib\net45\Microsoft.Owin.Security.MicrosoftAccount.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ActionResults\ExcelResult.cs" />
+    <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="App_Start\FilterConfig.cs" />
+    <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="App_Start\Startup.Auth.cs" />
+    <Compile Include="CitywithApiHeader_Result.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ClientAndUserId_Flux_Result.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ClientAndUserId_Result.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ClientManagementHelp.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\DashboardController.cs" />
+    <Compile Include="Controllers\GHReportController.cs" />
+    <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\PayUController.cs" />
+    <Compile Include="Controllers\ReportController.cs" />
+    <Compile Include="Controllers\SearchController.cs" />
+    <Compile Include="DAL\AccountDAL.cs" />
+    <Compile Include="DAO\GHDataDao.cs" />
+    <Compile Include="DecryptPswdClientGuestTable_Result.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DecryptPswd_Result.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="FAdmin.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="FClientLogo.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="FInformation.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="HB.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HB.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="HB.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="HB.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HB.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Mail.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\AccountLoginBO.cs" />
+    <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\APIAvailabilityExistingDataDAO.cs" />
+    <Compile Include="Models\APIDynamic.cs" />
+    <Compile Include="Models\BookingBO.cs" />
+    <Compile Include="Models\BookingFrontEndHelpBO.cs" />
+    <Compile Include="Models\BookingProperty.cs" />
+    <Compile Include="Models\CppExpBookingBO.cs" />
+    <Compile Include="Models\CppExpTRBookingBO.cs" />
+    <Compile Include="Models\CreateLogFiles.cs" />
+    <Compile Include="Models\DropdownList.cs" />
+    <Compile Include="Models\EmployeesBO.cs" />
+    <Compile Include="Models\GHModel.cs" />
+    <Compile Include="Models\IdentityModels.cs" />
+    <Compile Include="Models\InPBookingBO.cs" />
+    <Compile Include="Models\MGHBookingBO.cs" />
+    <Compile Include="Models\MGHTRBookingBO.cs" />
+    <Compile Include="Models\MMTBookingBO.cs" />
+    <Compile Include="Models\MoreDetailsBO.cs" />
+    <Compile Include="Models\Person.cs" />
+    <Compile Include="Models\UserRegisterBO.cs" />
+    <Compile Include="Models\WrbErpConnection.cs" />
+    <Compile Include="Paswword.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RolesRight.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="RowIdSearching_FrontEnd_Result.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="SP_ApartmentBookingPropertyAssingedGuest_Insert_FrontEnd_Result.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="SP_ApartmentBookingProperty_Insert_FrontEnd_Result.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="SP_BedBookingPropertyAssingedGuest_Insert_FrontEnd_Result.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="SP_BedBookingProperty_Insert_FrontEnd_Result.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Sp_BookingGuestDetails_Insert_FrontEnd_Result.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="SP_BookingPropertyAssingedGuest_Insert_FrontEnd_Result.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="SP_BookingPropertyDtls_Help_FrontEnd.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="SP_BookingPropertyDtls_Help_SA2_FrontEnd.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="SP_BookingPropertyDtls_Help_SA_FrontEnd.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="SP_BookingProperty_Insert_FrontEnd_Result.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Sp_Booking_Insert_FrontEnd_Result.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="SP_New_Booking_FrontEnd_Help_First.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="SP_New_Booking_FrontEnd_Help_Second.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Startup.cs" />
+    <Compile Include="sysdiagram.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="TrRequest.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="UserProfile.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Utilitys\Utility.cs" />
+    <Compile Include="webpages_Membership.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="webpages_OAuthMembership.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="webpages_Roles.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBAdjustmentCategory.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBApartmentBookingProperty.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBApartmentBookingPropertyAssingedGuest.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBAPICityCode.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBAPIHeader.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBAPIHeader_FrontEnd.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBAPIHotelHeader.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBAPIHotelHeader_FrontEnd.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBAPIRateMealPlanInclusionDtl.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBAPIRateMealPlanInclusionDtls_FrontEnd.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBAPIRoomRateDtl.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBAPIRoomRateDtls_FrontEnd.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBAPIRoomTypeDtl.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBAPIRoomTypeDtls_FrontEnd.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBAPITariffDtl.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBAPITariffDtls_FrontEnd.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBBankAccount.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBBankTransaction.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBBedBookingProperty.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBBedBookingPropertyAssingedGuest.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBBooking.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBBookingAdvanceAmountPaid.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBBookingCustomFieldsDetail.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBBookingGuestDetail.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBBookingProperty.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBBookingPropertyAssingedGuest.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBBookingPropertyAssingedGuest_FrontEnd.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBBookingTrackingPayment.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBBTCSubmission.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBBTCSubmissionCard.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBBTCSubmissionCash.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBBTCSubmissionCheque.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBBTCSubmissionDetail.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBBTCSubmissionNEFT.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBChechkOutHdr.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBChechkOutPaymentCard.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBChechkOutPaymentCash.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBChechkOutPaymentCheque.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBChechkOutPaymentCompanyInvoice.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBChechkOutPaymentNEFT.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBCheckInHdr.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBCheckOutServiceDtl.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBCheckOutServiceHdr.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBCheckOutSettleDtl.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBCheckOutSettleHdr.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBCity.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBClientColumn.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBClientContactType.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBClientGrade.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBClientGradeValue.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBClientGradeValueDetail.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBClientManagement.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBClientManagementAddClientGuest.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBClientManagementAddNewClient.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBClientManagementCustomField.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBClientSMTP.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBClientwisePricingModel.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBCompanyMaster.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBContarctProductMaster.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBContractClientPref_Details.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBContractClientPref_Header.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBContractManagement.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBContractManagementAppartment.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBContractManagementService.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBContractManagementTariffAppartment.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBContractNonDedicated.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBContractNonDedicatedApartment.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBContractNonDedicatedService.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBContractProductSubMaster.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBDeposit.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBDepositsDlt.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBExpenseGroup.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBExpenseHead.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBExternalChechkOutTAC.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBExternal_Users.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBFeedBckForm.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBFinancialYear.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBGradeMaster.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBImportGuest.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBInternal_Users.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBInvoiceExternalAmount.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBInvoiceExternalAmountMonthGenerated.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBInvoiceMaintenanceAmount.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBInvoiceManagedGHAmount.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBInvoiceManagedGHAmountMonthGenerated.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBInvoiceRentAmount.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBInvoiceRentMonthGeneratedMaintenance.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBInvoiceRentMonthGeneratedRent.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBKOTDtl.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBKOTHdr.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBKOTUser.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBLaundrServiceDtl.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBLaundrServiceHdr.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBLocality.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBMapPOAndVendorPaymentDtl.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBMapPOAndVendorPaymentHdr.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBMapVendor.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBMarkup.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBMasterClientManagement.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBMMTMarkup.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBMMTMarkupHistory.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBNewKOTEntryDtl.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBNewKOTEntryHdr.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBNewKOTUserEntryDtl.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBNewKOTUserEntryHdr.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBNewPCExpenseApproval.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBNewPettyCashApprovalDtl.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBNewPettyCashApprovalHdr.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBOutsourceKOTDtl.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBOutsourceKOTHdr.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBOutsourceServiceItem.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBPCExpenseApproval.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBPettyCash.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBPettyCashApprovalDtl.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBPettyCashApprovalHdr.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBPettyCashHdr.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBPettyCashStatu.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBPettyCashStatusHdr.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBProperty.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBPropertyAgreement.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBPropertyAgreementsAssociationName.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBPropertyAgreementsDetail.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBPropertyAgreementsHistory.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBPropertyAgreementsOwner.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBPropertyAgreementsRoomCharge.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBPropertyAgreementsRoomChargesHistory.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBPropertyAgreementsRoomType.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBPropertyApartment.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBPropertyApartmentHistory.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBPropertyBlock.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBPropertyImage.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBPropertyOwner.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBPropertyOwnerApartment.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBPropertyOwnerOtherContact.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBPropertyOwnerProperty.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBPropertyRoom.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBPropertyRoomBed.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBPropertyRoomBedsHistory.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBPropertyRoomsHistory.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBPropertyType.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBPropertyUser.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBReconcilePayment.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBReconcilePaymentRef.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBReference.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBRole.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBRolesGroup.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBRolesRight.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBScreenMaster.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBSSPCodeGeneration.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBSSPCodeGenerationApartment.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBSSPCodeGenerationRoom.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBSSPCodeGenerationService.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBState.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBStaticHotel.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBStaticHotels123.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBTaxMapping.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBTaxMaster.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBTDSDeclaration.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBTDSSlab.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBTiaAndNTia.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBTransSubsPriceModel.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WrbhbTravelDesk.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBTripAdvicerData.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBUser.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBUserGroup.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBUserRole.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBVendor.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBVendorAdvancePayment.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBVendorCategory.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBVendorChequeApprovalDtl.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBVendorChequeApprovalHdr.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBVendorChequeApprovalNewDtl.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBVendorChequeApprovalNewHdr.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBVendorCost.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBVendorRequest.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBVendorRequestDtl.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBVendorRequestTemp.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBVendorRequestTempDtl.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBVendorRequestType.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBVendorSettlementAdjusmentAdvanceAmount.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBVendorSettlementHdr.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBVendorSettlementInvoiceAmount.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBVendorSettlementPaidAmount.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WRBHBVendorSettlementTACInvoiceAmount.cs">
+      <DependentUpon>HB.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\alertify.bootstrap.css" />
+    <Content Include="Content\alertify.core.css" />
+    <Content Include="Content\alertify.default.css" />
+    <Content Include="Content\bootstrap.css" />
+    <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\css1\bootstrap-theme.css" />
+    <Content Include="Content\css1\bootstrap-theme.min.css" />
+    <Content Include="Content\css1\bootstrap.css" />
+    <Content Include="Content\css1\bootstrap.min.css" />
+    <Content Include="Content\css1\datepicker.css" />
+    <Content Include="Content\css1\font-awesome.css" />
+    <Content Include="Content\css1\font-awesome.min.css" />
+    <Content Include="Content\css1\jquery-ui.css" />
+    <Content Include="Content\css1\jquery-ui.min.css" />
+    <Content Include="Content\css1\jquery-ui.structure.css" />
+    <Content Include="Content\css1\jquery-ui.structure.min.css" />
+    <Content Include="Content\css1\jquery-ui.theme.css" />
+    <Content Include="Content\css1\jquery-ui.theme.min.css" />
+    <Content Include="Content\css1\jquery.autocomplete.css" />
+    <Content Include="Content\css1\owl.carousel.css" />
+    <Content Include="Content\css1\owl.theme.css" />
+    <Content Include="Content\css1\style-mobile.css" />
+    <Content Include="Content\css1\style-pc.css" />
+    <Content Include="Content\css1\style-tab.css" />
+    <Content Include="Content\css1\style.css" />
+    <Content Include="Content\dataTables.fixedColumns.css" />
+    <Content Include="Content\FixedTable.css" />
+    <Content Include="Content\images\glyphicons-halflings-white.png" />
+    <Content Include="Content\images\glyphicons-halflings.png" />
+    <Content Include="Content\images\ui-icons_222222_256x240.png" />
+    <Content Include="Content\images\ui-icons_2e83ff_256x240.png" />
+    <Content Include="Content\images\ui-icons_454545_256x240.png" />
+    <Content Include="Content\images\ui-icons_888888_256x240.png" />
+    <Content Include="Content\images\ui-icons_cd0a0a_256x240.png" />
+    <Content Include="Content\maruti-style.css" />
+    <Content Include="favicon.ico" />
+    <Content Include="fonts\fontawesome-webfont.svg" />
+    <Content Include="fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Global.asax" />
+    <Content Include="Content\Site.css" />
+    <Content Include="images\5stars.png" />
+    <Content Include="images\banner.jpg" />
+    <Content Include="images\client1.png" />
+    <Content Include="images\client2.png" />
+    <Content Include="images\client3.png" />
+    <Content Include="images\client4.png" />
+    <Content Include="images\client5.png" />
+    <Content Include="images\diagram.png" />
+    <Content Include="images\envelope.png" />
+    <Content Include="images\facebook-48.png" />
+    <Content Include="images\filter.jpg" />
+    <Content Include="images\history.jpg" />
+    <Content Include="images\hotel-img.jpg" />
+    <Content Include="images\i_icon.PNG" />
+    <Content Include="images\linkedin-48.png" />
+    <Content Include="images\main-bg.jpg" />
+    <Content Include="images\main-logo.png" />
+    <Content Include="images\main-logo1.png" />
+    <Content Include="images\main-logo2.png" />
+    <Content Include="images\MAP.png" />
+    <Content Include="images\map1.PNG" />
+    <Content Include="images\no-results.png" />
+    <Content Include="images\online.jpg" />
+    <Content Include="images\phone.png" />
+    <Content Include="images\property1.jpg" />
+    <Content Include="images\property2.jpg" />
+    <Content Include="images\property3.jpg" />
+    <Content Include="images\ss_footer.png" />
+    <Content Include="images\sub.jpg" />
+    <Content Include="images\twitter-48.png" />
+    <Content Include="images\x.png" />
+    <Content Include="img\3.jpg" />
+    <Content Include="img\3i.png" />
+    <Content Include="img\aditya.jpg" />
+    <Content Include="img\award.jpg" />
+    <Content Include="img\awards1.jpg" />
+    <Content Include="img\awards_2009.png" />
+    <Content Include="img\banner-2.jpg" />
+    <Content Include="img\banner.jpg" />
+    <Content Include="img\banner2.jpg" />
+    <Content Include="img\businessline-logo.gif" />
+    <Content Include="img\businessline-logo.png" />
+    <Content Include="img\cfo-icon.png" />
+    <Content Include="img\crisil.jpg" />
+    <Content Include="img\dcb.jpg" />
+    <Content Include="img\ddb.jpg" />
+    <Content Include="img\demo-design.png" />
+    <Content Include="img\diamond.png" />
+    <Content Include="img\envelope.png" />
+    <Content Include="img\et-logo.png" />
+    <Content Include="img\facebook-48.png" />
+    <Content Include="img\fb.png" />
+    <Content Include="img\header-bottom-image.png" />
+    <Content Include="img\header-bottom-image1.png" />
+    <Content Include="img\hpcl.png" />
+    <Content Include="img\hr.png" />
+    <Content Include="img\idea.jpg" />
+    <Content Include="img\inc-india-logo.jpg" />
+    <Content Include="img\inc-india-logo.png" />
+    <Content Include="img\jls.jpg" />
+    <Content Include="img\lakme.png" />
+    <Content Include="img\linkedin-48.png" />
+    <Content Include="img\linkedin.png" />
+    <Content Include="img\map.png" />
+    <Content Include="img\media-clients.jpg" />
+    <Content Include="img\mobile.png" />
+    <Content Include="img\news-center-logo.png" />
+    <Content Include="img\online.jpg" />
+    <Content Include="img\orange-patch.png" />
+    <Content Include="img\phone.png" />
+    <Content Include="img\play.png" />
+    <Content Include="img\quotes-grey.png" />
+    <Content Include="img\quotes-orange.png" />
+    <Content Include="img\rallis.jpg" />
+    <Content Include="img\ss-footer-contacts.png" />
+    <Content Include="img\ss_aboutus_icon1.png" />
+    <Content Include="img\ss_banner bg_democratize.png" />
+    <Content Include="img\ss_banner-icons_democratize.png" />
+    <Content Include="img\ss_banner_bg_democratize.png" />
+    <Content Include="img\ss_banner_democratize-with-icons.png" />
+    <Content Include="img\ss_banner_democratize.png" />
+    <Content Include="img\ss_banner_digitalautomation.png" />
+    <Content Include="img\ss_banner_digitalautomation2.png" />
+    <Content Include="img\ss_banner_digitalautomation3.png" />
+    <Content Include="img\ss_banner_digitalautomation_leftarrow.png" />
+    <Content Include="img\ss_banner_digitalautomation_rightarrow.png" />
+    <Content Include="img\ss_bookingtool.png" />
+    <Content Include="img\ss_bookingtool_box1.png" />
+    <Content Include="img\ss_bookingtool_box2.png" />
+    <Content Include="img\ss_bookingtool_box3.png" />
+    <Content Include="img\ss_bookingtool_box4.png" />
+    <Content Include="img\ss_bookingtool_box5.png" />
+    <Content Include="img\ss_bookingtool_box6.png" />
+    <Content Include="img\ss_businessint_bgbottom.png" />
+    <Content Include="img\ss_businessint_bgbottom1.png" />
+    <Content Include="img\ss_businessint_bgtop.png" />
+    <Content Include="img\ss_businessint_bgtop1.png" />
+    <Content Include="img\ss_businessint_button.png" />
+    <Content Include="img\ss_businessint_icon1.png" />
+    <Content Include="img\ss_businessint_icon11.png" />
+    <Content Include="img\ss_businessint_icon2.png" />
+    <Content Include="img\ss_businessint_icon3.png" />
+    <Content Include="img\ss_businessint_icon4.png" />
+    <Content Include="img\ss_businessint_icon5.png" />
+    <Content Include="img\ss_businessint_top.png" />
+    <Content Include="img\ss_clientsay_icon1.png" />
+    <Content Include="img\ss_clientsay_icon2.png" />
+    <Content Include="img\ss_clientsay_icon3.png" />
+    <Content Include="img\ss_clientsay_icon4.png" />
+    <Content Include="img\ss_clientsay_logo1.png" />
+    <Content Include="img\ss_clientsay_logo10.png" />
+    <Content Include="img\ss_clientsay_logo11.png" />
+    <Content Include="img\ss_clientsay_logo12.png" />
+    <Content Include="img\ss_clientsay_logo13.png" />
+    <Content Include="img\ss_clientsay_logo14.png" />
+    <Content Include="img\ss_clientsay_logo15.png" />
+    <Content Include="img\ss_clientsay_logo2.png" />
+    <Content Include="img\ss_clientsay_logo3.png" />
+    <Content Include="img\ss_clientsay_logo4.png" />
+    <Content Include="img\ss_clientsay_logo5.png" />
+    <Content Include="img\ss_clientsay_logo6.png" />
+    <Content Include="img\ss_clientsay_logo7.png" />
+    <Content Include="img\ss_clientsay_logo8.png" />
+    <Content Include="img\ss_clientsay_logo9.png" />
+    <Content Include="img\ss_demo_icon1.png" />
+    <Content Include="img\ss_demo_icon2.png" />
+    <Content Include="img\ss_demo_icon3.png" />
+    <Content Include="img\ss_digitize_corporates.png" />
+    <Content Include="img\ss_digitize_corporates1.png" />
+    <Content Include="img\ss_digitize_corporates_hover.png" />
+    <Content Include="img\ss_digitize_sme.png" />
+    <Content Include="img\ss_digitize_sme_hover.png" />
+    <Content Include="img\ss_digitize_startup.png" />
+    <Content Include="img\ss_digitize_startup_hover.png" />
+    <Content Include="img\ss_element_bird.png" />
+    <Content Include="img\ss_element_bird2.png" />
+    <Content Include="img\ss_element_triangleright1.png" />
+    <Content Include="img\ss_element_triangleright2.png" />
+    <Content Include="img\ss_footer.png" />
+    <Content Include="img\ss_homepage-banner1.jpg" />
+    <Content Include="img\ss_homepage-banner3.jpg" />
+    <Content Include="img\ss_logo.png" />
+    <Content Include="img\ss_media_banner.png" />
+    <Content Include="img\ss_tabs_bg.png" />
+    <Content Include="img\ss_tabs_bg1.png" />
+    <Content Include="img\ss_zipbooking_icon.png" />
+    <Content Include="img\tata.jpg" />
+    <Content Include="img\tatasky.png" />
+    <Content Include="img\tata_projects.jpg" />
+    <Content Include="img\testimonials\ss_testimonials_logo1.png" />
+    <Content Include="img\testimonials\ss_testimonials_logo2.png" />
+    <Content Include="img\testimonials\ss_testimonials_logo3.png" />
+    <Content Include="img\testimonials\ss_testimonials_logo4.png" />
+    <Content Include="img\testimonials\ss_testimonials_logo5.png" />
+    <Content Include="img\testimonials\ss_testimonials_logo6.png" />
+    <Content Include="img\testimonials\ss_testimonials_logo7.png" />
+    <Content Include="img\testimonials\ss_testimonials_logo8.png" />
+    <Content Include="img\travellers.png" />
+    <Content Include="img\twitter-48.png" />
+    <Content Include="img\twitter.png" />
+    <Content Include="img\vodafone.jpg" />
+    <Content Include="img\volvo.jpg" />
+    <Content Include="img\YouTube.jpg" />
+    <Content Include="img\YouTube.png" />
+    <Content Include="property_images\no_image.jpg" />
+    <Content Include="property_images\____Chrysanthemum.jpg" />
+    <Content Include="Scripts\alertify.js" />
+    <Content Include="Scripts\bootstrap.js" />
+    <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="img\ss_tabs_bg1.png_" />
+    <EntityDeploy Include="HB.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>HB.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="HB.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>HB.edmx</DependentUpon>
+      <LastGenOutput>HB.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="HB.edmx.diagram">
+      <DependentUpon>HB.edmx</DependentUpon>
+    </Content>
+    <Content Include="HB.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>HB.edmx</DependentUpon>
+      <LastGenOutput>HB.cs</LastGenOutput>
+    </Content>
+    <Content Include="fonts\fontawesome-webfont.eot" />
+    <Content Include="fonts\fontawesome-webfont.ttf" />
+    <Content Include="fonts\fontawesome-webfont.woff" />
+    <Content Include="fonts\FontAwesome.otf" />
+    <None Include="Properties\PublishProfiles\HBRelease.pubxml" />
+    <Content Include="property_images\no_image.jpg_" />
+    <None Include="Scripts\jquery-1.10.2.intellisense.js" />
+    <Content Include="Scripts\FixedColumn1.js" />
+    <Content Include="Scripts\FixedTable2.js" />
+    <Content Include="Scripts\FixedTable3.js" />
+    <Content Include="Scripts\jquery-1.10.2.js" />
+    <Content Include="Scripts\jquery-1.10.2.min.js" />
+    <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery-ui.js" />
+    <Content Include="Scripts\jquery.validate.js" />
+    <Content Include="Scripts\jquery.validate.min.js" />
+    <Content Include="Scripts\jquery.validate.unobtrusive.js" />
+    <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
+    <Content Include="Scripts\js\bootstrap-datepicker.js" />
+    <Content Include="Scripts\js\bootstrap.js" />
+    <Content Include="Scripts\js\bootstrap.min.js" />
+    <Content Include="Scripts\js\common.js" />
+    <Content Include="Scripts\js\demo.js" />
+    <Content Include="Scripts\js\jquery.js" />
+    <Content Include="Scripts\js\jquery.min.js" />
+    <Content Include="Scripts\js\owl.carousel.js" />
+    <Content Include="Scripts\js\responsive-nav.min.js" />
+    <Content Include="Scripts\js\scripts.js" />
+    <Content Include="Scripts\js\val_scripts.js" />
+    <Content Include="Scripts\modernizr-2.6.2.js" />
+    <Content Include="Scripts\respond.js" />
+    <Content Include="Scripts\respond.min.js" />
+    <Content Include="Scripts\_references.js" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Views\Web.config" />
+    <Content Include="Views\_ViewStart.cshtml" />
+    <Content Include="Views\Shared\Error.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\Home\Contact.cshtml" />
+    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Scripts\jquery-1.10.2.min.map" />
+    <Content Include="Views\Shared\_LoginPartial.cshtml" />
+    <Content Include="Views\Account\Login.cshtml" />
+    <Content Include="Views\Account\New_User.cshtml" />
+    <Content Include="Views\Search\Searchdata.cshtml" />
+    <Content Include="Views\Search\Book.cshtml" />
+    <Content Include="Views\Home\Feature.cshtml" />
+    <Content Include="Views\Home\Demo.cshtml" />
+    <Content Include="Views\Home\Pricing.cshtml" />
+    <Content Include="Views\Home\About_us.cshtml" />
+    <Content Include="Views\Home\Testimonials.cshtml" />
+    <Content Include="Views\Home\Awards.cshtml" />
+    <Content Include="Views\Home\Terms_of_Service.cshtml" />
+    <Content Include="Views\Home\Privacy_Policy.cshtml" />
+    <Content Include="Views\Home\Site_Map.cshtml" />
+    <Content Include="Views\Search\Aboutproperty.cshtml" />
+    <Content Include="Views\Dashboard\Index.cshtml" />
+    <Content Include="Views\Home\Profile.cshtml" />
+    <Content Include="Views\Account\ForgetPassword.cshtml" />
+    <Content Include="Views\Search\MGHBooking.cshtml" />
+    <Content Include="Views\Search\Failure.cshtml" />
+    <Content Include="Views\Search\Success.cshtml" />
+    <Content Include="Views\Search\InPBooking.cshtml" />
+    <Content Include="Views\Search\CppExpBooking.cshtml" />
+    <Content Include="Views\Search\Waiting.cshtml" />
+    <Content Include="Views\Search\NotAvailable.cshtml" />
+    <Content Include="Views\Search\NoItems.cshtml" />
+    <Content Include="Views\Search\Working.cshtml" />
+    <Content Include="Views\PayU\Success.cshtml" />
+    <Content Include="Views\PayU\Failure.cshtml" />
+    <Content Include="Views\Search\MMTBooking.cshtml" />
+    <Content Include="Views\Home\TravellerDetails.cshtml" />
+    <Content Include="Views\GHReport\Index.cshtml" />
+    <Content Include="Views\Search\cppExpTRBooking.cshtml" />
+    <Content Include="Views\Search\MMTTRBooking.cshtml" />
+    <Content Include="Views\Occupancy\OccupancyChart.cshtml" />
+    <Content Include="Views\Dashboard\CityDateReports.cshtml" />
+    <Content Include="Views\Dashboard\CityMonthReports.cshtml" />
+    <Content Include="Views\Dashboard\PaymentReports.cshtml" />
+    <Content Include="Views\Dashboard\PrptyDateReports.cshtml" />
+    <Content Include="Views\Dashboard\PrptyMonthReports.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="App_Data\" />
+    <Folder Include="Excelsheet\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="packages.config" />
+    <None Include="Project_Readme.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
+    <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />
+  </Target>
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>1076</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:1077/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target> -->
+</Project>

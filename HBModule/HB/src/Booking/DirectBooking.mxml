@@ -100,14 +100,14 @@
 				Chk_PaymentEmail.selected = true;
 				resultsTxtField.visible = false;
 				FnHelp_PageLoad();FnHelp_Title();
-				//useWeb("BookingPayment","BookingPayment_CUSTOM",[GlobalXml,"PaymentEmail","","",7160,0]);// payment email
+				//useWeb("BookingPayment","BookingPayment_CUSTOM",[GlobalXml,"PaymentEmail","","",8528,0]);// payment email
 				//var str:String = "12,12,12,12,12.00";
 				//str = str.toLowerCase(); //thi$ i$ a t#%%ible exam73@
 				//var start:Date=new Date();var end:Date=new Date(2015,3,1);				
 				//var num:Number= (end.getUTCFullYear() - start.getUTCFullYear()) * 12 +(end.getUTCMonth() - start.getUTCMonth());								
 				//useWeb("BOOKING","Tab2_to_Tab3_Dtls_CUSTOM",[GlobalXml,'Tab2_to_Tab3_Dtls','','','','',0,0,0,0,0,26,0]);				
 				var ss:String=Global_AC[0].UsrId;				
-				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Room',11223]);
+				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Room',3222]);
 				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,"RoomResend",10709]);				
 				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Bed',9614]);
 				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Apartment',2027]);
@@ -118,8 +118,8 @@
 				var ChkOutDt:String="2015-03-02 12:00:00 PM";
 				CityId = 0;
 				useWeb("API","API_CUSTOM",[GlobalXml,'GetAPIdata',CityId,ChkInDt,ChkOutDt]);*/
-				/*var ChkInDt:String="2015-03-01";
-				var ChkOutDt:String="2015-03-02";
+				/*var ChkInDt:String="2015-03-07";
+				var ChkOutDt:String="2015-03-08";
 				CityId = 0;
 				useWeb("API","GetAPIdataJson_CUSTOM",[GlobalXml,'GetAPIdataJson',CityId,ChkInDt,ChkOutDt]);*/
 				//useWeb("API","123_CUSTOM",[GlobalXml,'StaticData']); // STATIC HOTEL INSERT & UPDATE				

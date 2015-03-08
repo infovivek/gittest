@@ -156,7 +156,9 @@ namespace HB.Dao
                            " <p style=\"margin-top:10px;\">" +
                            " <span>Dear " + Td.FirstName + " </span> " + " <br>" +
                             " </p>" +
-                           " <span>Your account has now been created and you can login by using your email address and password by visiting our website or at the following URL:http://www.staysimplyfied.com </span> " +
+                           " <span>Welcome to Stay Simplyfied. India's first digital automation platform for Business STAY.</span> "+
+                            " <br>" + " </p>" + " <p style=\"margin-top:20px;\">" +
+                           " <span>Your Password has been reset and you can login by using your email address and password by visiting our website or at the following URL:http://www.staysimplyfied.com </span> " +
                            " </p>" +
                            " <p style=\"margin-top:20px;\">" +
                            " <span>We request you to make note of your user credentials.</span> " + "  <br>" +
@@ -167,7 +169,7 @@ namespace HB.Dao
                            " <span>  If you have problems signing in, please call 1800-425-3454 or email us at stay@staysimplyfied.com </span> " + "  <br>" +
                            " </p>" +
                            " <p style=\"margin-top:20px;\">" +
-                           " <span>  We look forward to your patronage and hope you continue to support us. </span> " +
+                           //" <span>  We look forward to your patronage and hope you continue to support us. </span> " +
                            " </p></td></tr></table>";
 
                         string Disclaimer = "";// "This message (including attachment if any)is confidential and may be privileged. Before opening attachments please check them for viruses and defects. HummingBird Travel & Stay Private Limited (HummingBird) will not be responsible for any viruses or defects or any forwarded attachments emanating either from within HummingBird or outside. If you have received this message by mistake please notify the sender by return e-mail and delete this message from your system. Any unauthorized use or dissemination of this message in whole or in part is strictly prohibited. Please note that e-mails are susceptible to change and HummingBird shall not be liable for any improper, untimely or incomplete transmission.";
@@ -305,19 +307,21 @@ namespace HB.Dao
                        " <td width=\"600\" style=\"padding:3px 5px;\">" +
                        " <p style=\"margin-top:10px;\">" +
                        " <span>Dear " + Td.FirstName + " </span> " + " <br>" +
-                        " </p>" +
-                       " <span>Your account has now been created and you can login by using your email address and password by visiting our website or at the following URL:http://www.staysimplyfied.com </span> " +
+                       " </p>" +
+                       " <span>Welcome to Stay Simplyfied. India's first digital automation platform for Business STAY.</span> " +
+                       " <br>" + " </p>" + " <p style=\"margin-top:20px;\">" +
+                       " <span>Your Password has been reset and you can login by using your email address and password by visiting our website or at the following URL:http://www.staysimplyfied.com </span> " +
                        " </p>" +
                        " <p style=\"margin-top:20px;\">" +
                        " <span>We request you to make note of your user credentials.</span> " + "  <br>" +
-                        " </p>" +
+                       " </p>" +
                        " <span style=\"font-weight:bold\"> Username : " + Td.Email + " </span> " + "  <br>" +
                        " <span style=\"font-weight:bold\"> Password : " + ds.Tables[0].Rows[0][2] + " </span> " + "  <br>" +
                        " <p style=\"margin-top:20px;\">" +
                        " <span>  If you have problems signing in, please call 1800-425-3454 or email us at stay@staysimplyfied.com </span> " + "  <br>" +
                        " </p>" +
                        " <p style=\"margin-top:20px;\">" +
-                       " <span>  We look forward to your patronage and hope you continue to support us. </span> " +
+                       //" <span>  We look forward to your patronage and hope you continue to support us. </span> " +
                        " </p></td></tr></table>";
 
                     string Disclaimer = "";//"This message (including attachment if any)is confidential and may be privileged. Before opening attachments please check them for viruses and defects. HummingBird Travel & Stay Private Limited (HummingBird) will not be responsible for any viruses or defects or any forwarded attachments emanating either from within HummingBird or outside. If you have received this message by mistake please notify the sender by return e-mail and delete this message from your system. Any unauthorized use or dissemination of this message in whole or in part is strictly prohibited. Please note that e-mails are susceptible to change and HummingBird shall not be liable for any improper, untimely or incomplete transmission.";
@@ -411,8 +415,10 @@ namespace HB.Dao
                        " <td width=\"600\" style=\"padding:3px 5px;\">" +
                        " <p style=\"margin-top:10px;\">" +
                        " <span>Dear " + Td.FirstName + " </span> " + " <br>" +
-                        " </p>" +
-                       " <span>Your Password has been Changed and you can login by using your email address and password by visiting our website or at the following URL:http://www.staysimplyfied.com </span> " +
+                       " </p>" +
+                       " <span>Welcome to Stay Simplyfied. India's first digital automation platform for Business STAY.</span> " +
+                       " <br>" + " </p>" + " <p style=\"margin-top:20px;\">" +
+                       " <span>Your Password has been reset and you can login by using your email address and password by visiting our website or at the following URL:http://www.staysimplyfied.com </span> " +
                        " </p>" +
                        " <p style=\"margin-top:20px;\">" +
                        " <span>We request you to make note of your user credentials.</span> " + "  <br>" +
@@ -423,7 +429,7 @@ namespace HB.Dao
                        " <span>  If you have problems signing in, please call 1800-425-3454 or email us at stay@staysimplyfied.com </span> " + "  <br>" +
                        " </p>" +
                        " <p style=\"margin-top:20px;\">" +
-                       " <span>  We look forward to your patronage and hope you continue to support us. </span> " +
+                      // " <span>  We look forward to your patronage and hope you continue to support us. </span> " +
                        " </p></td></tr></table>";
 
                     string Disclaimer = "";//"This message (including attachment if any)is confidential and may be privileged. Before opening attachments please check them for viruses and defects. HummingBird Travel & Stay Private Limited (HummingBird) will not be responsible for any viruses or defects or any forwarded attachments emanating either from within HummingBird or outside. If you have received this message by mistake please notify the sender by return e-mail and delete this message from your system. Any unauthorized use or dissemination of this message in whole or in part is strictly prohibited. Please note that e-mails are susceptible to change and HummingBird shall not be liable for any improper, untimely or incomplete transmission.";

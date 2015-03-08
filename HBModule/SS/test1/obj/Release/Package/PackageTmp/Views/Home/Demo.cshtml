@@ -1,0 +1,271 @@
+﻿
+@{
+    ViewBag.Title = "Demo";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="menu">
+    <div class="content-area">
+        <span class="navs col-xs-12 col-sm-4 col-md-3 pointer" onclick="">DEMO<div class="underline"></div></span>
+        <span class="navs col-xs-12 col-sm-4 col-md-3 pointer" onclick="">FEATURES</span>
+        <div class="clearfix"></div>
+    </div>
+</div>
+
+<div class="demo-page-pc">
+    <div class="body-contents demo-body-contents">
+        <div class="content-area stay-width">
+            <div class="demo-page pc">
+                <div class="image-row">
+                    <div class="business col-md-4">
+                        <div class="image" id="business" onclick="Demo.showBusinessTab(this);">
+                            <img src="../img/ss_demo_icon1.png">
+                            <div class="label">BUSINESS TRAVELLER</div>
+                        </div>
+                        <div class="arrow-up"></div>
+                    </div>
+                    <div class="agent col-md-4">
+                        <div class="image" id="agent" onclick="Demo.showAgentTab(this);">
+                            <img src="../img/ss_demo_icon2.png">
+                            <div class="label">TRAVEL DESK</div>
+                        </div>
+                        <div class="arrow-up"></div>
+                    </div>
+                    <div class="manager col-md-4">
+                        <div class="image" id="manager" onclick="Demo.showManagerTab(this);">
+                            <img src="../img/ss_demo_icon3.png">
+                            <div class="label">TRAVEL MANAGER</div>
+                        </div>
+                        <div class="arrow-up"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <img src="../img/demo-design.png" class="side-image">
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="page-popups" id="business-popup">
+        <div class="content-area">
+            <div class="images col-md-4">
+                <img src="../img/play.png">
+                <div class="label">Business Traveller - Sign In</div>
+            </div>
+            <div class="images col-md-4">
+                <img src="../img/play.png">
+                <div class="label">Business Traveller - Search</div>
+            </div>
+            <div class="images col-md-4">
+                <img src="../img/play.png">
+                <div class="label">Business Traveller -  Property Overview</div>
+            </div>
+            <div class="images col-md-4">
+                <img src="../img/play.png">
+                <div class="label">Business Traveller - Confirm</div>
+            </div>
+            <div class="images col-md-4">
+                <img src="../img/play.png">
+                <div class="label">Business Traveller - Payment</div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <img src="../img/demo-design.png" class="design-image">
+    </div>
+
+    <div class="page-popups" id="agent-popup">
+        <div class="content-area">
+            <div class="images col-md-4">
+                <img src="../img/play.png">
+                <div class="label">Traveller Agent - Sign In</div>
+            </div>
+            <div class="images col-md-4">
+                <img src="../img/play.png">
+                <div class="label">Traveller Agent - Search</div>
+            </div>
+            <div class="images col-md-4">
+                <img src="../img/play.png">
+                <div class="label">Traveller Agent -  Property Overview</div>
+            </div>
+            <div class="images col-md-4">
+                <img src="../img/play.png">
+                <div class="label">Traveller Agent - Confirm</div>
+            </div>
+            <div class="images col-md-4">
+                <img src="../img/play.png">
+                <div class="label">Traveller Agent - Payment</div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <img src="../img/demo-design.png" class="design-image">
+    </div>
+
+    <div class="page-popups" id="manager-popup">
+        <div class="content-area">
+            <div class="images col-md-4">
+                <img src="../img/play.png">
+                <div class="label">Traveller Manager - Sign In</div>
+            </div>
+            <div class="images col-md-4">
+                <img src="../img/play.png">
+                <div class="label">Traveller Manager - Search</div>
+            </div>
+            <div class="images col-md-4">
+                <img src="../img/play.png">
+                <div class="label">Traveller Manager -  Property Overview</div>
+            </div>
+            <div class="images col-md-4">
+                <img src="../img/play.png">
+                <div class="label">Traveller Manager - Confirm</div>
+            </div>
+            <div class="images col-md-4">
+                <img src="../img/play.png">
+                <div class="label">Traveller Manager - Payment</div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <img src="../img/demo-design.png" class="design-image">
+    </div>
+</div>
+
+
+<div class="ss-footer-contacts demo-footer col-md-12">
+    <div class="content-area">
+        <h2>If you are responsible for travel management for your organization:</h2>
+        <div class="points-container">
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <div class="numeral odd pull-left">1</div>
+                <div class="text pull-left"> Click 'register' to sign up with us</div>
+            </div>
+
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <div class="numeral even pull-left">2</div>
+                <div class="text pull-left"> Get your account activated instantly</div>
+            </div>
+
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <div class="numeral odd pull-left">3</div>
+                <div class="text pull-left"> Start making bookings right away</div>
+            </div>
+
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <div class="numeral even pull-left">4</div>
+                <div class="text pull-left">
+                    Monitor and track stay costs! Alternatively, click the 'Get A Free Consultation' button and fill in the details,
+                    and we will reach out to you and help you get started with saving on your stay costs!
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+<div class="demo-page-tab-mobile">
+    <div class="title-image col-xs-12 col-sm-12">
+        <div class="image">
+            <img src="../img/ss_demo_icon1.png">
+            <div class="label">BUSINESS TRAVELLER</div>
+        </div>
+    </div>
+    <div class="page-popups col-xs-12 col-sm-12">
+        <div class="arrow-up"></div>
+        <div class="images col-xs-12 col-sm-6">
+            <img src="../img/play.png">
+            <div class="label">Business Traveller - Sign In</div>
+        </div>
+        <div class="images col-xs-12 col-sm-6">
+            <img src="../img/play.png">
+            <div class="label">Business Traveller - Search</div>
+        </div>
+        <div class="images col-xs-12 col-sm-6">
+            <img src="../img/play.png">
+            <div class="label">Business Traveller -  Property Overview</div>
+        </div>
+        <div class="images col-xs-12 col-sm-6">
+            <img src="../img/play.png">
+            <div class="label">Business Traveller - Confirm</div>
+        </div>
+        <div class="images col-xs-12 col-sm-6">
+            <img src="../img/play.png">
+            <div class="label">Business Traveller - Payment</div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="clearfix"></div>
+</div>
+
+
+<div class="demo-page-tab-mobile">
+    <div class="title-image col-xs-12 col-sm-12">
+        <div class="image">
+            <img src="../img/ss_demo_icon2.png">
+            <div class="label">TRAVEL AGENT</div>
+        </div>
+    </div>
+    <div class="page-popups col-xs-12 col-sm-12">
+        <div class="arrow-up"></div>
+        <div class="images col-xs-12 col-sm-6">
+            <img src="../img/play.png">
+            <div class="label">Traveller Agent - Sign In</div>
+        </div>
+        <div class="images col-xs-12 col-sm-6">
+            <img src="../img/play.png">
+            <div class="label">Traveller Agent - Search</div>
+        </div>
+        <div class="images col-xs-12 col-sm-6">
+            <img src="../img/play.png">
+            <div class="label">Traveller Agent -  Property Overview</div>
+        </div>
+        <div class="images col-xs-12 col-sm-6">
+            <img src="../img/play.png">
+            <div class="label">Traveller Agent - Confirm</div>
+        </div>
+        <div class="images col-xs-12 col-sm-6">
+            <img src="../img/play.png">
+            <div class="label">Traveller Agent - Payment</div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="clearfix"></div>
+</div>
+
+
+<div class="demo-page-tab-mobile">
+    <div class="title-image col-xs-12 col-sm-12">
+        <div class="image">
+            <img src="../img/ss_demo_icon3.png">
+            <div class="label">TRAVEL MANAGER</div>
+        </div>
+    </div>
+    <div class="page-popups col-xs-12 col-sm-12">
+        <div class="arrow-up"></div>
+        <div class="images col-xs-12 col-sm-6">
+            <img src="../img/play.png">
+            <div class="label">Traveller Manager - Sign In</div>
+        </div>
+        <div class="images col-xs-12 col-sm-6">
+            <img src="../img/play.png">
+            <div class="label">Traveller Manager - Search</div>
+        </div>
+        <div class="images col-xs-12 col-sm-6">
+            <img src="../img/play.png">
+            <div class="label">Traveller Manager -  Property Overview</div>
+        </div>
+        <div class="images col-xs-12 col-sm-6">
+            <img src="../img/play.png">
+            <div class="label">Traveller Manager - Confirm</div>
+        </div>
+        <div class="images col-xs-12 col-sm-6">
+            <img src="../img/play.png">
+            <div class="label">Traveller Manager - Payment</div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="clearfix"></div>
+</div>
+
+

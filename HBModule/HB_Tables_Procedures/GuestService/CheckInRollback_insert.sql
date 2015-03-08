@@ -18,19 +18,20 @@ CREATE PROCEDURE [dbo].[SP_CheckInRollback_insert](@RoomId BIGINT,@PropertyId BI
 @Chkindate NVARCHAR(100)=NULL,@ChkoutDate NVARCHAR(100),
 @GuestName NVARCHAR(100)=NULL,@Property NVARCHAR(MAX)=NULL,@BookingCode NVARCHAR(100)=NULL,
 @CreatedBy INT,@ApartmentId INT=NULL,@BedId INT=NULL,@Type NVARCHAR(100),
-@BookingLevel NVARCHAR(100),@ChangedStatus NVARCHAR(100),@CheckInHdrId INT=NULL)
+@BookingLevel NVARCHAR(100),@ChangedStatus NVARCHAR(100),@CheckInHdrId INT=NULL,
+@Remarks NVARCHAR(MAX)=NULL)
 
 AS
 BEGIN
 DECLARE @InsId INT;
 INSERT INTO WRBHBCheckInRollback(RoomId,PropertyId,BookingId,
 GuestId,Chkindate,ChkoutDate,GuestName,Property,BookingCode,
-ApartmentId,BedId,CheckInHdrId,Type,BookingLevel,ChangedStatus,
+ApartmentId,BedId,CheckInHdrId,Type,BookingLevel,ChangedStatus,Remarks,
 CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId)
 
 VALUES(@RoomId,@PropertyId,@BookingId,@GuestId,@Chkindate,@ChkoutDate,
 @GuestName,@Property,@BookingCode,@ApartmentId,@BedId,@CheckInHdrId,@Type,
-@BookingLevel,@ChangedStatus,@CreatedBy,GETDATE(),@CreatedBy,
+@BookingLevel,@ChangedStatus,@Remarks,@CreatedBy,GETDATE(),@CreatedBy,
 GETDATE(),1,0,NEWID())
 
 SET @InsId=@@IDENTITY;

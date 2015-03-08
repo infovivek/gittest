@@ -1,0 +1,1170 @@
+﻿@model test1.Models.EmployeesBO
+@{
+    ViewBag.Title = "TravellerDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<style type="text/css">
+    .ui-autocomplete {
+        height: 160px;
+        overflow-y: scroll;
+        overflow-x: hidden;
+    }
+</style>
+
+
+
+<h2 style="margin-left:38%;">Traveller's Details</h2>
+@using (Html.BeginForm("TravellerDetailsSave", "Home"))
+{
+    <fieldset style="margin-top:3%;margin-left:2%;">
+        <span>Traveller's Count:@Model.count</span>
+        @Html.HiddenFor(m => m.count)
+        @Html.HiddenFor(m => m.destination)
+        @Html.HiddenFor(m => m.room1)
+        @Html.HiddenFor(m => m.room2)
+        @Html.HiddenFor(m => m.room3)
+        @Html.HiddenFor(m => m.room4)
+        @Html.HiddenFor(m => m.room5)
+        @Html.HiddenFor(m => m.Adult)
+        @Html.HiddenFor(m => m.checkin)
+        @Html.HiddenFor(m => m.checkout)
+        <table border="1">
+            <tbody>
+                <tr>
+                    <th>
+                        Employee Code
+                    </th>
+                    <th>
+                        First Name
+                    </th>
+                    <th>
+                        Last Name
+                    </th>
+                    <th>
+                        Email
+                    </th>
+                    <th>
+                        Phone No
+                    </th>
+                    <th>
+                        Grade
+                    </th>
+
+                </tr>
+
+                @if (Model.count > 0)
+                {
+                    <tr id="row1">
+                        <td>
+                            @Html.TextBoxFor(model => model.EmpCode1, new { @id = "emp1" })
+                            @*<input type="text" id="emp1" name="emp1">*@
+
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.First_Name1, new { @id = "f1" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.Last_Name1, new { @id = "l1" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.email1, new { @id = "e1" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.Phno1, new { @id = "p1" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.Grade1, new { @id = "g1" })
+                        </td>
+                    </tr>
+                }
+                @if (Model.count > 1)
+                {
+                    <tr id="row2">
+                        <td>
+                            @Html.TextBoxFor(model => model.EmpCode2, new { onkeypress = "autocompete2()", @id = "emp2" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.First_Name2, new { @id = "f2" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.Last_Name2, new { @id = "l2" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.email2, new { @id = "e2" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.Phno2, new { @id = "p2" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.Grade2, new { @id = "g2" })
+                        </td>
+                    </tr>
+                }
+                @if (Model.count > 2)
+                {
+                    <tr id="row3">
+                        <td>
+                            @Html.TextBoxFor(model => model.EmpCode3, new { onkeypress = "autocompete3()", @id = "emp3" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.First_Name3, new { @id = "f3" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.Last_Name3, new { @id = "l3" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.email3, new { @id = "e3" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.Phno3, new { @id = "p3" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.Grade3, new { @id = "g3" })
+                        </td>
+                    </tr>
+                }
+                @if (Model.count > 3)
+                {
+
+                    <tr id="row4">
+                        <td>
+                            @Html.TextBoxFor(model => model.EmpCode4, new { onkeypress = "autocompete4()", @id = "emp4" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.First_Name4, new { @id = "f4" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.Last_Name4, new { @id = "l4" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.email4, new { @id = "e4" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.Phno4, new { @id = "p4" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.Grade4, new { @id = "g4" })
+                        </td>
+                    </tr>
+                }
+                @if (Model.count > 4)
+                {
+
+                    <tr id="row5">
+                        <td>
+                            @Html.TextBoxFor(model => model.EmpCode5, new { onkeypress = "autocompete5()", @id = "emp5" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.First_Name5, new { @id = "f5" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.Last_Name5, new { @id = "l5" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.email5, new { @id = "e5" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.Phno5, new { @id = "p5" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.Grade5, new { @id = "g5" })
+                        </td>
+                    </tr>
+                }
+                @if (Model.count > 5)
+                {
+                    <tr id="row6">
+                        <td>
+                            @Html.TextBoxFor(model => model.EmpCode6, new { onkeypress = "autocompete6()", @id = "emp6" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.First_Name6, new { @id = "f6" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.Last_Name6, new { @id = "l6" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.email6, new { @id = "e6" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.Phno6, new { @id = "p6" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.Grade6, new { @id = "g6" })
+                        </td>
+                    </tr>
+                }
+                @if (Model.count > 6)
+                {
+
+                    <tr id="row7">
+                        <td>
+                            @Html.TextBoxFor(model => model.EmpCode7, new { onkeypress = "autocompete7()", @id = "emp7" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.First_Name7, new { @id = "f7" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.Last_Name7, new { @id = "l7" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.email7, new { @id = "e7" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.Phno7, new { @id = "p7" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.Grade7, new { @id = "g7" })
+                        </td>
+                    </tr>
+                }
+                @if (Model.count > 7)
+                {
+
+                    <tr id="row8">
+                        <td>
+                            @Html.TextBoxFor(model => model.EmpCode8, new { onkeypress = "autocompete8()", @id = "emp8" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.First_Name8, new { @id = "f8" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.Last_Name8, new { @id = "l8" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.email8, new { @id = "e8" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.Phno8, new { @id = "p8" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.Grade8, new { @id = "g8" })
+                        </td>
+                    </tr>
+                }
+                @if (Model.count > 8)
+                {
+
+                    <tr id="row9">
+                        <td>
+                            @Html.TextBoxFor(model => model.EmpCode9, new { onkeypress = "autocompete9()", @id = "emp9" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.First_Name9, new { @id = "f9" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.Last_Name9, new { @id = "l9" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.email9, new { @id = "e9" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.Phno9, new { @id = "p9" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.Grade9, new { @id = "g9" })
+                        </td>
+                    </tr>
+                }
+                @if (Model.count > 9)
+                {
+                    <tr id="row10">
+                        <td>
+                            @Html.TextBoxFor(model => model.EmpCode10, new { onkeypress = "autocompete10()", @id = "emp10" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.First_Name10, new { @id = "f10" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.Last_Name10, new { @id = "l10" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.email10, new { @id = "e10" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.Phno10, new { @id = "p10" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.Grade10, new { @id = "g10" })
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <br />
+        <button style="margin-left:40%" class="button topsearch" type="submit" onclick="return message()">continue</button>
+        @*<input type="submit" class="button topsearch" value="continue" onclick="">*@
+    </fieldset>
+}
+
+<script type="text/javascript">
+    function message() {      
+
+        var errmsg = ''; var gradeerror = ''; var grade = '';
+        if ($("#row1").is(':visible')) {
+
+            var fname = $("#f1").val();
+            var lname = $("#l1").val();
+            var em = $("#e1").val();
+            var gr = $("#g1").val();
+            var phno = $("#p1").val();
+            if (fname == "" || lname == "" || em == "" || phno == "") {
+
+                errmsg = "Please enter the all the required fields at s.no:1 on traveller details Table, "
+            }
+            if (gr != '') {
+                grade = gr;
+            }
+        }
+
+
+        var fname = $("#f2").val();
+        var lname = $("#l2").val();
+        var em = $("#e2").val();
+        var gr = $("#g2").val();
+        var phno = $("#p2").val();
+        if (fname == "" || lname == "" || em == "" || phno == "") {
+
+            errmsg += "Please enter the all the required fields at s.no:2 on traveller details Table, "
+        }
+        if (gr == '') {
+            grade = grade;
+        }
+        else {
+            if (gr != '' && grade != '' && gr != grade) {
+                gradeerror += "error";
+            }
+            else {
+                grade = gr;
+            }
+        }
+
+        if ($("#row3").is(':visible')) {
+
+            var fname = $("#f3").val();
+            var lname = $("#l3").val();
+            var em = $("#e3").val();
+            var gr = $("#g3").val();
+            var phno = $("#p3").val();
+            if (fname == "" || lname == "" || em == "" || phno == "") {
+
+                errmsg += "Please enter the all the required fields at s.no:3 on traveller details Table, "
+            }
+            if (gr == '') {
+                grade = grade;
+            }
+            else {
+                if (gr != '' && grade != '' && gr != grade) {
+                    gradeerror += "error";
+                }
+                else {
+                    grade = gr;
+                }
+            }
+        }
+        if ($("#row4").is(':visible')) {
+
+            var fname = $("#f4").val();
+            var lname = $("#l4").val();
+            var em = $("#e4").val();
+            var gr = $("#g4").val();
+            var phno = $("#p4").val();
+            if (fname == "" || lname == "" || em == "" || phno == "") {
+
+                errmsg += "Please enter the all the required fields at s.no:4 on traveller details Table, "
+            }
+            if (gr == '') {
+                grade = grade;
+            }
+            else {
+                if (gr != '' && grade != '' && gr != grade) {
+                    gradeerror += "error";
+                }
+                else {
+                    grade = gr;
+                }
+            }
+        }
+        if ($("#row5").is(':visible')) {
+
+            var fname = $("#f5").val();
+            var lname = $("#l5").val();
+            var em = $("#e5").val();
+            var gr = $("#g5").val();
+            var phno = $("#p5").val();
+            if (fname == "" || lname == "" || em == "" || phno == "") {
+
+                errmsg += "Please enter the all the required fields at s.no:5 on traveller details Table, "
+            }
+            if (gr == '') {
+                grade = grade;
+            }
+            else {
+                if (gr != '' && grade != '' && gr != grade) {
+                    gradeerror += "error";
+                }
+                else {
+                    grade = gr;
+                }
+            }
+        }
+        if ($("#row6").is(':visible')) {
+
+            var fname = $("#f6").val();
+            var lname = $("#l6").val();
+            var em = $("#e6").val();
+            var gr = $("#g6").val();
+            var phno = $("#p6").val();
+            if (fname == "" || lname == "" || em == "" || phno == "") {
+
+                errmsg += "Please enter the all the required fields at s.no:6 on traveller details Table, "
+            }
+            if (gr == '') {
+                grade = grade;
+            }
+            else {
+                if (gr != '' && grade != '' && gr != grade) {
+                    gradeerror += "error";
+                }
+                else {
+                    grade = gr;
+                }
+            }
+        }
+        if ($("#row7").is(':visible')) {
+
+            var fname = $("#f7").val();
+            var lname = $("#l7").val();
+            var em = $("#e7").val();
+            var gr = $("#g7").val();
+            var phno = $("#p7").val();
+            if (fname == "" || lname == "" || em == "" || phno == "") {
+
+                errmsg += "Please enter the all the required fields at s.no:7 on traveller details Table, "
+            }
+            if (gr == '') {
+                grade = grade;
+            }
+            else {
+                if (gr != '' && grade != '' && gr != grade) {
+                    gradeerror += "error";
+                }
+                else {
+                    grade = gr;
+                }
+            }
+        }
+        if ($("#row8").is(':visible')) {
+
+            var fname = $("#f8").val();
+            var lname = $("#l8").val();
+            var em = $("#e8").val();
+            var gr = $("#g8").val();
+            var phno = $("#p8").val();
+            if (fname == "" || lname == "" || em == "" || phno == "") {
+
+                errmsg += "Please enter the all the required fields at s.no:8 on traveller details Table, "
+            }
+            if (gr == '') {
+                grade = grade;
+            }
+            else {
+                if (gr != '' && grade != '' && gr != grade) {
+                    gradeerror += "error";
+                }
+                else {
+                    grade = gr;
+                }
+            }
+        }
+        if ($("#row9").is(':visible')) {
+
+            var fname = $("#f9").val();
+            var lname = $("#l9").val();
+            var em = $("#e9").val();
+            var gr = $("#g9").val();
+            var phno = $("#p9").val();
+            if (fname == "" || lname == "" || em == "" || phno == "") {
+
+                errmsg += "Please enter the all the required fields at s.no:9 on traveller details Table, "
+            }
+            if (gr == '') {
+                grade = grade;
+            }
+            else {
+                if (gr != '' && grade != '' && gr != grade) {
+                    gradeerror += "error";
+                }
+                else {
+                    grade = gr;
+                }
+            }
+        }
+        if ($("#row10").is(':visible')) {
+
+            var fname = $("#f10").val();
+            var lname = $("#l10").val();
+            var em = $("#e10").val();
+            var gr = $("#g10").val();
+            var phno = $("#p10").val();
+            if (fname == "" || lname == "" || em == "" || phno == "") {
+
+                errmsg += "Please enter the all the required fields at s.no:10 on traveller details Table, "
+            }
+        }
+        if (gr == '') {
+            grade = grade;
+        }
+        else {
+            if (gr != '' && grade != '' && gr != grade) {
+                gradeerror += "error";
+            }
+            else {
+                grade = gr;
+            }
+        }
+        if (errmsg != '') {
+            alert(errmsg);
+            return false;
+        }
+        if (gradeerror != '') {
+            alert("All Travellers Grade should be same");
+            return false;
+        }
+    }
+
+    function autocompete2() {
+        var availableTags1 = [];
+        var word = $("#emp2").val();
+        var leng = word.length;
+        if (word != "" && leng >= 1) {
+            $.ajax({
+                url: "/Home/Autocomplete/",
+                dataType: "JSON",
+                data: { empcode: word },
+                cache: false,
+                type: "GET",
+                success: function (data) {
+                    $.each(data, function (id, option) {
+                        availableTags1.push(option.EmpCode);
+                    })
+                    $("#emp2").autocomplete({
+                        source: availableTags1
+                    });
+                }
+            });
+        }
+    }
+
+    function autocompete3() {
+        var availableTags1 = [];
+        var word = $("#emp3").val();
+        var leng = word.length;
+        if (word != "" && leng >= 1) {
+            $.ajax({
+                url: "/Home/Autocomplete/",
+                dataType: "JSON",
+                data: { empcode: word },
+                cache: false,
+                type: "GET",
+                success: function (data) {
+                    $.each(data, function (id, option) {
+                        availableTags1.push(option.EmpCode);
+                    })
+                    $("#emp3").autocomplete({
+                        source: availableTags1
+                    });
+                }
+            });
+        }
+    }
+
+    function autocompete4() {
+        var availableTags1 = [];
+        var word = $("#emp4").val();
+        var leng = word.length;
+        if (word != "" && leng >= 1) {
+            $.ajax({
+                url: "/Home/Autocomplete/",
+                dataType: "JSON",
+                data: { empcode: word },
+                cache: false,
+                type: "GET",
+                success: function (data) {
+                    $.each(data, function (id, option) {
+                        availableTags1.push(option.EmpCode);
+                    })
+                    $("#emp4").autocomplete({
+                        source: availableTags1
+                    });
+                }
+            });
+        }
+    }
+
+    function autocompete5() {
+        var availableTags1 = [];
+        var word = $("#emp5").val();
+        var leng = word.length;
+        if (word != "" && leng >= 1) {
+            $.ajax({
+                url: "/Home/Autocomplete/",
+                dataType: "JSON",
+                data: { empcode: word },
+                cache: false,
+                type: "GET",
+                success: function (data) {
+                    $.each(data, function (id, option) {
+                        availableTags1.push(option.EmpCode);
+                    })
+                    $("#emp5").autocomplete({
+                        source: availableTags1
+                    });
+                }
+            });
+        }
+    }
+
+    function autocompete6() {
+        var availableTags1 = [];
+        var word = $("#emp6").val();
+        var leng = word.length;
+        if (word != "" && leng >= 1) {
+            $.ajax({
+                url: "/Home/Autocomplete/",
+                dataType: "JSON",
+                data: { empcode: word },
+                cache: false,
+                type: "GET",
+                success: function (data) {
+                    $.each(data, function (id, option) {
+                        availableTags1.push(option.EmpCode);
+                    })
+                    $("#emp6").autocomplete({
+                        source: availableTags1
+                    });
+                }
+            });
+        }
+    }
+
+    function autocompete7() {
+        var availableTags1 = [];
+        var word = $("#emp7").val();
+        var leng = word.length;
+        if (word != "" && leng >= 1) {
+            $.ajax({
+                url: "/Home/Autocomplete/",
+                dataType: "JSON",
+                data: { empcode: word },
+                cache: false,
+                type: "GET",
+                success: function (data) {
+                    $.each(data, function (id, option) {
+                        availableTags1.push(option.EmpCode);
+                    })
+                    $("#emp7").autocomplete({
+                        source: availableTags1
+                    });
+                }
+            });
+        }
+    }
+
+    function autocompete8() {
+        var availableTags1 = [];
+        var word = $("#emp8").val();
+        var leng = word.length;
+        if (word != "" && leng >= 1) {
+            $.ajax({
+                url: "/Home/Autocomplete/",
+                dataType: "JSON",
+                data: { empcode: word },
+                cache: false,
+                type: "GET",
+                success: function (data) {
+                    $.each(data, function (id, option) {
+                        availableTags1.push(option.EmpCode);
+                    })
+                    $("#emp8").autocomplete({
+                        source: availableTags1
+                    });
+                }
+            });
+        }
+    }
+
+    function autocompete9() {
+        var availableTags1 = [];
+        var word = $("#emp9").val();
+        var leng = word.length;
+        if (word != "" && leng >= 1) {
+            $.ajax({
+                url: "/Home/Autocomplete/",
+                dataType: "JSON",
+                data: { empcode: word },
+                cache: false,
+                type: "GET",
+                success: function (data) {
+                    $.each(data, function (id, option) {
+                        availableTags1.push(option.EmpCode);
+                    })
+                    $("#emp9").autocomplete({
+                        source: availableTags1
+                    });
+                }
+            });
+        }
+    }
+
+    function autocompete10() {
+        var availableTags1 = [];
+        var word = $("#emp10").val();
+        var leng = word.length;
+        if (word != "" && leng >= 1) {
+            $.ajax({
+                url: "/Home/Autocomplete/",
+                dataType: "JSON",
+                data: { empcode: word },
+                cache: false,
+                type: "GET",
+                success: function (data) {
+                    $.each(data, function (id, option) {
+                        availableTags1.push(option.EmpCode);
+                    })
+                    $("#emp10").autocomplete({
+                        source: availableTags1
+                    });
+                }
+            });
+        }
+    }
+
+
+
+    $(document).ready(function () {
+
+        var customer1 = new Array();
+        $("#emp1").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "/Home/Autocomplete/",
+                    type: "POST",
+                    dataType: "json",
+                    data: { empcode: request.term },
+                    success: function (data) {                        
+                        response(data, function (item) {
+                            for (var i = 0; i < data.length ; i++) {
+                                customer1[i] = { label: item[i].emp1, Id: item[i].emp1 };
+                            }
+                        })
+                    }
+                })
+                response(customer1);
+            },
+            select: function (event, ui) {
+                $.ajax({
+                    cache: false,
+                    async: false,
+                    type: "GET",
+                    url: "/Home/EmployeeDetails/",
+                    data: { code: ui.item.value },
+                    success: function (data) {
+
+                        $("#f1").val(data.FirstName)
+                        $("#l1").val(data.LastName)
+                        $("#p1").val(data.GMobileNo)
+                        $("#g1").val(data.Grade)
+                        $("#e1").val(data.EmailId)
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve Client Details');
+                    }
+                });
+            }
+        });
+
+        if ($("#emp2").is(':visible')) {
+            var customer2 = new Array();
+            //var word2 = $("#emp2").val();
+            $("#emp2").autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: "/Home/Autocomplete/",
+                        type: "POST",
+                        dataType: "json",
+                        data: { empcode: request.term },
+                        success: function (data) {                            
+                            response(data, function (item) {
+                                for (var i = 0; i < data.length ; i++) {
+                                    customer2[i] = { label: item[i].emp2, Id: item[i].emp2 };
+                                }
+                            })
+                        }
+
+                    })
+                    response(customer2);
+                },
+                select: function (event, ui) {
+                    $.ajax({
+                        cache: false,
+                        async: false,
+                        type: "GET",
+                        url: "/Home/EmployeeDetails/",
+                        data: { code: ui.item.value },
+                        success: function (data) {                            
+                            $("#f2").val(data.FirstName)
+                            $("#l2").val(data.LastName)
+                            $("#p2").val(data.GMobileNo)
+                            $("#g2").val(data.Grade)
+                            $("#e2").val(data.EmailId)
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            alert('Failed to retrieve Client Details');
+                        }
+                    });
+                }
+            });
+        }
+        if ($("#emp3").is(':visible')) {
+            var customer3 = new Array();
+
+            $("#emp3").autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: "/Home/Autocomplete/",
+                        type: "POST",
+                        dataType: "json",
+                        data: { empcode: request.term },
+                        success: function (data) {
+
+                            response(data, function (item) {
+                                for (var i = 0; i < data.length ; i++) {
+                                    customer3[i] = { label: item[i].emp3, Id: item[i].emp3 };
+                                }
+                            })
+                        }
+
+                    })
+                    response(customer3);
+                },
+                select: function (event, ui) {
+                    $.ajax({
+                        cache: false,
+                        async: false,
+                        type: "GET",
+                        url: "/Home/EmployeeDetails/",
+                        data: { code: ui.item.value },
+                        success: function (data) {                            
+                            $("#f3").val(data.FirstName)
+                            $("#l3").val(data.LastName)
+                            $("#p3").val(data.GMobileNo)
+                            $("#g3").val(data.Grade)
+                            $("#e3").val(data.EmailId)
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            alert('Failed to retrieve Client Details');
+                        }
+                    });
+                }
+            });
+        }
+        if ($("#emp4").is(':visible')) {
+            var customer4 = new Array();
+
+            $("#emp4").autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: "/Home/Autocomplete/",
+                        type: "POST",
+                        dataType: "json",
+                        data: { empcode: request.term },
+                        success: function (data) {
+                            response(data, function (item) {
+                                for (var i = 0; i < data.length ; i++) {
+                                    customer4[i] = { label: item[i].emp4, Id: item[i].emp4 };
+                                }
+                            })
+                        }
+                    })
+                    response(customer4);
+                },
+                select: function (event, ui) {
+                    $.ajax({
+                        cache: false,
+                        async: false,
+                        type: "GET",
+                        url: "/Home/EmployeeDetails/",
+                        data: { code: ui.item.value },
+                        success: function (data) {                           
+                            $("#f4").val(data.FirstName)
+                            $("#l4").val(data.LastName)
+                            $("#p4").val(data.GMobileNo)
+                            $("#g4").val(data.Grade)
+                            $("#e4").val(data.EmailId)
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            alert('Failed to retrieve Client Details');
+                        }
+                    });
+                }
+            });
+        }
+        if ($("#emp5").is(':visible')) {
+            var customer5 = new Array();
+
+            $("#emp5").autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: "/Home/Autocomplete/",
+                        type: "POST",
+                        dataType: "json",
+                        data: { empcode: request.term },
+                        success: function (data) {
+                            response(data, function (item) {
+                                for (var i = 0; i < data.length ; i++) {
+                                    customer5[i] = { label: item[i].emp5, Id: item[i].emp5 };
+                                }
+                            })
+                        }
+                    })
+                    response(customer5);
+                },
+                select: function (event, ui) {
+                    $.ajax({
+                        cache: false,
+                        async: false,
+                        type: "GET",
+                        url: "/Home/EmployeeDetails/",
+                        data: { code: ui.item.value },
+                        success: function (data) {
+                            
+                            $("#f5").val(data.FirstName)
+                            $("#l5").val(data.LastName)
+                            $("#p5").val(data.GMobileNo)
+                            $("#g5").val(data.Grade)
+                            $("#e5").val(data.EmailId)
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            alert('Failed to retrieve Client Details');
+                        }
+                    });
+                }
+            });
+        }
+        if ($("#emp6").is(':visible')) {
+            var customer6 = new Array();
+            
+            $("#emp6").autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: "/Home/Autocomplete/",
+                        type: "POST",
+                        dataType: "json",
+                        data: { empcode: request.term },
+                        success: function (data) {
+                           
+                            response(data, function (item) {
+                                for (var i = 0; i < data.length ; i++) {
+                                    customer6[i] = { label: item[i].emp6, Id: item[i].emp6 };
+                                }
+                            })
+                        }
+                    })
+                    response(customer6);
+                },
+                select: function (event, ui) {
+                    $.ajax({
+                        cache: false,
+                        async: false,
+                        type: "GET",
+                        url: "/Home/EmployeeDetails/",
+                        data: { code: ui.item.value },
+                        success: function (data) {
+                            
+                            $("#f6").val(data.FirstName)
+                            $("#l6").val(data.LastName)
+                            $("#p6").val(data.GMobileNo)
+                            $("#g6").val(data.Grade)
+                            $("#e6").val(data.EmailId)
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            alert('Failed to retrieve Client Details');
+                        }
+                    });
+                }
+            });
+        }
+        if ($("#emp7").is(':visible')) {
+            var customer7 = new Array();
+
+            $("#emp7").autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: "/Home/Autocomplete/",
+                        type: "POST",
+                        dataType: "json",
+                        data: { empcode: request.term },
+                        success: function (data) {
+                            response(data, function (item) {
+                                for (var i = 0; i < data.length ; i++) {
+                                    customer7[i] = { label: item[i].emp7, Id: item[i].emp7 };
+                                }
+                            })
+                        }
+                    })
+                    response(customer7);
+                },
+                select: function (event, ui) {
+                    $.ajax({
+                        cache: false,
+                        async: false,
+                        type: "GET",
+                        url: "/Home/EmployeeDetails/",
+                        data: { code: ui.item.value },
+                        success: function (data) {
+                           
+                            $("#f7").val(data.FirstName)
+                            $("#l7").val(data.LastName)
+                            $("#p7").val(data.GMobileNo)
+                            $("#g7").val(data.Grade)
+                            $("#e7").val(data.EmailId)
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            alert('Failed to retrieve Client Details');
+                        }
+                    });
+                }
+            });
+        }
+        if ($("#emp8").is(':visible')) {
+            var customer8 = new Array();
+
+            $("#emp8").autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: "/Home/Autocomplete/",
+                        type: "POST",
+                        dataType: "json",
+                        data: { empcode: request.term },
+                        success: function (data) {
+                            response(data, function (item) {
+                                for (var i = 0; i < data.length ; i++) {
+                                    customer8[i] = { label: item[i].emp8, Id: item[i].emp8 };
+                                }
+                            })
+                        }
+                    })
+                    response(customer8);
+                },
+                select: function (event, ui) {
+                    $.ajax({
+                        cache: false,
+                        async: false,
+                        type: "GET",
+                        url: "/Home/EmployeeDetails/",
+                        data: { code: ui.item.value },
+                        success: function (data) {
+                            
+                            $("#f8").val(data.FirstName)
+                            $("#l8").val(data.LastName)
+                            $("#p8").val(data.GMobileNo)
+                            $("#g8").val(data.Grade)
+                            $("#e8").val(data.EmailId)
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            alert('Failed to retrieve Client Details');
+                        }
+                    });
+                }
+            });
+        }
+        if ($("#emp9").is(':visible')) {
+            var customer9 = new Array();
+
+            $("#emp9").autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: "/Home/Autocomplete/",
+                        type: "POST",
+                        dataType: "json",
+                        data: { empcode: request.term },
+                        success: function (data) {
+                            response(data, function (item) {
+                                for (var i = 0; i < data.length ; i++) {
+                                    customer9[i] = { label: item[i].emp9, Id: item[i].emp9 };
+                                }
+                            })
+                        }
+                    })
+                    response(customer9);
+                },
+                select: function (event, ui) {
+                    $.ajax({
+                        cache: false,
+                        async: false,
+                        type: "GET",
+                        url: "/Home/EmployeeDetails/",
+                        data: { code: ui.item.value },
+                        success: function (data) {
+                           
+                            $("#f9").val(data.FirstName)
+                            $("#l9").val(data.LastName)
+                            $("#p9").val(data.GMobileNo)
+                            $("#g9").val(data.Grade)
+                            $("#e9").val(data.EmailId)
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            alert('Failed to retrieve Client Details');
+                        }
+                    });
+                }
+            });
+
+        }
+        if ($("#emp10").is(':visible')) {
+            var customer10 = new Array();
+
+            $("#emp10").autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: "/Home/Autocomplete/",
+                        type: "POST",
+                        dataType: "json",
+                        data: { empcode: request.term },
+                        success: function (data) {
+                            response(data, function (item) {
+                                for (var i = 0; i < data.length ; i++) {
+                                    customer10[i] = { label: item[i].emp10, Id: item[i].emp10 };
+                                }
+                            })
+                        }
+                    })
+                    response(customer10);
+                },
+                select: function (event, ui) {
+                    $.ajax({
+                        cache: false,
+                        async: false,
+                        type: "GET",
+                        url: "/Home/EmployeeDetails/",
+                        data: { code: ui.item.value },
+                        success: function (data) {                           
+                            $("#f10").val(data.FirstName)
+                            $("#l10").val(data.LastName)
+                            $("#p10").val(data.GMobileNo)
+                            $("#g10").val(data.Grade)
+                            $("#e10").val(data.EmailId)
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            alert('Failed to retrieve Client Details');
+                        }
+                    });
+                }
+            });
+        }
+    });
+
+</script>

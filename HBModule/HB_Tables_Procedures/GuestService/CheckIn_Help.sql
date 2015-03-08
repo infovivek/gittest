@@ -1,6 +1,6 @@
 
 GO
-/****** Object:  StoredProcedure [dbo].[Sp_CheckIn_Help]    Script Date: 01/21/2015 09:46:59 ******/
+/****** Object:  StoredProcedure [dbo].[Sp_CheckIn_Help]    Script Date: 02/28/2015 12:00:39 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -398,6 +398,7 @@ If @Action = 'GuestLoad'
 		--SET @Roles=(SELECT top 1 Roles FROM WRBHBUserRoles  WHERE UserId = 65 AND IsActive = 1 AND IsDeleted = 0 AND Roles = 'Operations Managers' AND Roles = 'Resident Managers')  
 		--SET @Roles=(SELECT Roles FROM WRBHBUserRoles  WHERE UserId = @UserId AND IsActive = 1 AND IsDeleted = 0 AND Roles = 'Resident Managers')  
 		
+	
 		
 IF @Roles = 'Operations Managers' --OR @Roles = 'Resident Managers'
 BEGIN
@@ -406,7 +407,7 @@ IF @SSPId =0
 	
 	
 -- To Check Booked and Direct Booked for Room Level
-		INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
+	INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		SELECT  H.Id,AG.BookingPropertyId As PropertyId,
 		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,
 		AG.BookingId,AG.RoomId,0 as ApartmentId,H.BookingLevel,0 as BedId,AG.RoomCaptured,AG.Id--,AG.Occupancy
@@ -1369,9 +1370,8 @@ IF @SSPId =0
 		from #CheckIn2 t2
 	
 -- To Check Booked and Direct Booked for Room Level
-INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
-		SELECT  
-		H.Id,AG.BookingPropertyId As PropertyId,
+  INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
+		SELECT  H.Id,AG.BookingPropertyId As PropertyId,
 		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,
 		AG.BookingId,AG.RoomId,0 as ApartmentId,H.BookingLevel,0 as BedId,AG.RoomCaptured,AG.Id--,AG.Occupancy
 		FROM WRBHBBooking H		
@@ -1389,14 +1389,17 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 		and BP.PropertyType in ('InP')--P.Category in ('Internal Property','Managed G H') 
 		and H.IsActive = 1 and H.IsDeleted = 0  
 	--	select * from WRBHBBookingPropertyAssingedGuest where BookingId = 25
-		AND CONVERT(varchar(100),AG.ChkInDt,103) BETWEEN  CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103) AND
-		CONVERT(NVARCHAR,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) 
+		AND CONVERT(varchar(100),AG.ChkInDt,103) IN( CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103), 
+		CONVERT(NVARCHAR,DATEADD(DAY,0,CONVERT(DATE,GETDATE(),103)),103),CONVERT(NVARCHAR,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) )
+		--AND CONVERT(varchar(100),AG.ChkInDt,103) BETWEEN  CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103) AND
+		--CONVERT(NVARCHAR,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) 
 		and AG.BookingPropertyId = @PropertyId and PU.UserId=@UserId
 		and AG.CurrentStatus = 'Booked' and isnull(AG.RoomShiftingFlag,0) = 0
 	--	AND AG.RoomId NOT IN (SELECT RoomId From WrbHbCheckInHdr WHERE BookingId=AG.BookingId) 
 		group by H.Id,AG.BookingPropertyId ,
 		AG.FirstName,AG.LastName,AG.GuestId,AG.GuestId,
 		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id
+	     
 	     
 	    -- Table2 ( to check single or double) 
 		
@@ -1444,8 +1447,10 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 		 WHERE  H.Status in( 'Booked','Direct Booked')  and isnull(H.CancelStatus,0)!='Canceled'  and
 		 H.IsActive = 1 and H.IsDeleted = 0  
 		 and P.Category in ('Internal Property') 
-		 and  CONVERT(varchar(100),ABPA.ChkInDt,103) BETWEEN  CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103) AND 
-		 CONVERT(NVARCHAR,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) 
+		 AND CONVERT(VARCHAR(100),ABPA.ChkInDt,103) IN( CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103), 
+		CONVERT(NVARCHAR,DATEADD(DAY,0,CONVERT(DATE,GETDATE(),103)),103),CONVERT(NVARCHAR,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) )
+		 --and  CONVERT(varchar(100),ABPA.ChkInDt,103) BETWEEN  CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103) AND 
+		 --CONVERT(NVARCHAR,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) 
 		 and ABPA.BookingPropertyId=@PropertyId and PU.UserId=@UserId
 		 and ABPA.CurrentStatus = 'Booked'
 	--	 and ABPA.ApartmentId NOT IN (SELECT ApartmentId From WrbHbCheckInHdr WHERE BookingId=ABPA.BookingId) 
@@ -1498,8 +1503,10 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 		 WHERE  H.Status in( 'Booked','Direct Booked')  and isnull(H.CancelStatus,0)!='Canceled'  and
 		 H.IsActive = 1 and H.IsDeleted = 0  
 		 and P.Category in ('Internal Property','Managed G H') 
-		 and CONVERT(varchar(100),ABPA.ChkInDt,103) BETWEEN  CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103) AND 
-		 CONVERT(NVARCHAR,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) 
+		 AND CONVERT(VARCHAR(100),ABPA.ChkInDt,103) IN( CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103), 
+		CONVERT(NVARCHAR,DATEADD(DAY,0,CONVERT(DATE,GETDATE(),103)),103),CONVERT(NVARCHAR,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) )
+		 --and CONVERT(varchar(100),ABPA.ChkInDt,103) BETWEEN  CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103) AND 
+		 --CONVERT(NVARCHAR,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) 
 		 and ABPA.BookingPropertyId=@PropertyId and PU.UserId=@UserId
 		 and ABPA.CurrentStatus = 'Booked'
 	--	 and ABPA.BedId NOT IN (SELECT BedId From WrbHbCheckInHdr WHERE BookingId=ABPA.BookingId) 
@@ -1817,6 +1824,7 @@ ELSE
 		AG.FirstName,AG.LastName,AG.GuestId,AG.GuestId,
 		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id
 		
+		
 	    -- Table2 ( to check single or double) 
 		
 		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
@@ -1850,7 +1858,7 @@ ELSE
  	
  	
  	    -- To Check Booked and Direct Booked for Room Level Internal
-        INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
+   INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		SELECT  distinct
 		H.Id,AG.BookingPropertyId As PropertyId,
 		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,
@@ -1870,14 +1878,17 @@ ELSE
 		and BP.PropertyType in ('InP')-- P.Category in ('Internal Property','Managed G H') 
 		and H.IsActive = 1 and H.IsDeleted = 0  and isnull(AG.RoomShiftingFlag,0) = 0
 	--	select * from WRBHBBookingPropertyAssingedGuest where BookingId = 25
-		and CONVERT(varchar(100),AG.ChkInDt,103) between  CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103) and
-		CONVERT(NVARCHAR,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) 
+		AND CONVERT(VARCHAR(100),AG.ChkInDt,103) IN( CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103), 
+		CONVERT(NVARCHAR,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) )
+		--and CONVERT(varchar(100),AG.ChkInDt,103) between  CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103) and
+		--CONVERT(NVARCHAR,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) 
 		and AG.BookingPropertyId = @PropertyId and PU.UserId=@UserId
 		and AG.CurrentStatus = 'Booked'
 	--	AND AG.RoomId NOT IN (SELECT RoomId From WrbHbCheckInHdr WHERE BookingId=AG.BookingId) 
 	     group by H.Id,AG.BookingPropertyId ,
 		AG.FirstName,AG.LastName,AG.GuestId,AG.GuestId,
 		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id
+		
 		
 	    -- Table2 ( to check single or double) 
 		
@@ -1926,8 +1937,10 @@ ELSE
 		 WHERE  H.Status in( 'Booked','Direct Booked')  and isnull(H.CancelStatus,0)!='Canceled'  and
 		 H.IsActive = 1 and H.IsDeleted = 0  
 		 and P.Category in ('Internal Property') 
-		 and  CONVERT(varchar(100),ABPA.ChkInDt,103) between  CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103) and 
-		 CONVERT(NVARCHAR,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) 
+		 AND CONVERT(VARCHAR(100),ABPA.ChkInDt,103) IN( CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103), 
+		CONVERT(NVARCHAR,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) )
+		 --and  CONVERT(varchar(100),ABPA.ChkInDt,103) between  CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103) and 
+		 --CONVERT(NVARCHAR,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) 
 		 and ABPA.BookingPropertyId=@PropertyId and PU.UserId=@UserId
 		 and ABPA.CurrentStatus = 'Booked'
 	--	 and ABPA.ApartmentId NOT IN (SELECT ApartmentId From WrbHbCheckInHdr WHERE BookingId=ABPA.BookingId) 
@@ -1980,8 +1993,10 @@ ELSE
 		 WHERE  H.Status in( 'Booked','Direct Booked')  and isnull(H.CancelStatus,0)!='Canceled'  and
 		 H.IsActive = 1 and H.IsDeleted = 0  
 		 and P.Category in ('Internal Property') 
-		 and CONVERT(varchar(100),ABPA.ChkInDt,103) between  CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103) and 
-		 CONVERT(NVARCHAR,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) 
+		 AND CONVERT(VARCHAR(100),ABPA.ChkInDt,103) IN( CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103), 
+		CONVERT(NVARCHAR,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) )
+		 --and CONVERT(varchar(100),ABPA.ChkInDt,103) between  CONVERT(NVARCHAR,DATEADD(DAY,-1,CONVERT(DATE,GETDATE(),103)),103) and 
+		 --CONVERT(NVARCHAR,DATEADD(DAY,1,CONVERT(DATE,GETDATE(),103)),103) 
 		 and ABPA.BookingPropertyId=@PropertyId and PU.UserId=@UserId
 		 and ABPA.CurrentStatus = 'Booked'
 	--	 and ABPA.BedId NOT IN (SELECT BedId From WrbHbCheckInHdr WHERE BookingId=ABPA.BookingId)  
@@ -2874,9 +2889,9 @@ CREATE TABLE #Name(Name NVARCHAR(100),Grade NVARCHAR(100),EmailId NVARCHAR(100),
 				BPA.BookingId,B.ClientId,B.CityId,C.ServiceCharge
 				FROM WRBHBBooking B 			
 				JOIN WRBHBBookingPropertyAssingedGuest BPA WITH(NOLOCK) ON BPA.BookingId=B.Id AND BPA.IsActive=1 
-				AND BPA.IsDeleted=0 AND BPA.Id=@ClientId
+				AND BPA.IsDeleted=0 AND  BPA.Id=@ClientId
 				JOIN WRBHBStaticHotels S WITH(NOLOCK) ON BPA.BookingPropertyId = S.HotalId AND s.IsActive=1 AND s.IsDeleted=0
-				JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON B.Id=GD.BookingId AND B.IsActive=1 AND B.IsDeleted=0
+				JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON B.Id=GD.BookingId AND GD.IsActive=1 AND GD.IsDeleted=0
 				AND BPA.GuestId=GD.GuestId			
 				JOIN WRBHBBookingProperty BP ON B.Id =BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0
 			--	JOIN WRBHBProperty P on  P.Id = BPA.BookingPropertyId and P.IsActive=1 and P.IsDeleted = 0
@@ -2885,6 +2900,8 @@ CREATE TABLE #Name(Name NVARCHAR(100),Grade NVARCHAR(100),EmailId NVARCHAR(100),
 				JOIN wrbhbstate st ON st.Id = Ct.StateId AND st.IsActive = 1 
 				WHERE B.Id=@BookingId AND B.IsActive=1 AND B.IsDeleted=0 AND
 				BP.PropertyType='MMT'
+				
+				
 		END	
 		IF @Str1='Apartment'
 	    BEGIN 
@@ -3102,7 +3119,7 @@ ELSE
 				JOIN WRBHBBookingPropertyAssingedGuest BPA WITH(NOLOCK) ON BPA.BookingId=B.Id AND BPA.IsActive=1 
 				AND BPA.IsDeleted=0 AND BPA.Id=@ClientId
 				JOIN WRBHBStaticHotels S WITH(NOLOCK) ON BPA.BookingPropertyId = S.HotalId AND s.IsActive=1 AND s.IsDeleted=0
-				JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON B.Id=GD.BookingId AND B.IsActive=1 AND B.IsDeleted=0
+				JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON B.Id=GD.BookingId AND GD.IsActive=1 AND GD.IsDeleted=0
 				AND BPA.GuestId=GD.GuestId			
 				JOIN WRBHBBookingProperty BP ON B.Id =BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0
 			--	JOIN WRBHBProperty P on  P.Id = BPA.BookingPropertyId and P.IsActive=1 and P.IsDeleted = 0

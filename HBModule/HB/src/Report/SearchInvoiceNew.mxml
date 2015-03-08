@@ -31,7 +31,7 @@
 			public var AddMode:Boolean=true,Flag:Boolean=true;
 			public 	var Type:String="";
 			public var Str_Tariff:String="",Str_CServ:String="";
-			public var PrintTariffId:int=0;
+			public var PrintTariffId:int=0,SC:int=0;
 			
 			protected function PageLoad():void
 			{
@@ -60,10 +60,10 @@
 				
 				Str_ChkOutTAC="http://sstage.in/HBReport/ExternalCheckoutTAC.aspx?";
 				// Rdlc Print
-				Str_Tariff="http://localhost:6236/CreditNoteTariffBill.aspx?";
-				Str_CServ="http://localhost:6236/CreditNoteServiceBill.aspx?";
-//				Str_Tariff="http://sstage.in/HBReport/CreditNoteTariffBill.aspx?";
-//				Str_CServ="http://sstage.in/HBReport/CreditNoteServiceBill.aspx?";
+//				Str_Tariff="http://localhost:6236/CreditNoteTariffBill.aspx?";
+//				Str_CServ="http://localhost:6236/CreditNoteServiceBill.aspx?";
+				Str_Tariff="http://sstage.in/HBReport/CreditNoteTariffBill.aspx?";
+				Str_CServ="http://sstage.in/HBReport/CreditNoteServiceBill.aspx?";
 				Modes.selectedValue=0;
 				
 			}
@@ -113,30 +113,12 @@
 					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
 					{
 						lbl_LT.text=Ds_Objects.result.Tables.Table3.Rows[0].LuxuryTaxPer
-						lbl_TST.text=Ds_Objects.result.Tables.Table3.Rows[0].ServiceTaxPer
+						//lbl_TST.text=Ds_Objects.result.Tables.Table3.Rows[0].ServiceTaxPer
 						lbl_Vat.text=Ds_Objects.result.Tables.Table3.Rows[0].VATPer
 						lbl_STFB.text=Ds_Objects.result.Tables.Table3.Rows[0].RestaurantSTPer
+						SC=Ds_Objects.result.Tables.Table3.Rows[0].ServiceCharge	
 					}
 					
-					if(Grd_Tariff.dataProvider !=null)
-					{
-						var TotAmt:Number=0,Len:Number=0;
-						var TempGrids:ArrayCollection = Grd_Tariff.dataProvider as ArrayCollection;
-						for(var i:int=0;i<TempGrids.length;i++)
-						{
-							TotAmt+=Number(TempGrids[i].Total);
-						}
-						var LT:Number=Number(lbl_LT.text);
-						var ST:Number=Number(lbl_TST.text);
-						var TLT:Number=TotAmt*LT/100
-						var TST:Number=TotAmt*ST/100
-						var LT1:String=NF_Two.format(TLT);
-						Txt_LT.text=LT1.replace(",","");
-						var ST1:String=NF_Two.format(TST);
-						Txt_TST.text=ST1.replace(",","");
-						var TA:String=NF_Two.format(TotAmt+TLT+TST);
-						Txt_TTotal.text=TA.replace(",","");
-					}
 										
 				}
 				if (Ds_Objects.currentTarget.description.toString() == "CreditNoteService_CUSTOM")
@@ -160,34 +142,13 @@
 					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
 					{
 						lbl_LT.text=Ds_Objects.result.Tables.Table3.Rows[0].LuxuryTaxPer
-						lbl_TST.text=Ds_Objects.result.Tables.Table3.Rows[0].ServiceTaxPer
+						//lbl_TST.text=Ds_Objects.result.Tables.Table3.Rows[0].ServiceTaxPer
 						lbl_Vat.text=Ds_Objects.result.Tables.Table3.Rows[0].VATPer
 						lbl_STFB.text=Ds_Objects.result.Tables.Table3.Rows[0].RestaurantSTPer
+						SC=Ds_Objects.result.Tables.Table3.Rows[0].ServiceCharge
 					}
 					
-					if(Grd_Service.dataProvider !=null)
-					{
-						var TotAmt:Number=0,Len:Number=0;
-						var TempGrids1:ArrayCollection = Grd_Service.dataProvider as ArrayCollection;		
-						for(var i:int=0;i<TempGrids1.length;i++)
-						{
-							TotAmt+=Number(TempGrids1[i].Total);
-						}
-						var VAT:Number=Number(lbl_Vat.text);
-						var STFB:Number=Number(lbl_STFB.text);
-						var ST:Number=Number(lbl_ST.text);
-						var VT:Number=TotAmt*VAT/100
-						var SFB:Number=TotAmt*STFB/100
-						var STS:Number=TotAmt*ST/100
-						var VT1:String=NF_Two.format(VT);
-						Txt_Vat.text=VT1.replace(",","");
-						var STF:String=NF_Two.format(SFB);
-						Txt_STFB.text=STF.replace(",","");
-						var ST1:String=NF_Two.format(STS);
-						Txt_ST.text=ST1.replace(",","");
-						var TA:String=NF_Two.format(TotAmt+VT+SFB+STS);
-						Txt_STotal.text=TA.replace(",","");
-					}
+					
 					
 				}
 				
@@ -540,10 +501,7 @@
 				ChkOutHdrId=Grd_SearchInvoice.selectedItem.ChkoutId;
 				Statuss=Grd_SearchInvoice.selectedItem.Status;
 				BillType=Grd_SearchInvoice.selectedItem.BillType;
-				//useWeb("VendorChequeApproval","Actionload_CUSTOM",[GlobalXml,"Action",,'','','','',ChkOutHdrId,0,0]);
 				
-//				if(Statuss=='UnSettled')
-//				{
 					if(BillType=='Tariff')
 					{
 	    				brd_CreditNote.visible=true;
@@ -560,33 +518,24 @@
 					}
 					else 
 					{
-						alignAlert(Alert.show("Select Tariff or Service","Alert Message !",
+						alignAlert(Alert.show("Select Tariff or Service InVoice","Alert Message !",
 													Alert.OK,null,null,iconWarning,Alert.OK),10,"");
 												return;
 					}
-//				}
-//				else
-//				{
-//					alignAlert(Alert.show("Select Unsettled Invoice","Alert Message !",
-//						Alert.OK,null,null,iconWarning,Alert.OK),10,"");
-//					return;
-//				}
+
 			}
 			protected function FnC_clickHandler(event):void
 			{
-				brd_CreditNote.visible=false;//Clear();				
+				brd_CreditNote.visible=false;
+				Grd_Tariff.dataProvider=null;Grd_Service.dataProvider=null;
+				Txt_ChkInVoiceNo.text="";Txt_ChkOutId.text="";Txt_CrdInVoiceNo.text="";
+				Txt_LT.text="";Txt_PropertyId.text="";Txt_SC.text="";
+				txt_Service.text="";Txt_ST.text="";Txt_STFB.text="";
+				Txt_STotal.text="";txt_TariffDes.text="";Txt_TST.text="";
+				Txt_TTotal.text="";Txt_Vat.text="";lbl_LT.text="";lbl_Vat.text="";
 			}
 			
-//			protected function button1_clickTariff(event:MouseEvent):void
-//			{
-//				brd_Tariff.visible=true;
-//				brd_Service.visible=false;				
-//			}
-//			protected function button2_clickService(event:MouseEvent):void
-//			{
-//				brd_Tariff.visible=false;
-//				brd_Service.visible=true;
-//			}
+
 			protected function FnValidation_BeforeTariffSave():String
 			{
 				ErrStr="";
@@ -659,7 +608,7 @@
 								CreditNoteNo:Txt_CrdInVoiceNo.text,
 								LuxuryTax:Txt_LT.text,
 								ServiceTax1:Txt_TST.text,
-								ServiceTax2:Txt_TST1.text,
+								ServiceTax2:Txt_SC.text,
 								TotalAmount:Txt_TTotal.text,
 								Description:txt_TariffDes.text,
 								ChkOutId:Txt_ChkOutId.text,
@@ -775,35 +724,63 @@
 			}
 			protected function Grd_Ingredients_focusOutHandler(event:FocusEvent):void
 			{
-				var temp_Val2:String=event.currentTarget.editable;
-				if(event.currentTarget.editedItemPosition != null)
-				{ 
-					
-					var Val2:Number =event.currentTarget.selectedItem.TariffAmount
-					var Val3:Number =event.currentTarget.selectedItem.NoOfDays						
-					event.currentTarget.selectedItem.Total = Val2*Val3;
-					var TotAmt:Number=0,Len:Number=0;
-					var TempGrids:ArrayCollection = Grd_Tariff.dataProvider as ArrayCollection;
-					TotAmt=event.currentTarget.selectedItem.Total
-					var LT:Number=Number(lbl_LT.text);
-					var ST:Number=Number(lbl_TST.text);
-					var STC:Number=Number(lbl_TSC.text);
-					var TLT:Number=TotAmt*LT/100
-					var TST:Number=TotAmt*ST/100
-					var TSC:Number=	TotAmt*STC/100
-					var LT1:String=NF_Two.format(TLT);
-					Txt_LT.text=LT1.replace(",","");
-					var ST1:String=NF_Two.format(TST);
-					Txt_TST.text=ST1.replace(",","");
-					var ST2:String=NF_Two.format(TSC);
-					Txt_TST1.text=ST2.replace(",","");
-					var TA:String=NF_Two.format(TotAmt+TLT+TST+TSC);
-					Txt_TTotal.text=TA.replace(",","");
-												
+				if(SC==0)
+				{
+					var temp_Val2:String=event.currentTarget.editable;
+					if(event.currentTarget.editedItemPosition != null)
+					{ 
+						
+						var Val2:Number =event.currentTarget.selectedItem.TariffAmount
+						var Val3:Number =event.currentTarget.selectedItem.NoOfDays						
+						event.currentTarget.selectedItem.Total = Val2*Val3;
+						var TotAmt:Number=0,Len:Number=0;
+						var TempGrids:ArrayCollection = Grd_Tariff.dataProvider as ArrayCollection;
+						TotAmt=event.currentTarget.selectedItem.Total
+						var LT:Number=Number(lbl_LT.text);
+						var ST:Number=Number(lbl_TST.text);
+						var STC:Number=Number(lbl_TSC.text);
+						var TLT:Number=TotAmt*LT/100
+						var TST:Number=TotAmt*7.42/100
+						var TSC:Number=	TotAmt*0.00/100
+						var LT1:String=NF_Two.format(TLT);
+						Txt_LT.text=LT1.replace(",","");
+						var ST1:String=NF_Two.format(TST);
+						Txt_TST.text=ST1.replace(",","");
+						var ST2:String=NF_Two.format(TSC);
+						Txt_SC.text=ST2.replace(",","");
+						var TA:String=NF_Two.format(TotAmt+TLT+TST+TSC);
+						Txt_TTotal.text=TA.replace(",","");
+													
+					}
 				}
 				else
 				{
-					
+					var temp_Val2:String=event.currentTarget.editable;
+					if(event.currentTarget.editedItemPosition != null)
+					{ 
+						
+						var Val2:Number =event.currentTarget.selectedItem.TariffAmount
+						var Val3:Number =event.currentTarget.selectedItem.NoOfDays						
+						event.currentTarget.selectedItem.Total = Val2*Val3;
+						var TotAmt:Number=0,Len:Number=0;
+						var TempGrids:ArrayCollection = Grd_Tariff.dataProvider as ArrayCollection;
+						TotAmt=event.currentTarget.selectedItem.Total
+						var LT:Number=Number(lbl_LT.text);
+						var ST:Number=Number(lbl_TST.text);
+						var STC:Number=Number(lbl_TSC.text);
+						var TLT:Number=TotAmt*LT/100
+						var TST:Number=TotAmt*ST/100
+						var TSC:Number=	TotAmt*2.5/100
+						var LT1:String=NF_Two.format(TLT);
+						Txt_LT.text=LT1.replace(",","");
+						var ST1:String=NF_Two.format(TST);
+						Txt_TST.text=ST1.replace(",","");
+						var ST2:String=NF_Two.format(TSC*12.36/100);
+						Txt_SC.text=ST2.replace(",","");
+						var TA:String=NF_Two.format(TotAmt+TLT+TST+TSC);
+						Txt_TTotal.text=TA.replace(",","");
+						
+					}
 				}
 			}
 			protected function Grd_Ingredients_focusOutHandler1(event:FocusEvent):void
@@ -812,32 +789,59 @@
 				var temp_Val2:String=event.currentTarget.editable;
 				if(event.currentTarget.editedItemPosition != null)
 				{ 
-					
-					var Val2:Number =event.currentTarget.selectedItem.ServiceAmount
-					var Val3:Number =event.currentTarget.selectedItem.Quantity						
-					
-					 Tot=(Val2*Val3);
-					 event.currentTarget.selectedItem.Total = Tot;
-					var TotAmt:Number=0,Len:Number=0;
-					var TempGrids:ArrayCollection = Grd_Service.dataProvider as ArrayCollection;
-					for(var i:int=0;i<TempGrids.length;i++)
-					{
-						TotAmt+=Number(TempGrids[i].Total);
+					var Type:String="";
+					Type=event.currentTarget.selectedItem.TypeService;
+					if(Type=="Food And Beverages")
+					{ 
+						var Val2:Number =event.currentTarget.selectedItem.ServiceAmount
+						var Val3:Number =event.currentTarget.selectedItem.Quantity						
+						
+						Tot=(Val2*Val3);
+						event.currentTarget.selectedItem.Total = Tot;
+						event.currentTarget.selectedItem.Tax =NF_Two.format(Tot*4.94/100);
+						var TotAmt:Number=0,Len:Number=0,Tax:Number=0;
+						var TempGrids:ArrayCollection = Grd_Service.dataProvider as ArrayCollection;
+						for(var i:int=0;i<TempGrids.length;i++)
+						{
+							TotAmt+=Number(TempGrids[i].Total);
+							Tax+=Number(TempGrids[i].Tax);
+						}
+						var VAT:Number=Number(lbl_Vat.text);
+						var VT:Number=TotAmt*VAT/100
+						var VT1:String=NF_Two.format(VT);
+						Txt_Vat.text=VT1.replace(",","");
+						var STF:String=NF_Two.format(Tax);
+						Txt_STFB.text=STF.replace(",","");
+						var ST1:String=NF_Two.format(0.00);
+						Txt_ST.text=ST1.replace(",","");
+						var TA:String=NF_Two.format(TotAmt+VT+Tax+0.00);
+						Txt_STotal.text=TA.replace(",","");
 					}
-					var VAT:Number=Number(lbl_Vat.text);
-					var STFB:Number=Number(lbl_STFB.text);
-					var ST:Number=Number(lbl_ST.text);
-					var VT:Number=TotAmt*VAT/100
-					var SFB:Number=TotAmt*STFB/100
-					var STS:Number=TotAmt*ST/100
-					var VT1:String=NF_Two.format(VT);
-					Txt_Vat.text=VT1.replace(",","");
-					var STF:String=NF_Two.format(SFB);
-					Txt_STFB.text=STF.replace(",","");
-					var ST1:String=NF_Two.format(STS);
-					Txt_ST.text=ST1.replace(",","");
-					var TA:String=NF_Two.format(TotAmt+VT+SFB+STS);
-					Txt_STotal.text=TA.replace(",","");
+					else
+					{
+						var Val2:Number =event.currentTarget.selectedItem.ServiceAmount
+						var Val3:Number =event.currentTarget.selectedItem.Quantity						
+						Tot=(Val2*Val3);
+						event.currentTarget.selectedItem.Total = Tot;
+						event.currentTarget.selectedItem.Tax = Tot*12.00/100;
+						var TotAmt:Number=0,Len:Number=0,Tax:Number=0;
+						var TempGrids:ArrayCollection = Grd_Service.dataProvider as ArrayCollection;
+						for(var i:int=0;i<TempGrids.length;i++)
+						{
+							TotAmt+=Number(TempGrids[i].Total);
+							Tax+=Number(TempGrids[i].Tax);
+						}
+						var VAT:Number=Number(lbl_Vat.text);
+						var VT:Number=TotAmt*VAT/100
+						var VT1:String=NF_Two.format(VT);
+						Txt_Vat.text=VT1.replace(",","");
+						var STF:String=NF_Two.format(0.00);
+						Txt_STFB.text=STF.replace(",","");
+						var ST1:String=NF_Two.format(Tax);
+						Txt_ST.text=ST1.replace(",","");
+						var TA:String=NF_Two.format(TotAmt+VT+0.00+Tax);
+						Txt_STotal.text=TA.replace(",","");
+					}
 											
 				}
 				else
@@ -959,7 +963,7 @@
 		<s:TextInput x="646" y="56" width="163" height="18"  id="Txt_CrdInVoiceNo" editable="false"/>
 	<s:BorderContainer x="69" y="79" width="1174" height="309" id="brd_Tariff"
 						   borderVisible="true" visible="true" depth="1500">
-		<mx:DataGrid id="Grd_Tariff" x="179" y="17" width="789" height="124"  editable="true" tabIndex="3" verticalAlign="middle"
+		<mx:DataGrid id="Grd_Tariff" x="179" y="7" width="789" height="124"  editable="true" tabIndex="3" verticalAlign="middle"
 					 doubleClickEnabled="true" textAlign="center" borderVisible="true" 
 					 focusOut="Grd_Ingredients_focusOutHandler(event)">
 		<mx:columns> 
@@ -969,57 +973,62 @@
 		<mx:DataGridColumn dataField="Total"  width="100" textAlign="center" editable="false" visible="true"/>
 		</mx:columns>
 		</mx:DataGrid>
-		<mx:Label x="193" y="167" text="Description"/>
-		<s:TextArea id="txt_TariffDes" x="279" y="150" width="322" height="92" maxChars="2000"/>
+		<mx:Label x="193" y="154" text="Description"/>
+		<s:TextArea id="txt_TariffDes" x="279" y="137" width="322" height="92" maxChars="2000" borderVisible="true"/>
 		
 		<mx:Label x="49" y="8" text="Tariff Credit Note" color="red"/> 
-		<mx:Label x="633" y="151" text="LuxuryTax @"/>
-		<mx:Label x="633" y="186" text="ServiceTax @"/>
-		<mx:Label x="633" y="213" text="ServiceTax @"/>
-		<mx:Label x="712" y="151" width="39" text="" id="lbl_LT"/>
-		<mx:Label x="713" y="186" width="39" text="" id="lbl_TST"/>
-		<mx:Label x="713" y="213" width="57" text="12.36" id="lbl_TSC"/>
-		<mx:Label x="633" y="241" text="Total Amount"/>
-		<s:TextInput x="832" y="153" width="116" id="Txt_LT" editable="false"/>
-		<s:TextInput x="832" y="186" width="116" id="Txt_TST" editable="false"/>
-		<s:TextInput x="832" y="212" width="116" id="Txt_TST1" editable="false"/>
-		<s:TextInput x="832" y="241" width="116" id="Txt_TTotal" editable="false"/>
-		<s:Button x="541" y="275" label="Submit" id="btn_Tariff" click="btn_TariffSave(event)"/>
+		<mx:Label x="633" y="136" text="LuxuryTax @"/>
+		<mx:Label x="633" y="163" text="ServiceTax @"/>
+		<mx:Label x="633" y="187" text="ServiceTax @" />
+		<mx:Label x="712" y="136" width="39" text="" id="lbl_LT"/>
+		<mx:Label x="752" y="136" width="39" text="%"/>
+		<mx:Label x="713" y="162" width="39" text="7.42" id="lbl_TST"/>
+		<mx:Label x="753" y="162" width="39" text="%"/>
+		<mx:Label x="713" y="186" width="39" text="12.36" id="lbl_TSC"/>
+		<mx:Label x="755" y="186" width="30" text="%" />
+		<mx:Label x="633" y="225" text="Total Amount"/>
+		<s:TextInput x="832" y="138" width="116" id="Txt_LT" editable="false"/>
+		<s:TextInput x="832" y="163" width="116" id="Txt_TST" editable="false"/>
+		<s:TextInput x="832" y="188" width="116" id="Txt_SC" editable="false" visible="true"/>
+		<s:TextInput x="832" y="225" width="116" id="Txt_TTotal" editable="false"/>
+		<s:Button x="541" y="262" label="Submit" id="btn_Tariff" click="btn_TariffSave(event)"/>
 	</s:BorderContainer>
 	<s:BorderContainer x="69" y="79" width="1174" height="309" id="brd_Service"
 						   borderVisible="true" visible="false" depth="1500">
-			<mx:DataGrid id="Grd_Service" x="179" y="17" width="789" height="124"  editable="true" tabIndex="3" verticalAlign="middle"
+			<mx:DataGrid id="Grd_Service" x="179" y="7" width="800" height="124"  editable="true" tabIndex="3" verticalAlign="middle"
 						 focusOut="Grd_Ingredients_focusOutHandler1(event)">
 				<mx:columns> 
-					<mx:DataGridColumn dataField="Item"  editable="false" textAlign="center" visible="true" width="100"/>						
-					<mx:DataGridColumn dataField="ServiceAmount"  textAlign="center" visible="true" editable="false" width="150" />
+					<mx:DataGridColumn dataField="Item"  editable="false" textAlign="center" visible="true" width="200"/>						
+					<mx:DataGridColumn dataField="ServiceAmount"  textAlign="center" visible="true" editable="true" width="150" />
 					<mx:DataGridColumn dataField="Quantity"  textAlign="center" visible="true" editable="true" width="150" />
+					<mx:DataGridColumn dataField="Tax"  textAlign="center" visible="true" editable="false" width="100" />
+					<mx:DataGridColumn dataField="TypeService"  textAlign="center" visible="false" editable="false" width="100" />
 					<mx:DataGridColumn dataField="Total"  width="100" textAlign="center" editable="false" visible="true"/>
 				</mx:columns>
 			</mx:DataGrid>
-			<mx:Label x="180" y="175" text="Description"/>
-			<s:TextArea id="txt_Service" x="261" y="148" width="277" height="104" maxChars="2000"/>
+			<mx:Label x="180" y="165" text="Description"/>
+			<s:TextArea id="txt_Service" x="261" y="138" width="277" height="104" maxChars="2000"/>
 		<mx:Label x="49" y="8" text="Service Credit Note" color="red"/> 
-		<mx:Label x="563" y="145" text="VAT @"/>
-		<mx:Label x="563" y="171" text="ServiceTax @"/>
-		<mx:Label x="563" y="197" text="ServiceTax @"/>
+		<mx:Label x="563" y="136" text="VAT @"/>
+		<mx:Label x="563" y="161" text="ServiceTax @"/>
+		<mx:Label x="563" y="185" text="ServiceTax @"/>
 		<!--mx:Label x="563" y="224" text="Cess @"/-->
 		<!--mx:Label x="563" y="250" text="HE Cess @"/-->
-		<mx:Label x="611" y="145" width="39" text="" id="lbl_Vat"/>
-		<mx:Label x="643" y="171" width="39" text="" id="lbl_STFB"/>
-		<mx:Label x="643" y="197" width="51" text="12.36" id="lbl_ST"/>
+		<mx:Label x="611" y="136" width="39" text="" id="lbl_Vat"/>
+		<mx:Label x="643" y="161" width="39" text="4.94" id="lbl_STFB"/>
+		<mx:Label x="643" y="185" width="51" text="12.00" id="lbl_ST"/>
 		<!--mx:Label x="613" y="224" width="39" text="" id="lbl_Cess"/-->
 		<!--mx:Label x="633" y="250" width="39" text="" id="lbl_HECess"/-->
-		<mx:Label x="693" y="171" width="151" text="On Food and Beverages"/>
-		<mx:Label x="693" y="197" width="73" text="On Others"/>
-		<mx:Label x="563" y="231" text="Total Amount"/>
-		<s:TextInput x="852" y="145" width="116" id="Txt_Vat" editable="false"/>
-		<s:TextInput x="852" y="171" width="116" id="Txt_STFB" editable="false"/>
-		<s:TextInput x="852" y="200" width="116" id="Txt_ST" editable="false"/>
+		<mx:Label x="688" y="161" width="151" text="On Food and Beverages"/>
+		<mx:Label x="693" y="185" width="73" text="On Others"/>
+		<mx:Label x="563" y="222" text="Total Amount"/>
+		<s:TextInput x="852" y="135" width="116" id="Txt_Vat" editable="false"/>
+		<s:TextInput x="852" y="161" width="116" id="Txt_STFB" editable="false"/>
+		<s:TextInput x="852" y="188" width="116" id="Txt_ST" editable="false"/>
 		<!--s:TextInput x="852" y="197" width="116" id="Txt_Cess" editable="false"/-->
 		<!--s:TextInput x="852" y="224" width="116" id="Txt_HECess" editable="false"/-->
-		<s:TextInput x="852" y="230" width="116" id="Txt_STotal" editable="false"/>
-		<s:Button id="btn_Service" x="521" y="270" width="78" height="20" label="Submit" click="btn_ServiceSave(event)"/>
+		<s:TextInput x="852" y="221" width="116" id="Txt_STotal" editable="false"/>
+		<s:Button id="btn_Service" x="521" y="260" width="78" height="20" label="Submit" click="btn_ServiceSave(event)"/>
 	</s:BorderContainer>
 		<s:BorderContainer x="0" y="0" width="100%" height="42" borderVisible="true"  backgroundColor="#c2c2c2">
 			<s:Image x="1335" y="14" source="@Embed(source='../Assets/CrossSmall.png')" 

@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   width="100%" height="100%" creationComplete="PageLoad()">
+	<fx:Declarations>
+		<s:Animate id="fader"
+				   duration="500"
+				   repeatBehavior="reverse"
+				   repeatCount="0">
+			<s:SimpleMotionPath property="alpha"
+								valueFrom="1.0" valueTo="0.0" />
+		</s:Animate>
+		<s:Animate id="fader1"
+				   duration="0"
+				   repeatBehavior="reverse"
+				   repeatCount="0">
+			<s:SimpleMotionPath property="alpha"
+								valueFrom="1.0" valueTo="0.0" />
+		</s:Animate>
+	</fx:Declarations>
+	<fx:Style source="..\\Common\\ApplicationCSS.css" />
+	<fx:Script source="..\\Common\\CommonScript.as" />
+	<fx:Script source="..\\Common\\Functions.as"/>
+	<fx:Script>
+		<![CDATA[
+			import com.as3xls.xls.Cell;
+			import com.as3xls.xls.ExcelFile;
+			import com.as3xls.xls.Sheet;
+			import com.as3xls.xls.Type;
+			public var Temp_AC:ArrayCollection = new ArrayCollection();
+			private var xlsFile:ExcelFile;
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "";
+			public var lbl:String="";
+			public var ClientId:Number=0,BookingId:Number=0;
+			public var GuestId:Number=0,ErrStr:String="",ErrMsg:String="";
+			public var Fad:Animate=new Animate();
+			public var Flag:Boolean=true;
+			public var Str_Tariff:String="",Str_CServ:String="",Type:String="";
+			private function PageLoad():void
+			{
+				Global_AC = funLoginInfo("<gScrId>1</gScrId><gUsrFk>1</gUsrFk>");				
+				GlobalXml = "";
+				GlobalXml += "<ROOT>";
+				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+				GlobalXml += "</ROOT>";	
+				help();
+			
+			}
+			private function help():void
+			{				
+				useWeb("BTCDownload","Property_CUSTOM",[GlobalXml,"PageLoad",'','','',0,0]);
+				
+			}
+			private function Custom_WebSer_Result (Ds_Objects:Object):void
+			{
+				if (Ds_Objects.currentTarget.description.toString() == "Property_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						hlp_Client.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						
+					}
+					else
+					{
+						hlp_Client.dataProvider=null;
+						
+					}
+					
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Client_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						hlp_Guest.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						
+					}
+					else
+					{
+						hlp_Guest.dataProvider=null;
+						
+					}
+					
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "Guest_CUSTOM")
+				{
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						Grd_BTC.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						
+					}
+					else
+					{
+						Grd_BTC.dataProvider=null;
+						
+					}
+					
+				}
+			}
+			private function fnGetClient():void
+			{
+				if(hlp_Client.selected())
+				{
+					hlp_Client.text=hlp_Client.Select_Row.ClientName
+					ClientId=hlp_Client.Select_Row.ClientId
+					useWeb("BTCDownload","Client_CUSTOM",[GlobalXml,"ClientLoad",'','','',ClientId,0]);	
+				}
+				else
+				{
+					hlp_Client.text="";
+					ClientId=0;
+				}
+			}
+			private function fnGetGuest():void
+			{
+				//var LabelName:String="";
+				if(hlp_Guest.selected())
+				{
+					
+					hlp_Guest.text=hlp_Guest.Select_Row.GuestName
+					GuestId=hlp_Guest.Select_Row.GuestId;
+ 					BookingId=hlp_Guest.Select_Row.BookingId;
+					Type=hlp_Guest.Select_Row.Type;
+									
+				}
+				else
+				{
+					hlp_Guest.text="";
+					GuestId=0;
+				}
+			}
+			protected function FnValidation_BeforeSave():String
+			{
+				ErrStr="";
+				
+				var TxtFlag:Boolean=true;
+				if(hlp_Client.text =="")
+				{
+					ErrStr=ErrStr+"* ClientName Required.\n";
+				}
+				if(hlp_Guest.text =="")
+				{
+					ErrStr=ErrStr+"* GuestName Required.\n";
+				}
+				return ErrStr;
+			}
+			protected function Search():void
+			{		
+				ErrStr="";
+				ErrMsg = ""; Flag = true; 
+				var Str:String=FnValidation_BeforeSave();
+				if(ErrStr !="")
+				{
+					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10,"");
+					return;
+				} 
+				else
+				{	
+					useWeb("BTCDownload","Guest_CUSTOM",[GlobalXml,"GuestLoad",'','',Type,GuestId,BookingId]);
+				}
+			}
+			
+			public function clear():void
+			{
+				hlp_Guest.text="";			
+				hlp_Client.text="";
+				ClientId=0;GuestId=0;
+				Grd_BTC.dataProvider=null;
+				
+			}
+			public function Download():void 
+			{
+				var File :String="";
+				File=Grd_BTC.selectedItem.BTCPath;
+				ExternalInterface.call("changeDocumentTitle",File);
+				clear();
+			}			
+		]]>
+	</fx:Script>
+	
+	
+<s:BorderContainer x="0" y="0" width="100%" height="100%" borderVisible="true">
+	
+					<mx:Label x="317" y="98" width="13" height="21" id="Lbl_FdStar" color="red" fontSize="18" text="*" fontWeight="bold"/>
+					<mx:Label x="678" y="98" width="13" height="21" id="Lbl_TdStar" color="red" fontSize="18" text="*" fontWeight="bold"/>
+					<mx:Label x="202" y="98" text="Select Client Name" id="lbl_Client"/>
+			<mx:Label id="lbl_Result" visible="false" x="547" y="340" width="183" text="BTC File Uploaded SuccesFully"/>
+					<WrbHelpComp:HelpText x="335" y="100.5" depth="9" pxTabIndex="4"  width="263" id="hlp_Client" onselection="{fnGetClient()}" pxSetColumnsWidth="0,263">
+					</WrbHelpComp:HelpText>
+					<mx:Label x="601" y="98" text="Select Guest" id="lbl_Guest"/>
+					<WrbHelpComp:HelpText x="699" y="100.5" depth="9" pxTabIndex="4"  width="263" id="hlp_Guest" onselection="{fnGetGuest()}" pxSetColumnsWidth="0,0,33,100,130">
+					</WrbHelpComp:HelpText>
+					<s:Image x="993" y="89" source="assets/a1.png" toolTip="Search" click="Search()"/>
+			
+			<mx:DataGrid id="Grd_BTC" x="197" y="152" width="850" height="168" depth="1"
+						 editable="true" verticalAlign="middle">
+				<mx:columns>
+					<mx:DataGridColumn dataField="BookingCode" headerText="Booking Code" editable="false" width="100" textAlign="center"/>
+					<mx:DataGridColumn dataField="GuestName" headerText="Guest Name" textAlign="center" editable="false"   width="100" />
+					<mx:DataGridColumn dataField="ChkInDate" headerText="CheckIn Date" textAlign="left" editable="false"   width="100" />
+					<mx:DataGridColumn dataField="ChkOutDate" headerText="CheckOut Date" textAlign="center" editable="false"   width="100" />
+					<mx:DataGridColumn dataField="BTCPath" headerText="BTC FilePath" textAlign="left" editable="false"   width="300" />
+					<mx:DataGridColumn dataField="Download" headerText="DownLoad" textAlign="left"  editable="false" width="100">
+						<mx:itemRenderer >
+							<fx:Component>
+								<mx:HBox horizontalAlign="center" verticalAlign="middle">										
+									<mx:Image source="@Embed(source='../Assets/view.gif')" buttonMode="true"
+											  click="outerDocument.Download()" />
+								</mx:HBox>	
+							</fx:Component>
+						</mx:itemRenderer>
+					</mx:DataGridColumn>
+				</mx:columns>
+			</mx:DataGrid>
+
+</s:BorderContainer>
+	
+	
+</s:Application>

@@ -47,8 +47,11 @@
 				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
 				GlobalXml += "</ROOT>";	
 				help();
-				Str_Tariff="http://localhost:6236/CreditNoteTariffBill.aspx?";
-				Str_CServ="http://localhost:6236/CreditNoteServiceBill.aspx?";
+//				Str_Tariff="http://localhost:6236/CreditNoteTariffBill.aspx?";
+//				Str_CServ="http://localhost:6236/CreditNoteServiceBill.aspx?";
+				
+				Str_Tariff="http://sstage.in/HBReport/CreditNoteTariffBill.aspx?";
+				Str_CServ="http://sstage.in/HBReport/CreditNoteServiceBill.aspx?";
 			}
 			private function help():void
 			{				

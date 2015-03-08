@@ -53,19 +53,20 @@
 			
 			protected function PageLoad():void
 			{
-				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
-				GlobalXml="";
-				GlobalXml += "<ROOT>";
-				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
-				GlobalXml += "</ROOT>";
-				init1();
-				init();
-				State="Please Select State";
-				City="Please Select City";
-				Save_PettyCash.setButtonRights("Delete",true);
-				Save_PettyCash.setButtonRights("Refresh",true);
-				Save_PettyCash.setButtonRights("Search",true);
-				FilePath.text="";
+				var u:URLRequest = new URLRequest("http://sstage.in/ImportExcel/Excelsheet/Index");
+//				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+//				GlobalXml="";
+//				GlobalXml += "<ROOT>";
+//				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
+//				GlobalXml += "</ROOT>";
+//				init1();
+//				init();
+//				State="Please Select State";
+//				City="Please Select City";
+//				Save_PettyCash.setButtonRights("Delete",true);
+//				Save_PettyCash.setButtonRights("Refresh",true);
+//				Save_PettyCash.setButtonRights("Search",true);
+//				FilePath.text="";
 				//Save_PettyCash.setButtonRights("Clear",true);
 				//useWeb("CompanyMaster","Pageload_CUSTOM",[GlobalXml,"Pageload","","",0,GlobalXml.UserId]);
 			}
@@ -202,7 +203,7 @@
 				//				var browserUrl:String = ExternalInterface.call("eval", "window.location.href");
 				//				var arr:Array =browserUrl.split("/");
 				ImageFormat=FilePath.text;				
-				uploadURL.url = "http://sstage.in/bank_import.php?id="+Global_AC[0].UsrId;
+				uploadURL.url = "http://sstage.in/ImportExcel/Excelsheet/Index";///bank_import.php?id="+Global_AC[0].UsrId;
 				//uploadURL.url = "http://sstage.in/bank_import.php?id="+FilePath.text+"&pid="+0+"&imgcount="+ImageCount+"&imgformat="+Global_AC[0].UsrId;
 				uploadURL.method = "POST"; // OR "POST" as you need it
 				uploadURL.contentType = "multipart/form-data";				
@@ -267,7 +268,7 @@
 				resultsTxtField.text = event.data.toString();
 				Img_CompanyLogo.visible=false;
 				Error=resultsTxtField.text;
-				Img_CompanyLogo.source="http://sstage.in/"+resultsTxtField.text;
+				Img_CompanyLogo.source="http://sstage.in/ImportExcel/Excelsheet/Index";//+resultsTxtField.text;
 				//alignAlert(Alert.show("Statement Uploaded Successfully","Message",Alert.OK, null, null,iconErrLarge, Alert.OK),10,"");
 				alignAlert(Alert.show("Statement Uploaded Successfully",null,Alert.OK, null, null,iconTickLarge, Alert.OK),10,"");	
 				//useWeb("CompanyMaster","ImageUpload_CUSTOM",[GlobalXml,'IMAGEUPLOAD',"http://sstage.in/Company_Images/"+resultsTxtField.text,0,0,0]);
@@ -320,7 +321,33 @@
 				
 				FilePath.text="";
 			}
-			
+			private function UploadSourceCodeZip():void
+			{
+				// TODO Auto-generated method stub
+				 var URL:Array = BrowserDatas();
+				
+				//if(URL[0].toString()=="http:")
+				//{
+					var u:URLRequest = new URLRequest("http://www.sstage.in/ImportExcel/AddclientGuest/Index");
+					
+					navigateToURL(u,"_blank");
+				//}
+				//else
+				//{
+				//	var U:URLRequest = new URLRequest("http://localhost:7025/PayRegister3.aspx?"+Global_AC[0].BranchId+"");
+					//					var U:URLRequest = new URLRequest("http://localhost:7025/PayRegister3.aspx?1");
+					
+				 //	navigateToURL(U,"_blank");
+			//	}
+			} 
+			private function BrowserDatas():Array 
+			{ 				
+				var browserUrl:String = ExternalInterface.call("eval", "window.location.href");
+				var arr:Array =browserUrl.split("/");	
+				//var Obj:FrmMenuScreen = new FrmMenuScreen();		
+				var BrowserStr:String = arr[0].toString()+"//"+arr[2].toString();
+				return arr;	
+			}
 			private function downloadSourceCodeZip():void 
 			{
 				fileRef.download(urlReq);
@@ -369,13 +396,16 @@
 	<s:VGroup x="0" y="0" width="100%" height="100%" gap="5" horizontalAlign="center" verticalAlign="top">
 		<s:BorderContainer x="37" y="319" width="100%" height="100%" backgroundColor="#fbf9f9"
 						   borderVisible="false">
-			<s:Label x="35" y="28" text="Bank Statement Upload" color="Red"/>
-			<mx:Button id="downloadBtn" x="731" y="45" width="163" height="36"
+			
+			<s:Label x="229" y="241" width="144" color="Red" text="Guest Details Upload"/>
+			<mx:Button id="downloadBtn" x="731" y="45" width="163" height="36" visible="false"
 					   label="Download Sample Excel" click="downloadSourceCodeZip()"
 					   toolTip="{FILE_URL}"/>
+			<mx:Button id="downloadBtn0" x="412" y="228" width="243" height="36" cornerRadius="5"
+					   label=" Click here to Upload GuestExcel" click="UploadSourceCodeZip()" />
 			<s:Label x="539" y="272" text="Logo" visible="false"/>
 			<s:Label x="574" y="269" text="*" color="red" visible="false"/>
-			<s:HGroup x="0" y="423" width="100%" height="41" horizontalAlign="center">
+			<s:HGroup x="0" y="423" width="100%" height="41" horizontalAlign="center" visible="false">
 				<WrbComp:SaveControl x="193" y="451" id="Save_PettyCash" docSave="Save()"
 									 docClear="PageLoad()" docRefresh="PageLoad()">
 				</WrbComp:SaveControl>
@@ -388,8 +418,9 @@
 			
 		</s:BorderContainer>
 	</s:VGroup>
-	<s:BorderContainer x="241" y="145" width="426" height="141" id="Brd_imageUpload" visible="true" borderVisible="true"
-					   backgroundColor="#fbf9f9" cornerRadius="5">
+	<s:BorderContainer x="241" y="145" width="426" height="141" id="Brd_imageUpload"   borderVisible="true"
+					   backgroundColor="#fbf9f9" cornerRadius="5" visible="false">
+		<WrbComp:Button_HB x="329" y="152" height="40" _Label="Click here to upload"  visible="true"/>
 		<mx:Panel x="27" y="19" title="Excel Uploader">
 			<mx:ControlBar>
 				<mx:Spacer width="80%"/>

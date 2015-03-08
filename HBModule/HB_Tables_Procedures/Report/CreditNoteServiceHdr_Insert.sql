@@ -44,7 +44,7 @@ BEGIN
 	 DECLARE @INVOICENO1 NVARCHAR(100),@Length BIGINT,@ChkInVce NVARCHAR(100);
 	 
 	 SET @ChkInVce=(SELECT ChkOutInVoiceNo FROM WRBHBCreditNoteServiceHdr WHERE 
-	 Id=@ChkOutId AND ChkOutInVoiceNo=@ChkInVoiceNo)
+	 CheckOutId=@ChkOutId AND ChkOutInVoiceNo=@ChkInVoiceNo)
 	 
 IF ISNULL(@ChkInVce,'')=''
  BEGIN

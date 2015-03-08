@@ -1,0 +1,34 @@
+﻿
+@{
+    ViewBag.Title = "New_User";
+}
+
+<div class="menu">
+    <div class="content-area">
+        <span class="navs col-xs-12 col-sm-6 col-md-4 pointer" onclick="loadUrl('~/Account/Login')">LOGIN</span>
+        <span class="navs col-xs-12 col-sm-6 col-md-4 pointer" onclick="loadUrl('~/Account/New_User')">NEW USER<div class="underline"></div></span>
+        <div class="clearfix"></div>
+    </div>
+</div>
+
+<div class="body-contents">
+    <div class="content-area sign-up-container">
+        <div class="form-box">
+            <img src="~/img/ss_element_bird.png" class="bird-image">
+            <form action="http://www.staysimplyfied.com/index.php/customer/addemployee" class="registerform" id="addemployee" name="addemployee" method="post"/>
+                <input type="text" class="input-fields input-field-20" placeholder="First Name" name="first_name" id="first_name">
+                <input type="text" class="input-fields input-field-20" placeholder="Last Name" name="last_name" id="last_name">
+                <input type="text" class="input-fields input-field-20" placeholder="Company Name" name="company" id="company">
+                <input type="text" class="input-fields input-field-20" placeholder="Company Email" name="email" id="email">
+                <input type="text" class="input-fields input-field-20" placeholder="Employee Code" name="empcode" id="empcode">
+                <input type="text" class="input-fields input-field-20" placeholder="Grade" name="grade" id="grade">
+                <input type="text" class="input-fields input-field-20" placeholder="Designation" name="designation" id="designation">
+                <input type="text" class="input-fields input-field-20" placeholder="Mobile Number" name="mobile" id="mobile">
+                <button class="button" type="submit">Sign Up</button>
+                <div class="clearfix"></div>
+        </div>
+    </div>
+
+</div>
+
+

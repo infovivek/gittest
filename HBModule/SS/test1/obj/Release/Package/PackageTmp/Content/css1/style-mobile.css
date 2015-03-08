@@ -1,0 +1,229 @@
+@media all and (max-width: 767px){
+
+	.large-font{}
+	.med-font{ font-size: 16px;}
+	.small-font{font-size: 14px;}
+
+	.form-box { width: 100%; max-width: 650px; min-height: 100px; margin: 60px auto; }
+	.form-box .bird-image{ top: -60px; left: 0px; height: 85px; width: auto;}
+	.form-box .input-fields{ height: 40px; margin: 15px auto;}
+	.form-box .button{ width: 100%; height: 40px; margin: 15px auto; font-size: 15px; display: block;}
+	.form-box .col-md-4{ margin-top: 10px; margin-bottom: 10px; text-align: center;}
+
+	.title-image-bar .first-block{margin: 0px auto;}
+	.title-image-bar .second-block{text-align: center;}
+
+	.header .top .logo{ margin: 20px auto; display: block; float: none !important;}
+	.header .top .menu-container{ margin: 20px auto;}
+
+	.header .bottom.pc {display: none;}
+	.header .bottom.tab {display: none;}
+	.header .bottom.mobile {display: block; margin-bottom: 20px;}
+
+	.text-right.mobile-text-left{text-align: center;}
+
+	.header .bottom.mobile .input-fields{ width: 100%; margin-bottom: 10px;}
+	.header .bottom.mobile .button{ width: 100%; height: 52px;}
+
+	.menu{ padding: 15px 10px; font-size: 16px; font-weight: bold}
+	.menu .navs .underline{ width: 75px; height: 4px; background: #fff;}
+
+	.slider-image .owl-item .item img{min-height: 250px;}
+
+	.digitize{ padding: 20px 5% 10px 5%; }
+	.digitize h1{ margin-top: 15px; margin-bottom: 25px; font-size: 42px;}
+	.digitize .bird-image{ top: 0px; left: 20px; height: 75px; }
+	.digitize .bottom-image{ bottom: 5px; right: 0px; }
+	.digitize .widgets {  font-size: 16px; color: #4e4e4e; font-weight: 400; margin-bottom: 20px;}
+	.digitize .widgets img{ margin: 75px auto 25px auto;}
+	.digitize .widgets .header{ font-weight: bold; font-size: 18px;}
+	.digitize .widgets div.header{font-weight: bold; font-size: 16px;}
+
+	.democratize{ width: 100%;}
+	.democratize img{ width: 100%; height: auto;}
+
+	.stay-width.top-header-container{margin-bottom: 0px;}
+
+	.bi-widget-container .stay-width h2{font-size: 17px;}
+	.stay-width .view-video-button{text-align: center;margin-top: 12px;}
+
+	.bi{ padding: 16px 5%; }
+	.bi h1{ margin-bottom: 5px; font-size: 24px; margin-top: 5px;}
+	.bi .bird-image{ top: 20px; left: 20px; height: 75px; }
+
+	.bi-widget-container .col-xs-12{ text-align: center; }
+	.bi-widget-container .top-image{ top:0px; }
+	.bi-widget-container .bottom-image{ bottom:0px; }
+	.bi-widget-container .zip-booking-text{padding: 15px;}
+	.bi-widget-container .zip-booking-image{ width: 95%; position: relative; margin: 20px auto; }
+	.bi-widget-container .button{ font-size: 18px; padding:10px 15px;}
+	.bi-widget-container .view-video-button{ width: 130px; padding: 5px; margin: 15px auto;}
+
+
+	.bi-widget-container .widgets{ padding: 25px;}
+	.bi-widget-container .widgets img{ width: auto; margin: 10px auto;}
+	.bi-widget-container .widgets h2{ width: 100%; text-align: center; margin: 10px auto; font-size: 24px;}
+	.bi-widget-container .widgets .small-font{ width: 80%; text-align: center; font-size: 16px; margin: 10px auto;}
+
+	.clients-testimony{  padding: 50px 5%; font-size: 22px;}
+	.clients-testimony .bird-image{ top: -75px; right: 15px; height: 100px; }
+	.clients-testimony .quest{ font-size: 30px; margin-bottom: 0px;}
+	.clients-testimony .quote-image{ height: 30px;}
+
+	.tabs{ padding: 25px 10%;}
+	.tabs .border-left{ border-left:  0px;}
+	.tabs .border-right{ border-right:  0px;}
+	.tabs div:first-child{ text-align: center;}
+	.tabs a{ display: inline-block; font-size: 18px; padding: 5px; margin-bottom: 10px; width: 100%; border-bottom: 2px solid;}
+	.tab-image{ height: 30px;}
+
+	.media .content-area img{max-width: 100%;}
+
+	.client-images #client-container{max-width: 50%;}
+
+	.footer{ }
+	.footer .top a{ margin-bottom: 7px;font-weight: lighter;font-size: 14px; }
+	.footer h4{ margin-top: 12px; margin-bottom: 10px; font-size: 16px;}
+	.footer .top{ font-size: 16px; text-align: center;}
+	.footer .bottom{ padding: 0 5%; }
+	.footer .bottom .bottom-right{ text-align: center; margin: 20px auto;}
+	.footer .content-area .bottom .bottom-right{font-size: 10px;}
+	.footer .bottom .bottom-left{ text-align: center; margin: 0px auto;}
+	.footer .bottom .bottom-left a{  padding: 0px 10px 0px 10px; font-size: 10px; display: block; margin: 2px auto; text-align: center;display: inline-block;}
+	.footer .bottom .bottom-left a:last-child{ border-bottom: none;}
+
+	.footer .contact .email{font-size: 12px;}
+	.footer .contact img { width: 24px; margin-right: 7px;}
+	.footer .contactno{ font-weight: lighter; font-size: 14px;}
+	.footer .icons{ margin-top: 20px; text-align: center;}
+	.footer .icons img{ margin: 0px; }
+
+
+	
+
+
+	.body-contents{ padding-top: 20px; padding-left: 20px; padding-right: 20px; overflow: hidden;}
+	.body-contents .row { margin-top: 50px; }
+	.body-contents .row .date{ font-size: 30px; }
+	.body-contents .row .right-content{ margin-bottom: 2px; }
+	.body-contents .row .right-content img{ width: 90%; }
+	.body-contents .row p{ margin-bottom: 20px }
+
+	.body-contents .video-row { width: 100%; margin: 10px auto; background: #f7f8f9; padding: 20px; overflow: hidden; text-align: center;}
+	.body-contents .video-row .left-content{ border-right: 0px; border-bottom: 2px solid #e5e5e4;}
+	.body-contents .video-row .left-content img{ width: 90%; margin-bottom: 25px; }
+	.body-contents .video-row .right-content{ padding-top: 25px;}
+	.body-contents .video-row .date{ font-size: 22px; }
+	.body-contents .video-row p{ font-size: 14px; margin-bottom: 0px;}
+
+
+	.two-column-text-area { font-size: 16px; padding-bottom: 50px;}
+	.two-column-text-area .page-title{ font-size: 20px; margin-bottom: 20px;}
+	.two-column-text-area .col-md-6.remove-right-padding{ padding-left: 0px; margin-top: 15px;}
+
+	.title-image-bar img{ width: 150px; height: auto;}
+	.title-image-bar .title{ font-size: 16px;}
+	.header-bottom-image{ margin-top: -30px;}
+
+	.widgets-block-container { padding-bottom: 50px;}
+	.widgets-block-container .title{font-size: 22px;}
+
+	.widgets-block-container .cells{font-size: 16px;}
+	.widgets-block-container .cells h3{ font-size: 18px;}
+
+	.widgets-block-container .cfo-icon{margin-top: 60px; margin-bottom: 30px;}
+	.widgets-block-container .cells img{ display: block; margin: 10px auto;}
+
+	.ss-footer-contacts{ padding: 50px 10px; font-size: 16px; }
+	.ss-footer-contacts h1{ font-size: 25px;}
+	.ss-footer-contacts img{ height: 30px; margin-right: 15px;}
+
+	.ss-footer-contacts .contact-details{ margin-top: 35px; }
+	.ss-footer-contacts .contact{  margin-bottom: 10px; padding: 0px;}
+	.ss-footer-contacts .email{  padding: 0px;}
+
+	.aboutus{ padding: 0px; font-size: 18px; font-weight: lighter; text-align: center;}
+	.aboutus .intro{ margin: 10px auto; overflow: hidden;}
+	.aboutus .intro .points{ font-size: 16px; width: 260px; margin: 0 auto;}
+	.aboutus .intro .points .col-md-4{ margin-top: 10px;}
+	.aboutus .intro .digit{ font-size: 20px; margin-right: 10px;}
+	.aboutus .intro .value{ line-height: 30px; font-size: 14px; }
+
+	.middle-row{ padding: 20px 10px; font-size: 16px;}
+
+	.logo-row{ padding: 10px;}
+	.logo-row .logo-image{ width: 100%; margin: 8px auto; display: block;}
+	.logo-row .about-ss{ width: 100%; font-size: 16px; margin: 15px auto 20px auto; padding: 20px; border-top: 2px solid #e5e5e4; border-bottom: 2px solid #e5e5e4; border-right: 2px solid #e5e5e4;}
+
+	
+	.map-area{ padding: 12px 10px;}
+	.map-area .map { padding: 0px; margin-bottom: 25px;}
+	.map-area .map img{ width: 100%;}
+	.map-area .sales-enquiry{ font-size: 14px; padding: 0px;}
+
+	.address-contact{ overflow: hidden; font-size: 14px;}
+	.address-contact img{ margin-top: 15px; margin-right: 25px; max-width: 30px;}
+	.address-contact .address{ }
+	.address-contact .contact{  font-size: 20px;}
+	.address-contact .contact div{font-size: 18px;margin-top: 26px;}
+
+	.sns-block{ margin-top: 0px;}
+	.sns-block .sns-icons{ height: 100px; padding-top: 20px;}
+	.sns-block img{ margin: 0px; height: 70px;}
+
+	.form-box.enquiry-form { width: 100%; margin: 0px auto;}
+	.checkbox-group .mailid{ padding: 0px; text-align: left; font-size: 16px; }
+
+	.enquiry-box textarea{ width: 100%; margin: 0px auto; }
+	.enquiry-box .button-container { width: 100%; margin: 20px auto 40px auto;}
+	.enquiry-box .button { width: 100%; height: 60px;}
+
+	
+	.testimonials-container { padding: 25px 0px; }
+	.testimonials-container .testimonial-box{ margin-bottom: 40px; font-size: 14px; padding: 0px; }
+	.testimonials-container .testimonial-box .testimonial{ width: 280px; margin: 10px auto; height: 250px;}
+	.testimonials-container .testimonial-box .message{ width: 80%; margin: 10px auto;}
+	.testimonials-container .testimonial-box .quotes{ margin: 20px auto 10px auto; width: 20px;}
+	.testimonials-container .testimonial-box .logo-image{ bottom: 0px; width: 50px; height: 50px; bottom: -30px; margin-left: -25px;}
+
+	.awards-page h2{ margin-bottom: 30px;}
+	.awards-page .text{ font-size: 14px;width: 100%;margin: 2px auto 20px auto;}
+	.awards-page .image-row{ margin-bottom: 10px;}
+	.awards-page .image-row img{ margin-bottom: 25px;}
+
+
+	.demo-footer h2{ }
+	.demo-footer .points-container{ width: 100%; margin: 20px auto; }
+	.demo-footer .numeral{ font-size: 24px; margin-right: 10px;}
+	.demo-footer .text{ font-size: 13px; padding-top: 10px; width: 89%; text-align: left;}
+
+
+	.demo-page-pc{ display: none;}
+
+	
+	.demo-page-tab-mobile{text-align: center; padding: 5px 0px; overflow: hidden; color: #4e4e4e;}
+	.demo-page-tab-mobile .title-image { width: 100%; position: relative; padding: 0px;}
+	.demo-page-tab-mobile .title-image .image{ width: 100%; margin: 0 auto; border: 2px solid #ededed; position: relative;}
+
+	.demo-page-tab-mobile .title-image .label {position: absolute; bottom: -15px; left: 50%; color: #4e4e4e; font-size: 16px; width: 250px; height: 30px; background: #fff; margin-left: -125px;}
+	.demo-page-tab-mobile img{ display: block; width: 100px; margin: 15px auto 20px;}
+	.arrow-up{ position: absolute; left: 50%; margin-left: -25px; margin-top: 15px; top: -30px; }
+
+	.page-popups{ padding: 0px; margin-top: 40px;}
+	.demo-page-tab-mobile .page-popups .label { position: relative; width: 100%; text-align: center; background: rgba(0,0,0,0); font-size: 12px;}
+	.page-popups .images { margin-bottom: 10px;}
+
+	.table-header .header-name { padding: 10px 0px;text-align: left;background: #E6802B;padding-left: 10px;color: #fff;font-size: 14px;height: 36px; }
+	.table-header .triangle{ width: 0; height: 0; border-style: solid; border-width: 36px 22px 0 0; border-color: #e68028 transparent transparent transparent; }
+
+	.top-right-menu{text-align: center;}
+	.clients-testimony .bird-image{display: none;}
+	.top-right-menu .menu-div a{padding: 2px 5px; font-size: 14px;}
+	.top-right-menu{height: 40px;line-height: 40px;}
+	.logo-container{text-align: center;}
+	.logo-container img{max-width: 180px;}
+	.digitize-icons-container .startup-image{height: 90px;}
+	.digitize-icons-container .sme-image{height: 90px;}
+	.digitize-icons-container .corporates-image{height: 90px;}
+
+}

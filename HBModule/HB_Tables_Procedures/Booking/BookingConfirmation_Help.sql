@@ -343,13 +343,16 @@ IF @Action = 'RoomBookingConfirmed'
    BEGIN
     SET @PropertyRefNo = 'reference number - '+@PtyRefNo;
    END
+  --
+  DECLARE @BTCTaxesContent NVARCHAR(100),@Stay NVARCHAR(100),@Uniglobe NVARCHAR(100);
   -- dataset table 4
   SELECT CAST(EmailtoGuest AS INT),
   'D:/Backend/flex_bin/Company_Images/Proof_of_Stay.pdf',
   --'D:/admonk/Backend/flex_bin/Company_Images/Proof_of_Stay.pdf',
   'Proof_of_Stay.pdf',@PName,@MobileNo,@SecurityPolicy,
   @CancelationPolicy,@Taxes,@TypeOfProperty,@PropertyRefNo,@CLogo,@CLogoAlt,
-  @TypeOfRoom 
+  @TypeOfRoom,@BTCTaxesContent,@Stay,@Uniglobe,
+  'http://www.staysimplyfied.com/payu/default.aspx?'+REPLACE(RowId,'-','') 
   FROM WRBHBBooking WHERE Id=@Id1;
   -- dataset table 5
   SELECT EmailId FROM WRBHBBookingGuestDetails WHERE BookingId=@Id1;

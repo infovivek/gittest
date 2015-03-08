@@ -4876,7 +4876,8 @@
 				}
 				bdr_ConPay1.visible=true;
 			}
-			// add tariff Payment save 	(Cash,Card,Cheque,Companyinvoice,NEFT)		
+			// add tariff Payment save 	(Cash,Card,Cheque,Companyinvoice,NEFT)	
+			
 			public 	var F4:String="";
 			public 	var F5:String="";
 			public 	var F6:String="";
@@ -4888,6 +4889,9 @@
 			{
 				if(Intermediate.selected==true)
 				{
+					F1="";
+					F2="";
+					
 					Mode="Tariff";
 					
 					var ErrStr:String="";var Flag:Boolean=true;
@@ -5288,6 +5292,12 @@
 				}
 				else  // Checkout option selected (below process)
 				{
+					
+					F1="";
+					F2="";
+					
+					
+					
 					Mode="Tariff";
 					
 					var ErrStr:String="";var Flag:Boolean=true;
@@ -7764,10 +7774,10 @@
 					}
 					if(BillType == "Service")
 					{
-						if(Amount != 0)
-						{
-							ExternalInterface.call("changeDocumentTitle",Str_Serv+PrintChkOutId);
-						}
+//						if(Amount != 0)
+//						{
+						ExternalInterface.call("changeDocumentTitle",Str_Serv+PrintChkOutId);
+//						}
 						
 					}
 					if(BillType == "Consolidate")
@@ -7800,10 +7810,10 @@
 					}
 					if(BillType == "Service")
 					{
-						if(Amount != 0)
-						{
-							ExternalInterface.call("changeDocumentTitle",Str_Serv+PrintChkOutId);
-						}
+//						if(Amount != 0)
+//						{
+						ExternalInterface.call("changeDocumentTitle",Str_Serv+PrintChkOutId);
+///						}
 						
 			//			ExternalInterface.call("changeDocumentTitle",Str_InChkSer+PrintChkOutId);
 //						if(OutStanding == "0")

@@ -1,0 +1,37 @@
+﻿@{
+    ViewBag.Title = "Waiting";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<br />
+<br />
+<br />
+<br />
+
+<div style="text-align:center; color:red;">
+    @if(ViewBag.ERROR == null)
+    { 
+    <span>Sorry,The @ViewBag.errmsg for selected Date Range please select another one.</span>
+    }
+    else
+    {
+        @ViewBag.ERROR
+    }
+</div>
+
+<br />
+<br />
+<br />
+<br />
+
+
+@*<script type="text/javascript">
+        window.onload = window.history.forward(0);
+
+        function windowClose() {
+            window.open('', '_self', '');
+            top.windowClose();
+        }
+    </script>*@

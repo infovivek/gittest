@@ -49,7 +49,9 @@ IF @PropertyType IN ('Managed G H')
 BEGIN
 IF @Direct = 'Direct'  
 	BEGIN
-		IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
+	IF ISNULL(@ChkOutServiceAmtl,0) !=0
+	BEGIN
+	IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
 		WHERE PropertyType IN ('Managed G H')  AND ISNULL(InVoiceNo,'') != '')
 		BEGIN
 			SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
@@ -62,10 +64,14 @@ IF @Direct = 'Direct'
 			BEGIN
 			SELECT @InVoiceNo='MGH/1';
 		END
+	END
+		
 	END	
 	IF @BTC = 'Bill to Company (BTC)'  
 	BEGIN
-		IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
+	IF ISNULL(@ChkOutServiceAmtl,0) !=0
+	BEGIN
+	IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
 		WHERE PropertyType IN ('Managed G H')  AND ISNULL(InVoiceNo,'') != '')
 		BEGIN
 			SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
@@ -78,10 +84,14 @@ IF @Direct = 'Direct'
 			BEGIN
 			SELECT @InVoiceNo='MGH/1';
 		END
+	END
+		
 	END	
 	IF @BTC = 'Bill to Client'  
 	BEGIN
-		IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
+	IF ISNULL(@ChkOutServiceAmtl,0) !=0
+	BEGIN
+	IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
 		WHERE PropertyType IN ('Managed G H')  AND ISNULL(InVoiceNo,'') != '')
 		BEGIN
 			SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
@@ -94,6 +104,8 @@ IF @Direct = 'Direct'
 			BEGIN
 			SELECT @InVoiceNo='MGH/1';
 		END
+	END
+		
 	END	
 END
 
@@ -101,7 +113,9 @@ IF @PropertyType IN ('DdP')
 BEGIN
 IF @Direct = 'Direct'  
 	BEGIN
-		IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
+	IF ISNULL(@ChkOutServiceAmtl,0) !=0
+	BEGIN
+	IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
 		WHERE PropertyType IN ('DdP')  AND ISNULL(InVoiceNo,'') != '')
 		BEGIN
 			SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
@@ -114,10 +128,14 @@ IF @Direct = 'Direct'
 			BEGIN
 			SELECT @InVoiceNo='DdP/1';
 		END
+	END
+		
 	END	
 	IF @BTC = 'Bill to Company (BTC)'  
 	BEGIN
-		IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
+	IF ISNULL(@ChkOutServiceAmtl,0) !=0
+	BEGIN
+	IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
 		WHERE PropertyType IN ('DdP')  AND ISNULL(InVoiceNo,'') != '')
 		BEGIN
 			SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
@@ -130,10 +148,15 @@ IF @Direct = 'Direct'
 			BEGIN
 			SELECT @InVoiceNo='DdP/1';
 		END
+	
+	END
+		
 	END	
 	IF @BTC = 'Bill to Client'  
 	BEGIN
-		IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
+	IF ISNULL(@ChkOutServiceAmtl,0) !=0
+	BEGIN
+	IF EXISTS (SELECT NULL FROM WRBHBChechkOutHdr
 		WHERE PropertyType IN ('DdP')  AND ISNULL(InVoiceNo,'') != '')
 		BEGIN
 			SELECT TOP 1 @InVoiceNo=SUBSTRING(InVoiceNo,0,5)+
@@ -146,6 +169,8 @@ IF @Direct = 'Direct'
 			BEGIN
 			SELECT @InVoiceNo='DdP/1';
 		END
+	END
+		
 	END	
 END
 
@@ -177,14 +202,18 @@ CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,IsActive,IsDeleted,RowId)
 VALUES(@CheckOutHdrId,@GuestName,'Service',@CheckOutNetAmount,@CreatedBy,GETDATE(),@CreatedBy,
 GETDATE(),1,0,NEWID())
 
-UPDATE WRBHBChechkOutHdr SET InVoiceNo=@InVoiceNo WHERE Id = @CheckOutHdrId AND
- PropertyType IN ('Managed G H','DdP') AND Direct='Direct'
- 
- UPDATE WRBHBChechkOutHdr SET InVoiceNo=@InVoiceNo WHERE Id = @CheckOutHdrId AND
- PropertyType IN ('Managed G H','DdP') AND BTC='Bill to Company (BTC)'
- 
-  UPDATE WRBHBChechkOutHdr SET InVoiceNo=@InVoiceNo WHERE Id = @CheckOutHdrId AND
- PropertyType IN ('Managed G H','DdP') AND BTC='Bill to Client'
+IF ISNULL(@ChkOutServiceAmtl,0) !=0
+	BEGIN
+	
+		UPDATE WRBHBChechkOutHdr SET InVoiceNo=@InVoiceNo WHERE Id = @CheckOutHdrId AND
+		PropertyType IN ('Managed G H','DdP') AND Direct='Direct'
+
+		UPDATE WRBHBChechkOutHdr SET InVoiceNo=@InVoiceNo WHERE Id = @CheckOutHdrId AND
+		PropertyType IN ('Managed G H','DdP') AND BTC='Bill to Company (BTC)'
+
+		UPDATE WRBHBChechkOutHdr SET InVoiceNo=@InVoiceNo WHERE Id = @CheckOutHdrId AND
+		PropertyType IN ('Managed G H','DdP') AND BTC='Bill to Client'
+	END
 
 END
 GO

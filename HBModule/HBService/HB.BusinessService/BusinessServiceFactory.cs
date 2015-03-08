@@ -386,6 +386,18 @@ namespace HB.BusinessService
                 case "CheckInRollback":
                     _businessService = new CheckInRollbackService();
                     break;
+                case "PreformaInvoiceInternalchkout":
+                    _businessService = new PreformaInvoiceIntenalchkoutService();
+                    break;
+                case "ProformainvoiceService":
+                    _businessService = new ProformainvoiceService();
+                    break;
+                case "ProformainvoiceEXTMMTCPPService":
+                    _businessService = new PreformaInvoiceEXTMMTCPPchkoutService();
+                    break;
+                case "BTCDownload":
+                    _businessService = new BTCDownloadService();
+                    break;
             }
             return _businessService;
         }

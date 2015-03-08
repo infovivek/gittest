@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BusinessService\BTCDownloadService.cs" />
     <Compile Include="BusinessServiceFactory.cs" />
     <Compile Include="BusinessService\AddUserService.cs" />
     <Compile Include="BusinessService\ApartmentBookingService.cs" />
@@ -130,6 +131,9 @@
     <Compile Include="BusinessService\PettyCashService.cs" />
     <Compile Include="BusinessService\PettyCashStatusHdrService.cs" />
     <Compile Include="BusinessService\PettyCashStatusService.cs" />
+    <Compile Include="BusinessService\PreformaInvoiceEXTMMTCPPchkoutService.cs" />
+    <Compile Include="BusinessService\PreformaInvoiceIntenalchkoutService.cs" />
+    <Compile Include="BusinessService\ProformainvoiceService.cs" />
     <Compile Include="BusinessService\PropertyAgreementService.cs" />
     <Compile Include="BusinessService\PropertyImageService.cs" />
     <Compile Include="BusinessService\PropertyOwnersService.cs" />

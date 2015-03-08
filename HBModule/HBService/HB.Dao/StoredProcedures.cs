@@ -783,5 +783,31 @@ namespace HB.Dao
         //chkin rollback
         public const string CheckInRollback_help = "SP_CheckInRollback_help";
         public const string CheckInRollback_insert = "SP_CheckInRollback_insert";
+
+        //PreformaInvoice Checkout tariff and service(INP,EXP,MMT,CPP)
+        public const string PreformaInvoiceIntcheckout_Help = "Sp_PreformaInvoiceIntcheckout_Help";
+        public const string PreformaInvoiceInternal_Insert = "Sp_PreformaInvoiceInternal_Insert";
+        public const string PreformaInvoiceServiceHdr_Insert = "SP_PreformaInvoiceServiceHdr_Insert";
+        public const string PreformaInvoiceServiceDtl_Insert = "SP_PreformaInvoiceServiceDtl_Insert";
+        public const string PreformaInvoiceSettleHdr_Insert = "SP_PreformaInvoiceSettleHdr_Insert";
+        public const string PreformaInvoiceSettleDtl_Insert = "SP_PreformaInvoiceSettleDtl_Insert";
+        public const string ProformaInvoiceService_Help = "Sp_ProformaInvoiceService_Help";
+
+        public const string PreformaInvoiceEXTcheckout_Help = "Sp_PreformaInvoiceEXTcheckout_Help";
+        public const string PreformaInvoiceEXTcheckout_Insert = "Sp_PreformaInvoiceEXTcheckout_Insert";
+        
+        //Proforma Invoice
+        public const string ProformaGuestCheckOutTariff_Bill = "SP_ProformaGuestCheckOutTariff_Bill";
+        public const string ProformainvoiceService_Bill = "SP_ProformainvoiceService_Bill";
+        public const string ProformaInvoiceConsolidate_Bill = "SP_ProformaInvoiceConsolidate_Bill";
+        public const string ProformainvoiceExtChkOutService_Bill = "ProformainvoiceExtChkOutService_Bill";
+        public const string ProformaInvoiceExtChkOutTariff_Bill = "SP_ProformaInvoiceExtChkOutTariff_Bill";
+        public const string ProformainvoiceExtChkOutConsolidate_Bill = "SP_ProformainvoiceExtChkOutConsolidate_Bill";
+
+
+        //BTCDownload
+        public const string BTCDownload_Help = "SP_BTCDownloads_Help";
+            
+
     }
 }

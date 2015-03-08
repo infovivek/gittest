@@ -42,7 +42,7 @@ BEGIN
 	 DECLARE @INVOICENO1 NVARCHAR(100),@Length BIGINT,@ChkInVce NVARCHAR(100);
 	 
 	 SET @ChkInVce=(SELECT ChkInVoiceNo FROM WRBHBCreditNoteTariffHdr WHERE 
-	 Id=@ChkOutId AND ChkInVoiceNo=@ChkInVoiceNo)
+	 CheckOutId=@ChkOutId AND ChkInVoiceNo=@ChkInVoiceNo)
 	 IF ISNULL(@ChkInVce,'')=''
 	 BEGIN
 		 SET @PROPERTY = (SELECT TOP 1 Property FROM WRBHBChechkOutHdr 

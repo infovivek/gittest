@@ -1,0 +1,187 @@
+﻿@model test1.Models.BookingBO
+@{
+    ViewBag.Title = "Book";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .bookpageclr {
+        color: #666;
+    }
+</style>
+<div class="booking-cont">
+    <div class="container">
+        <div class="col-md-12 col-lg-12 col-sm-12 booking-wrapper">
+            <div class="col-md-12 col-lg-12 col-sm-12 no-padding">
+                <h3 class="bordered bookpageclr">@Model.PropertyName</h3>
+            </div>
+
+            <div class="col-md-3 col-lg-3 col-sm-12 no-padding">
+                <img src="@Model.ImageLocation" alt="Property Photo" class="img-responsive" style="width:278px; height:278px;">
+
+
+
+            </div>
+
+            <div class="col-md-9 col-lg-9 col-sm-12 booking-details">
+                <!-- Check In -->
+                <div class="col-md-3 col-lg-3 col-sm-3 col-xs-6 checkin">
+                    <h3 class="bookpageclr">Check-in</h3>
+                    <p class="bookpageclr">@Model.CheckIn</p>
+                </div>
+
+
+                <!-- Check Out -->
+                <div class="col-md-3 col-lg-3 col-sm-3 col-xs-6 checkin">
+                    <h3 class="bookpageclr">Check-Out</h3>
+                    <p class="bookpageclr">@Model.Checkout</p>
+                </div>
+
+
+                <!-- Guests -->
+                <div class="col-md-3 col-lg-3 col-sm-3 col-xs-6 Guests">
+                    <h3 class="bookpageclr">Guests</h3>
+                    <p class="bookpageclr">@Model.RoomCount</p>
+                </div>
+
+
+                <!--<div class="col-md-3 col-lg-3 col-sm-3 col-xs-6 room">
+                  <h3>Price</h3>s
+                  <p>Rs. 1850.00</p>
+
+                </div>-->
+            </div>
+
+
+
+            <div class="col-md-9 col-lg-9 col-sm-12 coupon-cont">
+                <!-- <h3 class="margin">Would you like to redeem a coupon?</h3>-->
+                <form method="post" action="" onsubmit="return booking_validate();" name="payuForm">
+                    <input type="hidden" id="p_id" name="p_id" value="522" />
+
+                    <input type="hidden" id="p_name" name="p_name" value="Otium Suites Bangalore" />
+                    <input type="hidden" id="c_id" name="c_id" value="1107" />
+
+                    <input type="hidden" id="p_type" name="p_type" value="ExP" />
+
+                    <input type="hidden" id="checkin" name="checkin" value="01/30/2015" />
+
+                    <input type="hidden" id="checkout" name="checkout" value="01/31/2015" />
+
+                    <input type="hidden" id="noofrooms" name="noofrooms" value="" />
+                    <input type="hidden" id="tariff" name="tariff" value="1850" />
+
+                    <input type="hidden" id="s_tariff" name="s_tariff" value="1850.00" />
+                    <input type="hidden" id="d_tariff" name="d_tariff" value="2000.00" />
+                    <input type="hidden" id="t_tariff" name="t_tariff" value=".00" />
+
+
+                    <input type="hidden" name="productinfo" value="Otium Suites Bangalore" />
+
+                    <!-- <p><input type="text" name="coupon" id="coupon-code" placeholder="Enter your code here">
+                     <input type="submit" Value="Apply Code"></p>-->
+            </div>
+
+
+
+            <div class="col-md-9 col-lg-9 col-sm-12 payment-options">
+                <h3 class="bookpageclr">Payment Option :</h3>
+                <p><input type="radio" name="payment" id="payment" value="online" checked="checked">Pay now</p>
+
+
+
+
+            </div>
+
+
+            <div class="col-md-12 col-lg-12 col-sm-12 traveller">
+                <h3 class="margin bordered bookpageclr">Travellers Details</h3>
+
+                <div class="row">
+                    <div class="col-md-4 col-lg-4 col-sm-12">
+                        <label style="float:left" for="fullname">First Name </label>
+                        <label id="mandatory">*</label>
+                        <input type="text" name="firstname" id="firstname" value="@Model.FirstName">
+                    </div>
+
+                    <div class="col-md-4 col-lg-4 col-sm-12">
+                        <label style="float:left" for="fullname">Last Name </label>
+                        <label id="mandatory">*</label>
+                        <input type="text" name="lastname" id="lastname" value="@Model.LastName">
+                    </div>
+
+
+                    <div class="col-md-4 col-lg-4 col-sm-12">
+                        <label style="float:left" for="fullname">Employee Code</label>
+                        <label id="mandatory">*</label>
+                        <input type="text" name="empcode" id="empcode" value="@Model.EmployeeCode">
+                    </div>
+                </div>
+                <div class="row">
+                    <div style="height:10px;"></div>
+                    <div class="col-md-4 col-lg-4 col-sm-12">
+                        <label style="float:left" for="fullname">Employee Designation </label>
+                        <label id="mandatory">*</label>
+                        <input type="text" name="empdesi" id="empdesi" value="@Model.Designation">
+                    </div>
+
+
+                    <div class="col-md-4 col-lg-4 col-sm-12">
+                        <label style="float:left" for="fullname">Employee Email </label>
+                        <label id="mandatory">*</label>
+                        <input type="text" name="empemail" id="empemail" value="@Model.Email" readonly="readonly">
+                    </div>
+
+
+                    <div class="col-md-4 col-lg-4 col-sm-12">
+                        <label style="float:left" for="fullname">Mobile Number </label>
+                        <label id="mandatory">*</label>
+                        <input type="text" name="empmobile" id="empmobile" value="@Model.Phno">
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col-md-8 col-lg-8 col-sm-12">
+                        <label for="fullname">Special Requests</label>
+                        <input type="text" name="specialrequst" id="specialrequst">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12 col-lg-12 col-sm-12 last">
+                <div class="row">
+                    <div class="col-md-12 col-lg-12 col-sm-12 bordered">
+                        <div class="col-md-4 col-lg-4 col-sm-12">
+                            <!--  <input type="checkbox" value="agreed" id="terms" name="terms" checked="checked" readonly="readonly"> -->
+                            I / We acknowledge and accept the <a onclick="window.open('http://www.staysimplyfied.com/index.php/page/information/Terms and Conditions','mywindow','width=400,height=200,left=0,top=100,screenX=0,screenY=100')" style=" cursor:pointer">Terms and Conditions</a>  applicable and available on the site
+                        </div>
+
+
+                        <div class="col-md-3 col-lg-3 col-sm-8 ">
+
+
+                            <h3 style="color: #333">Total : Rs. @Model.Total_Tariff.00</h3> 			  <input type="hidden" id="total" name="total" value="" />
+                            <input type="hidden" id="amount" name="amount" value="" />
+
+
+
+                        </div>
+
+                        <div class="col-md-3 col-lg-3 col-sm-8">
+                            <input type="submit" value="Confirm Booking" id="submit" name="submit" style="width:60%">
+                        </div>
+
+                        <div class="col-md-2 col-lg-2 col-sm-6">
+                            <input type="button" onclick="javascript:window.history.go(-1);" value="Go Back" id="back" name="submit" style="width:50%">
+                        </div>
+                    </div>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.onload = window.history.forward(0);
+</script>

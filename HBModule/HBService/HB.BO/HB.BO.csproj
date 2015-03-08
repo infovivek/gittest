@@ -59,6 +59,7 @@
     <Compile Include="BookingMailResendBO.cs" />
     <Compile Include="BookingPropertyAssignedGuestBO.cs" />
     <Compile Include="BookingPropertyBO.cs" />
+    <Compile Include="BTCDownloadBO.cs" />
     <Compile Include="BTCSubmissionBO.cs" />
     <Compile Include="CheckInDtlsBo.cs" />
     <Compile Include="CheckInForecastReportBO.cs" />
@@ -136,6 +137,10 @@
     <Compile Include="PettyCashReportBO.cs" />
     <Compile Include="PettyCashStatusBO.cs" />
     <Compile Include="PettyCashStatusHdrBO.cs" />
+    <Compile Include="PreformaInvoiceEXTMMTCPPchkoutBO.cs" />
+    <Compile Include="PreformaInvoiceIntenalchkoutBO.cs" />
+    <Compile Include="ProformainvoiceServiceDtlsBO.cs" />
+    <Compile Include="ProformainvoiceServicehdrBO.cs" />
     <Compile Include="PropertyOwnerOtherContactsBO.cs" />
     <Compile Include="PropertyReportBO.cs" />
     <Compile Include="ReassignClientBO.cs" />

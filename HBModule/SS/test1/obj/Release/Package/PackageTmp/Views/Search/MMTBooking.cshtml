@@ -1,0 +1,220 @@
+﻿@model test1.Models.CppExpBookingBO
+@{
+    ViewBag.Title = "Book";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .bookpageclr {
+        color: #666;
+    }
+</style>
+@using (Html.BeginForm("MMTConfirmBooking   Booking", "Search"))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="booking-cont">
+        <div class="container">
+            <div class="col-md-12 col-lg-12 col-sm-12 booking-wrapper">
+                <div class="col-md-12 col-lg-12 col-sm-12 no-padding">
+                    <h3 class="bordered bookpageclr">@Model.PropertyName</h3>
+                </div>
+
+                <div class="col-md-3 col-lg-3 col-sm-12 no-padding">
+                    <img src="@Model.ImageLocation" alt="Property Photo" class="img-responsive" style="width:278px; height:278px;">
+
+
+
+                </div>
+
+                <div class="col-md-9 col-lg-9 col-sm-12 booking-details">
+                    <!-- Check In -->
+                    <div class="col-md-3 col-lg-3 col-sm-3 col-xs-6 checkin">
+                        <h3 class="bookpageclr">Check-in</h3>
+                        <p class="bookpageclr">@Model.CheckIn</p>
+                    </div>
+
+
+                    <!-- Check Out -->
+                    <div class="col-md-3 col-lg-3 col-sm-3 col-xs-6 checkin">
+                        <h3 class="bookpageclr">Check-Out</h3>
+                        <p class="bookpageclr">@Model.Checkout</p>
+                    </div>
+
+
+                    <!-- Guests -->
+                    <div class="col-md-3 col-lg-3 col-sm-3 col-xs-6 Guests">
+                        <h3 class="bookpageclr">Guests</h3>
+                        <p class="bookpageclr">@Model.RoomCount</p>
+                    </div>
+
+
+                    <!--<div class="col-md-3 col-lg-3 col-sm-3 col-xs-6 room">
+                      <h3>Price</h3>s
+                      <p>Rs. 1850.00</p>
+
+                    </div>-->
+                </div>
+
+
+                <div class="col-md-9 col-lg-9 col-sm-12 coupon-cont">
+
+                    @Html.HiddenFor(model => model.stateId)
+                    @Html.HiddenFor(model => model.SateName)
+                    @Html.HiddenFor(model => model.RoomCount)
+                    @Html.HiddenFor(model => model.PropertyName)
+                    @Html.HiddenFor(model => model.PropertyId)
+                    @Html.HiddenFor(model => model.Phno)
+                    @Html.HiddenFor(model => model.Level)
+                    @Html.HiddenFor(model => model.ImageLocation)
+                    @Html.HiddenFor(model => model.Grade)
+                    @Html.HiddenFor(model => model.UserId)
+                    @Html.HiddenFor(model => model.Email)
+                    @Html.HiddenFor(model => model.CheckIn)
+                    @Html.HiddenFor(model => model.Checkout)
+                    @Html.HiddenFor(model => model.CliendId)
+                    @Html.HiddenFor(model => model.ClientName)
+                    @Html.HiddenFor(model => model.Designation)
+                    @Html.HiddenFor(model => model.EmployeeCode)
+                    @Html.HiddenFor(model => model.FirstName)
+                    @Html.HiddenFor(model => model.LastName)
+                    @Html.HiddenFor(model => model.Total_Tariff)
+                    @Html.HiddenFor(model => model.CityName)
+                    @Html.HiddenFor(model => model.cityId)
+                    @Html.HiddenFor(model => model.PropertyType)
+                    @Html.HiddenFor(model => model.RoomType)
+                    @Html.HiddenFor(model => model.GradeId)
+                    @Html.HiddenFor(model => model.guestId)
+                    @Html.HiddenFor(model => model.Title)
+                    @Html.HiddenFor(model => model.SingleOccupancy)
+                    @Html.HiddenFor(model => model.doubleOccupancy)
+                    @Html.HiddenFor(model => model.Nationality)
+                    @Html.HiddenFor(model => model.CityCode)
+                    @Html.HiddenFor(model => model.ServicePayMode)
+                    @Html.HiddenFor(model => model.TariffPayMode)
+
+
+
+
+                </div>
+
+
+
+                <div class="col-md-9 col-lg-9 col-sm-12 payment-options">
+                    <h3 class="bookpageclr">Payment Option :</h3>
+                    <p><input type="radio" name="payment" id="payment" value="online" checked="checked">Pay now</p>
+                </div>
+
+
+                <div class="col-md-12 col-lg-12 col-sm-12 traveller">
+                    <h3 class="margin bordered bookpageclr">Travellers Details</h3>
+
+                    <div class="row">
+                        <div class="col-md-4 col-lg-4 col-sm-12">
+                            <label style="float:left" for="fullname">First Name </label>
+                            <label id="mandatory">*</label>
+                            <input type="text" name="firstname" id="firstname" value="@Model.FirstName">
+                        </div>
+
+                        <div class="col-md-4 col-lg-4 col-sm-12">
+                            <label style="float:left" for="fullname">Last Name </label>
+                            <label id="mandatory">*</label>
+                            <input type="text" name="lastname" id="lastname" value="@Model.LastName">
+                        </div>
+
+
+                        <div class="col-md-4 col-lg-4 col-sm-12">
+                            <label style="float:left" for="fullname">Employee Code</label>
+                            <label id="mandatory">*</label>
+                            <input type="text" name="empcode" id="empcode" value="@Model.EmployeeCode">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div style="height:10px;"></div>
+                        <div class="col-md-4 col-lg-4 col-sm-12">
+                            <label style="float:left" for="fullname">Employee Designation </label>
+                            <label id="mandatory">*</label>
+                            <input type="text" name="empdesi" id="empdesi" value="@Model.Designation">
+                        </div>
+
+
+                        <div class="col-md-4 col-lg-4 col-sm-12">
+                            <label style="float:left" for="fullname">Employee Email </label>
+                            <label id="mandatory">*</label>
+                            <input type="text" name="empemail" id="empemail" value="@Model.Email" readonly="readonly">
+                        </div>
+
+
+                        <div class="col-md-4 col-lg-4 col-sm-12">
+                            <label style="float:left" for="fullname">Mobile Number </label>
+                            <label id="mandatory">*</label>
+                            <input type="text" name="empmobile" id="empmobile" value="@Model.Phno">
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-8 col-lg-8 col-sm-12">
+                            <label for="fullname">Special Requests</label>
+                            <input type="text" name="specialrequst" value="-" id="specialrequst">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12 col-lg-12 col-sm-12 last">
+                    <div class="row">
+                        <div class="col-md-12 col-lg-12 col-sm-12 bordered">
+                            <div class="col-md-4 col-lg-4 col-sm-12">
+                                <!--  <input type="checkbox" value="agreed" id="terms" name="terms" checked="checked" readonly="readonly"> -->
+                                I / We acknowledge and accept the <a onclick="window.open('','mywindow','width=400,height=200,left=0,top=100,screenX=0,screenY=100')" style=" cursor:pointer">Terms and Conditions</a>  applicable and available on the site
+                            </div>
+
+
+                            <div class="col-md-3 col-lg-3 col-sm-8 ">
+                                <span style="text-align: center; color: green;">@ViewBag.UpdateTarrif</span>
+
+                                <h3 style="color: #333">Total : Rs. @Model.Total_Tariff</h3> 			  <input type="hidden" id="total" name="total" value="" />
+                                <input type="hidden" id="amount" name="amount" value=" " />
+
+
+
+                            </div>
+
+                            <div class="col-md-3 col-lg-3 col-sm-8">
+                                <input type="submit" value="Confirm Booking" onclick="return validation1()" id="submit" name="submit" style="width:60%">
+                            </div>
+
+
+                            <div class="col-md-2 col-lg-2 col-sm-6">
+                                <input type="button" onclick="javascript:window.history.go(-1);" value="Go Back" id="back" name="submit" style="width:50%">
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+<script type="text/javascript">
+    window.onload = window.history.forward(0);
+    function validation1() {
+        debugger;
+
+        var first = $("#firstname").val();
+        var lst = $("#lastname").val();
+        var empcode = $("#empcode").val();
+        var desic = $("#empdesi").val();
+        var email = $("#empemail").val();
+        var ph = $("#empmobile").val();
+
+        if ((first == null || first == "") || (lst == null || lst == "") || (empcode == null || empcode == "") || (email == null || email == "") || (ph == null || ph == "")) {
+            alert("Mandatory Fields are Missing Please Check Traveller Details")
+            return false;
+        }
+        else
+            return true;
+    }
+</script>

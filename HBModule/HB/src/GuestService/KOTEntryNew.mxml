@@ -65,7 +65,7 @@
 					}
 					if(Ds_Objects.result.Tables.Table1.Rows.length > 0)
 					{
-//						dt_Date.text=Ds_Objects.result.Tables.Table1.Rows[0].Date;
+						dt_Date.text=Ds_Objects.result.Tables.Table1.Rows[0].Date;
 //						//			Date Restrict
 //						var sdfs:String=dt_Date.text;						
 //						var D:String=sdfs.substr(0,2);

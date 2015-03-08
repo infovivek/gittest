@@ -40,14 +40,14 @@
 			public function funOcc():void
 			{
 				lbl_Rooms.text= Lable_Room;
-				
+				Brd_Occ.toolTip=Lable_Room
 			}
 			
 		]]>
 	</fx:Script>
 	<s:BorderContainer x="0" y="0" width="100%" height="100%" id="Brd_Occ" borderVisible="false">
 		<s:VGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle" visible="true">
-			<mx:Label text="" id="lbl_Rooms"/>			
+			<mx:Label id="lbl_Rooms" x="8" width="65"  text="" textAlign="left"/>					
 		</s:VGroup>	
 		<mx:HRule x="0" y="-1" width="98%" height="5" strokeColor="#060000" id="rl_1"/>
 		<mx:HRule x="0" y="32" width="98%" height="5" strokeColor="#060000" id="rl_2"/>

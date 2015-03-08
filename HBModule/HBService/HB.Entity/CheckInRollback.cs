@@ -25,5 +25,6 @@ namespace HB.Entity
         public string BookingLevel { get; set; }
         public string ChangedStatus { get; set; }
         public string Type { get; set; }
+        public string Remarks { get; set; }
     }
 }

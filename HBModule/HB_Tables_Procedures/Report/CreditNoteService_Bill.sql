@@ -58,13 +58,16 @@ IF @Action='PageLoad'
 		CREATE TABLE #Service1(ChkOutId INT,HdrId INT,
 		CrdNoteNo NVARCHAR(100),InVoiceNo NVARCHAR(100),VAT DECIMAL(27,2),ServiceFB DECIMAL(27,2),ServiceOT DECIMAL(27,2))
 		INSERT INTO #Service1(ChkOutId,CrdNoteNo,InVoiceNo,VAT,ServiceFB,ServiceOT,HdrId)
+		
 		SELECT DISTINCT Ch.CheckOutId, CreditNoteNo AS CrdNoteNo,CrdInVoiceNo AS InVoiceNo,
-		SUM(ServiceAmount*H.VATPer/100) AS VAT,SUM(ServiceAmount*H.ServiceTaxPer/100) AS ServiceTaxFB,SUM(ServiceAmount*12.36/100) AS ServiceTaxOthers,CH.Id
+		SUM(ServiceAmount*H.VATPer/100) AS VAT,SUM(Ch.ServiceTaxFB) AS ServiceTaxFB,SUM(ServiceTaxOthers) AS ServiceTaxOthers,CH.Id
 		FROM WRBHBCreditNoteServiceDtls CD
 		JOIN WRBHBCreditNoteServiceHdr  CH ON CD.CrdServiceHdrId=CH.Id AND CH.IsActive=1
 		JOIN WRBHBChechkOutHdr H ON Ch.CheckOutId=H.Id
-		WHERE CH.Id= @Id1 AND CD.Quantity !=0
+		WHERE CH.Id= @Id1 AND CD.Quantity !=0 
 		GROUP BY  Ch.CheckOutId,CreditNoteNo,CrdInVoiceNo,CH.Id
+		
+		
 		
 		
 		 SELECT DISTINCT h.GuestName as GuestName,h.Name,h.Stay,h.Type,d.Type as BookingLevel,convert(nvarchar(100),

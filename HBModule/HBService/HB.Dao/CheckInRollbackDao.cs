@@ -40,6 +40,7 @@ namespace HB.Dao
             Roll.Type = doc.SelectSingleNode("HdrXml").Attributes["Type"].Value;
             Roll.ChangedStatus = doc.SelectSingleNode("HdrXml").Attributes["ChangedStatus"].Value;
             Roll.BookingLevel = doc.SelectSingleNode("HdrXml").Attributes["BookingLevel"].Value;
+            Roll.Remarks = doc.SelectSingleNode("HdrXml").Attributes["Remarks"].Value;
             command = new SqlCommand();
             if (Roll.Id != 0)
             {
@@ -76,6 +77,7 @@ namespace HB.Dao
             command.Parameters.Add("@Type", SqlDbType.NVarChar).Value = Roll.Type;
             command.Parameters.Add("@ChangedStatus", SqlDbType.NVarChar).Value = Roll.ChangedStatus;
             command.Parameters.Add("@BookingLevel", SqlDbType.NVarChar).Value = Roll.BookingLevel;
+            command.Parameters.Add("@Remarks", SqlDbType.NVarChar).Value = Roll.Remarks;
             ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
             return ds;
         }

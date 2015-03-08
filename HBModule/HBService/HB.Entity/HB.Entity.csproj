@@ -121,6 +121,10 @@
     <Compile Include="PettyCashReportEntity.cs" />
     <Compile Include="PettyCashStatusEntity.cs" />
     <Compile Include="PettyCashStatusHdr.cs" />
+    <Compile Include="PreformaInvoiceEXTMMTCPPchkout.cs" />
+    <Compile Include="PreformaInvoiceIntenalchkout.cs" />
+    <Compile Include="ProformainvoiceServiceDtls.cs" />
+    <Compile Include="ProformainvoiceServicehdr.cs" />
     <Compile Include="PropertyOwnerOtherContacts.cs" />
     <Compile Include="PropertyReport.cs" />
     <Compile Include="ReassignClient.cs" />

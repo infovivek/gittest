@@ -1,0 +1,27 @@
+﻿@{
+    ViewBag.Title = "New_User";
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+
+
+    });
+    function autocomp() {
+        window.location.href = '/Report/PrptyMonthReports?' + ViewBag.UserId;
+    }
+</script>
+<div class="menu">
+    <div class="content-area">
+        <span class="navs col-xs-12 col-sm-6 col-md-4 pointer" onclick="autocomp()">REPORT<div class="underline"></div></span>
+        <span class="navs col-xs-12 col-sm-6 col-md-4 pointer" onclick="loadUrl('~/Account/Login')">LOGIN</span>
+        <span class="navs col-xs-12 col-sm-6 col-md-4 pointer" onclick="loadUrl('~/Account/New_User')">NEW USER</span>
+        <div class="clearfix"></div>
+    </div>
+</div>
+
+<div style="text-align:center;vertical-align:top"> 
+    <object>
+        <embed src="http://hbstay.in/PropertywiseReport.swf" type="application/x-shockwave-flash"
+               allowscriptaccess="always" allowfullscreen="true" width="1400" height="590"></embed>
+    </object> 
+</div>

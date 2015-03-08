@@ -51,7 +51,7 @@ IF @Action ='PAGELOAD'
 		
 		create TABLE #TEMPFINAL(GuestName NVARCHAR(200),GuestId BIGINT,CityId BIGINT,BookingId BIGINT,
 		ChkOutDate NVARCHAR(200),Type NVARCHAR(200), PropertyName NVARCHAR(200) ,CityName NVARCHAR(200),CheckInHdrId Bigint,
-		Category nvarchar(500),MOP Nvarchar(200) ,PropertyId Bigint,BookingCode Nvarchar(100),ClientName NVARCHAR(100),ClientId BIGINT,
+		Category nvarchar(500),MOP Nvarchar(200) ,PropertyId Nvarchar(200),BookingCode Nvarchar(100),ClientName NVARCHAR(100),ClientId BIGINT,
 		CheckInDate Nvarchar(100),NOofdays Int,PropertyMail Nvarchar(200),ContactNumber Nvarchar(100),RoomNO  Nvarchar(100),RoomId  Nvarchar(100))
 
    

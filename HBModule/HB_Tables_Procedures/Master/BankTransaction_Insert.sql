@@ -36,11 +36,21 @@ AS
 BEGIN
 	IF(@Credit!=0.00)
 	BEGIN
-		INSERT INTO WRBHBBankTransaction(AccountNumber,TransactionDate,Description,RefNo,Credit,
-			IsActive,IsDeleted,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,RowId,BalanceAmount)
-		VALUES (@AccountNumber,@TransactionDate,@Description,@RefNo,@Credit,1,0,@CreatedBy,GETDATE(),
-		@CreatedBy,GETDATE(),NEWID(),0.00)
-		
-		SELECT Id,RowId FROM WRBHBBankTransaction WHERE Id=@@IDENTITY;		
+	
+	 IF EXISTS(SELECT Id FROM WRBHBBankTransaction WHERE IsActive=1 AND 
+              TransactionDate=@TransactionDate AND RefNo=@RefNo and Description= @Description)
+       Begin
+			-- SELECT 'Already Exists.' AS Msg;
+			Update WRBHBBankTransaction set ModifiedDate= GETDATE()
+			 WHERE IsActive=1 AND TransactionDate=@TransactionDate AND RefNo=@RefNo and Description= @Description  
+		End
+		Else
+		Begin
+			INSERT INTO WRBHBBankTransaction(AccountNumber,TransactionDate,Description,RefNo,Credit,
+				IsActive,IsDeleted,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,RowId,BalanceAmount)
+			VALUES (@AccountNumber,@TransactionDate,@Description,@RefNo,@Credit,1,0,@CreatedBy,GETDATE(),
+			@CreatedBy,GETDATE(),NEWID(),0.00)
+		End
+		--SELECT Id,RowId FROM WRBHBBankTransaction WHERE Id=@@IDENTITY;		
 	END 
 END		

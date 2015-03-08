@@ -54,8 +54,7 @@ If @Action ='PageLoad'
 		 PU.UserId=@UserId  and 
 		--isnull(d.RoomShiftingFlag,0)=0 and
 		d.CurrentStatus = 'CheckIn' and
-		h.Id NOT IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where IsActive = 1 and IsDeleted = 0 
-		and ISNULL(IntermediateFlag,0)=1)
+		h.Id NOT IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where IsActive = 1 and IsDeleted = 0 )
 		group by h.BookingCode,h.ChkInGuest,h.Property,h.RoomNo,h.Type,
 		h.ArrivalDate,h.ChkoutDate,	h.BookingId,h.PropertyId,h.GuestId,h.Id ,
 		h.RoomId,h.ApartmentId,h.BedId,d.ChkInDt,d.ChkOutDt
@@ -82,8 +81,7 @@ If @Action ='PageLoad'
 		 PU.UserId=@UserId  and 
 		--isnull(d.RoomShiftingFlag,0)=0 and
 		d.CurrentStatus = 'CheckIn' and
-		h.Id NOT IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where IsActive = 1 and IsDeleted = 0 
-		and ISNULL(IntermediateFlag,0)=1)
+		h.Id NOT IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where IsActive = 1 and IsDeleted = 0 )
 		group by h.BookingCode,h.ChkInGuest,h.Property,h.RoomNo,h.Type,
 		h.ArrivalDate,h.ChkoutDate,	h.BookingId,h.PropertyId,h.GuestId,h.Id ,
 		h.RoomId,h.ApartmentId,h.BedId,d.ChkInDt,d.ChkOutDt
@@ -110,8 +108,7 @@ If @Action ='PageLoad'
 		 PU.UserId=@UserId  and 
 		--isnull(d.RoomShiftingFlag,0)=0 and
 		d.CurrentStatus = 'CheckIn' and
-		h.Id NOT IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where IsActive = 1 and IsDeleted = 0 
-		and ISNULL(IntermediateFlag,0)=1)
+		h.Id NOT IN (Select ChkInHdrId FRom WRBHBChechkOutHdr where IsActive = 1 and IsDeleted = 0 )
 		group by h.BookingCode,h.ChkInGuest,h.Property,h.RoomNo,h.Type,
 		h.ArrivalDate,h.ChkoutDate,	h.BookingId,h.PropertyId,h.GuestId,h.Id ,
 		h.RoomId,h.ApartmentId,h.BedId,d.ChkInDt,d.ChkOutDt
