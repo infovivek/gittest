@@ -1,0 +1,147 @@
+﻿@{
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript">
+    //  PrptyMonthwise Below
+    function PrptyMonthwise() {
+        $.ajax({
+            url: "/Dashboard/getUserId/",
+            cache: false,
+            type: "GET",
+            success: function (data) {
+                if (data != 0) {
+                    window.location.href = '/Dashboard/PrptyMonthReports?' + data;
+                }
+            }
+        });
+    }
+    function PrptyDatewise() {
+        $.ajax({
+            url: "/Dashboard/getUserId/",
+            cache: false,
+            type: "GET",
+            success: function (data) {
+                if (data != 0) {
+                    window.location.href = '/Dashboard/PrptyDateReports?' + data;
+                }
+            }
+        });
+    }
+    //For Payment Below
+    function Paymentwise() {
+        $.ajax({
+            url: "/Dashboard/getUserId/",
+            cache: false,
+            type: "GET",
+            success: function (data) {
+                if (data != 0) {
+                    window.location.href = '/Dashboard/PaymentReports?' + data;
+                }
+            }
+        });
+    }
+    //For Citywise Month Below
+    function CityDatewise() {
+        $.ajax({
+            url: "/Dashboard/getUserId/",
+            cache: false,
+            type: "GET",
+            success: function (data) {
+                if (data != 0) {
+                    window.location.href = '/Dashboard/CityDateReports?' + data;
+                }
+            }
+        });
+    }
+    //CityDatewise
+    function CityMonthwise() {
+        $.ajax({
+            url: "/Dashboard/getUserId/",
+            cache: false,
+            type: "GET",
+            success: function (data) {
+                if (data != 0) {
+                    window.location.href = '/Dashboard/CityMonthReports?' + data;
+                }
+            }
+        });
+    }
+    //changepwd
+    function changepwd() {
+        $.ajax({
+            url: "/Dashboard/getUserId/",
+            cache: false,
+            type: "GET",
+            success: function (data) {
+                if (data != 0) {
+                    window.location.href = '/Home/Profile?' + data;
+                }
+            }
+        });
+    }
+    //Menu_click()
+    // debugger;
+    function Menu_click() {
+        // debugger;
+        document.getElementById('Dash_menu').style.visibility = "visible";
+        // $("#Dash_menu").show();
+    }
+    //Occupancy
+    function OccupancyReport() {
+        $.ajax({
+            url: "",
+            cache: false,
+            type: "GET",
+            success: function (data) {
+                if (data != 0) {
+                    window.location.href = '/GHReport/Index';
+                }
+            }
+        });
+    }
+    //GHReport
+    function GHReport() {
+        $.ajax({
+            url: "",
+            cache: false,
+            type: "GET",
+            success: function (data) {
+                if (data != 0) {
+                    window.location.href = '/GHReport/Index';
+                }
+            }
+        });
+    }
+</script>
+
+<div class="container">
+    <div id="contactFormContainer"> 
+             <div class="menu-div" >
+                 <span class="pointer" onclick="PrptyMonthwise()"> Property Monthwise </span> 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+                 <span class="pointer" onclick="PrptyDatewise()"> Property Datewise </span> 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+                 <span class="pointer" onclick="Paymentwise()"> Paymentwise </span> 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+                 <span class="pointer" onclick="CityMonthwise()"> City Monthwise </span> 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+                 <span class="pointer" onclick="CityDatewise()"> City Datewise </span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+                 <span class="pointer" onclick="OccupancyReport()"> Occupancy Report </span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+                 <span class="pointer" onclick="GHReport()"> GHReport </span>
+            </div>
+   </div>
+</div>
+
+
+<br />
+<br />	<br />
+<br />
+
+<br />
+<br />	<br />	<br />	<br />
+
+<div style="float:right; height:55px;" class="col-md-6 bottom-right"><br /><a href="http://www.hummingbirdindia.com" target="_blank">Stay Simplyfied is a brand of HummingBird Travel & Stay Pvt. Ltd.  </a><br /></div>
+

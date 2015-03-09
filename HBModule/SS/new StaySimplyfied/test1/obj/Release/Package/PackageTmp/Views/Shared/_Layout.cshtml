@@ -1,0 +1,1083 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stay Simplyfied</title>
+
+    @Styles.Render("~/Content/css1")
+    @Styles.Render("~/Content/css2")
+    @Scripts.Render("~/bundles/bootstrap")
+
+    <style type="text/css">
+        .ui-autocomplete {
+            max-height: 220px;
+            overflow-y: scroll;
+            overflow-x: hidden;
+        }
+    </style>
+    <script type="text/javascript">
+        //  PrptyMonthwise Below
+        function PrptyMonthwise() {            
+            $.ajax({
+                url: "/Dashboard/getUserId/",
+                cache: false,
+                type: "GET",
+                success: function (data) {
+                    if (data != 0) {
+                        window.location.href = '/Dashboard/PrptyMonthReports?' + data;
+                    }
+                }
+            }); 
+        }
+        function PrptyDatewise() {            
+            $.ajax({
+                url: "/Dashboard/getUserId/",
+                cache: false,
+                type: "GET",
+                success: function (data) {
+                    if (data != 0) {
+                        window.location.href = '/Dashboard/PrptyDateReports?' + data;
+                    }
+                }
+            }); 
+        }
+        //For Payment Below
+        function Paymentwise() {             
+            $.ajax({
+                url: "/Dashboard/getUserId/",
+                cache: false,
+                type: "GET",
+                success: function (data) {
+                    if (data != 0) {
+                        window.location.href = '/Dashboard/PaymentReports?' + data;
+                    }
+                }
+            });
+        }
+        //For Citywise Month Below
+        function CityDatewise() {            
+            $.ajax({
+                url: "/Dashboard/getUserId/",
+                cache: false,
+                type: "GET",
+                success: function (data) {
+                    if (data != 0) {
+                        window.location.href = '/Dashboard/CityDateReports?' + data;
+                    }
+                }
+            });
+        }
+        //CityDatewise
+        function CityMonthwise() {
+            $.ajax({
+                url: "/Dashboard/getUserId/",
+                cache: false,
+                type: "GET",
+                success: function (data) {
+                    if (data != 0) {
+                        window.location.href = '/Dashboard/CityMonthReports?' + data;
+                    }
+                }
+            });
+        }
+        //changepwd
+        function changepwd() {
+            $.ajax({
+                url: "/Dashboard/getUserId/",
+                cache: false,
+                type: "GET",
+                success: function (data) {
+                    if (data != 0) {
+                        window.location.href = '/Home/Profile?' + data;
+                    }
+                }
+            });
+        }
+        //Menu_click()
+       // debugger;       
+        function Menu_click()
+        {
+           // debugger;
+            document.getElementById('Dash_menu').style.visibility = "visible";
+           // $("#Dash_menu").show();
+        }
+        //
+    </script>
+
+
+    <!-- Datepicker Script End -->
+
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row stay-width top-header-container">
+            <div class="col-lg-6 col-md-6 col-sm-6">
+                <div class="logo-container">
+
+                    @{
+                        string UserMode = "";
+                        string ClientLogo = "";
+                        HBEntities db = new HBEntities();
+                        if (User.Identity.IsAuthenticated)
+                        {
+                            var logo1 = (from s in db.UserProfiles
+                                         join td in db.WrbhbTravelDesks on s.UserId equals td.App_UserId
+                                         join cm in db.WRBHBClientManagements on td.ClientId equals cm.Id
+                                         where s.UserId == WebSecurity.CurrentUserId && td.IsActive == true && td.IsDeleted == false
+                                         select new { cm.ClientLogo }).FirstOrDefault();
+
+                            ClientLogo = (logo1 != null) ? logo1.ClientLogo : "";
+                            UserMode = logo1 != null ? "TRAVELDESK" : "";
+                            if (logo1 == null)
+                            {
+                                var logo2 = (from s in db.UserProfiles
+                                             join tc in db.WRBHBClientManagementAddClientGuests on s.UserId equals tc.App_UserId
+                                             join cm in db.WRBHBClientManagements on tc.CltmgntId equals cm.Id
+                                             where s.UserId == WebSecurity.CurrentUserId && tc.IsActive == true && tc.IsDeleted == false
+                                             select cm.ClientLogo).FirstOrDefault();
+
+                                ClientLogo = (logo2 != null) ? logo2 : "";
+                                UserMode = "ENDUSER";
+                            }
+
+                            string final = ClientLogo != "" ? ClientLogo : "http://www.staysimplyfied.com/img/ss_logo.png";
+
+                            <a href="@Url.Action("Index", "Home")"> <img src="@final" alt=""></a>
+                            <p>
+                                <br>
+                                <strong>
+                                    Online Hotel <span style="color:#E8530B">Concierge</span> Desk
+
+                                </strong>
+                            </p>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("Index", "Home")"> <img src="~/img/ss_logo.png" alt=""></a>
+
+                        }
+                    }
+
+
+
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6 top-right-menu">
+                <!--<div class="menu-div"><a href="#">Contact Us</a></div>	-->
+                @{
+            if (User.Identity.IsAuthenticated)
+            {
+                if (UserMode == "TRAVELDESK")
+                {
+                    @*<span class="pointer" onclick="PrptyMonthwise()"> Prpty Monthwise</span>*@ 
+                    @*<div class="menu-div"><span class="pointer" onclick="changepwd()">Change Password</span></div>*@
+                    <div class="menu-div"><a href="@Url.Action("Profile", "Home")">PROFILE</a></div>
+                    <div class="menu-div"><a href="@Url.Action("Index", "Dashboard")">DASHBOARD</a></div>                    
+                    <div class="menu-div"><a href="@Url.Action("Index", "Home")">NEW BOOKING</a></div>
+                    <div class="menu-div"><a href="@Url.Action("Logout", "Account")">LOGOUT</a></div> 
+                }
+                else
+                {
+                    <div class="menu-div"><a href="@Url.Action("Profile", "Home")">PROFILE</a></div>
+                    <div class="menu-div"><a href="@Url.Action("Logout", "Account")">LOGOUT</a></div>
+                }
+                    }
+                    else
+                    {
+                        <div class="menu-div"><a href="@Url.Action("New_User", "Account")">NEW USER</a></div>
+                        <div class="menu-div"><a href="@Url.Action("Login", "Account")">LOGIN</a></div>
+                    }
+                }
+
+            </div>
+            
+        </div>
+    </div>
+    @*<div style="padding-left: 805px;visibility:hidden;" id="Dash_menu">
+        <div class="menu-div" > <span class="pointer" onclick="PrptyMonthwise()"> Prpty Monthwise</span></div>
+        <div class="menu-div" style="margin-top:10px;"> <span class="pointer" onclick="PrptyDatewise()"> PrptyDatewise </span></div>
+        <div class="menu-div" style="margin-top:10px;"> <span class="pointer" onclick="Paymentwise()">  Paymentwise   </span></div>
+        <div class="menu-div" style="margin-top:10px;"> <span class="pointer" onclick="CityMonthwise()"> CityMonthwise </span></div>
+        <div class="menu-div" style="margin-top:10px;"> <span class="pointer" onclick="CityDatewise()">  CityDatewise  </span></div>
+
+    </div>*@
+    <div class="header">
+        <div class="content-area stay-width">
+            <div class="bottom pc">
+                @if (UserMode == "ENDUSER")
+                {
+                    using (Html.BeginForm("Searchdata", "Search"))
+                    {
+                        @Html.AntiForgeryToken()
+                        <input type="text" id="destination" name="destination" value="@ViewBag.Dest" class="input-fields input-field-30" placeholder="Destination" onkeypress="autocomp()" autocomplete="off">
+                        <input type="text" class="input-fields input-field-20" id="checkin" name="checkin" value="@ViewBag.IN" placeholder="Check In">
+                        <input type="text" class="input-fields input-field-20" id="checkout" name="checkout" value="@ViewBag.OUT" placeholder="Check Out">
+
+                        <select class="input-fields input-field-15" id="Adult" name="Adult" onchange="">
+
+                            <option value="1">1 Room </option>
+                        </select>
+                        <span id="rooms_grid">
+                            <select class="input-fields input-field-15" id="room0" name="room1" required>
+
+                                <option value="1">1 </option>
+
+
+                            </select>
+                        </span>
+                        <button class="button topsearch" type="submit" onclick="return validation()">Submit</button>
+                    }
+                }
+
+                else
+                {
+                    if (ViewBag.Done == null)
+                    {
+                        using (Html.BeginForm("TravellerDetails", "Home"))
+                        {
+                            @Html.AntiForgeryToken()
+                            <input type="text" id="destination" name="destination" value="@ViewBag.Dest" class="input-fields input-field-30" placeholder="Destination" onkeypress="autocomp()" autocomplete="off">
+                            <input type="text" class="input-fields input-field-20" id="checkin" name="checkin" value="@ViewBag.IN" placeholder="Check In">
+                            <input type="text" class="input-fields input-field-20" id="checkout" name="checkout" value="@ViewBag.OUT" placeholder="Check Out">
+
+                            <select class="input-fields input-field-15" id="Adult" name="Adult" onchange="GuestDrop()">
+
+                                <option value="1">1 Room </option>
+
+                                <option value="2">2 Room </option>
+
+                                <option value="3">3 Room </option>
+
+                                <option value="4">4 Room </option>
+
+                                <option value="5">5 Room </option>
+                            </select>
+                            <span id="rooms_grid1">
+                                <select class="input-fields input-field-15" id="room1" name="room1">
+
+                                    <option value="1">1 </option>
+
+                                    <option value="2">2 </option>
+                                </select>
+                            </span>
+
+                            <button class="button topsearch" type="submit" onclick="return validation2()">Submit</button>
+
+                            <div id="guest2" class="bottom pc" style="margin-left: 72.3%;width:105%;">
+                                <span id="rooms_grid2">
+                                    <select class="input-fields input-field-15" id="room2" name="room2">
+
+                                        <option value="1">1 </option>
+
+                                        <option value="2">2 </option>
+                                    </select>
+                                </span>
+                            </div>
+                            <div id="guest3" class="bottom pc" style="margin-left: 72.3%;width:105%;">
+                                <span id="rooms_grid3">
+                                    <select class="input-fields input-field-15" id="room3" name="room3">
+
+                                        <option value="1">1 </option>
+
+                                        <option value="2">2 </option>
+                                    </select>
+                                </span>
+                            </div>
+                            <div id="guest4" class="bottom pc" style="margin-left: 72.3%;width:105%;">
+                                <span id="rooms_grid4">
+                                    <select class="input-fields input-field-15" id="room4" name="room4">
+
+                                        <option value="1">1 </option>
+
+                                        <option value="2">2 </option>
+                                    </select>
+                                </span>
+                            </div>
+                            <div id="guest5" class="bottom pc" style="margin-left: 72.3%;width:105%;">
+                                <span id="rooms_grid5">
+                                    <select class="input-fields input-field-15" id="room5" name="room5">
+
+                                        <option value="1">1 </option>
+
+                                        <option value="2">2 </option>
+                                    </select>
+                                </span>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        using (Html.BeginForm("Searchdata", "Search"))
+                        {
+                            @Html.AntiForgeryToken()
+                            <input type="text" id="destination" name="destination" value="@ViewBag.Dest" class="input-fields input-field-30" placeholder="Destination" onkeypress="autocomp()" autocomplete="off">
+                            <input type="text" class="input-fields input-field-20" id="checkin" name="checkin" value="@ViewBag.IN" placeholder="Check In">
+                            <input type="text" class="input-fields input-field-20" id="checkout" name="checkout" value="@ViewBag.OUT" placeholder="Check Out">
+
+                            <select class="input-fields input-field-15" id="Adult" name="Adult" onchange="GuestDrop()">
+
+                                <option value="1">1 Room </option>
+
+                                <option value="2">2 Room </option>
+
+                                <option value="3">3 Room </option>
+
+                                <option value="4">4 Room </option>
+
+                                <option value="5">5 Room </option>
+                            </select>
+                            <span id="rooms_grid1">
+                                <select class="input-fields input-field-15" id="room1" name="room1">
+
+                                    <option value="1">1 </option>
+
+                                    <option value="2">2 </option>
+                                </select>
+                            </span>
+
+                            <button class="button topsearch" type="submit" onclick="return validation2()">Submit</button>
+
+                            <div id="guest2" class="bottom pc" style="margin-left: 72.3%;width:105%;">
+                                <span id="rooms_grid2">
+                                    <select class="input-fields input-field-15" id="room2" name="room2">
+
+                                        <option value="1">1 </option>
+
+                                        <option value="2">2 </option>
+                                    </select>
+                                </span>
+                            </div>
+                            <div id="guest3" class="bottom pc" style="margin-left: 72.3%;width:105%;">
+                                <span id="rooms_grid3">
+                                    <select class="input-fields input-field-15" id="room3" name="room3">
+
+                                        <option value="1">1 </option>
+
+                                        <option value="2">2 </option>
+                                    </select>
+                                </span>
+                            </div>
+                            <div id="guest4" class="bottom pc" style="margin-left: 72.3%;width:105%;">
+                                <span id="rooms_grid4">
+                                    <select class="input-fields input-field-15" id="room4" name="room4">
+
+                                        <option value="1">1 </option>
+
+                                        <option value="2">2 </option>
+                                    </select>
+                                </span>
+                            </div>
+                            <div id="guest5" class="bottom pc" style="margin-left: 72.3%;width:105%;">
+                                <span id="rooms_grid5">
+                                    <select class="input-fields input-field-15" id="room5" name="room5">
+
+                                        <option value="1">1 </option>
+
+                                        <option value="2">2 </option>
+                                    </select>
+                                </span>
+                            </div>
+                        }
+                    }
+                }
+            </div>
+        </div>
+            @*<div class="bottom pc">
+                    @using (Html.BeginForm("Searchdata", "Search"))
+                    {
+                        @Html.AntiForgeryToken()
+                        <input type="text" id="destination" name="destination" value="@ViewBag.Dest" class="input-fields input-field-30" placeholder="Destination" onkeypress="autocomp()" autocomplete="off">
+                        <input type="text" class="input-fields input-field-20" id="checkin" name="checkin" value="@ViewBag.IN" placeholder="Check In">
+                        <input type="text" class="input-fields input-field-20" id="checkout" name="checkout" value="@ViewBag.OUT" placeholder="Check Out">
+                        if (UserMode == "ENDUSER")
+                        {
+                            <select class="input-fields input-field-15" id="Adult" name="Adult" onchange="">
+
+                                <option value="1">1 Room </option>
+                            </select>
+                            <span id="rooms_grid">
+                                <select class="input-fields input-field-15" id="room0" name="room1" required>
+
+                                    <option value="1">1 </option>
+
+
+                                </select>
+                            </span>
+                            <button class="button topsearch" type="submit" onclick="return validation()">Submit</button>
+                        }
+                        else
+                        {
+                            <select class="input-fields input-field-15" id="Adult" name="Adult" onchange="GuestDrop()">
+
+                                <option value="1">1 Room </option>
+
+                                <option value="2">2 Room </option>
+
+                                <option value="3">3 Room </option>
+
+                                <option value="4">4 Room </option>
+
+                                <option value="5">5 Room </option>
+                            </select>
+                            <span id="rooms_grid1">
+                                <select class="input-fields input-field-15" id="room1" name="room1" onclick="EmpDetails()">
+
+                                    <option value="1">1 </option>
+
+                                    <option value="2">2 </option>
+                                </select>
+                            </span>
+                            <button class="button topsearch" type="submit" onclick="return validation()">Submit</button>
+
+                            <div id="guest2" class="bottom pc" style="margin-left: 72.3%;width:105%;">
+                                <span id="rooms_grid2">
+                                    <select class="input-fields input-field-15" id="room2" name="room2" >
+
+                                        <option value="1">1 </option>
+
+                                        <option value="2">2 </option>
+                                    </select>
+                                </span>
+                            </div>
+                            <div id="guest3" class="bottom pc" style="margin-left: 72.3%;width:105%;">
+                                <span id="rooms_grid3">
+                                    <select class="input-fields input-field-15" id="room3" name="room3" >
+
+                                        <option value="1">1 </option>
+
+                                        <option value="2">2 </option>
+                                    </select>
+                                </span>
+                            </div>
+                            <div id="guest4" class="bottom pc" style="margin-left: 72.3%;width:105%;">
+                                <span id="rooms_grid4">
+                                    <select class="input-fields input-field-15" id="room4" name="room4">
+
+                                        <option value="1">1 </option>
+
+                                        <option value="2">2 </option>
+                                    </select>
+                                </span>
+                            </div>
+                            <div id="guest5" class="bottom pc" style="margin-left: 72.3%;width:105%;">
+                                <span id="rooms_grid5">
+                                    <select class="input-fields input-field-15" id="room5" name="room5">
+
+                                        <option value="1">1 </option>
+
+                                        <option value="2">2 </option>
+                                    </select>
+                                </span>
+                            </div>
+                        }
+
+
+
+
+
+                    }
+                </div>*@
+
+
+            @*<div class="bottom tab">
+                    @using (Html.BeginForm("Searchdata", "Search", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                    {
+                    @Html.AntiForgeryToken()
+                    <div class="col-sm-4"><input id="destination" name="destination" value="" type="text" class="input-fields" placeholder="Destination" onkeypress="autocomp()"></div>
+                    <input type="text" class="input-fields input-field-20" id="checkin" name="checkin" value="@ViewBag.IN" placeholder="Check In">
+                    <input type="text" class="input-fields input-field-20" id="checkout" name="checkout" value="@ViewBag.OUT" placeholder="Check Out">
+                    <div class="col-sm-4">
+
+                        <select class="input-fields input-field-15" id="Adult" name="Adult" onchange="GuestDrop()">
+
+                            <option value="1">1 Room </option>
+
+                            <option value="2">2 Room </option>
+
+                            <option value="3">3 Room </option>
+
+                            <option value="4">4 Room </option>
+
+                            <option value="5">5 Room </option>
+                        </select>
+                    </div>
+                    <span id="rooms_grid">
+                        <div class="col-sm-4">
+
+                            <select class="input-fields input-field-15" id="room1" name="room1" required>
+
+                                <option value="1">1 </option>
+
+                                <option value="2">2 </option>
+                            </select>
+                        </div>
+                    </span>
+
+                    <div class="col-sm-4"><button class="button topsearch" type="submit" onclick="return validation()">Submit</button></div>
+
+                    <div id="guest2" class="bottom pc" style="margin-left: 72.3%;width:105%;">
+                        <span id="rooms_grid">
+                            <select class="input-fields input-field-15" id="room2" name="room2" required>
+
+                                <option value="1">1 </option>
+
+                                <option value="2">2 </option>
+                            </select>
+                        </span>
+                    </div>
+                    <div id="guest3" class="bottom pc" style="margin-left: 72.3%;width:105%;">
+                        <span id="rooms_grid">
+                            <select class="input-fields input-field-15" id="room3" name="room3" required>
+
+                                <option value="1">1 </option>
+
+                                <option value="2">2 </option>
+                            </select>
+                        </span>
+                    </div>
+                    <div id="guest4" class="bottom pc" style="margin-left: 72.3%;width:105%;">
+                        <span id="rooms_grid">
+                            <select class="input-fields input-field-15" id="room4" name="room4" required>
+
+                                <option value="1">1 </option>
+
+                                <option value="2">2 </option>
+                            </select>
+                        </span>
+                    </div>
+                    <div id="guest5" class="bottom pc" style="margin-left: 72.3%;width:105%;">
+                        <span id="rooms_grid">
+                            <select class="input-fields input-field-15" id="room5" name="room5" required>
+
+                                <option value="1">1 </option>
+
+                                <option value="2">2 </option>
+                            </select>
+                        </span>
+                    </div>
+
+
+
+                    }
+                </div>
+
+                <div class="bottom mobile">
+                    @using (Html.BeginForm("Searchdata", "Search", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                    {
+                                    @Html.AntiForgeryToken()
+                    <div class="col-xs-12"><input type="text" id="destination" name="destination" value="" class="input-fields" placeholder="Destination" onkeypress="autocomp()"> </div>
+                    <input type="text" class="input-fields input-field-20" id="checkin" name="checkin" value="@ViewBag.IN" placeholder="Check In">
+                    <input type="text" class="input-fields input-field-20" id="checkout" name="checkout" value="@ViewBag.OUT" placeholder="Check Out">
+
+                    <div class="col-xs-12">
+
+                        <select class="input-fields input-field-15" id="Adult" name="Adult" onchange="GuestDrop()">
+
+                            <option value="1">1 Room </option>
+
+                            <option value="2">2 Room </option>
+
+                            <option value="3">3 Room </option>
+
+                            <option value="4">4 Room </option>
+
+                            <option value="5">5 Room </option>
+                        </select>
+                    </div>
+                    <span id="rooms_grid">
+                        <div class="col-xs-12">
+                            <select class="input-fields input-field-15" id="room1" name="room1" required>
+
+                                <option value="1">1 </option>
+
+                                <option value="2">2 </option>
+                            </select>
+                        </div>
+                    </span>
+
+                    <div class="col-xs-12">
+
+                        <button class="button topsearch" type="submit" onclick="return validation()">Submit</button>
+                    </div>
+                    <div id="guest2" class="bottom pc" style="margin-left: 72.3%;width:105%;">
+                        <span id="rooms_grid">
+                            <select class="input-fields input-field-15" id="room2" name="room2" required>
+
+                                <option value="1">1 </option>
+
+                                <option value="2">2 </option>
+                            </select>
+                        </span>
+                    </div>
+                    <div id="guest3" class="bottom pc" style="margin-left: 72.3%;width:105%;">
+                        <span id="rooms_grid">
+                            <select class="input-fields input-field-15" id="room3" name="room3" required>
+
+                                <option value="1">1 </option>
+
+                                <option value="2">2 </option>
+                            </select>
+                        </span>
+                    </div>
+                    <div id="guest4" class="bottom pc" style="margin-left: 72.3%;width:105%;">
+                        <span id="rooms_grid">
+                            <select class="input-fields input-field-15" id="room4" name="room4" required>
+
+                                <option value="1">1 </option>
+
+                                <option value="2">2 </option>
+                            </select>
+                        </span>
+                    </div>
+                    <div id="guest5" class="bottom pc" style="margin-left: 72.3%;width:105%;">
+                        <span id="rooms_grid">
+                            <select class="input-fields input-field-15" id="room5" name="room5" required>
+
+                                <option value="1">1 </option>
+
+                                <option value="2">2 </option>
+                            </select>
+                        </span>
+                    </div>
+
+
+
+                    }
+                </div>*@
+
+        </div>
+        <div>
+
+            @RenderBody()
+        </div>
+
+
+
+        <footer style="border:none">
+            <div class="footer" style="background: url(../img/ss_footer.png)">
+
+
+                <div class="content-area">
+                    <div class="top">
+                        <div class="col-xs-6 col-sm-3 col-md-2 products-container">
+                            <h4>Product</h4>
+                            <a href="@Url.Action("Feature", "Home")">Feature</a>
+                            <a href="@Url.Action("Demo", "Home")">Demo</a>
+                            <a href="@Url.Action("Pricing", "Home")">Pricing</a>
+                        </div>
+
+                        <div class="col-xs-6 col-sm-3 col-md-2 company-container">
+                            <h4>Company</h4>
+                            <a href="@Url.Action("About_us", "Home")">About Us</a>
+                            <a href="@Url.Action("Testimonials", "Home")">Testimonials</a>
+                            <a href="@Url.Action("Awards", "Home")">Awards & Recognition</a>
+                            <a href="@Url.Action("Profile", "Home")">Media</a>
+                        </div>
+
+                        <div class="contact col-xs-12  col-sm-6 col-md-offset-5 col-md-3 ">
+                            <h4>Contact</h4>
+                            <div class="contactno"><img src="../img/phone.png">1800 425 3454</div><br>
+                            <div class="email"><img src="../img/envelope.png">sales@staysimplyfied.com</div>
+                            <div class="icons">
+                                <a href="https://www.facebook.com/" target="_blank">
+                                    <img src="../img/facebook-48.png" class="facebook">
+                                </a>
+                                <a href="https://twitter.com/" target="_blank">
+                                    <img src="../img/twitter-48.png" class="twitter">
+                                </a>
+                                <a href="https://www.linkedin.com/" target="_blank">
+                                    <img src="../img/linkedin-48.png" class="linkedin">
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="bottom">
+                        <div class="col-md-6 bottom-left">
+                            <a href="@Url.Action("Terms_of_Service", "Home")">TERMS OF SERVICE </a>
+                            <a href="@Url.Action("Privacy_Policy", "Home")">PRIVACY POLICY</a>
+                            <a href="#">SITE MAP</a>
+                        </div>
+                        <div class="col-md-6 bottom-right">All rights reserved.</div>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </footer>
+
+
+        @Scripts.Render("~/bundles/jquery")
+        @Scripts.Render("~/bundles/bootstrap")
+        @RenderSection("scripts", required: false)
+
+        <script type="text/javascript">
+            $(document).ready(function () {
+                var nowTemp = new Date();
+                var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0);
+                var checkin = $('#checkin').datepicker({
+                    onRender: function (date) {
+                        return date.valueOf() < now.valueOf() ? 'disabled' : '';
+                    }
+
+
+                }).on('changeDate', function (ev) {
+
+                    if (ev.date.valueOf() > checkout.date.valueOf()) {
+                        var newDate = new Date(ev.date)
+                        newDate.setDate(newDate.getDate() + 1);
+                        checkout.setValue(newDate);
+                    }
+                    else {
+                        var newDate = new Date(ev.date)
+                        newDate.setDate(newDate.getDate() + 1);
+                        checkout.setValue(newDate);
+                    }
+                    checkin.hide();
+                    // $('#checkout')[0].focus();
+                }).data('datepicker');
+
+
+
+
+                var checkin1 = $('#checkin1').datepicker({
+                    onRender: function (date) {
+                        return date.valueOf() < now.valueOf() ? 'disabled' : '';
+                    }
+                }).on('changeDate', function (ev) {
+                    if (ev.date.valueOf() > checkout1.date.valueOf()) {
+                        var newDate = new Date(ev.date)
+                        newDate.setDate(newDate.getDate() + 1);
+                        checkout1.setValue(newDate);
+                    }
+                    checkin1.hide();
+                    //$('#checkout1')[0].focus();
+                }).data('datepicker');
+
+
+
+
+
+                var checkout = $('#checkout').datepicker({
+                    onRender: function (date) {
+                        return date.valueOf() <= checkin.date.valueOf() ? 'disabled' : '';
+                    }
+                }).on('changeDate', function (ev) {
+                    checkout.hide();
+                }).data('datepicker');
+
+
+
+
+                var checkout1 = $('#checkout1').datepicker({
+                    onRender: function (date) {
+                        return date.valueOf() <= checkin1.date.valueOf() ? 'disabled' : '';
+                    }
+                }).on('changeDate', function (ev) {
+                    checkout1.hide();
+                }).data('datepicker');
+                //var currentDate = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
+                //var next = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000);
+                //var day = currentDate.getDate()
+                //var month = currentDate.getMonth() + 1
+                //var year = currentDate.getFullYear()
+                //var day1 = next.getDate()
+                //var month1 = next.getMonth() + 1
+                //var year1 = next.getFullYear()
+                //document.getElementById("checkin").value = month + "/" + day + "/" + year;
+                //document.getElementById("checkout").value = month1 + "/" + day1 + "/" + year1;
+            });
+
+
+            function validation() {
+                var place = $("#destination").val();
+                var indt = $("#checkin").val();
+                var outdt = $("#checkout").val();
+                if (place == "" || place == null || indt == "" || outdt == "" || indt == null || outdt == null) {
+                    alert("Please Enter the Destination or Date Fields");
+                    return false;
+                }
+            }
+
+            function validation2() {
+                var place = $("#destination").val();
+                var indt = $("#checkin").val();
+                var outdt = $("#checkout").val();
+                if (place == "" || place == null || indt == "" || outdt == "" || indt == null || outdt == null) {
+                    alert("Please Enter the Destination or Date Fields");
+                    return false;
+                }
+
+                if ($("#room2").is(':visible')) {
+                }
+                else {
+                    var a = 0;
+                    var tet = $("#room2").val('0');
+                }
+                if ($("#room3").is(':visible')) {
+                }
+                else {
+                    var a = 0;
+                    var tet = $("#room3").val('0');
+                }
+                if ($("#room4").is(':visible')) {
+                }
+                else {
+                    var a = 0;
+                    var tet = $("#room4").val('0');
+                }
+                if ($("#room5").is(':visible')) {
+                }
+                else {
+                    var a = 0;
+                    var tet = $("#room5").val('0');
+                }
+            }
+
+
+
+            function autocomp() {
+                var availableTags = [];
+
+                var word = $("#destination").val();
+                var leng = word.length;
+                if (word != "" && leng >= 1) {
+
+                    $.ajax({
+                        url: "/Search/Autocomplete/",
+                        dataType: "JSON",
+                        data: { city: word, count: leng },
+                        cache: false,
+                        type: "GET",
+                        success: function (data) {
+
+                            $.each(data, function (id, option) {
+                                availableTags.push(option.CityName);
+                            })
+
+                            $("#destination").autocomplete({
+                                source: availableTags
+
+                            });
+
+
+                        }
+                    });
+                }
+            }
+
+            function GuestDrop() {
+
+
+                var room = $("#Adult").val();
+                if (room == 1) {
+
+                    $("#guest2").hide();
+                    $("#guest3").hide();
+                    $("#guest4").hide();
+                    $("#guest5").hide();
+                }
+                else if (room == 2) {
+
+                    $("#guest2").show();
+                    $("#guest3").hide();
+                    $("#guest4").hide();
+                    $("#guest5").hide();
+                }
+                else if (room == 3) {
+
+                    $("#guest2").show();
+                    $("#guest3").show();
+                    $("#guest4").hide();
+                    $("#guest5").hide();
+                }
+                else if (room == 4) {
+
+                    $("#guest2").show();
+                    $("#guest3").show();
+                    $("#guest4").show();
+                    $("#guest5").hide();
+                }
+
+                else if (room == 5) {
+
+                    $("#guest2").show();
+                    $("#guest3").show();
+                    $("#guest4").show();
+                    $("#guest5").show();
+                }
+
+            }
+
+            $(document).ready(function () {
+                GuestDrop();
+
+            });
+
+            //function EmpDetails() {
+            //    var value = $("#room1").val();
+            //    if (value == 1)
+            //    {
+            //        $("#row1").show();
+            //        $("#row2").hide();
+            //        $("#row3").hide();
+            //        $("#row4").hide();
+            //        $("#row5").hide();
+            //        $("#row6").hide();
+            //        $("#row7").hide();
+            //        $("#row8").hide();
+            //        $("#row9").hide();
+            //        $("#row10").hide();
+
+            //    }
+            //    else if(value ==2) {
+            //        $("#row1").show();
+            //        $("#row2").show();
+            //        $("#row3").hide();
+            //        $("#row4").hide();
+            //        $("#row5").hide();
+            //        $("#row6").hide();
+            //        $("#row7").hide();
+            //        $("#row8").hide();
+            //        $("#row9").hide();
+            //        $("#row10").hide();
+            //    }
+            //    EmpDetails2();
+            //    EmpDetails3();
+            //    EmpDetails4();
+            //    EmpDetails5();
+            //}
+
+            //function EmpDetails2() {
+            //    if ($("#room2").is(':visible')) {
+
+            //        var persons = $("#room2").val();
+            //        if (persons == 1) {
+
+            //            $("#row3").show();
+            //            $("#row4").hide();
+            //            $("#row5").hide();
+            //            $("#row6").hide();
+            //            $("#row7").hide();
+            //            $("#row8").hide();
+            //            $("#row9").hide();
+            //            $("#row10").hide();
+
+            //        }
+            //        else if (persons == 2) {
+
+            //            $("#row3").show();
+            //            $("#row4").show();
+            //            $("#row5").hide();
+            //            $("#row6").hide();
+            //            $("#row7").hide();
+            //            $("#row8").hide();
+            //            $("#row9").hide();
+            //            $("#row10").hide();
+            //        }
+
+            //    }
+            //    EmpDetails3();
+            //    EmpDetails4();
+            //    EmpDetails5();
+            //}
+
+            //function EmpDetails3() {
+            //    if ($("#room3").is(':visible')) {
+
+            //        var persons = $("#room3").val();
+            //        if (persons == 1) {
+
+
+            //            $("#row5").show();
+            //            $("#row6").hide();
+            //            $("#row7").hide();
+            //            $("#row8").hide();
+            //            $("#row9").hide();
+            //            $("#row10").hide();
+
+
+            //        }
+            //        else if (persons == 2) {
+
+
+            //            $("#row5").show();
+            //            $("#row6").show();
+            //            $("#row7").hide();
+            //            $("#row8").hide();
+            //            $("#row9").hide();
+            //            $("#row10").hide();
+            //        }
+
+            //    }
+            //    EmpDetails4();
+            //    EmpDetails5();
+            //}
+
+            //function EmpDetails4() {
+            //    if ($("#room4").is(':visible')) {
+
+            //        var persons = $("#room4").val();
+            //        if (persons == 1) {
+
+
+            //            $("#row5").show();
+            //            $("#row6").hide();
+            //            $("#row7").hide();
+            //            $("#row8").hide();
+            //            $("#row9").hide();
+            //            $("#row10").hide();
+
+
+            //        }
+            //        else if (persons == 2) {
+
+
+            //            $("#row5").show();
+            //            $("#row6").show();
+            //            $("#row7").hide();
+            //            $("#row8").hide();
+            //            $("#row9").hide();
+            //            $("#row10").hide();
+            //        }
+            //    }
+            //    EmpDetails5();
+            //}
+            //function EmpDetails5() {
+            //    if ($("#room4").is(':visible')) {
+
+            //        var persons = $("#room4").val();
+            //        if (persons == 1) {
+
+
+            //            $("#row5").show();
+            //            $("#row6").hide();
+            //            $("#row7").hide();
+            //            $("#row8").hide();
+            //            $("#row9").hide();
+            //            $("#row10").hide();
+
+
+            //        }
+            //        else if (persons == 2) {
+
+
+            //            $("#row5").show();
+            //            $("#row6").show();
+            //            $("#row7").hide();
+            //            $("#row8").hide();
+            //            $("#row9").hide();
+            //            $("#row10").hide();
+            //        }
+
+            //    }
+            //}
+
+
+        </script>
+
+
+</body>
+</html>

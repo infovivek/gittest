@@ -1,0 +1,269 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stay Simplyfied</title>
+
+    @Styles.Render("~/Content/css1")
+    @Styles.Render("~/Content/css2")
+    @Scripts.Render("~/bundles/bootstrap")
+
+    <script type="text/javascript">
+        $(window).ready(function () {
+            var nowTemp = new Date();
+            var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0);
+            var checkin = $('#checkin').datepicker({
+                onRender: function (date) {
+                    return date.valueOf() < now.valueOf() ? 'disabled' : '';
+                }
+            }).on('changeDate', function (ev) {
+                if (ev.date.valueOf() > checkout.date.valueOf()) {
+                    var newDate = new Date(ev.date)
+                    newDate.setDate(newDate.getDate() + 0);
+                    checkout.setValue(newDate);
+                }
+                checkin.hide();
+                // $('#checkout')[0].focus();
+            }).data('datepicker');
+
+
+            var checkin1 = $('#checkin1').datepicker({
+                onRender: function (date) {
+                    return date.valueOf() < now.valueOf() ? 'disabled' : '';
+                }
+            }).on('changeDate', function (ev) {
+                if (ev.date.valueOf() > checkout1.date.valueOf()) {
+                    var newDate = new Date(ev.date)
+                    newDate.setDate(newDate.getDate() + 1);
+                    checkout1.setValue(newDate);
+                }
+                checkin1.hide();
+                //$('#checkout1')[0].focus();
+            }).data('datepicker');
+
+            var checkout = $('#checkout').datepicker({
+                onRender: function (date) {
+                    return date.valueOf() <= checkin.date.valueOf() ? 'disabled' : '';
+                }
+            }).on('changeDate', function (ev) {
+                checkout.hide();
+            }).data('datepicker');
+
+            var checkout1 = $('#checkout1').datepicker({
+                onRender: function (date) {
+                    return date.valueOf() <= checkin1.date.valueOf() ? 'disabled' : '';
+                }
+            }).on('changeDate', function (ev) {
+                checkout1.hide();
+            }).data('datepicker');
+        });
+
+    </script>
+    <!-- Datepicker Script End -->
+
+</head>
+<body>
+
+
+
+    <div class="container-fluid">
+        <div class="row stay-width top-header-container">
+            <div class="col-lg-6 col-md-6 col-sm-6">
+                <div class="logo-container">
+
+                    <a href="http://www.staysimplyfied.com/"> <img src="~/img/ss_logo.png" alt=""></a>
+
+
+
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6 top-right-menu">
+                <!--<div class="menu-div"><a href="#">Contact Us</a></div>	-->
+
+                <div class="menu-div"><a href="http://www.staysimplyfied.com/index.php/customer/signup">New User</a></div>
+                <div class="menu-div"><a href="http://www.staysimplyfied.com/index.php/customer/signin">Login</a></div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <div class="header">
+        <div class="content-area stay-width">
+
+
+            <div class="bottom pc">
+                <form role="form" method="post" action="http://www.staysimplyfied.com/index.php/page/search_result" name="search" id="search" onsubmit="return gen_validate();">
+                    <input type="text" id="destination" name="destination" value="" class="input-fields input-field-30" placeholder="Destination" onmouseout="return check_for_button();">
+                    <input type="text" class="input-fields input-field-20" id="checkin" name="checkin" value="01/15/2015" placeholder="Check In">
+                    <input type="text" class="input-fields input-field-20" id="checkout" name="checkout" value="01/16/2015" placeholder="Check Out">
+
+                    <select class="input-fields input-field-15" id="Adult" name="Adult" onchange="return getrooms_guest();">
+
+                        <option value="1">1 Room </option>
+
+                        <option value="2">2 Room </option>
+
+                        <option value="3">3 Room </option>
+
+                        <option value="4">4 Room </option>
+
+                        <option value="5">5 Room </option>
+                    </select>
+                    <span id="rooms_grid">
+                        <select class="input-fields input-field-15" id="room1" name="room1" required>
+
+                            <option value="1">1 </option>
+
+                            <option value="2">2 </option>
+                        </select>
+                    </span>
+                    <button class="button topsearch" type="submit">Submit</button>
+
+                </form>
+
+            </div>
+
+            <div class="bottom tab">
+                <form role="form" method="post" action="http://www.staysimplyfied.com/index.php/page/search_result" name="search" id="search" onsubmit="return gen_validate();">
+                    <div class="col-sm-4"><input id="destination" name="destination" value="" type="text" class="input-fields" placeholder="Destination" onmouseout="return check_for_button();"></div>
+                    <div class="col-sm-4"><input type="text" class="input-fields" id="checkin" name="checkin" value="01/15/2015" onchange="return check_for_button();" placeholder="Check In"></div>
+                    <div class="col-sm-4"><input type="text" class="input-fields" id="checkout" name="checkout" value="01/16/2015" onchange="return check_for_button();" placeholder="Check Out"></div>
+                    <div class="col-sm-4">
+
+                        <select class="input-fields input-field-15" id="Adult" name="Adult" onchange="return getrooms_guest();">
+
+                            <option value="1">1 Room </option>
+
+                            <option value="2">2 Room </option>
+
+                            <option value="3">3 Room </option>
+
+                            <option value="4">4 Room </option>
+
+                            <option value="5">5 Room </option>
+                        </select>
+                    </div>
+                    <span id="rooms_grid">
+                        <div class="col-sm-4">
+
+                            <select class="input-fields input-field-15" id="room1" name="room1" required>
+
+                                <option value="1">1 </option>
+
+                                <option value="2">2 </option>
+                            </select>
+                        </div>
+                    </span>
+
+                    <div class="col-sm-4"><button class="button topsearch" type="submit">Submit</button></div>
+                </form>
+            </div>
+
+            <div class="bottom mobile">
+                <form role="form" method="post" action="http://www.staysimplyfied.com/index.php/page/search_result" name="search" id="search" onsubmit="return gen_validate();">
+                    <div class="col-xs-12"><input type="text" id="destination" name="destination" value="" class="input-fields" placeholder="Destination" onmouseout="return check_for_button();"> </div>
+                    <div class="col-xs-12"><input type="text" class="input-fields" id="checkin" name="checkin" value="01/15/2015" onchange="return check_for_button();" placeholder="Check In"></div>
+                    <div class="col-xs-12"><input type="text" class="input-fields" id="checkout" name="checkout" value="01/16/2015" onchange="return check_for_button();" placeholder="Check Out"></div>
+
+                    <div class="col-xs-12">
+
+                        <select class="input-fields input-field-15" id="Adult" name="Adult" onchange="return getrooms_guest();">
+
+                            <option value="1">1 Room </option>
+
+                            <option value="2">2 Room </option>
+
+                            <option value="3">3 Room </option>
+
+                            <option value="4">4 Room </option>
+
+                            <option value="5">5 Room </option>
+                        </select>
+                    </div>
+                    <span id="rooms_grid">
+                        <div class="col-xs-12">
+                            <select class="input-fields input-field-15" id="room1" name="room1" required>
+
+                                <option value="1">1 </option>
+
+                                <option value="2">2 </option>
+                            </select>
+                        </div>
+                    </span>
+                    <div class="col-xs-12">
+
+                        <button class="button topsearch" type="submit">Submit</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+        <div>
+
+            @RenderBody()
+        </div>
+    
+    <footer>
+        <div class="footer" style="background: url(../img/ss_footer.png)">
+
+
+            <div class="content-area">
+                <div class="top">
+                    <div class="col-xs-6 col-sm-3 col-md-2 products-container">
+                        <h4>Product</h4>
+                        <a href="http://www.staysimplyfied.com/index.php/features">Feature</a>
+                        <a href="http://www.staysimplyfied.com/index.php/features/demo">Demo</a>
+                        <a href="http://www.staysimplyfied.com/index.php/features">Pricing</a>
+                    </div>
+
+                    <div class="col-xs-6 col-sm-3 col-md-2 company-container">
+                        <h4>Company</h4>
+                        <a href="http://www.staysimplyfied.com/index.php/company/">About Us</a>
+                        <a href="http://www.staysimplyfied.com/index.php/company/testimonial/">Testimonials</a>
+                        <a href="http://www.staysimplyfied.com/index.php/company/awards/">Awards & Recognition</a>
+                        <a href="http://www.staysimplyfied.com/index.php/company/media/">Media</a>
+                    </div>
+
+                    <div class="contact col-xs-12  col-sm-6 col-md-offset-5 col-md-3 ">
+                        <h4>Contact</h4>
+                        <div class="contactno"><img src="../img/phone.png">1800 425 3454</div><br>
+                        <div class="email"><img src="../img/envelope.png">sales@staysimplyfied.com</div>
+                        <div class="icons">
+                            <a href="https://www.facebook.com/" target="_blank">
+                                <img src="../img/facebook-48.png" class="facebook">
+                            </a>
+                            <a href="https://twitter.com/" target="_blank">
+                                <img src="../img/twitter-48.png" class="twitter">
+                            </a>
+                            <a href="https://www.linkedin.com/" target="_blank">
+                                <img src="../img/linkedin-48.png" class="linkedin">
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="bottom">
+                    <div class="col-md-6 bottom-left">
+                        <a href="http://www.staysimplyfied.com/index.php/company/terms/">TERMS OF SERVICE </a>
+                        <a href="http://www.staysimplyfied.com/index.php/company/privacy_policy/">PRIVACY POLICY</a>
+                        <a href="#">SITE MAP</a>
+                    </div>
+                    <div class="col-md-6 bottom-right">All rights reserved.</div>
+                </div>
+            </div>
+        </div>
+
+
+
+    </footer>
+
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+
+
+</body>
+</html>

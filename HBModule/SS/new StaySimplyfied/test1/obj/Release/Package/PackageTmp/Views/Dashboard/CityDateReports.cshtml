@@ -1,0 +1,158 @@
+﻿@{
+    ViewBag.Title = "Property Month";
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+
+
+    });
+    function autocomp() {
+        window.location.href = '/Dashboard/CityDateReports?' + ViewBag.UserId;
+    }
+</script>
+<script type="text/javascript">
+    //  PrptyMonthwise Below
+    function PrptyMonthwise() {
+        $.ajax({
+            url: "/Dashboard/getUserId/",
+            cache: false,
+            type: "GET",
+            success: function (data) {
+                if (data != 0) {
+                    window.location.href = '/Dashboard/PrptyMonthReports?' + data;
+                }
+            }
+        });
+    }
+    function PrptyDatewise() {
+        $.ajax({
+            url: "/Dashboard/getUserId/",
+            cache: false,
+            type: "GET",
+            success: function (data) {
+                if (data != 0) {
+                    window.location.href = '/Dashboard/PrptyDateReports?' + data;
+                }
+            }
+        });
+    }
+    //For Payment Below
+    function Paymentwise() {
+        $.ajax({
+            url: "/Dashboard/getUserId/",
+            cache: false,
+            type: "GET",
+            success: function (data) {
+                if (data != 0) {
+                    window.location.href = '/Dashboard/PaymentReports?' + data;
+                }
+            }
+        });
+    }
+    //For Citywise Month Below
+    function CityDatewise() {
+        $.ajax({
+            url: "/Dashboard/getUserId/",
+            cache: false,
+            type: "GET",
+            success: function (data) {
+                if (data != 0) {
+                    window.location.href = '/Dashboard/CityDateReports?' + data;
+                }
+            }
+        });
+    }
+    //CityDatewise
+    function CityMonthwise() {
+        $.ajax({
+            url: "/Dashboard/getUserId/",
+            cache: false,
+            type: "GET",
+            success: function (data) {
+                if (data != 0) {
+                    window.location.href = '/Dashboard/CityMonthReports?' + data;
+                }
+            }
+        });
+    }
+    //changepwd
+    function changepwd() {
+        $.ajax({
+            url: "/Dashboard/getUserId/",
+            cache: false,
+            type: "GET",
+            success: function (data) {
+                if (data != 0) {
+                    window.location.href = '/Home/Profile?' + data;
+                }
+            }
+        });
+    }
+    //Occupancy
+    function OccupancyReport() {
+        $.ajax({
+            url: "",
+            cache: false,
+            type: "GET",
+            success: function (data) {
+                if (data != 0) {
+                    window.location.href = '/GHReport/Index';
+                }
+            }
+        });
+    }
+    //GHReport
+    function GHReport() {
+        $.ajax({
+            url: "",
+            cache: false,
+            type: "GET",
+            success: function (data) {
+                if (data != 0) {
+                    window.location.href = '/GHReport/Index';
+                }
+            }
+        });
+    }
+    //Menu_click()
+    // debugger;
+    function Menu_click() {
+        // debugger;
+        document.getElementById('Dash_menu').style.visibility = "visible";
+        // $("#Dash_menu").show();
+    }
+    //
+</script>
+<!--div class="menu">
+    <div class="content-area">
+        @*<span class="navs col-xs-12 col-sm-6 col-md-4 pointer" onclick="autocomp()">REPORT<div class="underline"></div></span>*@
+        <span class="navs col-xs-12 col-sm-6 col-md-4 pointer" onclick="loadUrl('~/Account/Login')">LOGIN</span>
+        <span class="navs col-xs-12 col-sm-6 col-md-4 pointer" onclick="loadUrl('~/Account/New_User')">NEW USER</span>
+        <div class="clearfix"></div>
+    </div>
+</div-->
+<div class="container">
+    <div id="contactFormContainer">
+        <div class="menu-div">
+            <span class="pointer" onclick="PrptyMonthwise()"> Property Monthwise </span>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+            <span class="pointer" onclick="PrptyDatewise()"> Property Datewise </span>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+            <span class="pointer" onclick="Paymentwise()"> Paymentwise </span>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <span class="pointer" onclick="CityMonthwise()"> City Monthwise </span>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+            <span class="pointer" style="font-weight:bold;"> City Datewise </span>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+            <span class="pointer" onclick="OccupancyReport()"> Occupancy Report </span>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+            <span class="pointer" onclick="GHReport()"> GHReport </span>
+        </div>
+    </div>
+</div>
+<div style="text-align:center;vertical-align:top">
+    <object>
+        <embed src="http://hbstay.in/CityDatewise.swf" type="application/x-shockwave-flash"
+               allowscriptaccess="always" allowfullscreen="true" width="100%" height=" 590"></embed>
+    </object>
+</div>

@@ -1,0 +1,268 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stay Simplyfied</title>
+
+    @Styles.Render("~/Content/css1")
+    @Styles.Render("~/Content/css2")
+    @Scripts.Render("~/bundles/bootstrap")
+
+    <style type="text/css">
+        .ui-autocomplete {
+            max-height: 220px;
+            overflow-y: scroll;
+            overflow-x: hidden;
+        }
+    </style>
+    <script type="text/javascript">
+        //  PrptyMonthwise Below
+        function PrptyMonthwise() {
+            $.ajax({
+                url: "/Dashboard/getUserId/",
+                cache: false,
+                type: "GET",
+                success: function (data) {
+                    if (data != 0) {
+                        window.location.href = '/Dashboard/PrptyMonthReports?' + data;
+                    }
+                }
+            });
+        }
+        function PrptyDatewise() {
+            $.ajax({
+                url: "/Dashboard/getUserId/",
+                cache: false,
+                type: "GET",
+                success: function (data) {
+                    if (data != 0) {
+                        window.location.href = '/Dashboard/PrptyDateReports?' + data;
+                    }
+                }
+            });
+        }
+        //For Payment Below
+        function Paymentwise() {
+            $.ajax({
+                url: "/Dashboard/getUserId/",
+                cache: false,
+                type: "GET",
+                success: function (data) {
+                    if (data != 0) {
+                        window.location.href = '/Dashboard/PaymentReports?' + data;
+                    }
+                }
+            });
+        }
+        //For Citywise Month Below
+        function CityDatewise() {
+            $.ajax({
+                url: "/Dashboard/getUserId/",
+                cache: false,
+                type: "GET",
+                success: function (data) {
+                    if (data != 0) {
+                        window.location.href = '/Dashboard/CityDateReports?' + data;
+                    }
+                }
+            });
+        }
+        //CityDatewise
+        function CityMonthwise() {
+            $.ajax({
+                url: "/Dashboard/getUserId/",
+                cache: false,
+                type: "GET",
+                success: function (data) {
+                    if (data != 0) {
+                        window.location.href = '/Dashboard/CityMonthReports?' + data;
+                    }
+                }
+            });
+        }
+        //changepwd
+        function changepwd() {
+            $.ajax({
+                url: "/Dashboard/getUserId/",
+                cache: false,
+                type: "GET",
+                success: function (data) {
+                    if (data != 0) {
+                        window.location.href = '/Home/Profile?' + data;
+                    }
+                }
+            });
+        }
+        //Menu_click()
+        // debugger;
+        function Menu_click() {
+            // debugger;
+            document.getElementById('Dash_menu').style.visibility = "visible";
+            // $("#Dash_menu").show();
+        }
+        //
+    </script>
+
+
+    <!-- Datepicker Script End -->
+
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row stay-width top-header-container">
+            <div class="col-lg-6 col-md-6 col-sm-6">
+                <div class="logo-container">
+
+                    @{
+                        string UserMode = "";
+                        string ClientLogo = "";
+                        HBEntities db = new HBEntities();
+                        if (User.Identity.IsAuthenticated)
+                        {
+                            var logo1 = (from s in db.UserProfiles
+                                         join td in db.WrbhbTravelDesks on s.UserId equals td.App_UserId
+                                         join cm in db.WRBHBClientManagements on td.ClientId equals cm.Id
+                                         where s.UserId == WebSecurity.CurrentUserId && td.IsActive == true && td.IsDeleted == false
+                                         select new { cm.ClientLogo }).FirstOrDefault();
+
+                            ClientLogo = (logo1 != null) ? logo1.ClientLogo : "";
+                            UserMode = logo1 != null ? "TRAVELDESK" : "";
+                            if (logo1 == null)
+                            {
+                                var logo2 = (from s in db.UserProfiles
+                                             join tc in db.WRBHBClientManagementAddClientGuests on s.UserId equals tc.App_UserId
+                                             join cm in db.WRBHBClientManagements on tc.CltmgntId equals cm.Id
+                                             where s.UserId == WebSecurity.CurrentUserId && tc.IsActive == true && tc.IsDeleted == false
+                                             select cm.ClientLogo).FirstOrDefault();
+
+                                ClientLogo = (logo2 != null) ? logo2 : "";
+                                UserMode = "ENDUSER";
+                            }
+
+                            string final = ClientLogo != "" ? ClientLogo : "http://www.staysimplyfied.com/img/ss_logo.png";
+
+                            <a href="@Url.Action("Index", "Home")"> <img src="@final" alt=""></a>
+                            <p>
+                                <br>
+                                <strong>
+                                    Online Hotel <span style="color:#E8530B">Concierge</span> Desk
+
+                                </strong>
+                            </p>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("Index", "Home")"> <img src="~/img/ss_logo.png" alt=""></a>
+
+                        }
+                    }
+
+
+
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6 top-right-menu">
+                <!--<div class="menu-div"><a href="#">Contact Us</a></div>	-->
+                @{
+                    if (User.Identity.IsAuthenticated)
+                    {
+                        if (UserMode == "TRAVELDESK")
+                        {
+                            @*<span class="pointer" onclick="PrptyMonthwise()"> Prpty Monthwise</span>*@
+                            @*<div class="menu-div"><span class="pointer" onclick="changepwd()">Change Password</span></div>*@
+                            <div class="menu-div"><a href="@Url.Action("Profile", "Home")">PROFILE</a></div>
+                            <div class="menu-div"><a href="@Url.Action("Index", "Dashboard")">DASHBOARD</a></div>
+                            <div class="menu-div"><a href="@Url.Action("Index", "Home")">NEW BOOKING</a></div>
+                            <div class="menu-div"><a href="@Url.Action("Logout", "Account")">LOGOUT</a></div>
+                        }
+                        else
+                        {
+                            <div class="menu-div"><a href="@Url.Action("Profile", "Home")">PROFILE</a></div>
+                            <div class="menu-div"><a href="@Url.Action("Logout", "Account")">LOGOUT</a></div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="menu-div"><a href="@Url.Action("New_User", "Account")">NEW USER</a></div>
+                        <div class="menu-div"><a href="@Url.Action("Login", "Account")">LOGIN</a></div>
+                    }
+                }
+
+            </div>
+
+        </div>
+    </div>
+  
+    
+    <div>
+
+        @RenderBody()
+    </div>
+
+
+
+    <footer style="border:none">
+        <div class="footer" style="background: url(../img/ss_footer.png)">
+
+
+            <div class="content-area">
+                <div class="top">
+                    <div class="col-xs-6 col-sm-3 col-md-2 products-container">
+                        <h4>Product</h4>
+                        <a href="@Url.Action("Feature", "Home")">Feature</a>
+                        <a href="@Url.Action("Demo", "Home")">Demo</a>
+                        <a href="@Url.Action("Pricing", "Home")">Pricing</a>
+                    </div>
+
+                    <div class="col-xs-6 col-sm-3 col-md-2 company-container">
+                        <h4>Company</h4>
+                        <a href="@Url.Action("About_us", "Home")">About Us</a>
+                        <a href="@Url.Action("Testimonials", "Home")">Testimonials</a>
+                        <a href="@Url.Action("Awards", "Home")">Awards & Recognition</a>
+                        <a href="@Url.Action("Profile", "Home")">Media</a>
+                    </div>
+
+                    <div class="contact col-xs-12  col-sm-6 col-md-offset-5 col-md-3 ">
+                        <h4>Contact</h4>
+                        <div class="contactno"><img src="../img/phone.png">1800 425 3454</div><br>
+                        <div class="email"><img src="../img/envelope.png">sales@staysimplyfied.com</div>
+                        <div class="icons">
+                            <a href="https://www.facebook.com/" target="_blank">
+                                <img src="../img/facebook-48.png" class="facebook">
+                            </a>
+                            <a href="https://twitter.com/" target="_blank">
+                                <img src="../img/twitter-48.png" class="twitter">
+                            </a>
+                            <a href="https://www.linkedin.com/" target="_blank">
+                                <img src="../img/linkedin-48.png" class="linkedin">
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="bottom">
+                    <div class="col-md-6 bottom-left">
+                        <a href="@Url.Action("Terms_of_Service", "Home")">TERMS OF SERVICE </a>
+                        <a href="@Url.Action("Privacy_Policy", "Home")">PRIVACY POLICY</a>
+                        <a href="#">SITE MAP</a>
+                    </div>
+                    <div class="col-md-6 bottom-right">All rights reserved.</div>
+                </div>
+            </div>
+        </div>
+
+
+
+    </footer>
+
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+
+    
+
+
+</body>
+</html>

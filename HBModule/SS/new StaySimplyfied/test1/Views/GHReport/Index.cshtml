@@ -1,0 +1,459 @@
+﻿@{
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    @Scripts.Render("~/bundles/bootstrap")
+    @Styles.Render("~/Content/css")
+    @Styles.Render("~/Content/css1")
+    @Styles.Render("~/Content/css2")
+</head>
+<body>
+    <div class="container">
+        <div id="contactFormContainer">
+            <div class="menu-div">
+                <span class="pointer" onclick="PrptyMonthwise()"> Property Monthwise </span>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <span class="pointer" onclick="PrptyDatewise()"> Property Datewise </span>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+                <span class="pointer" onclick="Paymentwise()"> Paymentwise </span>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+                <span class="pointer" onclick="CityMonthwise()"> City Monthwise </span>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+                <span class="pointer" onclick="CityDatewise()"> City Datewise </span>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+                <span class="pointer" style="font-weight:bold;"> Occupancy Report </span>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+                <span class="pointer" onclick="GHReport()"> GHReport </span>
+            </div>
+        </div>
+    </div>
+    <div>
+
+        <div>
+            <div style="padding-left: 5%;background:#f1f7f7;">
+                <table>
+                    <tr>
+                        <td><label style="width: 90px; font-family: Arial, sans-serif;">From Date</label></td>
+                        <td><input class="input-fields input-field-20" style="width:150px;" type="text" id="From_datepicker"></td>
+                        <td><label style="width:80px;padding-left:5px;">To Date</label></td>
+                        <td><input class="input-fields input-field-20" style="width:150px;" type="text" id="To_datepicker"></td>
+                        <td><label style="width:65px;padding-left:10px;">Property</label></td>
+                        <td style="padding-left:10px;">
+                            @Html.DropDownList("Property", new SelectList(@ViewBag.Property, "Id", "Property"),
+                     "Select Property", new { width = "150px" })
+                    </td>
+                    <td></td>
+                    <td style="padding-left:10px;"><input class="btn btn-info" type="button" id="Save" value="Submit" onclick="Submit()"></td>
+                    <td style="padding-left:10px;"><input class="btn btn-info" type="button" id="Save" value="Clear" onclick="Clear()"></td>
+                    <td style="padding-left:10px;"><input class="btn btn-info" type="button" id="BT_Download" value="Export" onclick="Download()"></td>
+                    <td><input type="hidden" value="" id="DownloadExcel" /></td>
+                </tr>
+            </table>
+        </div>
+        <div class="OuterDiv">
+            <div class="LeftDiv"><table id="Data"></table></div>
+            <div class="RightDiv"><table id="Data1"></table></div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+        $('#BT_Download').hide();
+    //$(function () {
+    //    $("#From_datepicker").datepicker({
+    //        defaultDate: "+1w",
+    //        changeMonth: true,
+    //        numberOfMonths: 3,
+    //        dateformat: "mm/dd/yy",
+    //        showanim: "slide",
+    //        onClose: function (selectedDate) {
+    //            $("#To_datepicker").datepicker("option", "minDate", selectedDate);
+    //            $("#From_datepicker").datepicker("option", "dateFormat", "yy-mm-dd");
+
+    //        }
+    //    });
+    //    $("#To_datepicker").datepicker({
+    //        defaultDate: "+1w",
+    //        changeMonth: true,
+    //        numberOfMonths: 3,
+    //        dateformat: "mm/dd/yy",
+    //        showanim: "slide",
+    //        onClose: function (selectedDate) {
+    //            $("#From_datepicker").datepicker("option", "maxDate", selectedDate);
+    //            $("#To_datepicker").datepicker("option", "dateFormat", "yy-mm-dd");
+
+    //        }
+    //    });
+    //});
+        $(document).ready(function () {
+            var nowTemp = new Date();
+            var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0);
+            var checkin = $('#From_datepicker').datepicker({
+                //onRender: function (date) {
+                //    return date.valueOf() < now.valueOf() ? 'disabled' : '';
+                //}
+
+
+            }).on('changeDate', function (ev) {
+
+                if (ev.date.valueOf() > checkout.date.valueOf()) {
+                    var newDate = new Date(ev.date)
+                    newDate.setDate(newDate.getDate() + 1);
+                    checkout.setValue(newDate);
+                }
+                else {
+                    var newDate = new Date(ev.date)
+                    newDate.setDate(newDate.getDate() + 1);
+                    checkout.setValue(newDate);
+                }
+                checkin.hide();
+                // $('#checkout')[0].focus();
+            }).data('datepicker');
+
+
+
+
+            var checkin1 = $('#checkin1').datepicker({
+                onRender: function (date) {
+                    return date.valueOf() < now.valueOf() ? 'disabled' : '';
+                }
+            }).on('changeDate', function (ev) {
+                if (ev.date.valueOf() > checkout1.date.valueOf()) {
+                    var newDate = new Date(ev.date)
+                    newDate.setDate(newDate.getDate() + 1);
+                    checkout1.setValue(newDate);
+                }
+                checkin1.hide();
+                //$('#checkout1')[0].focus();
+            }).data('datepicker');
+
+
+
+
+
+            var checkout = $('#To_datepicker').datepicker({
+                onRender: function (date) {
+                    return date.valueOf() <= checkin.date.valueOf() ? 'disabled' : '';
+                }
+            }).on('changeDate', function (ev) {
+                checkout.hide();
+            }).data('datepicker');
+
+
+
+
+            var checkout1 = $('#checkout1').datepicker({
+                onRender: function (date) {
+                    return date.valueOf() <= checkin1.date.valueOf() ? 'disabled' : '';
+                }
+            }).on('changeDate', function (ev) {
+                checkout1.hide();
+            }).data('datepicker');
+            //var currentDate = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
+            //var next = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000);
+            //var day = currentDate.getDate()
+            //var month = currentDate.getMonth() + 1
+            //var year = currentDate.getFullYear()
+            //var day1 = next.getDate()
+            //var month1 = next.getMonth() + 1
+            //var year1 = next.getFullYear()
+            //document.getElementById("checkin").value = month + "/" + day + "/" + year;
+            //document.getElementById("checkout").value = month1 + "/" + day1 + "/" + year1;
+        });
+
+
+    function Clear() {
+
+        $('#Data').empty();
+        $('#Data1').empty();
+        $("#From_datepicker").val("");
+        $("#To_datepicker").val("");
+      
+
+    }
+    function Download() {
+
+            var Value = $("#DownloadExcel").val();
+           @* $.ajax({
+                cache: false,
+                type: "GET",
+                url: "@(Url.RouteUrl("ExcelDownload"))",
+                data: {
+                    "FileNames": Value
+                },
+            success: function (data) {
+
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alertify.error("Failed to retrieve Data");
+
+            }
+        });*@
+
+        window.location = '@(Url.RouteUrl("ExcelDownload"))?file=' + Value;
+
+    }
+    function Export() {
+
+        var StartDate = $("#From_datepicker").val();
+        var EndDate = $("#To_datepicker").val();
+        var PropertyId = $("#Property").val();
+        var Flage = true;
+        var Err = "";
+        if (StartDate == "") {
+            Flage = false;
+            Err = "Please Select From Date <br/>";
+        }
+        if (EndDate == "") {
+            Flage = false;
+            Err += "Please Select End Date <br/>";
+        }
+        if (PropertyId == "") {
+            Flage = false;
+            Err += "Please Select Property";
+        }
+        if (Flage == true) {
+            $.ajax({
+                cache: false,
+                type: "GET",
+                url: "@(Url.RouteUrl("GHExport"))",
+                data: {
+                    "StartDate": StartDate, "EndDate": EndDate,
+                    "PropertyId": PropertyId
+                },
+                success: function (data) {
+
+                    $('#DownloadExcel').val(data);
+                    $('#BT_Download').show();
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    // alertify.error("Failed to retrieve Data");
+
+                }
+            });
+        }
+    }
+    function Submit() {
+        $('#BT_Download').hide();
+        var StartDate = $("#From_datepicker").val();
+        var EndDate = $("#To_datepicker").val();
+        var PropertyId = $("#Property").val();
+        var Flage = true;
+        var Err = "";
+        if (StartDate == "") {
+            Flage = false;
+            Err = "Please Select From Date <br/>";
+        }
+        if (EndDate == "") {
+            Flage = false;
+            Err += "Please Select End Date <br/>";
+        }
+        if (PropertyId == "") {
+            Flage = false;
+            Err += "Please Select Property";
+        }
+        if (Flage == true) {
+            $.ajax({
+                cache: false,
+                type: "GET",
+                url: "@(Url.RouteUrl("GHData"))",
+                data: {
+                    "StartDate": StartDate, "EndDate": EndDate,
+                    "PropertyId": PropertyId
+                },
+                success: function (data) {
+                    var Len = data.length;
+                    if (Len > 0) {
+                        $('#Data').empty();
+                        $('#Data').append("<thead class='tableheader' ></thead>");
+                        $('#Data').append("<tbody class='tableheader'></tbody>");
+                        $('#Data > thead').append('<tr></tr>');
+                        $('#Data1').empty();
+                        $('#Data1').append("<thead class='tableheader' ></thead>");
+                        $('#Data1').append("<tbody class='tableheader'></tbody>");
+                        $('#Data1 > thead').append('<tr></tr>');
+                        $('#Data1 > thead > tr:last').append('<th class="tablecont" style="text-align:center;" colspan=4>Master Guest Details</th>');
+                        $('#Data1 > thead').append('<tr></tr>');
+                        $('#Data1 > thead > tr:last').append('<th class="tablecont">Guest Name</th><th class="tablecont">Guest Circle Name</th><th class="tablecont">Band</th><th class="tablecont">Consolidated Room Nights</th>');
+                        var RoomFlag = true;
+                        var BedFlag = true;
+                        var CountFlag = true;
+                        var NoFlag = true;
+                        var PerFlag = true;
+                        var Flag = true;
+                        var TotalFlag = true;
+                        var RoomFlag = true;
+                        $.each(data, function (id, option) {
+
+                            if (option.Type == "Room NO") {
+                                if (RoomFlag == true) {
+                                    $('#Data > thead').append('<tr></tr>');
+                                    $('#Data > thead > tr:last').append('<th class="tablecont"  ></th>');
+                                    $('#Data > thead > tr:last').append('<th class="tablecont" ></th>');
+                                    RoomFlag = false;
+                                }
+                                if (option.RoomCount == "2") {
+                                    if (Flag == true) {
+                                        $('#Data > thead > tr:last').append('<th class="tablehd1" colspan=2 >Room - ' + option.RoomName + '</th>');
+                                        Flag = false;
+                                    }
+                                    else {
+                                        // $('#Data > thead > tr:last').append('<th class="tablehd2"  ></th>');
+                                        Flag = true;
+                                    }
+                                }
+                                else {
+                                    $('#Data > thead > tr:last').append('<th class="tablehd1"  >Room  ' + option.RoomName + '</th>');
+                                }
+
+                            }
+                            else if (option.Type == "Bed NO") {
+                                if (BedFlag == true) {
+                                    $('#Data > thead > tr:last').append('<th class="tablecont"  ></th>');
+                                    $('#Data > thead').append('<tr></tr>');
+                                    $('#Data > thead > tr:last').append('<th class="tablecont1"  >Day of the week</th>');
+                                    $('#Data > thead > tr:last').append('<th class="tablecont1"  >Stay for the night of</th>');
+                                    BedFlag = false;
+                                }
+                                $('#Data > thead > tr:last').append('<th class="tablecont1"  >' + option.BedName + '</th>');
+
+                            }
+                            else if (option.Type == "Bed Count") {
+
+                                if (CountFlag == true) {
+                                    $('#Data > tbody').append('<tr></tr>');
+                                    $('#Data > tbody > tr:last').append('<th class="tabledata"  ></th>');
+                                    $('#Data > tbody > tr:last').append('<th class="tabledata"  >Actual occupancy</th>');
+                                    CountFlag = false;
+                                }
+
+                                if (option.BedName != "L") {
+                                    $('#Data > tbody > tr:last').append('<td class="tabledata"  >' + option.GuestName + '</td>');
+                                }
+                                else {
+                                    $('#Data > tbody > tr:last').append('<td class="tabledata" style="color:red;"  >' + option.GuestName + '</td>');
+                                }
+                            }
+                            else if (option.Type == "No Of Days") {
+
+                                if (NoFlag == true) {
+                                    $('#Data > tbody').append('<tr></tr>');
+                                    $('#Data > tbody > tr:last').append('<th class="tabledata"  ></th>');
+                                    $('#Data > tbody > tr:last').append('<th class="tabledata"  >No. of days</th>');
+                                    NoFlag = false;
+                                }
+
+                                if (option.BedName != "L") {
+                                    $('#Data > tbody > tr:last').append('<td class="tabledata"  >' + option.GuestName + '</td>');
+                                }
+                                else {
+                                    $('#Data > tbody > tr:last').append('<td class="tabledata" style="color:red;" >' + option.GuestName + '</td>');
+                                }
+                            }
+                            else if (option.Type == "Percentage") {
+
+                                if (PerFlag == true) {
+                                    $('#Data > tbody').append('<tr></tr>');
+                                    $('#Data > tbody > tr:last').append('<td class="tabledata"  ></td>');
+                                    $('#Data > tbody > tr:last').append('<td class="tabledata"  >% occupancy</td>');
+                                    PerFlag = false;
+                                }
+                                if (option.BedName != "L") {
+                                    $('#Data > tbody > tr:last').append('<td class="tabledata"  >' + option.GuestName + '%</td>');
+                                }
+                                else {
+                                    $('#Data > tbody > tr:last').append('<td class="tabledata" style="color:red;" >' + option.GuestName + '%</td>');
+                                }
+
+                            }
+                            else if (option.Type == "Employee") {
+                                $('#Data1 > tbody').append('<tr></tr>');
+                                $('#Data1 > tbody > tr:last').append('<td class="tabledata">' + option.GuestName + '</td><td class="tabledata"  ></td><td class="tabledata"  ></td><td class="tabledata"  >' + option.BedName + '</td>');
+                            }
+                            else if (option.Type == "Data") {
+                                if (option.RoomId == "0") {
+                                    if (TotalFlag == true) {
+                                        $('#Data > thead > tr:last').append('<th class="tablecont"  >Total Occupancy</th>');
+                                        TotalFlag = false;
+                                    }
+                                    else {
+                                        $('#Data > tbody > tr:last').append('<td class="tabledata"  ></td>');
+                                    }
+                                    $('#Data > tbody').append('<tr></tr>');
+                                    var date1 = new Date(option.DT);
+                                    var month = new Array();
+                                    month[0] = "Jan";
+                                    month[1] = "Feb";
+                                    month[2] = "Mar";
+                                    month[3] = "Apr";
+                                    month[4] = "May";
+                                    month[5] = "Jun";
+                                    month[6] = "Jul";
+                                    month[7] = "Aug";
+                                    month[8] = "Sep";
+                                    month[9] = "Oct";
+                                    month[10] = "Nov";
+                                    month[11] = "Dec";
+
+                                    var weekday = new Array(7);
+                                    weekday[0] = "Sunday";
+                                    weekday[1] = "Monday";
+                                    weekday[2] = "Tuesday";
+                                    weekday[3] = "Wednesday";
+                                    weekday[4] = "Thursday";
+                                    weekday[5] = "Friday";
+                                    weekday[6] = "Saturday";
+
+                                    var dd = date1.getDate();
+                                    var mm = date1.getMonth() + 1;
+                                    var y = date1.getFullYear();
+                                    var day = weekday[date1.getDay()];
+                                    var mon = month[date1.getMonth()];
+                                    $('#Data > tbody > tr:last').append('<td class="tabledata"  >' + dd + "-" + mon + "-" + y + '</td>');
+                                    $('#Data > tbody > tr:last').append('<td class="tabledata"  >' + day + '</td>');
+
+                                }
+                                else {
+                                    $('#Data > tbody > tr:last').append('<td class="tabledata" title="Room No - ' + option.RoomName + '  Bed No -' + option.BedName + '  Date - ' + option.DT + '">' + option.GuestName + '</td>');
+                                }
+
+                            }
+
+
+                        });
+                        Export();
+                    }
+                    else {
+                        alertify.error("Data not Available");
+                        $('#Data').empty();
+                        $('#Data1').empty();
+                    }
+
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alertify.error("Failed to retrieve Data");
+
+                }
+            });
+        }
+        else {
+            alertify.error(Err);
+        }
+
+
+    }
+
+
+
+
+</script>
+
+</body>
+</html>

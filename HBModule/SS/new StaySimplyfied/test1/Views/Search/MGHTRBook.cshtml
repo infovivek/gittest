@@ -1,0 +1,1193 @@
+﻿@model test1.Models.MGHTRBookingBO
+@{
+    ViewBag.Title = "cppExpTRBooking";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .bookpageclr {
+        color: #666;
+    }
+
+    .txtwidth {
+        width: 107px;
+    }
+
+    .dropdownmgh {
+        width: 30%;
+        height: 0.5%;
+    }
+</style>
+@using (Html.BeginForm("MGHTRConfirmBooking", "Search"))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="booking-cont">
+        <div class="container">
+            <div class="col-md-12 col-lg-12 col-sm-12 booking-wrapper">
+                <div class="col-md-12 col-lg-12 col-sm-12 no-padding">
+                    <h3 class="bordered bookpageclr">@Model.PropertyName</h3>
+                </div>
+
+                @*<div class="col-md-3 col-lg-3 col-sm-12 no-padding">
+                    <img src="@Model.ImageLocation" alt="Property Photo" class="img-responsive" style="width:278px; height:278px;">
+                                    </div>*@
+
+                <div class="col-md-9 col-lg-9 col-sm-12 booking-details">
+                    <!-- Check In -->
+                    <div class="col-md-3 col-lg-3 col-sm-3 col-xs-6 checkin">
+                        <h3 class="bookpageclr">Check-in</h3>
+                        <p class="bookpageclr">@Model.CheckIn</p>
+                    </div>
+
+
+                    <!-- Check Out -->
+                    <div class="col-md-3 col-lg-3 col-sm-3 col-xs-6 checkin">
+                        <h3 class="bookpageclr">Check-Out</h3>
+                        <p class="bookpageclr">@Model.Checkout</p>
+                    </div>
+
+
+                    <!-- Guests -->
+                    <div class="col-md-3 col-lg-3 col-sm-3 col-xs-6 ">
+                        <h3 class="bookpageclr">Guests</h3>
+                        <p class="bookpageclr">@Model.RoomCount</p>
+                    </div>
+                    <br /><br /><br /><br />
+
+                    <div style="width:100%;">
+                        <div style="float:left;width:115px;margin-top:5px;">
+                            <label>Purpose of Stay  :</label>
+                        </div>
+                        <div>
+                            <select id="purpose" style="width:150px;height:20px;">
+                                <option value="0">--select--</option>
+                                <option value="1">Official </option>
+                                <option value="2">Personal</option>
+                            </select>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-md-8 col-lg-8 col-sm-12">
+                            <label for="fullname">Special Requests</label>
+                            <input style="width:488px;height:30px;" type="text" name="specialrequst" value="-" id="specialrequst">
+                        </div>
+                    </div>
+                    <br />
+                    <div>
+                        <fieldset>
+                            <label style="font-weight:bold;">Traveller's Count:@Model.count</label>
+                            <table border="1">
+                                <tbody>
+                                    <tr>
+                                        <th>
+                                            Employee code
+                                        </th>
+                                        <th>
+                                            Employee Name
+                                        </th>
+                                        <th>
+                                            Email
+                                        </th>
+                                    </tr>
+
+                                    @if (Model.count > 0)
+                                    {
+                                        <tr id="row1">
+                                            <td>
+                                                @Html.TextBoxFor(model => model.EmployeeCode1, new { @id = "ec1" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Name1, new { @id = "l2" })
+                                            </td>
+
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Email1, new { @id = "e1" })
+                                            </td>
+                                        </tr>
+                                    }
+                                    @if (Model.count > 1)
+                                    {
+                                        <tr id="row2">
+                                            <td>
+                                                @Html.TextBoxFor(model => model.EmployeeCode2, new { @id = "ec2" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Name2, new { @id = "l2" })
+                                            </td>
+
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Email2, new { @id = "e2" })
+                                            </td>
+                                        </tr>
+                                    }
+                                    @if (Model.count > 2)
+                                    {
+                                        <tr id="row3">
+                                            <td>
+                                                @Html.TextBoxFor(model => model.EmployeeCode3, new { @id = "ec3" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Name3, new { @id = "l3" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Email3, new { @id = "e3" })
+                                            </td>
+                                        </tr>
+                                    }
+                                    @if (Model.count > 3)
+                                    {
+                                        <tr id="row4">
+                                            <td>
+                                                @Html.TextBoxFor(model => model.EmployeeCode4, new { @id = "ec4" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Name4, new { @id = "l4" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Email4, new { @id = "e4" })
+                                            </td>
+                                        </tr>
+                                    }
+                                    @if (Model.count > 4)
+                                    {
+                                        <tr id="row5">
+                                            <td>
+                                                @Html.TextBoxFor(model => model.EmployeeCode5, new { @id = "ec5" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Name5, new { @id = "l5" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Email5, new { @id = "e5" })
+                                            </td>
+                                        </tr>
+                                    }
+                                    @if (Model.count > 5)
+                                    {
+                                        <tr id="row6">
+                                            <td>
+                                                @Html.TextBoxFor(model => model.EmployeeCode6, new { @id = "ec6" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Name6, new { @id = "l6" })
+                                            </td>
+
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Email6, new { @id = "e6" })
+                                            </td>
+                                        </tr>
+                                    }
+                                    @if (Model.count > 6)
+                                    {
+                                        <tr id="row7">
+                                            <td>
+                                                @Html.TextBoxFor(model => model.EmployeeCode7, new { @id = "ec7" })
+                                            </td>
+
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Name7, new { @id = "l7" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Email7, new { @id = "e7" })
+                                            </td>
+
+
+                                        </tr>
+                                    }
+                                    @if (Model.count > 7)
+                                    {
+                                        <tr id="row8">
+                                            <td>
+                                                @Html.TextBoxFor(model => model.EmployeeCode8, new { @id = "ec8" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Name8, new { @id = "l8" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Email8, new { @id = "e8" })
+                                            </td>
+                                        </tr>
+                                    }
+                                    @if (Model.count > 8)
+                                    {
+                                        <tr id="row9">
+
+                                            <td>
+                                                @Html.TextBoxFor(model => model.EmployeeCode9, new { @id = "ec9" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Name9, new { @id = "l9" })
+                                            </td>
+
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Email9, new { @id = "e9" })
+                                            </td>
+                                        </tr>
+                                    }
+                                    @if (Model.count > 9)
+                                    {
+                                        <tr id="row10">
+                                            <td>
+                                                @Html.TextBoxFor(model => model.EmployeeCode10, new { @id = "ec10" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Name10, new { @id = "l10" })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(model => model.Email10, new { @id = "e10" })
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+
+                        </fieldset>
+                        <br /><br />
+                        <fieldset>
+                            <table border="1">
+                                <tbody>
+                                    <tr>
+                                        @if (Model.column1 != "" && Model.column1 != null)
+                                        {
+                                            <th class="txtwidth">
+                                                @Model.column1
+                                            </th>
+                                        }
+                                        @if (Model.column2 != "" && Model.column2 != null)
+                                        {
+                                            <th class="txtwidth">
+                                                @Model.column2
+                                            </th>
+                                        }
+                                        @if (Model.column3 != "" && Model.column3 != null)
+                                        {
+                                            <th class="txtwidth">
+                                                @Model.column3
+                                            </th>
+                                        }
+                                        @if (Model.column4 != "" && Model.column4 != null)
+                                        {
+                                            <th class="txtwidth">
+                                                @Model.column4
+                                            </th>
+                                        }
+                                        @if (Model.column5 != "" && Model.column5 != null)
+                                        {
+                                            <th class="txtwidth">
+                                                @Model.column5
+                                            </th>
+                                        }
+                                        @if (Model.column6 != "" && Model.column6 != null)
+                                        {
+                                            <th class="txtwidth">
+                                                @Model.column6
+                                            </th>
+                                        }
+                                        @if (Model.column7 != "" && Model.column7 != null)
+                                        {
+                                            <th class="txtwidth">
+                                                @Model.column7
+                                            </th>
+                                        }
+                                        @if (Model.column8 != "" && Model.column8 != null)
+                                        {
+                                            <th class="txtwidth">
+                                                @Model.column8
+                                            </th>
+                                        }
+                                        @if (Model.column9 != "" && Model.column9 != null)
+                                        {
+                                            <th class="txtwidth">
+                                                @Model.column9
+                                            </th>
+                                        }
+                                        @if (Model.column10 != "" && Model.column10 != null)
+                                        {
+                                            <th class="txtwidth">
+                                                @Model.column10
+                                            </th>
+                                        }
+                                    </tr>
+                                    @if (Model.count > 0)
+                                    {
+
+                                        <tr id="row1">
+                                            @if (Model.column1 != "" || Model.column1 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text1, new { @id = "txt1", @class = "txtwidth" })
+                                                </td>
+                                            }
+                                            @if (Model.column2 != "" && Model.column2 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text2, new { @id = "txt2", @class = "txtwidth" })
+                                                </td>
+                                            }
+                                            @if (Model.column3 != "" && Model.column3 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text3, new { @id = "txt3", @class = "txtwidth" })
+                                                </td>
+                                            }
+                                            @if (Model.column4 != "" && Model.column4 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text4, new { @id = "txt4", @class = "txtwidth" })
+                                                </td>
+                                            }
+                                            @if (Model.column5 != "" && Model.column5 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text5, new { @id = "txt5", @class = "txtwidth" })
+                                                </td>
+                                            }
+                                            @if (Model.column6 != "" && Model.column6 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text6, new { @id = "txt6", @class = "txtwidth" })
+                                                </td>
+                                            }
+                                            @if (Model.column7 != "" && Model.column7 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text7, new { @id = "txt7", @class = "txtwidth" })
+                                                </td>
+                                            }
+                                            @if (Model.column8 != "" && Model.column8 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text8, new { @id = "txt8", @class = "txtwidth" })
+                                                </td>
+                                            }
+                                            @if (Model.column9 != "" && Model.column9 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text9, new { @id = "txt9", @class = "txtwidth" })
+                                                </td>
+                                            }
+                                            @if (Model.column10 != "" && Model.column10 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text10, new { @id = "txt10", @class = "txtwidth" })
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
+                                    @if (Model.count > 1)
+                                    {
+                                        <tr id="row2">
+                                            @if (Model.column1 != "" && Model.column1 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text11, new { @id = "txt11", @class = "txtwidth" })
+                                                </td>
+                                            }
+                                            @if (Model.column2 != "" && Model.column2 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text12, new { @id = "txt12", @class = "txtwidth" })
+                                                </td>
+                                            }
+                                            @if (Model.column3 != "" && Model.column3 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text13, new { @id = "txt13", @class = "txtwidth" })
+                                                </td>
+                                            }
+                                            @if (Model.column4 != "" && Model.column4 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text14, new { @id = "txt14", @class = "txtwidth" })
+                                                </td>
+                                            }
+                                            @if (Model.column5 != "" && Model.column5 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text15, new { @id = "txt15", @class = "txtwidth" })
+                                                </td>
+                                            }
+                                            @if (Model.column6 != "" && Model.column6 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text16, new { @id = "txt16", @class = "txtwidth" })
+                                                </td>
+                                            }
+                                            @if (Model.column7 != "" && Model.column7 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text17, new { @id = "txt17", @class = "txtwidth" })
+                                                </td>
+                                            }
+                                            @if (Model.column8 != "" && Model.column8 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text18, new { @id = "txt18", @class = "txtwidth" })
+                                                </td>
+                                            }
+                                            @if (Model.column9 != "" && Model.column9 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text19, new { @id = "txt19", @class = "txtwidth" })
+                                                </td>
+                                            }
+                                            @if (Model.column10 != "" && Model.column10 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text20, new { @id = "txt20", @class = "txtwidth" })
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
+                                    @if (Model.count > 2)
+                                    {
+                                        <tr id="row3">
+                                            @if (Model.column1 != "" && Model.column1 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text21, new { @id = "txt21" })
+                                                </td>
+                                            }
+                                            @if (Model.column2 != "" && Model.column2 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text22, new { @id = "txt22" })
+                                                </td>
+                                            }
+                                            @if (Model.column3 != "" && Model.column3 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text23, new { @id = "txt23" })
+                                                </td>
+                                            }
+                                            @if (Model.column4 != "" && Model.column4 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text24, new { @id = "txt24" })
+                                                </td>
+                                            }
+                                            @if (Model.column5 != "" && Model.column5 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text25, new { @id = "txt25" })
+                                                </td>
+                                            }
+                                            @if (Model.column6 != "" && Model.column6 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text26, new { @id = "txt26" })
+                                                </td>
+                                            }
+                                            @if (Model.column7 != "" && Model.column7 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text27, new { @id = "txt27" })
+                                                </td>
+                                            }
+                                            @if (Model.column8 != "" && Model.column8 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text28, new { @id = "txt28" })
+                                                </td>
+                                            }
+                                            @if (Model.column9 != "" && Model.column9 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text29, new { @id = "txt29" })
+                                                </td>
+                                            }
+                                            @if (Model.column10 != "" && Model.column10 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text30, new { @id = "txt30" })
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
+                                    @if (Model.count > 3)
+                                    {
+                                        <tr id="row4">
+                                            @if (Model.column1 != "" && Model.column1 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text31, new { @id = "txt31" })
+                                                </td>
+                                            }
+                                            @if (Model.column2 != "" && Model.column2 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text32, new { @id = "txt32" })
+                                                </td>
+                                            }
+                                            @if (Model.column3 != "" && Model.column3 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text33, new { @id = "txt33" })
+                                                </td>
+                                            }
+                                            @if (Model.column4 != "" && Model.column4 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text34, new { @id = "txt34" })
+                                                </td>
+                                            }
+                                            @if (Model.column5 != "" && Model.column5 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text35, new { @id = "txt35" })
+                                                </td>
+                                            }
+                                            @if (Model.column6 != "" && Model.column6 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text36, new { @id = "txt36" })
+                                                </td>
+                                            }
+                                            @if (Model.column7 != "" && Model.column7 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text37, new { @id = "txt37" })
+                                                </td>
+                                            }
+                                            @if (Model.column8 != "" && Model.column8 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text38, new { @id = "txt38" })
+                                                </td>
+                                            }
+                                            @if (Model.column9 != "" && Model.column9 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text39, new { @id = "txt39" })
+                                                </td>
+                                            }
+                                            @if (Model.column10 != "" && Model.column10 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text40, new { @id = "txt40" })
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
+                                    @if (Model.count > 4)
+                                    {
+                                        <tr id="row5">
+                                            @if (Model.column1 != "" && Model.column1 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text41, new { @id = "txt41" })
+                                                </td>
+                                            }
+                                            @if (Model.column2 != "" && Model.column2 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text42, new { @id = "txt42" })
+                                                </td>
+                                            }
+                                            @if (Model.column3 != "" && Model.column3 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text43, new { @id = "txt43" })
+                                                </td>
+                                            }
+                                            @if (Model.column4 != "" && Model.column4 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text44, new { @id = "txt44" })
+                                                </td>
+                                            }
+                                            @if (Model.column5 != "" && Model.column5 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text45, new { @id = "txt45" })
+                                                </td>
+                                            }
+                                            @if (Model.column6 != "" && Model.column6 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text46, new { @id = "txt46" })
+                                                </td>
+                                            }
+                                            @if (Model.column7 != "" && Model.column7 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text47, new { @id = "txt47" })
+                                                </td>
+                                            }
+                                            @if (Model.column8 != "" && Model.column8 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text48, new { @id = "txt48" })
+                                                </td>
+                                            }
+                                            @if (Model.column9 != "" && Model.column9 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text49, new { @id = "txt49" })
+                                                </td>
+                                            }
+                                            @if (Model.column10 != "" && Model.column10 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text50, new { @id = "txt50" })
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
+                                    @if (Model.count > 5)
+                                    {
+                                        <tr id="row6">
+                                            @if (Model.column1 != "" && Model.column1 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text51, new { @id = "txt51" })
+                                                </td>
+                                            }
+                                            @if (Model.column2 != "" && Model.column2 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text52, new { @id = "txt52" })
+                                                </td>
+                                            }
+                                            @if (Model.column3 != "" && Model.column3 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text53, new { @id = "txt53" })
+                                                </td>
+                                            }
+                                            @if (Model.column4 != "" && Model.column4 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text54, new { @id = "txt54" })
+                                                </td>
+                                            }
+                                            @if (Model.column5 != "" && Model.column5 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text55, new { @id = "txt55" })
+                                                </td>
+                                            }
+                                            @if (Model.column6 != "" && Model.column6 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text56, new { @id = "txt56" })
+                                                </td>
+                                            }
+                                            @if (Model.column7 != "" && Model.column7 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text57, new { @id = "txt57" })
+                                                </td>
+                                            }
+                                            @if (Model.column8 != "" && Model.column8 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text58, new { @id = "txt58" })
+                                                </td>
+                                            }
+                                            @if (Model.column9 != "" && Model.column9 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text59, new { @id = "txt59" })
+                                                </td>
+                                            }
+                                            @if (Model.column10 != "" && Model.column10 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text60, new { @id = "txt60" })
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
+                                    @if (Model.count > 6)
+                                    {
+
+                                        <tr id="row7">
+                                            @if (Model.column1 != "" && Model.column1 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text61, new { @id = "txt61" })
+                                                </td>
+                                            }
+                                            @if (Model.column2 != "" && Model.column2 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text62, new { @id = "txt62" })
+                                                </td>
+                                            }
+                                            @if (Model.column3 != "" && Model.column3 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text63, new { @id = "txt63" })
+                                                </td>
+                                            }
+                                            @if (Model.column4 != "" && Model.column4 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text64, new { @id = "txt64" })
+                                                </td>
+                                            }
+                                            @if (Model.column5 != "" && Model.column5 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text65, new { @id = "txt65" })
+                                                </td>
+                                            }
+                                            @if (Model.column6 != "" && Model.column6 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text66, new { @id = "txt66" })
+                                                </td>
+                                            }
+                                            @if (Model.column7 != "" && Model.column7 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text67, new { @id = "txt67" })
+                                                </td>
+                                            }
+                                            @if (Model.column8 != "" && Model.column8 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text68, new { @id = "txt68" })
+                                                </td>
+                                            }
+                                            @if (Model.column9 != "" && Model.column9 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text69, new { @id = "txt69" })
+                                                </td>
+                                            }
+                                            @if (Model.column10 != "" && Model.column10 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text70, new { @id = "txt70" })
+                                                </td>
+                                            }
+
+
+                                        </tr>
+                                    }
+                                    @if (Model.count > 7)
+                                    {
+                                        <tr id="row8">
+                                            @if (Model.column1 != "" && Model.column1 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text71, new { @id = "txt71" })
+                                                </td>
+                                            }
+                                            @if (Model.column2 != "" && Model.column2 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text72, new { @id = "txt72" })
+                                                </td>
+                                            }
+                                            @if (Model.column3 != "" && Model.column3 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text73, new { @id = "txt73" })
+                                                </td>
+                                            }
+                                            @if (Model.column4 != "" && Model.column4 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text74, new { @id = "txt74" })
+                                                </td>
+                                            }
+                                            @if (Model.column5 != "" && Model.column5 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text75, new { @id = "txt75" })
+                                                </td>
+                                            }
+                                            @if (Model.column6 != "" && Model.column6 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text76, new { @id = "txt76" })
+                                                </td>
+                                            }
+                                            @if (Model.column7 != "" && Model.column7 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text77, new { @id = "txt77" })
+                                                </td>
+                                            }
+                                            @if (Model.column8 != "" && Model.column8 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text78, new { @id = "txt78" })
+                                                </td>
+                                            }
+                                            @if (Model.column9 != "" && Model.column9 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text79, new { @id = "txt79" })
+                                                </td>
+                                            }
+                                            @if (Model.column10 != "" && Model.column10 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text80, new { @id = "txt80" })
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
+                                    @if (Model.count > 8)
+                                    {
+                                        <tr id="row9">
+                                            @if (Model.column1 != "" && Model.column1 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text81, new { @id = "txt81" })
+                                                </td>
+                                            }
+                                            @if (Model.column2 != "" && Model.column2 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text82, new { @id = "txt82" })
+                                                </td>
+                                            }
+                                            @if (Model.column3 != "" && Model.column3 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text83, new { @id = "txt83" })
+                                                </td>
+                                            }
+                                            @if (Model.column4 != "" && Model.column4 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text84, new { @id = "txt84" })
+                                                </td>
+                                            }
+                                            @if (Model.column5 != "" && Model.column5 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text85, new { @id = "txt85" })
+                                                </td>
+                                            }
+                                            @if (Model.column6 != "" && Model.column6 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text86, new { @id = "txt86" })
+                                                </td>
+                                            }
+                                            @if (Model.column7 != "" && Model.column7 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text87, new { @id = "txt87" })
+                                                </td>
+                                            }
+                                            @if (Model.column8 != "" && Model.column8 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text88, new { @id = "txt88" })
+                                                </td>
+                                            }
+                                            @if (Model.column9 != "" && Model.column9 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text89, new { @id = "txt89" })
+                                                </td>
+                                            }
+                                            @if (Model.column10 != "" && Model.column10 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text90, new { @id = "txt90" })
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
+                                    @if (Model.count > 9)
+                                    {
+                                        <tr id="row10">
+                                            @if (Model.column1 != "" && Model.column1 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text91, new { @id = "txt91" })
+                                                </td>
+                                            }
+                                            @if (Model.column2 != "" && Model.column2 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text92, new { @id = "txt92" })
+                                                </td>
+                                            }
+                                            @if (Model.column3 != "" && Model.column3 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text93, new { @id = "txt93" })
+                                                </td>
+                                            }
+                                            @if (Model.column4 != "" && Model.column4 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text94, new { @id = "txt94" })
+                                                </td>
+                                            }
+                                            @if (Model.column5 != "" && Model.column5 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text95, new { @id = "txt95" })
+                                                </td>
+                                            }
+                                            @if (Model.column6 != "" && Model.column6 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text96, new { @id = "txt96" })
+                                                </td>
+                                            }
+                                            @if (Model.column7 != "" && Model.column7 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text97, new { @id = "txt97" })
+                                                </td>
+                                            }
+                                            @if (Model.column8 != "" && Model.column8 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text98, new { @id = "txt98" })
+                                                </td>
+                                            }
+                                            @if (Model.column9 != "" && Model.column9 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text99, new { @id = "txt99" })
+                                                </td>
+                                            }
+                                            @if (Model.column10 != "" && Model.column10 != null)
+                                            {
+                                                <td>
+                                                    @Html.TextBoxFor(model => model.text100, new { @id = "txt100" })
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
+                                <tbody>
+                            </table>
+                        </fieldset>
+                    </div>
+                </div>
+
+
+
+                <div>
+                    @Html.HiddenFor(m => m.BookerMail)
+                    @Html.HiddenFor(m => m.BookerName)
+                    @Html.HiddenFor(m => m.BookrerId)
+                    @Html.HiddenFor(m => m.CheckIn)
+                    @Html.HiddenFor(m => m.Checkout)
+                    @Html.HiddenFor(m => m.CityCode)
+                    @Html.HiddenFor(m => m.cityId)
+                    @Html.HiddenFor(m => m.CityName)
+                    @Html.HiddenFor(m => m.CliendId)
+                    @Html.HiddenFor(m => m.ClientName)
+                    @Html.HiddenFor(m => m.PropertyId)
+                    @Html.HiddenFor(m => m.PropertyType)
+                    @Html.HiddenFor(m => m.RoomCount)
+                    @Html.HiddenFor(m => m.RoomCount)
+                    @Html.HiddenFor(m => m.SateName)
+                    @Html.HiddenFor(m => m.ServicePayMode)
+                    @Html.HiddenFor(m => m.stateId)
+                    @Html.HiddenFor(m => m.TariffPayMode)
+                    @Html.HiddenFor(m => m.Title1)
+                    @Html.HiddenFor(m => m.Title2)
+                    @Html.HiddenFor(m => m.Title3)
+                    @Html.HiddenFor(m => m.Title4)
+                    @Html.HiddenFor(m => m.Title5)
+                    @Html.HiddenFor(m => m.Title7)
+                    @Html.HiddenFor(m => m.Title8)
+                    @Html.HiddenFor(m => m.Title9)
+                    @Html.HiddenFor(m => m.Title10)
+                    @Html.HiddenFor(m => m.grade1)
+                    @Html.HiddenFor(m => m.grade2)
+                    @Html.HiddenFor(m => m.grade3)
+                    @Html.HiddenFor(m => m.grade4)
+                    @Html.HiddenFor(m => m.grade5)
+                    @Html.HiddenFor(m => m.grade6)
+                    @Html.HiddenFor(m => m.grade7)
+                    @Html.HiddenFor(m => m.grade8)
+                    @Html.HiddenFor(m => m.grade9)
+                    @Html.HiddenFor(m => m.grade10)
+                    @Html.HiddenFor(m => m.GradeId1)
+                    @Html.HiddenFor(m => m.GradeId2)
+                    @Html.HiddenFor(m => m.GradeId3)
+                    @Html.HiddenFor(m => m.GradeId4)
+                    @Html.HiddenFor(m => m.GradeId5)
+                    @Html.HiddenFor(m => m.GradeId6)
+                    @Html.HiddenFor(m => m.GradeId7)
+                    @Html.HiddenFor(m => m.GradeId8)
+                    @Html.HiddenFor(m => m.GradeId9)
+                    @Html.HiddenFor(m => m.GradeId10)
+                    @Html.HiddenFor(m => m.guestId1)
+                    @Html.HiddenFor(m => m.guestId2)
+                    @Html.HiddenFor(m => m.guestId3)
+                    @Html.HiddenFor(m => m.guestId4)
+                    @Html.HiddenFor(m => m.guestId5)
+                    @Html.HiddenFor(m => m.guestId6)
+                    @Html.HiddenFor(m => m.guestId7)
+                    @Html.HiddenFor(m => m.guestId8)
+                    @Html.HiddenFor(m => m.guestId9)
+                    @Html.HiddenFor(m => m.guestId10)
+                    @Html.HiddenFor(m => m.UserId)
+                    @Html.HiddenFor(m => m.Level)
+                    @Html.HiddenFor(m => m.Nationality1)
+                    @Html.HiddenFor(m => m.Nationality2)
+                    @Html.HiddenFor(m => m.Nationality3)
+                    @Html.HiddenFor(m => m.Nationality4)
+                    @Html.HiddenFor(m => m.Nationality5)
+                    @Html.HiddenFor(m => m.Nationality6)
+                    @Html.HiddenFor(m => m.Nationality7)
+                    @Html.HiddenFor(m => m.Nationality8)
+                    @Html.HiddenFor(m => m.Nationality9)
+                    @Html.HiddenFor(m => m.Nationality10)
+                    @Html.HiddenFor(m => m.count)
+                    @Html.HiddenFor(m => m.BedId1)
+                    @Html.HiddenFor(m => m.BedId2)
+                    @Html.HiddenFor(m => m.BedId3)
+                    @Html.HiddenFor(m => m.BedId4)
+                    @Html.HiddenFor(m => m.BedId5)
+                    @Html.HiddenFor(m => m.BedId6)
+                    @Html.HiddenFor(m => m.BedId7)
+                    @Html.HiddenFor(m => m.BedId8)
+                    @Html.HiddenFor(m => m.BedId9)
+                    @Html.HiddenFor(m => m.BedId10)
+                    @Html.HiddenFor(m => m.RoomId1)
+                    @Html.HiddenFor(m => m.RoomId3)
+                    @Html.HiddenFor(m => m.RoomId2)
+                    @Html.HiddenFor(m => m.RoomId4)
+                    @Html.HiddenFor(m => m.RoomId5)
+                    @Html.HiddenFor(m => m.RoomType1)
+                    @Html.HiddenFor(m => m.RoomType2)
+                    @Html.HiddenFor(m => m.RoomType3)
+                    @Html.HiddenFor(m => m.RoomType4)
+                    @Html.HiddenFor(m => m.RoomType5)
+                    @Html.HiddenFor(m => m.BedType1)
+                    @Html.HiddenFor(m => m.BedType2)
+                    @Html.HiddenFor(m => m.BedType3)
+                    @Html.HiddenFor(m => m.BedType4)
+                    @Html.HiddenFor(m => m.BedType5)
+                    @Html.HiddenFor(m => m.BedType6)
+                    @Html.HiddenFor(m => m.BedType7)
+                    @Html.HiddenFor(m => m.BedType8)
+                    @Html.HiddenFor(m => m.BedType9)
+                    @Html.HiddenFor(m => m.BedType10)
+                    @Html.HiddenFor(m => m.FirstName1)
+                    @Html.HiddenFor(m => m.FirstName2)
+                    @Html.HiddenFor(m => m.FirstName3)
+                    @Html.HiddenFor(m => m.FirstName4)
+                    @Html.HiddenFor(m => m.FirstName5)
+                    @Html.HiddenFor(m => m.FirstName6)
+                    @Html.HiddenFor(m => m.FirstName7)
+                    @Html.HiddenFor(m => m.FirstName8)
+                    @Html.HiddenFor(m => m.FirstName9)
+                    @Html.HiddenFor(m => m.FirstName10)
+
+                    @Html.HiddenFor(m => m.LastName1)
+                    @Html.HiddenFor(m => m.LastName2)
+                    @Html.HiddenFor(m => m.LastName3)
+                    @Html.HiddenFor(m => m.LastName4)
+                    @Html.HiddenFor(m => m.LastName5)
+                    @Html.HiddenFor(m => m.LastName6)
+                    @Html.HiddenFor(m => m.LastName7)
+                    @Html.HiddenFor(m => m.LastName8)
+                    @Html.HiddenFor(m => m.LastName9)
+                    @Html.HiddenFor(m => m.LastName10)
+
+                    @Html.HiddenFor(m => m.Email1)
+                    @Html.HiddenFor(m => m.Email2)
+                    @Html.HiddenFor(m => m.Email3)
+                    @Html.HiddenFor(m => m.Email4)
+                    @Html.HiddenFor(m => m.Email5)
+                    @Html.HiddenFor(m => m.Email6)
+                    @Html.HiddenFor(m => m.Email7)
+                    @Html.HiddenFor(m => m.Email8)
+                    @Html.HiddenFor(m => m.Email9)
+                    @Html.HiddenFor(m => m.Email10)
+
+                    @Html.HiddenFor(m => m.Phno1)
+                    @Html.HiddenFor(m => m.Phno2)
+                    @Html.HiddenFor(m => m.Phno3)
+                    @Html.HiddenFor(m => m.Phno4)
+                    @Html.HiddenFor(m => m.Phno5)
+                    @Html.HiddenFor(m => m.Phno6)
+                    @Html.HiddenFor(m => m.Phno7)
+                    @Html.HiddenFor(m => m.Phno8)
+                    @Html.HiddenFor(m => m.Phno9)
+                    @Html.HiddenFor(m => m.Phno10)
+
+
+                    @Html.HiddenFor(m => m.EmployeeCode1)
+                    @Html.HiddenFor(m => m.EmployeeCode2)
+                    @Html.HiddenFor(m => m.EmployeeCode3)
+                    @Html.HiddenFor(m => m.EmployeeCode4)
+                    @Html.HiddenFor(m => m.EmployeeCode5)
+                    @Html.HiddenFor(m => m.EmployeeCode6)
+                    @Html.HiddenFor(m => m.EmployeeCode7)
+                    @Html.HiddenFor(m => m.EmployeeCode8)
+                    @Html.HiddenFor(m => m.EmployeeCode9)
+                    @Html.HiddenFor(m => m.EmployeeCode10)
+
+                    @Html.HiddenFor(m => m.Email1)
+                    @Html.HiddenFor(m => m.Email2)
+                    @Html.HiddenFor(m => m.Email3)
+                    @Html.HiddenFor(m => m.Email4)
+                    @Html.HiddenFor(m => m.Email5)
+                    @Html.HiddenFor(m => m.Email6)
+                    @Html.HiddenFor(m => m.Email7)
+                    @Html.HiddenFor(m => m.Email8)
+                    @Html.HiddenFor(m => m.Email9)
+                    @Html.HiddenFor(m => m.Email10)
+                </div>
+                <div class="col-md-12 col-lg-12 col-sm-12 last">
+                    <div class="row">
+                        <div class="col-md-12 col-lg-12 col-sm-12 bordered">
+                            <div class="col-md-4 col-lg-4 col-sm-12">
+                                <!--  <input type="checkbox" value="agreed" id="terms" name="terms" checked="checked" readonly="readonly"> -->
+                                I / We acknowledge and accept the <a onclick="window.open('','mywindow','width=400,height=200,left=0,top=100,screenX=0,screenY=100')" style=" cursor:pointer">Terms and Conditions</a>  applicable and available on the site
+                            </div>
+
+
+                            <div class="col-md-3 col-lg-3 col-sm-8 ">
+
+
+                                <h3 style="color: #333">Total : Rs. @Model.Total_Tariff</h3> 			  <input type="hidden" id="total" name="total" value="" />
+                                <input type="hidden" id="amount" name="amount" value=" " />
+
+
+
+                            </div>
+
+                            <div class="col-md-3 col-lg-3 col-sm-8">
+                                <input type="submit" value="Confirm Booking" onclick="return validation1()" id="submit" name="submit" style="width:60%">
+                            </div>
+
+
+                            <div class="col-md-2 col-lg-2 col-sm-6">
+                                <input type="button" onclick="javascript:window.history.go(-1);" value="Go Back" id="back" name="submit" style="width:50%">
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+
+    function validation1()
+    {
+        var value = $("#purpose").val();
+
+        if(value == 0 || value == null)
+        {
+            alert("please select purpose of stay");
+            return false;
+        }
+        return true;
+    }
+</script>

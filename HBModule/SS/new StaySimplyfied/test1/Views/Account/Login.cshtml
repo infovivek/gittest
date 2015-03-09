@@ -1,0 +1,36 @@
+﻿@{
+    ViewBag.Title = "Login";
+}
+
+
+<div class="menu">
+    <div class="content-area">
+        <span class="navs col-xs-12 col-sm-6 col-md-4 pointer" onclick="loadUrl('http://www.staysimplyfied.com/index.php/customer/signup')">LOGIN<div class="underline"></div></span>
+        <span class="navs col-xs-12 col-sm-6 col-md-4 pointer" onclick="loadUrl('http://www.staysimplyfied.com/index.php/customer/signup')">NEW USER</span>
+        <div class="clearfix"></div>
+    </div>
+</div>
+
+<div class="body-contents">
+    @using (@Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary()
+        <div class="content-area login-container">
+            <div class="form-box">
+                <img src="~/img/ss_element_bird.png" class="bird-image">
+                @ViewBag.error
+              
+                <form id="new_customer" name="new_customer" action="http://www.staysimplyfied.com/index.php/customer/login" method="post" />
+                <input type="text" class="input-fields input-field-20" placeholder="User Email" name="username" id="username">
+                <input type="password" class="input-fields input-field-20" placeholder="Password" name="password" id="password">
+                <button class="button" type="submit">Login</button>
+
+                <div class="col-sm-6 col-md-4"><a href="http://www.staysimplyfied.com/index.php/customer/forgotpassword">Forgot Password ?</a></div>
+                <div class="col-sm-6 col-md-4"><a href="http://www.staysimplyfied.com/index.php/customer/signup">New User ?</a></div>
+
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    }
+</div>

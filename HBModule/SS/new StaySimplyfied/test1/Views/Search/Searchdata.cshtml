@@ -1,0 +1,581 @@
+﻿@{
+    ViewBag.Title = "Searchdata";
+}
+
+<style type="text/css">
+    .demo {
+        width: 980px;
+        margin: 0px auto;
+    }
+
+        .demo h1 {
+            margin: 33px 0 25px;
+        }
+
+        .demo h3 {
+            margin: 10px 0;
+        }
+
+    pre {
+        background: #fff;
+    }
+
+    #tabInfo {
+        display: none;
+    }
+
+    input[type="submit"] {
+        min-height: 30px;
+        width: 25%;
+        float: right;
+        margin-top: 10px;
+    }
+
+    #no-result {
+        background: url("/images/no-results.png") no-repeat scroll 0 0 #e8530b;
+        margin: 30px;
+        padding: 25px;
+        color: #FFFFFF;
+        font-weight: bold;
+        background-position: 7% 60%;
+    }
+</style>
+
+
+<div class="sec-cont2 margin">
+    <div class="container-fluid no-padding">
+        <!-- Filters Content -->
+        <div class="col-md-2 col-lg-2 col-sm-12 no-padding" id="left-box-wrapper">
+            <div class="col-md-12 col-lg-12 col-sm-12 filters-wrapper orange-bg" id="left-box">
+                <p class="filters-head grey">Filters <span class="filterclose">Close X</span></p>
+            </div>
+
+            <div class="col-md-12 col-lg-12 col-sm-12">
+                <h4>Filter by Name</h4>
+                <form id="pname" name="pname" action="http://www.staysimplyfied.com/index.php/page/pname_search" method="post">
+                    <input type="text" class="form-control" id="propertyname" name="propertyname" placeholder="Property Name" value="">
+                    <input type="submit" id="submit" name="submit" class="go" onclick="return vale();" value="Go">
+                </form>
+            </div>
+
+
+            <div class="col-md-12 col-lg-12 col-sm-12">
+                <h4>Filter by Locality</h4>
+                <select id="locality" name="locality" class="form-control topsearch1" onchange="return locality();">
+                    <option value="0">All</option>
+                </select>
+            </div>
+            <div class="col-md-12 col-lg-12 col-sm-12">
+                <h4>Filter by Rating</h4>
+                <ul class="starfilter" style="background-image:url(~/images/5stars.png)">
+                    <li class="center one " onclick="star_rating('2');"></li>
+                    <li class="center two " onclick="star_rating('3');"></li>
+                    <li class="center three " onclick="star_rating('4');"></li>
+                    <li class="center four " onclick="star_rating('5');"></li>
+                    <li class="center five " onclick="star_rating('6');"></li>
+                </ul>
+            </div>
+            <div class="col-md-12 col-lg-12 col-sm-12">
+                <h4>Select Price Range</h4>
+                <form id="price" name="price" action="http://www.staysimplyfied.com/index.php/page/price_fliter" method="post" onsubmit="price();">
+
+                    <input type="hidden" value="1633.00:2312.00" id="prices" name="prices" />
+
+
+                    <input type="range" data-slider-min="1633" data-slider-max="2312" data-slider-step="5" data-slider-value="[1633,2312]" id="sl2">
+
+                    <br /><input type="submit" id="submit" name="submit" class="go" onclick="return vale();" value="Go">
+                </form>
+            </div>
+        </div>
+
+        <!-- END Filters Content -->
+        <div class="col-md-8 col-lg-8 col-sm-12 no-padding" id="middle-box">
+            <div class="col-md-12 col-lg-12 col-sm-12 no-padding" id="extra-btns">
+                <div class="col-md-6 col-lg-6 col-sm-6 col-xs-6">
+                    <p><button class="leftbtn">FILTERS</p>
+                </div>
+
+                <div class="col-md-6 col-lg-6 col-sm-6 col-xs-6 right-align">
+                    <p><button class="rightbtn">HISTORY & FAVOURITES</p>
+                </div>
+            </div>
+
+            <div id="ajax_load">
+                <style>
+                    #no-result {
+                        background: url("/images/no-results.png") no-repeat scroll 0 0 #e8530b;
+                        margin: 30px;
+                        padding: 25px;
+                        color: #FFFFFF;
+                        font-weight: bold;
+                        background-position: 7% 60%;
+                    }
+                </style>
+                <script type="text/javascript">
+
+                    function val(id) {
+
+                        var a = document.getElementById(id).style.display;
+
+                        if (a == 'none') {
+                            document.getElementById(id).style.display = "block";
+
+                        } else {
+                            document.getElementById(id).style.display = "none";
+                        }
+                    }
+
+
+
+                </script>
+
+
+                <div id="horizontalTab">
+                    <div>
+                        <div style="float:left">
+                            <input id="Button1" type="button" value="Serviced
+      Appartments" class="designtab" style="width:126px" />
+                        </div>
+                        <div style="float:left">
+                            <input id="Button1" type="button" value="Budget Hotels
+      (Rs. 750 - Rs. 2500)" class="designtab" style="width:165px" />
+                        </div>
+                        <div style="float:left">
+
+                            <input id="Button1" type="button" value="Business Hotels
+      (Rs. 2501 - Rs. 5000)" class="designtab" style="width:173px" />
+                        </div>
+                        <div style="float:left">
+                            <input id="Button1" type="button" value="Luxury Hotels
+      (Rs. 5001 and above)" class="designtab" style="width:179px" />
+                        </div>
+                        <div>
+                            <input id="Button1" type="button" value="Recent
+       Stay" class="designtab" />
+                        </div>
+
+                        <div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="resp-tabs-container">
+
+
+
+
+
+
+
+
+
+                        <div>
+
+                            <div class=" result-box col-md-12  col-lg-12 no-padding">
+
+                                <div class="col-md-3 col-lg-3 col-sm-3 no-padding">
+                                    <img src="http://images5.makemytrip.com/images/hotels/201409242001115718/pavieshpark main.jpg" alt="Property Photo" class="img-responsive" style="width:216px; height:155px;">
+
+
+
+                                </div>
+
+
+                                <div class="col-md-9 col-lg-9 col-sm-9 no-padding">
+
+                                    <div class="col-md-12 col-lg-12 col-sm-12 result-title">
+                                        <div class="row" style="margin-bottom:0px;">
+                                            <div class="col-md-6 col-lg-6 col-sm-6 col-xs-6">
+                                                <h3>Paviesh Park &nbsp;&nbsp;&nbsp;--&nbsp;&nbsp;</h3>
+                                            </div>
+                                            <!--<div class="col-md-3 col-lg-3 col-sm-6 col-xs-6">
+                                              <div class="default right-align"> </div>
+                                            </div>
+                                            <div class="col-md-3 col-lg-3 col-sm-12">
+                                              <p class="rooms-available">6 Rooms Available
+                                              </p>
+
+                                            </div>-->
+
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12 col-lg-12 col-sm-12 result-cont">
+
+
+                                    </div>
+                                    <div class="col-md-5 col-lg-5 col-sm-5 no-padding">
+                                        <p class="price"> Rs.1633.00</p>
+                                    </div>
+
+                                    <div class="col-md-3 col-lg-3 col-sm-3 icon-wrapper no-padding center">
+                                        <a href="http://www.staysimplyfied.com/index.php/property/property_detail/201409242001115718" class="icons">
+                                            <i class="fa fa-info fa-2x" alt="More details" title="More details"></i>
+                                        </a>
+
+                                        <a href="#" target="_blank" class="icons">
+
+                                            <i class="fa fa-map-marker fa-2x" alt="Map" title="Map"></i>
+                                        </a>
+                                    </div>
+
+                                    <div class="col-md-4 col-lg-4 col-sm-4 no-padding">
+                                        <p class="price"> <a onclick="val('b201409242001115718');">Price Details</a> </p>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div id="b201409242001115718" style="display:none" class="pricebox">
+
+                                <!-- Text goes here -->
+
+                                <table align="right">
+                                    <thead style="color:#E8530B">
+                                    <th width="26%">Room Type</th>
+                                    <th width="33%">Single Occupancy </th>
+                                    <th width="33%">Double Occupancy </th>
+                                    <th width="20%">&nbsp;</th>
+                                    </thead>
+
+
+
+                                    <tr>
+                                        <th width="23%">
+                                            1 Standard Non Ac  Room</td>
+                                        <th width="33%"> Rs 1633.00&nbsp;<sup style='color:#E8530B'>#</sup> </th>
+                                        <th width="33%">Rs 1631.00&nbsp;<sup style='color:#E8530B'>#</sup></th>
+                                        <th width="20%">
+
+                                            <a href="http://www.staysimplyfied.com/index.php/hotel/details/201409242001115718/87799528861803/23109" class="btn btn-default btn-orange">&nbsp;&nbsp;Book </a>
+
+                                            </td>
+                                    </tr>
+
+                                    <tr><td>&nbsp;</td></tr>
+                                    <tr style="color:#E8530B"><td><strong># - Net Tariff</strong></td></tr>
+                                    <tr style="color:#E8530B"><td><strong>* - Tax Rates as applicable</strong></td></tr>
+                                    <tr><td>&nbsp;</td></tr>
+                                </table>
+
+                            </div>
+                            <div class=" result-box col-md-12  col-lg-12 no-padding">
+
+                                <div class="col-md-3 col-lg-3 col-sm-3 no-padding">
+                                    <img src="http://images5.makemytrip.com/images/hotels/201401041349443065/Reception.jpg" alt="Property Photo" class="img-responsive" style="width:216px; height:155px;">
+
+
+
+                                </div>
+
+
+                                <div class="col-md-9 col-lg-9 col-sm-9 no-padding">
+
+                                    <div class="col-md-12 col-lg-12 col-sm-12 result-title">
+                                        <div class="row" style="margin-bottom:0px;">
+                                            <div class="col-md-6 col-lg-6 col-sm-6 col-xs-6">
+                                                <h3>West INN&nbsp;&nbsp;&nbsp;--&nbsp;&nbsp;</h3>
+                                            </div>
+                                            <!--<div class="col-md-3 col-lg-3 col-sm-6 col-xs-6">
+                                              <div class="default right-align"> </div>
+                                            </div>
+                                            <div class="col-md-3 col-lg-3 col-sm-12">
+                                              <p class="rooms-available">6 Rooms Available
+                                              </p>
+
+                                            </div>-->
+
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12 col-lg-12 col-sm-12 result-cont">
+                                        &lt;p align="justify"&gt; A budget property, 2 km from the Bus Stand, 2.3 km from the Railway Station &lt;br&gt;&lt;br&gt;
+
+                                        Located 2 km from Erode Fort, West Inn Hotel features comfortable and well-appointed rooms equipped in-room amenities like c
+
+                                    </div>
+                                    <div class="col-md-5 col-lg-5 col-sm-5 no-padding">
+                                        <p class="price"> Rs.1896.00</p>
+                                    </div>
+
+                                    <div class="col-md-3 col-lg-3 col-sm-3 icon-wrapper no-padding center">
+                                        <a href="http://www.staysimplyfied.com/index.php/property/property_detail/201401041349443065" class="icons">
+                                            <i class="fa fa-info fa-2x" alt="More details" title="More details"></i>
+                                        </a>
+                                        <a href="http://maps.google.com/?q=11.338647,77.714741" target="_blank" class="icons">
+                                            <i class="fa fa-map-marker fa-2x" alt="Map" title="Map"></i>
+                                        </a>
+                                    </div>
+
+                                    <div class="col-md-4 col-lg-4 col-sm-4 no-padding">
+                                        <p class="price"> <a onclick="val('b201401041349443065');">Price Details</a> </p>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div id="b201401041349443065" style="display:none" class="pricebox">
+
+                                <!-- Text goes here -->
+
+                                <table align="right">
+                                    <thead style="color:#E8530B">
+                                    <th width="26%">Room Type</th>
+                                    <th width="33%">Single Occupancy </th>
+                                    <th width="33%">Double Occupancy </th>
+                                    <th width="20%">&nbsp;</th>
+                                    </thead>
+
+
+
+                                    <tr>
+                                        <th width="23%">
+                                            Executive</td>
+                                        <th width="33%"> Rs 1896.00&nbsp;<sup style='color:#E8530B'>#</sup> </th>
+                                        <th width="33%">Rs 2166.00&nbsp;<sup style='color:#E8530B'>#</sup></th>
+                                        <th width="20%">
+
+                                            <a href="http://www.staysimplyfied.com/index.php/hotel/details/201401041349443065/42983064636842/24457" class="btn btn-default btn-orange">&nbsp;&nbsp;Book </a>
+
+                                            </td>
+                                    </tr>
+
+
+                                    <tr>
+                                        <th width="23%">
+                                            Royal Executive</td>
+                                        <th width="33%"> Rs 2573.00&nbsp;<sup style='color:#E8530B'>#</sup> </th>
+                                        <th width="33%">Rs 2573.00&nbsp;<sup style='color:#E8530B'>#</sup></th>
+                                        <th width="20%">
+
+                                            <a href="http://www.staysimplyfied.com/index.php/hotel/details/201401041349443065/63789336382230/2176" class="btn btn-default btn-orange">&nbsp;&nbsp;Book </a>
+
+                                            </td>
+                                    </tr>
+
+                                    <tr><td>&nbsp;</td></tr>
+                                    <tr style="color:#E8530B"><td><strong># - Net Tariff</strong></td></tr>
+                                    <tr style="color:#E8530B"><td><strong>* - Tax Rates as applicable</strong></td></tr>
+                                    <tr><td>&nbsp;</td></tr>
+                                </table>
+
+                            </div>
+                            <div class=" result-box col-md-12  col-lg-12 no-padding">
+
+                                <div class="col-md-3 col-lg-3 col-sm-3 no-padding">
+                                    <img src="http://images5.makemytrip.com/images/hotels/201401041433361973/Exterior_View.jpg" alt="Property Photo" class="img-responsive" style="width:216px; height:155px;">
+
+
+
+                                </div>
+
+
+                                <div class="col-md-9 col-lg-9 col-sm-9 no-padding">
+
+                                    <div class="col-md-12 col-lg-12 col-sm-12 result-title">
+                                        <div class="row" style="margin-bottom:0px;">
+                                            <div class="col-md-6 col-lg-6 col-sm-6 col-xs-6">
+                                                <h3>Hotel Iswariyaa&nbsp;&nbsp;&nbsp;--&nbsp;&nbsp;</h3>
+                                            </div>
+                                            <!--<div class="col-md-3 col-lg-3 col-sm-6 col-xs-6">
+                                              <div class="default right-align"> </div>
+                                            </div>
+                                            <div class="col-md-3 col-lg-3 col-sm-12">
+                                              <p class="rooms-available">6 Rooms Available
+                                              </p>
+
+                                            </div>-->
+
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12 col-lg-12 col-sm-12 result-cont">
+                                        &lt;p align="justify"&gt;The property is located 1.7 km form Erode Junction railway station, 1.5 km from Erode Central Bus Terminus, nearest airport is Coimbatore International Airport which is 90 km from Erode.&lt;br&gt;&lt;br&gt;
+
+                                        The Hotel offer
+
+                                    </div>
+                                    <div class="col-md-5 col-lg-5 col-sm-5 no-padding">
+                                        <p class="price"> Rs.2312.00</p>
+                                    </div>
+
+                                    <div class="col-md-3 col-lg-3 col-sm-3 icon-wrapper no-padding center">
+                                        <a href="http://www.staysimplyfied.com/index.php/property/property_detail/201401041433361973" class="icons">
+                                            <i class="fa fa-info fa-2x" alt="More details" title="More details"></i>
+                                        </a>
+                                        <a href="http://maps.google.com/?q=11.338876,77.721536" target="_blank" class="icons">
+                                            <i class="fa fa-map-marker fa-2x" alt="Map" title="Map"></i>
+                                        </a>
+                                    </div>
+
+                                    <div class="col-md-4 col-lg-4 col-sm-4 no-padding">
+                                        <p class="price"> <a onclick="val('b201401041433361973');">Price Details</a> </p>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div id="b201401041433361973" style="display:none" class="pricebox">
+
+                                <!-- Text goes here -->
+
+                                <table align="right">
+                                    <thead style="color:#E8530B">
+                                    <th width="26%">Room Type</th>
+                                    <th width="33%">Single Occupancy </th>
+                                    <th width="33%">Double Occupancy </th>
+                                    <th width="20%">&nbsp;</th>
+                                    </thead>
+
+
+
+                                    <tr>
+                                        <th width="23%">
+                                            Deluxe</td>
+                                        <th width="33%"> Rs 2312.00&nbsp;<sup style='color:#E8530B'>#</sup> </th>
+                                        <th width="33%">Rs 2719.00&nbsp;<sup style='color:#E8530B'>#</sup></th>
+                                        <th width="20%">
+
+                                            <a href="http://www.staysimplyfied.com/index.php/hotel/details/201401041433361973/45652596374716/3" class="btn btn-default btn-orange">&nbsp;&nbsp;Book </a>
+
+                                            </td>
+                                    </tr>
+
+                                    <tr><td>&nbsp;</td></tr>
+                                    <tr style="color:#E8530B"><td><strong># - Net Tariff</strong></td></tr>
+                                    <tr style="color:#E8530B"><td><strong>* - Tax Rates as applicable</strong></td></tr>
+                                    <tr><td>&nbsp;</td></tr>
+                                </table>
+
+                            </div>
+
+
+
+                        </div>
+
+
+
+
+
+                        <div>
+
+                            <div class=" result-box col-md-12  col-lg-12 no-padding">
+
+                                <div class="col-md-3 col-lg-3 col-sm-3 no-padding">
+                                    <img src="http://images5.makemytrip.com/images/hotels/201401041349443065/Reception.jpg" alt="Property Photo" class="img-responsive" style="width:216px; height:155px;">
+
+
+
+                                </div>
+
+
+                                <div class="col-md-9 col-lg-9 col-sm-9 no-padding">
+
+                                    <div class="col-md-12 col-lg-12 col-sm-12 result-title">
+                                        <div class="row" style="margin-bottom:0px;">
+                                            <div class="col-md-6 col-lg-6 col-sm-6 col-xs-6">
+                                                <h3>West INN&nbsp;&nbsp;&nbsp;--&nbsp;&nbsp;</h3>
+                                            </div>
+                                            <!--<div class="col-md-3 col-lg-3 col-sm-6 col-xs-6">
+                                              <div class="default right-align"> </div>
+                                            </div>
+                                            <div class="col-md-3 col-lg-3 col-sm-12">
+                                              <p class="rooms-available">6 Rooms Available
+                                              </p>
+
+                                            </div>-->
+
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12 col-lg-12 col-sm-12 result-cont">
+                                        &lt;p align="justify"&gt; A budget property, 2 km from the Bus Stand, 2.3 km from the Railway Station &lt;br&gt;&lt;br&gt;
+
+                                        Located 2 km from Erode Fort, West Inn Hotel features comfortable and well-appointed rooms equipped in-room amenities like c
+
+                                    </div>
+                                    <div class="col-md-5 col-lg-5 col-sm-5 no-padding">
+                                        <p class="price"> Rs.2573.00</p>
+                                    </div>
+
+                                    <div class="col-md-3 col-lg-3 col-sm-3 icon-wrapper no-padding center">
+                                        <a href="http://www.staysimplyfied.com/index.php/property/property_detail/201401041349443065" class="icons">
+                                            <i class="fa fa-info fa-2x" alt="More details" title="More details"></i>
+                                        </a>
+                                        <a href="http://maps.google.com/?q=11.338647,77.714741" target="_blank" class="icons">
+                                            <i class="fa fa-map-marker fa-2x" alt="Map" title="Map"></i>
+                                        </a>
+                                    </div>
+
+                                    <div class="col-md-4 col-lg-4 col-sm-4 no-padding">
+                                        <p class="price"> <a onclick="val('bg201401041349443065');">Price Details</a> </p>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div id="bg201401041349443065" style="display:none" class="pricebox">
+
+                                <!-- Text goes here -->
+
+                                <table align="right">
+                                    <thead style="color:#E8530B">
+                                    <th width="26%">Room Type</th>
+                                    <th width="33%">Single Occupancy </th>
+                                    <th width="33%">Double Occupancy </th>
+                                    <th width="20%">&nbsp;</th>
+                                    </thead>
+
+
+
+                                    <tr>
+                                        <th width="23%">
+                                            Executive</td>
+                                        <th width="33%"> Rs 1896.00&nbsp;<sup style='color:#E8530B'>#</sup> </th>
+                                        <th width="33%">Rs 2166.00&nbsp;<sup style='color:#E8530B'>#</sup></th>
+                                        <th width="20%">
+
+                                            <a href="http://www.staysimplyfied.com/index.php/hotel/details/201401041349443065/42983064636842/24457" class="btn btn-default btn-orange">&nbsp;&nbsp;Book </a>
+
+                                            </td>
+                                    </tr>
+
+
+                                    <tr>
+                                        <th width="23%">
+                                            Royal Executive</td>
+                                        <th width="33%"> Rs 2573.00&nbsp;<sup style='color:#E8530B'>#</sup> </th>
+                                        <th width="33%">Rs 2573.00&nbsp;<sup style='color:#E8530B'>#</sup></th>
+                                        <th width="20%">
+
+                                            <a href="http://www.staysimplyfied.com/index.php/hotel/details/201401041349443065/63789336382230/2176" class="btn btn-default btn-orange">&nbsp;&nbsp;Book </a>
+
+                                            </td>
+                                    </tr>
+
+                                    <tr><td>&nbsp;</td></tr>
+                                    <tr style="color:#E8530B"><td><strong># - Net Tariff</strong></td></tr>
+                                    <tr style="color:#E8530B"><td><strong>* - Tax Rates as applicable</strong></td></tr>
+                                    <tr><td>&nbsp;</td></tr>
+                                </table>
+                            </div>
+
+
+
+                        </div>
+
+
+
+
+
+
+
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+</div>
