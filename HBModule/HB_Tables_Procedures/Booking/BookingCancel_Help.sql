@@ -946,5 +946,213 @@ END
     WHERE Id = @ClientId;
    END
   END
+ IF @Action = 'FrontEndBookingLoad'
+  BEGIN
+   DECLARE @Designation NVARCHAR(100) = '';
+  DECLARE @Mode NVARCHAR(100) = '';
+  SELECT TOP 1 @Designation = Designation,@ClientId = ClientId,
+  @Mode = ISNULL(Mode,'') FROM WrbhbTravelDesk 
+  WHERE IsActive = 1 AND IsDeleted = 0 AND Id = @UserId;
+  --
+   CREATE TABLE #BooCode(BookingCode NVARCHAR(100),Id BIGINT,
+   GuestName NVARCHAR(100),PropertyName NVARCHAR(100),ClientNameId NVARCHAR(100),
+   BookingLevelId NVARCHAR(100),PropertyType NVARCHAR(100));
+   IF @Mode = 'ENDUSER'
+   BEGIN
+   -- ROOM LEVEL
+	INSERT INTO #BooCode(BookingCode,Id,GuestName,PropertyName,ClientNameId,
+	BookingLevelId,PropertyType)
+	SELECT BookingCode,B.Id,FirstName +' '+LastName,P.PropertyName,ClientName,
+	BookingLevel,'' FROM WRBHBBooking B
+	JOIN WRBHBBookingPropertyAssingedGuest A WITH(NOLOCK) ON A.BookingId = B.Id 
+	AND A.IsActive = 1 AND A.IsDeleted = 0 AND A.CurrentStatus ='Booked'
+	JOIN WRBHBProperty P ON A.BookingPropertyId = P.Id AND P.IsActive = 1 AND 
+	P.IsDeleted = 0
+	WHERE B.IsActive = 1 AND B.IsDeleted = 0 AND BookingCode != 0 AND
+	ISNULL(B.CancelStatus,'') != 'Canceled' AND B.BookingLevel = 'Room' AND
+	B.Status IN ('Direct Booked','Booked') AND ISNULL(B.FrontEnd,0) = 1 AND 
+	B.ClientId = @ClientId AND B.BookedUsrId = @UserId;
+	-- ROOM LEVEL MMT
+	INSERT INTO #BooCode(BookingCode,Id,GuestName,PropertyName,ClientNameId,
+	BookingLevelId,PropertyType)
+	SELECT B.BookingCode,B.Id,BG.FirstName +' '+BG.LastName,P.HotalName,
+	B.ClientName,B.BookingLevel,BP.PropertyType FROM WRBHBBooking B
+	LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId = B.Id
+	LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
+	BG.BookingId = B.Id AND BG.BookingPropertyTableId = BP.Id AND
+	BG.BookingPropertyId = BP.PropertyId
+	LEFT OUTER JOIN WRBHBStaticHotels P WITH(NOLOCK)ON 
+	P.HotalId = BG.BookingPropertyId
+	WHERE B.IsActive = 1 AND B.IsDeleted = 0 AND BP.IsActive = 1 AND
+	BP.IsDeleted = 0 AND BG.IsActive = 1 AND BG.IsDeleted = 0 AND
+	P.IsActive = 1 AND P.IsDeleted = 0 AND B.BookingLevel = 'Room' AND
+	B.BookingCode != 0 AND BG.CurrentStatus = 'Booked' AND
+	ISNULL(B.CancelStatus,'') = '' AND 
+	BP.PropertyType = 'MMT' AND BP.GetType = 'API' AND
+	B.Status IN ('Direct Booked','Booked') AND ISNULL(B.FrontEnd,0) = 1 AND 
+	B.ClientId = @ClientId AND B.BookedUsrId = @UserId;
+	-- BED LEVEL
+	INSERT INTO #BooCode(BookingCode,Id,GuestName,PropertyName,ClientNameId,
+	BookingLevelId,PropertyType)
+	SELECT BookingCode,B.Id,FirstName +' '+LastName,P.PropertyName,ClientName,
+	BookingLevel,'' FROM WRBHBBooking B
+	JOIN WRBHBBedBookingPropertyAssingedGuest A WITH(NOLOCK)ON A.BookingId = B.Id 
+	AND A.IsActive = 1 AND A.IsDeleted = 0 AND A.CurrentStatus = 'Booked'
+	JOIN WRBHBProperty P WITH(NOLOCK)ON A.BookingPropertyId = P.Id AND 
+	P.IsActive = 1 AND P.IsDeleted = 0
+	WHERE B.IsActive = 1 AND B.IsDeleted = 0 AND BookingCode != 0 AND
+	ISNULL(B.CancelStatus,'') != 'Canceled' AND B.BookingLevel = 'Bed' AND
+	B.Status IN ('Direct Booked','Booked') AND ISNULL(B.FrontEnd,0) = 1 AND 
+	B.ClientId = @ClientId AND B.BookedUsrId = @UserId;
+	-- APARTMENT LEVEL
+	INSERT INTO #BooCode(BookingCode,Id,GuestName,PropertyName,ClientNameId,
+	BookingLevelId,PropertyType)
+	SELECT BookingCode,B.Id,FirstName +' '+LastName,P.PropertyName,ClientName,
+	BookingLevel,'' FROM WRBHBBooking B
+	JOIN WRBHBApartmentBookingPropertyAssingedGuest A WITH(NOLOCK)ON 
+	A.BookingId = B.Id AND A.IsActive = 1 AND A.IsDeleted = 0 AND 
+	A.CurrentStatus = 'Booked'
+	JOIN WRBHBProperty P WITH(NOLOCK)ON A.BookingPropertyId = P.Id AND 
+	P.IsActive = 1 AND P.IsDeleted = 0
+	WHERE B.IsActive = 1 AND B.IsDeleted = 0 AND BookingCode != 0 AND
+	ISNULL(B.CancelStatus,'') != 'Canceled' AND B.BookingLevel = 'Apartment' AND 
+	B.Status IN ('Direct Booked','Booked') AND ISNULL(B.FrontEnd,0) = 1 AND 
+	B.ClientId = @ClientId AND B.BookedUsrId = @UserId;
+	--
+ END
+ IF @Mode = 'TRAVELDESK' AND @Designation = 'Client'
+   BEGIN
+   -- ROOM LEVEL
+	INSERT INTO #BooCode(BookingCode,Id,GuestName,PropertyName,ClientNameId,
+	BookingLevelId,PropertyType)
+	SELECT BookingCode,B.Id,FirstName +' '+LastName,P.PropertyName,ClientName,
+	BookingLevel,'' FROM WRBHBBooking B
+	JOIN WRBHBBookingPropertyAssingedGuest A WITH(NOLOCK) ON A.BookingId = B.Id 
+	AND A.IsActive = 1 AND A.IsDeleted = 0 AND A.CurrentStatus ='Booked'
+	JOIN WRBHBProperty P ON A.BookingPropertyId = P.Id AND P.IsActive = 1 AND 
+	P.IsDeleted = 0
+	WHERE B.IsActive = 1 AND B.IsDeleted = 0 AND BookingCode != 0 AND
+	ISNULL(B.CancelStatus,'') != 'Canceled' AND B.BookingLevel = 'Room' AND
+	B.Status IN ('Direct Booked','Booked') AND ISNULL(B.FrontEnd,0) = 1 AND 
+	B.ClientId = @ClientId;
+	-- ROOM LEVEL MMT
+	INSERT INTO #BooCode(BookingCode,Id,GuestName,PropertyName,ClientNameId,
+	BookingLevelId,PropertyType)
+	SELECT B.BookingCode,B.Id,BG.FirstName +' '+BG.LastName,P.HotalName,
+	B.ClientName,B.BookingLevel,BP.PropertyType FROM WRBHBBooking B
+	LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId = B.Id
+	LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
+	BG.BookingId = B.Id AND BG.BookingPropertyTableId = BP.Id AND
+	BG.BookingPropertyId = BP.PropertyId
+	LEFT OUTER JOIN WRBHBStaticHotels P WITH(NOLOCK)ON 
+	P.HotalId = BG.BookingPropertyId
+	WHERE B.IsActive = 1 AND B.IsDeleted = 0 AND BP.IsActive = 1 AND
+	BP.IsDeleted = 0 AND BG.IsActive = 1 AND BG.IsDeleted = 0 AND
+	P.IsActive = 1 AND P.IsDeleted = 0 AND B.BookingLevel = 'Room' AND
+	B.BookingCode != 0 AND BG.CurrentStatus = 'Booked' AND
+	ISNULL(B.CancelStatus,'') = '' AND 
+	BP.PropertyType = 'MMT' AND BP.GetType = 'API' AND
+	B.Status IN ('Direct Booked','Booked') AND ISNULL(B.FrontEnd,0) = 1 AND 
+	B.ClientId = @ClientId;
+	-- BED LEVEL
+	INSERT INTO #BooCode(BookingCode,Id,GuestName,PropertyName,ClientNameId,
+	BookingLevelId,PropertyType)
+	SELECT BookingCode,B.Id,FirstName +' '+LastName,P.PropertyName,ClientName,
+	BookingLevel,'' FROM WRBHBBooking B
+	JOIN WRBHBBedBookingPropertyAssingedGuest A WITH(NOLOCK)ON A.BookingId = B.Id 
+	AND A.IsActive = 1 AND A.IsDeleted = 0 AND A.CurrentStatus = 'Booked'
+	JOIN WRBHBProperty P WITH(NOLOCK)ON A.BookingPropertyId = P.Id AND 
+	P.IsActive = 1 AND P.IsDeleted = 0
+	WHERE B.IsActive = 1 AND B.IsDeleted = 0 AND BookingCode != 0 AND
+	ISNULL(B.CancelStatus,'') != 'Canceled' AND B.BookingLevel = 'Bed' AND
+	B.Status IN ('Direct Booked','Booked') AND ISNULL(B.FrontEnd,0) = 1 AND 
+	B.ClientId = @ClientId;
+	-- APARTMENT LEVEL
+	INSERT INTO #BooCode(BookingCode,Id,GuestName,PropertyName,ClientNameId,
+	BookingLevelId,PropertyType)
+	SELECT BookingCode,B.Id,FirstName +' '+LastName,P.PropertyName,ClientName,
+	BookingLevel,'' FROM WRBHBBooking B
+	JOIN WRBHBApartmentBookingPropertyAssingedGuest A WITH(NOLOCK)ON 
+	A.BookingId = B.Id AND A.IsActive = 1 AND A.IsDeleted = 0 AND 
+	A.CurrentStatus = 'Booked'
+	JOIN WRBHBProperty P WITH(NOLOCK)ON A.BookingPropertyId = P.Id AND 
+	P.IsActive = 1 AND P.IsDeleted = 0
+	WHERE B.IsActive = 1 AND B.IsDeleted = 0 AND BookingCode != 0 AND
+	ISNULL(B.CancelStatus,'') != 'Canceled' AND B.BookingLevel = 'Apartment' AND 
+	B.Status IN ('Direct Booked','Booked') AND ISNULL(B.FrontEnd,0) = 1 AND 
+	B.ClientId = @ClientId;
+	--
+ END
+ IF @Mode = 'TRAVELDESK' AND @Designation = 'MasterClient'
+   BEGIN
+   -- ROOM LEVEL
+	INSERT INTO #BooCode(BookingCode,Id,GuestName,PropertyName,ClientNameId,
+	BookingLevelId,PropertyType)
+	SELECT BookingCode,B.Id,FirstName +' '+LastName,P.PropertyName,ClientName,
+	BookingLevel,'' FROM WRBHBBooking B
+	JOIN WRBHBBookingPropertyAssingedGuest A WITH(NOLOCK) ON A.BookingId = B.Id 
+	AND A.IsActive = 1 AND A.IsDeleted = 0 AND A.CurrentStatus ='Booked'
+	JOIN WRBHBProperty P ON A.BookingPropertyId = P.Id AND P.IsActive = 1 AND 
+	P.IsDeleted = 0
+	WHERE B.IsActive = 1 AND B.IsDeleted = 0 AND BookingCode != 0 AND
+	ISNULL(B.CancelStatus,'') != 'Canceled' AND B.BookingLevel = 'Room' AND
+	B.Status IN ('Direct Booked','Booked') AND ISNULL(B.FrontEnd,0) = 1 AND 
+	B.ClientId IN (SELECT Id FROM WRBHBClientManagement 
+    WHERE IsActive = 1 AND IsDeleted = 0 AND MasterClientId = @ClientId);
+	-- ROOM LEVEL MMT
+	INSERT INTO #BooCode(BookingCode,Id,GuestName,PropertyName,ClientNameId,
+	BookingLevelId,PropertyType)
+	SELECT B.BookingCode,B.Id,BG.FirstName +' '+BG.LastName,P.HotalName,
+	B.ClientName,B.BookingLevel,BP.PropertyType FROM WRBHBBooking B
+	LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId = B.Id
+	LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
+	BG.BookingId = B.Id AND BG.BookingPropertyTableId = BP.Id AND
+	BG.BookingPropertyId = BP.PropertyId
+	LEFT OUTER JOIN WRBHBStaticHotels P WITH(NOLOCK)ON 
+	P.HotalId = BG.BookingPropertyId
+	WHERE B.IsActive = 1 AND B.IsDeleted = 0 AND BP.IsActive = 1 AND
+	BP.IsDeleted = 0 AND BG.IsActive = 1 AND BG.IsDeleted = 0 AND
+	P.IsActive = 1 AND P.IsDeleted = 0 AND B.BookingLevel = 'Room' AND
+	B.BookingCode != 0 AND BG.CurrentStatus = 'Booked' AND
+	ISNULL(B.CancelStatus,'') = '' AND 
+	BP.PropertyType = 'MMT' AND BP.GetType = 'API' AND
+	B.Status IN ('Direct Booked','Booked') AND ISNULL(B.FrontEnd,0) = 1 AND 
+	B.ClientId IN (SELECT Id FROM WRBHBClientManagement 
+    WHERE IsActive = 1 AND IsDeleted = 0 AND MasterClientId = @ClientId);
+	-- BED LEVEL
+	INSERT INTO #BooCode(BookingCode,Id,GuestName,PropertyName,ClientNameId,
+	BookingLevelId,PropertyType)
+	SELECT BookingCode,B.Id,FirstName +' '+LastName,P.PropertyName,ClientName,
+	BookingLevel,'' FROM WRBHBBooking B
+	JOIN WRBHBBedBookingPropertyAssingedGuest A WITH(NOLOCK)ON A.BookingId = B.Id 
+	AND A.IsActive = 1 AND A.IsDeleted = 0 AND A.CurrentStatus = 'Booked'
+	JOIN WRBHBProperty P WITH(NOLOCK)ON A.BookingPropertyId = P.Id AND 
+	P.IsActive = 1 AND P.IsDeleted = 0
+	WHERE B.IsActive = 1 AND B.IsDeleted = 0 AND BookingCode != 0 AND
+	ISNULL(B.CancelStatus,'') != 'Canceled' AND B.BookingLevel = 'Bed' AND
+	B.Status IN ('Direct Booked','Booked') AND ISNULL(B.FrontEnd,0) = 1 AND 
+	B.ClientId IN (SELECT Id FROM WRBHBClientManagement 
+    WHERE IsActive = 1 AND IsDeleted = 0 AND MasterClientId = @ClientId);
+	-- APARTMENT LEVEL
+	INSERT INTO #BooCode(BookingCode,Id,GuestName,PropertyName,ClientNameId,
+	BookingLevelId,PropertyType)
+	SELECT BookingCode,B.Id,FirstName +' '+LastName,P.PropertyName,ClientName,
+	BookingLevel,'' FROM WRBHBBooking B
+	JOIN WRBHBApartmentBookingPropertyAssingedGuest A WITH(NOLOCK)ON 
+	A.BookingId = B.Id AND A.IsActive = 1 AND A.IsDeleted = 0 AND 
+	A.CurrentStatus = 'Booked'
+	JOIN WRBHBProperty P WITH(NOLOCK)ON A.BookingPropertyId = P.Id AND 
+	P.IsActive = 1 AND P.IsDeleted = 0
+	WHERE B.IsActive = 1 AND B.IsDeleted = 0 AND BookingCode != 0 AND
+	ISNULL(B.CancelStatus,'') != 'Canceled' AND B.BookingLevel = 'Apartment' AND 
+	B.Status IN ('Direct Booked','Booked') AND ISNULL(B.FrontEnd,0) = 1 AND 
+	B.ClientId IN (SELECT Id FROM WRBHBClientManagement 
+    WHERE IsActive = 1 AND IsDeleted = 0 AND MasterClientId = @ClientId);
+	--
+ END
+	SELECT BookingCode,Id,GuestName,PropertyName,ClientNameId as ZClientNameId,
+	BookingLevelId as ZBookingLevelId,PropertyType AS ZPropertyTypeId 
+	FROM #BooCode ORDER BY Id ASC
+  END
 END
 	 

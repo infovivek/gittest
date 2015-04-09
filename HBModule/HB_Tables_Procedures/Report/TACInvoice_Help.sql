@@ -81,7 +81,7 @@ CREATE PROCEDURE Sp_TACInvoice_Help
 		INSERT INTO #TEMPs(BillNo,CreatedDate,InvoiceNo,Property,PropertyId,Amount,Tax,TotalAmount,Guests,
 		Client,ChkInDate,ChkOutDate,NOOfDays,PerdayRate,Location)
 	
-		SELECT C.CheckOutNo as BillId, convert(date, CT.CreatedDate,103) ,
+		SELECT C.CheckOutNo as BillId, convert(date, CT.BillDate,103) ,
 		CT.TACInvoiceNo InvoiceNo,P.PropertyName Property,C.PropertyId,CT.MarkUpAmount as Amount,
 		CT.TotalBusinessSupportST as Tax,CT.TACAmount TotalAmount,C.GuestName AS Guest,C.ClientName AS Client,
 		CT.CheckInDate as ChkInDt,CT.CheckOutDate AS ChkOutDt,ct.NoOfDays,ct.Rate,Ci.CityName 

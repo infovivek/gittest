@@ -103,6 +103,8 @@ namespace HB.Dao
                     command.Parameters.Add("@Remarks", SqlDbType.NVarChar).Value = CancellationMarkup;
                     DataSet ds1 = new WrbErpConnection().ExecuteDataSet(command, UserData);
                     //
+                    DataSet ds22 = new SMSCancel().FnSMSBookingCancel(Convert.ToInt32(data[2].ToString()), user);
+                    //
                     if (data[4].ToString() == "true")
                     {
                         try

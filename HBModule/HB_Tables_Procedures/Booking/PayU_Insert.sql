@@ -47,14 +47,37 @@ BEGIN
  zipcode,email,phone,udf1,udf2,udf3,udf4,udf5,Hash,Error,bankcode,PG_TYPE,bank_ref_num,
  shipping_firstname,shipping_lastname,shipping_address1,shipping_address2,shipping_city,
  shipping_state,shipping_country,shipping_zipcode,shipping_phone,unmappedstatus,
- Hashstatus)
+ Hashstatus,Dt)
  VALUES(@txnid,'',@mihpayid,@mode,@status,@Merchantkey,@amount,@discount,@offer,
  @productinfo,@firstname,@lastname,@address1,@address2,@city,@state,@country,
  @zipcode,@email,@phone,@udf1,@udf2,@udf3,@udf4,@udf5,@Hash,@Error,@bankcode,
  @PG_TYPE,@bank_ref_num,@shipping_firstname,@shipping_lastname,@shipping_address1,
  @shipping_address2,@shipping_city,@shipping_state,@shipping_country,
- @shipping_zipcode,@shipping_phone,@unmappedstatus,@Hashstatus);
- SELECT Id FROM WRBHBBooking WHERE REPLACE(ROWID,'-','') = @txnid;
+ @shipping_zipcode,@shipping_phone,@unmappedstatus,@Hashstatus,GETDATE());
+ SELECT B.Id,B.BookingLevel,P.PropertyType,'www.google.com' FROM WRBHBBooking B
+ LEFT OUTER JOIN WRBHBBookingProperty P WITH(NOLOCK)ON P.BookingId = B.Id
+ LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest G WITH(NOLOCK)ON
+ G.BookingId = B.Id AND G.BookingPropertyTableId = P.Id AND
+ G.BookingPropertyId = P.PropertyId
+ WHERE B.IsActive = 1 AND B.IsDeleted = 0 AND P.IsActive = 1 AND
+ P.IsDeleted = 0 AND G.IsActive = 1 AND G.IsDeleted = 0 AND G.Tariff != 0 AND
+ REPLACE(B.RowId,'-','') = @txnid;
  SELECT Id FROM WrbHBPayU WHERE Id = @@IDENTITY;
+ /*DECLARE @Type NVARCHAR(100) = '';
+ IF EXISTS(SELECT NULL FROM WRBHBBooking WHERE REPLACE(ROWID,'-','') = @txnid AND
+ BookingLevel = 'Room')
+  BEGIN
+   SET @Type = (SELECT TOP 1 PropertyType FROM WRBHBBookingProperty WHERE Id IN
+   (SELECT BookingPropertyTableId FROM WRBHBBookingPropertyAssingedGuest 
+   WHERE BookingId IN (SELECT Id FROM WRBHBBooking 
+   WHERE REPLACE(ROWID,'-','') = @txnid AND BookingLevel = 'Room')));
+  END
+ ELSE
+  BEGIN
+   SET @Type = '';
+  END
+ SELECT Id,BookingLevel,@Type FROM WRBHBBooking 
+ WHERE REPLACE(ROWID,'-','') = @txnid;
+ SELECT Id FROM WrbHBPayU WHERE Id = @@IDENTITY;*/
 END
 GO

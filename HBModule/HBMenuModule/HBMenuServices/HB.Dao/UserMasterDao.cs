@@ -151,7 +151,7 @@ namespace HB.Dao
             command.Parameters.Add("@PAction", SqlDbType.NVarChar).Value = Hdrval[1].ToString();
             command.Parameters.Add("@Param1", SqlDbType.NVarChar).Value = Hdrval[2].ToString();
             command.Parameters.Add("@Param2", SqlDbType.NVarChar).Value = Hdrval[3].ToString();
-            command.Parameters.Add("@Id", SqlDbType.BigInt).Value = Hdrval[4].ToString();
+            command.Parameters.Add("@Id", SqlDbType.NVarChar).Value = user.Id;
             return new WrbErpConnection().ExecuteDataSet(command, UserData);
          }
     }

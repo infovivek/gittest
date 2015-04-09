@@ -215,7 +215,7 @@ INSERT INTO #TFFINALS( GuestName,GuestId,RoomId,Typess,ClientName,Property,Prope
 				TariffPaymentMode,CurrentStatus,Btypes from #TFFINALS 
 				where -- month(CONVERT(DATE,CheckOutDate,103))=11
 				Occupancy ='Single'-- and PropertyId=2
-				group by   ClientName,Property,PropertyId,PropertyType,
+				group by  RoomId, ClientName,Property,PropertyId,PropertyType,
 				TariffTotal,CheckOutDate,CheckInDate,TotalDays,Occupancy,BookingId,ChkoutId,ChkInHdrId,
 				TariffPaymentMode,CurrentStatus,Btypes
 				order by BookingId 
@@ -425,7 +425,7 @@ INSERT INTO #TFFINALS( GuestName,GuestId,RoomId,Typess,ClientName,Property,Prope
      update #TFFINAL set ClientName='G H'
     -- Select * from #TFFINAL
      where PropertyType='Managed G H'
-     and  (CONVERT(date,CheckOutDate,103)) >  (CONVERT(DATE,GETDATE(),103))
+     and  Month(CONVERT(date,CheckOutDate,103)) >  Month(CONVERT(DATE,GETDATE(),103))
     --and  year(CONVERT(DATE,CheckOutDate,103)) >  year(CONVERT(DATE,GETDATE(),103))
        
    delete  from #TFFINAL where PropertyType='External Property'

@@ -171,7 +171,7 @@ namespace HB.Dao
                     smtp.Credentials = new System.Net.NetworkCredential("stay@staysimplyfied.com", "stay1234");
                     try
                     {
-                        smtp.Send(message);
+            //            smtp.Send(message);
                     }
                     catch (Exception ex)
                     {

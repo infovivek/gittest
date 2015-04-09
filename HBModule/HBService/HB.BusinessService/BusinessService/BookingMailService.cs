@@ -78,6 +78,10 @@ namespace HB.BusinessService.BusinessService
             {
                 ds = new BookingRoomResendMailDAO().Mail(BookingId, "", "", user);
             }
+            if (data[1].ToString() == "BookingModificationSMS")
+            {
+                ds = new SMSBookingModification().FnSMS(BookingId, Convert.ToInt32(data[3].ToString()), user);
+            }
             return ds;
         }
     }

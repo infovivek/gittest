@@ -93,31 +93,7 @@ namespace HB.Dao
                             message.CC.Add(new System.Net.Mail.MailAddress(ds.Tables[4].Rows[0][0].ToString()));
                         }
                     }
-                    if (ds.Tables[9].Rows.Count > 0)
-                    {
-                        //string pattern = @"\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*";
-                        string pattern = "^([0-9a-zA-Z]([-\\.\\w]*[0-9a-zA-Z])*@([0-9a-zA-Z][-\\w]*[0-9a-zA-Z]\\.)+[a-zA-Z]{2,9})$";
-                        for (int i = 0; i < ds.Tables[9].Rows.Count; i++)
-                        {
-                            string PropertyMail = ds.Tables[9].Rows[i][0].ToString();
-                            var PtyMail = PropertyMail.Split(',');
-                            int cnt = PtyMail.Length;
-                            for (int j = 0; j < cnt; j++)
-                            {
-                                System.Text.RegularExpressions.Match match =
-                                    Regex.Match(PtyMail[0].ToString(), pattern, RegexOptions.IgnoreCase);
-                                if (match.Success == true)
-                                {
-                                    //string sdsdf3 = PtyMail[j].ToString();
-                                    message.To.Add(new System.Net.Mail.MailAddress(PtyMail[j].ToString()));
-                                }
-                            }                                                       
-                        }
-                    }
-                    else
-                    {
-                        string asd = "";
-                    }
+                    
                     //Extra CC
                     for (int i = 0; i < ds.Tables[6].Rows.Count; i++)
                     {
@@ -290,8 +266,268 @@ namespace HB.Dao
                 catch (Exception ex)
                 {
                     CreateLogFiles log = new CreateLogFiles();
-                    log.ErrorLog(ex.Message + " --> Room Shifting Mail --> " + ds.Tables[0].Rows[0][0].ToString());
+                    log.ErrorLog(ex.Message + " --> Room Shifting Guest Mail --> " + ds.Tables[0].Rows[0][0].ToString());
                 }
+                try
+                {
+                    System.Net.Mail.MailMessage message = new System.Net.Mail.MailMessage();
+                    //message.From = new System.Net.Mail.MailAddress("stay@staysimplyfied.com", "", System.Text.Encoding.UTF8);
+                    //message.From = new System.Net.Mail.MailAddress("stay@hummingbirdindia.com", "", System.Text.Encoding.UTF8);
+                    message.From = new System.Net.Mail.MailAddress(ds.Tables[1].Rows[0][1].ToString(), "", System.Text.Encoding.UTF8);
+                    //message.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
+                    //message.Subject = "Testing Modification # : " + ds.Tables[0].Rows[0][0].ToString();
+                    message.To.Add(new System.Net.Mail.MailAddress(ds.Tables[1].Rows[0][1].ToString()));
+                    //if (ds.Tables[0].Rows[0][10].ToString() == "False")
+                    //{
+                    //    //string gdfg = ds.Tables[4].Rows[0][0].ToString();
+                    //    message.To.Add(new System.Net.Mail.MailAddress(ds.Tables[4].Rows[0][0].ToString()));
+                    //}
+                    //else
+                    //{
+                    //    for (int i = 0; i < ds.Tables[5].Rows.Count; i++)
+                    //    {
+                    //        //string sd = ds.Tables[5].Rows[i][0].ToString();
+                    //        message.To.Add(new System.Net.Mail.MailAddress(ds.Tables[5].Rows[i][0].ToString()));
+                    //    }
+                    //    if (ds.Tables[4].Rows[0][0].ToString() != "")
+                    //    {
+                    //        //string sds = ds.Tables[4].Rows[0][0].ToString();
+                    //        message.CC.Add(new System.Net.Mail.MailAddress(ds.Tables[4].Rows[0][0].ToString()));
+                    //    }
+                    //}
+                    //if (ds.Tables[9].Rows.Count > 0)
+                    //{
+                    //    //string pattern = @"\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*";
+                    //    string pattern = "^([0-9a-zA-Z]([-\\.\\w]*[0-9a-zA-Z])*@([0-9a-zA-Z][-\\w]*[0-9a-zA-Z]\\.)+[a-zA-Z]{2,9})$";
+                    //    for (int i = 0; i < ds.Tables[9].Rows.Count; i++)
+                    //    {
+                    //        string PropertyMail = ds.Tables[9].Rows[i][0].ToString();
+                    //        var PtyMail = PropertyMail.Split(',');
+                    //        int cnt = PtyMail.Length;
+                    //        for (int j = 0; j < cnt; j++)
+                    //        {
+                    //            System.Text.RegularExpressions.Match match =
+                    //                Regex.Match(PtyMail[0].ToString(), pattern, RegexOptions.IgnoreCase);
+                    //            if (match.Success == true)
+                    //            {
+                    //                //string sdsdf3 = PtyMail[j].ToString();
+                    //                message.To.Add(new System.Net.Mail.MailAddress(PtyMail[j].ToString()));
+                    //            }
+                    //        }
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    string asd = "";
+                    //}
+                    //Extra CC
+                    //for (int i = 0; i < ds.Tables[6].Rows.Count; i++)
+                    //{
+                    //    //string sdsdf3 = ds.Tables[6].Rows[i][0].ToString();
+                    //    message.CC.Add(new System.Net.Mail.MailAddress(ds.Tables[6].Rows[i][0].ToString()));
+                    //}
+                    if (ds.Tables[9].Rows.Count > 0)
+                    {
+                        for (int i = 0; i < ds.Tables[9].Rows.Count; i++)
+                        {
+                            string PropertyMail = ds.Tables[9].Rows[i][0].ToString();
+                            var PtyMail = PropertyMail.Split(',');
+                            int cnt = PtyMail.Length;
+                            for (int j = 0; j < cnt; j++)
+                            {
+                                try
+                                {
+                                    message.To.Add(new System.Net.Mail.MailAddress(PtyMail[j].ToString()));
+                                }
+                                catch (Exception ex)
+                                {
+                                    CreateLogFiles log = new CreateLogFiles();
+                                    log.ErrorLog("InvalidEmail: " + PtyMail[j].ToString() + " --> Room Shifting Property Mail --> " + ds.Tables[0].Rows[0][0].ToString());
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        string asd = "";
+                    }
+                    if (ds.Tables[4].Rows[0][0].ToString() != "")
+                    {
+                        //string sds = ds.Tables[4].Rows[0][0].ToString();
+                        message.CC.Add(new System.Net.Mail.MailAddress(ds.Tables[4].Rows[0][0].ToString()));
+                    }
+                    message.Bcc.Add(new System.Net.Mail.MailAddress("vivek@warblerit.com"));
+                    message.Bcc.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
+                    message.Subject = "Stay Modification Booking # : " + ds.Tables[0].Rows[0][0].ToString();
+                    string Imagelocation = "";
+                    if (ds.Tables[7].Rows.Count > 0)
+                    {
+                        if (ds.Tables[7].Rows[0][0].ToString() != "")
+                            Imagelocation = ds.Tables[7].Rows[0][0].ToString();
+
+                    }
+                    else
+                    {
+                        if (ds.Tables[1].Rows[0][0].ToString() != "")
+                            Imagelocation = ds.Tables[1].Rows[0][0].ToString();
+                    }
+
+                    string Imagebody =
+                       " <table cellpadding=\"0\" cellspacing=\"0\" width=\"600\" border=\"0\" align=\"center\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #cccdcf solid 1px\">" +
+                       " <tr><td><table cellpadding=\"0\" cellspacing=\"0\" width=\"600\" border=\"0\" align=\"center\">" +
+                       " <tr><td width=\"50%\" align=\"left\" style=\"padding: 10px 0px 10px 10px;\"> " +
+                       " <img src=" + Imagelocation + " width=\"200px\" height=\"52px\" alt=\"Humming bird logo\">" +
+                       " </td></tr></table>";
+
+
+                    string Header =
+                       " <table cellpadding=\"0\" cellspacing=\"0\" width=\"600\" border=\"0\" align=\"center\" style=\"padding-top:30px;\">" +
+                       " <tr style=\"font-size:11px; background-color:#eee;\">" +
+                       " <td width=\"600\" style=\"padding:12px 5px;\">" +
+                       " <p style=\"color:orange; font-weight:bold; margin:0px; font-size:14px;\"> Modification Details</p>" +
+                       " <p style=\"margin-top:20px;\">" +
+                       " <span style=\"color:#f54d02; font-weight:bold\"> System generated email. Please do not reply. </span><br>" +
+                       " </p>" +
+                       " <p style=\"margin-top:20px;\">" +
+                       " <span style=\"color:#f54d02; font-weight:bold\"> Date : " + ds.Tables[0].Rows[0][7].ToString() + "</span><br>" +
+                       " </p></td></tr></table>";
+
+                    string Remarks = "Stay Modified";
+                    string BookingDtls =
+                       " <table cellpadding=\"0\" cellspacing=\"0\" width=\"600\" border=\"0\" align=\"center\" style=\"padding-top:30px;\">" +
+                       " <tr style=\"font-size:11px; background-color:#eee;\">" +
+                       " <td width=\"600\" style=\"padding:12px 5px;\">" +
+                       " <p style=\"color:orange; font-weight:bold; margin:0px; font-size:14px;\"> Booking Details Reservation # : " + ds.Tables[0].Rows[0][0].ToString() + "</p>" +
+                       " <p style=\"margin-top:20px;\">" +
+                       " <span style=\"color:#f54d02; font-weight:bold\">Booking Date : </span> " + ds.Tables[0].Rows[0][8].ToString() + "  <br>" +
+                       " </p>" +
+                       " <p style=\"margin-top:20px;\">" +
+                       " <span style=\"color:#f54d02; font-weight:bold\">Client Name: </span> " + ds.Tables[0].Rows[0][4].ToString() + "  <br>" +
+                       " </p>" +
+                       " <p style=\"margin-top:20px;\">" +
+                       " <span style=\"color:#f54d02; font-weight:bold\">Property Name: </span> " + ds.Tables[2].Rows[0][0].ToString() + "  <br>" +
+                       " </p>" +
+                       " <p style=\"margin-top:20px;\">" +
+                       " <span style=\"color:#f54d02; font-weight:bold\">Booking Level: </span> " + ds.Tables[0].Rows[0][9].ToString() + "  <br>" +
+                       " </p>" +
+                       " <p style=\"margin-top:20px;\">" +
+                       " <span style=\"color:#f54d02; font-weight:bold\">Remarks: </span> " + Remarks + "  <br>" +
+                       " </p>" +
+                       " <p style=\"margin-top:20px;\">" +
+                       " <span style=\"color:#f54d02; font-weight:bold\">Stay Modified By: </span> " + ds.Tables[0].Rows[0][5].ToString() + "  <br>" +
+                       " </p></td></tr></table>";
+
+
+                    string GuestDetailsTable1 =
+                        " <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" align=\"center\">" +
+                        " <tr style=\"font-size:11px; font-weight:normal;\">" +
+                        " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Guest Name</p></th>" +
+                        " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Previous Check-In  Date</p></th>" +
+                        " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Previous Check-Out Date</p></th>" +
+                        " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Check-In Date</p></th>" +
+                        " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Check-Out Date</p></th>" +
+                        " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Expected Arrival Time</p></th>" +
+                        " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>No Of Room Nights</p></th>" +
+                        " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #666;\"><p>Tariff PaymentMode</p></th>" +
+                        " <th style=\"background-color:#ccc; padding:6px 0px; border-right:1px solid #ccc;\"><p>Service PaymentMode</p></th>" +
+                        " </tr>";
+
+                    GuestDetailsTable1 +=
+                            "<tr style=\"font-size:11px; font-weight:normal;\">" +
+                            " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">" + ds.Tables[8].Rows[0][0].ToString() + "</p></td>" +
+                            " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">" + ds.Tables[8].Rows[0][1].ToString() + "</p></td>" +
+                            " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">" + ds.Tables[8].Rows[0][2].ToString() + "</p></td>" +
+                            " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">" + ds.Tables[8].Rows[0][3].ToString() + "</p></td>" +
+                            " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">" + ds.Tables[8].Rows[0][4].ToString() + "</p></td>" +
+                            " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">" + ds.Tables[8].Rows[0][5].ToString() + "</p></td>" +
+                            " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">" + ds.Tables[8].Rows[0][6].ToString() + "</p></td>" +
+                            " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #666;\"><p style=\"text-align:center;\">" + ds.Tables[8].Rows[0][7].ToString() + "</p></td>" +
+                            " <td style=\"background-color:#eee; padding:6px 0px; border-right:1px solid #ccc;\"><p style=\"text-align:center;\">" + ds.Tables[8].Rows[0][8].ToString() + "</p></td>" +
+                            " </tr></table>";
+
+                    string UserName = "";
+                    string EmailId = "";
+                    string PhoneNo = "";
+                    for (int i = 0; i < ds.Tables[3].Rows.Count; i++)
+                    {
+                        if (i == 0)
+                        {
+                            if (ds.Tables[3].Rows[i][1].ToString() != "")
+                            {
+                                UserName = ds.Tables[3].Rows[i][1].ToString();
+                            }
+                            if (ds.Tables[3].Rows[i][2].ToString() != "")
+                            {
+                                EmailId = ds.Tables[3].Rows[i][2].ToString();
+                            }
+                            if (ds.Tables[3].Rows[i][3].ToString() != "")
+                            {
+                                PhoneNo = ds.Tables[3].Rows[i][3].ToString();
+                            }
+                        }
+                        else
+                        {
+                            if (ds.Tables[3].Rows[i][1].ToString() != "")
+                            {
+                                UserName += " , " + ds.Tables[3].Rows[i][1].ToString();
+                            }
+                            if (ds.Tables[3].Rows[i][2].ToString() != "")
+                            {
+                                EmailId += " , " + ds.Tables[3].Rows[i][2].ToString();
+                            }
+                            if (ds.Tables[3].Rows[i][3].ToString() != "")
+                            {
+                                PhoneNo += " , " + ds.Tables[3].Rows[i][3].ToString();
+                            }
+                        }
+                    }
+
+                    string AddressDtls =
+                       " <table cellpadding=\"0\" cellspacing=\"0\" width=\"600\" border=\"0\" align=\"center\" style=\"padding-top:30px;\">" +
+                       " <tr style=\"font-size:11px; background-color:#eee;\">" +
+                       " <td width=\"600\" style=\"padding:12px 5px;\">" +
+                       " <p style=\"margin-top:20px;\">" +
+                       " <span style=\"color:#f54d02; font-weight:bold\">Resident Manager: </span> " + UserName + "  <br>" +
+                       " </p>" +
+                       " <p style=\"margin-top:20px;\">" +
+                       " <span style=\"color:#f54d02; font-weight:bold\">Email: </span> " + EmailId + "  <br>" +
+                       " </p>" +
+                       " <p style=\"margin-top:20px;\">" +
+                       " <span style=\"color:#f54d02; font-weight:bold\">Address: </span> " + ds.Tables[2].Rows[0][1].ToString() + "  <br>" +
+                       " </p>" +
+                       " <p style=\"margin-top:20px;\">" +
+                       " <span style=\"color:#f54d02; font-weight:bold\">Phone No: </span> " + PhoneNo + "  <br>" +
+                       " </p></td></tr></table>";
+
+                    string Disclaimer = "This message (including attachment if any)is confidential and may be privileged. Before opening attachments please check them for viruses and defects. HummingBird Travel & Stay Private Limited (HummingBird) will not be responsible for any viruses or defects or any forwarded attachments emanating either from within HummingBird or outside. If you have received this message by mistake please notify the sender by return e-mail and delete this message from your system. Any unauthorized use or dissemination of this message in whole or in part is strictly prohibited. Please note that e-mails are susceptible to change and HummingBird shall not be liable for any improper, untimely or incomplete transmission.";
+                    string FooterDtls =
+                         " <table cellpadding=\"0\" cellspacing=\"0\" width=\"600\" border=\"0\" align=\"center\" style=\"padding-top:30px;\">" +
+                         " <tr style=\"font-size:11px; font-weight:normal;\"> " +
+                         " <td colspan=\"3\" style=\"padding-top:30px;\"> <p style=\"color:orange; font-weight:bold; margin:0px; font-size:11px;\"> Thanking You, <br>" +
+                         " STAY SIMPLYFIED Travel and stay Pvt Ltd</p><br><hr>" +
+                         " <p style=\"color:orange; font-weight:bold; margin:0px; font-size:11px; padding-top:20px;\">Disclaimer :</p>" +
+                         " <p style=\"font-size:10px; padding-top:10px; padding-bottom:20px;\">" + Disclaimer + "</p>" +
+                         " </td></tr> </table>";
+
+                    message.Body = Imagebody + Header + BookingDtls + GuestDetailsTable1 + AddressDtls + FooterDtls;
+                    message.IsBodyHtml = true;
+                    // SMTP Email email:
+                    System.Net.Mail.SmtpClient SMTP = new System.Net.Mail.SmtpClient();
+                    SMTP.EnableSsl = true;
+                    SMTP.Port = 587;
+                    //SMTP.Host = "smtp.gmail.com";SMTP.Credentials = new System.Net.NetworkCredential("stay@staysimplyfied.com", "stay1234");
+                    SMTP.Host = "email-smtp.us-west-2.amazonaws.com"; SMTP.Credentials = new System.Net.NetworkCredential("AKIAIIVF5D5D3CJAX7SQ", "ApmuZkd+L8tissEga8kac3quhhwohEi5CB+dYD36KTq3");
+                    SMTP.Send(message);
+                }
+                catch (Exception ex)
+                {
+                    CreateLogFiles log = new CreateLogFiles();
+                    log.ErrorLog(" --> Room Shifting Property Mail --> " + ds.Tables[0].Rows[0][0].ToString() + ", Err Msg --> " + ex.Message);
+                }
+            }
+            if (RS.Type == "Stay")
+            {
+                DataSet Ds1 = new SMSBookingModification().FnSMS(RS.BookingId, RS.RoomCaptured, user);
             }
             return ds;
         }

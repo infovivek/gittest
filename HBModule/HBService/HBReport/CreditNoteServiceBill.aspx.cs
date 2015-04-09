@@ -51,6 +51,8 @@ namespace HBReport
                 ReportParameter paramLogo = new ReportParameter();
 
                 paramLogo.Name = "Path";
+                string var = ConfigurationManager.ConnectionStrings["Images"].ToString();
+                paramLogo.Values.Add(@"file:///" + var + "LogoNew.png");
                 //paramLogo.Values.Add(@"D:\Backend\flex_bin\assets\Logo.jpg");
                 //      paramLogo.Values.Add(@"D:\Project\HR_Service\WrbHRPrint\Images\Logo.png");
                 // string var = ConfigurationManager.ConnectionStrings["Images"].ToString();

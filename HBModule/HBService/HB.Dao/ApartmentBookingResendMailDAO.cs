@@ -74,9 +74,7 @@ namespace HB.Dao
                         "<tr> " +
                         "<th align=\"left\" width=\"50%\" style=\"padding: 10px 0px 10px 10px;\">" +
                         "<img src=" + Imagelocation + " width=\"200px\" height=\"52px\" alt=" + ds.Tables[6].Rows[0][1].ToString() + ">" +              //Image Name Change
-                        "</th><th width=\"50%\" style=\"padding: 10px 10px 10px 10px;\" align=\"right\">" +
-                        "" + ds.Tables[4].Rows[0][7].ToString() + "" +
-                        "</th></tr></table>";
+                        "</th><th width=\"50%\"></th></tr></table>";
             string SecondRow =
                 " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\">" +
                 " <tr style=\"position:relative; background-color:#fff; font-size:11px;\">" +
@@ -284,7 +282,8 @@ namespace HB.Dao
                     " " + ds.Tables[4].Rows[0][3].ToString() + "" +
                     " </td><td width=\"200\" style=\"padding:10px; margin-bottom:20px; border-bottom:1px solid #ccc;\">" +
                     " " + ds.Tables[4].Rows[0][4].ToString() + "</td>" +
-                    " </tr></table><br>";
+                    " </tr></table><br>" +
+                    "<p style=\"margin-top:0px; margin-left:10px; font-size:11px;\">" + ds.Tables[4].Rows[0][7].ToString() + " </p>";
             message.Body = Imagebody + SecondRow + GuestDetailsTable1 + AddressDtls + QRCode + FooterDtls;
             message.IsBodyHtml = true;
             // SMTP Email email:

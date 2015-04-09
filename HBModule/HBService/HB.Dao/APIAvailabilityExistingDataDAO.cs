@@ -19,6 +19,7 @@ namespace HB.Dao
         DataSet ds = new DataSet();
         string UserData = "";
         string UpdateTariffFlag = "";
+        APIDynamic api = new APIDynamic();
         public DataSet FnAvailabilityExistingData(string[] data, User User)
         {
             try
@@ -26,8 +27,8 @@ namespace HB.Dao
                 UserData = "UserId : " + User.Id + ", UsreName : " + User.LoginUserName + ", ScreenName : " + User.ScreenName +
                        ", SctId : " + User.SctId + ", Service : APIAvailabilityExistingDataDAO" +
                        ", ProcName: " + StoredProcedures.API_Help;
-                //
-                APIDynamic api = new APIDynamic();
+                //  
+                api = new APIDynamic();
                 api.CityCode = data[2].ToString();
                 api.HotelId = data[3].ToString();
                 api.RatePlanCode = data[4].ToString();
@@ -124,6 +125,11 @@ namespace HB.Dao
                     }                    
                     if (api.AvaavailStatus == "B")
                     {
+                        //api.AmountAfterTax = Convert.ToDecimal(document.SelectNodes("//AmountAfterTax")[0].InnerText);
+                        //api.AmountBeforeTax = Convert.ToDecimal(document.SelectNodes("//AmountBeforeTax")[0].InnerText);
+                        //api.AvaResponseCode = document.SelectNodes("//ResponseCode")[0].Attributes["success"].Value;
+                        //api.AvaResponseReferenceKey = document.SelectNodes("//ResponseReferenceKey")[0].InnerText;
+
                         decimal RoomRate1 = 0, RoomRate2 = 0, RoomDiscount1 = 0, RoomDiscount2 = 0;
                         decimal Taxes1 = 0, Taxes2 = 0;
                         XmlNodeList XmlRoomTariffs1 = document.DocumentElement.SelectNodes("/MMTHotelAvailResponse/Hotel/PropertyInfo/RoomStays/RoomStay/RoomRates/RoomRate/Rate/RoomTariffs/RoomTariff");
@@ -307,7 +313,7 @@ namespace HB.Dao
             catch(Exception ex)
             {
                 CreateLogFiles log = new CreateLogFiles();
-                log.ErrorLog(ex.Message + " --> API Availability Existing Data.");
+                log.ErrorLog(ex.Message + " --> API Availability Existing Data --> CityCode : " + api.CityCode + ", HotelId : " + api.HotelId + ", RatePlanCode : " + api.RatePlanCode + ", RoomTypecode : " + api.RoomTypecode + ", FrmDt : " + api.FrmDt + ", ToDt" + api.ToDt);
                 Flag = false;
                 FlagStr = "Error";
             }

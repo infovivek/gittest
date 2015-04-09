@@ -35,8 +35,56 @@ SELECT * FROM dbo.Split(@ClientName,' ');
 SET @ClientName1 = (SELECT TOP 1 Name FROM #QAZXSW);
 --
 IF @Action = 'RoomBookingConfirmed'
- BEGIN  
-  -- Dataset Table 0
+ BEGIN
+  DECLARE @TotAmt NVARCHAR(100) = '';
+  CREATE TABLE #TMP(DtTime INT,Dt INT,Tariff DECIMAL(27,2),RoomCaptured INT,Diff INT);
+  INSERT INTO #TMP(DtTime,Dt,Tariff,RoomCaptured,Diff)
+  SELECT DATEDIFF(HOUR,CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
+  CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME),
+  CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME)),
+  DATEDIFF(HOUR,ChkInDt,ChkOutDt),PG.Tariff,PG.RoomCaptured,
+  DATEDIFF(HOUR,CAST(CAST(PG.ChkInDt AS VARCHAR)+' '+
+  CAST(PG.ExpectChkInTime+' '+PG.AMPM AS VARCHAR) AS DATETIME),
+  CAST(CAST(PG.ChkOutDt AS VARCHAR)+' '+'11:59:00 AM' AS DATETIME)) - 
+  DATEDIFF(HOUR,ChkInDt,ChkOutDt)
+  FROM WRBHBBookingPropertyAssingedGuest PG
+  WHERE PG.IsActive = 1 AND PG.IsDeleted = 0 AND PG.BookingId = @Id1
+  GROUP BY RoomCaptured,ChkInDt,ChkOutDt,Tariff,ExpectChkInTime,AMPM;
+  CREATE TABLE #Amt(Dayss DECIMAL(27,2),Tariff DECIMAL(27,2));
+  INSERT INTO #Amt(Dayss,Tariff)
+  SELECT CASE WHEN Diff > 0 THEN (DtTime / 24) + 1 ELSE (Dt / 24) END,Tariff 
+  FROM #TMP;
+  SELECT @TotAmt = CAST(CAST(SUM(Dayss * Tariff) AS INT) AS VARCHAR) 
+  FROM #Amt;
+  --
+  SELECT '<p style="font-size:10px;">System generated email. Please do not reply. Date : '+DATENAME(weekday, GETDATE())+', '+CONVERT(VARCHAR(12), GETDATE(), 107)+'</p>
+  <p style="font-size:10px;">Dear '+B.ClientBookerName+'</p>
+  <p style="font-size:10px;">This is to inform you that your travel request has been processed.</p>
+  <p style="font-size:10px;">Your accommodation has been arranged at '+P.PropertyName+', '+P.Locality+', '+B.CityName+' from '+CONVERT(VARCHAR(12),B.CheckInDate,107)+' - '+CONVERT(VARCHAR(12),B.CheckOutDate,107)+'. To confirm the booking,kindly arrange to make advance payment of Rs. '+@TotAmt+'.Booking confirmation mail will be sent to you, once the payment is received.</p>
+  <p style="font-size:10px;">To make payment, please <a href=http://www.staysimplyfied.com/paymentgateway/default.aspx?'+REPLACE(B.RowId,'-','')+'>click here</a>.</p>
+  <p style="font-size:10px;color:red;font-weight:bold;">Experience the power of digital automation.</p>
+  <p style="font-size:8.5px;color:orange;">Thanking You,<br>Team Stay Simplyfied</p>',
+  'http://sstage.in/Company_Images/ss_logo.png' AS Logo,'staysimplyfied' as Alt,B.PaymentCode,
+  'stay@hummingbirdindia.com'
+  FROM WRBHBBooking B
+  LEFT OUTER JOIN WRBHBBookingProperty P WITH(NOLOCK)ON P.BookingId = B.Id
+  WHERE B.Id = @Id1;
+  -- DATASET TABLE 1
+  SELECT EmailId FROM WRBHBBookingGuestDetails WHERE BookingId = @Id1 AND ISNULL(EmailId,'') != '' AND GuestId IN
+  (SELECT GuestId FROM WRBHBBookingPropertyAssingedGuest WHERE BookingId = @Id1);
+  -- DATASET TABLE 2
+  SELECT ClientBookerEmail FROM WRBHBBooking WHERE Id = @Id1;
+  -- DATASET TABLE 3
+  CREATE TABLE #BccEmail(Email NVARCHAR(100));
+  INSERT INTO #BccEmail(Email) SELECT 'sakthi@warblerit.com';
+  INSERT INTO #BccEmail(Email) SELECT 'vivek@warblerit.com';
+  INSERT INTO #BccEmail(Email) SELECT 'booking_confirmation@staysimplyfied.com';
+  INSERT INTO #BccEmail(Email) SELECT 'bookingbcc@staysimplyfied.com';
+  INSERT INTO #BccEmail(Email) SELECT Email FROM WRBHBUSER WHERE Id in
+  (select BookedUsrId from wrbhbbooking where Id = @Id1)
+  SELECT Email FROM #BccEmail;  
+  --<a href=http://www.staysimplyfied.com/paymentgateway/default.aspx?'+REPLACE(B.RowId,'-','')+'/>click here.<br> 
+  /*-- Dataset Table 0
   CREATE TABLE #FFF(BookingId BIGINT,RoomId BIGINT,ChkInDt NVARCHAR(100),
   ChkOutDt NVARCHAR(100),Tariff DECIMAL(27,2),Occupancy NVARCHAR(100),
   TariffPaymentMode NVARCHAR(100),ServicePaymentMode NVARCHAR(100),
@@ -483,7 +531,7 @@ IF @Action = 'RoomBookingConfirmed'
     ServicePaymentMode,'NOTBTC',@AgreedTariff,@BelowTACcontent 
     FROM #PropertyMailBTCChecking;
    END
-  -- Dataset Table 11 eND  
+  -- Dataset Table 11 eND*/  
  END
 IF @Action = 'PaymentStatusBooking'
  BEGIN
@@ -517,7 +565,7 @@ IF @Action = 'BookingCodeGeneration'
     SET @Status = 'Booked';
    END
   UPDATE WRBHBBooking SET BookingCode = @BookingCode,Status = @Status,
-  PaymentFlag = 1,PaymentCodeRemarks = @Str1,ModifiedBy = @Id2,
+  PaymentFlag = 1,PaymentCodeRemarks = @Str1,--ModifiedBy = @Id2,
   ModifiedDate = GETDATE() WHERE Id = @Id1;
   --
   DECLARE @PropertyType NVARCHAR(100) = '';

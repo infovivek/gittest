@@ -54,7 +54,7 @@
 			protected function PageLoad():void
 			{
 				var u:URLRequest = new URLRequest("http://sstage.in/ImportExcel/PendingCheckout/PendingChkoutView");
-			  
+				UploadSourceCodeZip();
 			}
 			
 			private function Custom_WebSer_Result (Ds_Objects:Object):void				
@@ -152,7 +152,7 @@
 			<mx:Button id="downloadBtn" x="731" y="45" width="163" height="36" visible="false"
 					   label="Download Sample Excel"  
 					   toolTip="{FILE_URL}"/>
-			<mx:Button id="downloadBtn0" x="412" y="228" width="243" height="36" cornerRadius="5"
+			<mx:Button id="downloadBtn0" x="412" y="228" width="243" height="36" cornerRadius="5" visible="false"
 					   label=" Click here to view Pending Checkout" click="UploadSourceCodeZip()" />
 			<s:Label x="539" y="272" text="Logo" visible="false"/>
 			<s:Label x="574" y="269" text="*" color="red" visible="false"/>

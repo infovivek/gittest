@@ -119,7 +119,7 @@ IF @Mode='Cash'
 	BEGIN
 	IF @FromDate='' AND @ToDate=''
 		BEGIN
-			SELECT Convert(NVARCHAR(100),DepositedDate,103) AS Date,P.PropertyName AS Property,Amount,D.BTCTo,BTCMode,
+			SELECT Convert(NVARCHAR(100),DepositedDate,103) AS Date,P.PropertyName AS Property,D.TotalAmount AS Amount,D.BTCTo,BTCMode,
 			Comments,ChallanImage,D.Id FROM WRBHBDeposits D 
 			JOIN WRBHBUser U ON U.Id=D.DepositedBy AND U.IsActive=1 AND U.IsDeleted=0
 			JOIN WRBHBProperty P ON D.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
@@ -127,7 +127,7 @@ IF @Mode='Cash'
 		END	
 	IF @FromDate!='' AND @ToDate=''
 		BEGIN
-			SELECT Convert(NVARCHAR(100),DepositedDate,103) AS Date,P.PropertyName AS Property,Amount,D.BTCTo,BTCMode,
+			SELECT Convert(NVARCHAR(100),DepositedDate,103) AS Date,P.PropertyName AS Property,D.TotalAmount AS Amount,D.BTCTo,BTCMode,
 			Comments,ChallanImage,D.Id FROM WRBHBDeposits D 
 			JOIN WRBHBUser U ON U.Id=D.DepositedBy AND U.IsActive=1 AND U.IsDeleted=0
 			JOIN WRBHBProperty P ON D.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
@@ -136,7 +136,7 @@ IF @Mode='Cash'
 		END	
 	IF @FromDate!='' AND @ToDate!=''
 		BEGIN
-			SELECT Convert(NVARCHAR(100),DepositedDate,103) AS Date,P.PropertyName AS Property,Amount,D.BTCTo,BTCMode,
+			SELECT Convert(NVARCHAR(100),DepositedDate,103) AS Date,P.PropertyName AS Property,D.TotalAmount AS Amount,D.BTCTo,BTCMode,
 			Comments,ChallanImage,D.Id FROM WRBHBDeposits D 
 			JOIN WRBHBUser U ON U.Id=D.DepositedBy AND U.IsActive=1 AND U.IsDeleted=0
 			JOIN WRBHBProperty P ON D.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0
@@ -145,7 +145,7 @@ IF @Mode='Cash'
 		END
 	IF @FromDate='' AND @ToDate!=''
 		BEGIN
-			SELECT Convert(NVARCHAR(100),DepositedDate,103) AS Date,P.PropertyName AS Property,Amount,D.BTCTo,BTCMode,
+			SELECT Convert(NVARCHAR(100),DepositedDate,103) AS Date,P.PropertyName AS Property,D.TotalAmount AS Amount,D.BTCTo,BTCMode,
 			Comments,ChallanImage,D.Id FROM WRBHBDeposits D 
 			JOIN WRBHBUser U ON U.Id=D.DepositedBy AND U.IsActive=1 AND U.IsDeleted=0
 			JOIN WRBHBProperty P ON D.PropertyId=P.Id AND P.IsActive=1 AND P.IsDeleted=0

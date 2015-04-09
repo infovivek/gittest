@@ -5,6 +5,7 @@ using System.Text;
 using System.Data;
 using System.Data.SqlClient;
 using HB.Entity;
+using System.Text.RegularExpressions;
 
 namespace HB.Dao
 {
@@ -17,6 +18,7 @@ namespace HB.Dao
              ", ProcName:'" + StoredProcedures.BookingConfirmation_Help;
             SqlCommand command = new SqlCommand();
             DataSet ds = new DataSet();
+            CreateLogFiles log = new CreateLogFiles();
             command.CommandText = StoredProcedures.BookingConfirmation_Help;
             command.CommandType = CommandType.StoredProcedure;
             command.Parameters.Add("@Action", SqlDbType.NVarChar).Value = "RoomBookingConfirmed";
@@ -25,8 +27,74 @@ namespace HB.Dao
             command.Parameters.Add("@Id1", SqlDbType.BigInt).Value = Convert.ToInt32(data[4].ToString());
             command.Parameters.Add("@Id2", SqlDbType.BigInt).Value = 0;
             ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
-            System.Net.Mail.MailMessage message = new System.Net.Mail.MailMessage();            
-            if (ds.Tables[10].Rows.Count > 0)
+            System.Net.Mail.MailMessage message = new System.Net.Mail.MailMessage();
+            message.From = new System.Net.Mail.MailAddress(ds.Tables[0].Rows[0][4].ToString(), "", System.Text.Encoding.UTF8);
+            string Flag = "";
+            for (int i = 0; i < ds.Tables[1].Rows.Count; i++)
+            {
+                Flag = FnEmailValidation(ds.Tables[1].Rows[i][0].ToString());
+                if (Flag == "1")
+                {
+                    message.To.Add(new System.Net.Mail.MailAddress(ds.Tables[1].Rows[i][0].ToString()));
+                }
+                else
+                {
+                    log.ErrorLog("Payment Code : " + ds.Tables[0].Rows[0][3].ToString() + ", Invalid Email - To : " + ds.Tables[1].Rows[i][0].ToString());
+                }
+            }
+            for (int i = 0; i < ds.Tables[2].Rows.Count; i++)
+            {
+                Flag = FnEmailValidation(ds.Tables[2].Rows[i][0].ToString());
+                if (Flag == "1")
+                {
+                    message.CC.Add(new System.Net.Mail.MailAddress(ds.Tables[2].Rows[i][0].ToString()));
+                }
+                else
+                {
+                    log.ErrorLog("Payment Code : " + ds.Tables[0].Rows[0][3].ToString() + ", Invalid Email - To : " + ds.Tables[2].Rows[i][0].ToString());
+                }
+            }
+            for (int i = 0; i < ds.Tables[3].Rows.Count; i++)
+            {
+                Flag = FnEmailValidation(ds.Tables[3].Rows[i][0].ToString());
+                if (Flag == "1")
+                {
+                    message.Bcc.Add(new System.Net.Mail.MailAddress(ds.Tables[3].Rows[i][0].ToString()));
+                }
+                else
+                {
+                    log.ErrorLog("Payment Code : " + ds.Tables[0].Rows[0][3].ToString() + ", Invalid Email - To : " + ds.Tables[3].Rows[i][0].ToString());
+                }
+            }
+            //message.To.Add(new System.Net.Mail.MailAddress("sakthi@warblerit.com"));
+            message.Subject = "Booking Payment - " + ds.Tables[0].Rows[0][3].ToString();
+            string Imagebody =
+                        " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #cccdcf solid 1px\">" +
+                        "<tr><td>" +
+                        "<table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\">" +
+                        "<tr> " +
+                        "<th align=\"left\" width=\"50%\" style=\"padding: 10px 0px 10px 10px;\">" +
+                        "<img src=" + ds.Tables[0].Rows[0][1].ToString() + " width=\"200px\" height=\"52px\" alt=" + ds.Tables[0].Rows[0][2].ToString() + ">" +              //Image Name Change
+                        "</th><th width=\"50%\"></th></tr></table>";
+            string SecondRow = " <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #ffffff solid 1px\">" +
+                        " <tr>" + ds.Tables[0].Rows[0][0].ToString() + "</tr>" +
+                        " </table>";
+            message.Body = Imagebody + SecondRow;
+            message.IsBodyHtml = true;            
+            System.Net.Mail.SmtpClient smtp = new System.Net.Mail.SmtpClient();
+            smtp.EnableSsl = true;
+            smtp.Port = 587;
+            //smtp.Host = "smtp.gmail.com";smtp.Credentials = new System.Net.NetworkCredential("stay@staysimplyfied.com", "stay1234");
+            smtp.Host = "email-smtp.us-west-2.amazonaws.com"; smtp.Credentials = new System.Net.NetworkCredential("AKIAIIVF5D5D3CJAX7SQ", "ApmuZkd+L8tissEga8kac3quhhwohEi5CB+dYD36KTq3");
+            try
+            {
+                smtp.Send(message);
+            }
+            catch (Exception ex)
+            {
+                log.ErrorLog(ex.Message + " --> Room Level Booking Payment Mail --> " + message.Subject);
+            }
+            /*if (ds.Tables[10].Rows.Count > 0)
             {
                 message.From = new System.Net.Mail.MailAddress("homestay@uniglobeatb.co.in", "", System.Text.Encoding.UTF8);
             }
@@ -66,7 +134,18 @@ namespace HB.Dao
                         " <tr><td>" +
                         " <p style=\"color:orange; font-weight:bold; font-size:14px;\"> Guest Details :</p>" +
                         " </td></tr>" +
-                        " </table>";           
+                        " </table>";
+            Imagebody =
+                        " <table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #cccdcf solid 1px\">" +
+                        "<tr><td>" +
+                        "<table cellpadding=\"0\" cellspacing=\"0\" width=\"800px\" border=\"0\" align=\"center\">" +
+                        "<tr> " +
+                        "<th align=\"left\" width=\"50%\" style=\"padding: 10px 0px 10px 10px;\">" +
+                        "<img src=" + ds.Tables[0].Rows[0][0].ToString() + " width=\"200px\" height=\"52px\" alt=" + ds.Tables[0].Rows[0][1].ToString() + ">" +              //Image Name Change
+                        "</th><th width=\"50%\"></th></tr></table>";
+            SecondRow = " <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\" style=\" position: relative; font-family:  arial, helvetica; font-size: 12px;  border: #ffffff solid 1px\">" +
+                        " <tr><p style=\"font-size:11px;\">"+ ds.Tables[0].Rows[0][2].ToString() +" </p></tr>" +
+                        " </table>";
             string GuestDetailsTable1 = "";
             string typeofpty = ds.Tables[4].Rows[0][8].ToString();
             if ((typeofpty == "MGH") || (typeofpty == "DdP"))
@@ -277,8 +356,24 @@ namespace HB.Dao
             {
                 CreateLogFiles log = new CreateLogFiles();
                 log.ErrorLog(ex.Message + " --> Room Level Booking Payment Mail --> " + message.Subject);
-            }
+            }*/            
             return ds;
+        }
+
+        public string FnEmailValidation(string email)
+        {
+            string pattern = "^([0-9a-zA-Z]([-\\.\\w]*[0-9a-zA-Z])*@([0-9a-zA-Z][-\\w]*[0-9a-zA-Z]\\.)+[a-zA-Z]{2,9})$";
+            System.Text.RegularExpressions.Match match =
+                        Regex.Match(email, pattern, RegexOptions.IgnoreCase);
+
+            if (!match.Success)
+            {
+                return "0";
+            }
+            else
+            {
+                return "1";
+            }
         }
     }
 }

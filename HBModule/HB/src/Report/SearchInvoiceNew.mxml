@@ -30,7 +30,7 @@
 			public var InVoiceNo:String="",ChkOutHdrId:int=0,Statuss:String="",BillType:String="",ErrStr:String="",ErrStr1:String="";
 			public var AddMode:Boolean=true,Flag:Boolean=true;
 			public 	var Type:String="";
-			public var Str_Tariff:String="",Str_CServ:String="";
+			public var Str_Tariff:String="",Str_CServ:String="",Str_TAC:String="";
 			public var PrintTariffId:int=0,SC:int=0;
 			
 			protected function PageLoad():void
@@ -62,6 +62,7 @@
 				// Rdlc Print
 //				Str_Tariff="http://localhost:6236/CreditNoteTariffBill.aspx?";
 //				Str_CServ="http://localhost:6236/CreditNoteServiceBill.aspx?";
+				Str_TAC="http://sstage.in/HBReport/CreditNoteTACBill.aspx?";
 				Str_Tariff="http://sstage.in/HBReport/CreditNoteTariffBill.aspx?";
 				Str_CServ="http://sstage.in/HBReport/CreditNoteServiceBill.aspx?";
 				Modes.selectedValue=0;
@@ -113,7 +114,7 @@
 					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
 					{
 						lbl_LT.text=Ds_Objects.result.Tables.Table3.Rows[0].LuxuryTaxPer
-						//lbl_TST.text=Ds_Objects.result.Tables.Table3.Rows[0].ServiceTaxPer
+						lbl_TST.text=Ds_Objects.result.Tables.Table3.Rows[0].ServiceTaxPer
 						lbl_Vat.text=Ds_Objects.result.Tables.Table3.Rows[0].VATPer
 						lbl_STFB.text=Ds_Objects.result.Tables.Table3.Rows[0].RestaurantSTPer
 						SC=Ds_Objects.result.Tables.Table3.Rows[0].ServiceCharge	
@@ -142,7 +143,7 @@
 					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
 					{
 						lbl_LT.text=Ds_Objects.result.Tables.Table3.Rows[0].LuxuryTaxPer
-						//lbl_TST.text=Ds_Objects.result.Tables.Table3.Rows[0].ServiceTaxPer
+						lbl_TST.text=Ds_Objects.result.Tables.Table3.Rows[0].ServiceTaxPer
 						lbl_Vat.text=Ds_Objects.result.Tables.Table3.Rows[0].VATPer
 						lbl_STFB.text=Ds_Objects.result.Tables.Table3.Rows[0].RestaurantSTPer
 						SC=Ds_Objects.result.Tables.Table3.Rows[0].ServiceCharge
@@ -162,6 +163,20 @@
 						{
 							PrintTariffId=Ds_Objects.result.Tables.Table.Rows[0].Id;
 							ExternalInterface.call("changeDocumentTitle",Str_Tariff+PrintTariffId);
+						}
+						else
+						{
+							alignAlert(Alert.show("CreditNote Added Successfully.","Message !",Alert.OK,
+								null, null,	iconTickLarge, Alert.OK),10,"");
+						}
+					}
+					else if(Type=="TAC")
+					{
+						PrintTariffId=0
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{
+							PrintTariffId=Ds_Objects.result.Tables.Table.Rows[0].Id;
+							ExternalInterface.call("changeDocumentTitle",Str_TAC+PrintTariffId);
 						}
 						else
 						{
@@ -740,7 +755,7 @@
 						var ST:Number=Number(lbl_TST.text);
 						var STC:Number=Number(lbl_TSC.text);
 						var TLT:Number=TotAmt*LT/100
-						var TST:Number=TotAmt*7.42/100
+						var TST:Number=TotAmt*ST/100
 						var TSC:Number=	TotAmt*0.00/100
 						var LT1:String=NF_Two.format(TLT);
 						Txt_LT.text=LT1.replace(",","");
@@ -982,7 +997,7 @@
 		<mx:Label x="633" y="187" text="ServiceTax @" />
 		<mx:Label x="712" y="136" width="39" text="" id="lbl_LT"/>
 		<mx:Label x="752" y="136" width="39" text="%"/>
-		<mx:Label x="713" y="162" width="39" text="7.42" id="lbl_TST"/>
+		<mx:Label x="713" y="162" width="39" text="" id="lbl_TST"/>
 		<mx:Label x="753" y="162" width="39" text="%"/>
 		<mx:Label x="713" y="186" width="39" text="12.36" id="lbl_TSC"/>
 		<mx:Label x="755" y="186" width="30" text="%" />

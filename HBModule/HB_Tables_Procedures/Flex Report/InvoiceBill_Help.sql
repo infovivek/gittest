@@ -385,9 +385,8 @@ BEGIN
  JOIN WRBHBCheckOutServiceHdr H WITH(NOLOCK) ON B.CheckOutId=H.CheckOutHdrId AND H.IsActive=1 AND H.IsDeleted=0
  JOIN  WRBHBCheckOutServiceDtls D WITH(NOLOCK) ON H.Id = D.ServiceHdrId AND D.IsActive=1 AND D.IsDeleted=0
  WHERE D.TypeService='Food And Beverages' 
- GROUP BY H.CheckOutHdrId,ChkOutServiceST,ChkOutServiceVat,H.MiscellaneousAmount,H.OtherService
+ GROUP BY H.CheckOutHdrId,ChkOutServiceST,H.OtherService,ChkOutServiceVat,H.MiscellaneousAmount
  
-
  --SELECT SUM(ISNULL(D.ChkOutSerAmount,0)),H.CheckOutHdrId,0,
  --SUM(ISNULL(cast(ChkOutServiceST as decimal(27,2)),0)) SerivceTax4,  
  --SUM(ISNULL(ChkOutServiceVat,0))  

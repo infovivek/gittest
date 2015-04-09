@@ -38,12 +38,12 @@ IF @Action = 'MMTdata'
   SET @Dub = (SELECT COUNT(*) FROM #OCCPNCY WHERE Occupancy='Double');
   --
   --SELECT @Single,@Dub,@Id1;
-  SELECT C.CityCode,BP.PropertyId,BP.RatePlanCode,BP.RoomTypeCode,
+  SELECT dbo.TRIM(C.CityCode),BP.PropertyId,dbo.TRIM(BP.RatePlanCode),dbo.TRIM(BP.RoomTypeCode),
   CAST(BG.ChkInDt AS VARCHAR),CAST(BG.ChkOutDt AS VARCHAR),
   @Single,@Dub,
   'shiv@hummingbirdindia.com',
   --'hotels-qa@makemytrip.com',
-  BG.FirstName,BG.Title,BG.LastName FROM WRBHBBooking B
+  dbo.TRIM(BG.FirstName),dbo.TRIM(BG.Title),dbo.TRIM(BG.LastName) FROM WRBHBBooking B
   LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON
   BP.BookingId=B.Id
   LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
@@ -328,12 +328,9 @@ IF @Action = 'MMTDiscountUpdate'
  END
 IF @Action = 'MMTWindowsService'
  BEGIN
-  --SELECT '';
-  --SELECT 'CJB';SELECT '2015-03-06','2015-03-07';
-  SELECT CityCode FROM WRBHBCity WHERE ISNULL(CityCode,'') != ''
-  GROUP BY CityCode ORDER BY CityCode ASC;
-  SELECT '2015-04-01','2015-04-02';
-  --SELECT CAST(CONVERT(DATE,DATEADD(DAY,6,GETDATE()),103) AS VARCHAR),
-  --CAST(CONVERT(DATE,DATEADD(DAY,7,GETDATE()),103) AS VARCHAR);
+  SELECT '';
+  --SELECT 'CJB';SELECT '2015-03-26','2015-03-27';
+  --SELECT CityCode FROM WRBHBCity WHERE ISNULL(CityCode,'') != '' GROUP BY CityCode ORDER BY CityCode ASC;SELECT '2015-03-30','2015-03-31';
+  --SELECT CityCode FROM WRBHBCity WHERE ISNULL(CityCode,'') != '' GROUP BY CityCode ORDER BY CityCode ASC;SELECT CAST(CONVERT(DATE,DATEADD(DAY,6,GETDATE()),103) AS VARCHAR),CAST(CONVERT(DATE,DATEADD(DAY,7,GETDATE()),103) AS VARCHAR);
  END
 END

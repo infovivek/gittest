@@ -1353,5 +1353,242 @@ IF @Action = 'AvaliableFromRoom'
    BEGIN
     SELECT '' AS RoomSts;
    END
+ END
+IF @Action = 'BookingLoadFrontEnd'  
+ BEGIN
+  DECLARE @Designation NVARCHAR(100) = '',@ClientId BIGINT = 0;
+  DECLARE @Mode NVARCHAR(100) = '';
+  SELECT TOP 1 @Designation = Designation,@ClientId = ClientId,
+  @Mode = ISNULL(Mode,'') FROM WrbhbTravelDesk 
+  WHERE IsActive = 1 AND IsDeleted = 0 AND Id = @BookingLevel;
+  --WHERE IsActive = 1 AND IsDeleted = 0 AND RowId = @BookingLevel;
+  -- Get CheckIn & Booked Booking  
+  CREATE TABLE #StayBook(BookingCode BIGINT,BookingId BIGINT,Guest NVARCHAR(100),  
+  RoomId BIGINT,RoomCaptured INT,CurrentStatus NVARCHAR(100),  
+  PropertyName NVARCHAR(100),RoomType NVARCHAR(100),PropertyType NVARCHAR(100),
+  BookingLevel NVARCHAR(100));
+  CREATE TABLE #StayBook1(Guest NVARCHAR(100),BookingCode INT,BookingId INT,  
+  RoomId INT,RoomCapturedId INT,BookingLevelId NVARCHAR(100),  
+  CurrentStatus NVARCHAR(100),PropertyName NVARCHAR(100),
+  RoomType NVARCHAR(100),PropertyType NVARCHAR(100));
+  IF @Mode = 'ENDUSER'
+   BEGIN
+    -- Room
+    INSERT INTO #StayBook(BookingCode,BookingId,Guest,RoomId,RoomCaptured,
+    CurrentStatus,PropertyName,RoomType,PropertyType,BookingLevel)
+    SELECT B.BookingCode,BG.BookingId,BG.FirstName+' '+BG.LastName AS Guest,
+    BG.RoomId,BG.RoomCaptured,BG.CurrentStatus,BP.PropertyName,BG.RoomType,
+    BP.PropertyType,B.BookingLevel FROM WRBHBBooking B
+    LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id
+    LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
+    BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND
+    BG.BookingPropertyId=BP.PropertyId
+    WHERE B.IsActive=1 AND B.IsDeleted=0 AND BP.IsActive=1 AND
+    BP.IsDeleted=0 AND BG.IsActive=1 AND BG.IsDeleted=0 AND
+    BG.CurrentStatus IN ('Booked','CheckIn') AND
+    B.BookingLevel = 'Room' AND BP.PropertyType IN ('MGH') AND
+    ISNULL(BG.RoomShiftingFlag,0) = 0 AND B.BookingCode != 0 AND
+    ISNULL(B.FrontEnd,0) = 1 AND B.ClientId = @ClientId AND
+    B.BookedUsrId = @Id1;
+    -- Bed
+    INSERT INTO #StayBook(BookingCode,BookingId,Guest,RoomId,RoomCaptured,
+    CurrentStatus,PropertyName,RoomType,PropertyType,BookingLevel)
+    SELECT B.BookingCode,BG.BookingId,BG.FirstName+' '+BG.LastName AS Guest,
+    BG.BedId,BG.RoomCaptured,BG.CurrentStatus,BP.PropertyName,BG.BedType,
+    BP.PropertyType,B.BookingLevel FROM WRBHBBooking B
+    LEFT OUTER JOIN WRBHBBedBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id
+    LEFT OUTER JOIN WRBHBBedBookingPropertyAssingedGuest BG WITH(NOLOCK)ON 
+    BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND
+    BG.BookingPropertyId=BP.PropertyId
+    WHERE B.IsActive=1 AND B.IsDeleted=0 AND BP.IsActive=1 AND
+    BP.IsDeleted=0 AND BG.IsActive=1 AND BG.IsDeleted=0 AND
+    BG.CurrentStatus IN ('Booked','CheckIn') AND
+    B.BookingLevel = 'Bed' AND BP.PropertyType IN ('MGH') AND
+    ISNULL(BG.RoomShiftingFlag,0) = 0 AND B.BookingCode != 0 AND
+    ISNULL(B.FrontEnd,0) = 1 AND B.ClientId = @ClientId AND
+    B.BookedUsrId = @Id1;    
+   END
+  IF @Mode = 'TRAVELDESK' AND @Designation = 'Client'
+   BEGIN
+    -- Room
+    INSERT INTO #StayBook(BookingCode,BookingId,Guest,RoomId,RoomCaptured,
+    CurrentStatus,PropertyName,RoomType,PropertyType,BookingLevel)
+    SELECT B.BookingCode,BG.BookingId,BG.FirstName+' '+BG.LastName AS Guest,
+    BG.RoomId,BG.RoomCaptured,BG.CurrentStatus,BP.PropertyName,BG.RoomType,
+    BP.PropertyType,B.BookingLevel FROM WRBHBBooking B
+    LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id
+    LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
+    BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND
+    BG.BookingPropertyId=BP.PropertyId
+    WHERE B.IsActive=1 AND B.IsDeleted=0 AND BP.IsActive=1 AND
+    BP.IsDeleted=0 AND BG.IsActive=1 AND BG.IsDeleted=0 AND
+    BG.CurrentStatus IN ('Booked','CheckIn') AND
+    B.BookingLevel = 'Room' AND BP.PropertyType IN ('MGH') AND
+    ISNULL(BG.RoomShiftingFlag,0) = 0 AND B.BookingCode != 0 AND
+    ISNULL(B.FrontEnd,0) = 1 AND B.ClientId = @ClientId;
+    -- Bed
+    INSERT INTO #StayBook(BookingCode,BookingId,Guest,RoomId,RoomCaptured,
+    CurrentStatus,PropertyName,RoomType,PropertyType,BookingLevel)
+    SELECT B.BookingCode,BG.BookingId,BG.FirstName+' '+BG.LastName AS Guest,
+    BG.BedId,BG.RoomCaptured,BG.CurrentStatus,BP.PropertyName,BG.BedType,
+    BP.PropertyType,B.BookingLevel FROM WRBHBBooking B
+    LEFT OUTER JOIN WRBHBBedBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id
+    LEFT OUTER JOIN WRBHBBedBookingPropertyAssingedGuest BG WITH(NOLOCK)ON 
+    BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND
+    BG.BookingPropertyId=BP.PropertyId
+    WHERE B.IsActive=1 AND B.IsDeleted=0 AND BP.IsActive=1 AND
+    BP.IsDeleted=0 AND BG.IsActive=1 AND BG.IsDeleted=0 AND
+    BG.CurrentStatus IN ('Booked','CheckIn') AND
+    B.BookingLevel = 'Bed' AND BP.PropertyType IN ('MGH') AND
+    ISNULL(BG.RoomShiftingFlag,0) = 0 AND B.BookingCode != 0 AND
+    ISNULL(B.FrontEnd,0) = 1 AND B.ClientId = @ClientId;
+   END
+  IF @Mode = 'TRAVELDESK' AND @Designation = 'MasterClient'
+   BEGIN
+    -- Room
+    INSERT INTO #StayBook(BookingCode,BookingId,Guest,RoomId,RoomCaptured,
+    CurrentStatus,PropertyName,RoomType,PropertyType,BookingLevel)
+    SELECT B.BookingCode,BG.BookingId,BG.FirstName+' '+BG.LastName AS Guest,
+    BG.RoomId,BG.RoomCaptured,BG.CurrentStatus,BP.PropertyName,BG.RoomType,
+    BP.PropertyType,B.BookingLevel FROM WRBHBBooking B
+    LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id
+    LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
+    BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND
+    BG.BookingPropertyId=BP.PropertyId
+    WHERE B.IsActive=1 AND B.IsDeleted=0 AND BP.IsActive=1 AND
+    BP.IsDeleted=0 AND BG.IsActive=1 AND BG.IsDeleted=0 AND
+    BG.CurrentStatus IN ('Booked','CheckIn') AND
+    B.BookingLevel = 'Room' AND BP.PropertyType IN ('MGH') AND
+    ISNULL(BG.RoomShiftingFlag,0) = 0 AND B.BookingCode != 0 AND
+    ISNULL(B.FrontEnd,0) = 1 AND B.ClientId IN
+    (SELECT Id FROM WRBHBClientManagement 
+    WHERE IsActive = 1 AND IsDeleted = 0 AND MasterClientId = @ClientId);
+    -- Bed
+    INSERT INTO #StayBook(BookingCode,BookingId,Guest,RoomId,RoomCaptured,
+    CurrentStatus,PropertyName,RoomType,PropertyType,BookingLevel)
+    SELECT B.BookingCode,BG.BookingId,BG.FirstName+' '+BG.LastName AS Guest,
+    BG.BedId,BG.RoomCaptured,BG.CurrentStatus,BP.PropertyName,BG.BedType,
+    BP.PropertyType,B.BookingLevel FROM WRBHBBooking B
+    LEFT OUTER JOIN WRBHBBedBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id
+    LEFT OUTER JOIN WRBHBBedBookingPropertyAssingedGuest BG WITH(NOLOCK)ON 
+    BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND
+    BG.BookingPropertyId=BP.PropertyId
+    WHERE B.IsActive=1 AND B.IsDeleted=0 AND BP.IsActive=1 AND
+    BP.IsDeleted=0 AND BG.IsActive=1 AND BG.IsDeleted=0 AND
+    BG.CurrentStatus IN ('Booked','CheckIn') AND
+    B.BookingLevel = 'Bed' AND BP.PropertyType IN ('MGH') AND
+    ISNULL(BG.RoomShiftingFlag,0) = 0 AND B.BookingCode != 0 AND
+    ISNULL(B.FrontEnd,0) = 1 AND B.ClientId IN
+    (SELECT Id FROM WRBHBClientManagement 
+    WHERE IsActive = 1 AND IsDeleted = 0 AND MasterClientId = @ClientId);
+   END
+  --
+  INSERT INTO #StayBook1(Guest,BookingCode,BookingId,RoomId,RoomCapturedId,
+  BookingLevelId,CurrentStatus,PropertyName,RoomType,PropertyType)
+  SELECT STUFF((SELECT ', ' + BA.Guest FROM #StayBook BA
+  WHERE BA.BookingId = B.BookingId AND BA.RoomId = B.RoomId AND
+  BA.RoomCaptured = B.RoomCaptured
+  FOR XML PATH('')),1,1,'') AS Guest,B.BookingCode,B.BookingId,
+  B.RoomId,B.RoomCaptured AS RoomCapturedId,B.BookingLevel,
+  B.CurrentStatus,B.PropertyName,B.RoomType,B.PropertyType FROM #StayBook AS B
+  GROUP BY B.BookingCode,B.BookingId,B.RoomCaptured,B.RoomId,B.CurrentStatus,
+  B.PropertyName,B.RoomType,B.PropertyType,B.BookingLevel;
+  --
+  SELECT T.BookingCode,T.BookingId,T.BookingLevelId,T.CurrentStatus,T.Guest,
+  T.PropertyName,T.RoomId,T.RoomCapturedId,T.RoomType AS RoomNoId
+  FROM #StayBook1 T
+  GROUP BY T.Guest,T.BookingCode,T.BookingId,T.RoomId,T.RoomCapturedId,
+  T.BookingLevelId,T.PropertyName,T.RoomType,T.CurrentStatus
+  ORDER BY T.BookingCode,T.RoomCapturedId ASC;
  END 
 END
+  ---- Room
+  --INSERT INTO #StayBook(BookingCode,BookingId,Guest,RoomId,RoomCaptured,  
+  --CurrentStatus,PropertyName,RoomType,PropertyType,BookingLevel)  
+  --SELECT B.BookingCode,BG.BookingId,  
+  --BG.FirstName+' '+BG.LastName AS Guest,BG.RoomId,BG.RoomCaptured,  
+  --BG.CurrentStatus,BP.PropertyName,BG.RoomType,BP.PropertyType,
+  --B.BookingLevel   
+  --FROM WRBHBBooking B  
+  --LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON  
+  --BP.BookingId=B.Id    
+  --LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON   
+  --BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND  
+  --BG.BookingPropertyId=BP.PropertyId    
+  --WHERE B.IsActive=1 AND B.IsDeleted=0 AND BP.IsActive=1 AND  
+  --BP.IsDeleted=0 AND BG.IsActive=1 AND BG.IsDeleted=0 AND  
+  ----BG.CurrentStatus IN ('CheckIn','Booked','UnSettled') AND 
+  --BG.CurrentStatus IN ('CheckIn','Booked') AND 
+  --B.BookingLevel = 'Room' AND BP.PropertyType IN ('InP','MGH','DdP','ExP','CPP') AND
+  --ISNULL(RoomShiftingFlag,0) = 0 AND B.BookingCode != 0;
+  ---- Bed
+  --INSERT INTO #StayBook(BookingCode,BookingId,Guest,RoomId,RoomCaptured,  
+  --CurrentStatus,PropertyName,RoomType,PropertyType,BookingLevel)  
+  --SELECT B.BookingCode,BG.BookingId,  
+  --BG.FirstName+' '+BG.LastName AS Guest,BG.BedId,BG.RoomCaptured,  
+  --BG.CurrentStatus,BP.PropertyName,BG.BedType,BP.PropertyType,
+  --B.BookingLevel   
+  --FROM WRBHBBooking B  
+  --LEFT OUTER JOIN WRBHBBedBookingProperty BP WITH(NOLOCK)ON  
+  --BP.BookingId=B.Id    
+  --LEFT OUTER JOIN WRBHBBedBookingPropertyAssingedGuest BG WITH(NOLOCK)ON   
+  --BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND  
+  --BG.BookingPropertyId=BP.PropertyId    
+  --WHERE B.IsActive=1 AND B.IsDeleted=0 AND BP.IsActive=1 AND  
+  --BP.IsDeleted=0 AND BG.IsActive=1 AND BG.IsDeleted=0 AND  
+  ----BG.CurrentStatus IN ('CheckIn','Booked','UnSettled') AND 
+  --BG.CurrentStatus IN ('CheckIn','Booked') AND 
+  --B.BookingLevel = 'Bed' AND BP.PropertyType IN ('InP','MGH') AND
+  --ISNULL(RoomShiftingFlag,0) = 0 AND B.BookingCode != 0;
+  ---- Apartment
+  --INSERT INTO #StayBook(BookingCode,BookingId,Guest,RoomId,RoomCaptured,  
+  --CurrentStatus,PropertyName,RoomType,PropertyType,BookingLevel)  
+  --SELECT B.BookingCode,BG.BookingId,  
+  --BG.FirstName+' '+BG.LastName AS Guest,BG.ApartmentId,BG.RoomCaptured,  
+  --BG.CurrentStatus,BP.PropertyName,BG.ApartmentType,BP.PropertyType,
+  --B.BookingLevel   
+  --FROM WRBHBBooking B  
+  --LEFT OUTER JOIN WRBHBApartmentBookingProperty BP WITH(NOLOCK)ON  
+  --BP.BookingId=B.Id    
+  --LEFT OUTER JOIN WRBHBApartmentBookingPropertyAssingedGuest BG WITH(NOLOCK)ON   
+  --BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND  
+  --BG.BookingPropertyId=BP.PropertyId    
+  --WHERE B.IsActive=1 AND B.IsDeleted=0 AND BP.IsActive=1 AND  
+  --BP.IsDeleted=0 AND BG.IsActive=1 AND BG.IsDeleted=0 AND  
+  ----BG.CurrentStatus IN ('CheckIn','Booked','UnSettled') AND 
+  --BG.CurrentStatus IN ('CheckIn','Booked') AND 
+  --B.BookingLevel = 'Apartment' AND BP.PropertyType IN ('InP','DdP') AND
+  --ISNULL(RoomShiftingFlag,0) = 0 AND B.BookingCode != 0;
+  ---- Get Guest in CheckIn & Booked Booking
+  
+  --INSERT INTO #TMP1(Guest,BookingCode,BookingId,RoomId,RoomCapturedId,  
+  --BookingLevelId,CurrentStatus,PropertyName,RoomType,PropertyType)  
+  --SELECT STUFF((SELECT ', ' + BA.Guest FROM #StayBook BA   
+  --WHERE BA.BookingId = B.BookingId AND BA.RoomId = B.RoomId AND  
+  --BA.RoomCaptured = B.RoomCaptured  
+  --FOR XML PATH('')),1,1,'') AS Guest,B.BookingCode,B.BookingId,  
+  --B.RoomId,B.RoomCaptured AS RoomCapturedId,B.BookingLevel,  
+  --B.CurrentStatus,B.PropertyName,B.RoomType,B.PropertyType FROM #StayBook AS B   
+  --GROUP BY B.BookingCode,B.BookingId,B.RoomCaptured,B.RoomId,B.CurrentStatus,  
+  --B.PropertyName,B.RoomType,B.PropertyType,B.BookingLevel;
+  ----
+  --IF @Str1 = 'Shift'
+  -- BEGIN
+  --  SELECT T.BookingCode,T.BookingId,T.BookingLevelId,T.CurrentStatus,
+  --  T.Guest,T.PropertyName,T.RoomId,T.RoomCapturedId,T.RoomType AS RoomNoId
+  --  FROM #StayBook1 T WHERE PropertyType IN ('InP','MGH','DdP') AND
+  --  T.CurrentStatus NOT IN('UnSettled')
+  --  GROUP BY T.Guest,T.BookingCode,T.BookingId,T.RoomId,T.RoomCapturedId,
+  --  T.BookingLevelId,T.PropertyName,T.RoomType,T.CurrentStatus
+  --  ORDER BY T.BookingCode,T.RoomCapturedId ASC;
+  -- END
+  --IF @Str1 = 'Stay'
+  -- BEGIN
+  --  SELECT T.BookingCode,T.BookingId,T.BookingLevelId,T.CurrentStatus,
+  --  T.Guest,T.PropertyName,T.RoomId,T.RoomCapturedId,T.RoomType AS RoomNoId
+  --  FROM #StayBook1 T
+  --  GROUP BY T.Guest,T.BookingCode,T.BookingId,T.RoomId,T.RoomCapturedId,
+  --  T.BookingLevelId,T.PropertyName,T.RoomType,T.CurrentStatus
+  --  ORDER BY T.BookingCode,T.RoomCapturedId ASC;
+  -- END  
+

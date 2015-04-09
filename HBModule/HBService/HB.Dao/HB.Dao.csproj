@@ -191,6 +191,8 @@
     <Compile Include="SearchDetailServiceInvoiceDAO.cs" />
     <Compile Include="SearchInvoiceReportDao.cs" />
     <Compile Include="SlabTaxDAO.cs" />
+    <Compile Include="SMSBookingModification.cs" />
+    <Compile Include="SMSCancel.cs" />
     <Compile Include="SMSDAO.cs" />
     <Compile Include="SnackKOTHistoryDAO.cs" />
     <Compile Include="SSPCodeGenerationApartmentDAO.cs" />

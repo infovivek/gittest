@@ -97,23 +97,25 @@
 				Txt_HRPolicyOverrideRemarks.visible = false;
 				Btn_AdvancePaid.visible=false;
 				Hlp_Client.visible = true;
-				Chk_PaymentEmail.selected = true;
+				Chk_PaymentEmail.selected = false;
 				resultsTxtField.visible = false;
 				FnHelp_PageLoad();FnHelp_Title();
-				//useWeb("BookingPayment","BookingPayment_CUSTOM",[GlobalXml,"PaymentEmail","","",8528,0]);// payment email
+				//useWeb("BookingPayment","BookingPayment_CUSTOM",[GlobalXml,"PaymentEmail","","",BookedId,0]);
+				//useWeb("BookingPayment","BookingPayment_CUSTOM",[GlobalXml,"PaymentEmail","","",16193,0]);// payment email
 				//var str:String = "12,12,12,12,12.00";
 				//str = str.toLowerCase(); //thi$ i$ a t#%%ible exam73@
 				//var start:Date=new Date();var end:Date=new Date(2015,3,1);				
 				//var num:Number= (end.getUTCFullYear() - start.getUTCFullYear()) * 12 +(end.getUTCMonth() - start.getUTCMonth());								
 				//useWeb("BOOKING","Tab2_to_Tab3_Dtls_CUSTOM",[GlobalXml,'Tab2_to_Tab3_Dtls','','','','',0,0,0,0,0,26,0]);				
 				var ss:String=Global_AC[0].UsrId;				
-				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Room',3222]);
+				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Room',18279]);
 				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,"RoomResend",10709]);				
-				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Bed',9614]);
+				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Bed',18286]);
 				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'Apartment',2027]);
 				//useWeb("BookingMail","RecommendMail_CUSTOM",[GlobalXml,'Recommend',5809]);
-				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'MMT',5765]);
+				//useWeb("BookingMail","SendMail_CUSTOM",[GlobalXml,'MMT',17986]);
 				//useWeb("BookingMail","SendSMS_CUSTOM",[GlobalXml,'SMS',10564]);// S M S
+				//useWeb("BookingMail","BookingModificationSMS_CUSTOM",[GlobalXml,'BookingModificationSMS',18054,2]);// S M S
 				/*var ChkInDt:String="2015-03-01 12:00:00 PM";
 				var ChkOutDt:String="2015-03-02 12:00:00 PM";
 				CityId = 0;
@@ -1100,7 +1102,7 @@
 					if(Save_Method == "Direct Booking")
 					{
 						BookedId = Id;
-						if(Chk_PaymentEmail.selected == true)
+						if(Chk_PaymentEmail.selected == false)
 						{
 							if(PropertyType == "MMT")
 							{
@@ -1989,7 +1991,7 @@
 				Txt_HRPolicyOverrideRemarks.text = "";
 				Chk_HRPolicy.selected = false;
 				Txt_HRPolicyOverrideRemarks.visible = false;
-				Chk_PaymentEmail.selected = true;
+				Chk_PaymentEmail.selected = false;
 				//
 				Txt_ExtraCCEmail.text="";Txt_PropertyRefNo.text = "";resultsTxtField.text = "";FilePath.text="";
 				Pnl123.visible = false;
@@ -3622,7 +3624,21 @@
 				{
 					alignAlert(Alert.show(Err,"Requierd Field(s) !",Alert.OK,null,null,iconErrLarge,Alert.OK),10,"");
 					return;
+				}				
+				var Ac_Tariff:ArrayCollection = new ArrayCollection();
+				Ac_Tariff = Grd_PropertyAssignedGuest.dataProvider as ArrayCollection;
+				var TotTariff:Number = 0;
+				for(var i:int = 0; i < Ac_Tariff.length; i++)
+				{
+					TotTariff += Number(Ac_Tariff[i].Tariff);					
 				}
+				//Alert.show(String(TotTariff));
+				if((Chk_PaymentEmail.selected == true) && (TotTariff == 0))
+				{
+					alignAlert(Alert.show("* Invalid Process. Tariff Amount is Zero.","Alert Message !",Alert.OK,null,null,iconWarning,Alert.OK),10,"");
+					return;
+				}				
+				//return;
 				var Ac_Guest:ArrayCollection=new ArrayCollection();
 				Ac_Guest=Grd_GuestTab3.dataProvider as ArrayCollection;
 				if(Ac_Guest.length > 0)
@@ -3632,11 +3648,36 @@
 				}
 				if(Ac_Guest.length == 0)
 				{
-					FnSave_Tab3();
+					if(Chk_PaymentEmail.selected == true)
+					{
+						alignAlert(Alert.show("Collect Payment, Do you want to Continue?", "Warning !",
+							Alert.YES | Alert.NO,null,PressYes1, iconWarning, Alert.NO),10,"");
+					}
+					else
+					{
+						FnSave_Tab3();
+					}
+					
 				}
 			}
 			
 			private function PressYes(event:CloseEvent):void 
+			{
+				if (event.detail==Alert.YES) 
+				{
+					if(Chk_PaymentEmail.selected == true)
+					{
+						alignAlert(Alert.show("Collect Payment, Do you want to Continue?", "Warning !",
+						Alert.YES | Alert.NO,null,PressYes1, iconWarning, Alert.NO),10,"");
+					}
+					else
+					{
+						FnSave_Tab3();
+					}
+				}
+			}
+			
+			private function PressYes1(event:CloseEvent):void 
 			{
 				if (event.detail==Alert.YES) 
 				{
@@ -3645,7 +3686,7 @@
 			}
 			
 			protected function FnSave_Tab3():void
-			{				
+			{
 				Save_Method="Direct Booking";
 				var Status:String="Direct Booked";
 				if(Hlp_TrackingNo.text != "")
@@ -4979,7 +5020,7 @@
 						<WrbComp:Button_HB id="Btn_PnlClose" _Label="Close" click="Btn_PnlClose_click()"/>
 					</s:HGroup>
 				</s:Panel>
-				<s:CheckBox x="283" y="192" label="Send Confirmation Email" id="Chk_PaymentEmail" depth="0"/>
+				<s:CheckBox x="283" y="192" label="Collect Payment" id="Chk_PaymentEmail" depth="0" enabled="true"/>
 				<s:Panel x="253" y="133" width="515" height="131" id="Pnl123" title="Upload Files" borderVisible="false"
 						 visible="false">
 					<s:Label x="496" y="-22" text="X" click="{Pnl123.visible = false;}" buttonMode="true"

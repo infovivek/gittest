@@ -299,12 +299,26 @@
 				}
 				if((Grd_Details.dataProvider==null)||(Grd_Details.dataProvider.length==0))
 				{
-					if(Flag==true)
-					{ 
-						//Grd_Details.setFocus();
-						Flag=false;
+					
+					if((Grd_UserDetails.dataProvider==null)||(Grd_UserDetails.dataProvider.length==0))
+					{
+						if(Flag==true)
+						{ 
+							Flag=false;
+						}
+						ErrStr=ErrStr+ "*  Details is Required \n";
 					}
-					ErrStr=ErrStr+ "*  Details is Required \n";
+				}
+				if((Grd_UserDetails.dataProvider==null)||(Grd_UserDetails.dataProvider.length==0))
+				{
+					if((Grd_Details.dataProvider==null)||(Grd_Details.dataProvider.length==0))
+					{
+						if(Flag==true)
+						{ 
+							Flag=false;
+						}
+						ErrStr=ErrStr+ "*  Details is Required \n";
+					}
 				}
 				return ErrStr;
 			}
@@ -327,6 +341,7 @@
 						
 					}]);
 				var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");
+				
 				var KOT:ArrayCollection= new  ArrayCollection();
 				KOT.removeAll();
 				KOT=Grd_Details.dataProvider as ArrayCollection;
@@ -334,6 +349,7 @@
 				GridXml += "<ROOT>";
 				GridXml += ObjToXmlStr_Comm(KOT,"GridXml")
 				GridXml += "</ROOT>";
+				
 				var USERKOT:ArrayCollection= new  ArrayCollection();
 				USERKOT.removeAll();
 				USERKOT=Grd_UserDetails.dataProvider as ArrayCollection;

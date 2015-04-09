@@ -81,7 +81,7 @@
 				}
 				if (Ds_Objects.currentTarget.description.toString() == "POSerch_CUSTOM")
 				{
-					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					if (Ds_Objects.result.Tables.Table.Rows.length >= 0)
 					{
 						Grd_Vendor.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
 					}
@@ -89,12 +89,12 @@
 					{
 						Help_AC=new ArrayCollection();
 						Grd_Vendor.dataProvider=Help_AC;
-						Clear();
+						//Clear();
 					}
 				}
 				if (Ds_Objects.currentTarget.description.toString() == "Save_CUSTOM")
 				{
-					useWeb("MapPOAndVendor","POSerch_CUSTOM", [GlobalXml,"POSerch",PropertyId,DT_From.text,DT_To.text,"",0]);
+					useWeb("MapPOAndVendor","POSerch_CUSTOM", [GlobalXml,"POSerch",PropertyId,DT_From.text,DT_To.text,"Exp",0]);
 					
 					Id=Ds_Objects.result.Tables.Table.Rows[0].MapPOAndVendorPaymentHdrId
 					if(FilePath.text!="")

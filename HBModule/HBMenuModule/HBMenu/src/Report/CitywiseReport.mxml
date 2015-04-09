@@ -32,6 +32,8 @@
 			public var Id:Number=0; public var Str_ChkOut:String="",Str_Serv:String="",Str_Settle:String="";
 			public var Str_ChkOut1:String="",Str_Serv1:String="",Str_Settle1:String="",Str_ChkOutTAC:String="";
 			public var InVoiceNo:String="",ClientId:int=0,Statuss:String="",CityId:int=0,PropertyId:int=0;
+			var Months:String="",Months1:String="",Months2:String="",Months3:String="",Months11:String="";
+			var Months21:String="",Months31:String="",Months41:String="",Months51:String="",Months61:String="";
 			protected function PageLoad():void
 			{
 				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>1</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
@@ -72,11 +74,14 @@
 					else
 					{
 						hlp_Client.enabled = false;
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{
 						hlp_Client.text = Ds_Objects.result.Tables.Table.Rows[0].ClientName;
 						ClientId = Ds_Objects.result.Tables.Table.Rows[0].Id; 
+						}
 					}
 				}
-				
+				var Ac:ArrayCollection = new ArrayCollection();
 				//Grd_PaymentWise1.dataProvider= null;
 				try
 				{
@@ -105,10 +110,27 @@
 							Grd_PaymentWise1.visible=true;
 							Grd_PaymentWise2.visible=false;
 							Grd_PaymentWise3.visible=false; 
+							if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+							{
+								MonthSelection.text=Ds_Objects.result.Tables.Table1.Rows[0].Reportdate;
+								Months=Ds_Objects.result.Tables.Table1.Rows[0].Months;
+							}  
 							if (Ds_Objects.result.Tables.Table.Rows.length > 0)
 							{
 								Grd_PaymentWise1.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+								
+								Ac = Grd_PaymentWise1.dataProvider as ArrayCollection;
+								for(var i:int = 0; i <= 1; i++)
+								{
+									Grd_PaymentWise1.columns[2].headerText ="BookingCount for"+'\n'+Months; 
+									Grd_PaymentWise1.columns[3].headerText ="RoomNight for "+'\n'+Months; 
+									Grd_PaymentWise1.columns[4].headerText ="Tariff for "+'\n'+Months; 
+								}
 							}   
+							if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+							{
+								MonthSelection.text=Ds_Objects.result.Tables.Table1.Rows[0].Reportdate;
+							}    
 						} 
 						else if(Monthwise=="Last 3 Months")
 						{
@@ -116,10 +138,32 @@
 							Grd_PaymentWise1.visible=false;
 							Grd_PaymentWise2.visible=true;
 							Grd_PaymentWise3.visible=false; 
+							if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+							{
+								MonthSelection.text=Ds_Objects.result.Tables.Table1.Rows[0].Reportdate;
+								Months1=Ds_Objects.result.Tables.Table1.Rows[0].Months1;
+								Months2=Ds_Objects.result.Tables.Table1.Rows[0].Months2;
+								Months3=Ds_Objects.result.Tables.Table1.Rows[0].Months3;
+							} 
 							if (Ds_Objects.result.Tables.Table.Rows.length > 0)
 							{
 								Grd_PaymentWise2.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
-							}  
+								Ac = Grd_PaymentWise2.dataProvider as ArrayCollection;
+								for(var i:int = 0; i <= 1; i++)
+								{
+									Grd_PaymentWise2.columns[2].headerText ="BookingCount for"+'\n'+Months1; 
+									Grd_PaymentWise2.columns[3].headerText ="RoomNight for "+'\n'+Months1; 
+									Grd_PaymentWise2.columns[4].headerText ="Tariff for "+'\n'+Months1; 
+									
+									Grd_PaymentWise2.columns[5].headerText ="BookingCount for"+'\n'+Months2; 
+									Grd_PaymentWise2.columns[6].headerText ="RoomNight for "+'\n'+Months2; 
+									Grd_PaymentWise2.columns[7].headerText ="Tariff for "+'\n'+Months2; 
+									
+									Grd_PaymentWise2.columns[8].headerText ="BookingCount for"+'\n'+Months3; 
+									Grd_PaymentWise2.columns[9].headerText ="RoomNight for "+'\n'+Months3; 
+									Grd_PaymentWise2.columns[10].headerText ="Tariff for "+'\n'+Months3; 
+								}
+							} 
 						}
 						else if(Monthwise=="Last 6 Months")
 						{
@@ -127,9 +171,46 @@
 							Grd_PaymentWise1.visible=false;
 							Grd_PaymentWise2.visible=false;
 							Grd_PaymentWise3.visible=true;
+							if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+							{
+								MonthSelection.text=Ds_Objects.result.Tables.Table1.Rows[0].Reportdate;
+								Months11 = Ds_Objects.result.Tables.Table1.Rows[0].Months11;
+								Months21 = Ds_Objects.result.Tables.Table1.Rows[0].Months21;
+								Months31 = Ds_Objects.result.Tables.Table1.Rows[0].Months31;
+								Months41 = Ds_Objects.result.Tables.Table1.Rows[0].Months41;
+								Months51 = Ds_Objects.result.Tables.Table1.Rows[0].Months51;
+								Months61 = Ds_Objects.result.Tables.Table1.Rows[0].Months61;
+							} 
 							if (Ds_Objects.result.Tables.Table.Rows.length > 0)
 							{
 								Grd_PaymentWise3.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+								Ac = Grd_PaymentWise3.dataProvider as ArrayCollection;
+								for(var i:int = 0; i <= 1; i++)
+								{
+									Grd_PaymentWise3.columns[2].headerText ="BookingCount for"+'\n'+Months11; 
+									Grd_PaymentWise3.columns[3].headerText ="RoomNight for "+'\n'+Months11; 
+									Grd_PaymentWise3.columns[4].headerText ="Tariff for "+'\n'+Months11; 
+									
+									Grd_PaymentWise3.columns[5].headerText ="BookingCount for"+'\n'+Months21; 
+									Grd_PaymentWise3.columns[6].headerText ="RoomNight for "+'\n'+Months21; 
+									Grd_PaymentWise3.columns[7].headerText ="Tariff for "+'\n'+Months21; 
+									
+									Grd_PaymentWise3.columns[8].headerText ="BookingCount for"+'\n'+Months31; 
+									Grd_PaymentWise3.columns[9].headerText ="RoomNight for "+'\n'+Months31; 
+									Grd_PaymentWise3.columns[10].headerText ="Tariff for "+'\n'+Months31; 
+									
+									Grd_PaymentWise3.columns[11].headerText ="BookingCount for"+'\n'+Months41; 
+									Grd_PaymentWise3.columns[12].headerText ="RoomNight for "+'\n'+Months41; 
+									Grd_PaymentWise3.columns[13].headerText ="Tariff for "+'\n'+Months41; 
+									
+									Grd_PaymentWise3.columns[14].headerText ="BookingCount for"+'\n'+Months51; 
+									Grd_PaymentWise3.columns[15].headerText ="RoomNight for "+'\n'+Months51; 
+									Grd_PaymentWise3.columns[16].headerText ="Tariff for "+'\n'+Months51; 
+									
+									Grd_PaymentWise3.columns[17].headerText ="BookingCount for"+'\n'+Months61; 
+									Grd_PaymentWise3.columns[18].headerText ="RoomNight for "+'\n'+Months61; 
+									Grd_PaymentWise3.columns[19].headerText ="Tariff for "+'\n'+Months61; 
+								}
 							}   
 						}	
 					}
@@ -137,6 +218,44 @@
 				catch(Exception)
 				{ 
 				}
+			}
+			public function grid_Clear():void
+			{
+				Months="";Months1="";Months2="";Months3="";Months11="";Months21="";
+				Months31="";Months41="";Months51="";Months61="";
+				Grd_PaymentWise1.columns[2].headerText ="BookingCount"; 
+				Grd_PaymentWise1.columns[3].headerText ="RoomNight"; 
+				Grd_PaymentWise1.columns[4].headerText ="Tariff"; 
+				
+				Grd_PaymentWise2.columns[2].headerText ="BookingCount"; 
+				Grd_PaymentWise2.columns[3].headerText ="RoomNight"; 
+				Grd_PaymentWise2.columns[4].headerText ="Tariff"; 				
+				Grd_PaymentWise2.columns[5].headerText ="BookingCount"; 
+				Grd_PaymentWise2.columns[6].headerText ="RoomNight"; 
+				Grd_PaymentWise2.columns[7].headerText ="Tariff"; 				
+				Grd_PaymentWise2.columns[8].headerText ="BookingCount"; 
+				Grd_PaymentWise2.columns[9].headerText ="RoomNight"; 
+				Grd_PaymentWise2.columns[10].headerText ="Tariff";
+				
+				Grd_PaymentWise3.columns[2].headerText ="BookingCount"; 
+				Grd_PaymentWise3.columns[3].headerText ="RoomNight"; 
+				Grd_PaymentWise3.columns[4].headerText ="Tariff"; 
+				Grd_PaymentWise3.columns[5].headerText ="BookingCount ";  
+				Grd_PaymentWise3.columns[6].headerText ="RoomNight"; 
+				Grd_PaymentWise3.columns[7].headerText ="Tariff"; 
+				Grd_PaymentWise3.columns[8].headerText ="BookingCount";  
+				Grd_PaymentWise3.columns[9].headerText ="RoomNight"; 
+				Grd_PaymentWise3.columns[10].headerText ="Tariff"; 
+				
+				Grd_PaymentWise3.columns[11].headerText ="BookingCount"; 
+				Grd_PaymentWise3.columns[12].headerText ="RoomNight"; 
+				Grd_PaymentWise3.columns[13].headerText ="Tariff";   
+				Grd_PaymentWise3.columns[14].headerText ="BookingCount"; 
+				Grd_PaymentWise3.columns[15].headerText ="RoomNight"; 
+				Grd_PaymentWise3.columns[16].headerText ="Tariff"; 
+				Grd_PaymentWise3.columns[17].headerText ="BookingCount";  
+				Grd_PaymentWise3.columns[18].headerText ="RoomNight";  
+				Grd_PaymentWise3.columns[19].headerText ="Tariff"; 
 			}
 			
 			public var 	FromDate:String="",ToDate:String="",ChkoutId:String="",Status:String="";
@@ -158,6 +277,7 @@
 				MonthwiseChangegrid();
 				PaymentModeChangegrid();
 				PrptyTypeChangegrid();
+				grid_Clear();
 				// if((Monthwise=="undefined"))
 				//{
 				//		Monthwise="CurrentMonth"; 
@@ -230,6 +350,7 @@
 					Grd_PaymentWise1.visible=true;
 					Grd_PaymentWise2.visible=false;
 					Grd_PaymentWise3.visible=false;
+					grid_Clear();
 				}
 				else if(Drp_Monthwise.selectedItem=="Last 3 Months")
 				{
@@ -238,6 +359,7 @@
 					Grd_PaymentWise1.visible=false;
 					Grd_PaymentWise2.visible=true;
 					Grd_PaymentWise3.visible=false;
+					grid_Clear();
 				}
 				else if(Drp_Monthwise.selectedItem=="Last 6 Months")
 				{
@@ -246,6 +368,7 @@
 					Grd_PaymentWise1.visible=false;
 					Grd_PaymentWise2.visible=false;
 					Grd_PaymentWise3.visible=true;
+					grid_Clear();
 				}
 			}
 			public var PaymentMode:String="";
@@ -305,9 +428,9 @@
 						sheet.setCell(1,0,'');
 						sheet.setCell(1,1,'CityName');
 						sheet.setCell(1,2,'PropertyName');
-						sheet.setCell(1,3,'BookingCount');
-						sheet.setCell(1,4,'RoomNight');
-						sheet.setCell(1,5,'Tariff');
+						sheet.setCell(1,3,'BookingCount-'+'\n'+Months);
+						sheet.setCell(1,4,'RoomNight-'+'\n'+Months);
+						sheet.setCell(1,5,'Tariff-'+'\n'+Months);
 						sheet.setCell(1,6,'StayPersons');
 						sheet.setCell(1,7,'NightCount');
 						sheet.setCell(1,8,'Total');
@@ -350,15 +473,15 @@
 							sheet.setCell(1,0,'');
 							sheet.setCell(1,1,'CityName');
 							//sheet.setCell(1,2,'PropertyName');
-							sheet.setCell(1,2,'BookingCount');
-							sheet.setCell(1,3,'RoomNight');
-							sheet.setCell(1,4,'Tariff');
-							sheet.setCell(1,5,'BookingCount');
-							sheet.setCell(1,6,'RoomNight');
-							sheet.setCell(1,7,'Tariff');
-							sheet.setCell(1,8,'BookingCount');
-							sheet.setCell(1,9,'RoomNight');
-							sheet.setCell(1,10,'Tariff');
+							sheet.setCell(1,2,'BookingCount-'+'\n'+Months1);
+							sheet.setCell(1,3,'RoomNight-'+'\n'+Months1);
+							sheet.setCell(1,4,'Tariff-'+'\n'+Months1);
+							sheet.setCell(1,5,'BookingCount-'+'\n'+Months2);
+							sheet.setCell(1,6,'RoomNight-'+'\n'+Months2);
+							sheet.setCell(1,7,'Tariff-'+'\n'+Months2);
+							sheet.setCell(1,8,'BookingCount-'+'\n'+Months3);
+							sheet.setCell(1,9,'RoomNight-'+'\n'+Months3);
+							sheet.setCell(1,10,'Tariff-'+'\n'+Months3);
 							sheet.setCell(1,11,'StayPersons');
 							sheet.setCell(1,12,'NightCount');
 							sheet.setCell(1,13,'Total');
@@ -407,25 +530,25 @@
 							sheet.setCell(1,0,'');
 							sheet.setCell(1,1,'CityName');
 							//sheet.setCell(1,2,'PropertyName');
-							sheet.setCell(1,2,'BookingCount'); 
-							sheet.setCell(1,3,'RoomNight');
-							sheet.setCell(1,4,'Tariff');
-							sheet.setCell(1,5,'BookingCount');
-							sheet.setCell(1,6,'RoomNight');
-							sheet.setCell(1,7,'Tariff'); 
-							sheet.setCell(1,8,'BookingCount');
-							sheet.setCell(1,9,'RoomNight');
-							sheet.setCell(1,10,'Tariff');
+							sheet.setCell(1,2,'BookingCount-'+'\n'+Months11); 
+							sheet.setCell(1,3,'RoomNight-'+'\n'+Months11);
+							sheet.setCell(1,4,'Tariff-'+'\n'+Months11);
+							sheet.setCell(1,5,'BookingCount-'+'\n'+Months21);
+							sheet.setCell(1,6,'RoomNight-'+'\n'+Months21);
+							sheet.setCell(1,7,'Tariff-'+'\n'+Months21); 
+							sheet.setCell(1,8,'BookingCount-'+'\n'+Months31);
+							sheet.setCell(1,9,'RoomNight-'+'\n'+Months31);
+							sheet.setCell(1,10,'Tariff-'+'\n'+Months31);
 							
-							sheet.setCell(1,11,'BookingCount');
-							sheet.setCell(1,12,'RoomNight');
-							sheet.setCell(1,13,'Tariff');
-							sheet.setCell(1,14,'BookingCount');
-							sheet.setCell(1,15,'RoomNight');
-							sheet.setCell(1,16,'Tariff');
-							sheet.setCell(1,17,'BookingCount');
-							sheet.setCell(1,18,'RoomNight');
-							sheet.setCell(1,19,'Tariff');
+							sheet.setCell(1,11,'BookingCount-'+'\n'+Months41);
+							sheet.setCell(1,12,'RoomNight-'+'\n'+Months41);
+							sheet.setCell(1,13,'Tariff-'+'\n'+Months41);
+							sheet.setCell(1,14,'BookingCount-'+'\n'+Months51);
+							sheet.setCell(1,15,'RoomNight-'+'\n'+Months51);
+							sheet.setCell(1,16,'Tariff-'+'\n'+Months51);
+							sheet.setCell(1,17,'BookingCount-'+'\n'+Months61);
+							sheet.setCell(1,18,'RoomNight-'+'\n'+Months61);
+							sheet.setCell(1,19,'Tariff-'+'\n'+Months61);
 							
 							sheet.setCell(1,20,'StayPersons');
 							sheet.setCell(1,21,'NightCount');
@@ -501,20 +624,20 @@
 			<s:Group x="-18" y="-3" width="100%" height="106">
 				
 				
-				<WrbComp:Button_HB  x="1082" y="29" Lable_val="Export" id="btn_Export"   click="Export(event)"> 
+				<WrbComp:Button_HB  x="1092" y="24" Lable_val="Export" id="btn_Export"   click="Export(event)"> 
 				</WrbComp:Button_HB>
-				<mx:Label x="308" y="16" width="76" height="23" text="Entity Wise" id="Lbl_Client"/>
+				<mx:Label x="288" y="16" width="76" height="23" text="Entity Wise" id="Lbl_Client"/>
 				
-				<mx:Label x="15" y="30" width="101" height="26" text="Select Range" />
-				<s:DropDownList id="Drp_Monthwise" x="118" y="30" width="154" height="21"
+				<mx:Label x="5" y="30" width="101" height="26" text="Select Range" />
+				<s:DropDownList id="Drp_Monthwise" x="108" y="30" width="154" height="21"
 								prompt="Current Month"  change="MonthwiseChangegrid()" >
 					<mx:ArrayCollection> 
-						<fx:String>CurrentMonth</fx:String> 
+						<fx:String>Current Month</fx:String> 
 						<fx:String>Last 3 Months</fx:String>
 						<fx:String>Last 6 Months</fx:String> 
 					</mx:ArrayCollection>
 				</s:DropDownList>
-				<s:DropDownList id="Drp_PaymentMode" x="745" y="53" width="166" height="21"
+				<s:DropDownList id="Drp_PaymentMode" x="725" y="53" width="166" height="21"
 								prompt="All" change="PaymentModeChangegrid()">
 					<mx:ArrayCollection> 
 						<fx:String>All</fx:String> 
@@ -523,7 +646,7 @@
 						<fx:String>Other Property</fx:String>
 					</mx:ArrayCollection>
 				</s:DropDownList>
-				<s:DropDownList id="Drp_PrptyType" x="745" y="12" width="166" height="21"
+				<s:DropDownList id="Drp_PrptyType" x="725" y="12" width="166" height="21"
 								prompt="Both"  change="PrptyTypeChangegrid()">
 					<mx:ArrayCollection> 
 						<fx:String>Both</fx:String> 
@@ -541,15 +664,19 @@
 				<mx:DateField id="DT_To" x="100" y="56" width="90" formatString="DD/MM/YYYY"
 				tabIndex="2" yearNavigationEnabled="true" /-->
 				
-				<mx:Label x="308" y="51" width="76" height="23" text="City Name"/>
-				<mx:Label x="628" y="14" width="90" height="23" text="Payment Type"/>
-				<mx:Label x="628" y="52" width="90" height="23" text="Property Mode"/>
-				<s:Image x="941" y="20" source="assets/a1.png" toolTip="Search" click="btn_Search_clickHandler()" tabIndex="5"/>
-				<s:Image x="1010" y="20" click="Clear()" source="assets/dust_bin1.png" toolTip="Clear"/>
-				<WrbHelpComp:HelpText x="406" y="16" depth="10" width="191" height="23" id="hlp_Client" onselection="{fnGetClient()}" pxSetColumnsWidth="226,0">
+				<mx:Label x="288" y="51" width="76" height="23" text="City Name"/>
+				<mx:Label x="608" y="14" width="90" height="23" text="Payment Type"/>
+				<mx:Label x="608" y="52" width="90" height="23" text="Property Mode"/>
+				<WrbComp:Button_HB   x="899" y="25" Lable_val="Search" id="btn_Search" toolTip="Search"  click="btn_Search_clickHandler()" tabIndex="5" > 
+				</WrbComp:Button_HB>
+				<WrbComp:Button_HB  x="995" y="25" Lable_val="Clear" id="Clears"  click="Clear()" tabIndex="6" toolTip="Clear" > 
+				</WrbComp:Button_HB>
+				<!--s:Image x="941" y="20" source="assets/a1.png" toolTip="Search" click="btn_Search_clickHandler()" tabIndex="5"/>
+				<s:Image x="1010" y="20" click="Clear()" source="assets/dust_bin1.png" toolTip="Clear"/-->
+				<WrbHelpComp:HelpText x="386" y="16" depth="10" width="191" height="23" id="hlp_Client" onselection="{fnGetClient()}" pxSetColumnsWidth="226,0">
 					
 				</WrbHelpComp:HelpText>
-				<WrbHelpComp:HelpText x="406" y="51" depth="1" width="191" height="23"  id="hlp_City" onselection="{fnGetCity()}" pxSetColumnsWidth="226,0">
+				<WrbHelpComp:HelpText x="386" y="51" depth="1" width="191" height="23"  id="hlp_City" onselection="{fnGetCity()}" pxSetColumnsWidth="226,0">
 				</WrbHelpComp:HelpText>
 				<WrbHelpComp:HelpText x="636" y="14" width="10" visible="false" id="hlp_Property" onselection="{fnGetProperty()}"  height="23" pxSetColumnsWidth="100,0">
 				</WrbHelpComp:HelpText>
@@ -560,7 +687,7 @@
 	</s:BorderContainer>
 	
 	<s:BorderContainer x="0" y="154" width="100%" height="406" id="bdr_Scroll" visible="true" borderVisible="false">
-		
+		<mx:Label x="542" y="-20" text="Reportdate" id="MonthSelection"/>
 		<s:HGroup width="100%" height="100%"> 
 			<s:BorderContainer x="0" y="0" width="100%" height="406"  visible="true" borderVisible="false"> 
 				<mx:DataGrid id="Grd_PaymentWise1" width="100%"  height="406" editable="false" tabIndex="3" horizontalScrollPolicy="off" verticalAlign="middle">

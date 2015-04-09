@@ -68,8 +68,11 @@
 					else
 					{
 						hlp_Client.enabled = false;
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{
 						hlp_Client.text = Ds_Objects.result.Tables.Table.Rows[0].ClientName;
 						ClientId = Ds_Objects.result.Tables.Table.Rows[0].Id; 
+						}
 					}
 				}
 				
@@ -86,15 +89,21 @@
 						if((Drp_PrptyType.selectedItem==""))
 						{
 							Drp_PrptyType.selectedItem="Both";
-						}
-						 	 
-							 
+						} 
 							if (Ds_Objects.result.Tables.Table.Rows.length > 0)
 							{
 								Grd_PaymentWise1.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+//								var Ac:ArrayCollection = new ArrayCollection();
+//								Ac = Grd_PaymentWise1.dataProvider as ArrayCollection;
+//								for(var i:int = 0; i <= 1; i++)
+//								{
+//									Grd_PaymentWise1.columns[0].headerText ="CityName"; 
+//								}
 							}   
-						 
-						 
+							if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
+							{
+								MonthSelection.text=Ds_Objects.result.Tables.Table1.Rows[0].Reportdate;
+							}   
 					}
 				}
 				catch(Exception)
@@ -324,9 +333,9 @@
 			<s:Group x="132" y="-3" width="100%" height="106">
 				
 				<mx:Label x="238" y="16" width="76" height="23" text="Entity Wise" id="Lbl_Client"/>
-				<WrbComp:Button_HB  x="1082" y="24" Lable_val="Export" id="btn_Export"   click="Export(event)"> 
+				<WrbComp:Button_HB  x="1088" y="24" Lable_val="Export" id="btn_Export"   click="Export(event)"> 
 				</WrbComp:Button_HB>
-				<s:DropDownList id="Drp_PaymentMode" x="725" y="53" width="166" height="21"
+				<s:DropDownList id="Drp_PaymentMode" x="717" y="53" width="166" height="21"
 								prompt="All" >
 					<mx:ArrayCollection> 
 						<fx:String>All</fx:String> 
@@ -335,7 +344,7 @@
 						<fx:String>Other Property</fx:String>
 					</mx:ArrayCollection>
 				</s:DropDownList>
-				<s:DropDownList id="Drp_PrptyType" x="725" y="12" width="166" height="21"
+				<s:DropDownList id="Drp_PrptyType" x="717" y="12" width="166" height="21"
 								prompt="Both" >
 					<mx:ArrayCollection> 
 						<fx:String>Both</fx:String> 
@@ -347,15 +356,20 @@
 							selectableRange="{{rangeEnd: new Date()}}" tabIndex="1" change="Change('Lbl_FDT')" 	yearNavigationEnabled="true"/>
 				<!--mx:Label x="603" y="20" height="29" text="City"/-->
 				<mx:Label x="14" y="57" text="To Date" id="Lbl_TDT"/>
+				<mx:Label x="554" y="98" text="Reportdate" id="MonthSelection"/>
 				<mx:Label x="14" y="15" width="64" height="16" text="From Date" id="Lbl_FDT"/>
 				<mx:DateField id="DT_To" x="100" y="56" width="90" formatString="DD/MM/YYYY"
 				tabIndex="2" yearNavigationEnabled="true"  change="Dt_toDate_changeHandler(event)"/>
 				
 				<mx:Label x="238" y="51" width="76" height="23" text="Property"/>
-				<mx:Label x="608" y="14" width="90" height="23" text="Payment Type"/>
-				<mx:Label x="608" y="55" width="90" height="23" text="Property Mode"/>
-				<s:Image x="921" y="15" source="assets/a1.png" toolTip="Search" click="btn_Search_clickHandler()" tabIndex="5"/>
-				<s:Image x="1010" y="15" click="Clear()" source="assets/dust_bin1.png" toolTip="Clear"/>
+				<mx:Label x="600" y="14" width="90" height="23" text="Payment Type"/>
+				<mx:Label x="600" y="55" width="90" height="23" text="Property Mode"/>
+				<WrbComp:Button_HB   x="899" y="25" Lable_val="Search" id="btn_Search" toolTip="Search"  click="btn_Search_clickHandler()" tabIndex="5" > 
+				</WrbComp:Button_HB>
+				<WrbComp:Button_HB  x="995" y="25" Lable_val="Clear" id="Clears"  click="Clear()" tabIndex="6" toolTip="Clear" > 
+				</WrbComp:Button_HB>
+				<!--s:Image x="921" y="15" source="assets/a1.png" toolTip="Search" click="btn_Search_clickHandler()" tabIndex="5"/>
+				<s:Image x="1010" y="15" click="Clear()" source="assets/dust_bin1.png" toolTip="Clear"/-->
 				<WrbHelpComp:HelpText x="336" y="16" depth="10" width="226" height="23" id="hlp_Client" onselection="{fnGetClient()}" pxSetColumnsWidth="226,0">
 					
 				</WrbHelpComp:HelpText>

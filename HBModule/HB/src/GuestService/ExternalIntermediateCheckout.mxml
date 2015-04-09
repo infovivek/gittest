@@ -79,25 +79,25 @@
 				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
 				GlobalXml += "</ROOT>";
 				// Rdlc Print
-				Str_ChkOut="http://localhost:6236/ExternalCheckOutTariff.aspx?";
-				Str_Serv="http://localhost:6236/GuestCheckOutService1.aspx?";
-				Str_Settle="http://localhost:6236/GuestCheckOutConsolidate1.aspx?";
-				Str_ChkOutEXT ="http://localhost:6236/ExternalCheckoutTACMail.aspx?";
+//				Str_ChkOut="http://localhost:6236/ExternalCheckOutTariff.aspx?";
+//				Str_Serv="http://localhost:6236/GuestCheckOutService1.aspx?";
+//				Str_Settle="http://localhost:6236/GuestCheckOutConsolidate1.aspx?";
+//				Str_ChkOutEXT ="http://localhost:6236/ExternalCheckoutTACMail.aspx?";
 				//				
 				//				Str_ExIntTar="http://localhost:4171/ExternalIntermediateCheckOutTariff.aspx?";
 				//				Str_ExIntServ="http://localhost:4171/ExternalIntermediateCheckoutService.aspx?";
 				//				Str_ExIntSettle="http://localhost:4171/ExternalIntermediateCheckoutConsolidate.aspx?";
 				//				Str_ExIntTAC ="http://localhost:4171/ExternalIntermediateTAC.aspx?";
 				
-//				Str_ChkOut="http://sstage.in/HBReport/ExternalCheckOutTariff.aspx?";
-//				Str_Serv="http://sstage.in/HBReport/GuestCheckOutService1.aspx?";
-//				Str_Settle="http://sstage.in/HBReport/GuestCheckOutConsolidate1.aspx?";
-//				Str_ChkOutEXT ="http://sstage.in/HBReport/ExternalCheckoutTACMail.aspx?";
+				Str_ChkOut="http://sstage.in/HBReport/ExternalCheckOutTariff.aspx?";
+				Str_Serv="http://sstage.in/HBReport/GuestCheckOutService1.aspx?";
+				Str_Settle="http://sstage.in/HBReport/GuestCheckOutConsolidate1.aspx?";
+				Str_ChkOutEXT ="http://sstage.in/HBReport/ExternalCheckoutTACMail.aspx?";
 				
-				Str_ExIntTar="http://sstage.in/HBReport/ExternalIntermediateCheckOutTariff.aspx?";
-				Str_ExIntServ="http://sstage.in/HBReport/ExternalIntermediateCheckoutService.aspx?";
-				Str_ExIntSettle="http://sstage.in/HBReport/ExternalIntermediateCheckoutConsolidate.aspx?";
-				Str_ExIntTAC ="http://sstage.in/HBReport/ExternalIntermediateTAC.aspx?";
+//				Str_ExIntTar="http://sstage.in/HBReport/ExternalIntermediateCheckOutTariff.aspx?";
+//				Str_ExIntServ="http://sstage.in/HBReport/ExternalIntermediateCheckoutService.aspx?";
+//				Str_ExIntSettle="http://sstage.in/HBReport/ExternalIntermediateCheckoutConsolidate.aspx?";
+//				Str_ExIntTAC ="http://sstage.in/HBReport/ExternalIntermediateTAC.aspx?";
 				
 				btn_Service.enabled=false;
 				Btn_Settlement.enabled=false;
@@ -121,8 +121,8 @@
 			
 			protected function Help():void
 			{				
-		//		useWeb("ExterIntermediateChkoutService","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId]);
-				useWeb("ExterIntermediateChkoutService","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65]);
+				useWeb("ExterIntermediateChkoutService","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,Global_AC[0].UsrId]);
+		//		useWeb("ExterIntermediateChkoutService","PageLoad_CUSTOM",[GlobalXml,"PageLoad","","","",0,0,0,65]);
 				//			useWeb("GuestCheckOut","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,0]);
 				Txt_ServiceBillAmt.editable=false;
 				Txt_ServiceVat.editable=false;
@@ -1651,6 +1651,18 @@
 										Txt_ConsolidateLoad.text=Ds_Objects.result.Tables.Table15.Rows[0].ConsolidateAmount;
 										Txt_ConsolidateOutStanding.text=Ds_Objects.result.Tables.Table15.Rows[0].ConsolidateAmount;
 									}
+									if (Ds_Objects.result.Tables.Table17.Rows.length > 0)
+									{
+										lbl_CreditTariff.text=Ds_Objects.result.Tables.Table16.Rows[0].CreditAmountTariff;
+									}
+									if (Ds_Objects.result.Tables.Table18.Rows.length > 0)
+									{
+										lbl_CreditService.text=Ds_Objects.result.Tables.Table17.Rows[0].CreditAmountService;
+									}
+									if (Ds_Objects.result.Tables.Table19.Rows.length > 0)
+									{
+										lbl_CreditConTariff.text=Ds_Objects.result.Tables.Table18.Rows[0].CreditConAmount;
+									}
 									OpenCheckoutBillButton();
 								}
 								if(RB=="Bill to Company (BTC)")
@@ -1715,6 +1727,18 @@
 										Txt_ConsolidateLoad.text=Ds_Objects.result.Tables.Table15.Rows[0].ConsolidateAmount;
 										Txt_ConsolidateOutStanding.text=Ds_Objects.result.Tables.Table15.Rows[0].ConsolidateAmount;
 									}
+									if (Ds_Objects.result.Tables.Table17.Rows.length > 0)
+									{
+										lbl_CreditTariff.text=Ds_Objects.result.Tables.Table17.Rows[0].CreditAmountTariff;
+									}
+									if (Ds_Objects.result.Tables.Table18.Rows.length > 0)
+									{
+										lbl_CreditService.text=Ds_Objects.result.Tables.Table18.Rows[0].CreditAmountService;
+									}
+									if (Ds_Objects.result.Tables.Table19.Rows.length > 0)
+									{
+										lbl_CreditConTariff.text=Ds_Objects.result.Tables.Table19.Rows[0].CreditConAmount;
+									}
 									OpenCheckoutBillButton();
 								}
 								
@@ -1777,6 +1801,18 @@
 										Txt_ConAdvance.text=Ds_Objects.result.Tables.Table15.Rows[0].ChkinAdvance;
 										Txt_ConsolidateLoad.text=Ds_Objects.result.Tables.Table15.Rows[0].ConsolidateAmount;
 										Txt_ConsolidateOutStanding.text=Ds_Objects.result.Tables.Table15.Rows[0].ConsolidateAmount;
+									}
+									if (Ds_Objects.result.Tables.Table17.Rows.length > 0)
+									{
+										lbl_CreditTariff.text=Ds_Objects.result.Tables.Table17.Rows[0].CreditAmountTariff;
+									}
+									if (Ds_Objects.result.Tables.Table18.Rows.length > 0)
+									{
+										lbl_CreditService.text=Ds_Objects.result.Tables.Table18.Rows[0].CreditAmountService;
+									}
+									if (Ds_Objects.result.Tables.Table19.Rows.length > 0)
+									{
+										lbl_CreditConTariff.text=Ds_Objects.result.Tables.Table19.Rows[0].CreditConAmount;
 									}
 									OpenCheckoutBillButton();
 								}
@@ -14678,7 +14714,7 @@
 						<s:TextInput id="Txt_Pname" x="96" y="25" width="159"/>
 						<mx:Label x="16" y="53" text="Address"/>
 						<mx:Label x="329" y="53" text="Address"/>
-						<s:TextArea id="Txt_address" x="96" y="53" width="185" height="60" depth="10" />
+						<s:TextArea id="Txt_address" x="96" y="53" width="185" height="38" depth="10" />
 						<mx:Label x="7" y="3" text="Tariff Payments" color="Red"/>
 						<mx:Label x="316" y="3" text="Service Payments" color="Red"/>
 						<WrbComp:Button_HB x="134" y="160" width="149" Lable_val="Add Payment" id="btn_TarPay" click="btn_TarPay_clickHandler(event)">
@@ -14686,15 +14722,19 @@
 						<WrbComp:Button_HB x="444" y="160" width="149" Lable_val="Add Payment" id="btn_SerPay" click="btn_SerPay_clickHandler(event)">
 						</WrbComp:Button_HB>
 						<s:TextInput x="418" y="25" width="159" id="Txt_SName"/>
-						<s:TextInput x="418" y="53" width="175" height="60" id="Txt_SAddress"/>
-						<mx:Label id="lbl_tariffpaid" x="118" y="125" width="78"/>
-						<mx:Label id="lbl_tariffpaymode" x="198" y="125" width="94"/>
-						<mx:Label x="12" y="125" text="Amount Paid"/>
-						<mx:Label x="94" y="125" width="26" text="Rs:"/>
-						<mx:Label x="329" y="125" text="Amount Paid"/>
-						<mx:Label x="416" y="125" width="26" text="Rs:"/>
-						<mx:Label id="lbl_ServicePaid" x="438" y="125" width="72" text=""/>
-						<mx:Label id="lbl_ServicePayMode" x="510" y="125" width="90"/>
+						<s:TextInput x="418" y="53" width="185" height="43" id="Txt_SAddress"/>
+						<mx:Label id="lbl_tariffpaid" x="118" y="130" width="78"/>
+						<mx:Label id="lbl_tariffpaymode" x="198" y="130" width="94"/>
+						<mx:Label x="12" y="130" text="Amount Paid"/>
+						<mx:Label x="94" y="130" width="26" text="Rs:"/>
+						<mx:Label x="329" y="130" text="Amount Paid"/>
+						<mx:Label x="416" y="130" width="26" text="Rs:"/>
+						<mx:Label id="lbl_ServicePaid" x="438" y="130" width="72" text=""/>
+						<mx:Label id="lbl_ServicePayMode" x="510" y="130" width="90"/>
+						<mx:Label x="12" y="99" text="Credit Note Amount Rs"/>
+						<mx:Label id="lbl_CreditTariff" x="151" y="99" width="130" textAlign="right" />
+						<mx:Label x="326" y="99" text="Credit Note Amount Rs"/>
+						<mx:Label id="lbl_CreditService" x="462" y="99" width="133" textAlign="right"/>
 					</s:BorderContainer>
 					<s:BorderContainer x="23" y="215" width="602" height="200" id="bdr_Consolidate" borderVisible="false" backgroundColor="#fbf9f9" 
 									   visible="false">
@@ -14702,13 +14742,15 @@
 						<mx:Label x="47" y="27" text="Payee Name" />
 						<s:TextInput  x="147" y="27" width="159" id="Txt_CName"/>
 						<mx:Label x="47" y="55" text="Address"/>
-						<s:TextArea  x="147" y="55" width="185" height="67" id="Txt_CAddress"/>
+						<s:TextArea  x="147" y="55" width="185" height="36" id="Txt_CAddress"/>
 						<WrbComp:Button_HB x="186" y="163" width="149" Lable_val="Add Payment" id="btn_ConPay" click="btn_ConPay_clickHandler(event)">
 						</WrbComp:Button_HB>
 						<mx:Label x="47" y="130" text="Amount Paid :"/>
 						<mx:Label x="131" y="130" text="Rs :"/>
 						<mx:Label id="lbl_ConPaid" x="161" y="130" width="86" text=""/>
 						<mx:Label x="251" y="130" width="84" text="" id="lbl_ConPaymode"/>
+						<mx:Label x="48" y="101" text="Credit Note Amount Rs"/>
+						<mx:Label id="lbl_CreditConTariff" x="187" y="101" width="130" textAlign="right" />
 					</s:BorderContainer>
 				</s:BorderContainer>
 				<mx:Label x="5" y="93" text="Property"/>

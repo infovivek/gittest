@@ -10,7 +10,7 @@ namespace HB.Entity
 {
     public class User
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
         public string LoginUserName { get; set; }
         public int UserGroupId { get; set; }
         public string UserCode { get; set; }
@@ -30,7 +30,7 @@ namespace HB.Entity
             XmlDocument document = new XmlDocument();
             document.LoadXml(data);
             User user = new User();
-            user.Id = Convert.ToInt32(document.SelectSingleNode("//GlobalXml").Attributes["UsrId"].Value);
+            user.Id = document.SelectSingleNode("//GlobalXml").Attributes["UsrId"].Value;
             user.LoginUserName = document.SelectSingleNode("//GlobalXml").Attributes["UsrName"].Value;
             user.SctId = Convert.ToInt32(document.SelectSingleNode("//GlobalXml").Attributes["SctId"].Value);
             user.ScreenName = document.SelectSingleNode("//GlobalXml").Attributes["ScrNM"].Value;

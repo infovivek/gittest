@@ -420,8 +420,13 @@ namespace HB.Dao
                 }
                 command.Parameters.Add("@UserId", SqlDbType.BigInt).Value = user.Id;
                 ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
+                //
                 if (data[1].ToString() == "BookingDelete")
                 {
+                    if (ds.Tables[0].Rows[0][2].ToString() == "Canceled")
+                    {
+                        DataSet DS22 = new SMSCancel().FnSMSBookingCancel(Convert.ToInt32(data[3].ToString()), user);
+                    }
                     if (data[5].ToString() == "true")
                     {
 
@@ -651,6 +656,9 @@ namespace HB.Dao
                            command.Parameters.Add("@Remarks", SqlDbType.NVarChar).Value = data[4].ToString();
                            command.Parameters.Add("@UserId", SqlDbType.BigInt).Value = user.Id;
                            ds= new WrbErpConnection().ExecuteDataSet(command, "");
+                           //
+                           DataSet DS22 = new SMSCancel().FnSMSGuestCancel(Convert.ToInt32(data[3].ToString()),Convert.ToInt32(document.SelectNodes("//HdrXml")[i].Attributes["Id"].Value), user);
+                           //
                        }
 
                    }

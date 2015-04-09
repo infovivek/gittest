@@ -36,6 +36,33 @@ private function BrowserData():Array
  
 private function useWeb(Action:String,CtrlNm:String,ParmArry:Array):void 
 {
+	/*var browserUrl:String = ExternalInterface.call("eval", "window.location.href");
+	var arr:Array =browserUrl.split("/");	
+	var arr1:Array =browserUrl.split("?");
+	var urlstr:String= ParmArry[0].toString();	
+	var urlxml:XML= XML(urlstr);  
+	
+	var Path:String=urlxml.children().attribute("ServicePath").toString();
+	ws = new WebService(); 
+	if(Path!="")
+	{ 
+		urlxml.GlobalXml.@UsrId =  arr1[1].toString();
+		ParmArry[0]=urlxml.toString();
+		ws.wsdl=arr[1].toString()+"/"+Path+"/HBService.asmx?WSDL"; 
+	}
+	else
+	{   
+		urlxml.GlobalXml.@UsrId = arr1[1].toString();
+		ParmArry[0]=urlxml.toString();
+		ws.wsdl="http://hbstay.in/HBService/HBService.asmx?WSDL"; 
+		// ws.wsdl="http://localhost:3654/HBService.asmx?WSDL"; 
+	}	 
+	ws.description=CtrlNm;
+	ws.addEventListener("result", echoResultHandler);
+	ws.addEventListener("fault",  faultHandle);
+	ws.loadWSDL();
+	CtrlVal=CtrlNm*/
+		
 	var browserUrl:String = ExternalInterface.call("eval", "window.location.href");
 	var arr:Array =browserUrl.split("/");		
 	var urlstr:String= ParmArry[0].toString();
@@ -50,7 +77,7 @@ private function useWeb(Action:String,CtrlNm:String,ParmArry:Array):void
 	}
 	else
 	{ 
-	ws.wsdl="http://localhost:6239/HBService.asmx?WSDL"; 
+	ws.wsdl="http://localhost:3654/HBService.asmx?WSDL"; 
 	//	ws.wsdl="http://192.168.1.14/HBService.asmx?WSDL"; 
 	}	
 	//ws.wsdl="http://localhost/HMS_Service/HBService.asmx?WSDL"; 

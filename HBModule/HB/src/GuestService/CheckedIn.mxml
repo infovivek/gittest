@@ -66,7 +66,7 @@
 			public var Save_Flag:Boolean=true; 
 			public var uploadURL:URLRequest = new URLRequest();
 			public var BTCSId:Number=0;
-			public var Roles:String="";
+			public var Roles:String="",gname:String="";
 			
 			
 			//public var Num1:String="",Num2:String="",Num3:String="",Num4:String="",Num5:String="";
@@ -135,8 +135,8 @@
 			public function Help():void
 			{				
 				
-				useWeb("GuestCheckIn","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,0,0,0,65]);
-		//		useWeb("GuestCheckIn","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,0,0,0,Global_AC[0].UsrId]);
+		//		useWeb("GuestCheckIn","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,0,0,0,65]);
+				useWeb("GuestCheckIn","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,0,0,0,Global_AC[0].UsrId]);
 				//			useWeb("GuestCheckIn","PageLoad_CUSTOM",[GlobalXml,"PageLoad","",0,0,0,0,0,0,0]);
 			}
 			
@@ -309,7 +309,7 @@
 					{ 
 						Txt_BookingLvl.text=Ds_Objects.result.Tables.Table.Rows[0].EmpCode;
 						Txt_Nationality.text=Ds_Objects.result.Tables.Table.Rows[0].Nationality;
-						Txt_EmailId.text=Ds_Objects.result.Tables.Table.Rows[0].EmailId;
+		//				Txt_EmailId.text=Ds_Objects.result.Tables.Table.Rows[0].EmailId;
 						//	Txt_MobileNo.text=Ds_Objects.result.Tables.Table.Rows[0].MobileNo;
 						hlp_Room.text = Ds_Objects.result.Tables.Table.Rows[0].RoomType;
 						
@@ -375,7 +375,7 @@
 						}
 						
 						
-						Txt_MobileNo.text = Ds_Objects.result.Tables.Table.Rows[0].MobileNo;
+		//				Txt_MobileNo.text = Ds_Objects.result.Tables.Table.Rows[0].MobileNo;
 						Txt_Special.text = Ds_Objects.result.Tables.Table.Rows[0].Designation;
 						Txt_Nationality.text = Ds_Objects.result.Tables.Table.Rows[0].Nationality;
 						Txt_Apartment.text=Ds_Objects.result.Tables.Table.Rows[0].ApartmentType;
@@ -754,11 +754,27 @@
 					ErrStr=ErrStr+"*  ID Proof is Required.\n";
 				}
 				
+				
 				if(ErrStr!="")
 				{
 					alignAlert(Alert.show(ErrStr,"Required Fields !",Alert.OK,this,null,iconErrLarge),10);
 					return;					
 				}
+				
+//				if(Hlp_Reservation.text==gname)
+//				{
+//					var guest:String =gname;
+//					var guestn=Hlp_Reservation.text;
+//					
+//				}
+//				else
+//				{
+//					var guest:String =gname;
+//					var guestn=Hlp_Reservation.text;
+//					alignAlert(Alert.show("Do you want Generate ?", "Warning",Alert.YES | Alert.NO, null,
+//						FnUpdate, iconWarning, Alert.NO),10,"");
+//					
+//				}
 				var Ac_Hdr:ArrayCollection=new ArrayCollection
 					([{
 						
@@ -781,6 +797,8 @@
 				var HdrXml:String = ObjToXmlStr_Comm(Ac_Hdr,"HdrXml");		
 				useWeb("GuestCheckIn","Save_CUSTOM",[GlobalXml,HdrXml,Str_Image]);
 			}
+			
+			
 			
 			protected function FnClr():void
 			{
@@ -878,6 +896,7 @@
 				{
 					Hlp_Reservation.text=Hlp_Reservation.Select_Row.CheckInGuest;	
 					Id = Hlp_Reservation.Select_Row.BookingAssGuestId;	
+				  gname=Hlp_Reservation.Select_Row.CheckInGuest;
 					//	Id=Hlp_Reservation.Select_Row.Id;
 					ClientId=Hlp_Reservation.Select_Row.ClientId;
 					//	Txt_Property.text=Hlp_Reservation.Select_Row.Property;
@@ -911,6 +930,8 @@
 					ApartmentId=Hlp_Reservation.Select_Row.ApartmentId;
 					BedId=Hlp_Reservation.Select_Row.BedId;
 					Txt_Type.text=Hlp_Reservation.Select_Row.TYPE;
+					Txt_EmailId.text=Hlp_Reservation.Select_Row.Email;
+					Txt_MobileNo.text=Hlp_Reservation.Select_Row.MobileNo;
 					
 					lbl_RoomNo.visible=true;
 					Tcl_Arrival.setTime = new Date("11/11/11,"+ExpectedChkInTime);
@@ -927,25 +948,27 @@
 					Txt_Special.editable=true;
 					Txt_Nationality.editable=true;
 					btn_AvlService.enabled=true;
-					Txt_EmailId.editable=true;
+					Txt_EmailId.editable=false;
 				}
 				else
 				{
+					
 					hlp_Room.enabled=false;
 					Txt_EmailId.editable=false;
 					Txt_Desginat.editable=false;
 					Txt_BookingLvl.editable=false;
 					Txt_Nationality.editable=false;
-					Txt_MobileNo.editable=false;
+					Txt_MobileNo.editable=true;
 					Txt_Purpose.editable=false;
-					Txt_IDProof.editable=false;
+					Txt_IDProof.editable=true;
 					Txt_Remarks.editable=false;
 					Txt_AdvanceAmount.editable=false;
 					Dt_ArrivalDate.editable=false;
 					Txt_IDProof.editable=false;
 					Txt_Property.editable=false;
 					Txt_AdvanceAmount.editable=false;
-					Hlp_Reservation.fnClear();ReservationId=0;				
+					Hlp_Reservation.fnClear();
+					ReservationId=0;				
 					Txt_Mode.text="";Txt_ResAdvAmt.text="";Hlp_Name.fnClear();
 					Txt_MobileNo.text="";
 					Tcl_Arrival.enabled=false;
@@ -1070,7 +1093,7 @@
 					
 					useWeb("GuestCheckIn","Guest_CUSTOM",[GlobalXml,'GuestLoad','',0,0,0,0,PropertyId,SSPId,Global_AC[0].UsrId]);
 					
-		//			useWeb("GuestCheckIn","Guest_CUSTOM",[GlobalXml,'GuestLoad','',0,0,0,0,PropertyId,SSPId,65]);
+			//		useWeb("GuestCheckIn","Guest_CUSTOM",[GlobalXml,'GuestLoad','',0,0,0,0,PropertyId,SSPId,65]);
 					Hlp_Reservation.enabled=true;
 					
 					Hlp_Reservation.text="";
@@ -1294,6 +1317,22 @@
 				//	Hlp_Reservation.dataProvider=null;
 			}
 			
+			
+			
+			protected function Update():void
+			{
+				// TODO Auto-generated method stub
+				txt_GuestNameEdit1.text
+				txt_GuestNameEdit2.text
+				txt_MobileNoEdit1.text
+				txt_MobileNoEdit2.text
+				txt_EmailEdit1.text
+				txt_EmailEdit2.text
+				
+			}
+			
+			
+			
 		]]>
 	</fx:Script>
 	<s:VGroup x="0" y="0" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle" >
@@ -1301,7 +1340,7 @@
 						   borderVisible="false">
 			<s:Group x="3" y="1" width="904" height="518">
 				<s:BorderContainer x="532" y="395" height="21" width="64" backgroundColor="#fbf9f9" visible="false">
-					<mx:LinkButton x="0" y="60" label="Capture" click="TakePicture()" cornerRadius="5"/>	
+					<mx:LinkButton x="0" y="60" label="Capture"  cornerRadius="5"/>	
 				</s:BorderContainer>					
 				<s:BorderContainer x="0" y="0" width="273" height="145" depth="50" backgroundColor="#fbf9f9" visible="false" >
 					<s:BorderContainer height="5" width="271" styleName="Brd_Hdr"  backgroundColor="#eb1c24"/>
@@ -1411,7 +1450,7 @@
 								 restrict="0-9" textAlign="right" tabIndex="30"/>
 				</s:BorderContainer>
 				<mx:VideoDisplay x="513" y="337" id="VD" width="100" height="100" 
-								 creationComplete="initCamera();" visible="false"/>
+								  visible="false"/>
 				<mx:Image id="Image" x="399" y="338" width="100" height="100" source="Assets/user.jpg" visible="false"/>
 				
 				<s:HGroup x="304" y="488" width="338" height="40" horizontalAlign="right" verticalAlign="middle"
@@ -1431,8 +1470,8 @@
 				</s:Scroller>
 				</s:BorderContainer> -->
 				<mx:HRule x="0" y="481" width="100%" strokeColor="#eb1c24"/>
-				<s:Label x="60" y="423" text="Advance Amount"/>
-				<s:Label x="60" y="359" text="Payment Mode"/>
+				<s:Label x="60" y="423" text="Advance Amount" visible="false"/>
+				<mx:Label x="60" y="353" text="Payment Mode"/>
 				<s:HGroup x="200" y="355" width="149" horizontalAlign="center" verticalAlign="middle" 
 						  gap="50" enabled="false">
 					<s:RadioButton label="Direct" groupName="Mode" value="0"
@@ -1441,8 +1480,8 @@
 								   id="BTC" buttonMode="true"/>
 				</s:HGroup>
 				<s:TextInput x="200" y="421" width="149" height="20" tabIndex="23" 
-							 restrict="0-9" id="Txt_AdvanceAmount" textAlign="right" prompt="0.00"/>
-				<mx:DateField id="Dt_ArrivalDate" x="200" y="97" width="112" height="20"
+							 restrict="0-9" id="Txt_AdvanceAmount" textAlign="right" prompt="0.00" visible="false"/>
+				<mx:DateField id="Dt_ArrivalDate" x="200" y="98" width="112" height="20"
 							  formatString="DD/MM/YYYY" tabIndex="31" enabled="false"
 							  selectableRange="{{rangeEnd: new Date()}}" 
 							  
@@ -1450,7 +1489,7 @@
 							  styleName="DisabledDateField" yearNavigationEnabled="true"/>  
 				<!--disabledDays="{[0]}"  -->
 				
-				<s:Label x="60" y="136" text="Arrival Time"/>
+				<mx:Label x="60" y="132" text="Arrival Time"/>
 				<WrbComp:TimeControl id="Tcl_Arrival" x="200" y="125" width="102" enabled="false"
 									 tabIndex="32" ShortTimeFormat="true"/>
 				<s:DropDownList x="304" y="129" width="55" height="23" id="Ddl_AMPM"
@@ -1460,63 +1499,57 @@
 						<fx:String>PM</fx:String>
 					</mx:ArrayCollection>
 				</s:DropDownList>
-				<s:TextInput x="637" y="233" width="200" id="Txt_Property" editable="false"/>
-				<s:Label x="500" y="237" text="Property"/>
-				<s:TextInput id="Txt_CheckInNo" x="637" y="69" width="200" height="20"
+				<s:TextInput x="637" y="242" width="200" id="Txt_Property" editable="false"/>
+				<mx:Label x="500" y="242" text="Property"/>
+				<s:TextInput id="Txt_CheckInNo" x="637" y="67" width="200" height="20"
 							 editable="false" focusEnabled="false"/>
 				<s:Label x="60" y="153" text="Booking Level" visible="false"/>
-				<s:Label x="500" y="73" text="Check In No"/>
+				<mx:Label x="500" y="67" text="Check In No"/>
 				<s:TextInput id="Txt_BookingLvl" x="200" y="151" width="200" height="20"
 							 tabIndex="10" restrict="0-9" maxChars="15" visible="false"/>
-				<s:Label x="60" y="71" text="Guest Name"/>
-				<WrbHelpComp:HelpText id="Hlp_Reservation" 
-									  x="200" y="67" width="200"
-									  height="20" pxSetHeight="183" depth="46" pxTabIndex="1" 
-									  pxSetColumnsWidth="210,210,210,210,210,210,210,210,120,0,0,0,0"											  
-									  onselection="{OnSelectionBooking()}" tabIndex="2" > 
-				</WrbHelpComp:HelpText> 
-				<s:Label x="60" y="246" text="Email Id"/>
-				<s:TextInput id="Txt_EmailId" x="200" y="243" width="200" height="20"
+				<mx:Label x="60" y="67" text="Guest Name"/>
+				<mx:Label x="60" y="242" text="Email Id"/>
+				<s:TextInput id="Txt_EmailId" x="200" y="242" width="200" height="20"
 							 tabIndex="10"  editable="false"/>
-				<s:Label x="60" y="307" text="Nationality"/>
+				<mx:Label x="60" y="305" text="Nationality"/>
 				<s:TextInput id="Txt_Nationality" x="200" y="305" width="200" height="20"
 							 tabIndex="10" editable="false"/>
 				<s:Label x="189" y="219" text="*" styleName="ReqLable" color="red"/>
 				<s:Label x="190" y="68" text="*" styleName="ReqLable" color="red"/>
 				<s:Label x="190" y="37" text="*" styleName="ReqLable" color="red"/>
 				<s:Label x="189" y="98" text="*" styleName="ReqLable" color="red"/>
-				<s:TextInput id="Txt_MobileNo" x="200" y="215" width="200" height="20"
+				<s:TextInput id="Txt_MobileNo" x="200" y="212" width="200" height="20"
 							 tabIndex="9" restrict="0-9" maxChars="11"/>
-				<s:Label x="60" y="216" text="Mobile No"/>
-				<s:TextInput id="Txt_Special" x="637" y="297" width="200" height="20"
+				<mx:Label x="60" y="212" text="Mobile No"/>
+				<s:TextInput id="Txt_Special" x="637" y="305" width="200" height="20"
 							 tabIndex="10"  editable="false"/>
-				<s:Label x="190" y="280" text="*" styleName="ReqLable" color="red"/>
-				<s:Label x="60" y="278" text="ID Proof"/>
-				<s:TextInput id="Txt_IDProof" x="200" y="273" width="200" height="20"
+				<s:Label x="190" y="275" text="*" styleName="ReqLable" color="red"/>
+				<mx:Label x="60" y="272" text="ID Proof"/>
+				<s:TextInput id="Txt_IDProof" x="200" y="272" width="200" height="20"
 							 tabIndex="12" editable="false"/>
 				<!--	<s:DropDownList x="637" y="111" width="200" id="Drp_Roomload" change="ChangeRoomload(event)"
 				prompt="Select RoomNo"	visible="true"></s:DropDownList> -->
-				<s:Label x="500" y="177" width="87" text="Room" id="lbl_RoomNo" visible="true"/>
+				<mx:Label x="500" y="181" width="87" text="Room" id="lbl_RoomNo" visible="true"/>
 				<s:Label x="26" y="13" text="Booking Information" color="Red"/>
 				<s:Label x="26" y="164" text="Guest Information" color="Red"/>
 				<s:Label x="26" y="334" text="Tariff Information" color="Red"/>
-				<s:Label x="60" y="103" text="Check In Date"/>
-				<s:Label x="500" y="107" text="Check Out Date"/>
-				<mx:DateField x="637" y="101" width="112" id="Dt_ChkoutDate" formatString="DD/MM/YYYY"
+				<mx:Label x="60" y="98" text="Check In Date"/>
+				<mx:Label x="500" y="98" text="Check Out Date"/>
+				<mx:DateField x="637" y="98" width="112" id="Dt_ChkoutDate" formatString="DD/MM/YYYY"
 							  enabled="false"/>
 				<s:Label x="60" y="208" text="Guest Name" visible="false"/>
 				<s:TextInput id="Txt_GuestName" x="200" y="204" width="200" height="20" editable="false" visible="false"/>
-				<s:Label x="60" y="188" text="Client Name"/>
-				<s:TextInput id="Txt_ClientName" x="200" y="186" width="200" editable="false"/>
-				<s:Label x="500" y="302" text="Designation"/>
-				<s:Label x="60" y="388" text="Tariff"/>
-				<s:TextInput x="200" y="386" width="149" id="Txt_Tariff" textAlign="right" restrict="0-9" editable="false" prompt="0.00"/>
-				<WrbHelpComp:HelpText x="637" y="173" width="200" id="hlp_Room" onselection="{OnSelectionRoom()}"
+				<mx:Label x="60" y="181" text="Client Name"/>
+				<s:TextInput id="Txt_ClientName" x="200" y="181" width="200" editable="false" />
+				<mx:Label x="500" y="305" text="Designation"/>
+				<mx:Label x="60" y="388" text="Tariff"/>
+				<s:TextInput x="200" y="388" width="149" id="Txt_Tariff" textAlign="right" restrict="0-9" editable="false" prompt="0.00"/>
+				<WrbHelpComp:HelpText x="637" y="181" width="200" id="hlp_Room" onselection="{OnSelectionRoom()}"
 									  pxSetColumnsWidth="198,0,0" depth="10" visible="true" enabled="false">
 				</WrbHelpComp:HelpText>
-				<s:Label x="500" y="39" text="Booking Code" visible="true"/>
+				<mx:Label x="500" y="36" text="Booking Code" visible="true"/>
 				<s:TextInput x="637" y="36" width="200" height="20" id="Txt_BookingCode" editable="false"/>
-				<s:Label x="60" y="39" text="Property"/>
+				<mx:Label x="60" y="36" text="Property"/>
 				<WrbHelpComp:HelpText x="200" y="36" width="200" id="hlp_Property" pxSetColumnsWidth="200,0"
 									  onselection="{OnSelectionProperty()}" depth="100" tabIndex="1">
 				</WrbHelpComp:HelpText>
@@ -1549,16 +1582,16 @@
 					</s:Group>
 					
 				</s:Panel>
-				<s:Label x="500" y="271" text="Occupancy"/>
-				<s:TextInput x="637" y="266" width="200" id="Txt_Occupancy" editable="false"/>
+				<mx:Label x="500" y="272" text="Occupancy"/>
+				<s:TextInput x="637" y="272" width="200" id="Txt_Occupancy" editable="false"/>
 				<s:TextInput x="659" y="18" id="Txt_RackTariffsingle" editable="false" visible="false"/>
 				<s:TextInput x="500" y="18" id="Txt_RackTariffDouble" editable="false" visible="false"/>
 				<s:Label x="500" y="186" text="Apartment" id="lbl_Apartment" visible="false"/>
 				<s:TextInput x="637" y="183" width="200" id="Txt_Apartment" editable="false" visible="false"/>
-				<s:Label x="500" y="206" text="Bed" id="lbl_bed" visible="true" />
-				<s:TextInput x="637" y="203" width="200" id="Txt_Bed" editable="false" visible="true"/>
-				<s:Label x="500" y="144" text="Type"/>
-				<s:TextInput x="637" y="140" width="200" id="Txt_Type" editable="false"/>
+				<mx:Label x="500" y="212" text="Bed" id="lbl_bed" visible="true" />
+				<s:TextInput x="637" y="212" width="200" id="Txt_Bed" editable="false" visible="true"/>
+				<mx:Label x="500" y="132" text="Type"/>
+				<s:TextInput x="637" y="132" width="200" id="Txt_Type" editable="false"/>
 				<s:TextInput x="366" y="99" id="Txt_PropertyType" editable="false" visible="false"/>
 				<mx:Panel x="528" y="328" height="73" title="Image Uploader">
 					<mx:ControlBar>
@@ -1576,6 +1609,31 @@
 				<WrbComp:SaveControl x="244" y="491" id="btn_Sctrl" docRefresh="btn_Sctrl_docRefreshHandler()">
 				</WrbComp:SaveControl>
 				<s:TextInput x="435" y="441" id="Txt_TariffPaymentMode" visible="false"/>
+				<WrbHelpComp:HelpText id="Hlp_Reservation"  x="200" y="67" width="200"
+									  height="20" pxSetHeight="183" depth="46" pxTabIndex="1" 
+									  pxSetColumnsWidth="0,0,200,0,0,200,200,0,0,0,200,0,0,0,0,0"											  
+									  onselection="{OnSelectionBooking()}" tabIndex="2" >
+				</WrbHelpComp:HelpText>
+				<WrbComp:Button_HB x="489" y="417" width="160"  id="Chg_guestdtls" Lable_val="Guest Edit" visible="false" >
+				</WrbComp:Button_HB>
+				<s:Panel x="101" y="29" width="721" height="229" visible="false">
+					<mx:Label x="16" y="35" text="1.Guest Name"/>
+					<s:TextInput x="111" y="35" id="txt_GuestNameEdit1"/>
+					<mx:Label x="476" y="35" text="EmailId"/>
+					<s:TextInput x="552" y="35" width="147" id="txt_EmailEdit1"/>
+					<mx:Label x="16" y="88" text="2.Guest Name"/>
+					<s:TextInput x="111" y="88" id="txt_GuestNameEdit2"/>
+					<mx:Label x="250" y="35" text="Mobile No" />
+					<s:TextInput x="338" y="35" id="txt_MobileNoEdit1"/>
+					<mx:Label x="250" y="88" text="Mobile No"/>
+					<s:TextInput x="338" y="88" id="txt_MobileNoEdit2"/>
+					<mx:Label x="476" y="88" text="EmailId"/>
+					<s:TextInput x="552" y="88" width="147" id="txt_EmailEdit2"/>
+					<WrbComp:Button_HB x="250" y="137" width="112" click="Update()">
+					</WrbComp:Button_HB>
+					<WrbComp:Button_HB x="397" y="137" width="117">
+					</WrbComp:Button_HB>
+				</s:Panel>
 			</s:Group>
 		</s:BorderContainer>
 	</s:VGroup>	

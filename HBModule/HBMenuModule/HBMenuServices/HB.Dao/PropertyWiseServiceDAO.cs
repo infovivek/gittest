@@ -32,7 +32,7 @@ namespace HB.Dao
             command.Parameters.Add("@ChkMode", SqlDbType.Int).Value = Convert.ToInt32(data[8].ToString());
             command.Parameters.Add("@PrptyType", SqlDbType.NVarChar).Value = data[9].ToString();
             command.Parameters.Add("@MonthWise", SqlDbType.Int).Value = Convert.ToInt32(data[10].ToString());
-            command.Parameters.Add("@userId", SqlDbType.Int).Value = Convert.ToInt32(user.Id);
+            command.Parameters.Add("@userId", SqlDbType.NVarChar).Value =Convert.ToString(user.Id );
             return new WrbErpConnection().ExecuteDataSet(command, UserData);
         }
     }

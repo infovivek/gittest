@@ -1265,7 +1265,7 @@
 				}
 				if(GradeId=="0")
 				{
-					if((arrObj.FirstName!=arrObj.OldFirstname)||(arrObj.GuestId==arrObj.OldGuestId))
+					if((arrObj.FirstName!=arrObj.OldFirstname)&&(arrObj.GuestId==arrObj.OldGuestId))
 					{
 						arrObj.GuestId=0;
 					}

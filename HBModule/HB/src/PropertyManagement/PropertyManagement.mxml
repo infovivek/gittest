@@ -688,24 +688,21 @@
 							var ChkIn:int=0,ChkOut:int=0;
 							ChkIn=Ds_Objects.result.Tables.Table.Rows[0].CheckIn
 							ChkOut=Ds_Objects.result.Tables.Table.Rows[0].CheckOut;
+							dd_CheckInType.selectedItem=Ds_Objects.result.Tables.Table.Rows[0].CheckInType;
+							dd_CheckOutType.selectedItem=Ds_Objects.result.Tables.Table.Rows[0].CheckOutType;
 							if(ChkIn==24)
 							{
 								dd_CheckIn.selectedIndex=13
 								dd_CheckOut.selectedIndex=13
-								dd_CheckInType.selectedIndex=0
-								dd_CheckOutType.selectedIndex=0
 								dd_gracetime.selectedIndex=0
 							}
 							else
 							{
 								dd_CheckIn.selectedIndex=Ds_Objects.result.Tables.Table.Rows[0].CheckIn-1;
 								dd_CheckOut.selectedIndex=Ds_Objects.result.Tables.Table.Rows[0].CheckOut-1;
-								dd_CheckInType.selectedIndex=2
-								dd_CheckOutType.selectedIndex=2
 								dd_gracetime.selectedIndex=0
 							}
-//							dd_CheckInType.selectedItem=Ds_Objects.result.Tables.Table.Rows[0].CheckInType;
-//							dd_CheckOutType.selectedItem=Ds_Objects.result.Tables.Table.Rows[0].CheckOutType;
+
 //							dd_gracetime.selectedItem=Ds_Objects.result.Tables.Table.Rows[0].GraceTime;
 							CategoryChange();
 							Lst_DSOM.dataProvider=Ac_Clear;

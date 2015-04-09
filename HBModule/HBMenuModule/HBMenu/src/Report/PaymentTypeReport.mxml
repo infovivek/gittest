@@ -35,22 +35,40 @@
 			public var InVoiceNo:String="",ClientId:int=0,Statuss:String="";
 			protected function PageLoad():void
 			{
-				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>4</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
+				Global_AC=funLoginInfo("<FlexServiceUrl>http://192.168.1.135/WebService/clsDataInterface.asmx?WSDL</FlexServiceUrl><FlexSwfUrl>http://192.168.1.135/wrperp/</FlexSwfUrl><gVchTypCd>PO</gVchTypCd><gVchTypDesc>Purchase Order</gVchTypDesc><gVchTypFk>387</gVchTypFk><gLocFk>1</gLocFk><gUmpFk></gUmpFk><gFyrFk>2</gFyrFk><gUsr>ADMIN</gUsr><gUsrFk>1</gUsrFk><gCur>Indian Rupees</gCur><gCurFk>1</gCurFk><gCurRt> 1.0000000</gCurRt><gPrintPath></gPrintPath><gScrId>551</gScrId><gCPRights>10101111</gCPRights>")
 				GlobalXml="";
 				GlobalXml += "<ROOT>";
 				GlobalXml += ObjToXmlStr_Comm(Global_AC,"GlobalXml")
 				GlobalXml += "</ROOT>";
-				useWeb("PaymentWiseService","Pageload_CUSTOM",[GlobalXml,"PageLoad1",'','','',0,Global_AC[0].UsrId]);
+				useWeb("PaymentWiseService","Pageload_CUSTOM",[GlobalXml,"PageLoad1",'','','',0,0]);
 				
 			}
 			private function Custom_WebSer_Result (Ds_Objects:Object):void				
 			{
 				if (Ds_Objects.currentTarget.description.toString() == "Pageload_CUSTOM")
 				{
-					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+//					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+//					{
+//						hlp_Client.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+//					} 
+					if(Ds_Objects.result.Tables.Table1.Rows[0].ClientTypes == "MasterClient")
+			  	 	{
+						hlp_Client.enabled = true;
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{
+							hlp_Client.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
+						}
+					}
+					else
 					{
-						hlp_Client.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
-					} 
+						hlp_Client.enabled = false;
+						if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+						{
+							hlp_Client.text = Ds_Objects.result.Tables.Table.Rows[0].ClientName;
+							ClientId = Ds_Objects.result.Tables.Table.Rows[0].Id;
+						}
+					}
+					
 				}
 				
 				if(Drp_Monthwise.selectedItem=="Current Month")
@@ -68,9 +86,13 @@
 							{
 								Grd_PaymentWise1.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
 							} 
-							if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+							if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
 							{
 								Grd_PaymentWiseExport1.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+							} 
+							if (Ds_Objects.result.Tables.Table2.Rows.length > 0)
+							{
+								MonthSelection.text=Ds_Objects.result.Tables.Table2.Rows[0].Reportdate;
 							} 
 						}
 						
@@ -94,9 +116,13 @@
 							{
 								Grd_PaymentWise2.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
 							} 
-							if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+							if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
 							{
 								Grd_PaymentWiseExport2.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+							} 
+							if (Ds_Objects.result.Tables.Table2.Rows.length > 0)
+							{
+								MonthSelection.text=Ds_Objects.result.Tables.Table2.Rows[0].Reportdate;
 							} 
 						}
 						
@@ -120,9 +146,13 @@
 							{
 								Grd_PaymentWise.dataProvider=Ds_Objects.result.Tables.Table.Rows as ArrayCollection;
 							} 
-							if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+							if (Ds_Objects.result.Tables.Table1.Rows.length > 0)
 							{
 								Grd_PaymentWiseExport.dataProvider=Ds_Objects.result.Tables.Table1.Rows as ArrayCollection;
+							} 
+							if (Ds_Objects.result.Tables.Table2.Rows.length > 0)
+							{
+								MonthSelection.text=Ds_Objects.result.Tables.Table2.Rows[0].Reportdate;
 							} 
 						}
 						
@@ -403,9 +433,15 @@
 						
 					</mx:ArrayCollection>
 				</s:DropDownList>
-				<s:Image x="890" y="13" source="assets/a1.png" toolTip="Search" click="btn_Search_clickHandler()" tabIndex="5"/>
+				<WrbComp:Button_HB   x="859" y="25" Lable_val="Search" id="btn_Search" toolTip="Search"  click="btn_Search_clickHandler()" tabIndex="5" > 
+				</WrbComp:Button_HB>
+				<WrbComp:Button_HB  x="955" y="25" Lable_val="Clear" id="Clears"  click="Clear()" tabIndex="6" toolTip="Clear" > 
+				</WrbComp:Button_HB>
+				<WrbComp:Button_HB  x="1075" y="25" Lable_val="Export" id="Exports"  click="Export(event)" tabIndex="7" toolTip="Export" > 
+				</WrbComp:Button_HB>
+				<!--s:Image x="890" y="13" source="assets/a1.png" toolTip="Search" click="btn_Search_clickHandler()" tabIndex="5"/>
 				<s:Image x="989" y="13" click="Clear()" source="assets/dust_bin1.png" toolTip="Clear"/>
-				<s:Image x="1080" y="16" width="50" height="50" source="assets/Excel copy copy.png" toolTip="Export" click="Export(event)"/>
+				<s:Image x="1080" y="16" width="50" height="50" source="assets/Excel copy copy.png" toolTip="Export" click="Export(event)"/-->
 				<WrbHelpComp:HelpText x="139" y="34" width="225" height="23" id="hlp_Client" onselection="{fnGetBooking()}" pxSetColumnsWidth="225,0">
 				</WrbHelpComp:HelpText>
 				<!--mx:Label id="Lbl_Vendor1" x="223" y="2" width="13" text="*" color="red" fontSize="16"/>
@@ -415,7 +451,7 @@
 	</s:BorderContainer>
 	
 	<s:BorderContainer x="0" y="150" width="100%" height="354" id="bdr_Scroll" visible="true" borderVisible="false">
-		
+		<mx:Label x="542" y="-20" text="Reportdate" id="MonthSelection"/>
 		<mx:DataGrid id="Grd_PaymentWise1" x="0" y="0" width="100%" height="100%"  editable="false" tabIndex="3" verticalAlign="middle"  visible="true">
 			<mx:columns>
 				<mx:DataGridColumn dataField="CityName" headerText="City" width="100" editable="false" visible="true"/>

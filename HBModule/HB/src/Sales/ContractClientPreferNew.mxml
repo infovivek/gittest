@@ -406,7 +406,7 @@
 					xlsFile = new ExcelFile();
 					var sheet:Sheet = new Sheet();
 					
-					sheet.resize(arrExportResult.length+1,14);
+					sheet.resize(arrExportResult.length+1,17);
 					
 					sheet.setCell(0,0,'ClientId');
 					sheet.setCell(0,1,'Property');
@@ -414,12 +414,15 @@
 					sheet.setCell(0,3,'TariffSingle');
 					sheet.setCell(0,4,'TariffDouble');
 					sheet.setCell(0,5,'TariffTriple');
-					sheet.setCell(0,6,'Facility');
-					sheet.setCell(0,7,'Inclusive');
-					sheet.setCell(0,8,'Tax');
-					sheet.setCell(0,9,'ContactEmail');
-					sheet.setCell(0,10,'ContactName');
-					sheet.setCell(0,11,'ContactPhone');
+					sheet.setCell(0,6,'TariffSingle');
+					sheet.setCell(0,7,'TariffDouble');
+					sheet.setCell(0,8,'TariffTriple');
+					sheet.setCell(0,9,'Facility');
+					sheet.setCell(0,10,'Inclusive');
+					sheet.setCell(0,11,'Tax');
+					sheet.setCell(0,12,'ContactEmail');
+					sheet.setCell(0,13,'ContactName');
+					sheet.setCell(0,14,'ContactPhone');
 					
 					
 					
@@ -428,15 +431,18 @@
 						sheet.setCell(i+1, 0, arrExportResult[i].ClientId);
 						sheet.setCell(i+1, 1, arrExportResult[i].Property);
 						sheet.setCell(i+1, 2, arrExportResult[i].RoomType);
-						sheet.setCell(i+1, 3, arrExportResult[i].TariffSingle);
-						sheet.setCell(i+1, 4, arrExportResult[i].TariffDouble);
-						sheet.setCell(i+1, 5, arrExportResult[i].TariffTriple);
-						sheet.setCell(i+1, 6, arrExportResult[i].Facility);
-						sheet.setCell(i+1, 7, arrExportResult[i].Inclusive);
-						sheet.setCell(i+1, 8, arrExportResult[i].Tax);
-						sheet.setCell(i+1, 9, arrExportResult[i].ContactEmail);
-						sheet.setCell(i+1, 10, arrExportResult[i].ContactName);
-						sheet.setCell(i+1, 11, arrExportResult[i].ContactPhone);
+						sheet.setCell(i+1, 3, arrExportResult[i].ATariffSingle);
+						sheet.setCell(i+1, 4, arrExportResult[i].ATariffDouble);
+						sheet.setCell(i+1, 5, arrExportResult[i].ATariffTriple);
+						sheet.setCell(i+1, 6, arrExportResult[i].RTariffSingle);
+						sheet.setCell(i+1, 7, arrExportResult[i].RTariffDouble);
+						sheet.setCell(i+1, 8, arrExportResult[i].RTariffTriple);
+						sheet.setCell(i+1, 9, arrExportResult[i].Facility);
+						sheet.setCell(i+1, 10, arrExportResult[i].Inclusive);
+						sheet.setCell(i+1, 11, arrExportResult[i].Tax);
+						sheet.setCell(i+1, 12, arrExportResult[i].ContactEmail);
+						sheet.setCell(i+1, 13, arrExportResult[i].ContactName);
+						sheet.setCell(i+1, 14, arrExportResult[i].ContactPhone);
 											
 						
 					}
@@ -472,7 +478,7 @@
 			    <WrbComp:ProDGrid1 x="20" y="96" width="1320" height="288" id="Grd_ClientDtls"
 							   _ColDataField="Property~RoomType~ATariffSingle~ATariffDouble~ATariffTriple~RTariffSingle~RTariffDouble~RTariffTriple~Facility~Inclusive~LTAgreed~LTRack~STAgreed~ContactName~ContactPhone~ContactEmail~PropertyId~RoomId~Id"
 							   _ColHdrText="Property~Room Type~Single Agreed~Double Agreed~Triple Agreed~Single Rack~Double Rack~Triple Rack~Facility~Inclusive~LTAgreed~LTRack~STAgreed~Name~Phone~Email~PropertyId~RoomId~Id"
-							   _ColType="hlp~hlp~ntxt~ntxt~ntxt~ntxt~ntxt~ntxt~txt~Chk~txt~ntxt~ntxt~ntxt~txt~txt~txt~txt~txt~txt"
+							   _ColType="hlp~hlp~ntxt~ntxt~ntxt~ntxt~ntxt~ntxt~txt~Chk~ntxt~ntxt~ntxt~txt~txt~txt~txt~txt~txt"
 							   _colVisible="1~1~1~1~1~1~1~1~1~1~1~1~1~1~1~1~0~0~0"
 							   _ColWidth="180~80~80~80~80~80~80~80~75~75~75~75~75~75~75~75~0~0~0"
 							   _editable="1~1~1~1~1~1~1~1~1~1~1~1~1~1~1~1~0~0~0"
@@ -491,9 +497,12 @@
 					<mx:DataGridColumn dataField="ClientId" headerText="ClientId" width="200" textAlign="left" editable="false"/>
 					<mx:DataGridColumn dataField="Property" headerText="Property" width="200" textAlign="left" editable="false"/>
 					<mx:DataGridColumn dataField="RoomType" headerText="RoomType" width="150" editable="false" />
-					<mx:DataGridColumn dataField="TariffSingle" headerText="TariffSingle" width="150" editable="false" textAlign="right"/>							
-					<mx:DataGridColumn dataField="TariffDouble" headerText="TariffDouble" width="150" editable="false" textAlign="right"/>
-					<mx:DataGridColumn dataField="TariffTriple" headerText="TariffTriple" width="200" textAlign="left" editable="false"/>
+					<mx:DataGridColumn dataField="ATariffSingle" headerText="TariffSingle" width="150" editable="false" textAlign="right"/>							
+					<mx:DataGridColumn dataField="ATariffDouble" headerText="TariffDouble" width="150" editable="false" textAlign="right"/>
+					<mx:DataGridColumn dataField="ATariffTriple" headerText="TariffTriple" width="200" textAlign="left" editable="false"/>
+					<mx:DataGridColumn dataField="RTariffSingle" headerText="TariffSingle" width="150" editable="false" textAlign="right"/>							
+					<mx:DataGridColumn dataField="RTariffDouble" headerText="TariffDouble" width="150" editable="false" textAlign="right"/>
+					<mx:DataGridColumn dataField="RTariffTriple" headerText="TariffTriple" width="200" textAlign="left" editable="false"/>
 					<mx:DataGridColumn dataField="Facility" headerText="Facility" width="200" textAlign="left" editable="false"/>
 					<mx:DataGridColumn dataField="Inclusive" headerText="Inclusive" width="150" editable="false" />
 					<mx:DataGridColumn dataField="Tax" headerText="Tax" width="150" editable="false" textAlign="right"/>							

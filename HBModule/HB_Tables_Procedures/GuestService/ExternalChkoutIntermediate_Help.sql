@@ -1,6 +1,6 @@
 
 GO
-/****** Object:  StoredProcedure [dbo].[Sp_ExternalChkoutIntermediate_Help]    Script Date: 11/12/2014 15:03:23 ******/
+/****** Object:  StoredProcedure [dbo].[Sp_ExternalChkoutIntermediate_Help]    Script Date: 04/02/2015 12:28:34 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -466,6 +466,8 @@ BEGIN
 	CONVERT(NVARCHAR(100),BillEndDate,103) AS ChkoutDate,CONVERT(NVARCHAR(100),BillFromDate,103) AS CheckInDate  
 	FROM WRBHBChechkOutHdr  
 	WHERE IsActive = 1 AND IsDeleted = 0 AND Status = 'UnSettled' AND ChkInHdrId =@CheckInHdrId
+	
+	
 		
 		
 	----BillDate 
@@ -662,11 +664,13 @@ BEGIN
 		DECLARE @CID BIGINT;
 		--Select isnull(Id,0) as chekoutId from WRBHBChechkOutHdr where ChkInHdrId = @CheckInHdrId and Flag=0 and
 		--IsActive = 1 and IsDeleted = 0
-		SET @CID=(SELECT TOP 1 isnull(Id,0) AS chekoutId FROM WRBHBChechkOutHdr WHERE ChkInHdrId = @CheckInHdrId and Flag=0
-		and IsActive= 1 and IsDeleted =0)  
- --select @CID  
+		
+		SET @CID=(SELECT TOP 1 ISNULL(Id,0) as chekoutId from WRBHBChechkOutHdr where ChkInHdrId = @CheckInHdrId and Flag=0
+		and IsActive= 1 and IsDeleted =0)    
+
 	IF(ISNULL(@CID,0)=0)  
 	BEGIN  
+	
 	
 	
 			CREATE TABLE #LEVEL1(ChkInDate NVARCHAR(100),ChkOutDate NVARCHAR(100),
@@ -690,7 +694,8 @@ BEGIN
 			JOIN WRBHBBookingPropertyAssingedGuest d on h.BookingId= d.BookingId AND
 			h.PropertyId = d.BookingPropertyId AND h.IsActive = 1 AND h.IsDeleted = 0
 			 
-			JOIN WRBHBCheckInHdr c on C.PropertyId=d.BookingPropertyId AND c.IsActive = 1 AND c.IsDeleted = 0
+			JOIN WRBHBCheckInHdr c on C.PropertyId=d.BookingPropertyId AND
+			c.BookingId=d.BookingId AND c.IsActive = 1 AND c.IsDeleted = 0
 			where d.GuestId  = @GuestId AND d.BookingId = @BookingId AND d.IsActive = 1 AND d.IsDeleted = 0
 			AND c.PropertyType IN ('External Property','Managed G H','MMT','DdP')
 			--group by d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,h.TACPer,d.Tariff
@@ -736,6 +741,8 @@ BEGIN
 			--group by d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,h.TACPer,d.Tariff
 			order by d.Id desc;
 		END
+		
+		
 	
 			DECLARE @ChkInDate1 nvarchar(100),@ChkOutDate1 nvarchar(100),@TariffPaymentMode1 nvarchar(100),
 			@ServicePaymentMode1 nvarchar(100),@TAC1 nvarchar(100),@TACPer1 nvarchar(100),
@@ -756,7 +763,7 @@ BEGIN
 			SET @TripleMarkup=(SELECT TripleMarkup FROM #LEVEL1)
 			SET @BTCFile1=(SELECT BTCFile FROM #LEVEL1)
 			
-			
+				
 			
 -- this is chkin and chkout date after comes selected bill date		
 			
@@ -780,7 +787,8 @@ BEGIN
 			FROM  WRBHBBookingProperty h 
 			JOIN WRBHBBookingPropertyAssingedGuest d on h.BookingId= d.BookingId and
 			h.PropertyId = d.BookingPropertyId	AND h.IsActive = 1 and	h.IsDeleted = 0
-			JOIN WRBHBCheckInHdr c on C.PropertyId=d.BookingPropertyId AND c.IsActive = 1 AND c.IsDeleted = 0
+			JOIN WRBHBCheckInHdr c on C.PropertyId=d.BookingPropertyId AND 
+			c.BookingId=d.BookingId AND c.IsActive = 1 AND c.IsDeleted = 0
 			where d.GuestId  = @GuestId and d.BookingId = @BookingId and d.IsActive = 1 and d.IsDeleted = 0
 			AND c.PropertyType IN ('External Property','Managed G H','MMT','DdP')
 			--group by d.TariffPaymentMode,d.ServicePaymentMode ,h.TAC,h.TACPer,d.Tariff
@@ -841,7 +849,7 @@ BEGIN
 			SET @BTCFile=(SELECT BTCFile FROM #LEVEL2)
 			
 			
-			
+		
 			
 			SELECT @CheckInTime=ArrivalTime,@NewCheckInTimeType=TimeType,
 			@NewCheckInDate=convert(nvarchar(100),Cast(NewCheckInDate as DATE),103)	FROM WRBHBCheckInHdr  
@@ -1692,8 +1700,9 @@ BEGIN
 		 
     END  
 	 ELSE-- for checkout done with flag 0  
- BEGIN  
+ BEGIN   
  
+
 		DECLARE @Tariff1 DECIMAL(27,2),@Id1 INT;
 		SET @Id1 = (SELECT TOP 1  ChkInHdrId FROM WRBHBChechkOutHdr WHERE Id = @CID and IsActive = 1 and IsDeleted = 0 and Flag=0)
 		SET @Tariff1 = (SELECT Tariff FROM WRBHBCheckInHdr WHERE Id = @Id1 AND IsActive = 1 AND IsDeleted = 0)
@@ -1959,6 +1968,23 @@ BEGIN
 		SELECT COUNT(*) AS UnPaid FROM  #Tariffs  WHERE PaymentStatus = 'UnPaid'  
 		
 		
+		
+		-- Creditamount	
+		SELECT ISNULL(d.TotalAmount,0) as CreditAmountTariff,d.CheckOutId FROM WRBHBChechkOutHdr h
+		JOIN WRBHBCreditNoteTariffHdr d ON h.Id = d.CheckOutId
+		WHERE d.CheckOutId =  7171
+		
+		SELECT ISNULL(d.TotalAmount,0) as CreditAmountService,d.CheckOutId FROM WRBHBChechkOutHdr h
+		JOIN WRBHBCreditNoteServiceHdr d ON h.Id = d.CheckOutId
+		WHERE d.CheckOutId =  @CID
+		
+		SELECT (ISNULL(d.TotalAmount,0)+ISNULL(c.TotalAmount,0)) as CreditConAmount,d.CheckOutId
+		FROM WRBHBChechkOutHdr h
+		LEFT OUTER JOIN WRBHBCreditNoteTariffHdr d ON h.Id = d.CheckOutId
+		LEFT OUTER	JOIN WRBHBCreditNoteServiceHdr c ON  c.CheckOutId = d.CheckOutId
+		WHERE h.Id =  @CID
+		
+		
 		END  
 	 END 	
 END			
@@ -2173,6 +2199,20 @@ END
 		--from #TafFin22  
 		--WHERE round((@TARIFAMT1s+@SERVICEAMT1s),0)!=0  
 		
+		-- Credit Amount		
+		SELECT d.TotalAmount AS CreditAmountTariff,d.CheckOutId FROM WRBHBChechkOutHdr h
+		JOIN WRBHBCreditNoteTariffHdr d ON h.Id = d.CheckOutId
+		WHERE d.CheckOutId =  @CheckOutId1
+						
+		SELECT ISNULL(d.TotalAmount,0) as CreditAmountService,d.CheckOutId FROM WRBHBChechkOutHdr h
+		JOIN WRBHBCreditNoteServiceHdr d ON h.Id = d.CheckOutId
+		WHERE d.CheckOutId =  @CheckOutId1
+		
+		SELECT (ISNULL(d.TotalAmount,0)+ISNULL(c.TotalAmount,0)) as CreditConAmount,d.CheckOutId
+		FROM WRBHBChechkOutHdr h
+		LEFT OUTER JOIN WRBHBCreditNoteTariffHdr d ON h.Id = d.CheckOutId
+		LEFT OUTER	JOIN WRBHBCreditNoteServiceHdr c ON  c.CheckOutId = d.CheckOutId
+		WHERE h.Id =  @CheckOutId1
 		    
 	END	
 		

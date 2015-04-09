@@ -20,6 +20,7 @@ namespace HB.Dao
         SqlCommand command = new SqlCommand();
         bool flg = true;
         string FlagStr = "";
+        CreateLogFiles log = new CreateLogFiles();
         public DataSet FnCreateReservation(string[] data, User Usr)
         {
             //DataSet asd = new DataSet();DataTable asddT = new DataTable("Table");asddT.Columns.Add("Str");asddT.Columns.Add("Str1");asddT.Rows.Add("No", "No1");ds.Tables.Add(asddT);return ds;            
@@ -304,14 +305,17 @@ namespace HB.Dao
                                     //BookRequest.ToString()
                                     ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
                                     //
-                                    CreateLogFiles log1 = new CreateLogFiles();
-                                    log1.ErrorLog("M M T BOOKING CONFIRMATION NO --> " + api.BookHotelReservationIdvalue);
+                                    //log = new CreateLogFiles();
+                                    log = new CreateLogFiles();
+                                    log.ErrorLog("M M T BOOKING CONFIRMATION NO --> " + api.BookHotelReservationIdvalue);
                                 }
                                 else
                                 {
                                     //Book Hotel Response - available status is E.                            
                                     flg = false;
                                     FlagStr = "Book Hotel Response - available status is E.";
+                                    log = new CreateLogFiles();
+                                    log.ErrorLog("APICreateReservationDAO --> " + Step + " --> " + FlagStr);
                                 }
                             }
                             else
@@ -319,6 +323,8 @@ namespace HB.Dao
                                 //Book Response Code is False.
                                 flg = false;
                                 FlagStr = "Book Response Code is False.";
+                                log = new CreateLogFiles();
+                                log.ErrorLog("APICreateReservationDAO --> " + Step + " --> " + FlagStr);
                             }
                         }
                         else
@@ -326,6 +332,8 @@ namespace HB.Dao
                             //Availability Available Status is E.                            
                             flg = false;
                             FlagStr = "Availability Available Status is E";
+                            log = new CreateLogFiles();
+                            log.ErrorLog("APICreateReservationDAO --> " + Step + " --> " + FlagStr);
                         }
                     }
                     else
@@ -333,6 +341,8 @@ namespace HB.Dao
                         //Availability Response Code is False.
                         flg = false;
                         FlagStr = "Availability Response Code is False.";
+                        log = new CreateLogFiles();
+                        log.ErrorLog("APICreateReservationDAO --> " + Step + " --> " + FlagStr);
                     }
                 }
                 else
@@ -340,11 +350,13 @@ namespace HB.Dao
                     //Availability Hotel Count is Zero OR Error
                     flg = false;
                     FlagStr = "Availability Hotel Count is Zero.";
+                    log = new CreateLogFiles();
+                    log.ErrorLog("APICreateReservationDAO --> " + Step + " --> " + FlagStr);
                 }
             }
             catch(Exception ex)
             {
-                CreateLogFiles log = new CreateLogFiles();
+                log = new CreateLogFiles();
                 log.ErrorLog("APICreateReservationDAO --> " + Step + " --> " + ex.Message);
                 flg = false;
                 FlagStr = "Error";

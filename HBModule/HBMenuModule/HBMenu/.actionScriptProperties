@@ -20,6 +20,8 @@
     <application path="Report/PrptyDatewise.mxml"/>
     <application path="Report/CityDatewise.mxml"/>
     <application path="FRONTHB.mxml"/>
+    <application path="Booking/shiftingandmodification.mxml"/>
+    <application path="Booking/cancelbooking.mxml"/>
     <application path="Report/CitywiseReport.mxml"/>
     <application path="Master/Test.mxml"/>
     <application path="Report/PaymentTypeReport.mxml"/>

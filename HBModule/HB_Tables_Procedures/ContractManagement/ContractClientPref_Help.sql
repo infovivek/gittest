@@ -68,11 +68,11 @@ CREATE PROCEDURE Sp_ContractClientPref_Help
 	WHERE HeaderId=@HeaderId AND C.IsActive=1 AND C.IsDeleted=0 ORDER BY P.PropertyName
  
 	
-	SELECT HeaderId AS ClientId,P.PropertyName as Property,RoomType,Isnull(TariffSingle,0) AS ATariffSingle,
-    Isnull(TariffDouble,0) ATariffDouble,
+	SELECT ISNULL(HeaderId,0) AS ClientId,ISNULL(P.PropertyName,'') AS Property,ISNULL(RoomType,'') AS RoomType,
+	Isnull(TariffSingle,0) AS ATariffSingle,Isnull(TariffDouble,0) ATariffDouble,
     Isnull(TariffTriple,0) AS ATariffTriple,Isnull(RTariffSingle,0) AS RTariffSingle,
     Isnull(RTariffDouble,0) AS RTariffDouble,Isnull(RTariffTriple,0) AS RTariffTriple,
-    Facility,TaxInclusive as Inclusive ,TaxPercentage as Tax,Isnull(LTAgreed,0) AS LTAgreed,
+    ISNULL(Facility,'') AS Facility,ISNULL(TaxInclusive,0) as Inclusive ,ISNULL(TaxPercentage,0) as Tax,Isnull(LTAgreed,0) AS LTAgreed,
     Isnull(LTRack,0) AS LTRack,Isnull(STAgreed,0) AS STAgreed,
     Isnull(C.Email,'') as ContactEmail,Isnull (ContactName,'') as ContactName,
     Isnull (ContactPhone,'') as ContactPhone

@@ -35,6 +35,7 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.ReportViewer.WebForms, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
+    <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Data" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -58,6 +59,7 @@
     <Content Include="ContractBill.aspx" />
     <Content Include="ContractBillDedicated.aspx" />
     <Content Include="CreditNoteServiceBill.aspx" />
+    <Content Include="CreditNoteTACBill.aspx" />
     <Content Include="CreditNoteTariffBill.aspx" />
     <Content Include="DetailedServiceinvoice.aspx" />
     <Content Include="ExternalCheckOutTAC.aspx" />
@@ -72,6 +74,7 @@
     <Content Include="GuestCheckOutService.aspx" />
     <Content Include="GuestCheckOutService1.aspx" />
     <Content Include="GuestCheckOutTariff.aspx" />
+    <Content Include="Images\LogoNew.png" />
     <Content Include="ImportExcel.aspx" />
     <Content Include="IntermediateCheckoutConsolidate.aspx" />
     <Content Include="IntermediateCheckoutService.aspx" />
@@ -144,6 +147,13 @@
     </Compile>
     <Compile Include="CreditNoteServiceBill.aspx.designer.cs">
       <DependentUpon>CreditNoteServiceBill.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="CreditNoteTACBill.aspx.cs">
+      <DependentUpon>CreditNoteTACBill.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CreditNoteTACBill.aspx.designer.cs">
+      <DependentUpon>CreditNoteTACBill.aspx</DependentUpon>
     </Compile>
     <Compile Include="CreditNoteTariffBill.aspx.cs">
       <DependentUpon>CreditNoteTariffBill.aspx</DependentUpon>
@@ -368,6 +378,7 @@
     <EmbeddedResource Include="CreditNoteServiceBill.rdlc" />
     <EmbeddedResource Include="CreditNoteTariffBill1.rdlc" />
     <EmbeddedResource Include="CreditNoteServiceBill1.rdlc" />
+    <EmbeddedResource Include="CreditNoteTACBill.rdlc" />
     <EmbeddedResource Include="TAC Annexure.rdlc" />
     <EmbeddedResource Include="TACAnnuxpage1.rdlc" />
   </ItemGroup>

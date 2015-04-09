@@ -377,11 +377,13 @@ BEGIN
 		WHERE BookingId=@BookingId and GuestId=@GuestId
 		ORDER BY Id ASC);
 
-		UPDATE WRBHBBedBookingPropertyAssingedGuest SET CurrentStatus = 'UnSettled' 
+		UPDATE WRBHBBedBookingPropertyAssingedGuest SET CurrentStatus = 'UnSettled' ,
+		CheckOutHdrId = @InsId
 		WHERE BookingId=@BookingId and  BedId =@BedId AND -- GuestId=@GuestId and
 		IsActive= 1 and IsDeleted = 0;
 
-		UPDATE WRBHBApartmentBookingPropertyAssingedGuest SET CurrentStatus = 'UnSettled' 
+		UPDATE WRBHBApartmentBookingPropertyAssingedGuest SET CurrentStatus = 'UnSettled' ,
+		CheckOutHdrId = @InsId
 		WHERE BookingId=@BookingId and  ApartmentId =@ApartmentId AND --GuestId=@GuestId and
 		IsActive= 1 and IsDeleted = 0;
 END

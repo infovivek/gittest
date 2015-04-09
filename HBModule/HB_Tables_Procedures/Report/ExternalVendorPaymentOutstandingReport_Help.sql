@@ -9,7 +9,7 @@ GO
 -- ===============================================================================
 -- Author:Sakthi
 -- Create date:27-06-2014
--- ModifiedBy :          , ModifiedDate: 
+-- ModifiedBy : Anbu         , ModifiedDate: 
 -- Description:	BOOKING
 -- =================================================================================
 CREATE PROCEDURE [dbo].[SP_ExternalVendorPaymentOutstandingReport_Help]
@@ -22,7 +22,7 @@ SET NOCOUNT ON
 SET ANSI_WARNINGS OFF
 IF @Action = 'POBased'
  BEGIN
-  CREATE TABLE #TABLE(PropertyId INT,PropertyName NVARCHAR(100),
+  CREATE TABLE #TABLE(PropertyId BIGINT,PropertyName NVARCHAR(100),
   PONo NVARCHAR(100),PONoId INT,POQty INT,Used INT,Unused INT,
   RatePerDay DECIMAL(27,2),TotalTariff DECIMAL(27,2),
   TotalLuxuryTax DECIMAL(27,2),TotalServiceTax DECIMAL(27,2),
@@ -30,6 +30,7 @@ IF @Action = 'POBased'
   BookingId INT,StayDuration NVARCHAR(100),PODate NVARCHAR(100),
   BookingStatus NVARCHAR(100),Guest NVARCHAR(100),GuestId INT,
   ClientName NVARCHAR(100),ClientId INT,RoomCaptured INT,ChkOutId INT);
+  
   -- Canceled Booking : Begin
   INSERT INTO #TABLE(PropertyId,PropertyName,PONo,PONoId,POQty,Used,Unused,
   RatePerDay,TotalTariff,TotalLuxuryTax,TotalServiceTax,TotalTax,
@@ -39,7 +40,7 @@ IF @Action = 'POBased'
   DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS POQty,0 AS Used,
   --DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS Unused,
   0 AS Unused,
-  BG.Tariff AS RatePerDay,0 AS TotalTariff,0 AS TotalLuxuryTax,
+  BP.SingleTariff AS RatePerDay,0 AS TotalTariff,0 AS TotalLuxuryTax,
   0 AS TotalServiceTax,0 AS TotalTax,0 AS TotalAmount,
   B.BookingCode,B.Id AS BookingId,
   CONVERT(VARCHAR(100),BG.ChkInDt,103)+' - '+
@@ -49,39 +50,196 @@ IF @Action = 'POBased'
   CG.FirstName+' '+CG.LastName AS Guest,BG.GuestId,C.ClientName,B.ClientId,
   BG.RoomCaptured,0
   FROM WRBHBBooking B
-  LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id
+  LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id AND BP.IsActive=1
   LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON 
-  BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id
+  BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND BG.IsActive=1
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id=BG.BookingPropertyId
   LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id=B.ClientId
   LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CG WITH(NOLOCK)ON
   CG.CltmgntId=C.Id AND CG.CltmgntId=B.ClientId AND CG.Id=BG.GuestId
   WHERE --B.IsActive=1 AND B.IsDeleted=0 AND 
   (ISNULL(B.CancelStatus,'')='Canceled' OR BG.CurrentStatus !='CheckOut') AND 
-  BP.PropertyType='ExP' AND
+  BP.PropertyType='ExP' AND BG.Occupancy='Single' AND
   B.BookingLevel='Room' AND CONVERT(DATE,BG.CreatedDate,103) BETWEEN 
   CONVERT(DATE,@ChkInDt,103) AND CONVERT(DATE,@ChkOutDt,103);
+  
+  INSERT INTO #TABLE(PropertyId,PropertyName,PONo,PONoId,POQty,Used,Unused,
+  RatePerDay,TotalTariff,TotalLuxuryTax,TotalServiceTax,TotalTax,
+  TotalAmount,BookingCode,BookingId,StayDuration,PODate,BookingStatus,
+  Guest,GuestId,ClientName,ClientId,RoomCaptured,ChkOutId)
+  SELECT BP.PropertyId,P.PropertyName,B.PONo,B.PONoId,
+  DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS POQty,0 AS Used,
+  --DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS Unused,
+  0 AS Unused,
+  BP.DoubleTariff AS RatePerDay,0 AS TotalTariff,0 AS TotalLuxuryTax,
+  0 AS TotalServiceTax,0 AS TotalTax,0 AS TotalAmount,
+  B.BookingCode,B.Id AS BookingId,
+  CONVERT(VARCHAR(100),BG.ChkInDt,103)+' - '+
+  CONVERT(VARCHAR(100),BG.ChkOutDt,103) AS StayDuration,
+  CONVERT(VARCHAR(100),BG.CreatedDate,103) AS PODate,
+  BG.CurrentStatus AS BookingStatus,
+  CG.FirstName+' '+CG.LastName AS Guest,BG.GuestId,C.ClientName,B.ClientId,
+  BG.RoomCaptured,0
+  FROM WRBHBBooking B
+ LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id AND BP.IsActive=1
+  LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON 
+  BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND BG.IsActive=1
+  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id=BG.BookingPropertyId
+  LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id=B.ClientId
+  LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CG WITH(NOLOCK)ON
+  CG.CltmgntId=C.Id AND CG.CltmgntId=B.ClientId AND CG.Id=BG.GuestId
+  WHERE --B.IsActive=1 AND B.IsDeleted=0 AND 
+  (ISNULL(B.CancelStatus,'')='Canceled' OR BG.CurrentStatus !='CheckOut') AND 
+  BP.PropertyType='ExP' AND BG.Occupancy='Double' AND
+  B.BookingLevel='Room' AND CONVERT(DATE,BG.CreatedDate,103) BETWEEN 
+  CONVERT(DATE,@ChkInDt,103) AND CONVERT(DATE,@ChkOutDt,103);
+  
+  
+  INSERT INTO #TABLE(PropertyId,PropertyName,PONo,PONoId,POQty,Used,Unused,
+  RatePerDay,TotalTariff,TotalLuxuryTax,TotalServiceTax,TotalTax,
+  TotalAmount,BookingCode,BookingId,StayDuration,PODate,BookingStatus,
+  Guest,GuestId,ClientName,ClientId,RoomCaptured,ChkOutId)
+  SELECT BP.PropertyId,P.PropertyName,B.PONo,B.PONoId,
+  DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS POQty,0 AS Used,
+  --DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS Unused,
+  0 AS Unused,
+  BP.TripleTariff AS RatePerDay,0 AS TotalTariff,0 AS TotalLuxuryTax,
+  0 AS TotalServiceTax,0 AS TotalTax,0 AS TotalAmount,
+  B.BookingCode,B.Id AS BookingId,
+  CONVERT(VARCHAR(100),BG.ChkInDt,103)+' - '+
+  CONVERT(VARCHAR(100),BG.ChkOutDt,103) AS StayDuration,
+  CONVERT(VARCHAR(100),BG.CreatedDate,103) AS PODate,
+  BG.CurrentStatus AS BookingStatus,
+  CG.FirstName+' '+CG.LastName AS Guest,BG.GuestId,C.ClientName,B.ClientId,
+  BG.RoomCaptured,0
+  FROM WRBHBBooking B
+  LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id AND BP.IsActive=1
+  LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON 
+  BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND BG.IsActive=1
+  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id=BG.BookingPropertyId
+  LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id=B.ClientId
+  LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CG WITH(NOLOCK)ON
+  CG.CltmgntId=C.Id AND CG.CltmgntId=B.ClientId AND CG.Id=BG.GuestId
+  WHERE --B.IsActive=1 AND B.IsDeleted=0 AND 
+  (ISNULL(B.CancelStatus,'')='Canceled' OR BG.CurrentStatus !='CheckOut') AND 
+  BP.PropertyType='ExP' AND BG.Occupancy='Triple' AND
+  B.BookingLevel='Room' AND CONVERT(DATE,BG.CreatedDate,103) BETWEEN 
+  CONVERT(DATE,@ChkInDt,103) AND CONVERT(DATE,@ChkOutDt,103);
+ 
+
+  -- Canceled Booking : Begin
+  INSERT INTO #TABLE(PropertyId,PropertyName,PONo,PONoId,POQty,Used,Unused,
+  RatePerDay,TotalTariff,TotalLuxuryTax,TotalServiceTax,TotalTax,
+  TotalAmount,BookingCode,BookingId,StayDuration,PODate,BookingStatus,
+  Guest,GuestId,ClientName,ClientId,RoomCaptured,ChkOutId)
+  
+  SELECT TOP 1 BP.PropertyId,BP.PropertyName,ISNULL(B.MMTPONo,'') AS PONo,ISNULL(B.MMTPONoId,0) AS PONoId,
+  DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS POQty,0 AS Used,
+  --DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS Unused,
+  0 AS Unused,
+  BP.SingleTariff AS RatePerDay,0 AS TotalTariff,0 AS TotalLuxuryTax,
+  0 AS TotalServiceTax,0 AS TotalTax,0 AS TotalAmount,
+  ISNULL(B.BookingCode,0) AS BookingCode,ISNULL(B.Id,0) AS BookingId,
+  CONVERT(VARCHAR(100),BG.ChkInDt,103)+' - '+
+  CONVERT(VARCHAR(100),BG.ChkOutDt,103) AS StayDuration,
+  CONVERT(VARCHAR(100),BG.CreatedDate,103) AS PODate,
+  BG.CurrentStatus AS BookingStatus,
+  CG.FirstName+' '+CG.LastName AS Guest,ISNULL(BG.GuestId,0) GuestId,C.ClientName,ISNULL(B.ClientId,0) ClientId,
+  ISNULL(BG.RoomCaptured,0) RoomCaptured,0 ChkOutId
+  FROM WRBHBBooking B
+ LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id AND BP.IsActive=1
+  LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON 
+  BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND BG.IsActive=1
+  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id=BG.BookingPropertyId
+  LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id=B.ClientId
+  LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CG WITH(NOLOCK)ON
+  CG.CltmgntId=C.Id AND CG.CltmgntId=B.ClientId AND CG.Id=BG.GuestId
+  WHERE --B.IsActive=1 AND B.IsDeleted=0 AND 
+  (ISNULL(B.CancelStatus,'')='Canceled' OR BG.CurrentStatus !='CheckOut') AND 
+  BP.PropertyType='MMT' AND BG.Occupancy='Single' AND
+  B.BookingLevel='Room' AND CONVERT(DATE,BG.CreatedDate,103) BETWEEN 
+  CONVERT(DATE,@ChkInDt,103) AND CONVERT(DATE,@ChkOutDt,103);
+ 
+   INSERT INTO #TABLE(PropertyId,PropertyName,PONo,PONoId,POQty,Used,Unused,
+  RatePerDay,TotalTariff,TotalLuxuryTax,TotalServiceTax,TotalTax,
+  TotalAmount,BookingCode,BookingId,StayDuration,PODate,BookingStatus,
+  Guest,GuestId,ClientName,ClientId,RoomCaptured,ChkOutId)
+  SELECT BP.PropertyId,BP.PropertyName,ISNULL(B.MMTPONo,'') AS PONo,ISNULL(B.MMTPONoId,0) AS PONoId,
+  DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS POQty,0 AS Used,
+  --DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS Unused,
+  0 AS Unused,
+  BP.DoubleTariff AS RatePerDay,0 AS TotalTariff,0 AS TotalLuxuryTax,
+  0 AS TotalServiceTax,0 AS TotalTax,0 AS TotalAmount,
+  B.BookingCode,B.Id AS BookingId,
+  CONVERT(VARCHAR(100),BG.ChkInDt,103)+' - '+
+  CONVERT(VARCHAR(100),BG.ChkOutDt,103) AS StayDuration,
+  CONVERT(VARCHAR(100),BG.CreatedDate,103) AS PODate,
+  BG.CurrentStatus AS BookingStatus,
+  CG.FirstName+' '+CG.LastName AS Guest,BG.GuestId,C.ClientName,B.ClientId,
+  BG.RoomCaptured,0
+  FROM WRBHBBooking B
+  LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id AND BP.IsActive=1
+  LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON 
+  BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND BG.IsActive=1
+  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id=BG.BookingPropertyId
+  LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id=B.ClientId
+  LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CG WITH(NOLOCK)ON
+  CG.CltmgntId=C.Id AND CG.CltmgntId=B.ClientId AND CG.Id=BG.GuestId
+  WHERE --B.IsActive=1 AND B.IsDeleted=0 AND 
+  (ISNULL(B.CancelStatus,'')='Canceled' OR BG.CurrentStatus !='CheckOut') AND 
+  BP.PropertyType='MMT' AND BG.Occupancy='Double' AND
+  B.BookingLevel='Room' AND CONVERT(DATE,BG.CreatedDate,103) BETWEEN 
+  CONVERT(DATE,@ChkInDt,103) AND CONVERT(DATE,@ChkOutDt,103);
+  
+  INSERT INTO #TABLE(PropertyId,PropertyName,PONo,PONoId,POQty,Used,Unused,
+  RatePerDay,TotalTariff,TotalLuxuryTax,TotalServiceTax,TotalTax,
+  TotalAmount,BookingCode,BookingId,StayDuration,PODate,BookingStatus,
+  Guest,GuestId,ClientName,ClientId,RoomCaptured,ChkOutId)
+  SELECT BP.PropertyId,BP.PropertyName,ISNULL(B.MMTPONo,'') AS PONo,ISNULL(B.MMTPONoId,0) AS PONoId,
+  DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS POQty,0 AS Used,
+  --DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS Unused,
+  0 AS Unused,
+  BP.TripleTariff AS RatePerDay,0 AS TotalTariff,0 AS TotalLuxuryTax,
+  0 AS TotalServiceTax,0 AS TotalTax,0 AS TotalAmount,
+  B.BookingCode,B.Id AS BookingId,
+  CONVERT(VARCHAR(100),BG.ChkInDt,103)+' - '+
+  CONVERT(VARCHAR(100),BG.ChkOutDt,103) AS StayDuration,
+  CONVERT(VARCHAR(100),BG.CreatedDate,103) AS PODate,
+  BG.CurrentStatus AS BookingStatus,
+  CG.FirstName+' '+CG.LastName AS Guest,BG.GuestId,C.ClientName,B.ClientId,
+  BG.RoomCaptured,0
+  FROM WRBHBBooking B
+  LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id AND BP.IsActive=1
+  LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON 
+  BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND BG.IsActive=1
+  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id=BG.BookingPropertyId
+  LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id=B.ClientId
+  LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CG WITH(NOLOCK)ON
+  CG.CltmgntId=C.Id AND CG.CltmgntId=B.ClientId AND CG.Id=BG.GuestId
+  WHERE --B.IsActive=1 AND B.IsDeleted=0 AND 
+  (ISNULL(B.CancelStatus,'')='Canceled' OR BG.CurrentStatus !='CheckOut') AND 
+  BP.PropertyType='MMT' AND BG.Occupancy='Triple' AND
+  B.BookingLevel='Room' AND CONVERT(DATE,BG.CreatedDate,103) BETWEEN 
+  CONVERT(DATE,@ChkInDt,103) AND CONVERT(DATE,@ChkOutDt,103);
+  
   -- Canceled Booking : End
   -- Check Out Booking : Begin
-  CREATE TABLE #TMPTABLE(PropertyId INT,PropertyName NVARCHAR(100),
+  CREATE TABLE #TMPTABLE(PropertyId BIGINT,PropertyName NVARCHAR(100),
   PONo NVARCHAR(100),PONoId INT,POQty INT,Used INT,Unused INT,
   RatePerDay DECIMAL(27,2),TotalLuxuryTax DECIMAL(27,2),
   TotalServiceTax DECIMAL(27,2),BookingCode INT,BookingId INT,
   StayDuration NVARCHAR(100),PODate NVARCHAR(100),
   BookingStatus NVARCHAR(100),Guest NVARCHAR(100),GuestId INT,
   ClientName NVARCHAR(100),ClientId INT,RoomCaptured INT,CheckOutHdrId INT);
+ 
   INSERT INTO #TMPTABLE(PropertyId,PropertyName,PONo,PONoId,POQty,Used,Unused,
   RatePerDay,TotalLuxuryTax,TotalServiceTax,BookingCode,BookingId,
   StayDuration,PODate,BookingStatus,Guest,GuestId,ClientName,ClientId,
   RoomCaptured,CheckOutHdrId)
   SELECT BP.PropertyId,P.PropertyName,B.PONo,B.PONoId,
   DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS POQty,
-  ISNULL(DATEDIFF(DAY,CONVERT(DATE,CO.CheckInDate,103),
-  CONVERT(DATE,CO.CheckOutDate,103)),0) AS Used,
-  ISNULL(DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) - 
-  DATEDIFF(DAY,CONVERT(DATE,CO.CheckInDate,103),
-  CONVERT(DATE,CO.CheckOutDate,103)),0) AS Unused,
-  BG.Tariff AS RatePerDay,
+ 0 AS Used, 0 AS Unused,
+  BP.SingleTariff AS RatePerDay,
   ISNULL(CO.LTAgreedAmount,0)+ISNULL(CO.LTRackAmount,0) AS TotalLuxuryTax,
   ISNULL(CO.STAgreedAmount,0)+ISNULL(CO.STRackAmount,0) AS TotalServiceTax,    
   B.BookingCode,B.Id AS BookingId,
@@ -92,9 +250,9 @@ IF @Action = 'POBased'
   CG.FirstName+' '+CG.LastName AS Guest,BG.GuestId,C.ClientName,B.ClientId,
   BG.RoomCaptured,ISNULL(BG.CheckOutHdrId,0)
   FROM WRBHBBooking B
-  LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id
+  LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id AND BP.IsActive=1
   LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON 
-  BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id
+  BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND BG.IsActive=1
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id=BG.BookingPropertyId
   LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id=B.ClientId
   LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CG WITH(NOLOCK)ON
@@ -103,7 +261,172 @@ IF @Action = 'POBased'
   CO.BookingId=B.Id AND CO.Id=BG.CheckOutHdrId
   WHERE B.IsActive=1 AND B.IsDeleted=0 AND BG.IsActive=1 AND 
   BG.IsDeleted=0 AND ISNULL(B.CancelStatus,'')='' AND 
-  BP.PropertyType='ExP' AND B.BookingLevel='Room' AND 
+  BP.PropertyType='ExP' AND B.BookingLevel='Room' AND BG.Occupancy='Single' AND
+  BG.CurrentStatus='CheckOut' AND CONVERT(DATE,BG.CreatedDate,103) BETWEEN 
+  CONVERT(DATE,@ChkInDt,103) AND CONVERT(DATE,@ChkOutDt,103);
+  
+   INSERT INTO #TMPTABLE(PropertyId,PropertyName,PONo,PONoId,POQty,Used,Unused,
+  RatePerDay,TotalLuxuryTax,TotalServiceTax,BookingCode,BookingId,
+  StayDuration,PODate,BookingStatus,Guest,GuestId,ClientName,ClientId,
+  RoomCaptured,CheckOutHdrId)
+  SELECT BP.PropertyId,P.PropertyName,B.PONo,B.PONoId,
+  DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS POQty,
+ 0 AS Used, 0 AS Unused,
+  BP.DoubleTariff AS RatePerDay,
+  ISNULL(CO.LTAgreedAmount,0)+ISNULL(CO.LTRackAmount,0) AS TotalLuxuryTax,
+  ISNULL(CO.STAgreedAmount,0)+ISNULL(CO.STRackAmount,0) AS TotalServiceTax,    
+  B.BookingCode,B.Id AS BookingId,
+  ISNULL(CONVERT(VARCHAR(100),CONVERT(DATE,CO.CheckInDate,103),103)+' - '+
+  CONVERT(VARCHAR(100),CONVERT(DATE,BG.ChkOutDt,103),103),'') AS StayDuration,
+  CONVERT(VARCHAR(100),BG.CreatedDate,103) AS PODate,
+  BG.CurrentStatus AS BookingStatus,
+  CG.FirstName+' '+CG.LastName AS Guest,BG.GuestId,C.ClientName,B.ClientId,
+  BG.RoomCaptured,ISNULL(BG.CheckOutHdrId,0)
+  FROM WRBHBBooking B
+  LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id AND BP.IsActive=1
+  LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON 
+  BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND BG.IsActive=1
+  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id=BG.BookingPropertyId
+  LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id=B.ClientId
+  LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CG WITH(NOLOCK)ON
+  CG.CltmgntId=C.Id AND CG.CltmgntId=B.ClientId AND CG.Id=BG.GuestId
+  LEFT OUTER JOIN WRBHBChechkOutHdr CO WITH(NOLOCK)ON 
+  CO.BookingId=B.Id AND CO.Id=BG.CheckOutHdrId
+  WHERE B.IsActive=1 AND B.IsDeleted=0 AND BG.IsActive=1 AND 
+  BG.IsDeleted=0 AND ISNULL(B.CancelStatus,'')='' AND 
+  BP.PropertyType='ExP' AND B.BookingLevel='Room' AND BG.Occupancy='Double' AND
+  BG.CurrentStatus='CheckOut' AND CONVERT(DATE,BG.CreatedDate,103) BETWEEN 
+  CONVERT(DATE,@ChkInDt,103) AND CONVERT(DATE,@ChkOutDt,103);
+  
+   INSERT INTO #TMPTABLE(PropertyId,PropertyName,PONo,PONoId,POQty,Used,Unused,
+  RatePerDay,TotalLuxuryTax,TotalServiceTax,BookingCode,BookingId,
+  StayDuration,PODate,BookingStatus,Guest,GuestId,ClientName,ClientId,
+  RoomCaptured,CheckOutHdrId)
+  SELECT BP.PropertyId,P.PropertyName,B.PONo,B.PONoId,
+  DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS POQty,
+ 0 AS Used, 0 AS Unused,
+  BP.TripleTariff AS RatePerDay,
+  ISNULL(CO.LTAgreedAmount,0)+ISNULL(CO.LTRackAmount,0) AS TotalLuxuryTax,
+  ISNULL(CO.STAgreedAmount,0)+ISNULL(CO.STRackAmount,0) AS TotalServiceTax,    
+  B.BookingCode,B.Id AS BookingId,
+  ISNULL(CONVERT(VARCHAR(100),CONVERT(DATE,CO.CheckInDate,103),103)+' - '+
+  CONVERT(VARCHAR(100),CONVERT(DATE,BG.ChkOutDt,103),103),'') AS StayDuration,
+  CONVERT(VARCHAR(100),BG.CreatedDate,103) AS PODate,
+  BG.CurrentStatus AS BookingStatus,
+  CG.FirstName+' '+CG.LastName AS Guest,BG.GuestId,C.ClientName,B.ClientId,
+  BG.RoomCaptured,ISNULL(BG.CheckOutHdrId,0)
+  FROM WRBHBBooking B
+  LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id AND BP.IsActive=1
+  LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON 
+  BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND BG.IsActive=1
+  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id=BG.BookingPropertyId
+  LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id=B.ClientId
+  LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CG WITH(NOLOCK)ON
+  CG.CltmgntId=C.Id AND CG.CltmgntId=B.ClientId AND CG.Id=BG.GuestId
+  LEFT OUTER JOIN WRBHBChechkOutHdr CO WITH(NOLOCK)ON 
+  CO.BookingId=B.Id AND CO.Id=BG.CheckOutHdrId
+  WHERE B.IsActive=1 AND B.IsDeleted=0 AND BG.IsActive=1 AND 
+  BG.IsDeleted=0 AND ISNULL(B.CancelStatus,'')='' AND 
+  BP.PropertyType='ExP' AND B.BookingLevel='Room' AND BG.Occupancy='Triple' AND
+  BG.CurrentStatus='CheckOut' AND CONVERT(DATE,BG.CreatedDate,103) BETWEEN 
+  CONVERT(DATE,@ChkInDt,103) AND CONVERT(DATE,@ChkOutDt,103);
+  
+  INSERT INTO #TMPTABLE(PropertyId,PropertyName,PONo,PONoId,POQty,Used,Unused,
+  RatePerDay,TotalLuxuryTax,TotalServiceTax,BookingCode,BookingId,
+  StayDuration,PODate,BookingStatus,Guest,GuestId,ClientName,ClientId,
+  RoomCaptured,CheckOutHdrId)
+  SELECT BP.PropertyId,BP.PropertyName,ISNULL(B.MMTPONo,'') AS PONo,ISNULL(B.MMTPONoId,0) AS PONoId,
+  DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS POQty,
+  0 AS Used, 0 AS Unused,
+  BP.SingleTariff AS RatePerDay,
+  ISNULL(CO.LTAgreedAmount,0)+ISNULL(CO.LTRackAmount,0) AS TotalLuxuryTax,
+  ISNULL(CO.STAgreedAmount,0)+ISNULL(CO.STRackAmount,0) AS TotalServiceTax,    
+  B.BookingCode,B.Id AS BookingId,
+  ISNULL(CONVERT(VARCHAR(100),CONVERT(DATE,CO.CheckInDate,103),103)+' - '+
+  CONVERT(VARCHAR(100),CONVERT(DATE,BG.ChkOutDt,103),103),'') AS StayDuration,
+  CONVERT(VARCHAR(100),BG.CreatedDate,103) AS PODate,
+  BG.CurrentStatus AS BookingStatus,
+  CG.FirstName+' '+CG.LastName AS Guest,BG.GuestId,C.ClientName,B.ClientId,
+  BG.RoomCaptured,ISNULL(BG.CheckOutHdrId,0)
+  FROM WRBHBBooking B
+  LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id AND BP.IsActive=1
+  LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON 
+  BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND BG.IsActive=1
+  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id=BG.BookingPropertyId
+  LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id=B.ClientId
+  LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CG WITH(NOLOCK)ON
+  CG.CltmgntId=C.Id AND CG.CltmgntId=B.ClientId AND CG.Id=BG.GuestId
+  LEFT OUTER JOIN WRBHBChechkOutHdr CO WITH(NOLOCK)ON 
+  CO.BookingId=B.Id AND CO.Id=BG.CheckOutHdrId
+  WHERE B.IsActive=1 AND B.IsDeleted=0 AND BG.IsActive=1 AND 
+  BG.IsDeleted=0 AND ISNULL(B.CancelStatus,'')='' AND 
+  BP.PropertyType='MMT' AND B.BookingLevel='Room' AND BG.Occupancy='Single' AND
+  BG.CurrentStatus='CheckOut' AND CONVERT(DATE,BG.CreatedDate,103) BETWEEN 
+  CONVERT(DATE,@ChkInDt,103) AND CONVERT(DATE,@ChkOutDt,103);
+  
+   INSERT INTO #TMPTABLE(PropertyId,PropertyName,PONo,PONoId,POQty,Used,Unused,
+  RatePerDay,TotalLuxuryTax,TotalServiceTax,BookingCode,BookingId,
+  StayDuration,PODate,BookingStatus,Guest,GuestId,ClientName,ClientId,
+  RoomCaptured,CheckOutHdrId)
+  SELECT BP.PropertyId,BP.PropertyName,ISNULL(B.MMTPONo,'') AS PONo,ISNULL(B.MMTPONoId,0) AS PONoId,
+  DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS POQty,
+  0 AS Used, 0 AS Unused,
+  BP.DoubleTariff AS RatePerDay,
+  ISNULL(CO.LTAgreedAmount,0)+ISNULL(CO.LTRackAmount,0) AS TotalLuxuryTax,
+  ISNULL(CO.STAgreedAmount,0)+ISNULL(CO.STRackAmount,0) AS TotalServiceTax,    
+  B.BookingCode,B.Id AS BookingId,
+  ISNULL(CONVERT(VARCHAR(100),CONVERT(DATE,CO.CheckInDate,103),103)+' - '+
+  CONVERT(VARCHAR(100),CONVERT(DATE,BG.ChkOutDt,103),103),'') AS StayDuration,
+  CONVERT(VARCHAR(100),BG.CreatedDate,103) AS PODate,
+  BG.CurrentStatus AS BookingStatus,
+  CG.FirstName+' '+CG.LastName AS Guest,BG.GuestId,C.ClientName,B.ClientId,
+  BG.RoomCaptured,ISNULL(BG.CheckOutHdrId,0)
+  FROM WRBHBBooking B
+  LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id AND BP.IsActive=1
+  LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON 
+  BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND BG.IsActive=1
+  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id=BG.BookingPropertyId
+  LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id=B.ClientId
+  LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CG WITH(NOLOCK)ON
+  CG.CltmgntId=C.Id AND CG.CltmgntId=B.ClientId AND CG.Id=BG.GuestId
+  LEFT OUTER JOIN WRBHBChechkOutHdr CO WITH(NOLOCK)ON 
+  CO.BookingId=B.Id AND CO.Id=BG.CheckOutHdrId
+  WHERE B.IsActive=1 AND B.IsDeleted=0 AND BG.IsActive=1 AND 
+  BG.IsDeleted=0 AND ISNULL(B.CancelStatus,'')='' AND 
+  BP.PropertyType='MMT' AND B.BookingLevel='Room' AND BG.Occupancy='Double' AND
+  BG.CurrentStatus='CheckOut' AND CONVERT(DATE,BG.CreatedDate,103) BETWEEN 
+  CONVERT(DATE,@ChkInDt,103) AND CONVERT(DATE,@ChkOutDt,103);
+  
+   INSERT INTO #TMPTABLE(PropertyId,PropertyName,PONo,PONoId,POQty,Used,Unused,
+  RatePerDay,TotalLuxuryTax,TotalServiceTax,BookingCode,BookingId,
+  StayDuration,PODate,BookingStatus,Guest,GuestId,ClientName,ClientId,
+  RoomCaptured,CheckOutHdrId)
+  SELECT BP.PropertyId,BP.PropertyName,ISNULL(B.MMTPONo,'') AS PONo,ISNULL(B.MMTPONoId,0) AS PONoId,
+  DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS POQty,
+ 0 AS Used, 0 AS Unused,
+  BP.TripleTariff AS RatePerDay,
+  ISNULL(CO.LTAgreedAmount,0)+ISNULL(CO.LTRackAmount,0) AS TotalLuxuryTax,
+  ISNULL(CO.STAgreedAmount,0)+ISNULL(CO.STRackAmount,0) AS TotalServiceTax,    
+  B.BookingCode,B.Id AS BookingId,
+  ISNULL(CONVERT(VARCHAR(100),CONVERT(DATE,CO.CheckInDate,103),103)+' - '+
+  CONVERT(VARCHAR(100),CONVERT(DATE,BG.ChkOutDt,103),103),'') AS StayDuration,
+  CONVERT(VARCHAR(100),BG.CreatedDate,103) AS PODate,
+  BG.CurrentStatus AS BookingStatus,
+  CG.FirstName+' '+CG.LastName AS Guest,BG.GuestId,C.ClientName,B.ClientId,
+  BG.RoomCaptured,ISNULL(BG.CheckOutHdrId,0)
+  FROM WRBHBBooking B
+  LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id AND BP.IsActive=1
+  LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON 
+  BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND BG.IsActive=1
+  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id=BG.BookingPropertyId
+  LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id=B.ClientId
+  LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CG WITH(NOLOCK)ON
+  CG.CltmgntId=C.Id AND CG.CltmgntId=B.ClientId AND CG.Id=BG.GuestId
+  LEFT OUTER JOIN WRBHBChechkOutHdr CO WITH(NOLOCK)ON 
+  CO.BookingId=B.Id AND CO.Id=BG.CheckOutHdrId
+  WHERE B.IsActive=1 AND B.IsDeleted=0 AND BG.IsActive=1 AND 
+  BG.IsDeleted=0 AND ISNULL(B.CancelStatus,'')='' AND 
+  BP.PropertyType='MMT' AND B.BookingLevel='Room' AND BG.Occupancy='Triple' AND
   BG.CurrentStatus='CheckOut' AND CONVERT(DATE,BG.CreatedDate,103) BETWEEN 
   CONVERT(DATE,@ChkInDt,103) AND CONVERT(DATE,@ChkOutDt,103);
   --
@@ -111,6 +434,7 @@ IF @Action = 'POBased'
   RatePerDay,TotalTariff,TotalLuxuryTax,TotalServiceTax,TotalTax,TotalAmount,
   BookingCode,BookingId,StayDuration,PODate,BookingStatus,Guest,GuestId,
   ClientName,ClientId,RoomCaptured,ChkOutId)
+  
   SELECT PropertyId,PropertyName,PONo,PONoId,POQty,Used,Unused,
   RatePerDay,RatePerDay*Used AS TotalTariff,TotalLuxuryTax,
   TotalServiceTax,TotalLuxuryTax+TotalServiceTax AS TotalTax,
@@ -118,7 +442,7 @@ IF @Action = 'POBased'
   BookingCode,BookingId,StayDuration,PODate,BookingStatus,Guest,GuestId,
   ClientName,ClientId,RoomCaptured,CheckOutHdrId FROM #TMPTABLE;
   -- Check Out Booking : End 
-  CREATE TABLE #TABLE1(PropertyId INT,PropertyName NVARCHAR(100),
+  CREATE TABLE #TABLE1(PropertyId BIGINT,PropertyName NVARCHAR(100),
   PONo NVARCHAR(100),PONoId INT,POQty INT,Used INT,Unused INT,
   RatePerDay DECIMAL(27,2),TotalTariff DECIMAL(27,2),
   TotalLuxuryTax DECIMAL(27,2),TotalServiceTax DECIMAL(27,2),
@@ -148,7 +472,7 @@ IF @Action = 'POBased'
   FROM #TABLE AS B
   GROUP BY B.BookingId,B.RoomCaptured;
   --
-  CREATE TABLE #PO(PropertyId INT,PropertyName NVARCHAR(100),
+  CREATE TABLE #PO(PropertyId BIGINT,PropertyName NVARCHAR(100),
   PONo NVARCHAR(100),PONoId INT,POQty INT,Used INT,Unused INT,
   RatePerDay DECIMAL(27,2),TotalTariff DECIMAL(27,2),
   TotalLuxuryTax DECIMAL(27,2),TotalServiceTax DECIMAL(27,2),
@@ -182,7 +506,7 @@ IF @Action = 'POBased'
  END
 IF @Action = 'StayBased'
  BEGIN
-  CREATE TABLE #TABLEStay(PropertyId INT,PropertyName NVARCHAR(100),
+  CREATE TABLE #TABLEStay(PropertyId BIGINT,PropertyName NVARCHAR(100),
   PONo NVARCHAR(100),PONoId INT,POQty INT,Used INT,Unused INT,
   RatePerDay DECIMAL(27,2),TotalTariff DECIMAL(27,2),
   TotalLuxuryTax DECIMAL(27,2),TotalServiceTax DECIMAL(27,2),
@@ -191,13 +515,14 @@ IF @Action = 'StayBased'
   BookingStatus NVARCHAR(100),Guest NVARCHAR(100),GuestId INT,
   ClientName NVARCHAR(100),ClientId INT,RoomCaptured INT,ChkOutId INT,
   ChkInDt DATE);
+  
   INSERT INTO #TABLEStay(PropertyId,PropertyName,PONo,PONoId,POQty,Used,Unused,
   RatePerDay,TotalTariff,TotalLuxuryTax,TotalServiceTax,TotalTax,TotalAmount,
   BookingCode,BookingId,StayDuration,PODate,BookingStatus,Guest,GuestId,
   ClientName,ClientId,RoomCaptured,ChkOutId,ChkInDt)
   SELECT BP.PropertyId,P.PropertyName,B.PONo,B.PONoId,
   DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS POQty,0 AS Used,
-  DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS Unused,BG.Tariff AS RatePerDay,
+  DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS Unused,BP.SingleTariff AS RatePerDay,
   0 AS TotalTariff,0 AS TotalLuxuryTax,0 AS TotalServiceTax,0 AS TotalTax,
   0 AS TotalAmount,B.BookingCode,B.Id AS BookingId,
   CONVERT(VARCHAR(100),BG.ChkInDt,103)+' - '+
@@ -206,21 +531,167 @@ IF @Action = 'StayBased'
   BG.CurrentStatus AS BookingStatus,CG.FirstName+' '+CG.LastName AS Guest,
   BG.GuestId,C.ClientName,B.ClientId,BG.RoomCaptured,0,BG.ChkInDt
   FROM WRBHBBooking B
-  LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id
+  LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id AND BP.IsActive=1
   LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON 
-  BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id
+  BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND BG.IsActive=1
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id=BG.BookingPropertyId
   LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id=B.ClientId
   LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CG WITH(NOLOCK)ON
   CG.CltmgntId=C.Id AND CG.CltmgntId=B.ClientId AND CG.Id=BG.GuestId
   WHERE --ISNULL(B.CancelStatus,'')='Canceled' AND 
-  BP.PropertyType='ExP' AND
+  BP.PropertyType='ExP' AND  BG.Occupancy='Single' AND
   (ISNULL(B.CancelStatus,'')='Canceled' OR BG.CurrentStatus !='CheckOut') AND 
   B.BookingLevel='Room' AND BG.ChkInDt BETWEEN 
   CONVERT(DATE,@ChkInDt,103) AND CONVERT(DATE,@ChkOutDt,103)
   ORDER BY B.PONoId ASC;
+  
+   INSERT INTO #TABLEStay(PropertyId,PropertyName,PONo,PONoId,POQty,Used,Unused,
+  RatePerDay,TotalTariff,TotalLuxuryTax,TotalServiceTax,TotalTax,TotalAmount,
+  BookingCode,BookingId,StayDuration,PODate,BookingStatus,Guest,GuestId,
+  ClientName,ClientId,RoomCaptured,ChkOutId,ChkInDt)
+  SELECT BP.PropertyId,P.PropertyName,B.PONo,B.PONoId,
+  DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS POQty,0 AS Used,
+  DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS Unused,BP.DoubleTariff AS RatePerDay,
+  0 AS TotalTariff,0 AS TotalLuxuryTax,0 AS TotalServiceTax,0 AS TotalTax,
+  0 AS TotalAmount,B.BookingCode,B.Id AS BookingId,
+  CONVERT(VARCHAR(100),BG.ChkInDt,103)+' - '+
+  CONVERT(VARCHAR(100),BG.ChkOutDt,103) AS StayDuration,
+  CONVERT(VARCHAR(100),BG.CreatedDate,103) AS PODate,
+  BG.CurrentStatus AS BookingStatus,CG.FirstName+' '+CG.LastName AS Guest,
+  BG.GuestId,C.ClientName,B.ClientId,BG.RoomCaptured,0,BG.ChkInDt
+  FROM WRBHBBooking B
+  LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id AND BP.IsActive=1
+  LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON 
+  BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND BG.IsActive=1
+  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id=BG.BookingPropertyId
+  LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id=B.ClientId
+  LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CG WITH(NOLOCK)ON
+  CG.CltmgntId=C.Id AND CG.CltmgntId=B.ClientId AND CG.Id=BG.GuestId
+  WHERE --ISNULL(B.CancelStatus,'')='Canceled' AND 
+  BP.PropertyType='ExP' AND  BG.Occupancy='Double' AND
+  (ISNULL(B.CancelStatus,'')='Canceled' OR BG.CurrentStatus !='CheckOut') AND 
+  B.BookingLevel='Room' AND BG.ChkInDt BETWEEN 
+  CONVERT(DATE,@ChkInDt,103) AND CONVERT(DATE,@ChkOutDt,103)
+  ORDER BY B.PONoId ASC;
+  
+   INSERT INTO #TABLEStay(PropertyId,PropertyName,PONo,PONoId,POQty,Used,Unused,
+  RatePerDay,TotalTariff,TotalLuxuryTax,TotalServiceTax,TotalTax,TotalAmount,
+  BookingCode,BookingId,StayDuration,PODate,BookingStatus,Guest,GuestId,
+  ClientName,ClientId,RoomCaptured,ChkOutId,ChkInDt)
+  SELECT BP.PropertyId,P.PropertyName,B.PONo,B.PONoId,
+  DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS POQty,0 AS Used,
+  DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS Unused,BP.TripleTariff AS RatePerDay,
+  0 AS TotalTariff,0 AS TotalLuxuryTax,0 AS TotalServiceTax,0 AS TotalTax,
+  0 AS TotalAmount,B.BookingCode,B.Id AS BookingId,
+  CONVERT(VARCHAR(100),BG.ChkInDt,103)+' - '+
+  CONVERT(VARCHAR(100),BG.ChkOutDt,103) AS StayDuration,
+  CONVERT(VARCHAR(100),BG.CreatedDate,103) AS PODate,
+  BG.CurrentStatus AS BookingStatus,CG.FirstName+' '+CG.LastName AS Guest,
+  BG.GuestId,C.ClientName,B.ClientId,BG.RoomCaptured,0,BG.ChkInDt
+  FROM WRBHBBooking B
+  LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id AND BP.IsActive=1
+  LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON 
+  BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND BG.IsActive=1
+  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id=BG.BookingPropertyId
+  LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id=B.ClientId
+  LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CG WITH(NOLOCK)ON
+  CG.CltmgntId=C.Id AND CG.CltmgntId=B.ClientId AND CG.Id=BG.GuestId
+  WHERE --ISNULL(B.CancelStatus,'')='Canceled' AND 
+  BP.PropertyType='ExP' AND  BG.Occupancy='Triple' AND
+  (ISNULL(B.CancelStatus,'')='Canceled' OR BG.CurrentStatus !='CheckOut') AND 
+  B.BookingLevel='Room' AND BG.ChkInDt BETWEEN 
+  CONVERT(DATE,@ChkInDt,103) AND CONVERT(DATE,@ChkOutDt,103)
+  ORDER BY B.PONoId ASC;
+  
+  INSERT INTO #TABLEStay(PropertyId,PropertyName,PONo,PONoId,POQty,Used,Unused,
+  RatePerDay,TotalTariff,TotalLuxuryTax,TotalServiceTax,TotalTax,TotalAmount,
+  BookingCode,BookingId,StayDuration,PODate,BookingStatus,Guest,GuestId,
+  ClientName,ClientId,RoomCaptured,ChkOutId,ChkInDt)
+  SELECT BP.PropertyId,BP.PropertyName,ISNULL(B.MMTPONo,'') AS PONo,ISNULL(B.MMTPONoId,0) AS PONoId,
+  DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS POQty,0 AS Used,
+  DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS Unused,BP.SingleTariff AS RatePerDay,
+  0 AS TotalTariff,0 AS TotalLuxuryTax,0 AS TotalServiceTax,0 AS TotalTax,
+  0 AS TotalAmount,B.BookingCode,B.Id AS BookingId,
+  CONVERT(VARCHAR(100),BG.ChkInDt,103)+' - '+
+  CONVERT(VARCHAR(100),BG.ChkOutDt,103) AS StayDuration,
+  CONVERT(VARCHAR(100),BG.CreatedDate,103) AS PODate,
+  BG.CurrentStatus AS BookingStatus,CG.FirstName+' '+CG.LastName AS Guest,
+  BG.GuestId,C.ClientName,B.ClientId,BG.RoomCaptured,0,BG.ChkInDt
+  FROM WRBHBBooking B
+  LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id AND BP.IsActive=1
+  LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON 
+  BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND BG.IsActive=1
+  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id=BG.BookingPropertyId
+  LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id=B.ClientId
+  LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CG WITH(NOLOCK)ON
+  CG.CltmgntId=C.Id AND CG.CltmgntId=B.ClientId AND CG.Id=BG.GuestId
+  WHERE --ISNULL(B.CancelStatus,'')='Canceled' AND 
+  BP.PropertyType='ExP' AND  BG.Occupancy='Single' AND
+  (ISNULL(B.CancelStatus,'')='Canceled' OR BG.CurrentStatus !='CheckOut') AND 
+  B.BookingLevel='Room' AND BG.ChkInDt BETWEEN 
+  CONVERT(DATE,@ChkInDt,103) AND CONVERT(DATE,@ChkOutDt,103)
+  ORDER BY B.MMTPONoId ASC;
+  
+   INSERT INTO #TABLEStay(PropertyId,PropertyName,PONo,PONoId,POQty,Used,Unused,
+  RatePerDay,TotalTariff,TotalLuxuryTax,TotalServiceTax,TotalTax,TotalAmount,
+  BookingCode,BookingId,StayDuration,PODate,BookingStatus,Guest,GuestId,
+  ClientName,ClientId,RoomCaptured,ChkOutId,ChkInDt)
+  SELECT BP.PropertyId,BP.PropertyName,ISNULL(B.MMTPONo,'') AS PONo,ISNULL(B.MMTPONoId,0) AS PONoId,
+  DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS POQty,0 AS Used,
+  DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS Unused,BP.DoubleTariff AS RatePerDay,
+  0 AS TotalTariff,0 AS TotalLuxuryTax,0 AS TotalServiceTax,0 AS TotalTax,
+  0 AS TotalAmount,B.BookingCode,B.Id AS BookingId,
+  CONVERT(VARCHAR(100),BG.ChkInDt,103)+' - '+
+  CONVERT(VARCHAR(100),BG.ChkOutDt,103) AS StayDuration,
+  CONVERT(VARCHAR(100),BG.CreatedDate,103) AS PODate,
+  BG.CurrentStatus AS BookingStatus,CG.FirstName+' '+CG.LastName AS Guest,
+  BG.GuestId,C.ClientName,B.ClientId,BG.RoomCaptured,0,BG.ChkInDt
+  FROM WRBHBBooking B
+  LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id AND BP.IsActive=1
+  LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON 
+  BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND BG.IsActive=1
+  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id=BG.BookingPropertyId
+  LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id=B.ClientId
+  LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CG WITH(NOLOCK)ON
+  CG.CltmgntId=C.Id AND CG.CltmgntId=B.ClientId AND CG.Id=BG.GuestId
+  WHERE --ISNULL(B.CancelStatus,'')='Canceled' AND 
+  BP.PropertyType='MMT' AND  BG.Occupancy='Double' AND
+  (ISNULL(B.CancelStatus,'')='Canceled' OR BG.CurrentStatus !='CheckOut') AND 
+  B.BookingLevel='Room' AND BG.ChkInDt BETWEEN 
+  CONVERT(DATE,@ChkInDt,103) AND CONVERT(DATE,@ChkOutDt,103)
+  ORDER BY B.MMTPONoId ASC;
+  
+   INSERT INTO #TABLEStay(PropertyId,PropertyName,PONo,PONoId,POQty,Used,Unused,
+  RatePerDay,TotalTariff,TotalLuxuryTax,TotalServiceTax,TotalTax,TotalAmount,
+  BookingCode,BookingId,StayDuration,PODate,BookingStatus,Guest,GuestId,
+  ClientName,ClientId,RoomCaptured,ChkOutId,ChkInDt)
+  SELECT BP.PropertyId,BP.PropertyName,ISNULL(B.MMTPONo,'') AS PONo,ISNULL(B.MMTPONoId,0) AS PONoId,
+  DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS POQty,0 AS Used,
+  DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS Unused,BP.TripleTariff AS RatePerDay,
+  0 AS TotalTariff,0 AS TotalLuxuryTax,0 AS TotalServiceTax,0 AS TotalTax,
+  0 AS TotalAmount,B.BookingCode,B.Id AS BookingId,
+  CONVERT(VARCHAR(100),BG.ChkInDt,103)+' - '+
+  CONVERT(VARCHAR(100),BG.ChkOutDt,103) AS StayDuration,
+  CONVERT(VARCHAR(100),BG.CreatedDate,103) AS PODate,
+  BG.CurrentStatus AS BookingStatus,CG.FirstName+' '+CG.LastName AS Guest,
+  BG.GuestId,C.ClientName,B.ClientId,BG.RoomCaptured,0,BG.ChkInDt
+  FROM WRBHBBooking B
+  LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id AND BP.IsActive=1
+  LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON 
+  BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND BG.IsActive=1
+  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id=BG.BookingPropertyId
+  LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id=B.ClientId
+  LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CG WITH(NOLOCK)ON
+  CG.CltmgntId=C.Id AND CG.CltmgntId=B.ClientId AND CG.Id=BG.GuestId
+  WHERE --ISNULL(B.CancelStatus,'')='Canceled' AND 
+  BP.PropertyType='MMT' AND  BG.Occupancy='Triple' AND
+  (ISNULL(B.CancelStatus,'')='Canceled' OR BG.CurrentStatus !='CheckOut') AND 
+  B.BookingLevel='Room' AND BG.ChkInDt BETWEEN 
+  CONVERT(DATE,@ChkInDt,103) AND CONVERT(DATE,@ChkOutDt,103)
+  ORDER BY B.MMTPONoId ASC;
+  
   -- Check Out Booking : Begin
-  CREATE TABLE #TMPTABLEStay(PropertyId INT,PropertyName NVARCHAR(100),
+  CREATE TABLE #TMPTABLEStay(PropertyId BIGINT,PropertyName NVARCHAR(100),
   PONo NVARCHAR(100),PONoId INT,POQty INT,Used INT,Unused INT,
   RatePerDay DECIMAL(27,2),TotalLuxuryTax DECIMAL(27,2),
   TotalServiceTax DECIMAL(27,2),BookingCode INT,BookingId INT,
@@ -228,6 +699,7 @@ IF @Action = 'StayBased'
   BookingStatus NVARCHAR(100),Guest NVARCHAR(100),GuestId INT,
   ClientName NVARCHAR(100),ClientId INT,RoomCaptured INT,CheckOutHdrId INT,
   ChkInDt DATE);
+  
   INSERT INTO #TMPTABLEStay(PropertyId,PropertyName,PONo,PONoId,POQty,Used,Unused,
   RatePerDay,TotalLuxuryTax,TotalServiceTax,BookingCode,BookingId,
   StayDuration,PODate,BookingStatus,Guest,GuestId,ClientName,ClientId,
@@ -239,7 +711,7 @@ IF @Action = 'StayBased'
   ISNULL(DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) - 
   DATEDIFF(DAY,CONVERT(DATE,CO.CheckInDate,103),
   CONVERT(DATE,CO.CheckOutDate,103)),0) AS Unused,
-  BG.Tariff AS RatePerDay,
+  BP.SingleTariff AS RatePerDay,
   ISNULL(CO.LTAgreedAmount,0)+ISNULL(CO.LTRackAmount,0) AS TotalLuxuryTax,
   ISNULL(CO.STAgreedAmount,0)+ISNULL(CO.STRackAmount,0) AS TotalServiceTax,    
   B.BookingCode,B.Id AS BookingId,
@@ -250,9 +722,9 @@ IF @Action = 'StayBased'
   CG.FirstName+' '+CG.LastName AS Guest,BG.GuestId,C.ClientName,B.ClientId,
   BG.RoomCaptured,ISNULL(BG.CheckOutHdrId,0),BG.ChkInDt
   FROM WRBHBBooking B
-  LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id
+  LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id AND BP.IsActive=1
   LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON 
-  BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id
+  BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND BG.IsActive=1
   LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id=BG.BookingPropertyId
   LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id=B.ClientId
   LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CG WITH(NOLOCK)ON
@@ -261,9 +733,195 @@ IF @Action = 'StayBased'
   CO.BookingId=B.Id AND CO.Id=BG.CheckOutHdrId
   WHERE B.IsActive=1 AND B.IsDeleted=0 AND BG.IsActive=1 AND 
   BG.IsDeleted=0 AND ISNULL(B.CancelStatus,'')='' AND 
-  BP.PropertyType='ExP' AND B.BookingLevel='Room' AND 
+  BP.PropertyType='ExP' AND B.BookingLevel='Room' AND BG.Occupancy='Single' AND
   BG.CurrentStatus='CheckOut' AND CONVERT(DATE,CO.CheckInDate,103) BETWEEN 
   CONVERT(DATE,@ChkInDt,103) AND CONVERT(DATE,@ChkOutDt,103);
+  
+   INSERT INTO #TMPTABLEStay(PropertyId,PropertyName,PONo,PONoId,POQty,Used,Unused,
+  RatePerDay,TotalLuxuryTax,TotalServiceTax,BookingCode,BookingId,
+  StayDuration,PODate,BookingStatus,Guest,GuestId,ClientName,ClientId,
+  RoomCaptured,CheckOutHdrId,ChkInDt)
+  SELECT BP.PropertyId,P.PropertyName,B.PONo,B.PONoId,
+  DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS POQty,
+  ISNULL(DATEDIFF(DAY,CONVERT(DATE,CO.CheckInDate,103),
+  CONVERT(DATE,CO.CheckOutDate,103)),0) AS Used,
+  ISNULL(DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) - 
+  DATEDIFF(DAY,CONVERT(DATE,CO.CheckInDate,103),
+  CONVERT(DATE,CO.CheckOutDate,103)),0) AS Unused,
+  BP.DoubleTariff AS RatePerDay,
+  ISNULL(CO.LTAgreedAmount,0)+ISNULL(CO.LTRackAmount,0) AS TotalLuxuryTax,
+  ISNULL(CO.STAgreedAmount,0)+ISNULL(CO.STRackAmount,0) AS TotalServiceTax,    
+  B.BookingCode,B.Id AS BookingId,
+  ISNULL(CONVERT(VARCHAR(100),CONVERT(DATE,CO.CheckInDate,103),103)+' - '+
+  CONVERT(VARCHAR(100),CONVERT(DATE,BG.ChkOutDt,103),103),'') AS StayDuration,
+  CONVERT(VARCHAR(100),BG.CreatedDate,103) AS PODate,
+  BG.CurrentStatus AS BookingStatus,
+  CG.FirstName+' '+CG.LastName AS Guest,BG.GuestId,C.ClientName,B.ClientId,
+  BG.RoomCaptured,ISNULL(BG.CheckOutHdrId,0),BG.ChkInDt
+  FROM WRBHBBooking B
+  LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id AND BP.IsActive=1
+  LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON 
+  BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND BG.IsActive=1
+  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id=BG.BookingPropertyId
+  LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id=B.ClientId
+  LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CG WITH(NOLOCK)ON
+  CG.CltmgntId=C.Id AND CG.CltmgntId=B.ClientId AND CG.Id=BG.GuestId
+  LEFT OUTER JOIN WRBHBChechkOutHdr CO WITH(NOLOCK)ON 
+  CO.BookingId=B.Id AND CO.Id=BG.CheckOutHdrId
+  WHERE B.IsActive=1 AND B.IsDeleted=0 AND BG.IsActive=1 AND 
+  BG.IsDeleted=0 AND ISNULL(B.CancelStatus,'')='' AND 
+  BP.PropertyType='ExP' AND B.BookingLevel='Room' AND BG.Occupancy='Double' AND
+  BG.CurrentStatus='CheckOut' AND CONVERT(DATE,CO.CheckInDate,103) BETWEEN 
+  CONVERT(DATE,@ChkInDt,103) AND CONVERT(DATE,@ChkOutDt,103);
+  
+   INSERT INTO #TMPTABLEStay(PropertyId,PropertyName,PONo,PONoId,POQty,Used,Unused,
+  RatePerDay,TotalLuxuryTax,TotalServiceTax,BookingCode,BookingId,
+  StayDuration,PODate,BookingStatus,Guest,GuestId,ClientName,ClientId,
+  RoomCaptured,CheckOutHdrId,ChkInDt)
+  SELECT BP.PropertyId,P.PropertyName,B.PONo,B.PONoId,
+  DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS POQty,
+  ISNULL(DATEDIFF(DAY,CONVERT(DATE,CO.CheckInDate,103),
+  CONVERT(DATE,CO.CheckOutDate,103)),0) AS Used,
+  ISNULL(DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) - 
+  DATEDIFF(DAY,CONVERT(DATE,CO.CheckInDate,103),
+  CONVERT(DATE,CO.CheckOutDate,103)),0) AS Unused,
+  BP.TripleTariff AS RatePerDay,
+  ISNULL(CO.LTAgreedAmount,0)+ISNULL(CO.LTRackAmount,0) AS TotalLuxuryTax,
+  ISNULL(CO.STAgreedAmount,0)+ISNULL(CO.STRackAmount,0) AS TotalServiceTax,    
+  B.BookingCode,B.Id AS BookingId,
+  ISNULL(CONVERT(VARCHAR(100),CONVERT(DATE,CO.CheckInDate,103),103)+' - '+
+  CONVERT(VARCHAR(100),CONVERT(DATE,BG.ChkOutDt,103),103),'') AS StayDuration,
+  CONVERT(VARCHAR(100),BG.CreatedDate,103) AS PODate,
+  BG.CurrentStatus AS BookingStatus,
+  CG.FirstName+' '+CG.LastName AS Guest,BG.GuestId,C.ClientName,B.ClientId,
+  BG.RoomCaptured,ISNULL(BG.CheckOutHdrId,0),BG.ChkInDt
+  FROM WRBHBBooking B
+  LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id AND BP.IsActive=1
+  LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON 
+  BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND BG.IsActive=1
+  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id=BG.BookingPropertyId
+  LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id=B.ClientId
+  LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CG WITH(NOLOCK)ON
+  CG.CltmgntId=C.Id AND CG.CltmgntId=B.ClientId AND CG.Id=BG.GuestId
+  LEFT OUTER JOIN WRBHBChechkOutHdr CO WITH(NOLOCK)ON 
+  CO.BookingId=B.Id AND CO.Id=BG.CheckOutHdrId
+  WHERE B.IsActive=1 AND B.IsDeleted=0 AND BG.IsActive=1 AND 
+  BG.IsDeleted=0 AND ISNULL(B.CancelStatus,'')='' AND 
+  BP.PropertyType='ExP' AND B.BookingLevel='Room' AND BG.Occupancy='Triple' AND
+  BG.CurrentStatus='CheckOut' AND CONVERT(DATE,CO.CheckInDate,103) BETWEEN 
+  CONVERT(DATE,@ChkInDt,103) AND CONVERT(DATE,@ChkOutDt,103);
+  
+  INSERT INTO #TMPTABLEStay(PropertyId,PropertyName,PONo,PONoId,POQty,Used,Unused,
+  RatePerDay,TotalLuxuryTax,TotalServiceTax,BookingCode,BookingId,
+  StayDuration,PODate,BookingStatus,Guest,GuestId,ClientName,ClientId,
+  RoomCaptured,CheckOutHdrId,ChkInDt)
+  SELECT BP.PropertyId,BP.PropertyName,ISNULL(B.MMTPONo,'') AS PONo,ISNULL(B.MMTPONoId,0) AS PONoId,
+  DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS POQty,
+  ISNULL(DATEDIFF(DAY,CONVERT(DATE,CO.CheckInDate,103),
+  CONVERT(DATE,CO.CheckOutDate,103)),0) AS Used,
+  ISNULL(DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) - 
+  DATEDIFF(DAY,CONVERT(DATE,CO.CheckInDate,103),
+  CONVERT(DATE,CO.CheckOutDate,103)),0) AS Unused,
+  BP.SingleTariff AS RatePerDay,
+  ISNULL(CO.LTAgreedAmount,0)+ISNULL(CO.LTRackAmount,0) AS TotalLuxuryTax,
+  ISNULL(CO.STAgreedAmount,0)+ISNULL(CO.STRackAmount,0) AS TotalServiceTax,    
+  B.BookingCode,B.Id AS BookingId,
+  ISNULL(CONVERT(VARCHAR(100),CONVERT(DATE,CO.CheckInDate,103),103)+' - '+
+  CONVERT(VARCHAR(100),CONVERT(DATE,BG.ChkOutDt,103),103),'') AS StayDuration,
+  CONVERT(VARCHAR(100),BG.CreatedDate,103) AS PODate,
+  BG.CurrentStatus AS BookingStatus,
+  CG.FirstName+' '+CG.LastName AS Guest,BG.GuestId,C.ClientName,B.ClientId,
+  BG.RoomCaptured,ISNULL(BG.CheckOutHdrId,0),BG.ChkInDt
+  FROM WRBHBBooking B
+  LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id AND BP.IsActive=1
+  LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON 
+  BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND BG.IsActive=1
+  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id=BG.BookingPropertyId
+  LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id=B.ClientId
+  LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CG WITH(NOLOCK)ON
+  CG.CltmgntId=C.Id AND CG.CltmgntId=B.ClientId AND CG.Id=BG.GuestId
+  LEFT OUTER JOIN WRBHBChechkOutHdr CO WITH(NOLOCK)ON 
+  CO.BookingId=B.Id AND CO.Id=BG.CheckOutHdrId
+  WHERE B.IsActive=1 AND B.IsDeleted=0 AND BG.IsActive=1 AND 
+  BG.IsDeleted=0 AND ISNULL(B.CancelStatus,'')='' AND 
+  BP.PropertyType='MMT' AND B.BookingLevel='Room' AND BG.Occupancy='Single' AND
+  BG.CurrentStatus='CheckOut' AND CONVERT(DATE,CO.CheckInDate,103) BETWEEN 
+  CONVERT(DATE,@ChkInDt,103) AND CONVERT(DATE,@ChkOutDt,103);
+  
+   INSERT INTO #TMPTABLEStay(PropertyId,PropertyName,PONo,PONoId,POQty,Used,Unused,
+  RatePerDay,TotalLuxuryTax,TotalServiceTax,BookingCode,BookingId,
+  StayDuration,PODate,BookingStatus,Guest,GuestId,ClientName,ClientId,
+  RoomCaptured,CheckOutHdrId,ChkInDt)
+  SELECT BP.PropertyId,BP.PropertyName,ISNULL(B.MMTPONo,'') AS PONo,ISNULL(B.MMTPONoId,0) AS PONoId,
+  DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS POQty,
+  ISNULL(DATEDIFF(DAY,CONVERT(DATE,CO.CheckInDate,103),
+  CONVERT(DATE,CO.CheckOutDate,103)),0) AS Used,
+  ISNULL(DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) - 
+  DATEDIFF(DAY,CONVERT(DATE,CO.CheckInDate,103),
+  CONVERT(DATE,CO.CheckOutDate,103)),0) AS Unused,
+  BP.DoubleTariff AS RatePerDay,
+  ISNULL(CO.LTAgreedAmount,0)+ISNULL(CO.LTRackAmount,0) AS TotalLuxuryTax,
+  ISNULL(CO.STAgreedAmount,0)+ISNULL(CO.STRackAmount,0) AS TotalServiceTax,    
+  B.BookingCode,B.Id AS BookingId,
+  ISNULL(CONVERT(VARCHAR(100),CONVERT(DATE,CO.CheckInDate,103),103)+' - '+
+  CONVERT(VARCHAR(100),CONVERT(DATE,BG.ChkOutDt,103),103),'') AS StayDuration,
+  CONVERT(VARCHAR(100),BG.CreatedDate,103) AS PODate,
+  BG.CurrentStatus AS BookingStatus,
+  CG.FirstName+' '+CG.LastName AS Guest,BG.GuestId,C.ClientName,B.ClientId,
+  BG.RoomCaptured,ISNULL(BG.CheckOutHdrId,0),BG.ChkInDt
+  FROM WRBHBBooking B
+  LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id AND BP.IsActive=1
+  LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON 
+  BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND BG.IsActive=1
+  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id=BG.BookingPropertyId
+  LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id=B.ClientId
+  LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CG WITH(NOLOCK)ON
+  CG.CltmgntId=C.Id AND CG.CltmgntId=B.ClientId AND CG.Id=BG.GuestId
+  LEFT OUTER JOIN WRBHBChechkOutHdr CO WITH(NOLOCK)ON 
+  CO.BookingId=B.Id AND CO.Id=BG.CheckOutHdrId
+  WHERE B.IsActive=1 AND B.IsDeleted=0 AND BG.IsActive=1 AND 
+  BG.IsDeleted=0 AND ISNULL(B.CancelStatus,'')='' AND 
+  BP.PropertyType='MMT' AND B.BookingLevel='Room' AND BG.Occupancy='Double' AND
+  BG.CurrentStatus='CheckOut' AND CONVERT(DATE,CO.CheckInDate,103) BETWEEN 
+  CONVERT(DATE,@ChkInDt,103) AND CONVERT(DATE,@ChkOutDt,103);
+  
+   INSERT INTO #TMPTABLEStay(PropertyId,PropertyName,PONo,PONoId,POQty,Used,Unused,
+  RatePerDay,TotalLuxuryTax,TotalServiceTax,BookingCode,BookingId,
+  StayDuration,PODate,BookingStatus,Guest,GuestId,ClientName,ClientId,
+  RoomCaptured,CheckOutHdrId,ChkInDt)
+  SELECT BP.PropertyId,BP.PropertyName,ISNULL(B.MMTPONo,'') AS PONo,ISNULL(B.MMTPONoId,0) AS PONoId,
+  DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) AS POQty,
+  ISNULL(DATEDIFF(DAY,CONVERT(DATE,CO.CheckInDate,103),
+  CONVERT(DATE,CO.CheckOutDate,103)),0) AS Used,
+  ISNULL(DATEDIFF(DAY,BG.ChkInDt,BG.ChkOutDt) - 
+  DATEDIFF(DAY,CONVERT(DATE,CO.CheckInDate,103),
+  CONVERT(DATE,CO.CheckOutDate,103)),0) AS Unused,
+  BP.TripleTariff AS RatePerDay,
+  ISNULL(CO.LTAgreedAmount,0)+ISNULL(CO.LTRackAmount,0) AS TotalLuxuryTax,
+  ISNULL(CO.STAgreedAmount,0)+ISNULL(CO.STRackAmount,0) AS TotalServiceTax,    
+  B.BookingCode,B.Id AS BookingId,
+  ISNULL(CONVERT(VARCHAR(100),CONVERT(DATE,CO.CheckInDate,103),103)+' - '+
+  CONVERT(VARCHAR(100),CONVERT(DATE,BG.ChkOutDt,103),103),'') AS StayDuration,
+  CONVERT(VARCHAR(100),BG.CreatedDate,103) AS PODate,
+  BG.CurrentStatus AS BookingStatus,
+  CG.FirstName+' '+CG.LastName AS Guest,BG.GuestId,C.ClientName,B.ClientId,
+  BG.RoomCaptured,ISNULL(BG.CheckOutHdrId,0),BG.ChkInDt
+  FROM WRBHBBooking B
+  LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id AND BP.IsActive=1
+  LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON 
+  BG.BookingId=B.Id AND BG.BookingPropertyTableId=BP.Id AND BG.IsActive=1
+  LEFT OUTER JOIN WRBHBProperty P WITH(NOLOCK)ON P.Id=BG.BookingPropertyId
+  LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK)ON C.Id=B.ClientId
+  LEFT OUTER JOIN WRBHBClientManagementAddClientGuest CG WITH(NOLOCK)ON
+  CG.CltmgntId=C.Id AND CG.CltmgntId=B.ClientId AND CG.Id=BG.GuestId
+  LEFT OUTER JOIN WRBHBChechkOutHdr CO WITH(NOLOCK)ON 
+  CO.BookingId=B.Id AND CO.Id=BG.CheckOutHdrId
+  WHERE B.IsActive=1 AND B.IsDeleted=0 AND BG.IsActive=1 AND 
+  BG.IsDeleted=0 AND ISNULL(B.CancelStatus,'')='' AND 
+  BP.PropertyType='MMT' AND B.BookingLevel='Room' AND BG.Occupancy='Triple' AND
+  BG.CurrentStatus='CheckOut' AND CONVERT(DATE,CO.CheckInDate,103) BETWEEN 
+  CONVERT(DATE,@ChkInDt,103) AND CONVERT(DATE,@ChkOutDt,103);
+  
   --
   INSERT INTO #TABLEStay(PropertyId,PropertyName,PONo,PONoId,POQty,Used,Unused,
   RatePerDay,TotalTariff,TotalLuxuryTax,TotalServiceTax,TotalTax,TotalAmount,
@@ -276,7 +934,7 @@ IF @Action = 'StayBased'
   BookingCode,BookingId,StayDuration,PODate,BookingStatus,Guest,GuestId,
   ClientName,ClientId,RoomCaptured,CheckOutHdrId,ChkInDt FROM #TMPTABLEStay;
   -- Check Out Booking : End
-  CREATE TABLE #TABLE1Stay(PropertyId INT,PropertyName NVARCHAR(100),
+  CREATE TABLE #TABLE1Stay(PropertyId BIGINT,PropertyName NVARCHAR(100),
   PONo NVARCHAR(100),PONoId INT,POQty INT,Used INT,Unused INT,
   RatePerDay DECIMAL(27,2),TotalTariff DECIMAL(27,2),
   TotalLuxuryTax DECIMAL(27,2),TotalServiceTax DECIMAL(27,2),
@@ -307,7 +965,7 @@ IF @Action = 'StayBased'
   FROM #TABLEStay AS B
   GROUP BY B.BookingId,B.RoomCaptured;
   --
-  CREATE TABLE #Stay(PropertyId INT,PropertyName NVARCHAR(100),
+  CREATE TABLE #Stay(PropertyId BIGINT,PropertyName NVARCHAR(100),
   PONo NVARCHAR(100),PONoId INT,POQty INT,Used INT,Unused INT,
   RatePerDay DECIMAL(27,2),TotalTariff DECIMAL(27,2),
   TotalLuxuryTax DECIMAL(27,2),TotalServiceTax DECIMAL(27,2),

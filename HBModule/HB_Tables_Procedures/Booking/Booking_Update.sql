@@ -59,6 +59,16 @@ BEGIN
    SET @HBStay = 'StayCorporateHB';
    SET @PropertyRefNo = '';
   END
+ ELSE
+  BEGIN
+   SET @HBStay = '';
+  END
+ --
+ IF @BookingLevel = 'Room'
+  BEGIN
+   IF @PaymentFlag = 1 BEGIN SET @PaymentFlag = 0 END
+   ELSE BEGIN SET @PaymentFlag = 1 END
+  END
  --   
  UPDATE WRBHBBooking SET CheckInDate = CONVERT(DATE,@CheckInDate,103),
  CheckOutDate = CONVERT(DATE,@CheckOutDate,103),

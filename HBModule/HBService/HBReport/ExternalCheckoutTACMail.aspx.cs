@@ -59,10 +59,11 @@ namespace HBReport
                 ReportParameter paramLogo = new ReportParameter();
 
                 paramLogo.Name = "Path";
-
+                string var = ConfigurationManager.ConnectionStrings["Images"].ToString();
+                paramLogo.Values.Add(@"file:///" + var + "LogoNew.png");
                 //paramLogo.Values.Add(@"D:\Project\HR_Service\WrbHRPrint\Images\Logo.png");
                 // string var = ConfigurationManager.ConnectionStrings["Images"].ToString();
-                paramLogo.Values.Add(@"http://sstage.in/Company_Images/HummingBird_Travel__0_0_HB_Logo.png_HB_Logo.png");
+      //          paramLogo.Values.Add(@"http://sstage.in/Company_Images/HummingBird_Travel__0_0_HB_Logo.png_HB_Logo.png");
                 ReportViewer1.LocalReport.SetParameters(paramLogo);
 
 

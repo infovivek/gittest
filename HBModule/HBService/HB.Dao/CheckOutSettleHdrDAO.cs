@@ -16,7 +16,7 @@ namespace HB.Dao
 {
     public class CheckOutSettleHdrDAO
     {
- string UserData;
+        string UserData;
         SqlCommand Cmd = new SqlCommand();
         public DataSet Save(string Hdrval, User user)
         {
@@ -52,33 +52,79 @@ namespace HB.Dao
             Cmd.Parameters.Add("@CreatedBy", SqlDbType.Int).Value = user.Id;
             ds = new WrbErpConnection().ExecuteDataSet(Cmd, "");
 
+
+            System.Net.Mail.MailMessage message = new System.Net.Mail.MailMessage();
+            message.From = new System.Net.Mail.MailAddress("noreply@hummingbirdindia.com", "HummingBird", System.Text.Encoding.UTF8);
+            string Valid = ""; string Err = "";
+           
             if (ds.Tables[1].Rows[0][3].ToString() != "") // GuestMail 
             {
-            //for mail to direct mode
-            string Valid = ""; string Err = "";
-            //     string Email = "shiv@hummingbirdindia.com";
-         //   string Email = "shameem@warblerit.com";
-            string Email = ds.Tables[1].Rows[0][3].ToString();
-            Valid = EmailValidate(Email);
+                int Cntfalse = 0;
+                    if (ds.Tables[1].Rows[0][3].ToString() != "")
+                    {
+                        string ExtraCC = ds.Tables[1].Rows[0][3].ToString();
+                        var ExtraCCEmail = ExtraCC.Split(',');
+                        int cnt = ExtraCCEmail.Length;
+                        for (int i = 0; i < cnt; i++)
+                        {
+                            if (ExtraCCEmail[i].ToString() != "")
+                            {
+                                Valid = EmailValidate(ExtraCCEmail[i].ToString());
+                                if (Valid == "True")
+                                {
+                                    message.To.Add(new System.Net.Mail.MailAddress(ExtraCCEmail[i].ToString()));
+                                }
+                                else
+                                {
+                                    Cntfalse += 1;
+                                }
+                            }
+                        }
+                        if (Cntfalse == cnt)
+                        {
+                            
+                            message.Bcc.Add(new System.Net.Mail.MailAddress("shameem@warblerit.com"));
+                            
+                        }
+                        else
+                        {
+                            
+                            message.Bcc.Add(new System.Net.Mail.MailAddress("shameem@warblerit.com"));
+                            
+                        }
+                    }
+                    else
+                    {
+                        
+                        message.Bcc.Add(new System.Net.Mail.MailAddress("shameem@warblerit.com"));
+                        
+                    }
 
-            if ((ds.Tables[0].Rows[0][0].ToString() != "UserName or EmailId Already Exist"))
-            {
+      //      //for mail to direct mode
+      //      string Valid = ""; string Err = "";
+      //      //     string Email = "shiv@hummingbirdindia.com";
+      //   //   string Email = "shameem@warblerit.com";
+      //      string Email = ds.Tables[1].Rows[0][3].ToString();
+      //      Valid = EmailValidate(Email);
 
-                System.Net.Mail.MailMessage message = new System.Net.Mail.MailMessage();
-         //       message.From = new System.Net.Mail.MailAddress("noreply@staysimplyfied.com", "staysimplyfied", System.Text.Encoding.UTF8);
-                message.From = new System.Net.Mail.MailAddress("feedbackhb@hummingbirdindia.com", "Hummingbird Feedback", System.Text.Encoding.UTF8);
-                if (Valid == "True")
-                {
-                    message.To.Add(new System.Net.Mail.MailAddress(Email));
-                }
-                else
-                {
-                    Err = "";
-                }
-      //          message.Bcc.Add(new System.Net.Mail.MailAddress("vivek@warblerit.com"));
-                message.Bcc.Add(new System.Net.Mail.MailAddress("shameem@warblerit.com"));
-                //     message.Bcc.Add(new System.Net.Mail.MailAddress("silam@hummingbirdindia.com"));
-                //     message.Bcc.Add(new System.Net.Mail.MailAddress("karthik@hummingbirdindia.com"));
+      //      if ((ds.Tables[0].Rows[0][0].ToString() != "UserName or EmailId Already Exist"))
+      //      {
+
+      //          System.Net.Mail.MailMessage message = new System.Net.Mail.MailMessage();
+      //   //       message.From = new System.Net.Mail.MailAddress("noreply@staysimplyfied.com", "staysimplyfied", System.Text.Encoding.UTF8);
+      //          message.From = new System.Net.Mail.MailAddress("feedbackhb@hummingbirdindia.com", "Hummingbird Feedback", System.Text.Encoding.UTF8);
+      //          if (Valid == "True")
+      //          {
+      //              message.To.Add(new System.Net.Mail.MailAddress(Email));
+      //          }
+      //          else
+      //          {
+      //              Err = "";
+      //          }
+      ////          message.Bcc.Add(new System.Net.Mail.MailAddress("vivek@warblerit.com"));
+      //          message.Bcc.Add(new System.Net.Mail.MailAddress("shameem@warblerit.com"));
+      //          //     message.Bcc.Add(new System.Net.Mail.MailAddress("silam@hummingbirdindia.com"));
+      //          //     message.Bcc.Add(new System.Net.Mail.MailAddress("karthik@hummingbirdindia.com"));
 
                 message.Subject = "FeedBack Form";
                 string Imagelocation = "";
@@ -108,7 +154,7 @@ namespace HB.Dao
                            " <tr style=\"font-size:12px;\">" +
                            " <td width=\"600\" style=\"padding:3px 5px;\">" +
                            " <p style=\"margin-top:10px;\">" +
-                           "<span>Dear    " + ChkOutSet.PayeeName + " , </span> " + " <br>" +
+                           "<span>Dear Guest , </span> " + " <br>" +
                            " </p>" +
                            "<span>Thank you for Booking HummingBird. " +
                             " <br>" +
@@ -161,11 +207,11 @@ namespace HB.Dao
                 smtp.EnableSsl = true;
                 smtp.Host = "email-smtp.us-west-2.amazonaws.com";
                 //Local test for below smtp 
-             //   smtp.Host = "smtp.gmail.com";
+                //smtp.Host = "smtp.gmail.com";
 
                 smtp.Port = 587;
                 smtp.Credentials = new System.Net.NetworkCredential("AKIAIIVF5D5D3CJAX7SQ", "ApmuZkd+L8tissEga8kac3quhhwohEi5CB+dYD36KTq3");
-              //  smtp.Credentials = new System.Net.NetworkCredential("stay@staysimplyfied.com", "stay1234");
+                //smtp.Credentials = new System.Net.NetworkCredential("stay@staysimplyfied.com", "stay1234");
                 try
                 {
                     smtp.Send(message);
@@ -175,7 +221,7 @@ namespace HB.Dao
                     CreateLogFiles log = new CreateLogFiles();
                     log.ErrorLog(ex.Message + " -->Internal Feedback Checkout --> " + message.Subject);
                 }
-            }
+            
           }//Mail Close 
 
             return ds;

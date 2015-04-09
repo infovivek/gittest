@@ -356,16 +356,17 @@ If @Action = 'GuestLoad'
 	
 	
 -- Table1 ( for Guest Name Load )
-		CREATE TABLE #CheckIn1(Id INT,PropertyId BIGINT,CheckInGuest NVARCHAR(500),GuestId NVARCHAR(500),RefGuestId Nvarchar(500),BookingId INT,RoomId INT,ApartmentId INT,BookingLevel NVARCHAR(500),BedId INT,
-		RoomCaptureId INT,BookingAssGuestId int)
-		CREATE TABLE #CheckIn2(Id INT,PropertyId BIGINT,CheckInGuest NVARCHAR(500),GuestId NVARCHAR(500),RefGuestId Nvarchar(500),BookingId INT,RoomId INT,ApartmentId INT,BookingLevel NVARCHAR(500),BedId INT,
-		RoomCaptureId INT,BookingAssGuestId int)
-		CREATE TABLE #CheckIn3(Id INT,PropertyId BIGINT,CheckInGuest NVARCHAR(500),GuestId NVARCHAR(500),RefGuestId Nvarchar(500),BookingId INT,RoomId INT,ApartmentId INT,BookingLevel NVARCHAR(500),BedId INT,
-		RoomCaptureId INT,BookingAssGuestId int)
-		CREATE TABLE #CheckInfinal(Id INT,PropertyId BIGINT,CheckInGuest NVARCHAR(500),GuestId NVARCHAR(500),RefGuestId Nvarchar(500),BookingId INT,RoomId INT,ApartmentId INT,BookingLevel NVARCHAR(500),BedId INT,
-		RoomCaptureId INT,BookingAssGuestId int,PId BIGINT PRIMARY KEY IDENTITY (1,1))
-		CREATE TABLE #CheckInfinal2(Id INT,PropertyId BIGINT,CheckInGuest NVARCHAR(500),GuestId NVARCHAR(500),RefGuestId Nvarchar(500),BookingId INT,RoomId INT,ApartmentId INT,BookingLevel NVARCHAR(500),BedId INT,
-		RoomCaptureId INT,BookingAssGuestId int)
+		CREATE TABLE #CheckIn1(Id INT,PropertyId BIGINT,CheckInGuest NVARCHAR(500),GuestId NVARCHAR(500),RefGuestId Nvarchar(500),EmailId Nvarchar(500),
+		MobileNo Nvarchar(500),BookingId INT,RoomId INT,ApartmentId INT,BookingLevel NVARCHAR(500),BedId INT,RoomCaptureId INT,BookingAssGuestId int)
+		CREATE TABLE #CheckIn2(Id INT,PropertyId BIGINT,CheckInGuest NVARCHAR(500),GuestId NVARCHAR(500),RefGuestId Nvarchar(500),EmailId Nvarchar(500),
+		MobileNo Nvarchar(500),BookingId INT,RoomId INT,ApartmentId INT,BookingLevel NVARCHAR(500),BedId INT,RoomCaptureId INT,BookingAssGuestId int)
+		CREATE TABLE #CheckIn3(Id INT,PropertyId BIGINT,CheckInGuest NVARCHAR(500),GuestId NVARCHAR(500),RefGuestId Nvarchar(500),EmailId Nvarchar(500),
+		MobileNo Nvarchar(500),BookingId INT,RoomId INT,ApartmentId INT,BookingLevel NVARCHAR(500),BedId INT,RoomCaptureId INT,BookingAssGuestId int)
+		CREATE TABLE #CheckInfinal(Id INT,PropertyId BIGINT,CheckInGuest NVARCHAR(500),GuestId NVARCHAR(500),RefGuestId Nvarchar(500),EmailId Nvarchar(500),
+		MobileNo Nvarchar(500),BookingId INT,RoomId INT,ApartmentId INT,BookingLevel NVARCHAR(500),BedId INT,RoomCaptureId INT,BookingAssGuestId int,
+		PId BIGINT PRIMARY KEY IDENTITY (1,1))
+		CREATE TABLE #CheckInfinal2(Id INT,PropertyId BIGINT,CheckInGuest NVARCHAR(500),GuestId NVARCHAR(500),RefGuestId Nvarchar(500),EmailId Nvarchar(500),
+		MobileNo Nvarchar(500),BookingId INT,RoomId INT,ApartmentId INT,BookingLevel NVARCHAR(500),BedId INT,RoomCaptureId INT,BookingAssGuestId int)
 		
 		DECLARE @NoData INT,@BookingId1 BIGINT,@RoomId1 BIGINT,@AparmentId BIGINT,@BedId BIGINT,
 		@BookingLevel NVARCHAR(100),@PId BIGINT;
@@ -399,7 +400,7 @@ If @Action = 'GuestLoad'
 		--SET @Roles=(SELECT Roles FROM WRBHBUserRoles  WHERE UserId = @UserId AND IsActive = 1 AND IsDeleted = 0 AND Roles = 'Resident Managers')  
 		
 	
-		
+	
 IF @Roles = 'Operations Managers' --OR @Roles = 'Resident Managers'
 BEGIN
 IF @SSPId =0
@@ -407,14 +408,17 @@ IF @SSPId =0
 	
 	
 -- To Check Booked and Direct Booked for Room Level
-	INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
+	INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,
+	ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		SELECT  H.Id,AG.BookingPropertyId As PropertyId,
-		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,
+		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,GD.EmailId,GD.MobileNo,
 		AG.BookingId,AG.RoomId,0 as ApartmentId,H.BookingLevel,0 as BedId,AG.RoomCaptured,AG.Id--,AG.Occupancy
 		FROM WRBHBBooking H		
 		join WRBHBBookingProperty BP on BP.BookingId = H.Id and BP.IsActive = 1 and BP.IsDeleted=0
 		join WRBHBBookingPropertyAssingedGuest AG on H.Id= AG.BookingId 
 		AND AG.BookingPropertyId = BP.PropertyId AND AG.BookingPropertyTableId = BP.Id AND AG.IsActive = 1 and AG.IsDeleted = 0
+		JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON H.Id=GD.BookingId AND GD.IsActive=1 AND GD.IsDeleted=0
+		AND AG.GuestId=GD.GuestId
 		join WRBHBProperty P on P.Id = AG.BookingPropertyId and P.IsActive = 1 and P.IsDeleted = 0
 		join WRBHBPropertyUsers PU on PU.PropertyId = P.Id and PU.IsActive = 1 and PU.IsDeleted = 0
 		join WRBHBUser U on   PU.UserId =U.Id and pu.IsActive = 1 and PU.IsDeleted = 0
@@ -435,46 +439,61 @@ IF @SSPId =0
 		--AND AG.RoomId NOT IN (SELECT RoomId From WrbHbCheckInHdr WHERE BookingId=AG.BookingId) 
 		group by H.Id,AG.BookingPropertyId ,
 		AG.FirstName,AG.LastName,AG.GuestId,AG.GuestId,
-		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id
+		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id,GD.EmailId,GD.MobileNo
 	     
 	    -- Table2 ( to check single or double) 
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) =1)
 		
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) >=2)
 		
 		-- Table3(Concatinate 2 Guest Name)
 	--	CREATE TABLE #CheckIn3(Id INT,PropertyId INT,ChkInGuest NVARCHAR(100),GuestId NVARCHAR(100),BookingId INT,RoomId INT)
-		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		select distinct t2.Id,t2.PropertyId,
 		(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId and t1.RoomCaptureId =t2.RoomCaptureId
         FOR XML PATH('')), 3, 10000000) AS list) AS ChkInGuest,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId and t1.RoomCaptureId =t2.RoomCaptureId
         FOR XML PATH('')), 3, 10000000) AS list) AS GuestId,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
-        FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId and t1.RoomCaptureId =t2.RoomCaptureId
+        FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,
+        (SELECT Substring((SELECT ', ' + CAST(t1.EmailId AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId and t1.RoomCaptureId =t2.RoomCaptureId
+        FOR XML PATH('')), 3, 10000000) AS list) AS EmailId,
+        (SELECT Substring((SELECT ',' + CAST(t1.MobileNo AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId and t1.RoomCaptureId =t2.RoomCaptureId
+        FOR XML PATH('')), 3, 10000000) AS list) AS MobileNo,
+        t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2
 		
 -- To Check  Booked for Apartment Level 
-INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
+		INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		select  H.Id,ABPA.BookingPropertyId As PropertyId,
-		 (ABPA.FirstName+','+ABPA.LastName) as  ChkInGuest,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,0 as RoomId,
+		 (ABPA.FirstName+','+ABPA.LastName) as  ChkInGuest,ABPA.GuestId,ABPA.GuestId,GD.EmailId,GD.MobileNo,ABPA.BookingId,0 as RoomId,
 		 ABPA.ApartmentId,H.BookingLevel,0 as BedId,ABPA.RoomCaptured as RoomCaptureId,ABPA.Id
 		 FROM WRBHBBooking H
 		 join WRBHBApartmentBookingPropertyAssingedGuest ABPA on H.Id = ABPA.BookingId AND
 		 ABPA.IsActive = 1 AND ABPA.IsDeleted = 0
+		 JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON H.Id=GD.BookingId AND GD.IsActive=1 AND GD.IsDeleted=0
+		AND ABPA.GuestId=GD.GuestId
 		 join WRBHBProperty P on P.Id = ABPA.BookingPropertyId and P.IsActive = 1 and P.IsDeleted = 0
 		 join WRBHBPropertyUsers PU on PU.PropertyId = P.Id and PU.IsActive = 1 and PU.IsDeleted = 0
 		join WRBHBUser U on   PU.UserId =U.Id and pu.IsActive = 1 and PU.IsDeleted = 0
@@ -493,49 +512,63 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 		-- and ABPA.ApartmentId NOT IN (SELECT ApartmentId From WrbHbCheckInHdr WHERE BookingId=ABPA.BookingId) 
 		group by H.Id,ABPA.BookingPropertyId ,
 		 ABPA.FirstName,ABPA.LastName,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,
-		 ABPA.ApartmentId,H.BookingLevel,ABPA.Id,ABPA.RoomCaptured
+		 ABPA.ApartmentId,H.BookingLevel,ABPA.Id,ABPA.RoomCaptured,GD.EmailId,GD.MobileNo
 		 
 -- Table2 ( to check single or double) 
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) =1)
 	
 		
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		SELECT Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		SELECT Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		FROM #CheckIn1
 		WHERE BookingId  IN (SELECT BookingId From #CheckIn1
 		GROUP BY BookingId having COUNT(*) >=2)
 		
 		-- Table3(Concatinate 2 Guest Name)
 	--	CREATE TABLE #CheckIn3(Id INT,PropertyId INT,ChkInGuest NVARCHAR(100),GuestId NVARCHAR(100),BookingId INT,RoomId INT)
-		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		SELECT DISTINCT t2.Id,t2.PropertyId,
 		(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId and t1.RoomCaptureId =t2.RoomCaptureId
         FOR XML PATH('')), 3, 10000000) AS list) AS ChkInGuest,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId and t1.RoomCaptureId =t2.RoomCaptureId
         FOR XML PATH('')), 3, 10000000) AS list) AS GuestId,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId --and t1.GuestId =t2.GuestId
-        FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId and t1.RoomCaptureId =t2.RoomCaptureId
+        FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,
+        (SELECT Substring((SELECT ', ' + CAST(t1.EmailId AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId and t1.RoomCaptureId =t2.RoomCaptureId
+        FOR XML PATH('')), 3, 10000000) AS list) AS EmailId,
+        (SELECT Substring((SELECT ', ' + CAST(t1.MobileNo AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS MobileNo,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2
 		
 		
 		
 -- to check Bed Level
-INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
+INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		 select  H.Id,ABPA.BookingPropertyId As PropertyId,
-		 (ABPA.FirstName+','+ABPA.LastName) as  ChkInGuest,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,ABPA.RoomId,
-		 0 AS ApartmentId,H.BookingLevel,ABPA.BedId as BedId,ABPA.RoomCaptured as RoomCaptureId,ABPA.Id
+		 (ABPA.FirstName+','+ABPA.LastName) as  ChkInGuest,ABPA.GuestId,ABPA.GuestId,GD.EmailId,GD.MobileNo,
+		 ABPA.BookingId,ABPA.RoomId,0 AS ApartmentId,H.BookingLevel,ABPA.BedId as BedId,ABPA.RoomCaptured as RoomCaptureId,ABPA.Id
 		 FROM WRBHBBooking H
 		 join WRBHBBedBookingPropertyAssingedGuest ABPA on H.Id = ABPA.BookingId  AND
 		 ABPA.IsActive = 1 AND ABPA.IsDeleted = 0
+		 JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON H.Id=GD.BookingId AND GD.IsActive=1 AND GD.IsDeleted=0
+		AND ABPA.GuestId=GD.GuestId
 		join WRBHBProperty P on P.Id = ABPA.BookingPropertyId and P.IsActive = 1 and P.IsDeleted = 0
 		join WRBHBPropertyUsers PU on PU.PropertyId = P.Id and PU.IsActive = 1 and PU.IsDeleted = 0
 		join WRBHBUser U on   PU.UserId =U.Id and pu.IsActive = 1 and PU.IsDeleted = 0
@@ -553,26 +586,31 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 		-- and ABPA.BedId NOT IN (SELECT BedId From WrbHbCheckInHdr WHERE BookingId=ABPA.BookingId)  
 		 group by H.Id,ABPA.BookingPropertyId ,
 		 ABPA.FirstName,ABPA.LastName,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,ABPA.RoomId,
-		 H.BookingLevel,ABPA.BedId ,ABPA.Id,ABPA.RoomCaptured
+		 H.BookingLevel,ABPA.BedId ,ABPA.Id,ABPA.RoomCaptured,GD.EmailId,GD.MobileNo
 		 
 		 -- Table2 ( to check single or double) 
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,
+		RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) =1)
 		
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) >=2)
 		
 		-- Table3(Concatinate 2 Guest Name)
 	--	CREATE TABLE #CheckIn3(Id INT,PropertyId INT,ChkInGuest NVARCHAR(100),GuestId NVARCHAR(100),BookingId INT,RoomId INT)
-		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		select distinct t2.Id,t2.PropertyId,
 		(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
         FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
@@ -581,19 +619,28 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
         FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS GuestId,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,
+        (SELECT Substring((SELECT ',' + CAST(t1.EmailId AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS EmailId,
+        (SELECT Substring((SELECT ',' + CAST(t1.MobileNo AS VARCHAR(1024))
         FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
-        FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS MobileNo,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2
 		
 -- External Property to check single double 		
-		INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
+		INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		SELECT H.Id,AG.BookingPropertyId As PropertyId,
-		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,
+		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,GD.EmailId,GD.MobileNo,
 		AG.BookingId,AG.RoomId,0 as ApartmentId,H.BookingLevel,0 as BedId,AG.RoomCaptured,AG.Id--,AG.Occupancy
 		FROM WRBHBBooking H	
 		join WRBHBBookingProperty BP on BP.BookingId = H.Id
 		join WRBHBBookingPropertyAssingedGuest AG on H.Id= AG.BookingId 
 		AND AG.BookingPropertyId = BP.PropertyId AND AG.BookingPropertyTableId = BP.Id AND AG.IsActive = 1 and AG.IsDeleted = 0	
+		JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON H.Id=GD.BookingId AND GD.IsActive=1 AND GD.IsDeleted=0
+		AND AG.GuestId=GD.GuestId
 	--	join WRBHBBookingPropertyAssingedGuest AG on H.Id= AG.BookingId AND AG.IsActive = 1 and AG.IsDeleted = 0
 		join WRBHBProperty P on P.Id = AG.BookingPropertyId and P.IsActive = 1 and P.IsDeleted = 0
 		join WRBHBPropertyUsers PU on PU.PropertyId = P.Id and PU.IsActive = 1 and PU.IsDeleted = 0
@@ -616,25 +663,30 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 	--	AND AG.RoomId NOT IN (SELECT RoomId From WrbHbCheckInHdr WHERE BookingId=AG.BookingId) 
 	     group by H.Id,AG.BookingPropertyId ,
 		AG.FirstName,AG.LastName,AG.GuestId,AG.GuestId,
-		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id
+		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id,GD.EmailId,GD.MobileNo
 	    -- Table2 ( to check single or double) 
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) =1)
 		
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,
+		RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) >=2)
 		
 		-- Table3(Concatinate 2 Guest Name)
 	--	CREATE TABLE #CheckIn3(Id INT,PropertyId INT,ChkInGuest NVARCHAR(100),GuestId NVARCHAR(100),BookingId INT,RoomId INT)
-		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		--select distinct t2.Id,t2.PropertyId,
 		--(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
   --      FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId and t1.GuestId =t2.GuestId
@@ -656,18 +708,27 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
         FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS ReefGuestId,
+        (SELECT Substring((SELECT ',' + CAST(t1.EmailId AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS EmailId,
+        (SELECT Substring((SELECT ',' + CAST(t1.MobileNo AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS MobileNo,
          t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2 
 		
 		
 -- CPP to check single double 		
-		INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
+		INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		SELECT H.Id,AG.BookingPropertyId As PropertyId,
-		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,
+		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,GD.EmailId,GD.MobileNo,
 		AG.BookingId,AG.RoomId,0 as ApartmentId,H.BookingLevel,0 as BedId,AG.RoomCaptured,AG.Id--,AG.Occupancy
 		FROM WRBHBBooking H		
 		
 		join WRBHBBookingPropertyAssingedGuest AG on H.Id= AG.BookingId AND AG.IsActive = 1 and AG.IsDeleted = 0
+		JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON H.Id=GD.BookingId AND GD.IsActive=1 AND GD.IsDeleted=0
+		AND AG.GuestId=GD.GuestId
 		join WRBHBBookingProperty BP on BP.BookingId = AG.BookingId AND BP.IsActive = 1 and BP.IsDeleted = 0
 		join WRBHBProperty P on P.Id = AG.BookingPropertyId and P.IsActive = 1 and P.IsDeleted = 0
 		
@@ -690,21 +751,26 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 	--	AND AG.RoomId NOT IN (SELECT RoomId From WrbHbCheckInHdr WHERE BookingId=AG.BookingId) 
 	     group by H.Id,AG.BookingPropertyId ,
 		AG.FirstName,AG.LastName,AG.GuestId,AG.GuestId,
-		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id		
+		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id,GD.EmailId,GD.MobileNo		
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) =1)
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,
+		RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) >=2)
 		
-		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		--select distinct t2.Id,t2.PropertyId,
 		--(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
   --      FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId and t1.GuestId =t2.GuestId
@@ -726,6 +792,12 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
         FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS ReefGuestId,
+        (SELECT Substring((SELECT ',' + CAST(t1.EmailId AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS EmailId,
+        (SELECT Substring((SELECT ',' + CAST(t1.MobileNo AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS MobileNo,
          t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2 
 		
@@ -733,12 +805,15 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 		
 		
 -- MMT to check single double 		
-		INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
+		INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		SELECT  H.Id,AG.BookingPropertyId As PropertyId,
-		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,
+		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,GD.EmailId,GD.MobileNo,
 		AG.BookingId,AG.RoomId,0 as ApartmentId,H.BookingLevel,0 as BedId,AG.RoomCaptured,AG.Id--,AG.Occupancy
 		FROM WRBHBBooking H
 		JOIN WRBHBBookingPropertyAssingedGuest AG WITH(NOLOCK) ON H.Id= AG.BookingId AND AG.IsActive = 1 and AG.IsDeleted = 0
+		JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON H.Id=GD.BookingId AND GD.IsActive=1 AND GD.IsDeleted=0
+		AND AG.GuestId=GD.GuestId
 		JOIN WRBHBStaticHotels S WITH(NOLOCK) ON Ag.BookingPropertyId = S.HotalId AND s.IsActive=1 AND s.IsDeleted=0
 		JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON H.Id=BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0 
 		JOIN wrbhbcity C ON C.Id = H.cityId AND C.IsActive = 1
@@ -758,18 +833,22 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 	--	AND AG.RoomId NOT IN (SELECT RoomId From WrbHbCheckInHdr WHERE BookingId=AG.BookingId) 
 	     group by H.Id,AG.BookingPropertyId ,
 		AG.FirstName,AG.LastName,AG.GuestId,AG.GuestId,
-		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id
+		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id,GD.EmailId,GD.MobileNo
 		
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) =1)
 		
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) >=2)
@@ -777,7 +856,8 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 		
 		-- Table3(Concatinate 2 Guest Name)
 	--	CREATE TABLE #CheckIn3(Id INT,PropertyId INT,ChkInGuest NVARCHAR(100),GuestId NVARCHAR(100),BookingId INT,RoomId INT)
-		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo
+		,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		--select distinct t2.Id,t2.PropertyId,
 		--(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
   --      FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId and t1.GuestId =t2.GuestId
@@ -799,14 +879,22 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
         FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS ReefGuestId,
+        (SELECT Substring((SELECT ',' + CAST(t1.EmailId AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS EmailId,
+        (SELECT Substring((SELECT ',' + CAST(t1.MobileNo AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS MobileNo,
          t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2 
 		
 		
 		
 		
-		INSERT INTO #CheckInfinal(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomCaptureId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckInfinal(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomCaptureId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn3
 		
 		
@@ -820,8 +908,8 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 		
 		WHILE (ISNULL(@NoData,0)!=0)  
 		BEGIN
-			INSERT INTO #CheckInfinal2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-			SELECT Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+			INSERT INTO #CheckInfinal2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+			SELECT Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 			FROM #CheckInfinal
 			WHERE PId=@PId
 			
@@ -847,7 +935,8 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 			
 		END
 		-- to send front end
-		SELECT distinct S.Id,CAST((PropertyId) AS NVARCHAR(100)) AS PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,S.BookingLevel as TYPE,
+		SELECT distinct S.Id,CAST((PropertyId) AS NVARCHAR(100)) AS PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId AS Email ,MobileNo,
+		BookingId,RoomId,ApartmentId,S.BookingLevel as TYPE,
 		BedId,RoomCaptureId,BookingAssGuestId,A.BookingCode
 		FROM #CheckInfinal2 S
 		JOIN WRBHBBooking A WITH(NOLOCK) ON S.BookingId=A.Id AND A.IsActive=1 AND A.IsDeleted=0
@@ -862,15 +951,18 @@ ELSE
  	
  	
  	    -- To Check Booked and Direct Booked for Room Level
-        INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
+        INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+        BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		SELECT  
 		H.Id,AG.BookingPropertyId As PropertyId,
-		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,
+		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,GD.EmailId,GD.MobileNo,
 		AG.BookingId,AG.RoomId,0 as ApartmentId,H.BookingLevel,0 as BedId,AG.RoomCaptured,AG.Id--,AG.Occupancy
 		FROM WRBHBBooking H		
 		join WRBHBBookingProperty BP on BP.BookingId = H.Id and BP.IsActive = 1 and BP.IsDeleted=0
 		join WRBHBBookingPropertyAssingedGuest AG on H.Id= AG.BookingId 
 		AND AG.BookingPropertyId = BP.PropertyId AND AG.BookingPropertyTableId = BP.Id AND AG.IsActive = 1 and AG.IsDeleted = 0
+		JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON H.Id=GD.BookingId AND GD.IsActive=1 AND GD.IsDeleted=0
+		AND AG.GuestId=GD.GuestId
 	--	join WRBHBBookingPropertyAssingedGuest AG on H.Id= AG.BookingId AND AG.IsActive = 1 and AG.IsDeleted = 0
 		join WRBHBProperty P on P.Id = AG.BookingPropertyId and P.IsActive = 1 and P.IsDeleted = 0
 		join WRBHBPropertyUsers PU on PU.PropertyId = P.Id and PU.IsActive = 1 and PU.IsDeleted = 0
@@ -891,19 +983,23 @@ ELSE
 	--	AND AG.RoomId NOT IN (SELECT RoomId From WrbHbCheckInHdr WHERE BookingId=AG.BookingId) 
 	     group by H.Id,AG.BookingPropertyId ,
 		AG.FirstName,AG.LastName,AG.GuestId,AG.GuestId,
-		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id
+		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id,GD.EmailId,GD.MobileNo
 		
 	    -- Table2 ( to check single or double) 
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,
+		RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) =1)
 		
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,
+		RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,
+		RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) >=2)
@@ -911,27 +1007,38 @@ ELSE
 		
 		-- Table3(Concatinate 2 Guest Name)
 	--	CREATE TABLE #CheckIn3(Id INT,PropertyId INT,ChkInGuest NVARCHAR(100),GuestId NVARCHAR(100),BookingId INT,RoomId INT)
-		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		select distinct t2.Id,t2.PropertyId,
 		(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId and t1.RoomCaptureId =t2.RoomCaptureId
         FOR XML PATH('')), 3, 10000000) AS list) AS ChkInGuest,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId and t1.RoomCaptureId =t2.RoomCaptureId
         FOR XML PATH('')), 3, 10000000) AS list) AS GuestId,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId and t1.RoomCaptureId =t2.RoomCaptureId
+        FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,
+        (SELECT Substring((SELECT ',' + CAST(t1.EmailId AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId and t1.RoomCaptureId =t2.RoomCaptureId
+        FOR XML PATH('')), 3, 10000000) AS list) AS EmailId,
+        (SELECT Substring((SELECT ',' + CAST(t1.MobileNo AS VARCHAR(1024))
         FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
-        FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS MobileNo,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2
 		
 -- To Check  Booked for Apartment Level 
-        INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
+        INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,
+        RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		select  H.Id,ABPA.BookingPropertyId As PropertyId,
-		 (ABPA.FirstName+','+ABPA.LastName) as  ChkInGuest,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,0 as RoomId,
+		 (ABPA.FirstName+','+ABPA.LastName) as  ChkInGuest,ABPA.GuestId,ABPA.GuestId,GD.EmailId,GD.MobileNo,
+		 ABPA.BookingId,0 as RoomId,
 		 ABPA.ApartmentId,H.BookingLevel,0 as BedId,ABPA.RoomCaptured as RoomCaptureId,ABPA.Id
 		 FROM WRBHBBooking H
 		 join WRBHBApartmentBookingPropertyAssingedGuest ABPA on H.Id = ABPA.BookingId AND
 		 ABPA.IsActive = 1 AND ABPA.IsDeleted = 0
+		 JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON H.Id=GD.BookingId AND GD.IsActive=1 AND GD.IsDeleted=0
+		AND ABPA.GuestId=GD.GuestId
 		 join WRBHBProperty P on P.Id = ABPA.BookingPropertyId and P.IsActive = 1 and P.IsDeleted = 0
 		 join WRBHBPropertyUsers PU on PU.PropertyId = P.Id and PU.IsActive = 1 and PU.IsDeleted = 0
 		join WRBHBUser U on   PU.UserId =U.Id and pu.IsActive = 1 and PU.IsDeleted = 0
@@ -949,45 +1056,58 @@ ELSE
 	--	 and ABPA.ApartmentId NOT IN (SELECT ApartmentId From WrbHbCheckInHdr WHERE BookingId=ABPA.BookingId) 
 	group by H.Id,ABPA.BookingPropertyId,
 		 ABPA.FirstName,ABPA.LastName,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,
-		 ABPA.ApartmentId,H.BookingLevel,ABPA.Id,ABPA.RoomCaptured
+		 ABPA.ApartmentId,H.BookingLevel,ABPA.Id,ABPA.RoomCaptured,GD.EmailId,GD.MobileNo
 		 
 -- Table2 ( to check single or double) 
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,
+		RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,
+		ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) =1)
 		
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,
+		RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,
+		ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) >=2)
 		
 		-- Table3(Concatinate 2 Guest Name)
 	--	CREATE TABLE #CheckIn3(Id INT,PropertyId INT,ChkInGuest NVARCHAR(100),GuestId NVARCHAR(100),BookingId INT,RoomId INT)
-		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		select distinct t2.Id,t2.PropertyId,
 		(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId and t1.RoomCaptureId =t2.RoomCaptureId
         FOR XML PATH('')), 3, 10000000) AS list) AS ChkInGuest,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId and t1.RoomCaptureId =t2.RoomCaptureId
         FOR XML PATH('')), 3, 10000000) AS list) AS GuestId,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId and t1.RoomCaptureId =t2.RoomCaptureId
+        FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,
+        (SELECT Substring((SELECT ',' + CAST(t1.EmailId AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId and t1.RoomCaptureId =t2.RoomCaptureId
+        FOR XML PATH('')), 3, 10000000) AS list) AS EmailId,
+        (SELECT Substring((SELECT ',' + CAST(t1.MobileNo AS VARCHAR(1024))
         FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId --and t1.GuestId =t2.GuestId
-        FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS MobileNo,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2
 -- to check Bed Level
-         INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
+         INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,
+         ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		 select  H.Id,ABPA.BookingPropertyId As PropertyId,
-		 (ABPA.FirstName+','+ABPA.LastName) as  ChkInGuest,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,0 as RoomId,
+		 (ABPA.FirstName+','+ABPA.LastName) as  ChkInGuest,ABPA.GuestId,ABPA.GuestId,GD.EmailId,GD.MobileNo,ABPA.BookingId,0 as RoomId,
 		 0 AS ApartmentId,H.BookingLevel,ABPA.BedId as BedId,ABPA.RoomCaptured as RoomCaptureId,ABPA.Id
 		 FROM WRBHBBooking H
 		 join WRBHBBedBookingPropertyAssingedGuest ABPA on H.Id = ABPA.BookingId  AND
 		 ABPA.IsActive = 1 AND ABPA.IsDeleted = 0
+		 JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON H.Id=GD.BookingId AND GD.IsActive=1 AND GD.IsDeleted=0
+		AND ABPA.GuestId=GD.GuestId
 		join WRBHBProperty P on P.Id = ABPA.BookingPropertyId and P.IsActive = 1 and P.IsDeleted = 0
 		join WRBHBPropertyUsers PU on PU.PropertyId = P.Id and PU.IsActive = 1 and PU.IsDeleted = 0
 		join WRBHBUser U on   PU.UserId =U.Id and pu.IsActive = 1 and PU.IsDeleted = 0
@@ -1005,25 +1125,25 @@ ELSE
 	--	 and ABPA.BedId NOT IN (SELECT BedId From WrbHbCheckInHdr WHERE BookingId=ABPA.BookingId)  
 		group by  H.Id,ABPA.BookingPropertyId,
 		 ABPA.FirstName,ABPA.LastName,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,
-		 H.BookingLevel,ABPA.BedId,ABPA.Id,ABPA.RoomCaptured
+		 H.BookingLevel,ABPA.BedId,ABPA.Id,ABPA.RoomCaptured,GD.EmailId,GD.MobileNo
 		 -- Table2 ( to check single or double) 
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) =1)
 		
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) >=2)
 		
 		-- Table3(Concatinate 2 Guest Name)
 	--	CREATE TABLE #CheckIn3(Id INT,PropertyId INT,ChkInGuest NVARCHAR(100),GuestId NVARCHAR(100),BookingId INT,RoomId INT)
-		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		select distinct t2.Id,t2.PropertyId,
 		(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
         FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
@@ -1033,19 +1153,28 @@ ELSE
         FOR XML PATH('')), 3, 10000000) AS list) AS GuestId,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
         FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
-        FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,
+        (SELECT Substring((SELECT ',' + CAST(t1.EmailId AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS EmailId,
+        (SELECT Substring((SELECT ',' + CAST(t1.MobileNo AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS MobileNo,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2
 		
 -- External Property to check single double 		
-		INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
+		INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,
+		BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		SELECT  
 		H.Id,AG.BookingPropertyId As PropertyId,
-		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,
+		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,GD.EmailId,GD.MobileNo,
 		AG.BookingId,AG.RoomId,0 as ApartmentId,H.BookingLevel,0 as BedId,AG.RoomCaptured,AG.Id--,AG.Occupancy
 		FROM WRBHBBooking H	
 		join WRBHBBookingProperty BP on BP.BookingId = H.Id and BP.IsActive = 1 and BP.IsDeleted=0
 		join WRBHBBookingPropertyAssingedGuest AG on H.Id= AG.BookingId 
 		AND AG.BookingPropertyId = BP.PropertyId AND AG.BookingPropertyTableId = BP.Id AND AG.IsActive = 1 and AG.IsDeleted = 0	
+		JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON H.Id=GD.BookingId AND GD.IsActive=1 AND GD.IsDeleted=0
+		AND AG.GuestId=GD.GuestId
 	--	join WRBHBBookingPropertyAssingedGuest AG on H.Id= AG.BookingId AND AG.IsActive = 1 and AG.IsDeleted = 0
 		join WRBHBProperty P on P.Id = AG.BookingPropertyId and P.IsActive = 1 and P.IsDeleted = 0
 		join WRBHBPropertyUsers PU on PU.PropertyId = P.Id and PU.IsActive = 1 and PU.IsDeleted = 0
@@ -1068,25 +1197,25 @@ ELSE
 	--	AND AG.RoomId NOT IN (SELECT RoomId From WrbHbCheckInHdr WHERE BookingId=AG.BookingId) 
 	     group by H.Id,AG.BookingPropertyId,
 		AG.FirstName,AG.LastName,AG.GuestId,AG.GuestId,
-		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id
+		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id,GD.EmailId,GD.MobileNo
 	    -- Table2 ( to check single or double) 
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) =1)
 		
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) >=2)
 		
 		-- Table3(Concatinate 2 Guest Name)
 	--	CREATE TABLE #CheckIn3(Id INT,PropertyId INT,ChkInGuest NVARCHAR(100),GuestId NVARCHAR(100),BookingId INT,RoomId INT)
-		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		--SELECT DISTINCT t2.Id,t2.PropertyId,
 		--(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
   --      FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
@@ -1108,17 +1237,25 @@ ELSE
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
         FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS ReefGuestId,
+        (SELECT Substring((SELECT ',' + CAST(t1.EmailId AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS EmailId,
+        (SELECT Substring((SELECT ',' + CAST(t1.MobileNo AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS MobileNo,
          t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2 
 		
 		-- CPP to check single double 		
-		INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
+		INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		SELECT H.Id,AG.BookingPropertyId As PropertyId,
-		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,
+		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,GD.EmailId,GD.MobileNo,
 		AG.BookingId,AG.RoomId,0 as ApartmentId,H.BookingLevel,0 as BedId,AG.RoomCaptured,AG.Id--,AG.Occupancy
 		FROM WRBHBBooking H		
 		
 		join WRBHBBookingPropertyAssingedGuest AG on H.Id= AG.BookingId AND AG.IsActive = 1 and AG.IsDeleted = 0
+		JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON H.Id=GD.BookingId AND GD.IsActive=1 AND GD.IsDeleted=0
+		AND AG.GuestId=GD.GuestId
 		join WRBHBBookingProperty BP on BP.BookingId = AG.BookingId AND BP.IsActive = 1 and BP.IsDeleted = 0
 		join WRBHBProperty P on P.Id = AG.BookingPropertyId and P.IsActive = 1 and P.IsDeleted = 0
 		
@@ -1141,21 +1278,21 @@ ELSE
 	--	AND AG.RoomId NOT IN (SELECT RoomId From WrbHbCheckInHdr WHERE BookingId=AG.BookingId) 
 	     group by H.Id,AG.BookingPropertyId ,
 		AG.FirstName,AG.LastName,AG.GuestId,AG.GuestId,
-		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id		
+		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id	,GD.EmailId,GD.MobileNo	
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) =1)
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) >=2)
 		
-		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		--select distinct t2.Id,t2.PropertyId,
 		--(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
   --      FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId and t1.GuestId =t2.GuestId
@@ -1177,16 +1314,24 @@ ELSE
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
         FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS ReefGuestId,
+        (SELECT Substring((SELECT ',' + CAST(t1.EmailId AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS EmailId,
+        (SELECT Substring((SELECT ',' + CAST(t1.MobileNo AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS MobileNo,
          t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2 
 		
 -- MMT to check single double 		
-		INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
+		INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		SELECT  H.Id,AG.BookingPropertyId As PropertyId,
-		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,
+		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,GD.EmailId,GD.MobileNo,
 		AG.BookingId,AG.RoomId,0 as ApartmentId,H.BookingLevel,0 as BedId,AG.RoomCaptured,AG.Id--,AG.Occupancy
 		FROM WRBHBBooking H
 		JOIN WRBHBBookingPropertyAssingedGuest AG WITH(NOLOCK) ON H.Id= AG.BookingId AND AG.IsActive = 1 and AG.IsDeleted = 0
+		JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON H.Id=GD.BookingId AND GD.IsActive=1 AND GD.IsDeleted=0
+		AND AG.GuestId=GD.GuestId
 		JOIN WRBHBStaticHotels S WITH(NOLOCK) ON Ag.BookingPropertyId = S.HotalId AND s.IsActive=1 AND s.IsDeleted=0
 		JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON H.Id=BP.BookingId AND BP.IsActive=1 AND BP.IsDeleted=0 
 		JOIN wrbhbcity C ON C.Id = H.cityId AND C.IsActive = 1
@@ -1206,18 +1351,18 @@ ELSE
 	--	AND AG.RoomId NOT IN (SELECT RoomId From WrbHbCheckInHdr WHERE BookingId=AG.BookingId) 
 	     group by H.Id,AG.BookingPropertyId ,
 		AG.FirstName,AG.LastName,AG.GuestId,AG.GuestId,
-		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id
+		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id,GD.EmailId,GD.MobileNo
 		
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) =1)
 		
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) >=2)
@@ -1225,7 +1370,7 @@ ELSE
 		
 		-- Table3(Concatinate 2 Guest Name)
 	--	CREATE TABLE #CheckIn3(Id INT,PropertyId INT,ChkInGuest NVARCHAR(100),GuestId NVARCHAR(100),BookingId INT,RoomId INT)
-		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		--select distinct t2.Id,t2.PropertyId,
 		--(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
   --      FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId and t1.GuestId =t2.GuestId
@@ -1247,13 +1392,19 @@ ELSE
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
         FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS ReefGuestId,
+        (SELECT Substring((SELECT ',' + CAST(t1.EmailId AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS EmailId,
+        (SELECT Substring((SELECT ',' + CAST(t1.MobileNo AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS MobileNo,
          t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2 
 		
-		INSERT INTO #CheckInfinal(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		INSERT INTO #CheckInfinal(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		--select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		--from #CheckIn3
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomCaptureId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomCaptureId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn3
 		
 		
@@ -1264,8 +1415,8 @@ ELSE
 		
 		WHILE (ISNULL(@NoData,0)!=0)  
 		BEGIN
-			INSERT INTO #CheckInfinal2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-			SELECT Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+			INSERT INTO #CheckInfinal2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+			SELECT Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 			FROM #CheckInfinal
 			WHERE PId=@PId
 			
@@ -1291,7 +1442,7 @@ ELSE
 			
 		END
 		-- to send front end
-		SELECT distinct S.Id,CAST((PropertyId) AS NVARCHAR(100)) AS PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,S.BookingLevel as TYPE,
+		SELECT distinct S.Id,CAST((PropertyId) AS NVARCHAR(100)) AS PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId AS Email,MobileNo,BookingId,RoomId,ApartmentId,S.BookingLevel as TYPE,
 		BedId,RoomCaptureId,BookingAssGuestId,A.BookingCode
 		FROM #CheckInfinal2 S
 		JOIN WRBHBBooking A WITH(NOLOCK) ON S.BookingId=A.Id AND A.IsActive=1 AND A.IsDeleted=0
@@ -1303,6 +1454,8 @@ ELSE
 END
 
 ELSE
+
+-- emailid and mobile no not update below pending
 -- @Roles = 'Resident Managers' and 'Assistent Resident Managers'
 BEGIN
 IF @SSPId =0
@@ -1310,15 +1463,17 @@ IF @SSPId =0
 	
 	
 -- Room Level For MGH,Ddp	
-	INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
+	INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		SELECT  
 		H.Id,AG.BookingPropertyId As PropertyId,
-		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,
+		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,GD.EmailId,GD.MobileNo,
 		AG.BookingId,AG.RoomId,0 as ApartmentId,H.BookingLevel,0 as BedId,AG.RoomCaptured,AG.Id--,AG.Occupancy
 		FROM WRBHBBooking H		
 		join WRBHBBookingProperty BP on BP.BookingId = H.Id and BP.IsActive = 1 and BP.IsDeleted=0
 		join WRBHBBookingPropertyAssingedGuest AG on H.Id= AG.BookingId 
 		AND AG.BookingPropertyId = BP.PropertyId AND AG.BookingPropertyTableId = BP.Id AND AG.IsActive = 1 and AG.IsDeleted = 0	
+		JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON H.Id=GD.BookingId AND GD.IsActive=1 AND GD.IsDeleted=0
+		AND AG.GuestId=GD.GuestId
 		--join WRBHBBookingPropertyAssingedGuest AG on H.Id= AG.BookingId AND AG.IsActive = 1 and AG.IsDeleted = 0
 		join WRBHBProperty P on P.Id = AG.BookingPropertyId and P.IsActive = 1 and P.IsDeleted = 0
 		join WRBHBPropertyUsers PU on PU.PropertyId = P.Id and PU.IsActive = 1 and PU.IsDeleted = 0
@@ -1337,47 +1492,55 @@ IF @SSPId =0
 	--	AND AG.RoomId NOT IN (SELECT RoomId From WrbHbCheckInHdr WHERE BookingId=AG.BookingId) 
 		group by H.Id,AG.BookingPropertyId ,
 		AG.FirstName,AG.LastName,AG.GuestId,AG.GuestId,
-		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id
+		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id,GD.EmailId,GD.MobileNo
 	     
 	    -- Table2 ( to check single or double) 
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) =1)
 		
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) >=2)
 		
 		-- Table3(Concatinate 2 Guest Name)
 	--	CREATE TABLE #CheckIn3(Id INT,PropertyId INT,ChkInGuest NVARCHAR(100),GuestId NVARCHAR(100),BookingId INT,RoomId INT)
-		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		select distinct t2.Id,t2.PropertyId,
 		(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId and t1.RoomCaptureId =t2.RoomCaptureId
         FOR XML PATH('')), 3, 10000000) AS list) AS ChkInGuest,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId and t1.RoomCaptureId =t2.RoomCaptureId
         FOR XML PATH('')), 3, 10000000) AS list) AS GuestId,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId and t1.RoomCaptureId =t2.RoomCaptureId
+        FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,
+        (SELECT Substring((SELECT ',' + CAST(t1.EmailId AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId and t1.RoomCaptureId =t2.RoomCaptureId
+        FOR XML PATH('')), 3, 10000000) AS list) AS EmailId,
+        (SELECT Substring((SELECT ',' + CAST(t1.MobileNo AS VARCHAR(1024))
         FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
-        FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS MobileNo,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2
 	
 -- To Check Booked and Direct Booked for Room Level
-  INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
+  INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		SELECT  H.Id,AG.BookingPropertyId As PropertyId,
-		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,
+		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,GD.EmailId,GD.MobileNo,
 		AG.BookingId,AG.RoomId,0 as ApartmentId,H.BookingLevel,0 as BedId,AG.RoomCaptured,AG.Id--,AG.Occupancy
 		FROM WRBHBBooking H		
 		join WRBHBBookingProperty BP on BP.BookingId = H.Id and BP.IsActive = 1 and BP.IsDeleted=0
 		join WRBHBBookingPropertyAssingedGuest AG on H.Id= AG.BookingId 
 		AND AG.BookingPropertyId = BP.PropertyId AND AG.BookingPropertyTableId = BP.Id AND AG.IsActive = 1 and AG.IsDeleted = 0	
+		JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON H.Id=GD.BookingId AND GD.IsActive=1 AND GD.IsDeleted=0
+		AND AG.GuestId=GD.GuestId
 		--join WRBHBBookingPropertyAssingedGuest AG on H.Id= AG.BookingId AND AG.IsActive = 1 and AG.IsDeleted = 0
 		join WRBHBProperty P on P.Id = AG.BookingPropertyId and P.IsActive = 1 and P.IsDeleted = 0
 		join WRBHBPropertyUsers PU on PU.PropertyId = P.Id and PU.IsActive = 1 and PU.IsDeleted = 0
@@ -1398,47 +1561,55 @@ IF @SSPId =0
 	--	AND AG.RoomId NOT IN (SELECT RoomId From WrbHbCheckInHdr WHERE BookingId=AG.BookingId) 
 		group by H.Id,AG.BookingPropertyId ,
 		AG.FirstName,AG.LastName,AG.GuestId,AG.GuestId,
-		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id
+		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id,GD.EmailId,GD.MobileNo
 	     
 	     
 	    -- Table2 ( to check single or double) 
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) =1)
 		
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) >=2)
 		
 		-- Table3(Concatinate 2 Guest Name)
 	--	CREATE TABLE #CheckIn3(Id INT,PropertyId INT,ChkInGuest NVARCHAR(100),GuestId NVARCHAR(100),BookingId INT,RoomId INT)
-		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		select distinct t2.Id,t2.PropertyId,
 		(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId and t1.RoomCaptureId =t2.RoomCaptureId
         FOR XML PATH('')), 3, 10000000) AS list) AS ChkInGuest,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId and t1.RoomCaptureId =t2.RoomCaptureId
         FOR XML PATH('')), 3, 10000000) AS list) AS GuestId,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
-        FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId and t1.RoomCaptureId =t2.RoomCaptureId
+        FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,
+        (SELECT Substring((SELECT ',' + CAST(t1.EmailId AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId and t1.RoomCaptureId =t2.RoomCaptureId
+        FOR XML PATH('')), 3, 10000000) AS list) AS EmailId,
+        (SELECT Substring((SELECT ',' + CAST(t1.MobileNo AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId and t1.RoomCaptureId =t2.RoomCaptureId
+        FOR XML PATH('')), 3, 10000000) AS list) AS MobileNo,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2
 		
 -- To Check  Booked for Apartment Level 
-INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
+INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		select distinct H.Id,ABPA.BookingPropertyId As PropertyId,
-		 (ABPA.FirstName+','+ABPA.LastName) as  ChkInGuest,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,0 as RoomId,
-		 ABPA.ApartmentId,H.BookingLevel,0 as BedId,ABPA.RoomCaptured as RoomCaptureId,ABPA.Id
+		 (ABPA.FirstName+','+ABPA.LastName) as  ChkInGuest,ABPA.GuestId,ABPA.GuestId,GD.EmailId,GD.MobileNo,
+		 ABPA.BookingId,0 as RoomId,ABPA.ApartmentId,H.BookingLevel,0 as BedId,ABPA.RoomCaptured as RoomCaptureId,ABPA.Id
 		 FROM WRBHBBooking H
 		 join WRBHBApartmentBookingPropertyAssingedGuest ABPA on H.Id = ABPA.BookingId AND
 		 ABPA.IsActive = 1 AND ABPA.IsDeleted = 0
+		 JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON H.Id=GD.BookingId AND GD.IsActive=1 AND GD.IsDeleted=0
+		AND ABPA.GuestId=GD.GuestId
 		 join WRBHBProperty P on P.Id = ABPA.BookingPropertyId and P.IsActive = 1 and P.IsDeleted = 0
 		 join WRBHBPropertyUsers PU on PU.PropertyId = P.Id and PU.IsActive = 1 and PU.IsDeleted = 0
 		join WRBHBUser U on   PU.UserId =U.Id and pu.IsActive = 1 and PU.IsDeleted = 0
@@ -1456,45 +1627,54 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 	--	 and ABPA.ApartmentId NOT IN (SELECT ApartmentId From WrbHbCheckInHdr WHERE BookingId=ABPA.BookingId) 
 	group by H.Id,ABPA.BookingPropertyId ,
 		 ABPA.FirstName,ABPA.LastName,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,
-		 ABPA.ApartmentId,H.BookingLevel,ABPA.Id,ABPA.RoomCaptured
+		 ABPA.ApartmentId,H.BookingLevel,ABPA.Id,ABPA.RoomCaptured,GD.EmailId,GD.MobileNo
 		 
 -- Table2 ( to check single or double) 
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) =1)
 		
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) >=2)
 		
 		-- Table3(Concatinate 2 Guest Name)
 	--	CREATE TABLE #CheckIn3(Id INT,PropertyId INT,ChkInGuest NVARCHAR(100),GuestId NVARCHAR(100),BookingId INT,RoomId INT)
-		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		select distinct t2.Id,t2.PropertyId,
 		(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId and t1.RoomCaptureId =t2.RoomCaptureId
         FOR XML PATH('')), 3, 10000000) AS list) AS ChkInGuest,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId and t1.RoomCaptureId =t2.RoomCaptureId
         FOR XML PATH('')), 3, 10000000) AS list) AS GuestId,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId and t1.RoomCaptureId =t2.RoomCaptureId
+        FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,
+        (SELECT Substring((SELECT ',' + CAST(t1.EmailId AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId and t1.RoomCaptureId =t2.RoomCaptureId
+        FOR XML PATH('')), 3, 10000000) AS list) AS EmailId,
+        (SELECT Substring((SELECT ',' + CAST(t1.MobileNo AS VARCHAR(1024))
         FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId --and t1.GuestId =t2.GuestId
-        FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS MobileNo,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2
 -- to check Bed Level Internal Property
-INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
+INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		 select distinct H.Id,ABPA.BookingPropertyId As PropertyId,
-		 (ABPA.FirstName+','+ABPA.LastName) as  ChkInGuest,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,ABPA.RoomId,
-		 0 AS ApartmentId,H.BookingLevel,ABPA.BedId as BedId,ABPA.RoomCaptured as RoomCaptureId,ABPA.Id
+		 (ABPA.FirstName+','+ABPA.LastName) as  ChkInGuest,ABPA.GuestId,ABPA.GuestId,GD.EmailId,GD.MobileNo,
+		 ABPA.BookingId,ABPA.RoomId,0 AS ApartmentId,H.BookingLevel,ABPA.BedId as BedId,
+		 ABPA.RoomCaptured as RoomCaptureId,ABPA.Id
 		 FROM WRBHBBooking H
 		 join WRBHBBedBookingPropertyAssingedGuest ABPA on H.Id = ABPA.BookingId  AND
 		 ABPA.IsActive = 1 AND ABPA.IsDeleted = 0
+		 JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON H.Id=GD.BookingId AND GD.IsActive=1 AND GD.IsDeleted=0
+		AND ABPA.GuestId=GD.GuestId
 		join WRBHBProperty P on P.Id = ABPA.BookingPropertyId and P.IsActive = 1 and P.IsDeleted = 0
 		join WRBHBPropertyUsers PU on PU.PropertyId = P.Id and PU.IsActive = 1 and PU.IsDeleted = 0
 		join WRBHBUser U on   PU.UserId =U.Id and pu.IsActive = 1 and PU.IsDeleted = 0
@@ -1512,7 +1692,7 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 	--	 and ABPA.BedId NOT IN (SELECT BedId From WrbHbCheckInHdr WHERE BookingId=ABPA.BookingId) 
 		group by H.Id,ABPA.BookingPropertyId ,
 		 ABPA.FirstName,ABPA.LastName,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,ABPA.RoomId,
-		 H.BookingLevel,ABPA.BedId ,ABPA.Id,ABPA.RoomCaptured
+		 H.BookingLevel,ABPA.BedId ,ABPA.Id,ABPA.RoomCaptured,GD.EmailId,GD.MobileNo
 		 
 		 -- Table2 ( to check single or double) 
 		
@@ -1531,7 +1711,7 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 		
 		-- Table3(Concatinate 2 Guest Name)
 	--	CREATE TABLE #CheckIn3(Id INT,PropertyId INT,ChkInGuest NVARCHAR(100),GuestId NVARCHAR(100),BookingId INT,RoomId INT)
-		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		select distinct t2.Id,t2.PropertyId,
 		(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
         FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
@@ -1541,17 +1721,26 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
         FOR XML PATH('')), 3, 10000000) AS list) AS GuestId,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
         FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
-        FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,
+        (SELECT Substring((SELECT ',' + CAST(t1.EmailId AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS EmailId,
+        (SELECT Substring((SELECT ',' + CAST(t1.MobileNo AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS MobileNo,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2
 		
 -- to check Bed Level MGH
-INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
+INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		 select distinct H.Id,ABPA.BookingPropertyId As PropertyId,
-		 (ABPA.FirstName+','+ABPA.LastName) as  ChkInGuest,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,ABPA.RoomId,
+		 (ABPA.FirstName+','+ABPA.LastName) as  ChkInGuest,ABPA.GuestId,ABPA.GuestId,GD.EmailId,GD.MobileNo,
+		 ABPA.BookingId,ABPA.RoomId,
 		 0 AS ApartmentId,H.BookingLevel,ABPA.BedId as BedId,0 as RoomCaptureId,ABPA.Id
 		 FROM WRBHBBooking H
 		 join WRBHBBedBookingPropertyAssingedGuest ABPA on H.Id = ABPA.BookingId  AND
 		 ABPA.IsActive = 1 AND ABPA.IsDeleted = 0
+		 JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON H.Id=GD.BookingId AND GD.IsActive=1 AND GD.IsDeleted=0
+		AND ABPA.GuestId=GD.GuestId
 		join WRBHBProperty P on P.Id = ABPA.BookingPropertyId and P.IsActive = 1 and P.IsDeleted = 0
 		join WRBHBPropertyUsers PU on PU.PropertyId = P.Id and PU.IsActive = 1 and PU.IsDeleted = 0
 		join WRBHBUser U on   PU.UserId =U.Id and pu.IsActive = 1 and PU.IsDeleted = 0
@@ -1567,47 +1756,55 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 	--	 and ABPA.BedId NOT IN (SELECT BedId From WrbHbCheckInHdr WHERE BookingId=ABPA.BookingId) 
 		group by H.Id,ABPA.BookingPropertyId ,
 		 ABPA.FirstName,ABPA.LastName,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,ABPA.RoomId,
-		 H.BookingLevel,ABPA.BedId ,ABPA.Id
+		 H.BookingLevel,ABPA.BedId ,ABPA.Id,GD.EmailId,GD.MobileNo
 		 
 		 -- Table2 ( to check single or double) 
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) =1)
 		
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) >=2)
 		
 		-- Table3(Concatinate 2 Guest Name)
 	--	CREATE TABLE #CheckIn3(Id INT,PropertyId INT,ChkInGuest NVARCHAR(100),GuestId NVARCHAR(100),BookingId INT,RoomId INT)
-		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		select distinct t2.Id,t2.PropertyId,
 		(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId and t1.RoomCaptureId =t2.RoomCaptureId
         FOR XML PATH('')), 3, 10000000) AS list) AS ChkInGuest,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId and t1.RoomCaptureId =t2.RoomCaptureId
         FOR XML PATH('')), 3, 10000000) AS list) AS GuestId,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
-        FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId and t1.RoomCaptureId =t2.RoomCaptureId
+        FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,
+        (SELECT Substring((SELECT ',' + CAST(t1.EmailId AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId and t1.RoomCaptureId =t2.RoomCaptureId
+        FOR XML PATH('')), 3, 10000000) AS list) AS EmailId,
+        (SELECT Substring((SELECT ',' + CAST(t1.MobileNo AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId and t1.RoomCaptureId =t2.RoomCaptureId
+        FOR XML PATH('')), 3, 10000000) AS list) AS MobileNo,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2
 		
 -- External Property to check single double 		
-		INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
+		INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		SELECT  distinct
 		H.Id,AG.BookingPropertyId As PropertyId,
-		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,
+		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,GD.EmailId,GD.MobileNo,
 		AG.BookingId,AG.RoomId,0 as ApartmentId,H.BookingLevel,0 as BedId,AG.RoomCaptured,AG.Id--,AG.Occupancy
 		FROM WRBHBBooking H		
 		join WRBHBBookingProperty BP on BP.BookingId = H.Id and BP.IsActive = 1 and BP.IsDeleted=0
 		join WRBHBBookingPropertyAssingedGuest AG on H.Id= AG.BookingId 
+		JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON H.Id=GD.BookingId AND GD.IsActive=1 AND GD.IsDeleted=0
+		AND AG.GuestId=GD.GuestId
 		AND AG.BookingPropertyId = BP.PropertyId AND AG.BookingPropertyTableId = BP.Id AND AG.IsActive = 1 and AG.IsDeleted = 0	
 	--	join WRBHBBookingPropertyAssingedGuest AG on H.Id= AG.BookingId AND AG.IsActive = 1 and AG.IsDeleted = 0
 		join WRBHBProperty P on P.Id = AG.BookingPropertyId and P.IsActive = 1 and P.IsDeleted = 0
@@ -1628,25 +1825,25 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 	--	AND AG.RoomId NOT IN (SELECT RoomId From WrbHbCheckInHdr WHERE BookingId=AG.BookingId) 
 	      group by H.Id,AG.BookingPropertyId,
 		AG.FirstName,AG.LastName,AG.GuestId,AG.GuestId,
-		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id
+		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id,GD.EmailId,GD.MobileNo
 	    -- Table2 ( to check single or double) 
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) =1)
 		
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) >=2)
 		
 		-- Table3(Concatinate 2 Guest Name)
 	--	CREATE TABLE #CheckIn3(Id INT,PropertyId INT,ChkInGuest NVARCHAR(100),GuestId NVARCHAR(100),BookingId INT,RoomId INT)
-		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		--SELECT DISTINCT t2.Id,t2.PropertyId,
 		--(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
   --      FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId and t1.GuestId =t2.GuestId
@@ -1668,17 +1865,25 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
         FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS ReefGuestId,
+        (SELECT Substring((SELECT ',' + CAST(t1.EmailId AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS EmailId,
+        (SELECT Substring((SELECT ',' + CAST(t1.MobileNo AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS MobileNo,
          t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2 
 		
 		-- CPP to check single double 		
-		INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
+		INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		SELECT H.Id,AG.BookingPropertyId As PropertyId,
-		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,
+		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,GD.EmailId,GD.MobileNo,
 		AG.BookingId,AG.RoomId,0 as ApartmentId,H.BookingLevel,0 as BedId,AG.RoomCaptured,AG.Id--,AG.Occupancy
 		FROM WRBHBBooking H		
 		
 		join WRBHBBookingPropertyAssingedGuest AG on H.Id= AG.BookingId AND AG.IsActive = 1 and AG.IsDeleted = 0
+		JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON H.Id=GD.BookingId AND GD.IsActive=1 AND GD.IsDeleted=0
+		AND AG.GuestId=GD.GuestId
 		join WRBHBBookingProperty BP on BP.BookingId = AG.BookingId AND BP.IsActive = 1 and BP.IsDeleted = 0
 		join WRBHBProperty P on P.Id = AG.BookingPropertyId and P.IsActive = 1 and P.IsDeleted = 0
 		
@@ -1701,21 +1906,21 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 	--	AND AG.RoomId NOT IN (SELECT RoomId From WrbHbCheckInHdr WHERE BookingId=AG.BookingId) 
 	     group by H.Id,AG.BookingPropertyId ,
 		AG.FirstName,AG.LastName,AG.GuestId,AG.GuestId,
-		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id		
+		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id,GD.EmailId,GD.MobileNo		
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) =1)
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) >=2)
 		
-		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		--select distinct t2.Id,t2.PropertyId,
 		--(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
   --      FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId and t1.GuestId =t2.GuestId
@@ -1737,14 +1942,20 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
         FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS ReefGuestId,
+        (SELECT Substring((SELECT ',' + CAST(t1.EmailId AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS EmailId,
+        (SELECT Substring((SELECT ',' + CAST(t1.MobileNo AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS MobileNo,
          t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2 
 		
 		
-		INSERT INTO #CheckInfinal(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		INSERT INTO #CheckInfinal(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		--select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		--from #CheckIn3
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomCaptureId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomCaptureId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn3
 		
 		
@@ -1757,8 +1968,8 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 		
 		WHILE (ISNULL(@NoData,0)!=0)  
 		BEGIN
-			INSERT INTO #CheckInfinal2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-			SELECT Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+			INSERT INTO #CheckInfinal2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+			SELECT Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 			FROM #CheckInfinal
 			WHERE PId=@PId
 			
@@ -1784,7 +1995,7 @@ INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,Ro
 			
 		END
 		-- to send front end
-		SELECT distinct S.Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,S.BookingLevel as TYPE,
+		SELECT distinct S.Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId AS Email,MobileNo,BookingId,RoomId,ApartmentId,S.BookingLevel as TYPE,
 		BedId,RoomCaptureId,BookingAssGuestId,A.BookingCode
 		FROM #CheckInfinal2 S
 		JOIN WRBHBBooking A WITH(NOLOCK) ON S.BookingId=A.Id AND A.IsActive=1 AND A.IsDeleted=0
@@ -1795,15 +2006,17 @@ ELSE
  	
  	
  	 -- To Check Booked and Direct Booked for Room Level MGH,Ddp
-        INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
+        INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		SELECT  distinct
 		H.Id,AG.BookingPropertyId As PropertyId,
-		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,
+		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,GD.EmailId,GD.MobileNo,
 		AG.BookingId,AG.RoomId,0 as ApartmentId,H.BookingLevel,0 as BedId,AG.RoomCaptured,AG.Id--,AG.Occupancy
 		FROM WRBHBBooking H		
 		join WRBHBBookingProperty BP on BP.BookingId = H.Id and BP.IsActive = 1 and BP.IsDeleted=0
 		join WRBHBBookingPropertyAssingedGuest AG on H.Id= AG.BookingId 
 		AND AG.BookingPropertyId = BP.PropertyId AND AG.BookingPropertyTableId = BP.Id AND AG.IsActive = 1 and AG.IsDeleted = 0	
+		JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON H.Id=GD.BookingId AND GD.IsActive=1 AND GD.IsDeleted=0
+		AND AG.GuestId=GD.GuestId
 	--	join WRBHBBookingPropertyAssingedGuest AG on H.Id= AG.BookingId AND AG.IsActive = 1 and AG.IsDeleted = 0
 		join WRBHBProperty P on P.Id = AG.BookingPropertyId and P.IsActive = 1 and P.IsDeleted = 0
 		join WRBHBPropertyUsers PU on PU.PropertyId = P.Id and PU.IsActive = 1 and PU.IsDeleted = 0
@@ -1822,20 +2035,20 @@ ELSE
 	--	AND AG.RoomId NOT IN (SELECT RoomId From WrbHbCheckInHdr WHERE BookingId=AG.BookingId) 
 	     group by H.Id,AG.BookingPropertyId ,
 		AG.FirstName,AG.LastName,AG.GuestId,AG.GuestId,
-		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id
+		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id,GD.EmailId,GD.MobileNo
 		
 		
 	    -- Table2 ( to check single or double) 
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) =1)
 		
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) >=2)
@@ -1843,7 +2056,7 @@ ELSE
 		
 		-- Table3(Concatinate 2 Guest Name)
 	--	CREATE TABLE #CheckIn3(Id INT,PropertyId INT,ChkInGuest NVARCHAR(100),GuestId NVARCHAR(100),BookingId INT,RoomId INT)
-		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		select distinct t2.Id,t2.PropertyId,
 		(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
         FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
@@ -1853,20 +2066,28 @@ ELSE
         FOR XML PATH('')), 3, 10000000) AS list) AS GuestId,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
         FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
-        FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,
+        (SELECT Substring((SELECT ',' + CAST(t1.EmailId AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS EmailId,
+        (SELECT Substring((SELECT ',' + CAST(t1.MobileNo AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS MobileNo,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2
  	
  	
  	    -- To Check Booked and Direct Booked for Room Level Internal
-   INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
+   INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		SELECT  distinct
 		H.Id,AG.BookingPropertyId As PropertyId,
-		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,
+		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,GD.EmailId,GD.MobileNo,
 		AG.BookingId,AG.RoomId,0 as ApartmentId,H.BookingLevel,0 as BedId,AG.RoomCaptured,AG.Id--,AG.Occupancy
 		FROM WRBHBBooking H		
 		join WRBHBBookingProperty BP on BP.BookingId = H.Id and BP.IsActive = 1 and BP.IsDeleted=0
 		join WRBHBBookingPropertyAssingedGuest AG on H.Id= AG.BookingId 
 		AND AG.BookingPropertyId = BP.PropertyId AND AG.BookingPropertyTableId = BP.Id AND AG.IsActive = 1 and AG.IsDeleted = 0	
+		JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON H.Id=GD.BookingId AND GD.IsActive=1 AND GD.IsDeleted=0
+		AND AG.GuestId=GD.GuestId
 	--	join WRBHBBookingPropertyAssingedGuest AG on H.Id= AG.BookingId AND AG.IsActive = 1 and AG.IsDeleted = 0
 		join WRBHBProperty P on P.Id = AG.BookingPropertyId and P.IsActive = 1 and P.IsDeleted = 0
 		join WRBHBPropertyUsers PU on PU.PropertyId = P.Id and PU.IsActive = 1 and PU.IsDeleted = 0
@@ -1887,20 +2108,20 @@ ELSE
 	--	AND AG.RoomId NOT IN (SELECT RoomId From WrbHbCheckInHdr WHERE BookingId=AG.BookingId) 
 	     group by H.Id,AG.BookingPropertyId ,
 		AG.FirstName,AG.LastName,AG.GuestId,AG.GuestId,
-		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id
+		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id,GD.EmailId,GD.MobileNo
 		
 		
 	    -- Table2 ( to check single or double) 
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) =1)
 		
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) >=2)
@@ -1908,27 +2129,35 @@ ELSE
 		
 		-- Table3(Concatinate 2 Guest Name)
 	--	CREATE TABLE #CheckIn3(Id INT,PropertyId INT,ChkInGuest NVARCHAR(100),GuestId NVARCHAR(100),BookingId INT,RoomId INT)
-		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		select distinct t2.Id,t2.PropertyId,
 		(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId and t1.RoomCaptureId =t2.RoomCaptureId
         FOR XML PATH('')), 3, 10000000) AS list) AS ChkInGuest,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId and t1.RoomCaptureId =t2.RoomCaptureId
         FOR XML PATH('')), 3, 10000000) AS list) AS GuestId,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId and t1.RoomCaptureId =t2.RoomCaptureId
+        FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,
+        (SELECT Substring((SELECT ',' + CAST(t1.EmailId AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId and t1.RoomCaptureId =t2.RoomCaptureId
+        FOR XML PATH('')), 3, 10000000) AS list) AS EmailId,
+        (SELECT Substring((SELECT ',' + CAST(t1.MobileNo AS VARCHAR(1024))
         FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
-        FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS MobileNo,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2
 		
 -- To Check  Booked for Apartment Level 
-        INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
+        INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		select distinct H.Id,ABPA.BookingPropertyId As PropertyId,
-		 (ABPA.FirstName+','+ABPA.LastName) as  ChkInGuest,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,0 as RoomId,
+		 (ABPA.FirstName+','+ABPA.LastName) as  ChkInGuest,ABPA.GuestId,ABPA.GuestId,GD.EmailId,GD.MobileNo,ABPA.BookingId,0 as RoomId,
 		 ABPA.ApartmentId,H.BookingLevel,0 as BedId,ABPA.RoomCaptured as RoomCaptureId,ABPA.Id
 		 FROM WRBHBBooking H
 		 join WRBHBApartmentBookingPropertyAssingedGuest ABPA on H.Id = ABPA.BookingId AND
 		 ABPA.IsActive = 1 AND ABPA.IsDeleted = 0
+		 JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON H.Id=GD.BookingId AND GD.IsActive=1 AND GD.IsDeleted=0
+		AND ABPA.GuestId=GD.GuestId
 		 join WRBHBProperty P on P.Id = ABPA.BookingPropertyId and P.IsActive = 1 and P.IsDeleted = 0
 		 join WRBHBPropertyUsers PU on PU.PropertyId = P.Id and PU.IsActive = 1 and PU.IsDeleted = 0
 		join WRBHBUser U on   PU.UserId =U.Id and pu.IsActive = 1 and PU.IsDeleted = 0
@@ -1946,45 +2175,53 @@ ELSE
 	--	 and ABPA.ApartmentId NOT IN (SELECT ApartmentId From WrbHbCheckInHdr WHERE BookingId=ABPA.BookingId) 
 		 group by H.Id,ABPA.BookingPropertyId ,
 		 ABPA.FirstName,ABPA.LastName,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,
-		 ABPA.ApartmentId,H.BookingLevel,ABPA.Id,ABPA.RoomCaptured
+		 ABPA.ApartmentId,H.BookingLevel,ABPA.Id,ABPA.RoomCaptured,GD.EmailId,GD.MobileNo
 		 
 -- Table2 ( to check single or double) 
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) =1)
 		
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) >=2)
 		
 		-- Table3(Concatinate 2 Guest Name)
 	--	CREATE TABLE #CheckIn3(Id INT,PropertyId INT,ChkInGuest NVARCHAR(100),GuestId NVARCHAR(100),BookingId INT,RoomId INT)
-		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		select distinct t2.Id,t2.PropertyId,
 		(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId and t1.RoomCaptureId =t2.RoomCaptureId
         FOR XML PATH('')), 3, 10000000) AS list) AS ChkInGuest,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId --and t1.GuestId =t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId and t1.RoomCaptureId =t2.RoomCaptureId
         FOR XML PATH('')), 3, 10000000) AS list) AS GuestId,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
-        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId --and t1.GuestId =t2.GuestId
-        FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId and t1.RoomCaptureId =t2.RoomCaptureId
+        FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,
+        (SELECT Substring((SELECT ',' + CAST(t1.EmailId AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId and t1.RoomCaptureId =t2.RoomCaptureId
+        FOR XML PATH('')), 3, 10000000) AS list) AS EmailId,
+        (SELECT Substring((SELECT ',' + CAST(t1.MobileNo AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.ApartmentId =t2.ApartmentId and t1.RoomCaptureId =t2.RoomCaptureId
+        FOR XML PATH('')), 3, 10000000) AS list) AS MobileNo,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2
 -- to check Bed Level Internal
-         INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
+         INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		 select distinct H.Id,ABPA.BookingPropertyId As PropertyId,
-		 (ABPA.FirstName+','+ABPA.LastName) as  ChkInGuest,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,0 as RoomId,
+		 (ABPA.FirstName+','+ABPA.LastName) as  ChkInGuest,ABPA.GuestId,ABPA.GuestId,GD.EmailId,GD.MobileNo,ABPA.BookingId,0 as RoomId,
 		 0 AS ApartmentId,H.BookingLevel,ABPA.BedId as BedId,ABPA.RoomCaptured as RoomCaptureId,ABPA.Id
 		 FROM WRBHBBooking H
 		 join WRBHBBedBookingPropertyAssingedGuest ABPA on H.Id = ABPA.BookingId  AND
 		 ABPA.IsActive = 1 AND ABPA.IsDeleted = 0
+		 JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON H.Id=GD.BookingId AND GD.IsActive=1 AND GD.IsDeleted=0
+		AND ABPA.GuestId=GD.GuestId
 		join WRBHBProperty P on P.Id = ABPA.BookingPropertyId and P.IsActive = 1 and P.IsDeleted = 0
 		join WRBHBPropertyUsers PU on PU.PropertyId = P.Id and PU.IsActive = 1 and PU.IsDeleted = 0
 		join WRBHBUser U on   PU.UserId =U.Id and pu.IsActive = 1 and PU.IsDeleted = 0
@@ -2002,26 +2239,26 @@ ELSE
 	--	 and ABPA.BedId NOT IN (SELECT BedId From WrbHbCheckInHdr WHERE BookingId=ABPA.BookingId)  
 		 group by H.Id,ABPA.BookingPropertyId ,
 		 ABPA.FirstName,ABPA.LastName,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,ABPA.RoomId,
-		 H.BookingLevel,ABPA.BedId ,ABPA.Id,ABPA.RoomCaptured
+		 H.BookingLevel,ABPA.BedId ,ABPA.Id,ABPA.RoomCaptured,GD.EmailId,GD.MobileNo
 		 
 		 -- Table2 ( to check single or double) 
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) =1)
 		
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) >=2)
 		
 		-- Table3(Concatinate 2 Guest Name)
 	--	CREATE TABLE #CheckIn3(Id INT,PropertyId INT,ChkInGuest NVARCHAR(100),GuestId NVARCHAR(100),BookingId INT,RoomId INT)
-		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		select distinct t2.Id,t2.PropertyId,
 		(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
         FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
@@ -2031,17 +2268,25 @@ ELSE
         FOR XML PATH('')), 3, 10000000) AS list) AS GuestId,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
         FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
-        FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,
+        (SELECT Substring((SELECT ',' + CAST(t1.EmailId AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS EmailId,
+        (SELECT Substring((SELECT ',' + CAST(t1.MobileNo AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS MobileNo,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2
 		
 -- to check Bed Level MGH
-         INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
+         INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		 select distinct H.Id,ABPA.BookingPropertyId As PropertyId,
-		 (ABPA.FirstName+','+ABPA.LastName) as  ChkInGuest,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,0 as RoomId,
+		 (ABPA.FirstName+','+ABPA.LastName) as  ChkInGuest,ABPA.GuestId,ABPA.GuestId,GD.EmailId,GD.MobileNo,ABPA.BookingId,0 as RoomId,
 		 0 AS ApartmentId,H.BookingLevel,ABPA.BedId as BedId,0 as RoomCaptureId,ABPA.Id
 		 FROM WRBHBBooking H
 		 join WRBHBBedBookingPropertyAssingedGuest ABPA on H.Id = ABPA.BookingId  AND
 		 ABPA.IsActive = 1 AND ABPA.IsDeleted = 0
+		 JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON H.Id=GD.BookingId AND GD.IsActive=1 AND GD.IsDeleted=0
+		AND ABPA.GuestId=GD.GuestId
 		join WRBHBProperty P on P.Id = ABPA.BookingPropertyId and P.IsActive = 1 and P.IsDeleted = 0
 		join WRBHBPropertyUsers PU on PU.PropertyId = P.Id and PU.IsActive = 1 and PU.IsDeleted = 0
 		join WRBHBUser U on   PU.UserId =U.Id and pu.IsActive = 1 and PU.IsDeleted = 0
@@ -2057,26 +2302,26 @@ ELSE
 	--	 and ABPA.BedId NOT IN (SELECT BedId From WrbHbCheckInHdr WHERE BookingId=ABPA.BookingId)  
 		 group by H.Id,ABPA.BookingPropertyId ,
 		 ABPA.FirstName,ABPA.LastName,ABPA.GuestId,ABPA.GuestId,ABPA.BookingId,ABPA.RoomId,
-		 H.BookingLevel,ABPA.BedId ,ABPA.Id
+		 H.BookingLevel,ABPA.BedId ,ABPA.Id,GD.EmailId,GD.MobileNo
 		 
 		 -- Table2 ( to check single or double) 
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) =1)
 		
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) >=2)
 		
 		-- Table3(Concatinate 2 Guest Name)
 	--	CREATE TABLE #CheckIn3(Id INT,PropertyId INT,ChkInGuest NVARCHAR(100),GuestId NVARCHAR(100),BookingId INT,RoomId INT)
-		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		select distinct t2.Id,t2.PropertyId,
 		(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
         FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
@@ -2086,19 +2331,27 @@ ELSE
         FOR XML PATH('')), 3, 10000000) AS list) AS GuestId,
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
         FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
-        FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS RefGuestId,
+        (SELECT Substring((SELECT ',' + CAST(t1.EmailId AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS EmailId,
+        (SELECT Substring((SELECT ',' + CAST(t1.MobileNo AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomId =t2.RoomId --and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS MobileNo,t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2		
 		
 -- External Property to check single double 		
-		INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
+		INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		SELECT  distinct
 		H.Id,AG.BookingPropertyId As PropertyId,
-		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,
+		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,GD.EmailId,GD.MobileNo,
 		AG.BookingId,AG.RoomId,0 as ApartmentId,H.BookingLevel,0 as BedId,AG.RoomCaptured,AG.Id--,AG.Occupancy
 		FROM WRBHBBooking H		
 		join WRBHBBookingProperty BP on BP.BookingId = H.Id and BP.IsActive = 1 and BP.IsDeleted=0
 		join WRBHBBookingPropertyAssingedGuest AG on H.Id= AG.BookingId 
 		AND AG.BookingPropertyId = BP.PropertyId AND AG.BookingPropertyTableId = BP.Id AND AG.IsActive = 1 and AG.IsDeleted = 0	
+		JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON H.Id=GD.BookingId AND GD.IsActive=1 AND GD.IsDeleted=0
+		AND AG.GuestId=GD.GuestId
 		--join WRBHBBookingPropertyAssingedGuest AG on H.Id= AG.BookingId AND AG.IsActive = 1 and AG.IsDeleted = 0
 		join WRBHBProperty P on P.Id = AG.BookingPropertyId and P.IsActive = 1 and P.IsDeleted = 0
 		join WRBHBPropertyUsers PU on PU.PropertyId = P.Id and PU.IsActive = 1 and PU.IsDeleted = 0
@@ -2118,26 +2371,26 @@ ELSE
 	--	AND AG.RoomId NOT IN (SELECT RoomId From WrbHbCheckInHdr WHERE BookingId=AG.BookingId) 
 	      group by H.Id,AG.BookingPropertyId,
 		AG.FirstName,AG.LastName,AG.GuestId,AG.GuestId,
-		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id
+		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id,GD.EmailId,GD.MobileNo
 		
 	    -- Table2 ( to check single or double) 
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) =1)
 		
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) >=2)
 		
 		-- Table3(Concatinate 2 Guest Name)
 	--	CREATE TABLE #CheckIn3(Id INT,PropertyId INT,ChkInGuest NVARCHAR(100),GuestId NVARCHAR(100),BookingId INT,RoomId INT)
-		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		--SELECT DISTINCT t2.Id,t2.PropertyId,
 		--(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
   --      FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
@@ -2159,17 +2412,25 @@ ELSE
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
         FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS ReefGuestId,
+        (SELECT Substring((SELECT ',' + CAST(t1.EmailId AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS EmailId,
+        (SELECT Substring((SELECT ',' + CAST(t1.MobileNo AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS MobileNo,
          t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2 
 		
 		-- CPP to check single double 		
-		INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
+		INSERT INTO #CheckIn1(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId) 
 		SELECT H.Id,AG.BookingPropertyId As PropertyId,
-		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,
+		(AG.FirstName+' '+AG.LastName)as ChkInGuest,AG.GuestId,AG.GuestId,GD.EmailId,GD.MobileNo,
 		AG.BookingId,AG.RoomId,0 as ApartmentId,H.BookingLevel,0 as BedId,AG.RoomCaptured,AG.Id--,AG.Occupancy
 		FROM WRBHBBooking H		
 		
 		join WRBHBBookingPropertyAssingedGuest AG on H.Id= AG.BookingId AND AG.IsActive = 1 and AG.IsDeleted = 0
+		JOIN WRBHBBookingGuestDetails GD WITH(NOLOCK) ON H.Id=GD.BookingId AND GD.IsActive=1 AND GD.IsDeleted=0
+		AND AG.GuestId=GD.GuestId
 		join WRBHBBookingProperty BP on BP.BookingId = AG.BookingId AND BP.IsActive = 1 and BP.IsDeleted = 0
 		join WRBHBProperty P on P.Id = AG.BookingPropertyId and P.IsActive = 1 and P.IsDeleted = 0
 		
@@ -2192,21 +2453,21 @@ ELSE
 	--	AND AG.RoomId NOT IN (SELECT RoomId From WrbHbCheckInHdr WHERE BookingId=AG.BookingId) 
 	     group by H.Id,AG.BookingPropertyId ,
 		AG.FirstName,AG.LastName,AG.GuestId,AG.GuestId,
-		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id		
+		AG.BookingId,AG.RoomId,H.BookingLevel,AG.RoomCaptured,AG.Id,GD.EmailId,GD.MobileNo		
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) =1)
 		
-		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		INSERT INTO #CheckIn2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn1
 		where BookingId  IN (SELECT BookingId From #CheckIn1
 		group by BookingId having COUNT(*) >=2)
 		
-		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		INSERT INTO #CheckIn3(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		--select distinct t2.Id,t2.PropertyId,
 		--(SELECT Substring((SELECT ', ' + CAST(t1.CheckInGuest AS VARCHAR(1024))
   --      FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId and t1.GuestId =t2.GuestId
@@ -2228,13 +2489,19 @@ ELSE
         (SELECT Substring((SELECT ', ' + CAST(t1.GuestId AS VARCHAR(1024))
         FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
         FOR XML PATH('')), 3, 10000000) AS list) AS ReefGuestId,
+        (SELECT Substring((SELECT ',' + CAST(t1.EmailId AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS EmailId,
+        (SELECT Substring((SELECT ',' + CAST(t1.MobileNo AS VARCHAR(1024))
+        FROM   #CheckIn1 t1 WHERE  t1.BookingId = t2.BookingId and t1.RoomCaptureId =t2.RoomCaptureId --and t1.GuestId =t2.GuestId
+        FOR XML PATH('')), 3, 10000000) AS list) AS MobileNo,
          t2.BookingId,t2.RoomId,t2.ApartmentId,t2.BookingLevel,t2.BedId,t2.RoomCaptureId,t2.BookingAssGuestId--,t2.GuestId
 		from #CheckIn2 t2 
 		
-		INSERT INTO #CheckInfinal(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+		INSERT INTO #CheckInfinal(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
 		--select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		--from #CheckIn3
-		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomCaptureId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+		select Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomCaptureId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 		from #CheckIn3
 		
 		
@@ -2246,8 +2513,8 @@ ELSE
 		
 		WHILE (ISNULL(@NoData,0)!=0)  
 		BEGIN
-			INSERT INTO #CheckInfinal2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
-			SELECT Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
+			INSERT INTO #CheckInfinal2(Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId)
+			SELECT Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId,MobileNo,BookingId,RoomId,ApartmentId,BookingLevel,BedId,RoomCaptureId,BookingAssGuestId
 			FROM #CheckInfinal
 			WHERE PId=@PId
 			
@@ -2273,7 +2540,7 @@ ELSE
 			
 		END
 		-- to send front end
-		SELECT  distinct S.Id,PropertyId,CheckInGuest,GuestId,RefGuestId,BookingId,RoomId,ApartmentId,S.BookingLevel as TYPE,
+		SELECT  distinct S.Id,PropertyId,CheckInGuest,GuestId,RefGuestId,EmailId AS Email,MobileNo,BookingId,RoomId,ApartmentId,S.BookingLevel as TYPE,
 		BedId,RoomCaptureId,BookingAssGuestId,A.BookingCode
 		FROM #CheckInfinal2 S
 		JOIN WRBHBBooking A WITH(NOLOCK) ON S.BookingId=A.Id AND A.IsActive=1 AND A.IsDeleted=0
@@ -2776,7 +3043,7 @@ IF @Action = 'ROOMLOAD'
   BEGIN
  --Guest Details Load 
 
-CREATE TABLE #Name(Name NVARCHAR(100),Grade NVARCHAR(100),EmailId NVARCHAR(100),MobileNo BIGINT,Nationality NVARCHAR(100),
+CREATE TABLE #Name(Name NVARCHAR(100),Grade NVARCHAR(100),EmailId NVARCHAR(100),MobileNo NVARCHAR(100),Nationality NVARCHAR(100),
 			EmpCode NVARCHAR(100),EmpCode1 INT,GuestId INT,PropertyId BIGINT,Designation NVARCHAR(100),PropertyName NVARCHAR(100),
 			PropertyType NVARCHAR(100),CheckInDate NVARCHAR(100),CheckOutDate NVARCHAR(100),RoomType NVARCHAR(100),
 			Tariff DECIMAL(27,2),ClientName NVARCHAR(100),StateId INT,RoomId INT,ExpectedChkInTime NVARCHAR(100),

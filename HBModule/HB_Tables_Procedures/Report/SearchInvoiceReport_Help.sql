@@ -177,13 +177,13 @@ END
 	ORDER BY Id desc
 	
 	INSERT INTO #TempInvoiceBillTotalAmount1(TotalAmount,CheckOutId,ChkInHdrId,BillType,BillAmount)
-	Select SUM(H.ChkOutServiceAmtl) AS TotalAmount,B.Id,B.ChkInHdrId ,'Service',H.ChkOutServiceNetAmount
+	Select SUM(H.ChkOutServiceNetAmount) AS TotalAmount,B.Id,B.ChkInHdrId ,'Service',H.ChkOutServiceNetAmount
 	FROM WRBHBChechkOutHdr B
 	JOIN WRBHBCheckOutServiceHdr H WITH(NOLOCK) ON B.Id=H.CheckOutHdrId AND H.IsActive=1 AND H.IsDeleted=0
     JOIN WRBHBCheckOutServiceDtls D WITH(NOLOCK) ON H.Id = D.ServiceHdrId AND D.IsActive=1 AND D.IsDeleted=0
     WHERE --D.TypeService='Food And Beverages' 
 	 B.IsActive=1 and B.IsDeleted=0 --AND B.Id NOT IN (Select CheckOutId from #TempInvoiceBillTotalAmount1)
-	AND D.ChkOutSerAmount!=0
+	--AND D.ChkOutSerAmount!=0
 	GROUP BY B.Id,B.ChkInHdrId,H.ChkOutServiceNetAmount
 	ORDER BY Id desc
 			
@@ -330,7 +330,7 @@ where Hh.PropertyType='External Property'  and ChkOutServiceNetAmount!=0 and InV
 		begin 
 		if(@FromDt!='')and(@ToDt!='')
 	    Begin 
-			SELECT CT.Id as ChkoutId,CT.TACInvoiceNo InvoiceNumber,P.PropertyName Property,
+			SELECT C.Id as ChkoutId,CT.TACInvoiceNo InvoiceNumber,P.PropertyName Property,
 			--round(ct.ChkOutTariffHECess+ct.ChkOutTariffCess+CT.TotalBusinessSupportST+CT.TACAmount,0) as Amount ,
 			CT.MarkupAmount  as Amount,
 			CT.TACAmount Amounts,C.GuestName AS GuestName ,C.ClientName AS ClientName,
@@ -346,7 +346,7 @@ where Hh.PropertyType='External Property'  and ChkOutServiceNetAmount!=0 and InV
 			end
 			Else
 			begin
-				SELECT CT.Id as ChkoutId,CT.TACInvoiceNo InvoiceNumber,P.PropertyName Property,
+				SELECT C.Id as ChkoutId,CT.TACInvoiceNo InvoiceNumber,P.PropertyName Property,
 				--round(ct.ChkOutTariffHECess+ct.ChkOutTariffCess+CT.TotalBusinessSupportST,0) as Amount,
 				CT.MarkupAmount  as Amount,
 				CT.TACAmount Amounts,C.GuestName AS GuestName ,C.ClientName AS ClientName,
@@ -379,14 +379,71 @@ BEGIN
 			where IsActive = 1 and IsDeleted = 0
 			ORDER BY Id DESC;  
 		END
-	SELECT InVoiceNo,Id AS ChkOutId,PropertyId FROM WRBHBChechkOutHdr WHERE 
-	Id=@Id1 AND InVoiceNo=@FromDt
+	CREATE TABLE #ChkId(InVoiceNo NVARCHAR(100),ChkOutId INT,PropertyId INT)
+	CREATE TABLE #Tariff(Type NVARCHAR(100),TariffAmount DECIMAL(27,2),NoOfDays INT,Total DECIMAL(27,2))
+	CREATE TABLE #Tax(LuxuryTaxPer DECIMAL(27,2),ServiceTaxPer DECIMAL(27,2),VATPer DECIMAL(27,2),
+	RestaurantSTPer DECIMAL(27,2),ServiceChargeChk DECIMAL(27,2),Type NVARCHAR(100),Cess DECIMAL(27,2),
+	HECess DECIMAL(27,2))
+	DECLARE @Direct NVARCHAR(100)
+	SET @Direct=(SELECT ISNULL(Direct,'') FROM WRBHBChechkOutHdr 
+	WHERE Id=@Id1 AND PropertyType='External Property')
+	
+	IF ISNULL(@Direct,'')=''
+	BEGIN
+		INSERT INTO #ChkId(InVoiceNo,ChkOutId,PropertyId)
+		SELECT InVoiceNo,Id AS ChkOutId,PropertyId FROM WRBHBChechkOutHdr WHERE 
+		Id=@Id1 AND InVoiceNo=@FromDt
+		
+	END
+	ELSE
+	BEGIN
+		INSERT INTO #ChkId(InVoiceNo,ChkOutId,PropertyId)
+		SELECT TACInvoiceNo,ChkOutHdrId AS ChkOutId,PropertyId FROM WRBHBExternalChechkOutTAC WHERE 
+		ChkOutHdrId=@Id1 AND TACInvoiceNo=@FromDt
+	END
 
-	 SELECT 'Tariff' AS Type,(ChkOutTariffTotal/NoOfDays) AS TariffAmount ,NoOfDays,(ChkOutTariffTotal/NoOfDays) AS Total
-	 FROM WRBHBChechkOutHdr WHERE Id=@Id1 AND InVoiceNo=@FromDt
-
-	 SELECT LuxuryTaxPer,ServiceTaxPer,VATPer,RestaurantSTPer,ISNULL(ServiceChargeChk,0) AS ServiceCharge FROM WRBHBChechkOutHdr
-	 WHERE Id=@Id1 AND InVoiceNo=@FromDt AND IsActive=1 AND IsDeleted=0
+	IF ISNULL(@Direct,'')=''
+		BEGIN
+			INSERT INTO #Tariff(Type,TariffAmount,NoOfDays,Total)
+			SELECT 'Tariff' AS Type,(ChkOutTariffTotal/NoOfDays) AS TariffAmount ,NoOfDays,(ChkOutTariffTotal) AS Total
+			FROM WRBHBChechkOutHdr WHERE Id=@Id1 AND InVoiceNo=@FromDt
+		END
+		ELSE
+		BEGIN
+			INSERT INTO #Tariff(Type,TariffAmount,NoOfDays,Total)
+			SELECT 'Tariff' AS Type,(MarkUpAmount) AS TariffAmount ,NoOfDays,(TACAmount) AS Total
+			FROM WRBHBExternalChechkOutTAC WHERE ChkOutHdrId=@Id1 AND TACInvoiceNo=@FromDt
+		END
+		IF ISNULL(@Direct,'')=''
+		BEGIN
+			 INSERT INTO #Tax(LuxuryTaxPer,ServiceTaxPer,VATPer,RestaurantSTPer,ServiceChargeChk,Type,Cess,HECess)
+			 SELECT LuxuryTaxPer,ServiceTaxPer,VATPer,RestaurantSTPer,ISNULL(ServiceChargeChk,0) AS ServiceCharge,
+			 PropertyType,T.Cess,T.HECess 
+			 FROM WRBHBChechkOutHdr C
+			 JOIN WRBHBTaxMaster T WITH(NOLOCK)ON C.StateId=T.StateId AND T.IsActive=1
+			 WHERE C.Id=@Id1 AND InVoiceNo=@FromDt AND C.IsActive=1 AND C.IsDeleted=0
+		END
+		ELSE
+		BEGIN
+			 INSERT INTO #Tax(LuxuryTaxPer,ServiceTaxPer,VATPer,RestaurantSTPer,ServiceChargeChk,Type,Cess,HECess)
+			 SELECT 0,T.ServiceTaxOnTariff AS ServiceTaxPer,0,0,0 AS ServiceCharge,
+			 PropertyType,T.Cess,T.HECess  
+			 FROM WRBHBExternalChechkOutTAC C
+			 JOIN WRBHBTaxMaster T WITH(NOLOCK)ON C.StateId=T.StateId AND T.IsActive=1
+			 WHERE ChkOutHdrId=@Id1 AND TACInvoiceNo=@FromDt AND C.IsActive=1 AND C.IsDeleted=0
+		END
+				
+		SELECT InVoiceNo,ChkOutId,PropertyId FROM #ChkId
+		
+		SELECT Type,TariffAmount,NoOfDays,Total FROM #Tariff
+		
+		SELECT LuxuryTaxPer,ServiceTaxPer,VATPer,RestaurantSTPer,ServiceChargeChk FROM #Tax
+	 
+	 --SELECT 'Tariff' AS Type,(ChkOutTariffTotal/NoOfDays) AS TariffAmount ,NoOfDays,(ChkOutTariffTotal/NoOfDays) AS Total
+	 --FROM WRBHBChechkOutHdr WHERE Id=@Id1 --AND InVoiceNo=@FromDt
+	 
+	 
+	
 END
 END
 IF @Action ='CreditNoteService'
@@ -412,7 +469,8 @@ BEGIN
 	 JOIN WRBHBChechkOutHdr C WITH(NOLOCK)ON H.CheckOutHdrId=C.Id AND C.IsActive=1 AND C.IsDeleted=0
 	 WHERE C.Id=@Id1 AND C.InVoiceNo=@FromDt AND ChkOutSerAmount !=0
  
-	 SELECT LuxuryTaxPer,ServiceTaxPer,VATPer,RestaurantSTPer,ISNULL(ServiceChargeChk,0) AS ServiceCharge FROM WRBHBChechkOutHdr
+	 SELECT LuxuryTaxPer,ServiceTaxPer,VATPer,RestaurantSTPer,ISNULL(ServiceChargeChk,0) AS ServiceCharge 
+	 FROM WRBHBChechkOutHdr
 	 WHERE Id=@Id1 AND InVoiceNo=@FromDt AND IsActive=1 AND IsDeleted=0;
 END
 END

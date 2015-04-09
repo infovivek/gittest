@@ -795,21 +795,36 @@ LEFT OUTER JOIN WRBHBPropertyAgreements PA WITH(NOLOCK) ON PA.IsActive=1 AND PA.
 	  UPDATE #MonthWiseFinal SET CityId = P.CityId 
 	  FROM #MonthWiseFinal F 
 	  JOIN WRBHBBooking p WITH(NOLOCK) ON p.Id=F.BookingId AND P.IsActive=1 AND IsDeleted=0
- 
+  --Select *  from #MonthWise  where PropertyType in('External Property','MMT')  AND  Bookingid IN (18081,18227)
+	   
 	 
+	--INSERT INTO	#MonthWiseFinal( Property,PropertyType,PropertyId, 
+	--Tariff,TariffPaymentMode,Dedicat,Direct,Btc,Onlin,Gtv,Total,PrintInvoice,Bookingid,CityId,CityName,DirectAmt1)
+	--Select  Bp.PropertyName,P.PropertyType, BP.PropertyId,
+	--0  ,''TariffPaymentMode,0 Dedicat,0   Direct,0 Btc,0 Onlin, SUM(GTVAmount) Gtv,Sum(P.ChkOutTariffTotal) Total,
+	--''PrintInvoice,Bp.BookingId,Pp.CityId,'',SUM(P.ChkOutTariffTotal)
+	--from #MonthWise  p
+	--left outer JOIN dbo.WRBHBBookingProperty BP WITH(NOLOCK)ON P.PropertyId=BP.PropertyId
+	--AND BP.IsActive=1 AND BP.IsDeleted=0 and Bp.PropertyType='Exp'  and p.BookingId=Bp.BookingId
+	--join WRBHBProperty PP on BP.PropertyId=pP.Id and pP.IsActive=1
+	--where P.PropertyType='External Property' and P.ChkOutTariffTotal!=0 and TariffPaymentMode='Direct' 
+	--group by   Bp.PropertyName,P.PropertyType,TariffPaymentMode,BP.PropertyId,Bp.BookingId,Pp.CityId
+	--order by BP.PropertyId
 	INSERT INTO	#MonthWiseFinal( Property,PropertyType,PropertyId, 
 	Tariff,TariffPaymentMode,Dedicat,Direct,Btc,Onlin,Gtv,Total,PrintInvoice,Bookingid,CityId,CityName,DirectAmt1)
-	Select  Bp.PropertyName,P.PropertyType, BP.PropertyId,
+	select  Pp.PropertyName,P.PropertyType, P.PropertyId,
 	0  ,''TariffPaymentMode,0 Dedicat,0   Direct,0 Btc,0 Onlin, SUM(GTVAmount) Gtv,Sum(P.ChkOutTariffTotal) Total,
-	''PrintInvoice,Bp.BookingId,Pp.CityId,'',SUM(P.ChkOutTariffTotal)
+	''PrintInvoice,P.BookingId,Pp.CityId,'',SUM(P.ChkOutTariffTotal)
 	from #MonthWise  p
-	left outer JOIN dbo.WRBHBBookingProperty BP WITH(NOLOCK)ON P.PropertyId=BP.PropertyId
-	AND BP.IsActive=1 AND BP.IsDeleted=0 and Bp.PropertyType='Exp'  and p.BookingId=Bp.BookingId
-	join WRBHBProperty PP on BP.PropertyId=pP.Id and pP.IsActive=1
+  --JOIN dbo.WRBHBBookingProperty BP WITH(NOLOCK)ON P.PropertyId=BP.PropertyId
+	--AND BP.IsActive=1 AND BP.IsDeleted=0 and Bp.PropertyType='Exp'  and p.BookingId=Bp.BookingId
+	join WRBHBProperty PP on P.PropertyId=PP.Id and PP.IsActive=1
 	where P.PropertyType='External Property' and P.ChkOutTariffTotal!=0 and TariffPaymentMode='Direct' 
-	group by   Bp.PropertyName,P.PropertyType,TariffPaymentMode,BP.PropertyId,Bp.BookingId,Pp.CityId
-	order by BP.PropertyId
-	 	
+	--AND P.Bookingid IN (18081,18227)
+	group by   PP.PropertyName,P.PropertyType,TariffPaymentMode,P.PropertyId,p.BookingId,Pp.CityId
+	order by P.PropertyId
+	 	 
+	   
 	-- UPDATE #MonthWiseFinal SET PropertyType = 'External Property'
 	--FROM #MonthWiseFinal F  
 	--WHERE F.PropertyType='MMT';

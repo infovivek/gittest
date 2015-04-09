@@ -65,7 +65,14 @@ IF ISNULL(@ChkInVce,'')=''
 	   SET @CrdInVoiceNo =SUBSTRING(@TEMPINVOICENO,0,5)+CAST(SUBSTRING(@TEMPINVOICENO,5,9)+1 AS VARCHAR); 
 	 END
 	 
+	 INSERT INTO WRBHBChechkOutPaymentCheque(ChkOutHdrId,Payment,PayeeName,Address,AmountPaid,
+	 PaymentMode,ChequeNumber,BankName,DateIssued,IsActive,IsDeleted,Createdby,CreatedDate,
+	 Modifiedby,ModifiedDate,RowId,DateIssueMonth,DateIssueYear,OutStanding,CreditNoteFlag)
 	 
+	 SELECT @ChkOutId,'Service',GuestName,'',@TotalAmount,
+	 'Credit','','',CONVERT(date,GETDATE(),103),1,0,@Createdby,GETDATE(),@Createdby,
+	 GETDATE(),NEWID(),MONTH(GETDATE()),YEAR(GETDATE()),0,1 FROM WRBHBChechkOutHdr C
+	  WHERE C.Id=@ChkOutId
 	 
 	 INSERT INTO WRBHBCreditNoteServiceHdr(CheckOutId,ChkOutInVoiceNo,CrdInVoiceNo,VAT,ServicetaxFB,
 	 ServiceTaxOthers,TotAlAmount,Cess,HECess,Description,IsActive,IsDeleted,Createdby,CreatedDate,

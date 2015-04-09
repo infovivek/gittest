@@ -33,5 +33,13 @@ namespace HB.Dao
             sw.Flush();
             sw.Close();
         }
+
+        public void SMSLog(string sErrMsg)
+        {
+            StreamWriter sw = new StreamWriter(ConfigurationManager.ConnectionStrings["SMS"].ToString() + sErrorTime, true);
+            sw.WriteLine(sLogFormat + sErrMsg);
+            sw.Flush();
+            sw.Close();
+        }
     }
 }

@@ -11,14 +11,14 @@ create procedure HBMenu_ChangePassword_help
 @PAction   nvarchar(100),
 @Param1    nvarchar(100),
 @Param2    nvarchar(100),
-@Id        bigint
+@Id        NVarChar(500)
 )
 as 
 begin
 --declare @Action varchar(100)
 DECLARE @UserPassword VARCHAR(100)
 
-
+Set @Id =( Select Id FROM WrbhbTravelDesk WHERE IsDeleted=0 AND IsActive=1 AND Rowid=@Id)
 --IF @PAction ='User'
 --BEGIN	
 --			SELECT  RoleName label,Id UserId,0 as Id,isnull(RoleGroup,'') as  UserType

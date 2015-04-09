@@ -230,7 +230,7 @@ INSERT INTO #TFFINALSs( RoomId,Typess,ClientName,Property,PropertyId,PropertyTyp
 			TariffPaymentMode,CurrentStatus,Btypes from #TFFINALS 
  where -- month(CONVERT(DATE,CheckOutDate,103))=11
   Occupancy ='Single'-- and PropertyId=2
- group by  ClientName,Property,PropertyId,PropertyType,
+ group by  RoomId,ClientName,Property,PropertyId,PropertyType,
 			TariffTotal,CheckOutDate,CheckInDate,TotalDays,Occupancy,BookingId,ChkoutId,ChkInHdrId,
 			TariffPaymentMode,CurrentStatus,Btypes
  order by BookingId 
@@ -777,7 +777,7 @@ truncate table #ExternalForecastNew;
 		Sum(Dedicat) DD,Sum(Direct) Direct,Sum(Btc) BTC,
 		SUM(0) Online,Sum(Direct+Btc+Dedicat) Total,Sum(GtvAmount+Direct+Btc+Dedicat) GTV,m.PropertyType,m.PropertyId,'A',m.CityId
 		from #MonthWiseFinal m
-	 	JOIN WRBHBCity C WITH(NOLOCK) ON C.Id=m.CityId AND C.IsActive=1 AND C.IsDeleted=0 
+	 	JOIN WRBHBCity C WITH(NOLOCK) ON C.Id=m.CityId --AND C.IsActive=1 AND C.IsDeleted=0 
 		group by  Property,m.PropertyId,m.PropertyType,C.CityName,m.CityId
 		order by m.PropertyType
 		Insert into #Temp1Final(CityName,PropertyName,DD,Direct,BTC,Online,TOTAL,GTV,Category,Pid,OrderData,CityId)
@@ -797,7 +797,7 @@ truncate table #ExternalForecastNew;
 		Sum(Dedicat) DD,Sum(Direct) Direct,Sum(Btc) BTC,
 		SUM(Onlin) Online,Sum(Direct+Btc+Dedicat) Total,Sum(GtvAmount+Btc+Dedicat) GTV,m.PropertyType,m.PropertyId,'A',m.CityId
 		from #MonthWiseFinal m
-		JOIN WRBHBCity C WITH(NOLOCK) ON C.Id=m.CityId AND C.IsActive=1 AND C.IsDeleted=0 
+		JOIN WRBHBCity C WITH(NOLOCK) ON C.Id=m.CityId --AND C.IsActive=1 AND C.IsDeleted=0 
 		where m.PropertyType='External Property'
 		group by  Property,m.PropertyId,m.PropertyType,C.CityName,m.CityId
 		order by m.PropertyType
@@ -819,7 +819,7 @@ truncate table #ExternalForecastNew;
 		Sum(Dedicat) DD,Sum(Direct) Direct,Sum(Btc) BTC,
 		SUM(Onlin) Online,Sum(Direct+Btc+Dedicat) Total,Sum(Direct+Btc+Dedicat) GTV,m.PropertyType,m.PropertyId,'A',m.CityId
 		from #MonthWiseFinal m
-		JOIN WRBHBCity C WITH(NOLOCK) ON C.Id=m.CityId AND C.IsActive=1 AND C.IsDeleted=0 
+		JOIN WRBHBCity C WITH(NOLOCK) ON C.Id=m.CityId --AND C.IsActive=1 AND C.IsDeleted=0 
 		where m.PropertyType='Internal Property'
 		group by  Property,m.PropertyId,m.PropertyType,C.CityName,m.CityId
 		order by m.PropertyType
@@ -842,7 +842,7 @@ truncate table #ExternalForecastNew;
 		Sum(Dedicat) DD,Sum(Direct) Direct,Sum(Btc) BTC,
 		SUM(Onlin) Online,Sum(Direct+Btc+Dedicat) Total,Sum(Direct+Btc+Dedicat) GTV,m.PropertyType,m.PropertyId,'A',m.CityId
 		from #MonthWiseFinal m
-		JOIN WRBHBCity C WITH(NOLOCK) ON C.Id=m.CityId AND C.IsActive=1 AND C.IsDeleted=0 
+		JOIN WRBHBCity C WITH(NOLOCK) ON C.Id=m.CityId --AND C.IsActive=1 AND C.IsDeleted=0 
 		where m.PropertyType='Managed G H'
 		group by  Property,m.PropertyId,m.PropertyType,C.CityName,m.CityId
 		order by m.PropertyType

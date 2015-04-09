@@ -27,7 +27,7 @@ If @Action ='PageLoad'
 	BEGIN
 	
 	
-			CREATE TABLE #BOOK(BookingCode NVARCHAR(100),GuestName NVARCHAR(100),
+		CREATE TABLE #BOOK(BookingCode NVARCHAR(100),GuestName NVARCHAR(100),
 		ChkInDate NVARCHAR(100),ChkOutDate NVARCHAR(100),
 		BookingId BIGINT,PropertyId BIGINT,GuestId BIGINT,CheckInHdrId BIGINT,RoomId BIGINT,
 		ApartmentId BIGINT,BedId BIGINT)
@@ -116,14 +116,24 @@ If @Action ='PageLoad'
 		
 		
 		DECLARE @Roles NVARCHAR(100);
-		SET @Roles=(SELECT Roles FROM WRBHBUserRoles  WHERE UserId = @UserId AND IsActive = 1 AND IsDeleted = 0 AND Roles='Other Roles');
+		SET @Roles=(SELECT  TOP 1 Roles FROM WRBHBUserRoles  
+		WHERE UserId = @UserId AND IsActive = 1 AND IsDeleted = 0 AND Roles IN('Other Roles'));
 		
 		
 		
-		IF(@Roles = 'Other Roles')
+		IF(@Roles = 'Admin')
 		BEGIN
 			SELECT BookingCode,GuestName,ChkInDate,ChkOutDate,
 			BookingId,PropertyId,GuestId,CheckInHdrId,RoomId,ApartmentId,BedId FROM #BOOK
+			GROUP BY BookingCode,GuestName,ChkInDate,ChkOutDate,
+			BookingId,PropertyId,GuestId,CheckInHdrId,RoomId,ApartmentId,BedId
+		END
+		ELSE
+		BEGIN
+			SELECT BookingCode,GuestName,ChkInDate,ChkOutDate,
+			BookingId,PropertyId,GuestId,CheckInHdrId,RoomId,ApartmentId,BedId FROM #BOOK
+			GROUP BY BookingCode,GuestName,ChkInDate,ChkOutDate,
+			BookingId,PropertyId,GuestId,CheckInHdrId,RoomId,ApartmentId,BedId
 		END
 		
 		

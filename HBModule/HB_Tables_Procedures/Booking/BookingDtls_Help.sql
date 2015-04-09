@@ -51,6 +51,8 @@ DECLARE @Stay NVARCHAR(100),@Uniglobe NVARCHAR(100);
 SET @Stay = 'stay@hummingbirdindia.com';
 SET @Uniglobe = 'homestay@uniglobeatb.co.in';
 --
+DECLARE @MailStr NVARCHAR(1000)='';  
+--
 /*SET @CLogoAlt=(SELECT TOP 1 LegalCompanyName FROM WRBHBCompanyMaster 
 WHERE IsActive=1 AND IsDeleted=0);*/
 --
@@ -171,8 +173,20 @@ IF @Action = 'ClientGuestLoad'
     WHERE B.Id = @Id;
    END
   -- dataset table 2
-  SELECT CAST(EmailtoGuest AS INT),@Stay,@Uniglobe FROM WRBHBBooking 
-  WHERE Id=@Id;
+  SET @Uniglobe = '';
+  IF EXISTS(SELECT NULL FROM WRBHBClientSMTP WHERE IsActive = 1 AND 
+  IsDeleted = 0 AND ClientId = (SELECT ClientId FROM WRBHBBooking WHERE Id = @Id) 
+  AND EmailId = (SELECT ClientBookerEmail FROM WRBHBBooking WHERE Id = @Id))
+   BEGIN
+    SET @Uniglobe = (SELECT ClientBookerEmail FROM WRBHBBooking WHERE Id = @Id);
+    SELECT CAST(EmailtoGuest AS INT),@Stay,@Uniglobe FROM WRBHBBooking
+    WHERE Id=@Id;
+   END
+  ELSE
+   BEGIN
+    SELECT CAST(EmailtoGuest AS INT),@Stay,@Uniglobe FROM WRBHBBooking
+    WHERE Id=@Id;
+   END
   -- dataset table 3
   SELECT EmailId FROM WRBHBBookingGuestDetails WHERE BookingId=@Id;
   -- dataset table 4
@@ -209,14 +223,12 @@ IF @Action = 'ClientGuestLoad'
     WHERE BookingId=@Id ORDER BY NEWID();
    END
   -- Dataset Table 8
-  SELECT MasterClientId FROM WRBHBClientSMTP
-  WHERE IsActive=1 AND IsDeleted=0 AND
-  MasterClientId=(SELECT MasterClientId FROM WRBHBClientManagement
-  WHERE IsActive=1 AND IsDeleted=0 AND
-  Id=(SELECT ClientId FROM WRBHBBooking WHERE Id=@Id)); 
+  SELECT ClientId FROM WRBHBClientSMTP WHERE IsActive = 1 AND IsDeleted = 0 AND
+  ClientId = (SELECT ClientId FROM WRBHBBooking WHERE Id = @Id) AND
+  EmailId = (SELECT ClientBookerEmail FROM WRBHBBooking WHERE Id = @Id); 
  END
 IF @Action = 'RoomBookingConfirmed'
- BEGIN  
+ BEGIN
   -- Dataset Table 0
   CREATE TABLE #FFF(BookingId BIGINT,RoomId BIGINT,ChkInDt NVARCHAR(100),
   ChkOutDt NVARCHAR(100),Tariff DECIMAL(27,2),Occupancy NVARCHAR(100),
@@ -332,7 +344,7 @@ IF @Action = 'RoomBookingConfirmed'
   --
   --select 'df';return;
   -- Get CPP & Property Mail
-  DECLARE @MailStr NVARCHAR(1000)='';  
+  
   IF EXISTS(SELECT NULL FROM WRBHBBookingProperty BP
   LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest BG WITH(NOLOCK)ON
   BP.BookingId=BG.BookingId AND BP.Id=BG.BookingPropertyTableId AND
@@ -360,28 +372,24 @@ IF @Action = 'RoomBookingConfirmed'
     IsActive=1 AND IsDeleted=0);
    END
   --
+  SET @Uniglobe = '';
   -- dataset table 3
-  IF EXISTS(SELECT NULL FROM WRBHBClientSMTP WHERE IsActive = 1 AND IsDeleted = 0 
-  AND MasterClientId = (SELECT MasterClientId FROM WRBHBClientManagement
-  WHERE IsActive = 1 AND IsDeleted = 0 AND Id=
-  (SELECT ClientId FROM WRBHBBooking WHERE Id=@Id)))
+  IF EXISTS(SELECT NULL FROM WRBHBClientSMTP WHERE IsActive = 1 AND 
+  IsDeleted = 0 AND ClientId = (SELECT ClientId FROM WRBHBBooking WHERE Id = @Id) 
+  AND EmailId = (SELECT ClientBookerEmail FROM WRBHBBooking WHERE Id = @Id))
    BEGIN
-    SET @Uniglobe = (SELECT TOP 1 ISNULL(EmailId,'stay@hummingbirdindia.com') 
-    FROM WRBHBClientSMTP 
-    WHERE IsActive = 1 AND IsDeleted = 0 AND 
-    MasterClientId = (SELECT MasterClientId FROM WRBHBClientManagement
-    WHERE IsActive = 1 AND IsDeleted = 0 AND 
-    Id = (SELECT ClientId FROM WRBHBBooking WHERE Id=@Id)));
-    --
-    SELECT BP.PropertyName, '' as UserName,
+    SET @Uniglobe = (SELECT ClientBookerEmail FROM WRBHBBooking WHERE Id = @Id);
+    /*SELECT BP.PropertyName, '' as UserName,
     ISNULL(BP.Email,'') Email,ISNULL(BP.Phone,'') PhoneNumber,
     ISNULL(@MailStr,'') --ISNULL(BP.Email,'') AS Email
-    FROM dbo.WRBHBProperty BP    
-    WHERE BP.Id=@BookingPropertyId;
+    FROM dbo.WRBHBProperty BP WHERE BP.Id=@BookingPropertyId;*/
+    SELECT '' AS PropertyName,FirstName AS UserName,Email,
+    MobileNo AS PhoneNumber,ISNULL(@MailStr,'')
+    FROM WRBHBClientManagementAddNewClient
+    WHERE Id = (SELECT ClientBookerId FROM WRBHBBooking WHERE Id = @Id);
    END
   ELSE
    BEGIN
-    SET @Uniglobe = '';
     SELECT BP.PropertyName, ISNULL(U.FirstName,'') as UserName,
     ISNULL(U.Email,'')Email,ISNULL(U.MobileNumber,'')PhoneNumber,
     ISNULL(@MailStr,'') --ISNULL(BP.Email,'') AS Email
@@ -584,28 +592,11 @@ IF @Action = 'RoomBookingConfirmed'
   DECLARE @BTCTaxesContent NVARCHAR(1000) = '';  
   IF @TypeofPtyy NOT IN ('MGH','InP','DdP')
    BEGIN
-    SET @BTCTaxesContent = 'Inclusive of Property Taxes (LT & ST) & 7.42% extra ST.';
+    SET @BTCTaxesContent = 'Inclusive of Property Taxes (LT & ST) & 7.42% extra ST.<br><p style="font-size:14px;padding-left:5px;font-weight:bold;">IMPORTANT – Kindly arrange to fill the Proof of Stay (as per your company’s requirement) which has been shared with the property. Kindly insist to fill the FORM.<p>';
    END
   IF @TypeofPtyy IN ('MGH','InP','DdP')
    BEGIN
     SET @BTCTaxesContent = 'Taxes as applicable';
-   END
-  --
-  IF EXISTS(SELECT NULL FROM WRBHBClientSMTP WHERE IsActive = 1 AND IsDeleted = 0 
-  AND MasterClientId = (SELECT MasterClientId FROM WRBHBClientManagement
-  WHERE IsActive = 1 AND IsDeleted = 0 AND Id=
-  (SELECT ClientId FROM WRBHBBooking WHERE Id=@Id)))
-   BEGIN
-    SET @Uniglobe = (SELECT TOP 1 ISNULL(EmailId,'stay@hummingbirdindia.com') 
-    FROM WRBHBClientSMTP 
-    WHERE IsActive = 1 AND IsDeleted = 0 AND 
-    MasterClientId = (SELECT MasterClientId FROM WRBHBClientManagement
-    WHERE IsActive = 1 AND IsDeleted = 0 AND 
-    Id = (SELECT ClientId FROM WRBHBBooking WHERE Id=@Id)));
-   END
-  ELSE
-   BEGIN
-    SET @Uniglobe = '';
    END
   -- dataset table 4
   SELECT CAST(EmailtoGuest AS INT),
@@ -766,16 +757,22 @@ from tmp
    SELECT dbo.TRIM(DataItem) AS Email FROM tmp WHERE DataItem != '' GROUP BY DataItem;
   -- Dataset Table 9 Email Address End
   -- Dataset Table 10 Begin
-  SELECT MasterClientId FROM WRBHBClientSMTP
+  /*SELECT MasterClientId FROM WRBHBClientSMTP
   WHERE IsActive=1 AND IsDeleted=0 AND
   MasterClientId=(SELECT MasterClientId FROM WRBHBClientManagement
   WHERE IsActive=1 AND IsDeleted=0 AND
-  Id=(SELECT ClientId FROM WRBHBBooking WHERE Id=@Id));
+  Id=(SELECT ClientId FROM WRBHBBooking WHERE Id=@Id));*/
+  SELECT ClientId FROM WRBHBClientSMTP WHERE IsActive = 1 AND IsDeleted = 0 AND
+  ClientId = (SELECT ClientId FROM WRBHBBooking WHERE Id = @Id) AND
+  EmailId = (SELECT ClientBookerEmail FROM WRBHBBooking WHERE Id = @Id);
   --
   --select 'df';return;
   -- Dataset Table 10 End
   DECLARE @BelowTACcontent NVARCHAR(MAX) = 'Kindly arrange to pay the above TAC amount to HummingBird by CHEQUE or through Bank Transfer (NEFT).<br><b>CHEQUE</b> : Kindly issue the cheque in Favour of "Humming Bird Travel & Stay Pvt Ltd".<br><b>Bank Transfer (NEFT)</b> : <br>Payee Name : Humming Bird Travel & Stay Pvt. Ltd.<br>Bank Name : HDFC Bank<br>Account No. : 17552560000226<br>IFSC : HDFC0001755';
   -- Dataset Table 11 bEGIN
+  DECLARE @TaxAdd NVARCHAR(100) = (SELECT ISNULL(TaxAdded,'T') FROM WRBHBBookingProperty WHERE Id IN
+  (SELECT BookingPropertyTableId FROM WRBHBBookingPropertyAssingedGuest WHERE BookingId = @Id));
+  --
   CREATE TABLE #PropertyMailBTCChecking(Name NVARCHAR(100),
   ChkInDt NVARCHAR(100),ChkOutDt NVARCHAR(100),Tariff NVARCHAR(100),
   Occupancy NVARCHAR(100),TariffPaymentMode NVARCHAR(100),
@@ -799,7 +796,11 @@ from tmp
     BP.PropertyId=BG.BookingPropertyId
     WHERE BG.BookingId=@Id;
     SELECT Name,ChkInDt,ChkOutDt,
-    CASE WHEN Occupancy = 'Single' THEN @Single
+    --CASE WHEN Occupancy = 'Single' THEN CAST(@Single AS VARCHAR) + ' (Tax Added) '
+    --     WHEN Occupancy = 'Double' THEN CAST(@Double AS VARCHAR) + ' (Tax Added) '
+    --     WHEN Occupancy = 'Triple' THEN CAST(@Triple AS VARCHAR) + ' (Tax Added) '
+    --     ELSE Tariff END,
+         CASE WHEN Occupancy = 'Single' THEN @Single
          WHEN Occupancy = 'Double' THEN @Double
          WHEN Occupancy = 'Triple' THEN @Triple
          ELSE Tariff END,Occupancy,TariffPaymentMode,
@@ -808,7 +809,12 @@ from tmp
    END
   ELSE
    BEGIN
-    SELECT Name,ChkInDt,ChkOutDt,Tariff,Occupancy,TariffPaymentMode,
+    SELECT Name,ChkInDt,ChkOutDt,
+    CASE WHEN @TaxAdd = 'T' AND Tariff != '0.00' THEN Tariff+' (Tax Added) '
+         WHEN @TaxAdd = 'T' AND Tariff = '0.00' THEN Tariff
+         WHEN @TaxAdd = 'N' AND Tariff != '0.00' THEN Tariff+' (Nett Tariff) '
+         WHEN @TaxAdd = 'N' AND Tariff = '0.00' THEN Tariff
+         ELSE Tariff END,Occupancy,TariffPaymentMode,
     ServicePaymentMode,'NOTBTC',@AgreedTariff,@BelowTACcontent,RoomNo 
     FROM #PropertyMailBTCChecking;
    END
@@ -872,18 +878,49 @@ IF @Action = 'BedBookingConfirmed'
     REPLACE(CONVERT(VARCHAR(11), B.BookedDt, 106), ' ', '-'),
     B.SpecialRequirements,B.ClientBookerEmail FROM WRBHBBooking B
     LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK) ON  C.Id=B.ClientId
-    LEFT OUTER JOIN WRBHBUser U  WITH(NOLOCK) ON  U.Id=B.CreatedBy
+    LEFT OUTER JOIN WRBHBUser U  WITH(NOLOCK) ON  U.Id=B.BookedUsrId
     WHERE B.Id=@Id;
    END
+  --
+  SET @MailStr=(SELECT ISNULL(Email,'') FROM WRBHBProperty
+  WHERE Id = (select top 1 BookingPropertyId 
+  from WRBHBBedBookingPropertyAssingedGuest where BookingId = @Id));
   -- Dataset Table 3
-  SELECT BP.PropertyName,ISNULL(U.FirstName,''),ISNULL(U.Email,''),
+  SET @Uniglobe = '';
+  IF EXISTS(SELECT NULL FROM WRBHBClientSMTP WHERE IsActive = 1 AND 
+  IsDeleted = 0 AND ClientId = (SELECT ClientId FROM WRBHBBooking WHERE Id = @Id) 
+  AND EmailId = (SELECT ClientBookerEmail FROM WRBHBBooking WHERE Id = @Id))
+   BEGIN
+    SET @Uniglobe = (SELECT ClientBookerEmail FROM WRBHBBooking WHERE Id = @Id);
+    /*SELECT BP.PropertyName, '' as UserName,
+    ISNULL(BP.Email,'') Email,ISNULL(BP.Phone,'') PhoneNumber,
+    ISNULL(@MailStr,'') --ISNULL(BP.Email,'') AS Email
+    FROM dbo.WRBHBProperty BP WHERE BP.Id=@BookingPropertyId;*/
+    SELECT '' AS PropertyName,FirstName AS UserName,Email,
+    MobileNo AS PhoneNumber,ISNULL(@MailStr,'')
+    FROM WRBHBClientManagementAddNewClient
+    WHERE Id = (SELECT ClientBookerId FROM WRBHBBooking WHERE Id = @Id);
+   END
+  ELSE
+   BEGIN
+    SELECT BP.PropertyName, ISNULL(U.FirstName,'') as UserName,
+    ISNULL(U.Email,'')Email,ISNULL(U.MobileNumber,'')PhoneNumber,
+    ISNULL(@MailStr,'') --ISNULL(BP.Email,'') AS Email
+    FROM dbo.WRBHBProperty BP
+    LEFT OUTER JOIN WRBHBPropertyUsers PU WITH(NOLOCK) ON BP.Id =PU.PropertyId 
+    AND PU.IsActive=1 AND PU.IsDeleted=0 AND 
+    UserType in('Resident Managers','Assistant Resident Managers')
+    LEFT OUTER JOIN WRBHBUser U  WITH(NOLOCK) ON  U.Id=PU.UserId
+    WHERE BP.Id=@BookingPropertyId  AND BP.IsActive=1 AND BP.IsDeleted=0;
+   END
+  /*SELECT BP.PropertyName,ISNULL(U.FirstName,''),ISNULL(U.Email,''),
   ISNULL(U.MobileNumber,''),ISNULL(BP.Email,'')
   FROM dbo.WRBHBProperty BP
   LEFT OUTER JOIN WRBHBPropertyUsers PU WITH(NOLOCK) ON BP.Id=PU.PropertyId
   AND PU.IsActive=1 AND PU.IsDeleted=0 AND 
   UserType in('Resident Managers','Assistant Resident Managers')
   LEFT OUTER JOIN WRBHBUser U  WITH(NOLOCK) ON  U.Id=PU.UserId
-  WHERE BP.Id=@BookingPropertyId  AND BP.IsActive=1 AND BP.IsDeleted=0;
+  WHERE BP.Id=@BookingPropertyId  AND BP.IsActive=1 AND BP.IsDeleted=0;*/
   --
   SELECT @PName=(P.PropertyName+', '+L.Locality+', '+C.CityName),
   @SecurityPolicy=P.BookingPolicy,@CancelationPolicy=P.CancelPolicy
@@ -904,22 +941,16 @@ IF @Action = 'BedBookingConfirmed'
   --
   SET @MobileNo = (SELECT TOP 1 ISNULL(MobileNo,'') FROM #GST1);
   --
-  IF EXISTS(SELECT NULL FROM WRBHBClientSMTP WHERE IsActive = 1 AND IsDeleted = 0 
-  AND MasterClientId = (SELECT MasterClientId FROM WRBHBClientManagement
-  WHERE IsActive = 1 AND IsDeleted = 0 AND Id=
-  (SELECT ClientId FROM WRBHBBooking WHERE Id=@Id)))
+  /*IF EXISTS(SELECT NULL FROM WRBHBClientSMTP WHERE IsActive = 1 AND 
+  IsDeleted = 0 AND ClientId = (SELECT ClientId FROM WRBHBBooking WHERE Id = @Id) 
+  AND EmailId = (SELECT ClientBookerEmail FROM WRBHBBooking WHERE Id = @Id))
    BEGIN
-    SET @Uniglobe = (SELECT TOP 1 ISNULL(EmailId,'stay@hummingbirdindia.com') 
-    FROM WRBHBClientSMTP 
-    WHERE IsActive = 1 AND IsDeleted = 0 AND 
-    MasterClientId = (SELECT MasterClientId FROM WRBHBClientManagement
-    WHERE IsActive = 1 AND IsDeleted = 0 AND 
-    Id = (SELECT ClientId FROM WRBHBBooking WHERE Id=@Id)));
+    SET @Uniglobe = (SELECT ClientBookerEmail FROM WRBHBBooking WHERE Id = @Id);
    END
   ELSE
    BEGIN
     SET @Uniglobe = '';
-   END
+   END*/
   -- Dataset Table 4
   SELECT CAST(EmailtoGuest AS INT),@PName,@MobileNo,
   @SecurityPolicy,@CancelationPolicy,@Stay,@Uniglobe,
@@ -986,11 +1017,14 @@ IF @Action = 'BedBookingConfirmed'
   SELECT dbo.TRIM(Email) FROM #BedMail WHERE Email != '';
   -- Dataset Table 9 Email Address End
   -- Dataset Table 10 Begin
-  SELECT MasterClientId FROM WRBHBClientSMTP
-  WHERE IsActive=1 AND IsDeleted=0 AND
-  MasterClientId=(SELECT MasterClientId FROM WRBHBClientManagement
-  WHERE IsActive=1 AND IsDeleted=0 AND
-  Id=(SELECT ClientId FROM WRBHBBooking WHERE Id=@Id));
+  --SELECT MasterClientId FROM WRBHBClientSMTP
+  --WHERE IsActive=1 AND IsDeleted=0 AND
+  --MasterClientId=(SELECT MasterClientId FROM WRBHBClientManagement
+  --WHERE IsActive=1 AND IsDeleted=0 AND
+  --Id=(SELECT ClientId FROM WRBHBBooking WHERE Id=@Id));
+  SELECT ClientId FROM WRBHBClientSMTP WHERE IsActive = 1 AND IsDeleted = 0 AND
+  ClientId = (SELECT ClientId FROM WRBHBBooking WHERE Id = @Id) AND
+  EmailId = (SELECT ClientBookerEmail FROM WRBHBBooking WHERE Id = @Id);
   -- Dataset Table 10 End  
  END
 IF @Action = 'ApartmentBookingConfirmed'
@@ -1055,17 +1089,48 @@ IF @Action = 'ApartmentBookingConfirmed'
   REPLACE(CONVERT(VARCHAR(11), B.BookedDt, 106), ' ', '-'),
   B.SpecialRequirements,B.ClientBookerEmail,B.ExtraCCEmail FROM WRBHBBooking B
   LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK) ON  C.Id=B.ClientId
-  LEFT OUTER JOIN WRBHBUser U  WITH(NOLOCK) ON  U.Id=B.CreatedBy
+  LEFT OUTER JOIN WRBHBUser U  WITH(NOLOCK) ON  U.Id=B.BookedUsrId
   WHERE B.Id=@Id;
+  --
+  SET @MailStr=(SELECT ISNULL(Email,'') FROM WRBHBProperty
+  WHERE Id = (select top 1 BookingPropertyId 
+  from WRBHBApartmentBookingPropertyAssingedGuest where BookingId = @Id));
   -- Dataset Table 3
-  SELECT BP.PropertyName,ISNULL(U.FirstName,''),ISNULL(U.Email,''),
+  SET @Uniglobe = '';
+  IF EXISTS(SELECT NULL FROM WRBHBClientSMTP WHERE IsActive = 1 AND 
+  IsDeleted = 0 AND ClientId = (SELECT ClientId FROM WRBHBBooking WHERE Id = @Id) 
+  AND EmailId = (SELECT ClientBookerEmail FROM WRBHBBooking WHERE Id = @Id))
+   BEGIN
+    SET @Uniglobe = (SELECT ClientBookerEmail FROM WRBHBBooking WHERE Id = @Id);
+    /*SELECT BP.PropertyName, '' as UserName,
+    ISNULL(BP.Email,'') Email,ISNULL(BP.Phone,'') PhoneNumber,
+    ISNULL(@MailStr,'') --ISNULL(BP.Email,'') AS Email
+    FROM dbo.WRBHBProperty BP WHERE BP.Id=@BookingPropertyId;*/
+    SELECT '' AS PropertyName,FirstName AS UserName,Email,
+    MobileNo AS PhoneNumber,ISNULL(@MailStr,'')
+    FROM WRBHBClientManagementAddNewClient
+    WHERE Id = (SELECT ClientBookerId FROM WRBHBBooking WHERE Id = @Id);
+   END
+  ELSE
+   BEGIN
+    SELECT BP.PropertyName, ISNULL(U.FirstName,'') as UserName,
+    ISNULL(U.Email,'')Email,ISNULL(U.MobileNumber,'')PhoneNumber,
+    ISNULL(@MailStr,'') --ISNULL(BP.Email,'') AS Email
+    FROM dbo.WRBHBProperty BP
+    LEFT OUTER JOIN WRBHBPropertyUsers PU WITH(NOLOCK) ON BP.Id =PU.PropertyId 
+    AND PU.IsActive=1 AND PU.IsDeleted=0 AND 
+    UserType in('Resident Managers','Assistant Resident Managers')
+    LEFT OUTER JOIN WRBHBUser U  WITH(NOLOCK) ON  U.Id=PU.UserId
+    WHERE BP.Id=@BookingPropertyId  AND BP.IsActive=1 AND BP.IsDeleted=0;
+   END
+  /*SELECT BP.PropertyName,ISNULL(U.FirstName,''),ISNULL(U.Email,''),
   ISNULL(U.MobileNumber,''),ISNULL(BP.Email,'')
   FROM dbo.WRBHBProperty BP
   LEFT OUTER JOIN WRBHBPropertyUsers PU WITH(NOLOCK) ON BP.Id=PU.PropertyId
   AND PU.IsActive=1 AND PU.IsDeleted=0 AND 
   UserType in('Resident Managers','Assistant Resident Managers')
   LEFT OUTER JOIN WRBHBUser U  WITH(NOLOCK) ON  U.Id=PU.UserId
-  WHERE BP.Id=@BookingPropertyId  AND BP.IsActive=1 AND BP.IsDeleted=0;
+  WHERE BP.Id=@BookingPropertyId  AND BP.IsActive=1 AND BP.IsDeleted=0;*/
   --
   SELECT @PName=(P.PropertyName+', '+L.Locality+', '+C.CityName),
   @SecurityPolicy=P.BookingPolicy,@CancelationPolicy=P.CancelPolicy
@@ -1086,22 +1151,16 @@ IF @Action = 'ApartmentBookingConfirmed'
   --
   SET @MobileNo = (SELECT TOP 1 ISNULL(MobileNo,'') FROM #GST11);
   --
-  IF EXISTS(SELECT NULL FROM WRBHBClientSMTP WHERE IsActive = 1 AND IsDeleted = 0 
-  AND MasterClientId = (SELECT MasterClientId FROM WRBHBClientManagement
-  WHERE IsActive = 1 AND IsDeleted = 0 AND Id=
-  (SELECT ClientId FROM WRBHBBooking WHERE Id=@Id)))
+  /*IF EXISTS(SELECT NULL FROM WRBHBClientSMTP WHERE IsActive = 1 AND 
+  IsDeleted = 0 AND ClientId = (SELECT ClientId FROM WRBHBBooking WHERE Id = @Id) 
+  AND EmailId = (SELECT ClientBookerEmail FROM WRBHBBooking WHERE Id = @Id))
    BEGIN
-    SET @Uniglobe = (SELECT TOP 1 ISNULL(EmailId,'stay@hummingbirdindia.com') 
-    FROM WRBHBClientSMTP 
-    WHERE IsActive = 1 AND IsDeleted = 0 AND 
-    MasterClientId = (SELECT MasterClientId FROM WRBHBClientManagement
-    WHERE IsActive = 1 AND IsDeleted = 0 AND 
-    Id = (SELECT ClientId FROM WRBHBBooking WHERE Id=@Id)));
+    SET @Uniglobe = (SELECT ClientBookerEmail FROM WRBHBBooking WHERE Id = @Id);
    END
   ELSE
    BEGIN
     SET @Uniglobe = '';
-   END
+   END*/
   -- Dataset Table 4
   SELECT CAST(EmailtoGuest AS INT),@PName,@MobileNo,
   @SecurityPolicy,@CancelationPolicy,@Stay,@Uniglobe,
@@ -1163,11 +1222,9 @@ IF @Action = 'ApartmentBookingConfirmed'
   SELECT dbo.TRIM(Email) FROM #AMail WHERE Email != '';
   -- Dataset Table 9 Email Address End
   -- Dataset Table 10 Begin
-  SELECT MasterClientId FROM WRBHBClientSMTP
-  WHERE IsActive=1 AND IsDeleted=0 AND
-  MasterClientId=(SELECT MasterClientId FROM WRBHBClientManagement
-  WHERE IsActive=1 AND IsDeleted=0 AND
-  Id=(SELECT ClientId FROM WRBHBBooking WHERE Id=@Id));
+  SELECT ClientId FROM WRBHBClientSMTP WHERE IsActive = 1 AND IsDeleted = 0 AND
+  ClientId = (SELECT ClientId FROM WRBHBBooking WHERE Id = @Id) AND
+  EmailId = (SELECT ClientBookerEmail FROM WRBHBBooking WHERE Id = @Id);
   -- Dataset Table 10 End  
  END
 IF @Action = 'MMTBookingConfirmed'
@@ -1249,7 +1306,7 @@ IF @Action = 'MMTBookingConfirmed'
   END
   -- dataset table 1
   SELECT SH.HotalName,SH.Line1+', '+SH.Line2+', '+SH.Area+', '+SH.City+', '+
-  SH.State+', '+SH.Pincode AS Propertaddress,SH.Phone,dbo.TRIM(SH.Description),
+  SH.State+', '+SH.Pincode AS Propertaddress,SH.Phone,substring(dbo.TRIM(SH.Description),0,250),
   ISNULL(SH.CheckInTime,'') CheckInType,
   ISNULL(SH.CheckOutTime,'') AS CheckOutType,'MMT' AS Category,
   @SecurityPolicy,@CancelationPolicy
@@ -1286,7 +1343,7 @@ IF @Action = 'MMTBookingConfirmed'
     FROM WRBHBBooking B
     LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId=B.Id
     LEFT OUTER JOIN WRBHBClientManagement C WITH(NOLOCK) ON  C.Id=B.ClientId
-    LEFT OUTER JOIN WRBHBUser U  WITH(NOLOCK) ON  U.Id=B.CreatedBy
+    LEFT OUTER JOIN WRBHBUser U  WITH(NOLOCK) ON  U.Id=B.BookedUsrId
     WHERE B.Id=@Id;
    END
   -- dataset table 3 
@@ -1294,17 +1351,11 @@ IF @Action = 'MMTBookingConfirmed'
   WHERE BookingId=@Id GROUP BY EmailId;*/
   --SELECT EmailId,'Taxes as applicable',@Stay,@Uniglobe 
   --SELECT dbo.TRIM(EmailId),'Including Tax',@Stay,@Uniglobe
-  IF EXISTS(SELECT NULL FROM WRBHBClientSMTP WHERE IsActive = 1 AND IsDeleted = 0 
-  AND MasterClientId = (SELECT MasterClientId FROM WRBHBClientManagement
-  WHERE IsActive = 1 AND IsDeleted = 0 AND Id=
-  (SELECT ClientId FROM WRBHBBooking WHERE Id=@Id)))
+  IF EXISTS(SELECT NULL FROM WRBHBClientSMTP WHERE IsActive = 1 AND 
+  IsDeleted = 0 AND ClientId = (SELECT ClientId FROM WRBHBBooking WHERE Id = @Id) 
+  AND EmailId = (SELECT ClientBookerEmail FROM WRBHBBooking WHERE Id = @Id))
    BEGIN
-    SET @Uniglobe = (SELECT TOP 1 ISNULL(EmailId,'stay@hummingbirdindia.com') 
-    FROM WRBHBClientSMTP 
-    WHERE IsActive = 1 AND IsDeleted = 0 AND 
-    MasterClientId = (SELECT MasterClientId FROM WRBHBClientManagement
-    WHERE IsActive = 1 AND IsDeleted = 0 AND 
-    Id = (SELECT ClientId FROM WRBHBBooking WHERE Id=@Id)));
+    SET @Uniglobe = (SELECT ClientBookerEmail FROM WRBHBBooking WHERE Id = @Id);
    END
   ELSE
    BEGIN
@@ -1329,12 +1380,23 @@ IF @Action = 'MMTBookingConfirmed'
     WHERE IsActive=1 AND IsDeleted=0;
    END
   -- Dataset Table 5 Begin
-  SELECT MasterClientId FROM WRBHBClientSMTP
-  WHERE IsActive=1 AND IsDeleted=0 AND
-  MasterClientId=(SELECT MasterClientId FROM WRBHBClientManagement
-  WHERE IsActive=1 AND IsDeleted=0 AND
-  Id=(SELECT ClientId FROM WRBHBBooking WHERE Id=@Id));
+  SELECT ClientId FROM WRBHBClientSMTP WHERE IsActive = 1 AND IsDeleted = 0 AND
+  ClientId = (SELECT ClientId FROM WRBHBBooking WHERE Id = @Id) AND
+  EmailId = (SELECT ClientBookerEmail FROM WRBHBBooking WHERE Id = @Id);
   -- Dataset Table 5 End  
+  -- Dataset Table 6 Begin
+  IF EXISTS(SELECT NULL FROM WRBHBClientSMTP WHERE IsActive = 1 AND 
+  IsDeleted = 0 AND ClientId = (SELECT ClientId FROM WRBHBBooking WHERE Id = @Id) 
+  AND EmailId = (SELECT ClientBookerEmail FROM WRBHBBooking WHERE Id = @Id))
+   BEGIN    
+    SELECT FirstName AS UserName,Email,MobileNo AS PhoneNumber
+    FROM WRBHBClientManagementAddNewClient
+    WHERE Id = (SELECT ClientBookerId FROM WRBHBBooking WHERE Id = @Id);
+   END
+  ELSE
+   BEGIN
+    SELECT '' AS UserName,'' AS Email,'' AS PhoneNumber;
+   END
   /*-- DELETE API DATA BEGIN
   DECLARE @TMPHeaderId BIGINT = 0;
   SELECT @TMPHeaderId=ISNULL(APIHdrId,0) FROM WRBHBBookingProperty 
@@ -1562,5 +1624,285 @@ IF @Action = 'BookingStatus'
   SELECT PropertyType FROM WRBHBBookingProperty WHERE Id IN
   (SELECT BookingPropertyTableId FROM WRBHBBookingPropertyAssingedGuest 
   WHERE BookingId = @Id);
+ END
+IF @Action = 'BookingModificationSMS'
+ BEGIN
+  DECLARE @BookLevel NVARCHAR(100) = '',@BookType NVARCHAR(100) = '';
+  DECLARE @ManagedGHNo NVARCHAR(100) = '';
+  CREATE TABLE #BookSMS(Content NVARCHAR(MAX),GuestId BIGINT);
+  CREATE TABLE #ManagedGHNo(Id BIGINT, MGHNo NVARCHAR(100),BId BIGINT);
+  SET @BookLevel = (SELECT BookingLevel FROM WRBHBBooking WHERE Id = @Id);
+  IF @BookLevel = 'Room'
+   BEGIN
+    INSERT INTO #BookSMS(Content,GuestId)
+    SELECT 'http://api.mVaayoo.com/mvaayooapi/MessageCompose?user=shiv@hummingbirdindia.com:HBsmsconf&senderID=HBCONF&receipientno='+ BG.MobileNo +'&msgtxt=HummingBird booking no - '+CAST(B.BookingCode AS VARCHAR)+' at '+BP.PropertyName+','+B.CityName +' has been modified. New Check-in date '+CONVERT(VARCHAR(100),MIN(PAG.ChkInDt),103) +' and Check-out date '+ CONVERT(VARCHAR(100),MAX(PAG.ChkOutDt),103)+'&state=4',
+    PAG.GuestId FROM WRBHBBooking B  
+    LEFT OUTER JOIN WRBHBBookingGuestDetails BG WITH(NOLOCK)ON BG.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest PAG WITH(NOLOCK)ON
+    PAG.BookingId = B.Id AND PAG.BookingPropertyTableId = BP.Id AND
+    PAG.BookingPropertyId = BP.PropertyId AND PAG.GuestId = BG.GuestId
+    WHERE PAG.IsActive = 1 and PAG.IsDeleted = 0 AND BG.MobileNo != '' AND PAG.GuestId != 0 and
+    B.Id = @Id and RoomCaptured = @Str
+	GROUP BY BG.MobileNo,B.BookingCode,BP.PropertyName,B.CityName,PAG.GuestId;
+    --
+    SELECT TOP 1 @BookType = PropertyType,@ManagedGHNo = ISNULL(Phone,'')
+    FROM WRBHBBookingProperty WHERE Id IN (
+    SELECT BookingPropertyTableId FROM WRBHBBookingPropertyAssingedGuest 
+    WHERE BookingId = @Id);
+    IF @BookType = 'MGH' AND @ManagedGHNo != ''
+     BEGIN
+      INSERT INTO #ManagedGHNo(Id, MGHNo)
+      SELECT * FROM dbo.Split(@ManagedGHNo,',');
+      UPDATE #ManagedGHNo SET BId = @Id;
+      INSERT INTO #BookSMS(Content,GuestId)
+      SELECT 'http://api.mVaayoo.com/mvaayooapi/MessageCompose?user=shiv@hummingbirdindia.com:HBsmsconf&senderID=HBCONF&receipientno='+ Gh.MGHNo +'&msgtxt=HummingBird booking no - '+CAST(B.BookingCode AS VARCHAR)+' at '+BP.PropertyName+','+B.CityName +' for '+PAG.FirstName+' '+PAG.LastName+' has been modified. New Check-in date '+CONVERT(VARCHAR(100),MIN(PAG.ChkInDt),103) +' and Check-out date '+ CONVERT(VARCHAR(100),MAX(PAG.ChkOutDt),103)+'&state=4',
+      PAG.GuestId FROM WRBHBBooking B 
+      LEFT OUTER JOIN #ManagedGHNo GH WITH(nolock)on GH.BId = B.Id 
+      LEFT OUTER JOIN WRBHBBookingGuestDetails BG WITH(NOLOCK)ON BG.BookingId = B.Id
+      LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId = B.Id
+      LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest PAG WITH(NOLOCK)ON
+      PAG.BookingId = B.Id AND PAG.BookingPropertyTableId = BP.Id AND
+      PAG.BookingPropertyId = BP.PropertyId AND PAG.GuestId = BG.GuestId
+      WHERE PAG.IsActive = 1 and PAG.IsDeleted = 0 AND BG.MobileNo != '' AND PAG.GuestId != 0 and
+      B.Id = @Id and RoomCaptured = @Str
+      GROUP BY GH.MGHNo,B.BookingCode,BP.PropertyName,B.CityName,PAG.GuestId,PAG.FirstName,PAG.LastName;
+     END
+   END
+  IF @BookLevel = 'Bed'
+   BEGIN
+    INSERT INTO #BookSMS(Content,GuestId)
+    SELECT 'http://api.mVaayoo.com/mvaayooapi/MessageCompose?user=shiv@hummingbirdindia.com:HBsmsconf&senderID=HBCONF&receipientno='+ BG.MobileNo +'&msgtxt=HummingBird booking no - '+CAST(B.BookingCode AS VARCHAR)+' at '+BP.PropertyName+','+B.CityName +' has been modified. New Check-in date '+CONVERT(VARCHAR(100),MIN(PAG.ChkInDt),103) +' and Check-out date '+ CONVERT(VARCHAR(100),MAX(PAG.ChkOutDt),103)+'&state=4',
+    PAG.GuestId FROM WRBHBBooking B  
+    LEFT OUTER JOIN WRBHBBookingGuestDetails BG WITH(NOLOCK)ON BG.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBBedBookingProperty BP WITH(NOLOCK)ON BP.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBBedBookingPropertyAssingedGuest PAG WITH(NOLOCK)ON
+    PAG.BookingId = B.Id AND PAG.BookingPropertyTableId = BP.Id AND
+    PAG.BookingPropertyId = BP.PropertyId AND PAG.GuestId = BG.GuestId
+    WHERE PAG.IsActive = 1 and PAG.IsDeleted = 0 AND BG.MobileNo != '' AND PAG.GuestId != 0 and
+    B.Id = @Id and RoomCaptured = @Str
+	GROUP BY BG.MobileNo,B.BookingCode,BP.PropertyName,B.CityName,PAG.GuestId;
+    --
+    SELECT TOP 1 @BookType = PropertyType,@ManagedGHNo = ISNULL(Phone,'')
+    FROM WRBHBBedBookingProperty WHERE Id IN (
+    SELECT BookingPropertyTableId FROM WRBHBBedBookingPropertyAssingedGuest 
+    WHERE BookingId = @Id);
+    IF @BookType = 'MGH' AND @ManagedGHNo != ''
+     BEGIN
+      INSERT INTO #ManagedGHNo(Id, MGHNo)
+      SELECT * FROM dbo.Split(@ManagedGHNo,',');
+      UPDATE #ManagedGHNo SET BId = @Id;
+      INSERT INTO #BookSMS(Content,GuestId)
+      SELECT 'http://api.mVaayoo.com/mvaayooapi/MessageCompose?user=shiv@hummingbirdindia.com:HBsmsconf&senderID=HBCONF&receipientno='+ Gh.MGHNo +'&msgtxt=HummingBird booking no - '+CAST(B.BookingCode AS VARCHAR)+' at '+BP.PropertyName+','+B.CityName +' for '+PAG.FirstName+' '+PAG.LastName+' has been modified. New Check-in date '+CONVERT(VARCHAR(100),MIN(PAG.ChkInDt),103) +' and Check-out date '+ CONVERT(VARCHAR(100),MAX(PAG.ChkOutDt),103)+'&state=4',
+      PAG.GuestId FROM WRBHBBooking B 
+      LEFT OUTER JOIN #ManagedGHNo GH WITH(nolock)on GH.BId = B.Id 
+      LEFT OUTER JOIN WRBHBBookingGuestDetails BG WITH(NOLOCK)ON BG.BookingId = B.Id
+      LEFT OUTER JOIN WRBHBBedBookingProperty BP WITH(NOLOCK)ON BP.BookingId = B.Id
+      LEFT OUTER JOIN WRBHBBedBookingPropertyAssingedGuest PAG WITH(NOLOCK)ON
+      PAG.BookingId = B.Id AND PAG.BookingPropertyTableId = BP.Id AND
+      PAG.BookingPropertyId = BP.PropertyId AND PAG.GuestId = BG.GuestId
+      WHERE PAG.IsActive = 1 and PAG.IsDeleted = 0 AND BG.MobileNo != '' AND PAG.GuestId != 0 and
+      B.Id = @Id and RoomCaptured = @Str
+      GROUP BY GH.MGHNo,B.BookingCode,BP.PropertyName,B.CityName,PAG.GuestId,PAG.FirstName,PAG.LastName;
+     END
+   END
+  IF @BookLevel = 'Apartment'
+   BEGIN
+    INSERT INTO #BookSMS(Content,GuestId)
+    SELECT 'http://api.mVaayoo.com/mvaayooapi/MessageCompose?user=shiv@hummingbirdindia.com:HBsmsconf&senderID=HBCONF&receipientno='+ BG.MobileNo +'&msgtxt=HummingBird booking no - '+CAST(B.BookingCode AS VARCHAR)+' at '+BP.PropertyName+','+B.CityName +' has been modified. New Check-in date '+CONVERT(VARCHAR(100),MIN(PAG.ChkInDt),103) +' and Check-out date '+ CONVERT(VARCHAR(100),MAX(PAG.ChkOutDt),103)+'&state=4',
+    PAG.GuestId FROM WRBHBBooking B  
+    LEFT OUTER JOIN WRBHBBookingGuestDetails BG WITH(NOLOCK)ON BG.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBApartmentBookingProperty BP WITH(NOLOCK)ON BP.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBApartmentBookingPropertyAssingedGuest PAG WITH(NOLOCK)ON
+    PAG.BookingId = B.Id AND PAG.BookingPropertyTableId = BP.Id AND
+    PAG.BookingPropertyId = BP.PropertyId AND PAG.GuestId = BG.GuestId
+    WHERE PAG.IsActive = 1 and PAG.IsDeleted = 0 AND BG.MobileNo != '' AND PAG.GuestId != 0 and
+    B.Id = @Id and RoomCaptured = @Str
+	GROUP BY BG.MobileNo,B.BookingCode,BP.PropertyName,B.CityName,PAG.GuestId;
+   END
+   SELECT Content FROM #BookSMS GROUP BY Content;
+ END
+ DECLARE @BookLevel1 NVARCHAR(100) = '',@BookType1 NVARCHAR(100) = '';
+  DECLARE @ManagedGHNo1 NVARCHAR(100) = '';
+  CREATE TABLE #BookSMS1(Content NVARCHAR(MAX),GuestId BIGINT);
+  CREATE TABLE #ManagedGHNo1(Id BIGINT, MGHNo NVARCHAR(100),BId BIGINT);
+IF @Action = 'BookingCancelSMS'
+ BEGIN
+  
+  SET @BookLevel1 = (SELECT BookingLevel FROM WRBHBBooking WHERE Id = @Id);
+  IF @BookLevel1 = 'Room'
+   BEGIN
+    INSERT INTO #BookSMS1(Content,GuestId)
+    SELECT 'http://api.mVaayoo.com/mvaayooapi/MessageCompose?user=shiv@hummingbirdindia.com:HBsmsconf&senderID=HBCONF&receipientno='+ BG.MobileNo +'&msgtxt=HummingBird booking no - '+CAST(B.BookingCode AS VARCHAR)+' at '+BP.PropertyName+','+B.CityName +' has been cancelled &state=4',
+    PAG.GuestId FROM WRBHBBooking B  
+    LEFT OUTER JOIN WRBHBBookingGuestDetails BG WITH(NOLOCK)ON BG.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest PAG WITH(NOLOCK)ON
+    PAG.BookingId = B.Id AND PAG.BookingPropertyTableId = BP.Id AND
+    PAG.BookingPropertyId = BP.PropertyId AND PAG.GuestId = BG.GuestId
+    WHERE BG.MobileNo != '' AND PAG.GuestId != 0 AND B.Id = @Id
+	GROUP BY BG.MobileNo,B.BookingCode,BP.PropertyName,B.CityName,PAG.GuestId;
+    --
+    SELECT TOP 1 @BookType1 = PropertyType,@ManagedGHNo1 = ISNULL(Phone,'')
+    FROM WRBHBBookingProperty WHERE Id IN (
+    SELECT BookingPropertyTableId FROM WRBHBBookingPropertyAssingedGuest 
+    WHERE BookingId = @Id);
+    IF @BookType1 = 'MGH' AND @ManagedGHNo1 != ''
+     BEGIN
+      INSERT INTO #ManagedGHNo1(Id, MGHNo)
+      SELECT * FROM dbo.Split(@ManagedGHNo1,',');
+      UPDATE #ManagedGHNo1 SET BId = @Id;
+      INSERT INTO #BookSMS1(Content,GuestId)
+      SELECT 'http://api.mVaayoo.com/mvaayooapi/MessageCompose?user=shiv@hummingbirdindia.com:HBsmsconf&senderID=HBCONF&receipientno='+ Gh.MGHNo +'&msgtxt=HummingBird booking no - '+CAST(B.BookingCode AS VARCHAR)+' at '+BP.PropertyName+','+B.CityName +' has been cancelled &state=4',
+      PAG.GuestId FROM WRBHBBooking B 
+      LEFT OUTER JOIN #ManagedGHNo1 GH WITH(nolock)on GH.BId = B.Id 
+      LEFT OUTER JOIN WRBHBBookingGuestDetails BG WITH(NOLOCK)ON BG.BookingId = B.Id
+      LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId = B.Id
+      LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest PAG WITH(NOLOCK)ON
+      PAG.BookingId = B.Id AND PAG.BookingPropertyTableId = BP.Id AND
+      PAG.BookingPropertyId = BP.PropertyId AND PAG.GuestId = BG.GuestId
+      WHERE BG.MobileNo != '' AND PAG.GuestId != 0 AND B.Id = @Id
+      GROUP BY GH.MGHNo,B.BookingCode,BP.PropertyName,B.CityName,PAG.GuestId,PAG.FirstName,PAG.LastName;
+     END
+   END
+  IF @BookLevel1 = 'Bed'
+   BEGIN
+    INSERT INTO #BookSMS1(Content,GuestId)
+    SELECT 'http://api.mVaayoo.com/mvaayooapi/MessageCompose?user=shiv@hummingbirdindia.com:HBsmsconf&senderID=HBCONF&receipientno='+ BG.MobileNo +'&msgtxt=HummingBird booking no - '+CAST(B.BookingCode AS VARCHAR)+' at '+BP.PropertyName+','+B.CityName +' has been cancelled &state=4',
+    PAG.GuestId FROM WRBHBBooking B  
+    LEFT OUTER JOIN WRBHBBookingGuestDetails BG WITH(NOLOCK)ON BG.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBBedBookingProperty BP WITH(NOLOCK)ON BP.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBBedBookingPropertyAssingedGuest PAG WITH(NOLOCK)ON
+    PAG.BookingId = B.Id AND PAG.BookingPropertyTableId = BP.Id AND
+    PAG.BookingPropertyId = BP.PropertyId AND PAG.GuestId = BG.GuestId
+    WHERE BG.MobileNo != '' AND PAG.GuestId != 0 AND B.Id = @Id
+	GROUP BY BG.MobileNo,B.BookingCode,BP.PropertyName,B.CityName,PAG.GuestId;
+    --
+    SELECT TOP 1 @BookType1 = PropertyType,@ManagedGHNo1 = ISNULL(Phone,'')
+    FROM WRBHBBedBookingProperty WHERE Id IN (
+    SELECT BookingPropertyTableId FROM WRBHBBedBookingPropertyAssingedGuest 
+    WHERE BookingId = @Id);
+    IF @BookType1 = 'MGH' AND @ManagedGHNo1 != ''
+     BEGIN
+      INSERT INTO #ManagedGHNo1(Id, MGHNo)
+      SELECT * FROM dbo.Split(@ManagedGHNo1,',');
+      UPDATE #ManagedGHNo1 SET BId = @Id;
+      INSERT INTO #BookSMS1(Content,GuestId)
+      SELECT 'http://api.mVaayoo.com/mvaayooapi/MessageCompose?user=shiv@hummingbirdindia.com:HBsmsconf&senderID=HBCONF&receipientno='+ Gh.MGHNo +'&msgtxt=HummingBird booking no - '+CAST(B.BookingCode AS VARCHAR)+' at '+BP.PropertyName+','+B.CityName +' has been cancelled &state=4',
+      PAG.GuestId FROM WRBHBBooking B 
+      LEFT OUTER JOIN #ManagedGHNo1 GH WITH(nolock)on GH.BId = B.Id 
+      LEFT OUTER JOIN WRBHBBookingGuestDetails BG WITH(NOLOCK)ON BG.BookingId = B.Id
+      LEFT OUTER JOIN WRBHBBedBookingProperty BP WITH(NOLOCK)ON BP.BookingId = B.Id
+      LEFT OUTER JOIN WRBHBBedBookingPropertyAssingedGuest PAG WITH(NOLOCK)ON
+      PAG.BookingId = B.Id AND PAG.BookingPropertyTableId = BP.Id AND
+      PAG.BookingPropertyId = BP.PropertyId AND PAG.GuestId = BG.GuestId
+      WHERE BG.MobileNo != '' AND PAG.GuestId != 0 AND B.Id = @Id
+      GROUP BY GH.MGHNo,B.BookingCode,BP.PropertyName,B.CityName,PAG.GuestId,PAG.FirstName,PAG.LastName;
+     END
+   END
+  IF @BookLevel1 = 'Apartment'
+   BEGIN
+    INSERT INTO #BookSMS1(Content,GuestId)
+    SELECT 'http://api.mVaayoo.com/mvaayooapi/MessageCompose?user=shiv@hummingbirdindia.com:HBsmsconf&senderID=HBCONF&receipientno='+ BG.MobileNo +'&msgtxt=HummingBird booking no - '+CAST(B.BookingCode AS VARCHAR)+' at '+BP.PropertyName+','+B.CityName +' has been cancelled &state=4',
+    PAG.GuestId FROM WRBHBBooking B  
+    LEFT OUTER JOIN WRBHBBookingGuestDetails BG WITH(NOLOCK)ON BG.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBApartmentBookingProperty BP WITH(NOLOCK)ON BP.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBApartmentBookingPropertyAssingedGuest PAG WITH(NOLOCK)ON
+    PAG.BookingId = B.Id AND PAG.BookingPropertyTableId = BP.Id AND
+    PAG.BookingPropertyId = BP.PropertyId AND PAG.GuestId = BG.GuestId
+    WHERE BG.MobileNo != '' AND PAG.GuestId != 0 AND B.Id = @Id
+	GROUP BY BG.MobileNo,B.BookingCode,BP.PropertyName,B.CityName,PAG.GuestId;
+   END
+   SELECT Content FROM #BookSMS1 GROUP BY Content;
+ END
+IF @Action = 'BookingGuestCancelSMS'
+ BEGIN
+  DECLARE @GuestId BIGINT = 0;
+  SET @BookLevel1 = (SELECT BookingLevel FROM WRBHBBooking WHERE Id = @Id);
+  IF @BookLevel1 = 'Room'
+   BEGIN
+    SET @GuestId = (SELECT TOP 1 GuestId FROM WRBHBBookingPropertyAssingedGuest WHERE Id = @Str);
+    INSERT INTO #BookSMS1(Content,GuestId)
+    SELECT 'http://api.mVaayoo.com/mvaayooapi/MessageCompose?user=shiv@hummingbirdindia.com:HBsmsconf&senderID=HBCONF&receipientno='+ BG.MobileNo +'&msgtxt=HummingBird booking no - '+CAST(B.BookingCode AS VARCHAR)+' at '+BP.PropertyName+','+B.CityName +' has been cancelled &state=4',
+    PAG.GuestId FROM WRBHBBooking B  
+    LEFT OUTER JOIN WRBHBBookingGuestDetails BG WITH(NOLOCK)ON BG.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest PAG WITH(NOLOCK)ON
+    PAG.BookingId = B.Id AND PAG.BookingPropertyTableId = BP.Id AND
+    PAG.BookingPropertyId = BP.PropertyId AND PAG.GuestId = BG.GuestId
+    WHERE BG.MobileNo != '' AND PAG.GuestId != 0 AND B.Id = @Id AND PAG.GuestId = @GuestId
+	GROUP BY BG.MobileNo,B.BookingCode,BP.PropertyName,B.CityName,PAG.GuestId;
+    --
+    SELECT TOP 1 @BookType1 = PropertyType,@ManagedGHNo1 = ISNULL(Phone,'')
+    FROM WRBHBBookingProperty WHERE Id IN (
+    SELECT BookingPropertyTableId FROM WRBHBBookingPropertyAssingedGuest 
+    WHERE BookingId = @Id);
+    IF @BookType1 = 'MGH' AND @ManagedGHNo1 != ''
+     BEGIN
+      INSERT INTO #ManagedGHNo1(Id, MGHNo)
+      SELECT * FROM dbo.Split(@ManagedGHNo1,',');
+      UPDATE #ManagedGHNo1 SET BId = @Id;
+      INSERT INTO #BookSMS1(Content,GuestId)
+      SELECT 'http://api.mVaayoo.com/mvaayooapi/MessageCompose?user=shiv@hummingbirdindia.com:HBsmsconf&senderID=HBCONF&receipientno='+ Gh.MGHNo +'&msgtxt=HummingBird booking no - '+CAST(B.BookingCode AS VARCHAR)+' at '+BP.PropertyName+','+B.CityName +' for '+PAG.Title+'.'+PAG.FirstName+' '+PAG.LastName+' has been cancelled &state=4',
+      PAG.GuestId FROM WRBHBBooking B 
+      LEFT OUTER JOIN #ManagedGHNo1 GH WITH(nolock)on GH.BId = B.Id 
+      LEFT OUTER JOIN WRBHBBookingGuestDetails BG WITH(NOLOCK)ON BG.BookingId = B.Id
+      LEFT OUTER JOIN WRBHBBookingProperty BP WITH(NOLOCK)ON BP.BookingId = B.Id
+      LEFT OUTER JOIN WRBHBBookingPropertyAssingedGuest PAG WITH(NOLOCK)ON
+      PAG.BookingId = B.Id AND PAG.BookingPropertyTableId = BP.Id AND
+      PAG.BookingPropertyId = BP.PropertyId AND PAG.GuestId = BG.GuestId
+      WHERE PAG.GuestId != 0 AND B.Id = @Id AND PAG.GuestId = @GuestId
+      GROUP BY GH.MGHNo,B.BookingCode,BP.PropertyName,B.CityName,PAG.GuestId,PAG.FirstName,PAG.LastName,PAG.Title;
+     END
+   END
+  IF @BookLevel1 = 'Bed'
+   BEGIN
+    INSERT INTO #BookSMS1(Content,GuestId)
+    SELECT 'http://api.mVaayoo.com/mvaayooapi/MessageCompose?user=shiv@hummingbirdindia.com:HBsmsconf&senderID=HBCONF&receipientno='+ BG.MobileNo +'&msgtxt=HummingBird booking no - '+CAST(B.BookingCode AS VARCHAR)+' at '+BP.PropertyName+','+B.CityName +' has been cancelled &state=4',
+    PAG.GuestId FROM WRBHBBooking B  
+    LEFT OUTER JOIN WRBHBBookingGuestDetails BG WITH(NOLOCK)ON BG.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBBedBookingProperty BP WITH(NOLOCK)ON BP.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBBedBookingPropertyAssingedGuest PAG WITH(NOLOCK)ON
+    PAG.BookingId = B.Id AND PAG.BookingPropertyTableId = BP.Id AND
+    PAG.BookingPropertyId = BP.PropertyId AND PAG.GuestId = BG.GuestId
+    WHERE BG.MobileNo != '' AND PAG.GuestId != 0 AND B.Id = @Id AND PAG.GuestId = @GuestId
+	GROUP BY BG.MobileNo,B.BookingCode,BP.PropertyName,B.CityName,PAG.GuestId;
+    --
+    SELECT TOP 1 @BookType1 = PropertyType,@ManagedGHNo1 = ISNULL(Phone,'')
+    FROM WRBHBBedBookingProperty WHERE Id IN (
+    SELECT BookingPropertyTableId FROM WRBHBBedBookingPropertyAssingedGuest 
+    WHERE BookingId = @Id);
+    IF @BookType1 = 'MGH' AND @ManagedGHNo1 != ''
+     BEGIN
+      INSERT INTO #ManagedGHNo1(Id, MGHNo)
+      SELECT * FROM dbo.Split(@ManagedGHNo1,',');
+      UPDATE #ManagedGHNo1 SET BId = @Id;
+      INSERT INTO #BookSMS1(Content,GuestId)
+      SELECT 'http://api.mVaayoo.com/mvaayooapi/MessageCompose?user=shiv@hummingbirdindia.com:HBsmsconf&senderID=HBCONF&receipientno='+ Gh.MGHNo +'&msgtxt=HummingBird booking no - '+CAST(B.BookingCode AS VARCHAR)+' at '+BP.PropertyName+','+B.CityName +' for '+PAG.Title+'.'+PAG.FirstName+' '+PAG.LastName+' has been cancelled &state=4',
+      PAG.GuestId FROM WRBHBBooking B 
+      LEFT OUTER JOIN #ManagedGHNo1 GH WITH(nolock)on GH.BId = B.Id 
+      LEFT OUTER JOIN WRBHBBookingGuestDetails BG WITH(NOLOCK)ON BG.BookingId = B.Id
+      LEFT OUTER JOIN WRBHBBedBookingProperty BP WITH(NOLOCK)ON BP.BookingId = B.Id
+      LEFT OUTER JOIN WRBHBBedBookingPropertyAssingedGuest PAG WITH(NOLOCK)ON
+      PAG.BookingId = B.Id AND PAG.BookingPropertyTableId = BP.Id AND
+      PAG.BookingPropertyId = BP.PropertyId AND PAG.GuestId = BG.GuestId
+      WHERE PAG.GuestId != 0 AND B.Id = @Id AND PAG.GuestId = @GuestId
+      GROUP BY GH.MGHNo,B.BookingCode,BP.PropertyName,B.CityName,PAG.GuestId,PAG.FirstName,PAG.LastName,PAG.Title;
+     END
+   END
+  IF @BookLevel1 = 'Apartment'
+   BEGIN
+    INSERT INTO #BookSMS1(Content,GuestId)
+    SELECT 'http://api.mVaayoo.com/mvaayooapi/MessageCompose?user=shiv@hummingbirdindia.com:HBsmsconf&senderID=HBCONF&receipientno='+ BG.MobileNo +'&msgtxt=HummingBird booking no - '+CAST(B.BookingCode AS VARCHAR)+' at '+BP.PropertyName+','+B.CityName +' has been cancelled &state=4',
+    PAG.GuestId FROM WRBHBBooking B  
+    LEFT OUTER JOIN WRBHBBookingGuestDetails BG WITH(NOLOCK)ON BG.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBApartmentBookingProperty BP WITH(NOLOCK)ON BP.BookingId = B.Id
+    LEFT OUTER JOIN WRBHBApartmentBookingPropertyAssingedGuest PAG WITH(NOLOCK)ON
+    PAG.BookingId = B.Id AND PAG.BookingPropertyTableId = BP.Id AND
+    PAG.BookingPropertyId = BP.PropertyId AND PAG.GuestId = BG.GuestId
+    WHERE BG.MobileNo != '' AND PAG.GuestId != 0 AND B.Id = @Id AND PAG.GuestId = @GuestId
+	GROUP BY BG.MobileNo,B.BookingCode,BP.PropertyName,B.CityName,PAG.GuestId;
+   END
+   SELECT Content FROM #BookSMS1 GROUP BY Content;
  END
 END

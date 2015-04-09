@@ -18,6 +18,7 @@ namespace HB.Dao
         {
             DataSet ds = new DataSet();
             DataTable dTable = new DataTable("ERRORTBL");
+            DataTable deTable = new DataTable("DBERRORTBL");
             dTable.Columns.Add("Exception");
             XmlDocument document = new XmlDocument();
             SqlCommand command = new SqlCommand();
@@ -153,7 +154,12 @@ namespace HB.Dao
                 command.Parameters.Add("@UserId", SqlDbType.Int).Value = Usr.Id;
                 ds = new WrbErpConnection().ExecuteDataSet(command, UserData);
             }
+            
                 {
+                    if (n == 0)
+                    {
+                        ds.Tables.Add(deTable);
+                    }
                     ds.Tables.Add(dTable);
                     return ds;
                 }

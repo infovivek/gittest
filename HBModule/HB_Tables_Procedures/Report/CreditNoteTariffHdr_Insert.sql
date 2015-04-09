@@ -38,7 +38,7 @@ CREATE PROCEDURE [dbo].[SP_CreditNoteTariffHdr_Insert](
 AS
 BEGIN
     
-	 DECLARE @TEMPINVOICENO NVARCHAR(100),@PROPERTY NVARCHAR(100);
+	 DECLARE @TEMPINVOICENO NVARCHAR(100),@PROPERTY NVARCHAR(100),@TAC INT;
 	 DECLARE @INVOICENO1 NVARCHAR(100),@Length BIGINT,@ChkInVce NVARCHAR(100);
 	 
 	 SET @ChkInVce=(SELECT ChkInVoiceNo FROM WRBHBCreditNoteTariffHdr WHERE 
@@ -47,6 +47,11 @@ BEGIN
 	 BEGIN
 		 SET @PROPERTY = (SELECT TOP 1 Property FROM WRBHBChechkOutHdr 
 		 WHERE PropertyType ='Internal Property' and  Id = @ChkOutId) 
+		 
+		 SET @TAC = (SELECT T.Id FROM WRBHBChechkOutHdr C
+		 JOIN WRBHBExternalChechkOutTAC T ON C.Id=T.ChkOutHdrId AND T.IsActive=1
+		 WHERE C.PropertyType ='External Property' and  C.Id = @ChkOutId AND C.Direct='Direct'
+		 ) 
 		 
 		 SET @TEMPINVOICENO = (SELECT TOP 1 CrdInVoiceNo FROM WRBHBCreditNoteTariffHdr 
 		 WHERE PropertyId=@PropertyId 
@@ -61,6 +66,14 @@ BEGIN
 		   SET @CrdInVoiceNo =SUBSTRING(@TEMPINVOICENO,0,5)+CAST(SUBSTRING(@TEMPINVOICENO,5,9)+1 AS VARCHAR); 
 		 END
 		 
+		 INSERT INTO WRBHBChechkOutPaymentCheque(ChkOutHdrId,Payment,PayeeName,Address,AmountPaid,
+		 PaymentMode,ChequeNumber,BankName,DateIssued,IsActive,IsDeleted,Createdby,CreatedDate,
+		 Modifiedby,ModifiedDate,RowId,DateIssueMonth,DateIssueYear,OutStanding,CreditNoteFlag)
+		 
+		 SELECT @ChkOutId,'Tariff',C.GuestName,'',@TotalAmount,
+		 'Credit','','',CONVERT(date,GETDATE(),103),1,0,@Createdby,GETDATE(),@Createdby,
+		 GETDATE(),NEWID(),MONTH(GETDATE()),YEAR(GETDATE()),0,1 FROM WRBHBChechkOutHdr C
+		 WHERE C.Id=@ChkOutId
 		 
 		 
 		 INSERT INTO WRBHBCreditNoteTariffHdr(CheckOutId,ChkInVoiceNo,CrdInVoiceNo,LuxuryTax,Servicetax1,
@@ -68,10 +81,19 @@ BEGIN
 		 Modifiedby,ModifiedDate,RowId,CreditNoteNo,PropertyId)
 		 
 		 VALUES(@ChkOutId,@ChkInVoiceNo,@CrdInVoiceNo,@LuxuryTax,@ServiceTax1,
-		 @ServiceTax2,@TotalAmount,@Description,1,0,@Createdby,GETDATE(),@Createdby,GETDATE(),NEWID(),@CreditNoteNo,@PropertyId)
+		 @ServiceTax2,@TotalAmount,@Description,1,0,@Createdby,GETDATE(),@Createdby,
+		 GETDATE(),NEWID(),@CreditNoteNo,@PropertyId)
 		 
+		 IF @TAC !=0
+		 BEGIN
+		 SELECT Id,RowId,'TAC' AS Type FROM WRBHBCreditNoteTariffHdr
+		 WHERE Id=@@IDENTITY;
+		 END
+		 ELSE
+		 BEGIN
 		 SELECT Id,RowId,'Tariff' AS Type FROM WRBHBCreditNoteTariffHdr
 		 WHERE Id=@@IDENTITY;
+		 END
 	END
 	ELSE
 	BEGIN
@@ -79,3 +101,4 @@ BEGIN
 	END
 	 
 END
+--ALTER TABLE WRBHBChechkOutPaymentCheque ADD CreditNote INT

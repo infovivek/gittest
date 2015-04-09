@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:Controls="fx.com.adobe.Controls.*"
+			   xmlns:WrbHelpComp="WrbHelpComp.*"
+			   xmlns:WrbComp="WrbComp.*"
+			   xmlns:flexlib="http://code.google.com/p/flexlib/"
+			   width="100%" height="100%" creationComplete="PageLoad()" pageTitle="Feedback  Report">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script source = "..\\Common\\CommonScript.as"/>
+	<fx:Script source = "..\\Common\\Functions.as"/>
+	<fx:Style source="..\\Common\\ApplicationCSS.css"/>
+	<fx:Script>
+		<![CDATA[
+			import WrbComp.frmsearchwindow;
+			
+			import WrbHelpComp.HlpGridHdr;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.CalendarLayoutChangeEvent;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.events.IndexChangedEvent;
+			import mx.graphics.codec.PNGEncoder;
+			
+			import spark.events.IndexChangeEvent;
+			import spark.events.TextOperationEvent;
+			private var SearchPopUp:frmsearchwindow = new frmsearchwindow();
+			public static var Global_AC:ArrayCollection = new ArrayCollection();
+			public static var GlobalXml:String = "",TypeServiceId:int=0,ErrStr:String="";
+			public var Id:int=0,ErrMsg:String="",CityId:int=0,City:String="",UserId:int=0;
+			public var AddMode:Boolean=true,Flag:Boolean=true;
+			public var CompanyLogo:String="",StateId:int=0,State:String="",Str_Email:String="";
+			private var fileRef:FileReference = new FileReference();
+			private var fileTypes:Array = new Array();
+			public var CompanyId:int=0;
+			private var arrColl:ArrayCollection;
+			private var fr:FileReference;    
+			//public var uploadURL:URLRequest = new URLRequest();
+			private var documentTypes:FileFilter = new FileFilter("Excel (*.xls,*.xlsx)",("*.xls; *.xlsx"));
+			//private var FILE_URL:String = "";
+			public var ImageCount:Number=0;
+			//public var ImageFormat:String="";
+			private var urlReq:URLRequest;
+			public var Save_Flag:Boolean=true; 
+			public var uploadURL:URLRequest = new URLRequest();
+			private const FILE_URL:String="";//"http://sstage.in/Guest_Import/SampleBankSt.xlsx";
+			
+			protected function PageLoad():void
+			{
+				var u:URLRequest = new URLRequest("http://www.hummingbirdindia.com/Feedback/Form/Resendmails");
+				UploadSourceCodeZip();
+			}
+			
+			private function Custom_WebSer_Result (Ds_Objects:Object):void				
+			{
+				
+				if (Ds_Objects.currentTarget.description.toString() == "Pageload_CUSTOM")
+				{
+					//StateId=0;State="";CityId=0;City="";
+					if (Ds_Objects.result.Tables.Table.Rows.length > 0)
+					{
+						
+						//FilePath.text=Ds_Objects.result.Tables.Table.Rows[0].ImageName;
+						
+						//FILE_URL=Ds_Objects.result.Tables.Table.Rows[0].Logo;
+						if(Ds_Objects.result.Tables.Table.Rows[0].Logo!="")
+						{
+							Img_logo.visible=true;
+							Img_logo.source=Ds_Objects.result.Tables.Table.Rows[0].Logo;
+						}
+						else
+						{
+							Img_logo.visible=false;
+						}						
+						Id=Ds_Objects.result.Tables.Table.Rows[0].Id;
+					}
+					AddMode=false;
+				}
+				if (Ds_Objects.currentTarget.description.toString() == "ImageUpload_CUSTOM")
+				{
+					if(Ds_Objects.result.Tables.Table.Rows[0].Logo!="")
+					{
+						Img_logo.source=Ds_Objects.result.Tables.Table.Rows[0].Logo;
+					}
+					
+				}
+				
+			}
+			public function FunCall(event:CloseEvent):void
+			{
+				if (event.detail == Alert.OK) 
+				{	
+					//txt_title.setFocus();
+					//txt_LegalCompanyName.setFocus();
+				}
+			}
+			private function FnValidation_BeforeSave():String
+			{
+				var TxtFlag:Boolean=true;var ErrStr:String="";
+				if(FilePath.text=="")
+				{
+					if(TxtFlag=true)
+					{
+						FilePath.setFocus();
+						TxtFlag=false;
+					}
+					ErrStr=ErrStr+" *   Excel file is Required \n";
+				}
+				return ErrStr;
+			}
+			
+			protected function Save():void
+			{ 	}
+			
+			
+			
+			private function UploadSourceCodeZip():void
+			{
+				// TODO Auto-generated method stub
+				var URL:Array = BrowserDatas();
+				
+				//if(URL[0].toString()=="http:")
+				//{
+				var u:URLRequest = new URLRequest("http://www.hummingbirdindia.com/Feedback/Form/Resendmails");
+				
+				navigateToURL(u,"_blank");
+				
+			} 
+			private function BrowserDatas():Array 
+			{ 				
+				var browserUrl:String = ExternalInterface.call("eval", "window.location.href");
+				var arr:Array =browserUrl.split("/");	
+				//var Obj:FrmMenuScreen = new FrmMenuScreen();		
+				var BrowserStr:String = arr[0].toString()+"//"+arr[2].toString();
+				return arr;	
+			}
+			
+			
+		]]>
+	</fx:Script>
+	<s:VGroup x="0" y="0" width="100%" height="100%" gap="5" horizontalAlign="center" verticalAlign="top">
+		<s:BorderContainer x="37" y="319" width="100%" height="100%" backgroundColor="#fbf9f9"
+						   borderVisible="false">
+			
+			<s:Label x="462" y="239" width="213" height="38" color="Red"
+					 text="FeedBack Report view"/>
+			<mx:Button id="downloadBtn" x="731" y="45" width="163" height="36" visible="false"
+					   label="Download Sample Excel"  
+					   toolTip="{FILE_URL}"/>
+			<mx:Button id="downloadBtn0" x="412" y="228" width="243" height="36" cornerRadius="5" visible="false"
+					   label=" Click here to view Pending Checkout" click="UploadSourceCodeZip()" />
+			<s:Label x="539" y="272" text="Logo" visible="false"/>
+			<s:Label x="574" y="269" text="*" color="red" visible="false"/>
+			<s:HGroup x="0" y="423" width="100%" height="41" horizontalAlign="center" visible="false">
+				<WrbComp:SaveControl x="193" y="451" id="Save_PettyCash" docSave="Save()"
+									 docClear="PageLoad()" docRefresh="PageLoad()">
+				</WrbComp:SaveControl>
+			</s:HGroup>
+			
+			<s:Image x="462" y="311" width="100" height="100" id="Img_CompanyLogo"
+					 source="@Embed(source='../Assets/user.jpg')" visible="false"/>
+			<s:Image x="688" y="90" width="185" height="125" visible="false" id="Img_logo"/>
+			<mx:HRule x="0" y="417" width="100%" strokeColor="#eb1c24"/>
+			
+		</s:BorderContainer>
+	</s:VGroup>
+	<s:BorderContainer x="241" y="145" width="426" height="141" id="Brd_imageUpload"   borderVisible="true"
+					   backgroundColor="#fbf9f9" cornerRadius="5" visible="false">
+		<WrbComp:Button_HB x="329" y="152" height="40" _Label="Click here to upload"  visible="true"/>
+		<mx:Panel x="27" y="19" title="Excel Uploader">
+			<mx:ControlBar>
+				<mx:Spacer width="80%"/>
+				<mx:HBox>
+					<mx:TextInput id="FilePath" width="150"  visible="true"/>
+					<mx:Button id="Filedata" label="Browse File" name="Filedata" />
+					<mx:Button label="UpLoad File" name="uploadbutton" id="uploadbutton" visible="false" width="0" />
+				</mx:HBox>
+				<mx:TextArea id="resultsTxtField"  width="0"  name="resultsTxtField" visible="false"/>
+			</mx:ControlBar>
+		</mx:Panel>
+		<s:TextInput x="27" y="152" width="189" height="40" id="txt_ImageName" enabled="false" visible="false"/>		
+		
+		<WrbComp:Button_HB x="329" y="152" height="40" _Label="Close" click="{Brd_imageUpload.visible=false;}" visible="false"/>
+		<!--WrbComp:Button_HB id="downloadBtn" x="237" y="152" height="40" _Label="Download"
+		click="downloadSourceCodeZip();"  toolTip="{FILE_URL}" visible="false"/-->
+	</s:BorderContainer>
+</s:Application>

@@ -494,7 +494,7 @@ If @BookingLevel = 'Apartment'
 		--FROM WRBHBCheckInHdr  
 		--WHERE IsActive = 1 and IsDeleted = 0 and Id =@CheckInHdrId;  
 		
-		SELECT Property, Stay,ChkOutTariffTotal AS  Tariff,  
+		SELECT Property,CONVERT(NVARCHAR(100),CheckInDate,103)+' To '+CONVERT(NVARCHAR(100),@ChkOutDate,103)  Stay,ChkOutTariffTotal AS  Tariff,  
 		CONVERT(NVARCHAR(100),BillEndDate,103) AS ChkoutDate,CONVERT(NVARCHAR(100),BillFromDate,103) AS CheckInDate  
 		FROM WRBHBChechkOutHdr  
 		WHERE IsActive = 1 AND IsDeleted = 0 AND Status = 'UnSettled' AND ChkInHdrId =@CheckInHdrId
@@ -718,6 +718,8 @@ BEGIN
  
 IF(ISNULL(@CID,0)=0)  
 BEGIN  
+
+
 -- this is chkin and chkout date to check directly from booking table
 		CREATE TABLE #LEVEL1(ChkInDate NVARCHAR(100),ChkOutDate NVARCHAR(100),Id BIGINT,
 		TariffPaymentMode NVARCHAR(100),ServicePaymentMode NVARCHAR(100),BTCFile NVARCHAR(MAX))  
@@ -1872,11 +1874,26 @@ BEGIN
 		 D.Id=@CID;  
 		-- CONSOLIDATE FOR ADD PAYMENTS  
 		SELECT DISTINCT ISNULL( ROUND((@TARIFAMT+@SERVICEAMT),0),0) AS ConsolidateAmount 
+		
 		--FROM #Tariffs  
 		--WHERE ROUND((@TARIFAMT+@SERVICEAMT),0)!=0  
 	--	SELECT 1 AS UnPaid;   
 	
 	--	SELECT IntermediateFlag FROM WRBHBChechkOutHdr where Status = 'UnSettled' AND ChkInHdrId=@CheckInHdrId;
+-- Creditamount	
+		SELECT ISNULL(d.TotalAmount,0) as CreditAmountTariff,d.CheckOutId FROM WRBHBChechkOutHdr h
+		JOIN WRBHBCreditNoteTariffHdr d ON h.Id = d.CheckOutId
+		WHERE d.CheckOutId =  @CID
+		
+		SELECT ISNULL(d.TotalAmount,0) as CreditAmountService,d.CheckOutId FROM WRBHBChechkOutHdr h
+		JOIN WRBHBCreditNoteServiceHdr d ON h.Id = d.CheckOutId
+		WHERE d.CheckOutId =  @CID
+		
+		SELECT (ISNULL(d.TotalAmount,0)+ISNULL(c.TotalAmount,0)) as CreditConAmount,d.CheckOutId
+		FROM WRBHBChechkOutHdr h
+		LEFT OUTER JOIN WRBHBCreditNoteTariffHdr d ON h.Id = d.CheckOutId
+		LEFT OUTER	JOIN WRBHBCreditNoteServiceHdr c ON  c.CheckOutId = d.CheckOutId
+		WHERE h.Id =  @CID
 	END
 		
 	
@@ -2066,7 +2083,7 @@ END
       --Name  
         
 		SELECT DISTINCT Name FROM WRBHBChechkOutHdr  
-		WHERE ChkInHdrId=@PropertyId 
+		WHERE ChkInHdrId=@PropertyId   -- @PropertyId like checkinhdr id
 		--AND IsActive=1 AND IsDeleted=0   
 
 		-- TARIFF FOR ADD PAYMENTS   
@@ -2075,7 +2092,7 @@ END
 		FROM WRBHBChechkOutHdr H  
 		JOIN WRBHBCheckInHdr D ON H.ChkInHdrId = D.Id --AND D.IsActive = 1 AND D.IsDeleted = 0  
 		WHERE --H.IsActive = 1 AND D.IsDeleted = 0  AND
-		 H.Id = @PropertyId  
+		 H.Id = @PropertyId  -- @PropertyId like checkinhdr id
 
 		-- SERVICE FOR ADD PAYMENTS  
 		SELECT isnull(round(@SERVICEAMTs,0),0) as ChkOutServiceNetAmount  
@@ -2083,12 +2100,26 @@ END
 		JOIN WRBHBChechkOutHdr D ON H.CheckOutHdrId = D.Id --AND D.IsActive = 1 AND D.IsDeleted = 0  
 		WHERE 
 		--H.IsActive=1 AND H.IsDeleted=0 AND 
-		D.Id=@PropertyId;  
+		D.Id=@PropertyId;  -- @PropertyId like checkinhdr id
 		-- CONSOLIDATE FOR ADD PAYMENTS  
 
 		SELECT distinct isnull(round((@TARIFAMT1s+@SERVICEAMT1s),0),0) AS ConsolidateAmount 
 		--from #TafFin22  
 		--WHERE round((@TARIFAMT1s+@SERVICEAMT1s),0)!=0  
+-- Credit Amount		
+		SELECT d.TotalAmount AS CreditAmountTariff,d.CheckOutId FROM WRBHBChechkOutHdr h
+		JOIN WRBHBCreditNoteTariffHdr d ON h.Id = d.CheckOutId
+		WHERE d.CheckOutId =  @CheckOutId1
+						
+		SELECT ISNULL(d.TotalAmount,0) as CreditAmountService,d.CheckOutId FROM WRBHBChechkOutHdr h
+		JOIN WRBHBCreditNoteServiceHdr d ON h.Id = d.CheckOutId
+		WHERE d.CheckOutId =  @CheckOutId1
+		
+		SELECT (ISNULL(d.TotalAmount,0)+ISNULL(c.TotalAmount,0)) as CreditConAmount,d.CheckOutId
+		FROM WRBHBChechkOutHdr h
+		LEFT OUTER JOIN WRBHBCreditNoteTariffHdr d ON h.Id = d.CheckOutId
+		LEFT OUTER	JOIN WRBHBCreditNoteServiceHdr c ON  c.CheckOutId = d.CheckOutId
+		WHERE h.Id =  @CheckOutId1
 		
 		
 		

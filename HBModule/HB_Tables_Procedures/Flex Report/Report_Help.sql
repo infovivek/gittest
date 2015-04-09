@@ -156,10 +156,10 @@ IF @Action ='Property'
     --CONVERT(DATE,ChkOutDt,103) BETWEEN CONVERT(DATE,@Pram3,103)  
     --AND CONVERT(DATE,@Pram4,103) --  
     BookingPropertyId=@Pram2  
-    AND G.IsActive=1 AND G.IsDeleted=0  
+    AND G.IsActive=1 AND G.IsDeleted=0  AND ISNULL(G.CurrentStatus,'') !='Canceled'
     JOIN WRBHBPropertyRooms R WITH(NOLOCK) ON R.Id=G.RoomId AND R.IsActive=1 AND R.IsDeleted=0  
     AND G.BookingPropertyId=R.PropertyId AND R.RoomStatus='Active'  
-    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
+    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  AND B.BookingCode!='0' 
     --AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.RoomId=G.RoomId AND CO.IsActive=1 AND CO.IsDeleted=0)  
     GROUP BY G.Id,BookingId,RoomId,G.RoomType,FirstName,ChkInDt,ChkOutDt,G.Occupancy,G.ExpectChkInTime,G.AMPM,CurrentStatus    
       
@@ -177,10 +177,10 @@ IF @Action ='Property'
     AND CONVERT(DATE,ChkOutDt,103) BETWEEN CONVERT(DATE,@Pram3,103)  
     AND CONVERT(DATE,@Pram4,103) AND  
     BookingPropertyId=@Pram2   
-    AND G.IsActive=1 AND G.IsDeleted=0  
+    AND G.IsActive=1 AND G.IsDeleted=0  AND ISNULL(G.CurrentStatus,'') !='Canceled'
     JOIN WRBHBPropertyRooms R WITH(NOLOCK) ON R.Id=G.RoomId AND R.IsActive=1 AND R.IsDeleted=0  
     AND G.BookingPropertyId=R.PropertyId AND R.RoomStatus='Active'  
-    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
+    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled' AND B.BookingCode!='0'  
     AND B.Id NOT IN(SELECT BookingId FROM #BookingRoom BR WHERE BR.RoomId=G.RoomId AND CONVERT(date,BR.CheckInDt,103)=CONVERT(date,G.ChkInDt,103) 
    AND CONVERT(date,BR.CheckOutDt,103)=CONVERT(date,G.ChkOutDt,103))   
    -- AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.RoomId=G.RoomId AND CO.IsActive=1 AND CO.IsDeleted=0)  
@@ -197,10 +197,10 @@ IF @Action ='Property'
     AND CONVERT(DATE,ChkInDt,103) < CONVERT(DATE,@Pram3,103)  
     AND CONVERT(DATE,ChkOutDt,103) > CONVERT(DATE,@Pram4,103) AND    
     BookingPropertyId=@Pram2  
-    AND G.IsActive=1 AND G.IsDeleted=0  
+    AND G.IsActive=1 AND G.IsDeleted=0  AND ISNULL(G.CurrentStatus,'') !='Canceled'
     JOIN WRBHBPropertyRooms R WITH(NOLOCK) ON R.Id=G.RoomId AND R.IsActive=1 AND R.IsDeleted=0  
     AND G.BookingPropertyId=R.PropertyId AND R.RoomStatus='Active'  
-    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
+    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  AND B.BookingCode!='0' 
    AND B.Id NOT IN(SELECT BookingId FROM #BookingRoom BR WHERE BR.RoomId=G.RoomId AND CONVERT(date,BR.CheckInDt,103)=CONVERT(date,G.ChkInDt,103) 
    AND CONVERT(date,BR.CheckOutDt,103)=CONVERT(date,G.ChkOutDt,103))     
     --AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.RoomId=G.RoomId AND CO.IsActive=1 AND CO.IsDeleted=0)  
@@ -218,10 +218,10 @@ IF @Action ='Property'
     AND CONVERT(DATE,ChkInDt,103) > CONVERT(DATE,@Pram3,103)  
     AND CONVERT(DATE,ChkOutDt,103) < CONVERT(DATE,@Pram4,103) AND    
     BookingPropertyId=@Pram2  
-    AND G.IsActive=1 AND G.IsDeleted=0  
+    AND G.IsActive=1 AND G.IsDeleted=0  AND ISNULL(G.CurrentStatus,'') !='Canceled'
     JOIN WRBHBPropertyRooms R WITH(NOLOCK) ON R.Id=G.RoomId AND R.IsActive=1 AND R.IsDeleted=0  
     AND G.BookingPropertyId=R.PropertyId AND R.RoomStatus='Active'  
-    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
+    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  AND B.BookingCode!='0' 
    AND B.Id NOT IN(SELECT BookingId FROM #BookingRoom BR WHERE BR.RoomId=G.RoomId AND CONVERT(date,BR.CheckInDt,103)=CONVERT(date,G.ChkInDt,103) 
    AND CONVERT(date,BR.CheckOutDt,103)=CONVERT(date,G.ChkOutDt,103))    
     --AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.RoomId=G.RoomId AND CO.IsActive=1 AND CO.IsDeleted=0)  
@@ -243,10 +243,10 @@ IF @Action ='Property'
     --CONVERT(DATE,ChkOutDt,103) BETWEEN CONVERT(DATE,@Pram3,103)  
     --AND CONVERT(DATE,@Pram4,103) --  
     BookingPropertyId=@Pram2  
-    AND G.IsActive=1 AND G.IsDeleted=0  
+    AND G.IsActive=1 AND G.IsDeleted=0  AND ISNULL(G.CurrentStatus,'') !='Canceled'
     JOIN WRBHBPropertyRooms R WITH(NOLOCK) ON R.Id=G.RoomId AND R.IsActive=1 AND R.IsDeleted=0  
     AND G.BookingPropertyId=R.PropertyId AND R.RoomStatus='Active'  
-    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
+    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled' AND B.BookingCode!='0'   
     --AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.BedId=G.BedId AND CO.IsActive=1 AND CO.IsDeleted=0)  
     GROUP BY G.Id,BookingId,BedId,RoomId,RoomNo,FirstName,ChkInDt,ChkOutDt,G.ExpectChkInTime,G.AMPM,
     G.CurrentStatus   
@@ -264,10 +264,10 @@ IF @Action ='Property'
     CONVERT(DATE,ChkOutDt,103) BETWEEN CONVERT(DATE,@Pram3,103)  
     AND CONVERT(DATE,@Pram4,103) AND  
     BookingPropertyId=@Pram2  
-    AND G.IsActive=1 AND G.IsDeleted=0   
+    AND G.IsActive=1 AND G.IsDeleted=0   AND ISNULL(G.CurrentStatus,'') !='Canceled'
     JOIN WRBHBPropertyRooms R WITH(NOLOCK) ON R.Id=G.RoomId AND R.IsActive=1 AND R.IsDeleted=0  
     AND G.BookingPropertyId=R.PropertyId AND R.RoomStatus='Active'  
-    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
+    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  AND B.BookingCode!='0' 
    AND B.Id NOT IN(SELECT BookingId FROM #BookingBed BB WHERE BB.BedId=G.BedId AND CONVERT(date,BB.CheckInDt,103)=CONVERT(date,G.ChkInDt,103) 
    AND CONVERT(date,BB.CheckOutDt,103)=CONVERT(date,G.ChkOutDt,103)) 
    
@@ -288,10 +288,10 @@ IF @Action ='Property'
     CONVERT(DATE,ChkOutDt,103) > CONVERT(DATE,@Pram4,103)AND  
     --AND CONVERT(DATE,@Pram4,103)   
     BookingPropertyId=@Pram2  
-    AND G.IsActive=1 AND G.IsDeleted=0   
+    AND G.IsActive=1 AND G.IsDeleted=0 AND ISNULL(G.CurrentStatus,'') !='Canceled'  
     JOIN WRBHBPropertyRooms R WITH(NOLOCK) ON R.Id=G.RoomId AND R.IsActive=1 AND R.IsDeleted=0  
     AND G.BookingPropertyId=R.PropertyId AND R.RoomStatus='Active'  
-    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
+    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled' AND B.BookingCode!='0'  
    AND B.Id NOT IN(SELECT BookingId FROM #BookingBed BB WHERE BB.BedId=G.BedId AND CONVERT(date,BB.CheckInDt,103)=CONVERT(date,G.ChkInDt,103) 
    AND CONVERT(date,BB.CheckOutDt,103)=CONVERT(date,G.ChkOutDt,103))  
    -- AND G.BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO   
@@ -313,10 +313,10 @@ IF @Action ='Property'
     CONVERT(DATE,ChkOutDt,103) < CONVERT(DATE,@Pram4,103)AND  
     --AND CONVERT(DATE,@Pram4,103)   
     BookingPropertyId=@Pram2  
-    AND G.IsActive=1 AND G.IsDeleted=0   
+    AND G.IsActive=1 AND G.IsDeleted=0 AND ISNULL(G.CurrentStatus,'') !='Canceled'  
     JOIN WRBHBPropertyRooms R WITH(NOLOCK) ON R.Id=G.RoomId AND R.IsActive=1 AND R.IsDeleted=0  
     AND G.BookingPropertyId=R.PropertyId AND R.RoomStatus='Active'  
-    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
+    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  AND B.BookingCode!='0' 
     AND B.Id NOT IN(SELECT BookingId FROM #BookingBed BB WHERE BB.BedId=G.BedId AND CONVERT(date,BB.CheckInDt,103)=CONVERT(date,G.ChkInDt,103) 
    AND CONVERT(date,BB.CheckOutDt,103)=CONVERT(date,G.ChkOutDt,103))  
     --AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.BedId=G.BedId AND CO.IsActive=1 AND CO.IsDeleted=0)  
@@ -338,11 +338,11 @@ IF @Action ='Property'
     --CONVERT(DATE,ChkOutDt,103) BETWEEN CONVERT(DATE,@Pram3,103)  
     --AND CONVERT(DATE,@Pram4,103) --  
     BookingPropertyId=@Pram2  
-    AND G.IsActive=1 AND G.IsDeleted=0  
+    AND G.IsActive=1 AND G.IsDeleted=0  AND ISNULL(G.CurrentStatus,'') !='Canceled'
     JOIN dbo.WRBHBPropertyApartment A WITH(NOLOCK) ON  G.BookingPropertyId=A.PropertyId AND G.ApartmentId=A.Id  
     AND A.IsActive=1 AND B.IsDeleted=0  
     JOIN WRBHBPropertyRooms R ON R.ApartmentId=G.ApartmentId AND R.IsActive=1 AND R.IsDeleted=0 AND R.RoomStatus='Active'  
-    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
+    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled' AND B.BookingCode!='0'  
     --AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.ApartmentId=G.ApartmentId AND CO.IsActive=1 AND CO.IsDeleted=0)  
     GROUP BY G.Id,BookingId,R.Id,RoomType,FirstName,ChkInDt,ChkOutDt,G.ExpectChkInTime,G.AMPM,
     G.CurrentStatus   
@@ -359,11 +359,11 @@ IF @Action ='Property'
     CONVERT(DATE,ChkOutDt,103) BETWEEN CONVERT(DATE,@Pram3,103)  
     AND CONVERT(DATE,@Pram4,103) AND  
     BookingPropertyId=@Pram2  
-    AND G.IsActive=1 AND G.IsDeleted=0  
+    AND G.IsActive=1 AND G.IsDeleted=0  AND ISNULL(G.CurrentStatus,'') !='Canceled'
     JOIN dbo.WRBHBPropertyApartment A WITH(NOLOCK) ON  G.BookingPropertyId=A.PropertyId AND G.ApartmentId=A.Id  
     AND A.IsActive=1 AND B.IsDeleted=0  
     JOIN WRBHBPropertyRooms R ON R.ApartmentId=G.ApartmentId AND R.IsActive=1 AND R.IsDeleted=0 AND R.RoomStatus='Active'  
-    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
+    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  AND B.BookingCode!='0' 
     AND B.Id NOT IN(SELECT BookingId FROM #BookingApartment BA WHERE BA.RoomId=R.Id AND CONVERT(date,BA.CheckInDt,103)=CONVERT(date,G.ChkInDt,103) 
     AND CONVERT(date,BA.CheckOutDt,103)=CONVERT(date,G.ChkOutDt,103))  
     --AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.ApartmentId=G.ApartmentId AND CO.IsActive=1 AND CO.IsDeleted=0)  
@@ -381,11 +381,11 @@ IF @Action ='Property'
     CONVERT(DATE,ChkOutDt,103) > CONVERT(DATE,@Pram4,103) AND  
     --AND CONVERT(DATE,@Pram4,103) AND  
     BookingPropertyId=@Pram2  
-    AND G.IsActive=1 AND G.IsDeleted=0  
+    AND G.IsActive=1 AND G.IsDeleted=0  AND ISNULL(G.CurrentStatus,'') !='Canceled'
     JOIN dbo.WRBHBPropertyApartment A WITH(NOLOCK) ON  G.BookingPropertyId=A.PropertyId AND G.ApartmentId=A.Id  
     AND A.IsActive=1 AND B.IsDeleted=0  
     JOIN WRBHBPropertyRooms R ON R.ApartmentId=G.ApartmentId AND R.IsActive=1 AND R.IsDeleted=0 AND R.RoomStatus='Active'  
-    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
+    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  AND B.BookingCode!='0' 
     AND B.Id NOT IN(SELECT BookingId FROM #BookingApartment BA WHERE BA.RoomId=R.Id AND CONVERT(date,BA.CheckInDt,103)=CONVERT(date,G.ChkInDt,103) 
     AND CONVERT(date,BA.CheckOutDt,103)=CONVERT(date,G.ChkOutDt,103))    
     --AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.ApartmentId=G.ApartmentId AND CO.IsActive=1 AND CO.IsDeleted=0)  
@@ -402,11 +402,11 @@ IF @Action ='Property'
     CONVERT(DATE,ChkOutDt,103) < CONVERT(DATE,@Pram4,103) AND  
     --AND CONVERT(DATE,@Pram4,103) AND  
     BookingPropertyId=@Pram2  
-    AND G.IsActive=1 AND G.IsDeleted=0  
+    AND G.IsActive=1 AND G.IsDeleted=0  AND ISNULL(G.CurrentStatus,'') !='Canceled'
     JOIN dbo.WRBHBPropertyApartment A WITH(NOLOCK) ON  G.BookingPropertyId=A.PropertyId AND G.ApartmentId=A.Id  
     AND A.IsActive=1 AND B.IsDeleted=0  
     JOIN WRBHBPropertyRooms R ON R.ApartmentId=G.ApartmentId AND R.IsActive=1 AND R.IsDeleted=0 AND R.RoomStatus='Active'  
-    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  
+    WHERE B.IsActive=1 AND B.IsDeleted=0 AND ISNULL(B.CancelStatus,'')!='Canceled'  AND B.BookingCode!='0' 
     AND B.Id NOT IN(SELECT BookingId FROM #BookingApartment BA WHERE BA.RoomId=R.Id AND CONVERT(date,BA.CheckInDt,103)=CONVERT(date,G.ChkInDt,103) 
     AND CONVERT(date,BA.CheckOutDt,103)=CONVERT(date,G.ChkOutDt,103))  
     --AND BookingId NOT IN(SELECT BookingId FROM WRBHBChechkOutHdr CO WHERE CO.ApartmentId=G.ApartmentId AND CO.IsActive=1 AND CO.IsDeleted=0)  

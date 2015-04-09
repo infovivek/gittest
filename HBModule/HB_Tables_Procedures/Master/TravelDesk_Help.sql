@@ -81,10 +81,10 @@ BEGIN
    begin
     if isnull(@Param2,'')='Client'
       BEGIN
-        SELECT FirstName , LastName,Email Mail,Id zId,MobileNo Mobile   
+        SELECT FirstName , LastName,Email Mail,Id zId,MobileNo Mobile
 		 FROM  WRBHBClientManagementAddNewClient 
 		 WHERE IsActive=1 AND IsDeleted=0  and FirstName!='' and LastName!=''
-		  and Email!=''  and   MobileNo!='' AND CltmgntId=@Id1;
+		  and Email!=''  and   MobileNo!='' AND CltmgntId=@Id1 AND ContactType='Booker';
        END  
      --IF @PAction='MasterClent-DeskS'
      if isnull(@Param2,'')='MasterClient'
@@ -95,14 +95,14 @@ BEGIN
 		join WRBHBClientManagement cli on m.Id=cli.MasterClientId  and cli.IsActive=1 AND cli.IsDeleted=0  
 		join WRBHBClientManagementAddNewClient cc on cli.Id=cc.CltmgntId and  cc.IsActive=1 AND cc.IsDeleted=0  
 		WHERE M.IsActive=1 AND M.IsDeleted=0  and FirstName!='' and LastName!=''
-		and Email!=''  and   MobileNo!=''  AND m.Id=@Id1;
+		and Email!=''  and   MobileNo!=''  AND m.Id=@Id1 AND ContactType='Booker';
   END
     if isnull(@Param2,'')=''
       BEGIN
         SELECT FirstName , LastName,Email Mail,Id zId,MobileNo Mobile   
 		 FROM  WRBHBClientManagementAddNewClient 
 		 WHERE IsActive=1 AND IsDeleted=0  and FirstName!='' and LastName!=''
-		  and Email!=''  and   MobileNo!='' AND CltmgntId=@Id1;
+		  and Email!=''  and   MobileNo!='' AND CltmgntId=@Id1 AND ContactType='Booker';
        END  
   end
   IF @PAction='Update'

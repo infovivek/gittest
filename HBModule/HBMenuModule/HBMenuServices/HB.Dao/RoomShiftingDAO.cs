@@ -304,14 +304,23 @@ namespace HB.Dao
             command.CommandText = StoredProcedures.RoomShifting_Help;
             command.CommandType = CommandType.StoredProcedure;
             command.Parameters.Add("@Action", SqlDbType.NVarChar).Value = data[1].ToString();
-            command.Parameters.Add("@Str1", SqlDbType.NVarChar).Value = data[2].ToString();
-            command.Parameters.Add("@BookingLevel", SqlDbType.NVarChar).Value = data[3].ToString();
+            command.Parameters.Add("@Str1", SqlDbType.NVarChar).Value = data[2].ToString(); 
             command.Parameters.Add("@ChkInDt", SqlDbType.NVarChar).Value = data[4].ToString();
             command.Parameters.Add("@ChkOutDt", SqlDbType.NVarChar).Value = data[5].ToString();
             command.Parameters.Add("@BookingId", SqlDbType.BigInt).Value = Convert.ToInt32(data[6].ToString());
             command.Parameters.Add("@RoomId", SqlDbType.BigInt).Value = Convert.ToInt32(data[7].ToString());
             command.Parameters.Add("@Id1", SqlDbType.BigInt).Value = Convert.ToInt32(data[8].ToString());
             command.Parameters.Add("@Id2", SqlDbType.BigInt).Value = Convert.ToInt32(data[9].ToString());
+            if (data[1].ToString() == "BookingLoadFrontEnd")
+            {
+                command.Parameters.Add("@BookingLevel", SqlDbType.NVarChar).Value = user.Id;
+            }
+            else
+            {
+                command.Parameters.Add("@BookingLevel", SqlDbType.NVarChar).Value = data[3].ToString();
+            }
+        
+         
             return new WrbErpConnection().ExecuteDataSet(command, UserData);
         }
     }

@@ -26,7 +26,7 @@ BEGIN
 
 If(@Str1!='')and(LEN(@Str1)>35)
 Begin
-	Declare @Bookingcode Int,@CheckoutId Int,@Images Nvarchar(500),@Mobile Nvarchar(100),@chkinhdrId Bigint;
+	Declare @Bookingcode Int,@CheckoutId Int,@Images Nvarchar(500),@Mobile Nvarchar(100),@chkinhdrId Bigint,@bookingId bigint;
 	
 	Set @Images =(Select top 1 ImageName from WRBHBCompanyMaster where IsActive=1 )
 	--Select ChkOutHdrId,RowId from WRBHBCheckOutSettleHdr where ChkOutHdrId=2224
@@ -35,11 +35,17 @@ Begin
 	                  where rowid=@Str1 and isactive=1)
 	Set @Bookingcode =(Select top 1 BookingCode from WRBHBBooking H 
 	            join WRBHBBookingPropertyAssingedGuest D on H.Id=d.BookingId  where CheckOutHdrId=@CheckoutId)
-
+	            
+   if(isnull(@Bookingcode,'')='')
+	    Begin  
+	       Set @bookingId   =(Select top 1 BookingId from WRBHBChechkOutHdr where Id=@CheckoutId and isactive=1) 
+           Set @Bookingcode =(Select top 1 BookingCode from WRBHBBooking H 
+                            join WRBHBBedBookingPropertyAssingedGuest D on H.Id=d.BookingId  where H.id=@bookingId)
+      End
 Set @chkinhdrId =(Select top 1 ChkInHdrId from WRBHBChechkOutHdr 
 	                  where Id=@CheckoutId and IsActive=1  and IsDeleted=0) 
 Set @Mobile =(Select top 1 MobileNo from WRBHBCheckInHdr 
-	                  where Id=@chkinhdrId and IsActive=1  and IsDeleted=0 and MobileNo!=0)
+	                  where Id=@chkinhdrId and IsActive=1  and IsDeleted=0 )
 	                  
 	 Select  Id ,BookingId,ChkInHdrId,GuestName GuestName,ClientName,ClientId,Property,PropertyId,GuestId,
 	 convert(nvarchar(100),CheckInDate,103)Column1,convert(nvarchar(100),CheckOutDate,103) Column2,
@@ -83,53 +89,71 @@ IF @Action ='DataUpdate'
 	BEGIN
 		If(@ToDt!='')-- prpty wise fileter
 		Begin
-			 Select top 10 H.Id ,BookingId,ChkInHdrId,GuestName GuestName,ClientName,ClientId,Property,PropertyId,GuestId,
-			 convert(nvarchar(100),CheckInDate,103)Column1,convert(nvarchar(100),CheckOutDate,103) Column2,
-			 0  Bookingcode, GETDATE() CreatedDate,HH.RowId RowId,'' Images,Email,'' as Mobile
-			 from WRBHBChechkOutHdr H
-			 join WRBHBCheckOutSettleHdr HH on H.Id=HH.ChkOutHdrId and HH.IsActive=1 and HH.IsDeleted=0
-			 where  H.IsActive=1  and H.IsDeleted=0 --and hh.RowId='C3A7B608-5522-45F8-9FB4-DC7A57C3ED09'-- and H.Id=
-			 and CONVERT(date,HH.CreatedDate,103) <= CONVERT(date,GETDATE(),103)
-			 and Property like '%'+@ToDt+'%'
-			 order by H.Id Desc
+			Select H.Id ,H.BookingId,H.ChkInHdrId,H.GuestName GuestName,H.ClientName,H.ClientId,H.Property,
+			H.PropertyId,H.GuestId,convert(nvarchar(100),CheckInDate,103)Column1,convert(nvarchar(100),CheckOutDate,103) Column2,
+			0  Bookingcode, GETDATE() CreatedDate,HH.RowId RowId,'' Images,Email,isnull(Ch.MobileNo,'') as Mobile
+			from WRBHBChechkOutHdr H
+			join WRBHBCheckOutSettleHdr HH on H.Id=HH.ChkOutHdrId and HH.IsActive=1 and HH.IsDeleted=0
+			join WRBHBCheckInHdr Ch on ch.Id=h.ChkInHdrId and ch.IsActive=1 and ch.IsDeleted=0
+			where  H.IsActive=1  and H.IsDeleted=0 --and hh.RowId='C3A7B608-5522-45F8-9FB4-DC7A57C3ED09'-- and H.Id=
+			and CONVERT(date,HH.CreatedDate,103) <= CONVERT(date,GETDATE(),103)
+			and H.Property like '%'+@ToDt+'%'
+			order by H.Id Desc
 		 END
 		 If(@Str1!='')-- Client wise fileter
 		Begin
-			 Select top 10 H.Id ,BookingId,ChkInHdrId,GuestName GuestName,ClientName,ClientId,Property,PropertyId,GuestId,
-			 convert(nvarchar(100),CheckInDate,103)Column1,convert(nvarchar(100),CheckOutDate,103) Column2,
-			 0  Bookingcode, GETDATE() CreatedDate,HH.RowId RowId,'' Images,Email,'' as Mobile
+			 Select H.Id ,H.BookingId,H.ChkInHdrId,H.GuestName GuestName,H.ClientName,H.ClientId,H.Property,
+			 H.PropertyId,H.GuestId,convert(nvarchar(100),CheckInDate,103)Column1,convert(nvarchar(100),CheckOutDate,103) Column2,
+			 0  Bookingcode, GETDATE() CreatedDate,HH.RowId RowId,'' Images,Email,isnull(Ch.MobileNo,'') as Mobile
 			 from WRBHBChechkOutHdr H
 			 join WRBHBCheckOutSettleHdr HH on H.Id=HH.ChkOutHdrId and HH.IsActive=1 and HH.IsDeleted=0
+			 join WRBHBCheckInHdr Ch on ch.Id=h.ChkInHdrId and ch.IsActive=1 and ch.IsDeleted=0
 			 where  H.IsActive=1  and H.IsDeleted=0 --and hh.RowId='C3A7B608-5522-45F8-9FB4-DC7A57C3ED09'-- and H.Id=
 			 and CONVERT(date,HH.CreatedDate,103) <= CONVERT(date,GETDATE(),103)
-			  and ClientName like '%'+@Str1+'%'
+			  and H.ClientName like '%'+@Str1+'%'
 			 order by H.Id Desc
 		 END
 		 If(@Str2!='') -- guestwise wise fileter
 		Begin
-			 Select top 10 H.Id ,BookingId,ChkInHdrId,GuestName GuestName,ClientName,ClientId,Property,PropertyId,GuestId,
-			 convert(nvarchar(100),CheckInDate,103)Column1,convert(nvarchar(100),CheckOutDate,103) Column2,
-			 0  Bookingcode, GETDATE() CreatedDate,HH.RowId RowId,'' Images,Email,'' as Mobile
+		  	 Select H.Id ,H.BookingId,H.ChkInHdrId,H.GuestName GuestName,H.ClientName,H.ClientId,H.Property,
+			 H.PropertyId,H.GuestId,convert(nvarchar(100),CheckInDate,103)Column1,convert(nvarchar(100),CheckOutDate,103) Column2,
+			 0  Bookingcode, GETDATE() CreatedDate,HH.RowId RowId,'' Images,Email,isnull(Ch.MobileNo,'') as Mobile
 			 from WRBHBChechkOutHdr H
 			 join WRBHBCheckOutSettleHdr HH on H.Id=HH.ChkOutHdrId and HH.IsActive=1 and HH.IsDeleted=0
+			 join WRBHBCheckInHdr Ch on ch.Id=h.ChkInHdrId and ch.IsActive=1 and ch.IsDeleted=0 
 			 where  H.IsActive=1  and H.IsDeleted=0 --and hh.RowId='C3A7B608-5522-45F8-9FB4-DC7A57C3ED09'-- and H.Id=
 			 and CONVERT(date,HH.CreatedDate,103) <= CONVERT(date,GETDATE(),103)
-			 and GuestName like '%'+@Str2+'%'
+			 and H.GuestName like '%'+@Str2+'%'
 			 order by H.Id Desc
 		 END
 		 If(@Str2='') and  (@Str1='') and (@ToDt='')
 		Begin
-		    Select   H.Id ,BookingId,ChkInHdrId,GuestName GuestName,ClientName,ClientId,Property,PropertyId,GuestId,
-			 convert(nvarchar(100),CheckInDate,103)Column1,convert(nvarchar(100),CheckOutDate,103) Column2,
-			 0  Bookingcode, GETDATE() CreatedDate,HH.RowId RowId,'' Images,Email,'' as Mobile
+		     Select H.Id ,H.BookingId,H.ChkInHdrId,H.GuestName GuestName,H.ClientName,H.ClientId,H.Property,
+			 H.PropertyId,H.GuestId,convert(nvarchar(100),CheckInDate,103)Column1,convert(nvarchar(100),CheckOutDate,103) Column2,
+			 0  Bookingcode, GETDATE() CreatedDate,HH.RowId RowId,'' Images,Email,isnull(Ch.MobileNo,'') as Mobile
 			 from WRBHBChechkOutHdr H
 			 join WRBHBCheckOutSettleHdr HH on H.Id=HH.ChkOutHdrId and HH.IsActive=1 and HH.IsDeleted=0
+			 join WRBHBCheckInHdr Ch on ch.Id=h.ChkInHdrId and ch.IsActive=1 and ch.IsDeleted=0 
 			 where  H.IsActive=1  and H.IsDeleted=0 --and hh.RowId='C3A7B608-5522-45F8-9FB4-DC7A57C3ED09'-- and H.Id=
 			 and CONVERT(date,HH.CreatedDate,103) <= CONVERT(date,GETDATE(),103) 
 			 order by H.Id Desc
 		End
 		 
+	END
+	
+	IF @Action ='Submitted'
+	BEGIN
+			Select Id,Guestname GuestName,ClientName ClientName,PropertyName PropertyName,CheckInDate CheckIndate,
+			CheckoutDate ChkOutDate,
+		isnull(f.Cleanlinessofrooms,'') Cleanlinessofrooms,isnull(f.QualityofFoodServed,'') QualityofFoodServed,
+		isnull(f.InternetService,'') InternetService,isnull(f.RoomAmbience,'') RoomAmbience,
+		isnull(f.QualityofService,'') QualityofService,isnull(f.OverallStayExperience,'') OverallStayExperience,
+			isnull(f.Remarks ,'') Remarks
+			from WRBHBFeedBckForms F
+			where isactive=1 
+			order by Id Desc
 	End
+ 
  End 
  
 --exec [dbo].[Sp_CheckOutFeedbackform_Help] @Action=N'Pageload',@FromDt=N'',@ToDt=N'',@Str1=N'C6953DF4-41BB-4BDE-8A34-23B81BA716034',@Str2=N'',@Id1=0,@Id2=0,@UserId=0
@@ -141,5 +165,7 @@ IF @Action ='DataUpdate'
 --Add Mobile nvarchar(200)
 
 --Update WRBHBFeedBckForms set MObile='',Email=''
+--update WRBHBCheckInHdr set MobileNo='' where MobileNo=0
+--alter table  WRBHBCheckInHdr Alter Column  MobileNo    Nvarchar(100);
  
    

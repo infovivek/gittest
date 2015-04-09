@@ -81,11 +81,13 @@ UPDATE WRBHBBookingPropertyAssingedGuest SET CurrentStatus = 'CheckIn' ,
  WHERE BookingId=@BookingId and GuestId=@GuestId AND IsActive= 1 and IsDeleted = 0 );
  
  
- UPDATE WRBHBBedBookingPropertyAssingedGuest SET CurrentStatus = 'CheckIn' 
+ UPDATE WRBHBBedBookingPropertyAssingedGuest SET CurrentStatus = 'CheckIn' ,
+ CheckInHdrId = (SELECT Id  FROM WRBHBCheckInHdr WHERE Id=@InsId)
  WHERE BookingId=@BookingId and  BedId =@BedId AND --GuestId = @GuestId
  IsActive= 1 and IsDeleted = 0;
  
- UPDATE WRBHBApartmentBookingPropertyAssingedGuest SET CurrentStatus = 'CheckIn' 
+ UPDATE WRBHBApartmentBookingPropertyAssingedGuest SET CurrentStatus = 'CheckIn' ,
+ CheckInHdrId = (SELECT Id  FROM WRBHBCheckInHdr WHERE Id=@InsId)
  WHERE BookingId=@BookingId and  ApartmentId =@ApartmentId AND --GuestId=@GuestId and
  IsActive= 1 and IsDeleted = 0;
 
